@@ -146,12 +146,12 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
       component: literal`affine-data-view`,
     },
   },
-  /* {
+  {
     schema: DividerBlockSchema,
     view: {
       component: literal`affine-divider`,
     },
-  },*/
+  },
   {
     schema: CodeBlockSchema,
     view: {
@@ -189,13 +189,13 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
     },
     service: AttachmentService,
   },
-  //EmbedFigmaBlockSpec,
-  //EmbedYoutubeBlockSpec,
-  //EmbedGithubBlockSpec,
-  //EmbedHtmlBlockSpec,
-  //EmbedLinkedDocBlockSpec,
-  //EmbedSyncedDocBlockSpec,
-  //EmbedLoomBlockSpec,
+  EmbedFigmaBlockSpec,
+  EmbedYoutubeBlockSpec,
+  EmbedGithubBlockSpec,
+  EmbedHtmlBlockSpec,
+  EmbedLinkedDocBlockSpec,
+  EmbedSyncedDocBlockSpec,
+  EmbedLoomBlockSpec,
 ];
 
 export const PageEditorBlockSpecs: BlockSpec[] = [
@@ -241,8 +241,6 @@ export const PageEditorBlockSpecsSimple: BlockSpec[] = [
     },
   },
 ];
-
-console.log('222222', PageEditorBlockSpecsSimple);
 
 export const EdgelessEditorBlockSpecs: BlockSpec[] = [
   EdgelessPageSpec,

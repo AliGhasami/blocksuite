@@ -1,8 +1,15 @@
 <template>
-  <main style="height: 450px" >
-<!--    this is editor-->
-    <div ref="refEditor" class="editor"></div>
-  </main>
+  <div>
+    <div>
+      <button @click="handleGetData">get data</button>
+      <button @click="handleSetData">set data</button>
+
+    </div>
+    <main style="height: 450px" >
+      <!--    this is editor-->
+      <div ref="refEditor" class="editor"></div>
+    </main>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -11,6 +18,16 @@ import { createEmptyDoc, PageEditor,EdgelessEditor,AffineEditorContainer } from 
 import { Text } from '@blocksuite/store';
 import {onMounted, ref} from "vue";
 const refEditor = ref<HTMLElement>(null)
+
+function handleGetData(){
+  console.log("1111")
+}
+
+function handleSetData(){
+  console.log(22222)
+}
+
+
 onMounted(()=>{
   const doc = createEmptyDoc().init();
   //const editor = new EdgelessEditor();

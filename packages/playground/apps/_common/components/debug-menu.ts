@@ -395,6 +395,7 @@ export class DebugMenu extends ShadowlessElement {
   }
 
   private async _exportSnapshot() {
+    console.log('this is clolection', this.collection);
     const file = await ZipTransformer.exportDocs(this.collection, [
       ...this.collection.docs.values(),
     ]);

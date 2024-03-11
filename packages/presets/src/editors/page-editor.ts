@@ -57,14 +57,10 @@ export class PageEditor extends WithDisposable(ShadowlessElement) {
   private _host: Ref<EditorHost> = createRef<EditorHost>();
 
   get host() {
-    console.log('this is host', this._host.value);
     return this._host.value as EditorHost;
   }
 
   override render() {
-    console.log('3333', this.hasViewport);
-    //console.log("1111",this.specs)
-    //this.specs=[]
     return html`
       <div
         class=${this.hasViewport

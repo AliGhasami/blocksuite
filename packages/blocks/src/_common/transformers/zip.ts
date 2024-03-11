@@ -16,8 +16,10 @@ async function exportDocs(collection: DocCollection, docs: Doc[]) {
 
   const job = new Job({ collection });
   const snapshots = await Promise.all(docs.map(job.docToSnapshot));
+  console.log('snapshots', snapshots);
 
   const collectionInfo = job.collectionInfoToSnapshot();
+  console.log('collectionInfo', collectionInfo);
   zip.file('info.json', JSON.stringify(collectionInfo, null, 2));
 
   snapshots.forEach(snapshot => {
