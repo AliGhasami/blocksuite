@@ -101,6 +101,7 @@ export class Job {
   }
 
   private _exportDocMeta(doc: Doc): DocSnapshot['meta'] {
+    //debugger;
     const docMeta = doc.meta;
 
     assertExists(docMeta);

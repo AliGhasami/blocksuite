@@ -13,7 +13,7 @@ import { replaceIdMiddleware } from './middlewares.js';
 
 async function exportDocs(collection: DocCollection, docs: Doc[]) {
   const zip = new JSZip();
-
+  //debugger;
   const job = new Job({ collection });
   const snapshots = await Promise.all(docs.map(job.docToSnapshot));
   console.log('snapshots', snapshots);

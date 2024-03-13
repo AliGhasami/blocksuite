@@ -3,7 +3,6 @@
     <div>
       <button @click="handleGetData">get data</button>
       <button @click="handleSetData">set data</button>
-
     </div>
     <main style="height: 450px" >
       <!--    this is editor-->
@@ -17,7 +16,7 @@ import '@blocksuite/presets/themes/affine.css';
 import { createEmptyDoc, PageEditor,EdgelessEditor,AffineEditorContainer } from '@blocksuite/presets';
 import { Text } from '@blocksuite/store';
 import {onMounted, ref} from "vue";
-const refEditor = ref<HTMLElement>(null)
+const refEditor = ref<HTMLElement | null>(null)
 
 function handleGetData(){
   console.log("1111")

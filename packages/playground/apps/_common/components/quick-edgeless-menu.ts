@@ -171,6 +171,7 @@ export class QuickEdgelessMenu extends ShadowlessElement {
   }
 
   private async _exportSnapshot() {
+    debugger;
     console.log('this is collection', this.collection);
     console.log('this is docs', this.doc);
     const zipTransformer = this.rootService.transformers.zip;
