@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 overrides:
   array-includes: npm:@nolyfill/array-includes@latest
   array.prototype.flat: npm:@nolyfill/array.prototype.flat@latest
@@ -552,25 +556,25 @@ importers:
   packages/simple:
     dependencies:
       '@blocksuite/blocks':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../blocks
       '@blocksuite/global':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../framework/global
       '@blocksuite/inline':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../framework/inline
       '@blocksuite/lit':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../framework/lit
       '@blocksuite/presets':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../presets
       '@blocksuite/store':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../framework/store
       '@blocksuite/sync':
-        specifier: workspace:*
+        specifier: ^0.12.0
         version: link:../framework/sync
       pinia:
         specifier: ^2.1.7
@@ -8971,7 +8975,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
