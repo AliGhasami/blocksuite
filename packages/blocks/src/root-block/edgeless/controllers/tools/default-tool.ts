@@ -1,14 +1,20 @@
 import type { PointerEventState } from '@blocksuite/block-std';
 import { DisposableGroup, noop } from '@blocksuite/global/utils';
 
-import { type EdgelessTool } from '../../../../_common/utils/index.js';
+import {
+  asyncFocusRichText,
+  buildPath,
+  type EdgelessTool,
+} from '../../../../_common/utils/index.js';
 import {
   type DefaultTool,
   handleNativeRangeAtPoint,
   resetNativeSelection,
   type Selectable,
 } from '../../../../_common/utils/index.js';
+import { clamp } from '../../../../_common/utils/math.js';
 import type { FrameBlockModel } from '../../../../frame-block/index.js';
+import type { NoteBlockModel } from '../../../../note-block/note-model.js';
 import {
   GroupElementModel,
   ShapeElementModel,
@@ -109,6 +115,14 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     return this.selection.selections;
   }
 
+  get _zoom() {
+    return this._edgeless.service.viewport.zoom;
+  }
+
+  get _readonly() {
+    return this._edgeless.doc.readonly;
+  }
+
   private _pick(x: number, y: number, options?: HitTestOptions) {
     const service = this._service;
     const modelPos = service.viewport.toModelCoord(x, y);
@@ -130,12 +144,60 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     });
   }
 
+  private _addEmptyParagraphBlock(note: NoteBlockModel) {
+    const blockId = this._doc.addBlock(
+      'affine:paragraph',
+      { type: 'text' },
+      note.id
+    );
+    if (blockId) {
+      asyncFocusRichText(this._edgeless.host, blockId)?.catch(console.error);
+    }
+  }
+
+  private _handleClickAtNoteBlock(note: NoteBlockModel, e: PointerEventState) {
+    // check if note has children blocks, if not, add a paragraph block and focus on it
+    if (note.children.length === 0) {
+      this._addEmptyParagraphBlock(note);
+    } else {
+      // handleNativeRangeAtPoint(e.raw.clientX, e.raw.clientY);
+      const noteBlockElement = this._edgeless.host.view.viewFromPath(
+        'block',
+        buildPath(note)
+      );
+      if (noteBlockElement) {
+        const rect = noteBlockElement.getBoundingClientRect();
+        const offsetY = 16 * this._zoom;
+        const offsetX = 2 * this._zoom;
+        const x = clamp(
+          e.raw.clientX,
+          rect.left + offsetX,
+          rect.right - offsetX
+        );
+        const y = clamp(
+          e.raw.clientY,
+          rect.top + offsetY,
+          rect.bottom - offsetY
+        );
+        handleNativeRangeAtPoint(x, y);
+        return;
+      }
+
+      handleNativeRangeAtPoint(e.raw.clientX, e.raw.clientY);
+    }
+  }
+
   private _handleClickOnSelected(element: EdgelessModel, e: PointerEventState) {
+    if (this._readonly) return;
+
     const { selectedIds, selections } = this.selection;
     const editing = selections[0]?.editing ?? false;
 
     // click the inner area of active text and note element
     if (selectedIds.length === 1 && selectedIds[0] === element.id && editing) {
+      if (isNoteBlock(element) && element.children.length === 0) {
+        this._addEmptyParagraphBlock(element);
+      }
       return;
     }
 
@@ -149,9 +211,9 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
         // If the previously selected element is a noteBlock and is in an active state,
         // then the currently clicked noteBlock should also be in an active state when selected.
         this._setSelectionState([element.id], true);
-        requestAnimationFrame(() => {
-          handleNativeRangeAtPoint(e.raw.clientX, e.raw.clientY);
-        });
+        this._edgeless.updateComplete
+          .then(() => this._handleClickAtNoteBlock(element, e))
+          .catch(console.error);
         return;
       }
     }

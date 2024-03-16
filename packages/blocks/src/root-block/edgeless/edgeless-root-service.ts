@@ -20,6 +20,7 @@ import {
 } from '../../surface-block/index.js';
 import type { ReorderingDirection } from '../../surface-block/managers/layer-manager.js';
 import { LayerManager } from '../../surface-block/managers/layer-manager.js';
+import { compare } from '../../surface-block/managers/layer-utils.js';
 import { Bound } from '../../surface-block/utils/bound.js';
 import { RootService } from '../root-service.js';
 import { EdgelessFrameManager } from './frame-manager.js';
@@ -61,7 +62,6 @@ export class EdgelessRootService extends RootService {
       blocks: TopLevelBlockModel[];
       shapes: CanvasElement[];
     }>(),
-    docLinkClicked: new Slot<{ docId: string; blockId?: string }>(),
     readonlyUpdated: new Slot<boolean>(),
     draggingAreaUpdated: new Slot(),
     navigatorSettingUpdated: new Slot<{
@@ -75,6 +75,12 @@ export class EdgelessRootService extends RootService {
     elementResizeStart: new Slot(),
     elementResizeEnd: new Slot(),
     toggleNoteSlicer: new Slot(),
+
+    docLinkClicked: new Slot<{
+      docId: string;
+      blockId?: string;
+    }>(),
+    tagClicked: new Slot<{ tagId: string }>(),
     editorModeSwitch: new Slot<'edgeless' | 'page'>(),
   };
 
@@ -151,6 +157,17 @@ export class EdgelessRootService extends RootService {
    */
   get elements() {
     return this._layer.canvasElements;
+  }
+
+  /**
+   * sorted edgeless elements
+   */
+  get edgelessElements() {
+    return [
+      ...this._layer.canvasElements,
+      ...this._layer.blocks,
+      ...this._layer.frames,
+    ].sort(compare);
   }
 
   get frames() {
