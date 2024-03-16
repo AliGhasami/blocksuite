@@ -197,10 +197,13 @@ export class QuickEdgelessMenu extends ShadowlessElement {
       }
       try {
         const zipTransformer = this.rootService.transformers.zip;
+        console.log('this is file', file);
         const docs = await zipTransformer.importDocs(this.collection, file);
         console.log('this is docs', docs);
         for (const doc of docs) {
+          console.log('this is doc 1111', window.doc);
           const noteBlock = window.doc.getBlockByFlavour('affine:note');
+          console.log('this is note block', noteBlock);
           window.doc.addBlock(
             'affine:paragraph',
             {

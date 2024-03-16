@@ -23,7 +23,8 @@ function handleGetData(){
 }
 
 function handleSetData(){
-  console.log(22222)
+
+
 }
 
 

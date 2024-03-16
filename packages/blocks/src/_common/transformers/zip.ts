@@ -9,6 +9,7 @@ import type {
 import { getAssetName, Job, sha } from '@blocksuite/store';
 import JSZip from 'jszip';
 
+import { cloneDeep } from '../../root-block/edgeless/components/toolbar/template/utils.js';
 import { replaceIdMiddleware } from './middlewares.js';
 
 async function exportDocs(collection: DocCollection, docs: Doc[]) {
@@ -41,6 +42,7 @@ async function exportDocs(collection: DocCollection, docs: Doc[]) {
 }
 
 async function importDocs(collection: DocCollection, imported: Blob) {
+  //debugger;
   const zip = new JSZip();
   const { files } = await zip.loadAsync(imported);
 
@@ -134,7 +136,7 @@ async function importDocs(collection: DocCollection, imported: Blob) {
       });
 
       await Promise.all(tasks);
-
+      console.log('this is snapshot', cloneDeep(snapshot));
       return job.snapshotToDoc(snapshot);
     })
   );
