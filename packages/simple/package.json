@@ -1,11 +1,46 @@
 {
-  "name": "simple",
-  "version": "0.0.0",
-  "private": true,
+  "name": "vue-tri-state-checkbox",
+  "private": false,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatijaNovosel/tri-state-checkbox.git"
+  },
+  "version": "0.0.4",
+  "keywords": [
+    "checkbox",
+    "vue-tri-state-checkbox",
+    "material",
+    "material-ui",
+    "vue3",
+    "vue",
+    "vuejs"
+  ],
+  "files": [
+    "dist",
+    "src/components/"
+  ],
+  "description": "A test component library",
+  "main": "./dist/vue-tri-state-checkbox.umd.cjs",
+  "module": "./dist/vue-tri-state-checkbox.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-tri-state-checkbox.js",
+      "require": "./dist/vue-tri-state-checkbox.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "ali ghasami",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
@@ -13,16 +48,17 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "pinia": "^2.1.7",
-    "vue": "^3.4.15",
-    "vue-router": "^4.2.5",
-    "@blocksuite/sync": "workspace:*",
     "@blocksuite/blocks": "workspace:*",
     "@blocksuite/global": "workspace:*",
     "@blocksuite/inline": "workspace:*",
     "@blocksuite/lit": "workspace:*",
     "@blocksuite/presets": "workspace:*",
-    "@blocksuite/store": "workspace:*"
+    "@blocksuite/store": "workspace:*",
+    "@blocksuite/sync": "workspace:*",
+    "pinia": "^2.1.7",
+    "vite-plugin-dts": "^3.7.3",
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.3.3",

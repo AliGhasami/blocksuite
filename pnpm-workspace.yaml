@@ -10,4 +10,3 @@ packages:
   - 'packages/playground'
   - 'packages/presets'
   - 'packages/simple'
-  - 'packages/claytap'
