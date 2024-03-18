@@ -1,5 +1,5 @@
 import {
-  PageEditorBlockSpecs,
+  //PageEditorBlockSpecs,
   PageEditorBlockSpecsSimple,
 } from '@blocksuite/blocks';
 import { noop } from '@blocksuite/global/utils';
