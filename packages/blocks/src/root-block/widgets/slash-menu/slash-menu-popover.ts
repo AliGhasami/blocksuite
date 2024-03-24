@@ -210,6 +210,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
       this._leftPanelActivated = false;
     }
     const searchStr = this._searchString.toLowerCase();
+    console.log('this is options', this.options);
     let allMenus = this.options.menus
       .map(group =>
         typeof group.items === 'function'
@@ -219,7 +220,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
           : group.items.map(item => ({ ...item, groupName: group.name }))
       )
       .flat();
-
+    console.log('this is all menu', allMenus);
     allMenus = allMenus.filter(({ showWhen = () => true }) =>
       showWhen(this.model, this.rootElement)
     );
@@ -327,6 +328,8 @@ export class SlashMenu extends WithDisposable(LitElement) {
       : styleMap({
           visibility: 'hidden',
         });
+
+    console.log('1111', this._filterItems);
 
     const btnItems = this._filterItems.map(
       ({ name, icon, suffix, disabled = false, groupName }, index) => {

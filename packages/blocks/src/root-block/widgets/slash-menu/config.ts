@@ -167,7 +167,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
       })),
   },
 
-  {
+  /* {
     name: 'Docs',
     items: [
       {
@@ -215,7 +215,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         },
       },
     ],
-  },
+  },*/
   {
     name: 'Content & Media',
     items: [
@@ -400,7 +400,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
       },
     ],
   },
-  {
+  /* {
     name: 'Date & Time',
     items: [
       {
@@ -447,7 +447,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         },
       },
     ],
-  },
+  },*/
   {
     name: 'Database',
     items: [
@@ -605,7 +605,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
       );
     },
   },
-  {
+  /*{
     name: 'Actions',
     items: [
       {
@@ -697,5 +697,5 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         },
       },
     ],
-  },
+  },*/
 ];
