@@ -158,6 +158,7 @@ export class ImageService extends BlockService<ImageBlockModel> {
   };
 
   override mounted(): void {
+    // debugger;
     super.mounted();
 
     this.selectionManager.register(ImageSelection);

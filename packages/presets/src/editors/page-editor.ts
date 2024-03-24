@@ -1,7 +1,4 @@
-import {
-  //PageEditorBlockSpecs,
-  PageEditorBlockSpecsSimple,
-} from '@blocksuite/blocks';
+import { PageEditorBlockSpecs } from '@blocksuite/blocks';
 import { noop } from '@blocksuite/global/utils';
 import { EditorHost, ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import type { Doc } from '@blocksuite/store';
@@ -48,8 +45,7 @@ export class PageEditor extends WithDisposable(ShadowlessElement) {
   doc!: Doc;
 
   @property({ attribute: false })
-  specs = PageEditorBlockSpecsSimple;
-  //specs = PageEditorBlockSpecs;
+  specs = PageEditorBlockSpecs;
 
   @property({ type: Boolean })
   hasViewport = true;
