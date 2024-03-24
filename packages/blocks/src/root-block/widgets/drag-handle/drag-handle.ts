@@ -1641,6 +1641,7 @@ export class AffineDragHandleWidget extends WidgetElement<
       <div class="affine-drag-handle-widget">
         <div class="affine-drag-handle-container">
           <div class="affine-drag-handle-grabber"></div>
+          <span>11111</span>
         </div>
         <div class="affine-drag-hover-rect" style=${hoverRectStyle}></div>
       </div>

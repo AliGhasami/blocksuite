@@ -28,7 +28,7 @@ import { SurfaceRefBlockSchema } from './surface-ref-block/surface-ref-model.js'
 
 /** Built-in first party block models built for affine */
 export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
-  //CodeBlockSchema,
+  CodeBlockSchema,
   ParagraphBlockSchema,
   RootBlockSchema,
   //ListBlockSchema,

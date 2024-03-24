@@ -3,6 +3,7 @@ import { DocCollection, Schema } from '@blocksuite/store';
 
 export function createEmptyDoc() {
   //console.log('AffineSchemas', AffineSchemas);
+  //AffineSchemas
   const schema = new Schema().register(AffineSchemas);
   //console.log("this is schema",schema)
   const collection = new DocCollection({ schema });

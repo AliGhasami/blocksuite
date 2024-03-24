@@ -25,9 +25,7 @@ const refEditor = ref<HTMLElement | null>(null)
 function handleGetData(){
   //console.log("1111")
 }
-
 function handleSetData(){
-
 }
 */
 
@@ -61,7 +59,6 @@ onMounted(async ()=>{
   const paragraphs = doc.getBlockByFlavour('affine:paragraph');
   const paragraph = paragraphs[0];
   doc.updateBlock(paragraph, { text: new Text('Hello World!') });
-
 })
 
 

@@ -253,6 +253,7 @@ export class ParagraphBlockComponent extends BlockElement<
   };
 
   override renderBlock(): TemplateResult<1> {
+    /*console.log('5555555');*/
     const { type } = this.model;
     const children = html`<div
       class="affine-block-children-container"
@@ -263,6 +264,7 @@ export class ParagraphBlockComponent extends BlockElement<
 
     return html`
       <div class="affine-paragraph-block-container">
+        <!-- <span>11111</span>-->
         <div class="affine-paragraph-rich-text-wrapper ${type}">
           <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}
