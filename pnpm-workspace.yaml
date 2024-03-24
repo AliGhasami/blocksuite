@@ -10,3 +10,4 @@ packages:
   - 'packages/playground'
   - 'packages/presets'
   - 'packages/simple'
+  - 'packages/simple-editor'
