@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <div>
+  <div style="padding-top: 30px">
+<!--    <div>
       <button @click="handleGetData">get data</button>
       <button @click="handleSetData">set data</button>
-    </div>
+    </div>-->
     <main style="height: 450px" >
       <!--    this is editor-->
       <div ref="refEditor" class="editor"></div>
@@ -13,13 +13,14 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css';
-import { createEmptyDoc, PageEditor,EdgelessEditor,AffineEditorContainer } from '@blocksuite/presets';
-import {DocCollection, Job, Schema, Text} from '@blocksuite/store';
+import { createEmptyDoc, PageEditor } from '@blocksuite/presets';
+import {Text} from '@blocksuite/store';
 import {onMounted, ref} from "vue";
-import {AffineSchemas} from "@blocksuite/blocks";
+///import {AffineSchemas} from "@blocksuite/blocks";
 //import sampleData from "./data"
 const refEditor = ref<HTMLElement | null>(null)
 
+/*
 function handleGetData(){
   //console.log("1111")
 }
@@ -27,6 +28,7 @@ function handleGetData(){
 function handleSetData(){
 
 }
+*/
 
 
 /*onMounted(()=>{
@@ -47,7 +49,6 @@ function handleSetData(){
 })*/
 
 onMounted(async ()=>{
-
   const doc = createEmptyDoc().init();
   const editor = new PageEditor();
   editor.doc = doc;
@@ -59,7 +60,6 @@ onMounted(async ()=>{
   const paragraphs = doc.getBlockByFlavour('affine:paragraph');
   const paragraph = paragraphs[0];
   doc.updateBlock(paragraph, { text: new Text('Hello World!') });
-
   //return
   //const doc = createEmptyDoc().init();
   //debugger;
