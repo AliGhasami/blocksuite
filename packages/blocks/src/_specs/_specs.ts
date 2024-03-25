@@ -219,7 +219,7 @@ export const PageEditorBlockSpecs: BlockSpec[] = [
     },
   },
 ];
-console.log('2222222222', PageEditorBlockSpecs);
+//console.log('2222222222', PageEditorBlockSpecs);
 
 export const EdgelessEditorBlockSpecs: BlockSpec[] = [
   EdgelessPageSpec,

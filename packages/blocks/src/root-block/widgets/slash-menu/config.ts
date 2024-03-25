@@ -75,6 +75,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
           return true;
         },
         action: ({ rootElement }) => {
+          //debugger;
           rootElement.host.std.command
             .chain()
             .updateBlockType({

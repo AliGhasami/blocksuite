@@ -28,10 +28,10 @@ export const styles = css`
   }
 
   .affine-drag-handle-grabber {
-    width: 4px;
-    height: 100%;
+    //width: 4px;
+    //height: 100%;
     border-radius: 1px;
-    background: var(--affine-placeholder-color);
+    //background: var(--affine-placeholder-color);
     transition: width 0.25s ease;
   }
 

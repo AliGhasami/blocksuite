@@ -1,5 +1,5 @@
 import { AffineSchemas } from '@blocksuite/blocks/schemas';
-import { DocCollection, Schema } from '@blocksuite/store';
+import {DocCollection, Schema, Text} from '@blocksuite/store';
 
 export function createEmptyDoc() {
   //console.log('AffineSchemas', AffineSchemas);
@@ -14,10 +14,17 @@ export function createEmptyDoc() {
     init() {
       doc.load();
       const rootId = doc.addBlock('affine:page', {});
+      console.log("this is root id",rootId)
       doc.addBlock('affine:surface', {}, rootId);
       const noteId = doc.addBlock('affine:note', {}, rootId);
+      console.log("this is note id",noteId)
       doc.addBlock('affine:paragraph', {}, noteId);
-      return doc;
+      doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
+      //doc.addBlock('affine:divider', {}, noteId);
+      return {doc,noteId};
     },
   };
 }
