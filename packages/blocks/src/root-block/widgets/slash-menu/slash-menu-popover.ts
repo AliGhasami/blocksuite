@@ -1,10 +1,12 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { WithDisposable } from '@blocksuite/lit';
+import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import { type BlockModel } from '@blocksuite/store';
-import { html, LitElement, nothing } from 'lit';
+import { html, nothing } from 'lit'; //LitElement
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
+//import { literal, unsafeStatic } from 'lit/static-html.js';
 import {
   cleanSpecifiedTail,
   createKeydownObserver,
@@ -15,6 +17,7 @@ import {
 } from '../../../_common/utils/index.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { RootBlockComponent } from '../../../root-block/types.js';
+import { clayTapGroupMenu } from './menu.js';
 import { styles } from './styles.js';
 import {
   collectGroupNames,
@@ -24,7 +27,7 @@ import {
 } from './utils.js';
 
 @customElement('affine-slash-menu')
-export class SlashMenu extends WithDisposable(LitElement) {
+export class SlashMenu extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
   @property({ attribute: false })
@@ -308,6 +311,27 @@ export class SlashMenu extends WithDisposable(LitElement) {
     </div>`;
   }
 
+  private _clayTapMenu() {
+    return html`<div>
+      ${clayTapGroupMenu.map(itemGroup => {
+        return html`<span class="group-title"> ${itemGroup.groupName} </span>
+          <div class="claytap-slash-menu">
+            ${itemGroup.children.map(item => {
+              return html`<div class="claytap-slash-menu-item">
+                <div style="width: 40px;height: 40px">
+                  ${html`${unsafeSVG(item.icon)}`}
+                </div>
+                <div class="item-title">
+                  <span class="title">${item.title}</span>
+                  <span class="description">${item.description}</span>
+                </div>
+              </div>`;
+            })}
+          </div>`;
+      })}
+    </div>`;
+  }
+
   override render() {
     if (this._hide) {
       return nothing;
@@ -373,9 +397,12 @@ export class SlashMenu extends WithDisposable(LitElement) {
         @click="${() => this.abortController.abort()}"
       ></div>
       <div class="slash-menu" style="${slashMenuStyles}">
+        <!--        1111 1111 1111 1111 1111 1111 1111 1111-->
         ${this._categoryTemplate()}
         <div class="slash-item-container">${btnItems}</div>
+        <!-- <div class="slash-item-container">${this._clayTapMenu()}</div> -->
       </div>
     </div>`;
   }
 }
+// ${this._categoryTemplate()}
