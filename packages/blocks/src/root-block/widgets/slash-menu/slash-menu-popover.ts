@@ -1,7 +1,7 @@
 import { assertExists } from '@blocksuite/global/utils';
 import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import { type BlockModel } from '@blocksuite/store';
-import { html, nothing } from 'lit'; //LitElement
+import { html, LitElement, nothing } from 'lit'; //LitElement
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -27,7 +27,8 @@ import {
 } from './utils.js';
 
 @customElement('affine-slash-menu')
-export class SlashMenu extends WithDisposable(ShadowlessElement) {
+export class SlashMenu extends WithDisposable(LitElement) {
+  //ShadowlessElement
   static override styles = styles;
 
   @property({ attribute: false })
@@ -398,9 +399,8 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       ></div>
       <div class="slash-menu" style="${slashMenuStyles}">
         <!--        1111 1111 1111 1111 1111 1111 1111 1111-->
-        ${this._categoryTemplate()}
         <div class="slash-item-container">${btnItems}</div>
-        <!-- <div class="slash-item-container">${this._clayTapMenu()}</div> -->
+        <!-- <div class="slash-item-container">${this._clayTapMenu()}</div>*/ -->
       </div>
     </div>`;
   }

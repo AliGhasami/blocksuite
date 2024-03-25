@@ -24,11 +24,12 @@ export const styles = css`
     top: 0;
     box-sizing: border-box;
     font-size: var(--affine-font-base);
-    //padding: 12px 0;
+    padding: 12px 0;
     display: flex;
-    //background: var(--affine-background-overlay-panel-color);
-    //box-shadow: var(--affine-shadow-2);
-    //border-radius: 12px;
+
+    background: var(--affine-background-overlay-panel-color);
+    box-shadow: var(--affine-shadow-2);
+    border-radius: 12px;
     z-index: var(--affine-z-index-popover);
     /* transition: max-height 0.2s ease-in-out; */
   }
@@ -97,7 +98,7 @@ export const styles = css`
     box-sizing: border-box;
     overflow-y: auto;
     padding: 0 8px;
-    width: 300px;
+    width: 200px;
   }
 
   ${scrollbarStyle('.slash-item-container')}
