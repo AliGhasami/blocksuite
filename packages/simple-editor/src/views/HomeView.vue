@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <Editor />
+  <div style="padding-top: 30px;">
+<!--    style="border:1px solid red"-->
+    <Editor  />
   </div>
 </template>
 

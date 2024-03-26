@@ -1,8 +1,29 @@
 {
-  "name": "editor",
+  "name": "vue-block-editor",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "type": "module",
+  "files": [
+    "dist",
+    "src/components/"
+  ],
+  "main": "./dist/vue-block-editor.umd.cjs",
+  "module": "./dist/vue-block-editor.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-block-editor.js",
+      "require": "./dist/vue-block-editor.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "Ali Ghasami",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -17,6 +38,7 @@
     "less": "^4.2.0",
     "pinia": "^2.1.7",
     "unocss-preset-autoprefixer": "^0.0.7",
+    "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

@@ -17,7 +17,14 @@ import type { ParagraphService } from './paragraph-service.js';
 
 const getPlaceholder = (model: ParagraphBlockModel) => {
   if (model.type === 'text') {
-    return "Type '/' for commands";
+    return html`<span class="place-holder">
+      Press
+      <span class="short-code">@</span>
+      for AI &
+      <span class="short-code">/</span>
+      for Commands ...
+    </span>`;
+    //return "Type '/' for commands";
   }
 
   const placeholders = {
@@ -229,6 +236,17 @@ export class ParagraphBlockComponent extends BlockElement<
     )
       return;
 
+    console.log('1111111', this.doc.getBlockByFlavour('affine:note'));
+    console.log('22222222', this.dataset.blockId);
+    console.log('22222222', this.childBlockElements);
+    //const temp = this.rootElement);
+    //if (temp) {
+    //console.log('11111', this.inlineEditor.toDomRange(temp));
+    //console.log('222222', this.inlineEditor.toDomRange(temp), this);
+    //console.log('3333', this.inlineEditor.getLine(temp.index));
+    //}
+
+    //console.log('222', this.inlineEditor.isLastLine(null));
     if (
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
@@ -253,7 +271,6 @@ export class ParagraphBlockComponent extends BlockElement<
   };
 
   override renderBlock(): TemplateResult<1> {
-    /*console.log('5555555');*/
     const { type } = this.model;
     const children = html`<div
       class="affine-block-children-container"
@@ -264,7 +281,6 @@ export class ParagraphBlockComponent extends BlockElement<
 
     return html`
       <div class="affine-paragraph-block-container">
-        <!-- <span>11111</span>-->
         <div class="affine-paragraph-rich-text-wrapper ${type}">
           <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}

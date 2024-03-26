@@ -6,6 +6,7 @@ import UnoCSS from 'unocss/vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import { resolve } from 'path'
+import dts from "vite-plugin-dts";
 
 
 
@@ -16,6 +17,7 @@ export default defineConfig({
     vueJsx(),
     VueDevTools(),
     UnoCSS(),
+    dts(),
   ],
   resolve: {
     alias: {
@@ -36,5 +38,20 @@ export default defineConfig({
         javascriptEnabled: true
       }
     }
-  }
+  },
+  build: {
+    lib: {
+      entry: resolve(__dirname, "src/index.ts"),
+      name: "Editor",
+      fileName: "vue-editor",
+    },
+    rollupOptions: {
+      external: ["vue"],
+      output: {
+        globals: {
+          vue: "Vue",
+        },
+      },
+    },
+  },
 })

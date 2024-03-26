@@ -28,6 +28,7 @@ import {
 
 @customElement('affine-slash-menu')
 export class SlashMenu extends WithDisposable(LitElement) {
+  //export class SlashMenu extends WithDisposable(ShadowlessElement) {
   //ShadowlessElement
   static override styles = styles;
 

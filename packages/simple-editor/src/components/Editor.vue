@@ -1,13 +1,13 @@
 <template>
-  <div style="padding-top: 30px" >
-    <div>
-      <button @click="handleAddDivider">Add Divider</button>
+  <div class="vue-block-editor">
+<!--    <div>-->
+<!--      <button @click="handleAddDivider">Add Divider</button>-->
 <!--      <button @click="handleSetData">set data</button>-->
-    </div>
-    <main style="height: 450px" >
+<!--    </div>-->
+<!--    <main style="height: 450px" >-->
       <!--    this is editor-->
       <div ref="refEditor" class="editor"></div>
-    </main>
+<!--    </main>-->
   </div>
 </template>
 
@@ -59,13 +59,13 @@ onMounted(async ()=>{
     refEditor.value.appendChild(editor);
   }
   // Update block node with some initial text content
-  const paragraphs = doc.getBlockByFlavour('affine:paragraph');
-  const paragraph = paragraphs[0];
-  doc.updateBlock(paragraph, { text: new Text('Hello World!') });
+  //const paragraphs = doc.getBlockByFlavour('affine:paragraph');
+  //const paragraph = paragraphs[0];
+  //doc.updateBlock(paragraph, { text: new Text('Hello World!') });
 })
 
 
-function handleAddDivider(){
+/*function handleAddDivider(){
   if(myDoc){
     console.log("this is doc",myDoc)
     //const noteId=doc.
@@ -79,14 +79,31 @@ function handleAddDivider(){
     //doc.updateBlock(paragraph, { text: new Text('Hello World!') });
   }
 
-}
-
-
-
+}*/
 
 </script>
 
 <style lang="less">
+
+.vue-block-editor{
+
+  .place-holder{
+    @apply text-neutral-4;
+    //background-color: red;
+    .short-code{
+      border-radius: 4px;
+      @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
+    }
+
+  }
+
+
+
+  /*.editor{
+      display: block;
+      height: 650px;
+  }*/
+}
 
 .slash-menu{
   @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
@@ -123,10 +140,7 @@ function handleAddDivider(){
 }
 
 
-.editor{
-  display: block;
-  height: 650px;
-}
+
 </style>
 
 
