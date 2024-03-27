@@ -20,7 +20,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
     groupName: 'Text Style',
     children: [
       {
-        title: 'Heading 1',
+        title: 'Text',
         description: 'Big Heading.',
         icon: h1,
         action: () => {
@@ -28,64 +28,24 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
       {
-        title: 'Heading 2',
-        description: 'Medium Heading.',
-        icon: h2,
-        action: () => {
-          //console.log(1111);
-        },
-      },
-      {
-        title: 'Heading 3',
-        description: 'Small Heading',
-        icon: h3,
-        action: () => {
-          //console.log(1111);
-        },
-      },
-      {
-        title: 'Bulleted List',
-        description: 'Description Bulleted List',
-        icon: bulleted_list,
-        action: () => {
-          //console.log(1111);
-        },
-      },
-      {
-        title: 'Check List',
-        description: 'Description Check List',
-        icon: check_list,
-        action: () => {
-          //console.log(1111);
-        },
-      },
-      {
-        title: 'Numbered List',
-        description: 'Description Check List',
-        icon: numbered_list,
-        action: () => {
-          //console.log(1111);
-        },
-      },
-      {
-        title: 'Quote',
-        description: 'Description Quote',
+        title: 'HeadingB',
+        description: 'Big Heading.',
         icon: h1,
         action: () => {
           //console.log(1111);
         },
       },
       {
-        title: 'Divider',
-        description: 'Description Divider',
-        icon: divider,
+        title: 'Kanban View',
+        description: 'Big Heading.',
+        icon: h1,
         action: () => {
           //console.log(1111);
         },
       },
     ],
   },
-  {
+  /*{
     groupName: 'Insert',
     children: [
       {
@@ -97,8 +57,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
     ],
-  },
-  {
+  },*/
+  /*{
     groupName: 'Text Style',
     children: [
       {
@@ -110,5 +70,5 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
     ],
-  },
+  },*/
 ];

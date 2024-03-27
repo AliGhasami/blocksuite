@@ -1,7 +1,7 @@
 <template>
   <div style="padding-top: 30px;">
-<!--    style="border:1px solid red"-->
-    <Editor  />
+<!--    min-height: 450px;max-height: 450px;overflow-y: scroll-->
+    <Editor   style="border:1px solid pink;min-height: 600px"  />
   </div>
 </template>
 

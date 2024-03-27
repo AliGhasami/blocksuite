@@ -87,17 +87,54 @@ onMounted(async ()=>{
 
 .vue-block-editor{
 
+  .affine-paragraph-block-container{
+    &:hover .place-holder{
+      @apply text-neutral-6;
+    }
+
+    /*&:hover{
+      //background-color: red;
+    }*/
+
+    /*&:active{
+      background-color: red;
+    }*/
+
+  }
+
+  /*.with-drag-handle{
+    //background-color: red;
+  }*/
+
+  /*.affine-paragraph-placeholder{
+    //background-color: red;
+    cursor: pointer !important;
+
+   !* &.hover{
+      //background-color: green;
+    }*!
+
+  }*/
+
   .place-holder{
     @apply text-neutral-4;
+    transition: all 0.3s ease-in-out;
     //background-color: red;
     .short-code{
       border-radius: 4px;
       @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
     }
 
+    & .hover{
+      color:red;
+    }
+
+    &:hover{
+      color: red;
+      background-color:red;
+    }
+
   }
-
-
 
   /*.editor{
       display: block;
@@ -105,7 +142,7 @@ onMounted(async ()=>{
   }*/
 }
 
-.slash-menu{
+/*.slash-menu{
   @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
   border-radius: var(--mt-roundness-3);
 
@@ -137,7 +174,7 @@ onMounted(async ()=>{
     background: #F4F4F5;
     }
   }
-}
+}*/
 
 
 

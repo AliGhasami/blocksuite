@@ -236,27 +236,38 @@ export class ParagraphBlockComponent extends BlockElement<
     )
       return;
 
-    console.log('1111111', this.doc.getBlockByFlavour('affine:note'));
-    console.log('22222222', this.dataset.blockId);
-    console.log('22222222', this.childBlockElements);
-    //const temp = this.rootElement);
-    //if (temp) {
-    //console.log('11111', this.inlineEditor.toDomRange(temp));
-    //console.log('222222', this.inlineEditor.toDomRange(temp), this);
-    //console.log('3333', this.inlineEditor.getLine(temp.index));
-    //}
-
-    //console.log('222', this.inlineEditor.isLastLine(null));
+    //TODO(@alighasami) check is last Paragraph
+    /*let isLastParagraph = false;
+    const note = this.doc.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].children : [];
+    const currentBlockId = this.dataset.blockId;
+    if (
+      paragraphList.length &&
+      paragraphList[paragraphList.length - 1].id == currentBlockId
+    ) {
+      isLastParagraph = true;
+    }*/
+    let isEmpty = false;
+    const note = this.doc.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].children : [];
+    if (paragraphList.length == 1) {
+      isEmpty = true;
+    }
     if (
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
-      !this.selected ||
+      (!this.selected && !isEmpty) ||
       this._isInDatabase()
     ) {
       this._placeholderContainer.classList.remove('visible');
     } else {
       this._placeholderContainer.classList.add('visible');
     }
+    if (this.selected) {
+      this._placeholderContainer.classList.add('hover');
+    }
+    //console.log('is selected', this.selected);
+    //if()
   };
 
   private _isInDatabase = () => {

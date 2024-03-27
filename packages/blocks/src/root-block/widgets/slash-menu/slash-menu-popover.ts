@@ -239,6 +239,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
   }
 
   private _scrollToItem(item: SlashItem, force = true) {
+    console.log('this is');
     const shadowRoot = this.shadowRoot;
     if (!shadowRoot) {
       return;
@@ -314,24 +315,48 @@ export class SlashMenu extends WithDisposable(LitElement) {
   }
 
   private _clayTapMenu() {
-    return html`<div>
+    return html`
       ${clayTapGroupMenu.map(itemGroup => {
-        return html`<span class="group-title"> ${itemGroup.groupName} </span>
-          <div class="claytap-slash-menu">
-            ${itemGroup.children.map(item => {
-              return html`<div class="claytap-slash-menu-item">
-                <div style="width: 40px;height: 40px">
-                  ${html`${unsafeSVG(item.icon)}`}
-                </div>
-                <div class="item-title">
-                  <span class="title">${item.title}</span>
-                  <span class="description">${item.description}</span>
-                </div>
-              </div>`;
-            })}
-          </div>`;
+        return html` ${itemGroup.children.map(
+            ({ title, disabled = false }, index) => {
+              return html` <icon-button
+                class="slash-item ${title}"
+                ?disabled=${disabled}
+                width="100%"
+                height="32px"
+                style="padding-left: 12px; justify-content: flex-start; gap: 8px;"
+                hover=${!disabled &&
+                !this._leftPanelActivated &&
+                this._activatedItemIndex === index
+                  ? 'true'
+                  : 'false'}
+                text="${title}"
+                data-testid="${title}"
+                @mousemove=${() => {
+                  // Use `mousemove` instead of `mouseover` to avoid navigate conflict in left panel
+                  this._leftPanelActivated = false;
+                  this._activatedItemIndex = index;
+                }}
+                @click=${() => {
+                  this._handleClickItem(index);
+                }}
+              >
+                111111111
+              </icon-button>`;
+              /*return html`<div class="claytap-slash-menu-item">
+              <div style="width: 40px;height: 40px">
+                ${html`${unsafeSVG(item.icon)}`}
+              </div>
+              <div class="item-title">
+                <span class="title">${item.title}</span>
+                <span class="description">${item.description}</span>
+              </div>
+            </div>`;*/
+            }
+          )}
+          <!-- </div> -->`;
       })}
-    </div>`;
+    `;
   }
 
   override render() {
@@ -392,6 +417,42 @@ export class SlashMenu extends WithDisposable(LitElement) {
           </icon-button>`;
       }
     );
+    console.log('this is filter list', this._filterItems);
+    const myBtnItems = this._filterItems.map(
+      ({ name, icon, suffix, disabled = false, groupName }, index) => {
+        const showDivider =
+          index !== 0 && this._filterItems[index - 1].groupName !== groupName;
+        return html`<div
+            class="slash-item-divider"
+            ?hidden=${!showDivider || !!this._searchString.length}
+          ></div>
+          <icon-button
+            class="slash-item ${name}"
+            ?disabled=${disabled}
+            width="100%"
+            height="32px"
+            style="padding-left: 12px; justify-content: flex-start; gap: 8px;"
+            hover=${!disabled &&
+            !this._leftPanelActivated &&
+            this._activatedItemIndex === index
+              ? 'true'
+              : 'false'}
+            text="${name}"
+            data-testid="${name}"
+            @mousemove=${() => {
+              // Use `mousemove` instead of `mouseover` to avoid navigate conflict in left panel
+              this._leftPanelActivated = false;
+              this._activatedItemIndex = index;
+            }}
+            @click=${() => {
+              this._handleClickItem(index);
+            }}
+          >
+            ${icon}
+            <div slot="suffix">${suffix}</div>
+          </icon-button>`;
+      }
+    );
 
     return html`<div class="slash-menu-container blocksuite-overlay">
       <div
@@ -400,8 +461,9 @@ export class SlashMenu extends WithDisposable(LitElement) {
       ></div>
       <div class="slash-menu" style="${slashMenuStyles}">
         <!--        1111 1111 1111 1111 1111 1111 1111 1111-->
-        <div class="slash-item-container">${btnItems}</div>
-        <!-- <div class="slash-item-container">${this._clayTapMenu()}</div>*/ -->
+        <div class="slash-item-container">${this._clayTapMenu()}</div>
+        <!-- <div class="slash-item-container">${btnItems}</div> -->
+        <!-- <div class="slash-item-container">${myBtnItems}</div>-->
       </div>
     </div>`;
   }
