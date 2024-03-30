@@ -158,6 +158,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
         }
       },
       onMove: step => {
+        console.log('this is move');
         const configLen = this._filterItems.length;
         if (this._leftPanelActivated) {
           const groupNames = collectGroupNames(this._filterItems);
