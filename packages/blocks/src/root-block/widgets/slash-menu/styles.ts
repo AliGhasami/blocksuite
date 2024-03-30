@@ -23,12 +23,11 @@ export const styles = css`
     left: 0;
     top: 0;
     box-sizing: border-box;
-    font-size: var(--affine-font-base);
-    padding: 12px 0;
+    //font-size: var(--affine-font-base);
+    //padding: 12px 0;
     display: flex;
-
-    background: var(--affine-background-overlay-panel-color);
-    box-shadow: var(--affine-shadow-2);
+    //background: var(--affine-background-overlay-panel-color);
+    //box-shadow: var(--affine-shadow-2);
     border-radius: 12px;
     z-index: var(--affine-z-index-popover);
     /* transition: max-height 0.2s ease-in-out; */
@@ -113,38 +112,9 @@ export const styles = css`
     fill: var(--affine-error-color);
   }
 
-  .slash-menu {
-    //background-color: red;
-    //@apply pt-3 pb-1 shadow-floated border-roundness bg-white;
-    //border-radius: var(--mt-roundness-3);
-
-    .group-title {
-      //@apply mt-footnote text-neutral-5 block my-2;
-    }
-
-    .title {
-      //@apply mt-overline;
-    }
-
-    .item-title {
-      //@apply py-2 flex flex-col; //gap-2
-    }
-
-    .description {
-      //@apply mt-footnote text-neutral-5;
-    }
-
-    .claytap-slash-menu {
-      //@apply flex flex-col gap-2;
-      //width: 260px;
-    }
-
-    .claytap-slash-menu-item {
-      //@apply py-1 gap-4 items-center flex px-2 cursor-pointer;
-      /*border-radius: 4px;
-      &:hover {
-        background: #f4f4f5;
-      }*/
-    }
+  .claytap-slash-menu-item.hover {
+    background-color: #1e96eb;
+  }
+  
   }
 `;

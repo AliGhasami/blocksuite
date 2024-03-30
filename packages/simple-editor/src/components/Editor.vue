@@ -142,7 +142,8 @@ onMounted(async ()=>{
   }*/
 }
 
-/*.slash-menu{
+.slash-menu{
+  background-color: red;
   @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
   border-radius: var(--mt-roundness-3);
 
@@ -170,11 +171,11 @@ onMounted(async ()=>{
   .claytap-slash-menu-item {
     @apply py-1 gap-4 items-center flex px-2 cursor-pointer;
     border-radius: 4px;
-    &:hover{
+    &:hover,&.hover{
     background: #F4F4F5;
     }
   }
-}*/
+}
 
 
 

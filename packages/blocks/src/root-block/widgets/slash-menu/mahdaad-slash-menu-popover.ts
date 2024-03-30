@@ -1,10 +1,12 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { WithDisposable } from '@blocksuite/lit';
+import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import { type BlockModel } from '@blocksuite/store';
-import { html, LitElement, nothing } from 'lit';
+import { html, LitElement, nothing } from 'lit'; //LitElement
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
+//import { literal, unsafeStatic } from 'lit/static-html.js';
 import {
   cleanSpecifiedTail,
   createKeydownObserver,
@@ -15,6 +17,7 @@ import {
 } from '../../../_common/utils/index.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { RootBlockComponent } from '../../../root-block/types.js';
+import { clayTapGroupMenu, type ClayTapSlashMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
 import {
   collectGroupNames,
@@ -24,7 +27,7 @@ import {
 } from './utils.js';
 
 @customElement('affine-slash-menu')
-export class SlashMenu extends WithDisposable(LitElement) {
+export class SlashMenu extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
   @property({ attribute: false })
@@ -49,7 +52,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
   private _activatedItemIndex = 0;
 
   @state()
-  private _filterItems: InternalSlashItem[] = [];
+  private _filterItems: ClayTapSlashMenu[] = [];
 
   @state()
   private _hide = false;
@@ -71,6 +74,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
    * Does not include the slash character
    */
   private _searchString = '';
+  private slasheMenuID = 'mahdaad-claytap-slash-menu';
 
   override connectedCallback() {
     super.connectedCallback();
@@ -127,22 +131,22 @@ export class SlashMenu extends WithDisposable(LitElement) {
           this._hide = false;
         }
 
-        const isControlled = isControlledKeyboardEvent(e);
-        const isShift = e.shiftKey;
-        if (e.key === 'ArrowLeft' && !isControlled && !isShift) {
+        //const isControlled = isControlledKeyboardEvent(e);
+        //const isShift = e.shiftKey;
+        /*if (e.key === 'ArrowLeft' && !isControlled && !isShift) {
           e.stopPropagation();
           e.preventDefault();
           // If the left panel is hidden, should not activate it
           if (this._searchString.length) return;
           this._leftPanelActivated = true;
           return;
-        }
-        if (e.key === 'ArrowRight' && !isControlled && !isShift) {
+        }*/
+        /*if (e.key === 'ArrowRight' && !isControlled && !isShift) {
           e.stopPropagation();
           e.preventDefault();
           this._leftPanelActivated = false;
           return;
-        }
+        }*/
         next();
       },
       onUpdateQuery: val => {
@@ -153,8 +157,9 @@ export class SlashMenu extends WithDisposable(LitElement) {
         }
       },
       onMove: step => {
+        //console.log('this is move');
         const configLen = this._filterItems.length;
-        if (this._leftPanelActivated) {
+        /*if (this._leftPanelActivated) {
           const groupNames = collectGroupNames(this._filterItems);
           const nowGroupIdx = groupNames.findIndex(
             groupName =>
@@ -167,17 +172,20 @@ export class SlashMenu extends WithDisposable(LitElement) {
             ];
           this._handleClickCategory(targetGroup);
           return;
-        }
-        let ejectedCnt = configLen;
-        do {
+        }*/
+        //let ejectedCnt = configLen;
+        this._activatedItemIndex =
+          (this._activatedItemIndex + step + configLen) % configLen;
+        /*do {
           this._activatedItemIndex =
             (this._activatedItemIndex + step + configLen) % configLen;
           // Skip disabled items
         } while (
-          this._filterItems[this._activatedItemIndex].disabled &&
+          //this._filterItems[this._activatedItemIndex].disabled &&
+          false &&
           // If all items are disabled, the loop will never end
           ejectedCnt--
-        );
+        );*/
 
         this._scrollToItem(this._filterItems[this._activatedItemIndex], false);
       },
@@ -202,15 +210,22 @@ export class SlashMenu extends WithDisposable(LitElement) {
     this.abortController.abort();
   };
 
-  private _updateItem(query: string): InternalSlashItem[] {
+  private _updateItem(query: string): ClayTapSlashMenu[] {
     this._searchString = query;
     this._activatedItemIndex = 0;
+    const _menu: ClayTapSlashMenu[] = [];
+    clayTapGroupMenu.map(group => {
+      _menu.push(
+        ...group.children.map(item => ({ ...item, group: group.groupName }))
+      );
+    });
     // Activate the right panel when search string is not empty
-    if (this._leftPanelActivated) {
+    /*if (this._leftPanelActivated) {
       this._leftPanelActivated = false;
-    }
+    }*/
     const searchStr = this._searchString.toLowerCase();
-    let allMenus = this.options.menus
+    //console.log('this is options', this.options);
+    /*let allMenus = this.options.menus
       .map(group =>
         typeof group.items === 'function'
           ? group
@@ -218,26 +233,26 @@ export class SlashMenu extends WithDisposable(LitElement) {
               .map(item => ({ ...item, groupName: group.name }))
           : group.items.map(item => ({ ...item, groupName: group.name }))
       )
-      .flat();
-
-    allMenus = allMenus.filter(({ showWhen = () => true }) =>
+      .flat();*/
+    //console.log('this is all menu', allMenus);
+    /*allMenus = allMenus.filter(({ showWhen = () => true }) =>
       showWhen(this.model, this.rootElement)
-    );
+    );*/
     if (!searchStr) {
-      return allMenus;
+      return _menu;
     }
 
-    return allMenus.filter(({ name, alias = [] }) =>
-      [name, ...alias].some(str => isFuzzyMatch(str, searchStr))
-    );
+    return _menu.filter(item => isFuzzyMatch(item.title, searchStr));
   }
 
-  private _scrollToItem(item: SlashItem, force = true) {
-    const shadowRoot = this.shadowRoot;
+  private _scrollToItem(item: ClayTapSlashMenu, force = true) {
+    /*const shadowRoot = this.rootElement;
     if (!shadowRoot) {
       return;
-    }
-    const ele = shadowRoot.querySelector(`icon-button[text="${item.name}"]`);
+    }*/
+    const ele = this.renderRoot.querySelector(
+      `#${this.slasheMenuID} div[text="menu-item-${item.title}"]`
+    );
     if (!ele) {
       return;
     }
@@ -253,7 +268,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
 
   private _handleClickItem(index: number) {
     if (
-      this._leftPanelActivated ||
+      //this._leftPanelActivated ||
       index < 0 ||
       index >= this._filterItems.length
     ) {
@@ -275,7 +290,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
     );
   }
 
-  private _handleClickCategory(groupName: string) {
+  /*private _handleClickCategory(groupName: string) {
     const item = this._filterItems.find(item => item.groupName === groupName);
     if (!item) return;
     this._scrollToItem(item);
@@ -283,8 +298,8 @@ export class SlashMenu extends WithDisposable(LitElement) {
       i => i.name === item.name
     );
   }
-
-  private _categoryTemplate() {
+*/
+  /* private _categoryTemplate() {
     const showCategory = !this._searchString.length;
     const activatedGroupName =
       this._filterItems[this._activatedItemIndex]?.groupName;
@@ -304,6 +319,45 @@ export class SlashMenu extends WithDisposable(LitElement) {
             ${groupName}
           </div>`
       )}
+    </div>`;
+  }*/
+
+  private _clayTapMenu() {
+    //console.log('this._activatedItemIndex', this._activatedItemIndex);
+    const group: string[] = [];
+    this._filterItems.forEach(item => {
+      if (item.group && !group.includes(item.group)) group.push(item.group);
+    });
+    let index = 0;
+    return html`<div>
+      ${group.map(itemGroup => {
+        return html`<span class="group-title"> ${itemGroup} </span>
+          <div class="claytap-slash-menu">
+            ${this._filterItems
+              .filter(item => item.group == itemGroup)
+              .map(item => {
+                const currentIndex = index;
+                return html`<div
+                  class="claytap-slash-menu-item ${this._activatedItemIndex ==
+                  index++
+                    ? 'hover'
+                    : ''}"
+                  text="menu-item-${item.title}"
+                  @click=${() => {
+                    return this._handleClickItem(currentIndex);
+                  }}
+                >
+                  <div style="width: 40px;height: 40px">
+                    ${html`${unsafeSVG(item.icon)}`}
+                  </div>
+                  <div class="item-title">
+                    <span class="title">${item.title}</span>
+                    <span class="description">${item.description}</span>
+                  </div>
+                </div>`;
+              })}
+          </div>`;
+      })}
     </div>`;
   }
 
@@ -328,7 +382,9 @@ export class SlashMenu extends WithDisposable(LitElement) {
           visibility: 'hidden',
         });
 
-    const btnItems = this._filterItems.map(
+    //console.log('1111', this._filterItems);
+
+    /* const btnItems = this._filterItems.map(
       ({ name, icon, suffix, disabled = false, groupName }, index) => {
         const showDivider =
           index !== 0 && this._filterItems[index - 1].groupName !== groupName;
@@ -363,15 +419,17 @@ export class SlashMenu extends WithDisposable(LitElement) {
           </icon-button>`;
       }
     );
-
-    return html`<div class="slash-menu-container blocksuite-overlay">
+*/
+    return html`<div
+      id="${this.slasheMenuID}"
+      class="slash-menu-container blocksuite-overlay"
+    >
       <div
         class="overlay-mask"
         @click="${() => this.abortController.abort()}"
       ></div>
       <div class="slash-menu" style="${slashMenuStyles}">
-        ${this._categoryTemplate()}
-        <div class="slash-item-container">${btnItems}</div>
+        <div class="slash-item-container">${this._clayTapMenu()}</div>
       </div>
     </div>`;
   }

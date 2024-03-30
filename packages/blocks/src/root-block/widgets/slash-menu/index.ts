@@ -18,7 +18,8 @@ import type { RootBlockComponent } from '../../../root-block/types.js';
 import { isRootElement } from '../../../root-block/utils/guard.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { menuGroups } from './config.js';
-import { SlashMenu } from './slash-menu-popover.js';
+//import { SlashMenu } from './slash-menu-popover.js';
+import { SlashMenu } from './mahdaad-slash-menu-popover.js';
 import type { SlashMenuOptions } from './utils.js';
 
 let globalAbortController = new AbortController();
