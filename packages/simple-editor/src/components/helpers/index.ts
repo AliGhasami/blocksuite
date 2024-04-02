@@ -13,6 +13,7 @@ export function createEmptyDoc() {
     doc,
     init() {
       doc.load();
+      console.log("this is doc",doc)
       const rootId = doc.addBlock('affine:page', {});
       //console.log("this is root id",rootId)
       doc.addBlock('affine:surface', {}, rootId);

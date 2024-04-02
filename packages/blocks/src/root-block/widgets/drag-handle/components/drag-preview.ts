@@ -24,8 +24,8 @@ export class DragPreview extends ShadowlessElement {
         font-family: ${baseTheme.fontSansFamily};
         font-size: var(--affine-font-base);
         line-height: var(--affine-line-height);
-        /*color: var(--affine-text-primary-color);*/
-        color: red;
+        color: var(--affine-text-primary-color);
+        /*color: red;*/
         font-weight: 400;
         top: 0;
         left: 0;

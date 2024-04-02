@@ -634,8 +634,8 @@ importers:
   packages/simple-editor:
     dependencies:
       '@mahdaad/tokens':
-        specifier: ^0.0.22
-        version: 0.0.22
+        specifier: ^0.0.27
+        version: 0.0.27
       less:
         specifier: ^4.2.0
         version: 4.2.0
@@ -2220,8 +2220,8 @@ packages:
       call-bind: 1.0.7
     dev: true
 
-  /@mahdaad/tokens@0.0.22:
-    resolution: {integrity: sha512-/NbY9bagQKPGVvYvcLXHLR2XRB+KEKI104kgbNwgAeelpUCdz8QvvrPBCaTBvpbj6Mu7jwBs1IyUqsdIQ5lFZg==}
+  /@mahdaad/tokens@0.0.27:
+    resolution: {integrity: sha512-/1+d7QXHtVI5kybsEBoob82PI2vZCPqUsthAU46s2PjCvfeve514fFO2/fby7lt8pUyrai0M1Ef1QtUfBWp5ug==}
     dependencies:
       mitt: 3.0.1
       tinycolor2: 1.6.0
