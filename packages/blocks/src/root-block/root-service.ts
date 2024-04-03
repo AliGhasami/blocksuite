@@ -184,7 +184,7 @@ export class RootService extends BlockService<RootBlockModel> {
   }
 
   loadFonts() {
-    this.fontLoader.load(CanvasTextFonts);
+    //this.fontLoader.load(CanvasTextFonts);
   }
 
   private _getLastNoteBlock() {

@@ -1,6 +1,5 @@
 import { AffineSchemas } from '@blocksuite/blocks/schemas';
-import {DocCollection, Schema, Text} from '@blocksuite/store';
-import {data} from '../temp/tempData'
+import {DocCollection, Schema} from '@blocksuite/store';
 export function createEmptyDoc() {
   //console.log('AffineSchemas', AffineSchemas);
   //AffineSchemas
@@ -20,7 +19,7 @@ export function createEmptyDoc() {
     doc,
     init() {
       doc.load();
-      console.log("this is doc",doc)
+      //console.log("this is doc",doc)
       const rootId = doc.addBlock('affine:page', {});
       //console.log("this is root id",rootId)
       doc.addBlock('affine:surface', {}, rootId);

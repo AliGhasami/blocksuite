@@ -2,6 +2,8 @@
   <div style="padding-top: 30px;">
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
+    <button @click="handleSetFocus">set focus</button>
+    <input style="margin-left: 30px" id="input"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
     <Editor ref="refEditor"  style="border:1px solid pink;min-height: 600px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
@@ -11,6 +13,7 @@
 <script setup lang="ts">
 import Editor from "@/components/Editor.vue";
 import {ref} from "vue";
+import {data} from "@/components/temp/tempData";
 
 const refEditor=ref(null)
 async function handleGetData(){
@@ -18,7 +21,13 @@ async function handleGetData(){
 }
 
 async function handleSetData(){
-  await refEditor?.value?.setData()
+  await refEditor?.value?.setData(data)
+}
+
+
+function handleSetFocus(){
+    //document.querySelector('#input').focus();
+    document.querySelector('affine-note').focus();
 }
 
 /*

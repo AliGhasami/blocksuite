@@ -148,7 +148,8 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       this._inlineEditor.setAttributeRenderer(this.attributeRenderer);
     }
     const inlineEditor = this._inlineEditor;
-
+    console.log('this is inline editor', inlineEditor);
+    inlineEditor.focusStart();
     const markdownShortcutHandler = this.markdownShortcutHandler;
     if (markdownShortcutHandler) {
       const keyDownHandler = createInlineKeyDownHandler(inlineEditor, {
