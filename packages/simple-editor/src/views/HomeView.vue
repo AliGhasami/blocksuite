@@ -2,7 +2,8 @@
   <div style="padding-top: 30px;">
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
-<!--    min-height: 450px;max-height: 450px;overflow-y: scroll-->
+<!--    <button @click="handleSetData2">set data 2</button>-->
+<!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
     <Editor ref="refEditor"  style="border:1px solid pink;min-height: 600px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
   </div>
 </template>
@@ -16,12 +17,15 @@ async function handleGetData(){
     await refEditor?.value?.getData()
 }
 
-
-
-
 async function handleSetData(){
   await refEditor?.value?.setData()
 }
+
+/*
+async function handleSetData2(){
+  await refEditor?.value?.setData(2)
+}
+*/
 
 function handleChange(data){
   console.log("this is change event",data)
@@ -38,11 +42,6 @@ function handleDeleteBlock(data){
 function handleUpdateBlock(data){
   console.log("this is update block event",data)
 }
-
-
-
-
-
 
 </script>
 

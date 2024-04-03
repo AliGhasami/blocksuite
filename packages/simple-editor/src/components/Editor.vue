@@ -15,14 +15,16 @@
 import '@blocksuite/presets/themes/affine.css';
 import { PageEditor } from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
-import {data} from './temp/tempData'
-import {type BlockModel, Doc, DocCollection, Job, Text} from '@blocksuite/store';
+//import {data, data2} from './temp/tempData'
+import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
 import {onMounted, ref} from "vue";
+import {replaceIdMiddleware} from "@blocksuite/blocks";
 ///import {AffineSchemas} from "@blocksuite/blocks";
 //import sampleData from "./data"
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 let editor: any = null
+let myCollection: DocCollection | null = null
 //let myNoteId : string | null=null
 
 type IBlockChange= {
@@ -59,30 +61,70 @@ async function getData(){
   //console.log("ref editor",refEditor.value)
 }
 
-
-async function setData(){
-  //currentDocument?.destroy()
+//TODO(@ali ghasami) for fix after and check performance
+async function setData(data:any){
+  //console.log("this is id",id)
   //currentDocument?.dispose()
+  //currentDocument?.destroy()
   //console.log("1111",currentDocument.collection)
-  const job = new Job({ collection: currentDocument.collection })
-  const new_doc = await job.snapshotToDoc(data)
-  //editor = new PageEditor()
-  //editor.doc = new_doc
-  console.log('this is set data', data)
-  currentDocument = editor.doc
-  bindEvent(editor.doc)
-  //editor.doc.load()
-  //editor.doc.resetHistory()
-  if (refEditor.value) {
-    const children = refEditor.value.children
-    console.log('refEditor', refEditor.value.children)
-    if (children.length) {
-      refEditor.value.removeChild(children[0])
+  if(myCollection){
+    /*myCollection.docs.forEach(item=>{
+      myCollection?.removeDoc(item.id)
+    })*/
+    //console.log("this is my collection",myCollection)
+    //return
+    //debugger
+    const _editor = new PageEditor();
+    //console.log("this is collcetion before remove",myCollection)
+    //myCollection.removeDoc(currentDocument?.id)
+    //console.log("this is collcetion after remove",myCollection)
+    //_collection?.re
+    const job = new Job({ collection: myCollection, middlewares: [
+        replaceIdMiddleware
+      ]})
+    //data.meta.id=`xgtgs${Date.now()}`
+    //let new_doc=null
+   //if(id==2){
+     // new_doc = await job.snapshotToDoc(data2)
+    ///}else{
+     const new_doc = await job.snapshotToDoc(data)
+    console.log("this is doc",new_doc)
+    //}
+   //new_doc.load()
+    console.log("this is collcetion",myCollection)
+    console.log("this is new doc",new_doc)
+    //myCollection
+    //const _collection = editor.doc.collection;
+    //console.log("11111",_collection)
+    //const docs = [..._collection.docs.values()];
+    _editor.doc = new_doc
+    //editor.doc.load();
+    //editor.doc.resetHistory();
+    //currentDocument = editor.doc
+    if (refEditor.value) {
+      const children = refEditor.value.children
+      console.log('refEditor', refEditor.value.children)
+      if (children.length) {
+       refEditor.value.removeChild(children[0])
+      }
+      refEditor.value.appendChild(_editor)
+      //const childs = refEditor.value //refEditor.value.removeChild(ed)
+      //.appendChild(editor)
     }
-    refEditor.value.appendChild(editor)
-    //const childs = refEditor.value //refEditor.value.removeChild(ed)
-    //.appendChild(editor)
+    return
+    //editor = new PageEditor()
+    //new_doc.load()
+    //editor.doc.load();
+    //editor.doc.resetHistory();
+    //editor.doc.
+    //console.log('this is set data', data)
+    //currentDocument = editor.doc
+    //bindEvent(editor.doc)
+    //editor.doc.load()
+    //editor.doc.resetHistory()
+
   }
+
 
 }
 
@@ -125,7 +167,8 @@ function handleSetData(){
 })*/
 
 onMounted(async ()=>{
-  const {doc,noteId} = createEmptyDoc().init();
+  const {doc,noteId,collection} = createEmptyDoc().init();
+  myCollection= collection
   currentDocument=doc
   //myNoteId=noteId
   editor = new PageEditor();
@@ -136,7 +179,7 @@ onMounted(async ()=>{
   }
   //console.log("editor",editor,editor.slots)
   //console.log("doc",doc)
-  bindEvent(doc)
+ // bindEvent(doc)
   //editor.doc.destroy()
   //doc.destroy()
   // Update block node with some initial text content
