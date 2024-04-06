@@ -3,7 +3,7 @@
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
-    <input style="margin-left: 30px" id="input"  />
+    <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
     <Editor ref="refEditor"  style="border:1px solid pink;min-height: 600px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
@@ -25,9 +25,12 @@ async function handleSetData(){
 }
 
 
-function handleSetFocus(){
+async function handleSetFocus(){
+   refEditor?.value?.setFocus()
     //document.querySelector('#input').focus();
-    document.querySelector('affine-note').focus();
+    //document.querySelector('affine-note').focus();
+  //console.log("1111",document.querySelector('rich-text')?.inlineEditor)
+  //document.querySelector('rich-text')?.inlineEditor.focusEnd()
 }
 
 /*
@@ -37,19 +40,19 @@ async function handleSetData2(){
 */
 
 function handleChange(data){
-  console.log("this is change event",data)
+  //console.log("this is change event",data)
 }
 
 function handleAddBlock(data){
-  console.log("this is add block event",data)
+  //console.log("this is add block event",data)
 }
 
 function handleDeleteBlock(data){
-  console.log("this is delete block event",data)
+  //console.log("this is delete block event",data)
 }
 
 function handleUpdateBlock(data){
-  console.log("this is update block event",data)
+  //console.log("this is update block event",data)
 }
 
 </script>

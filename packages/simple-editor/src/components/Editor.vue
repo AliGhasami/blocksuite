@@ -11,6 +11,7 @@ import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
 import {onMounted, ref} from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
+import {HTMLElement} from "happy-dom";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 //let editor: any = null
@@ -151,10 +152,10 @@ onMounted(async ()=>{
     refEditor.value.appendChild(editor);
   }
   bindEvent(doc)
-  console.log("1111",editor)
-  console.log("2222",doc)
-  const a=doc.getBlockByFlavour('affine:paragraph')
-  console.log("this is a",a[0])
+  //console.log("1111",editor)
+  //console.log("2222",doc)
+  //const a=doc.getBlockByFlavour('affine:paragraph')
+  //console.log("this is a",a[0])
   //console.log("editor",editor,editor.slots)
   //console.log("doc",doc)
   //editor.doc.destroy()
@@ -177,9 +178,30 @@ async function exportData(collection : DocCollection, docs:any[]) {
   return null
 }
 
+function setFocus(){
+  if(refEditor.value){
+    const editor=(refEditor.value as HTMLElement).querySelector('rich-text')
+    if(editor && editor.inlineEditor){
+      editor.inlineEditor.focusEnd()
+    }
+    //console.log("55555",editor)
+  }
+  //console.log("ggg",refEditor.value)
+}
+
+onMounted(()=>{
+  setTimeout(()=>{
+    setFocus()
+  },5000)
+
+  //console.log("111",refEditor.value)
+})
+
+
 defineExpose({
   getData,
   setData,
+  setFocus
 })
 
 
