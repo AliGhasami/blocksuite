@@ -1,6 +1,6 @@
 {
   "name": "alighasami_vue-block-editor",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "private": false,
   "type": "module",
   "files": [
@@ -26,7 +26,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",

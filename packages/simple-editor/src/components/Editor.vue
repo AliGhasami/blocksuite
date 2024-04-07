@@ -11,7 +11,6 @@ import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
 import {onMounted, ref} from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
-import {HTMLElement} from "happy-dom";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 //let editor: any = null
@@ -189,13 +188,13 @@ function setFocus(){
   //console.log("ggg",refEditor.value)
 }
 
-onMounted(()=>{
+/*onMounted(()=>{
   setTimeout(()=>{
     setFocus()
   },5000)
 
   //console.log("111",refEditor.value)
-})
+})*/
 
 
 defineExpose({
