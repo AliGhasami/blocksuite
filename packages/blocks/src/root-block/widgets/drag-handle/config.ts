@@ -6,7 +6,7 @@ import type { Point, Rect } from '../../../_common/utils/index.js';
 import type { DragPreview } from './components/drag-preview.js';
 
 export const DRAG_HANDLE_CONTAINER_HEIGHT = 20;
-export const DRAG_HANDLE_CONTAINER_WIDTH = 16;
+export const DRAG_HANDLE_CONTAINER_WIDTH = 50;
 export const DRAG_HANDLE_CONTAINER_WIDTH_TOP_LEVEL = 4;
 export const DRAG_HANDLE_CONTAINER_OFFSET_LEFT = 10;
 export const DRAG_HANDLE_CONTAINER_OFFSET_LEFT_LIST = 18;

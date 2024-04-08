@@ -263,7 +263,7 @@ function runCommand(
   flavour: BlockSuite.Flavour,
   type: string
 ) {
-  console.log('this is root element', rootElement);
+  //console.log('this is root element', rootElement);
   rootElement.host.std.command
     .chain()
     .updateBlockType({

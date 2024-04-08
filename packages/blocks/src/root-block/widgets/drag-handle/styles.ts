@@ -15,8 +15,8 @@ export const styles = css`
     top: 0;
     left: 0;
     position: absolute;
-    display: flex;
-    justify-content: center;
+    //display: flex;
+    //justify-content: center;
     width: ${DRAG_HANDLE_CONTAINER_WIDTH}px;
     min-height: 12px;
     pointer-events: auto;
@@ -24,7 +24,7 @@ export const styles = css`
     box-sizing: border-box;
   }
   .affine-drag-handle-container:hover {
-    cursor: grab;
+    //cursor: grab;
   }
 
   .affine-drag-handle-grabber {
@@ -33,6 +33,20 @@ export const styles = css`
     border-radius: 1px;
     //background: var(--affine-placeholder-color);
     transition: width 0.25s ease;
+  }
+
+  .affine-drag-handle-grabber {
+    .add-icon {
+      cursor: pointer;
+    }
+    .drag-icon {
+      cursor: grab;
+    }
+  }
+
+  .affine-drag-handle-grabber-icons {
+    display: flex;
+    gap: 10px;
   }
 
   @media print {

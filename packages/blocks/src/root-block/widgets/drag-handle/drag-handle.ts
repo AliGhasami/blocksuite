@@ -55,7 +55,7 @@ import {
   DRAG_HOVER_RECT_PADDING,
   HOVER_AREA_RECT_PADDING_TOP_LEVEL,
 } from './config.js';
-import { gripVertical } from './icons.js';
+import { gripVertical, plus } from './icons.js';
 import { styles } from './styles.js';
 import {
   calcDropTarget,
@@ -486,6 +486,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     this._anchorBlockId = '';
     this._anchorBlockPath = null;
 
+    //todo ali ghasami
     if (this._dragHandleContainer) {
       this._dragHandleContainer.style.display = 'none';
     }
@@ -604,9 +605,9 @@ export class AffineDragHandleWidget extends WidgetElement<
       container.style.width = `${
         DRAG_HANDLE_CONTAINER_WIDTH * this.scale * this.noteScale
       }px`;
-      container.style.left = `${draggingAreaRect.left}px`;
+      //container.style.left = `${draggingAreaRect.left}px`;
       container.style.top = `${draggingAreaRect.top}px`;
-      container.style.display = 'flex';
+      container.style.display = 'block';
       container.style.height = `${draggingAreaRect.height}px`;
     };
 
@@ -678,7 +679,8 @@ export class AffineDragHandleWidget extends WidgetElement<
     container.style.width = `${
       DRAG_HANDLE_CONTAINER_WIDTH_TOP_LEVEL * this.scale
     }px`;
-    container.style.left = `${posLeft}px`;
+    //container.style.left = `${posLeft}px`;
+    container.style.left = `30px`;
     container.style.top = `${posTop}px`;
     container.style.display = 'flex';
     container.style.height = `${height}px`;
@@ -1650,7 +1652,10 @@ export class AffineDragHandleWidget extends WidgetElement<
             111
           </span>-->
           <div class="affine-drag-handle-grabber">
-            ${unsafeSVG(gripVertical)}
+            <div class="affine-drag-handle-grabber-icons">
+              <span class="add-icon"> ${unsafeSVG(plus)} </span>
+              <span class="drag-icon"> ${unsafeSVG(gripVertical)} </span>
+            </div>
             <!--           <svg
               width="8"
               height="12"

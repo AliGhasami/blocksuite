@@ -80,7 +80,7 @@ export class PageRootBlockComponent extends BlockElement<
       //padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
       /* prettier-ignore */
       //padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
-      padding-left: 30px;
+      padding-left: 50px;
     }
 
     /* Extra small devices (phones, 640px and down) */
