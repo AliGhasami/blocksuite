@@ -23,12 +23,11 @@ export const styles = css`
     left: 0;
     top: 0;
     box-sizing: border-box;
-    font-size: var(--affine-font-base);
-    padding: 12px 0;
+    //font-size: var(--affine-font-base);
+    //padding: 12px 0;
     display: flex;
-
-    background: var(--affine-background-overlay-panel-color);
-    box-shadow: var(--affine-shadow-2);
+    //background: var(--affine-background-overlay-panel-color);
+    //box-shadow: var(--affine-shadow-2);
     border-radius: 12px;
     z-index: var(--affine-z-index-popover);
     /* transition: max-height 0.2s ease-in-out; */
