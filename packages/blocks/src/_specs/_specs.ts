@@ -34,6 +34,7 @@ import {
 } from '../root-block/index.js';
 import { PageRootService } from '../root-block/page/page-root-service.js';
 import { RootBlockSchema } from '../root-block/root-model.js';
+import { AFFINE_ADD_BLOCK_HANDLE_WIDGET } from '../root-block/widgets/add-block-handle/add-block-handle.js';
 import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../root-block/widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../root-block/widgets/drag-handle/drag-handle.js';
 import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../root-block/widgets/edgeless-remote-selection/index.js';
@@ -69,6 +70,9 @@ const DocPageSpec: BlockSpec<PageRootBlockWidgetName> = {
       )}`,*/
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
+      )}`,
+      [AFFINE_ADD_BLOCK_HANDLE_WIDGET]: literal`${unsafeStatic(
+        AFFINE_ADD_BLOCK_HANDLE_WIDGET
       )}`,
       [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
         AFFINE_FORMAT_BAR_WIDGET

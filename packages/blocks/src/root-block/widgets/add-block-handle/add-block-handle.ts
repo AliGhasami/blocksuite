@@ -14,14 +14,10 @@ import { type BlockModel } from '@blocksuite/store';
 import { html, render } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import {
-  buildPath,
   type EdgelessTool,
-  getBlockElementsExcludeSubtrees,
   getCurrentNativeRange,
-  getModelByBlockComponent,
   isInsideEdgelessEditor,
   isInsidePageEditor,
   matchFlavours,
@@ -34,12 +30,12 @@ import {
   getSelectedRect,
   isTopLevelBlock,
 } from '../../../root-block/edgeless/utils/query.js';
-import { PageRootBlockComponent } from '../../../root-block/page/page-root-block.js';
+import type { PageRootBlockComponent } from '../../../root-block/page/page-root-block.js';
 import { autoScroll } from '../../../root-block/text-selection/utils.js';
 import { Bound, type IVec } from '../../../surface-block/index.js';
 import type { EdgelessBlockModel } from '../../edgeless/type.js';
-import { DragPreview } from './components/drag-preview.js';
-import { DropIndicator } from './components/drop-indicator.js';
+//import { DragPreview } from './components/drag-preview.js';
+//import { DropIndicator } from './components/drop-indicator.js';
 import type { DragHandleOption, DropResult, DropType } from './config.js';
 import { DragHandleOptionsRunner } from './config.js';
 import {
@@ -54,7 +50,7 @@ import {
   DRAG_HOVER_RECT_PADDING,
   HOVER_AREA_RECT_PADDING_TOP_LEVEL,
 } from './config.js';
-import { gripVertical } from './icons.js';
+//import { gripVertical } from './icons.js';
 import { styles } from './styles.js';
 import {
   calcDropTarget,
@@ -65,7 +61,6 @@ import {
   getClosestNoteBlock,
   getDragHandleContainerHeight,
   getDragHandleLeftPadding,
-  getDuplicateBlocks,
   getNoteId,
   includeTextSelection,
   insideDatabaseTable,
@@ -74,10 +69,10 @@ import {
   updateDragHandleClassName,
 } from './utils.js';
 
-export const AFFINE_DRAG_HANDLE_WIDGET = 'affine-drag-handle-widget';
+export const AFFINE_ADD_BLOCK_HANDLE_WIDGET = 'affine-add-block-widget';
 
-@customElement(AFFINE_DRAG_HANDLE_WIDGET)
-export class AffineDragHandleWidget extends WidgetElement<
+@customElement(AFFINE_ADD_BLOCK_HANDLE_WIDGET)
+export class AffineAddBlockHandleWidget extends WidgetElement<
   EdgelessRootBlockComponent | PageRootBlockComponent
 > {
   static override styles = styles;
@@ -85,7 +80,7 @@ export class AffineDragHandleWidget extends WidgetElement<
   static staticOptionRunner = new DragHandleOptionsRunner();
 
   static registerOption(option: DragHandleOption) {
-    return AffineDragHandleWidget.staticOptionRunner.register(option);
+    return AffineAddBlockHandleWidget.staticOptionRunner.register(option);
   }
 
   @query('.affine-drag-handle-container')
@@ -98,8 +93,8 @@ export class AffineDragHandleWidget extends WidgetElement<
   dropBlockId = '';
   dropType: DropType | null = null;
   dragging = false;
-  dragPreview: DragPreview | null = null;
-  dropIndicator: DropIndicator | null = null;
+  //dragPreview: DragPreview | null = null;
+  //dropIndicator: DropIndicator | null = null;
   lastDragPointerState: PointerEventState | null = null;
   scale = 1;
   noteScale = 1;
@@ -128,7 +123,7 @@ export class AffineDragHandleWidget extends WidgetElement<
   private _anchorModelDisposables: DisposableGroup | null = null;
 
   get optionRunner() {
-    return AffineDragHandleWidget.staticOptionRunner;
+    return AffineAddBlockHandleWidget.staticOptionRunner;
   }
 
   get rootElement() {
@@ -156,17 +151,17 @@ export class AffineDragHandleWidget extends WidgetElement<
     return isTopLevelBlock(edgelessElement) ? edgelessElement : null;
   }
 
-  private _clearRaf() {
-    if (this.rafID) {
-      cancelAnimationFrame(this.rafID);
-      this.rafID = 0;
-    }
-  }
+  // private _clearRaf() {
+  //   if (this.rafID) {
+  //     cancelAnimationFrame(this.rafID);
+  //     this.rafID = 0;
+  //   }
+  // }
 
   /**
    * When dragging, should update indicator position and target drop block id
    */
-  private _getDropResult = (state: PointerEventState): DropResult | null => {
+  /*private _getDropResult = (state: PointerEventState): DropResult | null => {
     const point = new Point(state.raw.x, state.raw.y);
     const closestBlockElement = getClosestBlockByPoint(
       this.host,
@@ -239,10 +234,10 @@ export class AffineDragHandleWidget extends WidgetElement<
     };
 
     return dropIndicator;
-  };
+  };*/
 
-  private _updateDropResult = (dropResult: DropResult | null) => {
-    assertExists(this.dropIndicator);
+  /* private _updateDropResult = (dropResult: DropResult | null) => {
+    //assertExists(this.dropIndicator);
     this.dropBlockId = dropResult?.dropBlockId ?? '';
     this.dropType = dropResult?.dropType ?? null;
     if (dropResult?.rect) {
@@ -269,22 +264,22 @@ export class AffineDragHandleWidget extends WidgetElement<
     } else {
       this.dropIndicator.rect = dropResult?.rect ?? null;
     }
-  };
+  };*/
 
-  private _resetDropResult = () => {
+  /* private _resetDropResult = () => {
     this.dropBlockId = '';
     this.dropType = null;
     if (this.dropIndicator) this.dropIndicator.rect = null;
-  };
+  };*/
 
-  private _createDropIndicator = () => {
+  /*private _createDropIndicator = () => {
     if (!this.dropIndicator) {
       this.dropIndicator = new DropIndicator();
       this.rootElement.append(this.dropIndicator);
     }
-  };
+  };*/
 
-  private _updateDropIndicator = (
+  /* private _updateDropIndicator = (
     state: PointerEventState,
     shouldAutoScroll: boolean = false
   ) => {
@@ -319,9 +314,9 @@ export class AffineDragHandleWidget extends WidgetElement<
     } else {
       this._clearRaf();
     }
-  };
+  };*/
 
-  private _updateDropIndicatorOnScroll = () => {
+  /*private _updateDropIndicatorOnScroll = () => {
     if (
       !this.dragging ||
       this.draggingElements.length === 0 ||
@@ -334,62 +329,62 @@ export class AffineDragHandleWidget extends WidgetElement<
       this._updateDropIndicator(state, false)
     );
   };
-
-  private _removeDropIndicator = () => {
+*/
+  /* private _removeDropIndicator = () => {
     if (this.dropIndicator) {
       this.dropIndicator.remove();
       this.dropIndicator = null;
     }
-  };
+  };*/
 
-  private _calculatePreviewOffset = (
+  /*private _calculatePreviewOffset = (
     blockElements: BlockElement[],
     state: PointerEventState
   ) => {
     const { top, left } = blockElements[0].getBoundingClientRect();
     const previewOffset = new Point(state.raw.x - left, state.raw.y - top);
     return previewOffset;
-  };
+  };*/
 
-  private _createDragPreview = (
-    blockElements: BlockElement[],
-    state: PointerEventState,
-    dragPreviewEl?: HTMLElement,
-    dragPreviewOffset?: Point
-  ): DragPreview => {
-    let dragPreview: DragPreview;
-    if (dragPreviewEl) {
-      dragPreview = new DragPreview(dragPreviewOffset);
-      dragPreview.append(dragPreviewEl);
-    } else {
-      const fragment = document.createDocumentFragment();
-      let width = 0;
-      blockElements.forEach(element => {
-        width = Math.max(width, element.getBoundingClientRect().width);
-        const container = document.createElement('div');
-        render(this.host.renderModel(element.model), container);
-        fragment.append(container);
-      });
+  // private _createDragPreview = (
+  //   blockElements: BlockElement[],
+  //   state: PointerEventState,
+  //   dragPreviewEl?: HTMLElement,
+  //   dragPreviewOffset?: Point
+  // ): DragPreview => {
+  //   let dragPreview: DragPreview;
+  //   if (dragPreviewEl) {
+  //     dragPreview = new DragPreview(dragPreviewOffset);
+  //     dragPreview.append(dragPreviewEl);
+  //   } else {
+  //     const fragment = document.createDocumentFragment();
+  //     let width = 0;
+  //     blockElements.forEach(element => {
+  //       width = Math.max(width, element.getBoundingClientRect().width);
+  //       const container = document.createElement('div');
+  //       render(this.host.renderModel(element.model), container);
+  //       fragment.append(container);
+  //     });
+  //
+  //     const offset = this._calculatePreviewOffset(blockElements, state);
+  //     const posX = state.raw.x - offset.x;
+  //     const posY = state.raw.y - offset.y;
+  //     const altKey = state.raw.altKey;
+  //
+  //     dragPreview = new DragPreview(offset);
+  //     dragPreview.style.width = `${width / this.scale / this.noteScale / this.cumulativeParentScale}px`;
+  //     dragPreview.style.transform = `translate(${posX}px, ${posY}px) scale(${
+  //       this.scale * this.noteScale
+  //     })`;
+  //
+  //     dragPreview.style.opacity = altKey ? '1' : '0.5';
+  //     dragPreview.append(fragment);
+  //   }
+  //   this.rootElement.append(dragPreview);
+  //   return dragPreview;
+  // };
 
-      const offset = this._calculatePreviewOffset(blockElements, state);
-      const posX = state.raw.x - offset.x;
-      const posY = state.raw.y - offset.y;
-      const altKey = state.raw.altKey;
-
-      dragPreview = new DragPreview(offset);
-      dragPreview.style.width = `${width / this.scale / this.noteScale / this.cumulativeParentScale}px`;
-      dragPreview.style.transform = `translate(${posX}px, ${posY}px) scale(${
-        this.scale * this.noteScale
-      })`;
-
-      dragPreview.style.opacity = altKey ? '1' : '0.5';
-      dragPreview.append(fragment);
-    }
-    this.rootElement.append(dragPreview);
-    return dragPreview;
-  };
-
-  private _updateDragPreviewPosition = (state: PointerEventState) => {
+  /* private _updateDragPreviewPosition = (state: PointerEventState) => {
     if (!this.dragPreview) return;
 
     const rootElement = this.rootElement;
@@ -423,21 +418,21 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     const altKey = state.raw.altKey;
     this.dragPreview.style.opacity = altKey ? '1' : '0.5';
-  };
+  };*/
 
-  private _updateDragPreviewOnViewportUpdate = () => {
+  /* private _updateDragPreviewOnViewportUpdate = () => {
     if (this.dragPreview && this.lastDragPointerState) {
       this._updateDragPreviewPosition(this.lastDragPointerState);
     }
-  };
+  };*/
 
-  private _removeDragPreview = () => {
+  /* private _removeDragPreview = () => {
     if (this.dragPreview) {
       this.dragPreview.remove();
       this.dragPreview = null;
     }
   };
-
+*/
   private _changeCursorToGrabbing = () => {
     document.documentElement.classList.add('affine-drag-preview-grabbing');
   };
@@ -446,7 +441,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     document.documentElement.classList.remove('affine-drag-preview-grabbing');
   };
 
-  private _startDragging = (
+  /*  private _startDragging = (
     blockElements: BlockElement[],
     state: PointerEventState,
     dragPreviewEl?: HTMLElement,
@@ -473,7 +468,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     this._changeCursorToGrabbing();
     this._createDropIndicator();
     this._hide();
-  };
+  };*/
 
   private _hide = (force = false) => {
     updateDragHandleClassName();
@@ -511,8 +506,8 @@ export class AffineDragHandleWidget extends WidgetElement<
     this._isDragHandleHovered = false;
     this._isTopLevelDragHandleVisible = false;
 
-    this._removeDragPreview();
-    this._removeDropIndicator();
+    //this._removeDragPreview();
+    // this._removeDropIndicator();
     this._resetCursor();
   };
 
@@ -998,7 +993,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     const state = ctx.get('pointerState');
     const { target } = state.raw;
     const element = captureEventTarget(target);
-    const insideDragHandle = !!element?.closest(AFFINE_DRAG_HANDLE_WIDGET);
+    const insideDragHandle = !!element?.closest(AFFINE_ADD_BLOCK_HANDLE_WIDGET);
     if (!insideDragHandle) return;
 
     if (!this._anchorBlockId || !this._anchorBlockPath) return;
@@ -1031,7 +1026,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     return true;
   };
 
-  private _onDragStart = (state: PointerEventState) => {
+  /*private _onDragStart = (state: PointerEventState) => {
     const event = state.raw;
     const { target } = event;
     const element = captureEventTarget(target);
@@ -1100,9 +1095,9 @@ export class AffineDragHandleWidget extends WidgetElement<
     this._startDragging(blockElementsExcludingChildren, state);
     this._hide();
     return true;
-  };
+  };*/
 
-  private _onDragMove = (state: PointerEventState) => {
+  /* private _onDragMove = (state: PointerEventState) => {
     this._clearRaf();
 
     this.rafID = requestAnimationFrame(() => {
@@ -1110,9 +1105,9 @@ export class AffineDragHandleWidget extends WidgetElement<
       this._updateDropIndicator(state, true);
     });
     return true;
-  };
+  };*/
 
-  private _onDragEnd = (state: PointerEventState) => {
+  /*private _onDragEnd = (state: PointerEventState) => {
     const targetBlockId = this.dropBlockId;
     const dropType = this.dropType;
     const draggingElements = this.draggingElements;
@@ -1262,12 +1257,12 @@ export class AffineDragHandleWidget extends WidgetElement<
     }, 0);
 
     return true;
-  };
+  };*/
 
   /**
    * When start dragging, should set dragging elements and create drag preview
    */
-  private _dragStartHandler: UIEventHandler = ctx => {
+  /*private _dragStartHandler: UIEventHandler = ctx => {
     const state = ctx.get('pointerState');
     // If not click left button to start dragging, should do nothing
     const { button } = state.raw;
@@ -1290,7 +1285,7 @@ export class AffineDragHandleWidget extends WidgetElement<
       }
     }
     return this._onDragStart(state);
-  };
+  };*/
 
   /**
    * When dragging, should:
@@ -1298,7 +1293,7 @@ export class AffineDragHandleWidget extends WidgetElement<
    * Update indicator position
    * Update drop block id
    */
-  private _dragMoveHandler: UIEventHandler = ctx => {
+  /*private _dragMoveHandler: UIEventHandler = ctx => {
     if (this._isHoverDragHandleVisible || this._isTopLevelDragHandleVisible) {
       this._hide();
     }
@@ -1318,13 +1313,13 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     // call default drag move handler if no option return true
     return this._onDragMove(state);
-  };
+  };*/
 
   /**
    * When drag end, should move blocks to drop position
    * @returns
    */
-  private _dragEndHandler: UIEventHandler = ctx => {
+  /* private _dragEndHandler: UIEventHandler = ctx => {
     this._clearRaf();
     if (!this.dragging || !this.dragPreview) return false;
     if (this.draggingElements.length === 0 || this.doc.readonly) {
@@ -1367,7 +1362,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     }
 
     return true;
-  };
+  };*/
 
   private _pointerOutHandler: UIEventHandler = ctx => {
     const state = ctx.get('pointerState');
@@ -1387,13 +1382,15 @@ export class AffineDragHandleWidget extends WidgetElement<
     );
     const inPage = !!relatedElement?.closest('.affine-page-viewport');
 
-    const inDragHandle = !!relatedElement?.closest(AFFINE_DRAG_HANDLE_WIDGET);
+    const inDragHandle = !!relatedElement?.closest(
+      AFFINE_ADD_BLOCK_HANDLE_WIDGET
+    );
     if (outOfPageViewPort && !inDragHandle && !inPage) {
       this._hide();
     }
   };
 
-  private _keyboardHandler: UIEventHandler = ctx => {
+  /*private _keyboardHandler: UIEventHandler = ctx => {
     if (!this.dragging || !this.dragPreview) {
       return;
     }
@@ -1405,7 +1402,7 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     const altKey = event.key === 'Alt' && event.altKey;
     this.dragPreview.style.opacity = altKey ? '1' : '0.5';
-  };
+  };*/
 
   private _onDragHandlePointerEnter = () => {
     const container = this._dragHandleContainer;
@@ -1483,12 +1480,12 @@ export class AffineDragHandleWidget extends WidgetElement<
   }) => {
     if (this.scale !== zoom) {
       this.scale = zoom;
-      this._updateDragPreviewOnViewportUpdate();
+      //  this._updateDragPreviewOnViewportUpdate();
     }
 
     if (this.center[0] !== center[0] && this.center[1] !== center[1]) {
       this.center = [...center];
-      this._updateDropIndicatorOnScroll();
+      //this._updateDropIndicatorOnScroll();
     }
 
     if (this._isTopLevelDragHandleVisible) {
@@ -1540,19 +1537,19 @@ export class AffineDragHandleWidget extends WidgetElement<
       this._disposables.add(
         pageRoot.slots.viewportUpdated.on(() => {
           this._hide();
-          if (this.dropIndicator) {
+          /* if (this.dropIndicator) {
             this.dropIndicator.rect = null;
-          }
+          }*/
         })
       );
 
       const viewportElement = pageRoot.viewportElement;
       assertExists(viewportElement);
-      this._disposables.addFromEvent(
+      /*this._disposables.addFromEvent(
         viewportElement,
         'scrollend',
         this._updateDropIndicatorOnScroll
-      );
+      );*/
     } else if (isInsideEdgelessEditor(this.host)) {
       const edgelessRoot = this.rootElement as EdgelessRootBlockComponent;
 
@@ -1609,13 +1606,13 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     this.handleEvent('pointerMove', this._throttledPointerMoveHandler);
     this.handleEvent('click', this._clickHandler);
-    this.handleEvent('dragStart', this._dragStartHandler);
-    this.handleEvent('dragMove', this._dragMoveHandler);
-    this.handleEvent('dragEnd', this._dragEndHandler, { global: true });
+    //this.handleEvent('dragStart', this._dragStartHandler);
+    //this.handleEvent('dragMove', this._dragMoveHandler);
+    //this.handleEvent('dragEnd', this._dragEndHandler, { global: true });
     this.handleEvent('pointerOut', this._pointerOutHandler);
     this.handleEvent('beforeInput', () => this._hide());
-    this.handleEvent('keyDown', this._keyboardHandler, { global: true });
-    this.handleEvent('keyUp', this._keyboardHandler, { global: true });
+    //this.handleEvent('keyDown', this._keyboardHandler, { global: true });
+    // this.handleEvent('keyUp', this._keyboardHandler, { global: true });
   }
 
   override disconnectedCallback() {
@@ -1649,7 +1646,7 @@ export class AffineDragHandleWidget extends WidgetElement<
             111
           </span>-->
           <div class="affine-drag-handle-grabber">
-            ${unsafeSVG(gripVertical)}
+            11
             <!--           <svg
               width="8"
               height="12"
@@ -1705,6 +1702,6 @@ export class AffineDragHandleWidget extends WidgetElement<
 
 declare global {
   interface HTMLElementTagNameMap {
-    [AFFINE_DRAG_HANDLE_WIDGET]: AffineDragHandleWidget;
+    [AFFINE_ADD_BLOCK_HANDLE_WIDGET]: AffineAddBlockHandleWidget;
   }
 }
