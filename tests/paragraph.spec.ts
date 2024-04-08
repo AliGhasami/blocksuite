@@ -26,6 +26,7 @@ import {
   redoByKeyboard,
   resetHistory,
   setSelection,
+  switchReadonly,
   type,
   undoByClick,
   undoByKeyboard,
@@ -1308,22 +1309,13 @@ test('press arrow up in the second line should move caret to the first line', as
 
   // Focus the empty paragraph
   await focusRichText(page, 1);
-  await page.waitForTimeout(100);
   await assertRichTexts(page, ['ib'.repeat(75), '']);
-  await pressArrowUp(page);
-  await pressArrowUp(page);
+  await pressArrowUp(page, 2);
   await type(page, '0');
   await assertTitle(page, '');
   await assertRichTexts(page, ['0' + 'ib'.repeat(75), '']);
-  await pressArrowUp(page);
+  await pressArrowUp(page, 2);
 
-  // workaround for selection manager
-  // selection within the note uses direct document selection
-  // selection from one note to another or to title uses selection manager
-  // giving wait for selection manager to sync up with document selection
-  await page.waitForTimeout(100);
-
-  await pressArrowUp(page);
   // At title
   await type(page, '1');
   await assertTitle(page, '1');
@@ -1417,6 +1409,24 @@ test('should placeholder works', async ({ page }) => {
 
   await pressEnter(page);
   await expect(placeholder).toHaveCount(1);
+});
+
+test('should placeholder not show at readonly mode', async ({ page }) => {
+  await enterPlaygroundRoom(page);
+  await initEmptyParagraphState(page);
+  await focusRichText(page);
+
+  await pressEnter(page);
+  await updateBlockType(page, 'affine:paragraph', 'h1');
+
+  const placeholder = page.locator('.affine-paragraph-placeholder.visible');
+
+  await switchReadonly(page);
+  await focusRichText(page, 0);
+  await expect(placeholder).toBeHidden();
+
+  await focusRichText(page, 1);
+  await expect(placeholder).toBeHidden();
 });
 
 test.describe('press ArrowDown when cursor is at the last line of a block', () => {

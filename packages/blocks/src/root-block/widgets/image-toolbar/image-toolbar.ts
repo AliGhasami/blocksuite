@@ -1,16 +1,20 @@
-import { WidgetElement } from '@blocksuite/lit';
+import { WidgetElement } from '@blocksuite/block-std';
 import { limitShift, offset, shift } from '@floating-ui/dom';
 import { customElement } from 'lit/decorators.js';
 
 import { HoverController } from '../../../_common/components/hover/controller.js';
 import { PAGE_HEADER_HEIGHT } from '../../../_common/consts.js';
 import type { ImageBlockComponent } from '../../../image-block/image-block.js';
+import type { ImageBlockModel } from '../../../image-block/index.js';
 import { ImageOptionsTemplate } from './image-options.js';
 
 export const AFFINE_IMAGE_TOOLBAR_WIDGET = 'affine-image-toolbar-widget';
 
 @customElement(AFFINE_IMAGE_TOOLBAR_WIDGET)
-export class AffineImageToolbarWidget extends WidgetElement<ImageBlockComponent> {
+export class AffineImageToolbarWidget extends WidgetElement<
+  ImageBlockModel,
+  ImageBlockComponent
+> {
   private _hoverController = new HoverController(
     this,
     ({ abortController }) => {

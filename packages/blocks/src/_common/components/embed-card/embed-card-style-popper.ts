@@ -1,7 +1,7 @@
 import './../button.js';
 import '../tooltip/tooltip.js';
 
-import { WithDisposable } from '@blocksuite/lit';
+import { WithDisposable } from '@blocksuite/block-std';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -56,12 +56,16 @@ export class EmbedCardStyleMenu extends WithDisposable(LitElement) {
     const { EmbedCardHorizontalIcon, EmbedCardListIcon } = getEmbedCardIcons();
     return html`
       <div class="embed-card-style-menu">
-        <div class="embed-card-style-menu-container">
+        <div
+          class="embed-card-style-menu-container"
+          @pointerdown=${(e: MouseEvent) => e.stopPropagation()}
+        >
           <icon-button
             width="76px"
             height="76px"
             class=${classMap({
               selected: this.model.style === 'horizontal',
+              'card-style-button-horizontal': true,
             })}
             @click=${() => this._setEmbedCardStyle('horizontal')}
           >
@@ -76,6 +80,7 @@ export class EmbedCardStyleMenu extends WithDisposable(LitElement) {
             height="76px"
             class=${classMap({
               selected: this.model.style === 'list',
+              'card-style-button-list': true,
             })}
             @click=${() => this._setEmbedCardStyle('list')}
           >

@@ -2,7 +2,7 @@ import '../panel/font-family-panel.js';
 import '../panel/size-panel.js';
 import '../panel/font-weight-and-style-panel.js';
 
-import { WithDisposable } from '@blocksuite/lit';
+import { WithDisposable } from '@blocksuite/block-std';
 import { baseTheme } from '@toeverything/theme';
 import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -14,6 +14,7 @@ import {
   TextAlignRightIcon,
 } from '../../../../_common/icons/index.js';
 import type { CssVariableName } from '../../../../_common/theme/css-variables.js';
+import { createButtonPopper } from '../../../../_common/utils/button-popper.js';
 import { countBy, maxBy } from '../../../../_common/utils/iterable.js';
 import {
   isFontStyleSupported,
@@ -51,7 +52,6 @@ import {
   type EdgelessCanvasTextElement,
   type EdgelessCanvasTextElementType,
 } from '../text/types.js';
-import { createButtonPopper } from '../utils.js';
 import { ShapeArrowDownSmallIcon } from './../../../../_common/icons/index.js';
 
 @customElement('edgeless-change-text-menu')

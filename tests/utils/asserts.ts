@@ -3,6 +3,10 @@
 
 import './declare-test-window.js';
 
+import type {
+  BlockElement,
+  EditorHost,
+} from '@block-std/view/element/index.js';
 import { BLOCK_ID_ATTR, NOTE_WIDTH } from '@blocks/_common/consts.js';
 import type { CssVariableName } from '@blocks/_common/theme/css-variables.js';
 import type {
@@ -13,7 +17,6 @@ import type {
 } from '@blocks/index.js';
 import { assertExists } from '@global/utils/index.js';
 import type { InlineRootElement } from '@inline/inline-editor.js';
-import type { BlockElement, EditorHost } from '@lit/element/index.js';
 import type { Locator } from '@playwright/test';
 import { expect, type Page } from '@playwright/test';
 import { COLLECTION_VERSION, PAGE_VERSION } from '@store/consts.js';
@@ -800,6 +803,7 @@ export async function assertEdgelessDraggingArea(page: Page, xywh: number[]) {
   expect(box.width).toBeCloseTo(w, 0);
   expect(box.height).toBeCloseTo(h, 0);
 }
+
 export async function assertEdgelessSelectedRect(page: Page, xywh: number[]) {
   const [x, y, w, h] = xywh;
   const editor = getEditorLocator(page);
@@ -1078,4 +1082,16 @@ export async function assertBlockSelections(page: Page, paths: string[][]) {
   });
   const actualPaths = selections.map(selection => selection.path);
   expect(actualPaths).toEqual(paths);
+}
+
+export async function assertConnectorStrokeColor(
+  page: Page,
+  color: CssVariableName
+) {
+  const colorButton = page
+    .locator('edgeless-change-connector-button')
+    .locator('edgeless-color-panel')
+    .locator(`.color-unit[aria-label="${color}"]`);
+
+  expect(await colorButton.count()).toBe(1);
 }

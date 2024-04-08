@@ -1,3 +1,4 @@
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import {
   type AttributeRenderer,
@@ -8,7 +9,6 @@ import {
   type InlineRangeProvider,
   type KeyboardBindingContext,
 } from '@blocksuite/inline';
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import type { Y } from '@blocksuite/store';
 import { DocCollection, Text } from '@blocksuite/store';
 import { css, html } from 'lit';
@@ -40,6 +40,10 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       width: 100%;
       outline: none;
       cursor: text;
+    }
+
+    .inline-editor.readonly {
+      cursor: default;
     }
 
     rich-text .nowrap-lines {
@@ -215,8 +219,11 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       })
     );
 
-    inlineEditor.mount(this.inlineEditorContainer, this.inlineEventSource);
-    inlineEditor.setReadonly(this.readonly);
+    inlineEditor.mount(
+      this.inlineEditorContainer,
+      this.inlineEventSource,
+      this.readonly
+    );
   }
 
   private _onStackItemAdded = (event: { stackItem: RichTextStackItem }) => {
@@ -377,6 +384,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
     const classes = classMap({
       'inline-editor': true,
       'nowrap-lines': !this.wrapText,
+      readonly: this.readonly,
     });
 
     return html`<div class=${classes}></div>`;

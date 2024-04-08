@@ -1,13 +1,24 @@
+import {
+  RangeManager,
+  ShadowlessElement,
+  WithDisposable,
+} from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import { html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { RichText } from '../../../../_common/components/rich-text/rich-text.js';
 import { isCssVariable } from '../../../../_common/theme/css-variables.js';
-import type { ShapeElementModel } from '../../../../surface-block/element-model/index.js';
-import { SHAPE_TEXT_PADDING } from '../../../../surface-block/elements/shape/consts.js';
+import {
+  SHAPE_TEXT_PADDING,
+  SHAPE_TEXT_VERTICAL_PADDING,
+} from '../../../../surface-block/canvas-renderer/element-renderer/shape/utils.js';
+import { TextResizing } from '../../../../surface-block/element-model/common.js';
+import {
+  MindmapElementModel,
+  type ShapeElementModel,
+} from '../../../../surface-block/element-model/index.js';
 import { Bound, toRadian, Vec } from '../../../../surface-block/index.js';
 import { wrapFontFamily } from '../../../../surface-block/utils/font.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
@@ -24,6 +35,12 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   edgeless!: EdgelessRootBlockComponent;
 
+  @property({ attribute: false })
+  mounteEditor?: (
+    element: ShapeElementModel,
+    edgeless: EdgelessRootBlockComponent
+  ) => void;
+
   get inlineEditor() {
     assertExists(this.richText.inlineEditor);
     return this.richText.inlineEditor;
@@ -39,11 +56,18 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
     this._keeping = keeping;
   }
 
-  private _updateHeight() {
+  private _updateElementWH() {
     const bcr = this.richText.getBoundingClientRect();
     const containerHeight = this.richText.offsetHeight;
+    const containerWidth = this.richText.offsetWidth;
+    const textResizing = this.element.textResizing;
 
-    if (containerHeight > this.element.h) {
+    if (
+      (containerHeight !== this.element.h &&
+        textResizing === TextResizing.AUTO_HEIGHT) ||
+      (textResizing === TextResizing.AUTO_WIDTH &&
+        containerWidth !== this.element.w)
+    ) {
       const [leftTopX, leftTopY] = Vec.rotWith(
         [this.richText.offsetLeft, this.richText.offsetTop],
         [bcr.left + bcr.width / 2, bcr.top + bcr.height / 2],
@@ -57,16 +81,24 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
         xywh: new Bound(
           modelLeftTopX,
           modelLeftTopY,
-          this.element.w,
+          textResizing === TextResizing.AUTO_WIDTH
+            ? containerWidth
+            : this.element.w,
           containerHeight
         ).serialize(),
       });
       this.richText.style.minHeight = `${containerHeight}px`;
     }
+
     this.edgeless.service.selection.set({
       elements: [this.element.id],
       editing: true,
     });
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
   }
 
   override firstUpdated(): void {
@@ -80,7 +112,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
         this.requestUpdate();
         this.updateComplete
           .then(() => {
-            this._updateHeight();
+            this._updateElementWH();
           })
           .catch(console.error);
       })
@@ -102,7 +134,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
 
         this.disposables.add(
           this.inlineEditor.slots.renderComplete.on(() => {
-            this._updateHeight();
+            this._updateElementWH();
           })
         );
         this.disposables.addFromEvent(
@@ -115,6 +147,8 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
         );
       })
       .catch(console.error);
+
+    this._initMindmapKeyBindings();
   }
 
   override async getUpdateComplete(): Promise<boolean> {
@@ -128,6 +162,8 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
     this._resizeObserver = null;
 
     this.element.textDisplay = true;
+    this.element.group instanceof MindmapElementModel &&
+      this.element.group.layout();
 
     this.remove();
     this.edgeless.service.selection.set({
@@ -136,11 +172,63 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
     });
   }
 
+  private _initMindmapKeyBindings() {
+    if (!this.element.surface.isInMindmap(this.element.id)) {
+      return;
+    }
+
+    this._disposables.addFromEvent(this, 'keydown', evt => {
+      switch (evt.key) {
+        case 'Enter': {
+          evt.preventDefault();
+          const edgeless = this.edgeless;
+          const element = this.element;
+          const mindmap = this.element.group as MindmapElementModel;
+          const parent = mindmap.getParentNode(element.id) ?? element;
+
+          edgeless.doc.transact(() => {
+            const id = mindmap.addNode(parent.id, 'shape');
+
+            requestAnimationFrame(() => {
+              this.element = edgeless.service.getElementById(
+                id
+              ) as ShapeElementModel;
+              this.mounteEditor?.(this.element, edgeless);
+            });
+          });
+
+          (this.ownerDocument.activeElement as HTMLElement).blur();
+          break;
+        }
+        case 'Tab': {
+          evt.preventDefault();
+          const edgeless = this.edgeless;
+          const element = this.element;
+          const mindmap = this.element.group as MindmapElementModel;
+
+          edgeless.doc.transact(() => {
+            const id = mindmap.addNode(element.id, 'shape');
+
+            requestAnimationFrame(() => {
+              this.element = edgeless.service.getElementById(
+                id
+              ) as ShapeElementModel;
+              this.mounteEditor?.(this.element, edgeless);
+            });
+          });
+
+          (this.ownerDocument.activeElement as HTMLElement).blur();
+        }
+      }
+    });
+  }
+
   override render() {
     if (!this.element.text) {
       throw new Error('Failed to mount shape editor because of no text.');
     }
 
+    const textResizing = this.element.textResizing;
     const viewport = this.edgeless.service.viewport;
     const zoom = viewport.zoom;
     const rect = getSelectedRect([this.element]);
@@ -159,12 +247,23 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
       position: 'absolute',
       left: x + 'px',
       top: y + 'px',
-      width: rect.width + 'px',
+      width:
+        textResizing > TextResizing.AUTO_WIDTH
+          ? rect.width + 'px'
+          : 'fit-content',
       minHeight: rect.height + 'px',
+      maxWidth:
+        textResizing === TextResizing.AUTO_WIDTH
+          ? this.element.maxWidth
+            ? `${this.element.maxWidth}px`
+            : undefined
+          : undefined,
+      boxSizing: 'border-box',
       // override rich-text style (height: 100%)
       height: 'initial',
       fontSize: this.element.fontSize + 'px',
       fontFamily: wrapFontFamily(this.element.fontFamily),
+      fontWeight: this.element.fontWeight,
       lineHeight: 'initial',
       outline: 'none',
       transform: `scale(${zoom}, ${zoom}) rotate(${rotate}deg)`,
@@ -172,7 +271,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
       color: isCssVariable(this.element.color)
         ? `var(${this.element.color})`
         : this.element.color,
-      padding: SHAPE_TEXT_PADDING + 'px',
+      padding: `${SHAPE_TEXT_VERTICAL_PADDING}px ${SHAPE_TEXT_PADDING}px`,
       textAlign: this.element.textAlign,
       display: 'grid',
       gridTemplateColumns: '100%',

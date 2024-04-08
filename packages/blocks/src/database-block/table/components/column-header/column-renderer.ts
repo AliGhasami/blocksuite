@@ -1,4 +1,4 @@
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -66,7 +66,7 @@ export class DataViewColumnPreview extends WithDisposable(ShadowlessElement) {
     }
     return groupHelper.groups.map(group => {
       return html`
-        <div style="height: 40px;"></div>
+        <div style="height: 44px;"></div>
         ${this.renderGroup(group.rows)}
       `;
     });

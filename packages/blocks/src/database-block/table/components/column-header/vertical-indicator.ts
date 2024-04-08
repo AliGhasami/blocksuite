@@ -1,4 +1,4 @@
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -114,7 +114,7 @@ export const startDragWidthAdjustmentBar = (
   width: number,
   column: DataViewTableColumnManager
 ) => {
-  const scale = column.width / width;
+  const scale = width / column.width;
   const tableRect = tableContainer.getBoundingClientRect();
   const left =
     tableContainer

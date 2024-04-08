@@ -1,10 +1,14 @@
 import './../button.js';
 
-import { WithDisposable } from '@blocksuite/lit';
+import { WithDisposable } from '@blocksuite/block-std';
 import { Slice } from '@blocksuite/store';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
+import {
+  isEmbedLinkedDocBlock,
+  isEmbedSyncedDocBlock,
+} from '../../../root-block/edgeless/utils/query.js';
 import {
   CopyIcon,
   DeleteIcon,
@@ -13,7 +17,7 @@ import {
   RefreshIcon,
 } from '../../icons/text.js';
 import { toast } from '../toast.js';
-import type { EmbedToolbarBlock } from './embed-card-toolbar.js';
+import type { EmbedToolbarBlockElement } from './type.js';
 
 @customElement('embed-card-more-menu')
 export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
@@ -62,7 +66,7 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  block!: EmbedToolbarBlock;
+  block!: EmbedToolbarBlockElement;
 
   @property({ attribute: false })
   abortController!: AbortController;
@@ -121,7 +125,10 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
   override render() {
     return html`
       <div class="embed-card-more-menu">
-        <div class="embed-card-more-menu-container">
+        <div
+          class="embed-card-more-menu-container"
+          @pointerdown=${(e: MouseEvent) => e.stopPropagation()}
+        >
           <icon-button
             width="126px"
             height="32px"
@@ -153,16 +160,19 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
             ${DuplicateIcon}
           </icon-button>
 
-          <icon-button
-            width="126px"
-            height="32px"
-            class="menu-item reload"
-            text="Reload"
-            ?disabled=${this._doc.readonly}
-            @click=${() => this._refreshData()}
-          >
-            ${RefreshIcon}
-          </icon-button>
+          ${isEmbedLinkedDocBlock(this._model) ||
+          isEmbedSyncedDocBlock(this._model)
+            ? nothing
+            : html`<icon-button
+                width="126px"
+                height="32px"
+                class="menu-item reload"
+                text="Reload"
+                ?disabled=${this._doc.readonly}
+                @click=${() => this._refreshData()}
+              >
+                ${RefreshIcon}
+              </icon-button>`}
 
           <div class="divider"></div>
 

@@ -109,7 +109,7 @@ export type DataViewSelectionState = DataViewSelection | undefined;
 
 export type CommonSlots = RefNodeSlots;
 
-type EditorMode = 'page' | 'edgeless';
+export type EditorMode = 'page' | 'edgeless';
 type EditorSlots = {
   editorModeSwitched: Slot<EditorMode>;
   docUpdated: Slot<{ newDocId: string }>;
@@ -173,6 +173,11 @@ export enum LineWidth {
   Twelve = 12,
 }
 
+export enum LassoMode {
+  FreeHand,
+  Polygonal,
+}
+
 export type TextTool = {
   type: 'text';
 };
@@ -197,6 +202,15 @@ export type FrameNavigatorTool = {
 export type PanTool = {
   type: 'pan';
   panning: boolean;
+};
+
+export type CopilotSelectionTool = {
+  type: 'copilot';
+};
+
+export type LassoTool = {
+  type: 'lasso';
+  mode: LassoMode;
 };
 
 export type NoteChildrenFlavour =
@@ -239,7 +253,9 @@ export type EdgelessTool =
   | ConnectorTool
   | EraserTool
   | FrameTool
-  | FrameNavigatorTool;
+  | FrameNavigatorTool
+  | CopilotSelectionTool
+  | LassoTool;
 
 export type EmbedBlockDoubleClickData = {
   blockId: string;

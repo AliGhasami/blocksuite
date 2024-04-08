@@ -1,7 +1,7 @@
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import type { RichText } from '@blocksuite/blocks';
 import { type RootBlockModel } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import type { Doc } from '@blocksuite/store';
 import { css, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -27,7 +27,6 @@ export class DocTitle extends WithDisposable(ShadowlessElement) {
       max-width: var(--affine-editor-width);
       margin-left: auto;
       margin-right: auto;
-      cursor: text;
       padding: 38px 0;
 
       padding-left: var(

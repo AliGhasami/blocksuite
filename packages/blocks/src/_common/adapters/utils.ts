@@ -10,6 +10,9 @@ export const fetchImage = async (
     if (!proxy) {
       return await fetch(url, init);
     }
+    if (url.startsWith('data:')) {
+      return await fetch(url, init);
+    }
     return await fetch(proxy + '?url=' + encodeURIComponent(url), init)
       .then(res => {
         if (!res.ok) {
@@ -48,3 +51,11 @@ export const mergeDeltas = (
   }
   return [...acc, cur];
 };
+
+export const isNullish = (value: unknown) =>
+  value === null || value === undefined;
+
+export const fetchable = (url: string) =>
+  url.startsWith('http:') ||
+  url.startsWith('https:') ||
+  url.startsWith('data:');

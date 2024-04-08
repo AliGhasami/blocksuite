@@ -47,7 +47,7 @@ import {
   hastQuerySelector,
   type HtmlAST,
 } from './hast.js';
-import { fetchImage, mergeDeltas } from './utils.js';
+import { fetchable, fetchImage, mergeDeltas } from './utils.js';
 
 export type Html = string;
 
@@ -704,10 +704,10 @@ export class HtmlAdapter extends BaseAdapter<Html> {
               : '';
           if (imageURL) {
             let blobId = '';
-            if (!imageURL.startsWith('http')) {
+            if (!fetchable(imageURL)) {
               assets.getAssets().forEach((_value, key) => {
                 const attachmentName = getAssetName(assets.getAssets(), key);
-                if (imageURL.includes(attachmentName)) {
+                if (decodeURIComponent(imageURL).includes(attachmentName)) {
                   blobId = key;
                 }
               });
@@ -1021,10 +1021,11 @@ export class HtmlAdapter extends BaseAdapter<Html> {
         }
         case 'p': {
           if (
-            o.parent!.type === 'element' &&
-            o.parent!.children.length > o.index! + 1
+            o.parent &&
+            o.parent.type === 'element' &&
+            o.parent.children.length > o.index! + 1
           ) {
-            const next = o.parent!.children[o.index! + 1];
+            const next = o.parent.children[o.index! + 1];
             if (
               next.type === 'element' &&
               next.tagName === 'div' &&

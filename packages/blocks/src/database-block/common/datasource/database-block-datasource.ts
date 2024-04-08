@@ -1,6 +1,6 @@
+import type { EditorHost } from '@blocksuite/block-std';
 import type { Disposable } from '@blocksuite/global/utils';
 import { assertExists, Slot } from '@blocksuite/global/utils';
-import type { EditorHost } from '@blocksuite/lit';
 import type { BlockModel } from '@blocksuite/store';
 import { Text, type Y } from '@blocksuite/store';
 
@@ -275,6 +275,7 @@ export class DatabaseBlockDatasource extends BaseDataSource {
     this.doc.updateBlock(this._model, {
       children: this._model.children.filter(v => !ids.includes(v.id)),
     });
+    this._model.deleteRows(ids);
   }
 
   public override captureSync(): void {

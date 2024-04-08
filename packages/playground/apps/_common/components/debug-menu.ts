@@ -17,6 +17,7 @@ import '@shoelace-style/shoelace/dist/themes/dark.css';
 import './left-side-panel.js';
 import './side-panel.js';
 
+import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import type {
   AffineTextAttributes,
   SerializedXYWH,
@@ -36,7 +37,6 @@ import {
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
 import type { DeltaInsert } from '@blocksuite/inline/types';
-import { type EditorHost, ShadowlessElement } from '@blocksuite/lit';
 import type {
   AffineEditorContainer,
   CommentPanel,
@@ -52,6 +52,7 @@ import * as lz from 'lz-string';
 import type { Pane } from 'tweakpane';
 
 import { getEdgelessService } from '../../../../presets/src/fragments/copilot-panel/utils/selection-utils.js';
+import type { CustomChatPanel } from './custom-chat-panel.js';
 import type { CustomFramePanel } from './custom-frame-panel.js';
 import type { CustomOutlinePanel } from './custom-outline-panel.js';
 import type { DocsPanel } from './docs-panel.js';
@@ -192,6 +193,9 @@ export class DebugMenu extends ShadowlessElement {
   framePanel!: CustomFramePanel;
 
   @property({ attribute: false })
+  chatPanel!: CustomChatPanel;
+
+  @property({ attribute: false })
   copilotPanel!: CopilotPanel;
 
   @property({ attribute: false })
@@ -300,6 +304,10 @@ export class DebugMenu extends ShadowlessElement {
 
   private _toggleFramePanel() {
     this.framePanel.toggleDisplay();
+  }
+
+  private _toggleChatPanel() {
+    this.chatPanel.toggleDisplay();
   }
 
   private _toggleCopilotPanel() {
@@ -684,6 +692,9 @@ export class DebugMenu extends ShadowlessElement {
               </sl-menu-item>
               <sl-menu-item @click="${this._toggleFramePanel}">
                 Toggle Frame Panel
+              </sl-menu-item>
+              <sl-menu-item @click="${this._toggleChatPanel}">
+                Toggle Chat Panel
               </sl-menu-item>
               <sl-menu-item @click="${this._createMindMap}">
                 Create Mind Map

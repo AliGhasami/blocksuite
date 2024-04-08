@@ -4,8 +4,8 @@ import type { EdgelessRootService } from './edgeless/edgeless-root-service.js';
 import type { PageRootService } from './page/page-root-service.js';
 import type { RootBlockModel } from './root-model.js';
 
+export * from './clipboard/index.js';
 export { FramePreview } from './edgeless/components/frame/frame-preview.js';
-export { createButtonPopper } from './edgeless/components/utils.js';
 export * from './edgeless/edgeless-root-block.js';
 export { EdgelessRootService } from './edgeless/edgeless-root-service.js';
 export { EdgelessBlockModel as EdgelessBlock } from './edgeless/type.js';

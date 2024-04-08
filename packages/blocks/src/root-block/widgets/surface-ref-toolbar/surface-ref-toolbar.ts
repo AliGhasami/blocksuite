@@ -1,4 +1,4 @@
-import { WidgetElement } from '@blocksuite/lit';
+import { WidgetElement } from '@blocksuite/block-std';
 import { offset, shift } from '@floating-ui/dom';
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
@@ -25,7 +25,10 @@ import { edgelessToBlob, writeImageBlobToClipboard } from './utils.js';
 export const AFFINE_SURFACE_REF_TOOLBAR = 'affine-surface-ref-toolbar';
 
 @customElement(AFFINE_SURFACE_REF_TOOLBAR)
-export class AffineSurfaceRefToolbar extends WidgetElement<SurfaceRefBlockComponent> {
+export class AffineSurfaceRefToolbar extends WidgetElement<
+  SurfaceRefBlockModel,
+  SurfaceRefBlockComponent
+> {
   private _hoverController = new HoverController(
     this,
     ({ abortController }) => {

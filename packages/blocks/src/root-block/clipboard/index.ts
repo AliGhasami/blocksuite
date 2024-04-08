@@ -1,6 +1,6 @@
 import type { UIEventHandler } from '@blocksuite/block-std';
+import type { BlockElement } from '@blocksuite/block-std';
 import { assertExists, DisposableGroup } from '@blocksuite/global/utils';
-import type { BlockElement } from '@blocksuite/lit';
 import type { BlockSnapshot, Doc } from '@blocksuite/store';
 
 import {
@@ -187,3 +187,5 @@ export class PageClipboard {
       .run();
   };
 }
+
+export { copyMiddleware, pasteMiddleware };

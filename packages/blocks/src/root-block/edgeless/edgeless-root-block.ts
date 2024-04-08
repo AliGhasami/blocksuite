@@ -3,8 +3,9 @@ import '../../surface-block/surface-block.js';
 import './components/block-portal/frame/edgeless-frame.js';
 
 import type { SurfaceSelection } from '@blocksuite/block-std';
+import { BlockElement } from '@blocksuite/block-std';
+import { IS_WINDOWS } from '@blocksuite/global/env';
 import { assertExists, throttle } from '@blocksuite/global/utils';
-import { BlockElement } from '@blocksuite/lit';
 import { type BlockModel } from '@blocksuite/store';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
@@ -19,6 +20,7 @@ import {
 import { listenToThemeChange } from '../../_common/theme/utils.js';
 import {
   type EdgelessTool,
+  isPinchEvent,
   NoteDisplayMode,
   Point,
   requestConnectedFrame,
@@ -47,6 +49,7 @@ import {
   Bound,
   type IBound,
   type IVec,
+  normalizeWheelDeltaY,
   serializeXYWH,
   Vec,
 } from '../../surface-block/index.js';
@@ -64,10 +67,12 @@ import { readImageSize } from './components/utils.js';
 import { EdgelessClipboardController } from './controllers/clipboard.js';
 import { BrushToolController } from './controllers/tools/brush-tool.js';
 import { ConnectorToolController } from './controllers/tools/connector-tool.js';
+import { CopilotSelectionController } from './controllers/tools/copilot-tool.js';
 import { DefaultToolController } from './controllers/tools/default-tool.js';
 import { EraserToolController } from './controllers/tools/eraser-tool.js';
 import { PresentToolController } from './controllers/tools/frame-navigator-tool.js';
 import { FrameToolController } from './controllers/tools/frame-tool.js';
+import { LassoToolController } from './controllers/tools/lasso-tool.js';
 import { NoteToolController } from './controllers/tools/note-tool.js';
 import { PanToolController } from './controllers/tools/pan-tool.js';
 import { ShapeToolController } from './controllers/tools/shape-tool.js';
@@ -663,6 +668,7 @@ export class EdgelessRootBlockComponent extends BlockElement<
     this._initSurface();
 
     this._initViewport();
+    this._initWheelEvent();
 
     if (this.doc.readonly) {
       this.tools.setEdgelessTool({ type: 'pan', panning: true });
@@ -713,12 +719,51 @@ export class EdgelessRootBlockComponent extends BlockElement<
       FrameToolController,
       PanToolController,
       PresentToolController,
+      CopilotSelectionController,
+      LassoToolController,
     ] as EdgelessToolConstructor[];
 
     tools.forEach(tool => {
       this.service.registerTool(tool);
     });
     this.service.tool.mount(this);
+  }
+
+  private _initWheelEvent() {
+    this._disposables.add(
+      this.dispatcher.add('wheel', ctx => {
+        const state = ctx.get('defaultState');
+        const e = state.event as WheelEvent;
+
+        e.preventDefault();
+
+        const { viewport } = this.service;
+        // zoom
+        if (isPinchEvent(e)) {
+          const rect = this.getBoundingClientRect();
+          // Perform zooming relative to the mouse position
+          const [baseX, baseY] = this.service.viewport.toModelCoord(
+            e.clientX - rect.x,
+            e.clientY - rect.y
+          );
+
+          const zoom = normalizeWheelDeltaY(e.deltaY, viewport.zoom);
+          viewport.setZoom(zoom, new Point(baseX, baseY));
+          e.stopPropagation();
+        }
+        // pan
+        else {
+          const simulateHorizontalScroll = IS_WINDOWS && e.shiftKey;
+          const dx = simulateHorizontalScroll
+            ? e.deltaY / viewport.zoom
+            : e.deltaX / viewport.zoom;
+          const dy = simulateHorizontalScroll ? 0 : e.deltaY / viewport.zoom;
+
+          viewport.applyDeltaCenter(dx, dy);
+          e.stopPropagation();
+        }
+      })
+    );
   }
 
   override connectedCallback() {

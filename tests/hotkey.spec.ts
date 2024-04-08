@@ -1067,7 +1067,7 @@ test('should cut work single line', async ({ page }) => {
   );
 });
 
-test.skip('should cut work multiple line', async ({ page }) => {
+test('should cut work multiple line', async ({ page }) => {
   await enterPlaygroundRoom(page);
   const { noteId } = await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
@@ -1097,7 +1097,11 @@ test.skip('should cut work multiple line', async ({ page }) => {
   prop:index="a0"
 >
   <affine:paragraph
-    prop:text="19"
+    prop:text="1"
+    prop:type="text"
+  />
+  <affine:paragraph
+    prop:text="9"
     prop:type="text"
   />
 </affine:note>`,
@@ -1105,7 +1109,7 @@ test.skip('should cut work multiple line', async ({ page }) => {
   );
   await undoByKeyboard(page);
   const text = await readClipboardText(page);
-  expect(text).toBe(`23\n456\n78`);
+  expect(text).toBe(`23 456 78`);
   await assertStoreMatchJSX(
     page,
     `
@@ -1335,7 +1339,7 @@ test('enter in title should move cursor in new paragraph block', async ({
   await assertRichTexts(page, ['world', '']);
 });
 
-test('should support ctrl/cmd+shift+g convert to linked doc', async ({
+test('should support ctrl/cmd+shift+l convert to linked doc', async ({
   page,
 }) => {
   await enterPlaygroundRoom(page);
@@ -1359,10 +1363,8 @@ test('should support ctrl/cmd+shift+g convert to linked doc', async ({
   const title = page.locator('.affine-embed-linked-doc-content-title-text');
   expect(await title.innerText()).toBe('Untitled');
 
-  const description = page.locator(
-    '.affine-embed-linked-doc-content-description'
-  );
-  expect(await description.innerText()).toBe('123');
+  const noteContent = page.locator('.affine-embed-linked-doc-content-note');
+  expect(await noteContent.innerText()).toBe('123');
 });
 
 test('should forwardDelete works when delete single character', async ({

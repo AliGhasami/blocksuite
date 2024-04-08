@@ -3,13 +3,14 @@ import type {
   EventName,
   UIEventHandler,
 } from '@blocksuite/block-std';
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import type { Disposable, Slot } from '@blocksuite/global/utils';
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
 import type { Doc } from '@blocksuite/store';
 import { property } from 'lit/decorators.js';
 
 import type { UniComponent } from '../../_common/components/uni-component/uni-component.js';
 import type { DataViewSelection } from '../../_common/utils/index.js';
+import type { DataViewNative } from '../data-view.js';
 import type { InsertToPosition } from '../types.js';
 import type { DataViewExpose, DataViewProps } from './data-view.js';
 import type { DataViewManager } from './data-view-manager.js';
@@ -27,6 +28,8 @@ export abstract class BaseDataView<
   @property({ attribute: false })
   header!: UniComponent<{ viewMethods: DataViewExpose; view: T }>;
 
+  @property({ attribute: false })
+  dataViewEle!: DataViewNative;
   @property({ attribute: false })
   view!: T;
 

@@ -1,9 +1,9 @@
 import '../_common/components/rich-text/rich-text.js';
 import '../_common/components/block-selection.js';
 
+import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
@@ -254,6 +254,7 @@ export class ParagraphBlockComponent extends BlockElement<
       isEmpty = true;
     }
     if (
+      this.doc.readonly ||
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
       (!this.selected && !isEmpty) ||

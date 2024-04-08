@@ -1,6 +1,6 @@
 {
   "name": "@blocksuite/store",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "BlockSuite data store built for general purpose state management.",
   "type": "module",
   "repository": "toeverything/blocksuite",
@@ -21,7 +21,7 @@
     "@types/flexsearch": "^0.7.6",
     "flexsearch": "0.7.43",
     "idb-keyval": "^6.2.1",
-    "lib0": "^0.2.91",
+    "lib0": "^0.2.93",
     "merge": "^2.1.1",
     "minimatch": "^9.0.3",
     "nanoid": "^5.0.6",
@@ -49,12 +49,7 @@
         "module": "./dist/index.js",
         "import": "./dist/index.js"
       },
-      "./shim.d.ts": "./shim.d.ts",
-      "./providers/*": {
-        "types": "./dist/providers/*.d.ts",
-        "module": "./dist/providers/*.js",
-        "import": "./dist/providers/*.js"
-      }
+      "./shim.d.ts": "./shim.d.ts"
     }
   },
   "files": [

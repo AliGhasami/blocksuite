@@ -29,7 +29,7 @@ import {
   hastQuerySelector,
   type HtmlAST,
 } from './hast.js';
-import { fetchImage } from './utils.js';
+import { fetchable, fetchImage } from './utils.js';
 
 export type NotionHtml = string;
 
@@ -241,7 +241,6 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
           context.skipAllChildren();
           break;
         }
-        // TODO: move to Normal HTML Adapter as this is not notion specific
         case 'img': {
           if (!assets) {
             break;
@@ -253,10 +252,10 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
               : '';
           if (imageURL) {
             let blobId = '';
-            if (!imageURL.startsWith('http')) {
+            if (!fetchable(imageURL)) {
               assets.getAssets().forEach((_value, key) => {
                 const attachmentName = getAssetName(assets.getAssets(), key);
-                if (imageURL.includes(attachmentName)) {
+                if (decodeURIComponent(imageURL).includes(attachmentName)) {
                   blobId = key;
                 }
               });
@@ -576,10 +575,10 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
           }
           if (imageURL) {
             let blobId = '';
-            if (!imageURL.startsWith('http')) {
+            if (!fetchable(imageURL)) {
               assets.getAssets().forEach((_value, key) => {
                 const attachmentName = getAssetName(assets.getAssets(), key);
-                if (imageURL.includes(attachmentName)) {
+                if (decodeURIComponent(imageURL).includes(attachmentName)) {
                   blobId = key;
                 }
               });
@@ -634,10 +633,10 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
             let name = '';
             let type = '';
             let size = 0;
-            if (!embededURL.startsWith('http')) {
+            if (!fetchable(embededURL)) {
               assets.getAssets().forEach((value, key) => {
                 const embededName = getAssetName(assets.getAssets(), key);
-                if (embededURL.includes(embededName)) {
+                if (decodeURIComponent(embededURL).includes(embededName)) {
                   blobId = key;
                   name = embededName;
                   size = value.size;
@@ -821,10 +820,11 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
             break;
           }
           if (
-            o.parent!.type === 'element' &&
-            o.parent!.children.length > o.index! + 1
+            o.parent &&
+            o.parent.type === 'element' &&
+            o.parent.children.length > o.index! + 1
           ) {
-            const next = o.parent!.children[o.index! + 1];
+            const next = o.parent.children[o.index! + 1];
             if (
               next.type === 'element' &&
               next.tagName === 'div' &&

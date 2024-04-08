@@ -15,8 +15,10 @@ import {
 import { clamp } from '../../../../_common/utils/math.js';
 import type { FrameBlockModel } from '../../../../frame-block/index.js';
 import type { NoteBlockModel } from '../../../../note-block/note-model.js';
+import { GroupLikeModel } from '../../../../surface-block/element-model/base.js';
 import {
   GroupElementModel,
+  MindmapElementModel,
   ShapeElementModel,
   TextElementModel,
 } from '../../../../surface-block/element-model/index.js';
@@ -229,10 +231,16 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     });
   }
 
+  private _getSnapAxis(dx: number, dy: number): 'x' | 'y' {
+    const angle = Math.abs(Math.atan2(dy, dx));
+    return angle < Math.PI / 4 || angle > 3 * (Math.PI / 4) ? 'x' : 'y';
+  }
+
   private _handleSurfaceDragMove(
     selected: CanvasElement,
     initialBound: Bound,
-    delta: IVec
+    delta: IVec,
+    e: PointerEventState
   ) {
     if (!this._lock) {
       this._lock = true;
@@ -240,8 +248,14 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     }
 
     const bound = initialBound.clone();
-    bound.x += delta[0];
-    bound.y += delta[1];
+
+    if (e.keys.shift || this._edgeless.tools.shiftKey) {
+      const snapAxis = this._getSnapAxis(delta[0], delta[1]);
+      snapAxis === 'x' ? (bound.x += delta[0]) : (bound.y += delta[1]);
+    } else {
+      bound.x += delta[0];
+      bound.y += delta[1];
+    }
 
     if (selected instanceof ConnectorElementModel) {
       selected.moveTo(bound);
@@ -255,11 +269,17 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
   private _handleBlockDragMove(
     block: EdgelessBlockModel,
     initialBound: Bound,
-    delta: IVec
+    delta: IVec,
+    e: PointerEventState
   ) {
     const bound = initialBound.clone();
-    bound.x += delta[0];
-    bound.y += delta[1];
+    if (e.keys.shift || this._edgeless.tools.shiftKey) {
+      const snapAxis = this._getSnapAxis(delta[0], delta[1]);
+      snapAxis === 'x' ? (bound.x += delta[0]) : (bound.y += delta[1]);
+    } else {
+      bound.x += delta[0];
+      bound.y += delta[1];
+    }
 
     this._service.updateElement(block.id, {
       xywh: bound.serialize(),
@@ -472,7 +492,7 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     }
   };
 
-  private _clearLastSelecton = () => {
+  private _clearLastSelection = () => {
     if (this.selection.empty) {
       this.selection.clearLast();
     }
@@ -511,6 +531,7 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
   };
 
   async onContainerDragStart(e: PointerEventState) {
+    if (this.selection.editing) return;
     // Determine the drag type based on the current state and event
     let dragType = this._determineDragType(e);
 
@@ -560,7 +581,7 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
         this._edgeless.service.frame
           .getElementsInFrame(element)
           .forEach(ele => toBeMoved.add(ele));
-      } else if (element instanceof GroupElementModel) {
+      } else if (element instanceof GroupLikeModel) {
         element.decendants().forEach(ele => toBeMoved.add(ele));
       }
     });
@@ -651,13 +672,15 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
             this._handleSurfaceDragMove(
               element,
               this._selectedBounds[index],
-              delta
+              delta,
+              e
             );
           } else {
             this._handleBlockDragMove(
               element as EdgelessBlockModel,
               this._selectedBounds[index],
-              delta
+              delta,
+              e
             );
           }
         });
@@ -679,6 +702,10 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     this._doc.transact(() => {
       this._toBeMoved.forEach(el => {
         el.pop('xywh');
+
+        if (el.group instanceof MindmapElementModel) {
+          el.group.requestLayout();
+        }
       });
     });
 
@@ -736,7 +763,7 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
 
   beforeModeSwitch(edgelessTool?: EdgelessTool) {
     if (edgelessTool?.type === 'pan') {
-      this._clearLastSelecton();
+      this._clearLastSelection();
     }
     this._stopAutoPanning();
     this._clearDraggingAreaDisposable();

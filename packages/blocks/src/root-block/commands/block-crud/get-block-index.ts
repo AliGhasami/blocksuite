@@ -1,7 +1,7 @@
 import type { Command } from '@blocksuite/block-std';
+import type { BlockElement } from '@blocksuite/block-std';
 import { PathFinder } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { BlockElement } from '@blocksuite/lit';
 
 export const getBlockIndexCommand: Command<
   'currentSelectionPath',
@@ -20,13 +20,13 @@ export const getBlockIndexCommand: Command<
   if (!parent) {
     return;
   }
-  const index = parent.children.findIndex(x => {
+  const index = parent.childBlockElements.findIndex(x => {
     return PathFinder.equals(x.path, path);
   });
 
   next({
     blockIndex: index,
-    parentBlock: parent.view as BlockElement,
+    parentBlock: parent as BlockElement,
   });
 };
 

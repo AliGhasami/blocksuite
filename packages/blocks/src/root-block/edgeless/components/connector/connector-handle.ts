@@ -1,5 +1,5 @@
+import { WithDisposable } from '@blocksuite/block-std';
 import { DisposableGroup } from '@blocksuite/global/utils';
-import { WithDisposable } from '@blocksuite/lit';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -12,8 +12,8 @@ export class EdgelessConnectorHandle extends WithDisposable(LitElement) {
   static override styles = css`
     .line-controller {
       position: absolute;
-      width: 9px;
-      height: 9px;
+      width: 12px;
+      height: 12px;
       box-sizing: border-box;
       border-radius: 50%;
       border: 2px solid var(--affine-text-emphasis-color);
@@ -23,11 +23,11 @@ export class EdgelessConnectorHandle extends WithDisposable(LitElement) {
       z-index: 10;
       pointer-events: all;
       /**
-             * Fix: pointerEvent stops firing after a short time.
-             * When a gesture is started, the browser intersects the touch-action values of the touched element and its ancestors,
-             * up to the one that implements the gesture (in other words, the first containing scrolling element)
-             * https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action
-             */
+       * Fix: pointerEvent stops firing after a short time.
+       * When a gesture is started, the browser intersects the touch-action values of the touched element and its ancestors,
+       * up to the one that implements the gesture (in other words, the first containing scrolling element)
+       * https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action
+       */
       touch-action: none;
     }
     .line-controller-hidden {
@@ -107,12 +107,10 @@ export class EdgelessConnectorHandle extends WithDisposable(LitElement) {
     const { path } = this.connector;
     const zoom = service.viewport.zoom;
     const start = {
-      position: 'absolute',
       left: `${path[0][0] * zoom}px`,
       top: `${path[0][1] * zoom}px`,
     };
     const end = {
-      position: 'absolute',
       left: `${path[path.length - 1][0] * zoom}px`,
       top: `${path[path.length - 1][1] * zoom}px`,
     };

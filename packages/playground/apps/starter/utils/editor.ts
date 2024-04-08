@@ -1,4 +1,4 @@
-import type { PageRootService } from '@blocksuite/blocks';
+import type { EditorHost } from '@blocksuite/block-std';
 import {
   AffineFormatBarWidget,
   EdgelessEditorBlockSpecs,
@@ -6,7 +6,6 @@ import {
   toolbarDefaultConfig,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
-import type { EditorHost } from '@blocksuite/lit';
 import {
   AffineEditorContainer,
   affineFormatBarItemConfig,
@@ -15,6 +14,7 @@ import {
 } from '@blocksuite/presets';
 import type { DocCollection } from '@blocksuite/store';
 
+import { CustomChatPanel } from '../../_common/components/custom-chat-panel.js';
 import { CustomFramePanel } from '../../_common/components/custom-frame-panel.js';
 import { CustomOutlinePanel } from '../../_common/components/custom-outline-panel.js';
 import { DebugMenu } from '../../_common/components/debug-menu.js';
@@ -60,14 +60,6 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
           });
 
           disposable.add(onFormatBarConnected);
-
-          slots.mounted.once(({ service }) => {
-            disposable.add(
-              (<PageRootService>service).slots.editorModeSwitch.on(mode => {
-                editor.mode = mode;
-              })
-            );
-          });
         },
       };
     }
@@ -78,7 +70,7 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
       spec = {
         ...spec,
         setup: (slots, disposable) => {
-          slots.mounted.once(({ service }) => {
+          slots.mounted.once(() => {
             const onFormatBarConnected = slots.widgetConnected.on(view => {
               if (view.component instanceof AffineFormatBarWidget) {
                 configureFormatBar(view.component);
@@ -86,11 +78,6 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
             });
 
             disposable.add(onFormatBarConnected);
-            disposable.add(
-              (<PageRootService>service).slots.editorModeSwitch.on(mode => {
-                editor.mode = mode;
-              })
-            );
           });
         },
       };
@@ -130,6 +117,9 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   const commentPanel = new CommentPanel();
   commentPanel.host = editor.host;
 
+  const chatPanel = new CustomChatPanel();
+  chatPanel.editor = editor;
+
   const debugMenu = new DebugMenu();
   debugMenu.collection = collection;
   debugMenu.editor = editor;
@@ -140,12 +130,14 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   debugMenu.leftSidePanel = leftSidePanel;
   debugMenu.docsPanel = docsPanel;
   debugMenu.commentPanel = commentPanel;
+  debugMenu.chatPanel = chatPanel;
 
   document.body.append(outlinePanel);
   document.body.append(framePanel);
   document.body.append(sidePanel);
   document.body.append(leftSidePanel);
   document.body.append(debugMenu);
+  document.body.append(chatPanel);
 
   // debug info
   window.editor = editor;

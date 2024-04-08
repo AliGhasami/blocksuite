@@ -23,11 +23,12 @@ export const styles = css`
     left: 0;
     top: 0;
     box-sizing: border-box;
-    //font-size: var(--affine-font-base);
-    //padding: 12px 0;
+    font-size: var(--affine-font-base);
+    padding: 12px 0;
     display: flex;
-    //background: var(--affine-background-overlay-panel-color);
-    //box-shadow: var(--affine-shadow-2);
+
+    background: var(--affine-background-overlay-panel-color);
+    box-shadow: var(--affine-shadow-2);
     border-radius: 12px;
     z-index: var(--affine-z-index-popover);
     /* transition: max-height 0.2s ease-in-out; */
@@ -106,10 +107,13 @@ export const styles = css`
     border-top: 1px dashed var(--affine-border-color);
     margin: 8px 0;
   }
-  .slash-item.Delete:hover {
+  .slash-item.delete:hover {
     background: var(--affine-background-error-color);
     color: var(--affine-error-color);
     fill: var(--affine-error-color);
+  }
+  .slash-item.ask-ai {
+    color: var(--affine-brand-color);
   }
 
   .claytap-slash-menu-item.hover {

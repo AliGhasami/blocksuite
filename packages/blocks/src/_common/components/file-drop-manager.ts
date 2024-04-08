@@ -1,6 +1,6 @@
 import type { BlockService } from '@blocksuite/block-std';
+import type { EditorHost } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { EditorHost } from '@blocksuite/lit';
 import type { BlockModel } from '@blocksuite/store';
 
 import {
@@ -91,8 +91,8 @@ export class FileDropManager {
         lastNote = newNote;
       }
 
-      const lastItem = lastNote.lastItem();
-      if (lastItem && !matchFlavours(lastItem, ['affine:note'])) {
+      const lastItem = lastNote.children[lastNote.children.length - 1];
+      if (lastItem) {
         targetModel = lastItem;
       } else {
         const newParagraphId = this.doc.addBlock(

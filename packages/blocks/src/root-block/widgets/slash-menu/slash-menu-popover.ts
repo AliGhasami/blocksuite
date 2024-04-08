@@ -1,5 +1,5 @@
+import { WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { WithDisposable } from '@blocksuite/lit';
 import { type BlockModel } from '@blocksuite/store';
 import { html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -332,12 +332,13 @@ export class SlashMenu extends WithDisposable(LitElement) {
       ({ name, icon, suffix, disabled = false, groupName }, index) => {
         const showDivider =
           index !== 0 && this._filterItems[index - 1].groupName !== groupName;
+        const itemClass = name.split(' ').join('-').toLocaleLowerCase();
         return html`<div
             class="slash-item-divider"
             ?hidden=${!showDivider || !!this._searchString.length}
           ></div>
           <icon-button
-            class="slash-item ${name}"
+            class="slash-item ${itemClass}"
             ?disabled=${disabled}
             width="100%"
             height="32px"

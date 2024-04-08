@@ -1,6 +1,6 @@
 import type { BlockService } from '@blocksuite/block-std';
+import type { EditorHost } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { EditorHost } from '@blocksuite/lit';
 import type { BlockModel, Doc } from '@blocksuite/store';
 
 import {
@@ -495,7 +495,7 @@ export class ExportManager {
     );
   }
 
-  public async replaceImgSrcWithSvg(element: HTMLElement) {
+  public replaceImgSrcWithSvg = async (element: HTMLElement) => {
     const imgList = Array.from(element.querySelectorAll('img'));
     // Create an array of promises
     const promises = imgList.map(img => {
@@ -541,7 +541,7 @@ export class ExportManager {
 
     // Wait for all promises to resolve
     await Promise.all(promises);
-  }
+  };
 
   public async exportPdf() {
     const rootModel = this.doc.root;

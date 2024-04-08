@@ -1,10 +1,8 @@
 import '../_common/components/block-selection.js';
 import '../_common/components/embed-card/embed-card-caption.js';
-import '../_common/components/embed-card/embed-card-toolbar.js';
 
 import { assertExists } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
-import { flip, offset } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import {
   customElement,
@@ -14,10 +12,8 @@ import {
   state,
 } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { ref } from 'lit/directives/ref.js';
 
 import type { EmbedCardCaption } from '../_common/components/embed-card/embed-card-caption.js';
-import { HoverController } from '../_common/components/hover/controller.js';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
 import { EmbedBlockElement } from '../_common/embed-block-helper/index.js';
 import { REFERENCE_NODE } from '../_common/inline/presets/nodes/consts.js';
@@ -46,7 +42,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
   override _height = EMBED_CARD_HEIGHT.horizontal;
 
   @property({ attribute: false })
-  abstractText = '';
+  isNoteContentEmpty = false;
 
   @property({ attribute: false })
   isBannerEmpty = false;
@@ -75,6 +71,9 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
   @queryAsync('.affine-embed-linked-doc-banner.render')
   bannerContainer!: Promise<HTMLDivElement>;
 
+  @queryAsync('.affine-embed-linked-doc-content-note.render')
+  noteContainer!: Promise<HTMLDivElement>;
+
   get editorMode() {
     return this._editorMode;
   }
@@ -97,7 +96,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
   private async _load() {
     this._loading = true;
     this.isError = false;
-    this.abstractText = '';
+    this.isNoteContentEmpty = true;
     this.isBannerEmpty = true;
 
     const linkedDoc = this.linkedDoc;
@@ -129,7 +128,11 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
     this._loading = false;
 
     if (!this.isError) {
-      renderLinkedDocInCard(this);
+      // renderLinkedDocInCard(this);
+      const cardStyle = this.model.style;
+      if (cardStyle === 'horizontal' || cardStyle === 'vertical') {
+        renderLinkedDocInCard(this);
+      }
     }
   }
 
@@ -139,7 +142,10 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
       return false;
     }
     return (
-      !!linkedDoc && !linkedDoc.meta?.title.length && !this.abstractText.length
+      !!linkedDoc &&
+      !linkedDoc.meta?.title.length &&
+      this.isNoteContentEmpty &&
+      this.isBannerEmpty
     );
   }
 
@@ -318,7 +324,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
     }
 
     this.model.propsUpdated.on(({ key }) => {
-      if (key === 'pageId') {
+      if (key === 'pageId' || key === 'style') {
         this._load().catch(e => {
           console.error(e);
           this.isError = true;
@@ -339,66 +345,29 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
   }
 
   override disconnectedCallback() {
-    super.disconnectedCallback();
     this.cleanUpSurfaceRefRenderer();
+    super.disconnectedCallback();
   }
 
-  private _whenHover = new HoverController(this, ({ abortController }) => {
-    const selection = this.host.selection;
-    const textSelection = selection.find('text');
-    if (
-      !!textSelection &&
-      (!!textSelection.to || !!textSelection.from.length)
-    ) {
-      return null;
-    }
-
-    const blockSelections = selection.filter('block');
-    if (
-      blockSelections.length > 1 ||
-      (blockSelections.length === 1 && blockSelections[0].path !== this.path)
-    ) {
-      return null;
-    }
-
-    return {
-      template: html`
-        <style>
-          :host {
-            z-index: 1;
-          }
-        </style>
-        <embed-card-toolbar
-          .block=${this}
-          .abortController=${abortController}
-        ></embed-card-toolbar>
-      `,
-      computePosition: {
-        referenceElement: this,
-        placement: 'top-start',
-        middleware: [flip(), offset(4)],
-        autoUpdate: true,
-      },
-    };
-  });
-
   override renderBlock() {
-    const linkedDoc = this.linkedDoc;
-    const isDeleted = !linkedDoc;
-    const isLoading = this._loading;
-    const editorMode = this.editorMode;
-
     this._cardStyle = this.model.style;
     this._width = EMBED_CARD_WIDTH[this._cardStyle];
     this._height = EMBED_CARD_HEIGHT[this._cardStyle];
 
+    const linkedDoc = this.linkedDoc;
+    const isDeleted = !linkedDoc;
+    const isLoading = this._loading;
+    const isError = this.isError;
+    const editorMode = this.editorMode;
     const isEmpty = this._isDocEmpty() && this.isBannerEmpty;
 
     const cardClassMap = classMap({
       loading: isLoading,
+      error: isError,
       deleted: isDeleted,
       empty: isEmpty,
       'banner-empty': this.isBannerEmpty,
+      'note-empty': this.isNoteContentEmpty,
       [this._cardStyle]: true,
     });
 
@@ -419,71 +388,83 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockElement<
     const titleText = isLoading
       ? 'Loading...'
       : isDeleted
-        ? `Deleted ${editorMode}`
+        ? `Deleted ${this.editorMode}`
         : linkedDoc?.meta?.title.length
           ? linkedDoc.meta.title
           : 'Untitled';
 
-    const descriptionText = isLoading
+    const showDefaultNoteContent = isLoading || isDeleted || isEmpty;
+    const defaultNoteContent = isLoading
       ? ''
       : isDeleted
-        ? 'This linked page is deleted.'
+        ? 'This linked doc is deleted.'
         : isEmpty
-          ? 'Preview of the page will be displayed here.'
-          : this.abstractText;
+          ? 'Preview of the doc will be displayed here.'
+          : '';
 
     const dateText = this._docUpdatedAt.toLocaleTimeString();
 
     const showDefaultBanner = isDeleted || isEmpty;
 
-    const defaultBanner = isDeleted
-      ? LinkedDocDeletedBanner
-      : LinkedDocEmptyBanner;
+    const defaultBanner = isLoading
+      ? LinkedDocEmptyBanner
+      : isDeleted
+        ? LinkedDocDeletedBanner
+        : LinkedDocEmptyBanner;
 
     return this.renderEmbed(
       () => html`
-        <div
-          ${this.isInSurface ? nothing : ref(this._whenHover.setReference)}
-          class="affine-embed-linked-doc-block ${cardClassMap}"
-          @click=${this._handleClick}
-          @dblclick=${this._handleDoubleClick}
-        >
-          <div class="affine-embed-linked-doc-content">
-            <div class="affine-embed-linked-doc-content-title">
-              <div class="affine-embed-linked-doc-content-title-icon">
-                ${titleIcon}
+        <div>
+          <div
+            class="affine-embed-linked-doc-block ${cardClassMap}"
+            @click=${this._handleClick}
+            @dblclick=${this._handleDoubleClick}
+          >
+            <div class="affine-embed-linked-doc-content">
+              <div class="affine-embed-linked-doc-content-title">
+                <div class="affine-embed-linked-doc-content-title-icon">
+                  ${titleIcon}
+                </div>
+
+                <div class="affine-embed-linked-doc-content-title-text">
+                  ${titleText}
+                </div>
               </div>
 
-              <div class="affine-embed-linked-doc-content-title-text">
-                ${titleText}
+              <div class="affine-embed-linked-doc-content-note render"></div>
+              ${showDefaultNoteContent
+                ? html`<div
+                    class="affine-embed-linked-doc-content-note default"
+                  >
+                    ${defaultNoteContent}
+                  </div>`
+                : nothing}
+
+              <div class="affine-embed-linked-doc-content-date">
+                <span>Updated</span>
+
+                <span>${dateText}</span>
               </div>
             </div>
 
-            <div class="affine-embed-linked-doc-content-description">
-              ${descriptionText}
-            </div>
+            <div class="affine-embed-linked-doc-banner render"></div>
 
-            <div class="affine-embed-linked-doc-content-date">
-              <span>Updated</span>
-
-              <span>${dateText}</span>
-            </div>
+            ${showDefaultBanner
+              ? html`
+                  <div class="affine-embed-linked-doc-banner default">
+                    ${defaultBanner}
+                  </div>
+                `
+              : nothing}
+            <div class="affine-embed-linked-doc-block-overlay"></div>
           </div>
 
-          <div class="affine-embed-linked-doc-banner render"></div>
+          <embed-card-caption .block=${this}></embed-card-caption>
 
-          ${showDefaultBanner
-            ? html`
-                <div class="affine-embed-linked-doc-banner default">
-                  ${defaultBanner}
-                </div>
-              `
-            : nothing}
+          <affine-block-selection .block=${this}></affine-block-selection>
         </div>
 
-        <embed-card-caption .block=${this}></embed-card-caption>
-
-        <affine-block-selection .block=${this}></affine-block-selection>
+        ${this.isInSurface ? nothing : Object.values(this.widgets)}
       `
     );
   }

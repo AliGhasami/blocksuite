@@ -1,17 +1,21 @@
 import './zoom-toolbar.js';
 import './zoom-bar-toggle-button.js';
 
-import { WidgetElement } from '@blocksuite/lit';
+import { WidgetElement } from '@blocksuite/block-std';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+import type { RootBlockModel } from '../../root-model.js';
 
 export const AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET =
   'affine-edgeless-zoom-toolbar-widget';
 
 @customElement(AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET)
-export class AffineEdgelessZoomToolbarWidget extends WidgetElement<EdgelessRootBlockComponent> {
+export class AffineEdgelessZoomToolbarWidget extends WidgetElement<
+  RootBlockModel,
+  EdgelessRootBlockComponent
+> {
   static override styles = css`
     :host {
       position: absolute;

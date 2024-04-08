@@ -1,4 +1,4 @@
-import { ShadowlessElement, WithDisposable } from '@blocksuite/lit';
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -43,6 +43,7 @@ export class RecordField extends WithDisposable(ShadowlessElement) {
       width: 116px;
       border-radius: 4px;
       cursor: pointer;
+      user-select: none;
     }
 
     .field-left:hover {

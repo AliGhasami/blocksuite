@@ -7,12 +7,13 @@ import './note/note-tool-button.js';
 import './frame/frame-order-button.js';
 import './frame/frame-tool-button.js';
 import './default/default-tool-button.js';
+import './lasso/lasso-tool-button.js';
 import './text/text-tool-button.js';
 import './eraser/eraser-tool-button.js';
 import './frame/navigator-setting-button.js';
 import './template/template-tool-button.js';
 
-import { WithDisposable } from '@blocksuite/lit';
+import { WithDisposable } from '@blocksuite/block-std';
 import { baseTheme } from '@toeverything/theme';
 import {
   css,
@@ -523,6 +524,12 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
           .edgeless=${this.edgeless}
           .setEdgelessTool=${this.setEdgelessTool}
         ></edgeless-default-tool-button>
+
+        <edgeless-lasso-tool-button
+          .edgelessTool=${this.edgelessTool}
+          .edgeless=${this.edgeless}
+          .setEdgelessTool=${this.setEdgelessTool}
+        ></edgeless-lasso-tool-button>
 
         <edgeless-connector-tool-button
           .edgeless=${this.edgeless}

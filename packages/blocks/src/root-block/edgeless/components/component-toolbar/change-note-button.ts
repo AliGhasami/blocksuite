@@ -7,8 +7,8 @@ import '../panel/note-display-mode-panel.js';
 import '../panel/scale-panel.js';
 import '../panel/size-panel.js';
 
+import { WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { WithDisposable } from '@blocksuite/lit';
 import { css, html, LitElement, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
@@ -23,6 +23,7 @@ import {
 } from '../../../../_common/icons/index.js';
 import type { CssVariableName } from '../../../../_common/theme/css-variables.js';
 import { NoteDisplayMode } from '../../../../_common/types.js';
+import { createButtonPopper } from '../../../../_common/utils/button-popper.js';
 import { matchFlavours } from '../../../../_common/utils/model.js';
 import { type NoteBlockModel } from '../../../../note-block/note-model.js';
 import { Bound, StrokeStyle } from '../../../../surface-block/index.js';
@@ -33,7 +34,7 @@ import {
   type LineStylesPanelClickedButton,
   lineStylesPanelStyles,
 } from '../panel/line-styles-panel.js';
-import { createButtonPopper, getTooltipWithShortcut } from '../utils.js';
+import { getTooltipWithShortcut } from '../utils.js';
 
 const NOTE_BACKGROUND: CssVariableName[] = [
   '--affine-tag-red',

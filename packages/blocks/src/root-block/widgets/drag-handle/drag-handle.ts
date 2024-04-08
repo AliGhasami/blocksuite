@@ -1,17 +1,17 @@
+import type { BlockElement } from '@blocksuite/block-std';
 import {
   PathFinder,
   type PointerEventState,
   type UIEventHandler,
 } from '@blocksuite/block-std';
+import { WidgetElement } from '@blocksuite/block-std';
 import {
   assertExists,
   DisposableGroup,
   throttle,
 } from '@blocksuite/global/utils';
-import type { BlockElement } from '@blocksuite/lit';
-import { WidgetElement } from '@blocksuite/lit';
 import { type BlockModel } from '@blocksuite/store';
-import { html, render } from 'lit';
+import { html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -28,13 +28,17 @@ import {
   Point,
   Rect,
 } from '../../../_common/utils/index.js';
-import type { NoteBlockComponent, NoteBlockModel } from '../../../index.js';
+import type {
+  NoteBlockComponent,
+  NoteBlockModel,
+} from '../../../note-block/index.js';
 import type { EdgelessRootBlockComponent } from '../../../root-block/edgeless/edgeless-root-block.js';
 import {
   getSelectedRect,
   isTopLevelBlock,
 } from '../../../root-block/edgeless/utils/query.js';
 import { PageRootBlockComponent } from '../../../root-block/page/page-root-block.js';
+import type { RootBlockModel } from '../../../root-block/root-model.js';
 import { autoScroll } from '../../../root-block/text-selection/utils.js';
 import { Bound, type IVec } from '../../../surface-block/index.js';
 import type { EdgelessBlockModel } from '../../edgeless/type.js';
@@ -78,6 +82,7 @@ export const AFFINE_DRAG_HANDLE_WIDGET = 'affine-drag-handle-widget';
 
 @customElement(AFFINE_DRAG_HANDLE_WIDGET)
 export class AffineDragHandleWidget extends WidgetElement<
+  RootBlockModel,
   EdgelessRootBlockComponent | PageRootBlockComponent
 > {
   static override styles = styles;
@@ -367,7 +372,8 @@ export class AffineDragHandleWidget extends WidgetElement<
       blockElements.forEach(element => {
         width = Math.max(width, element.getBoundingClientRect().width);
         const container = document.createElement('div');
-        render(this.host.renderModel(element.model), container);
+        // FIXME(mirone/#6534): use `renderSpecPortal` to render preview.
+        // render(this.host.renderModel(element.model), container);
         fragment.append(container);
       });
 
@@ -564,7 +570,7 @@ export class AffineDragHandleWidget extends WidgetElement<
   // Multiple blocks: drag handle should show on the vertical middle of all blocks
   private _showDragHandleOnHoverBlock = (blockPath: string[]) => {
     const blockElement = this._getBlockElementFromViewStore(blockPath);
-    assertExists(blockElement);
+    if (!blockElement) return;
 
     const container = this._dragHandleContainer;
     const grabber = this._dragHandleGrabber;
@@ -1250,10 +1256,9 @@ export class AffineDragHandleWidget extends WidgetElement<
         buildPath(parent)
       );
       if (parentElement) {
-        const newSelectedBlocks = selectedBlocks
-          .map(block => parentElement.path.concat(block.id))
-          .map(path => this._getBlockElementFromViewStore(path));
-
+        const newSelectedBlocks = selectedBlocks.map(block => {
+          return this.std.view.getBlock(block.id);
+        });
         if (!newSelectedBlocks) return;
 
         const noteId = getNoteId(parentElement);

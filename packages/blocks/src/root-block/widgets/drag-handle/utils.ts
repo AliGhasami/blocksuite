@@ -1,10 +1,10 @@
+import type { BlockElement, EditorHost } from '@blocksuite/block-std';
 import {
   type BaseSelection,
   PathFinder,
   type PointerEventState,
 } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { BlockElement, EditorHost } from '@blocksuite/lit';
 import type { BlockModel } from '@blocksuite/store';
 
 import {
@@ -47,7 +47,7 @@ const heightMap: { [key: string]: number } = {
   h5: 28,
   h6: 26,
   quote: 46,
-  list: 32,
+  list: 24,
   database: 28,
   image: 28,
   divider: 36,
@@ -399,24 +399,36 @@ export function convertDragPreviewDocToEdgeless({
   }
 
   const previewEl = dragPreview.querySelector(cssSelector);
-  assertExists(previewEl);
+  if (!previewEl) {
+    return false;
+  }
   const rect = previewEl.getBoundingClientRect();
+  const border = 2;
   const { left: viewportLeft, top: viewportTop } = edgelessRoot.viewport;
   const currentViewBound = new Bound(
     (rect.x - viewportLeft) / state.cumulativeParentScale,
     (rect.y - viewportTop) / state.cumulativeParentScale,
-    rect.width / noteScale,
-    rect.height / noteScale
+    rect.width + border / noteScale,
+    rect.height + border / noteScale
   );
   const currentModelBound =
     edgelessRoot.service.viewport.toModelBound(currentViewBound);
 
-  const newBound = new Bound(
-    currentModelBound.x,
-    currentModelBound.y,
-    (currentModelBound.w ?? width) * noteScale,
-    (currentModelBound.h ?? height) * noteScale
-  );
+  // Except for embed synced doc block
+  // The width and height of other card style should be fixed
+  const newBound = isEmbedSyncedDocBlock(blockComponent.model)
+    ? new Bound(
+        currentModelBound.x,
+        currentModelBound.y,
+        (currentModelBound.w ?? width) * noteScale,
+        (currentModelBound.h ?? height) * noteScale
+      )
+    : new Bound(
+        currentModelBound.x,
+        currentModelBound.y,
+        (width ?? currentModelBound.w) * noteScale,
+        (height ?? currentModelBound.h) * noteScale
+      );
 
   const blockModel = blockComponent.model;
   const blockProps = getBlockProps(blockModel);
