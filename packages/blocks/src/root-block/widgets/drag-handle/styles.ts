@@ -24,7 +24,7 @@ export const styles = css`
     box-sizing: border-box;
   }
   .affine-drag-handle-container:hover {
-    //cursor: grab;
+    cursor: grab;
   }
 
   .affine-drag-handle-grabber {
@@ -35,14 +35,14 @@ export const styles = css`
     transition: width 0.25s ease;
   }
 
-  .affine-drag-handle-grabber {
+  /*.affine-drag-handle-grabber {
     .add-icon {
       cursor: pointer;
     }
     .drag-icon {
       cursor: grab;
     }
-  }
+  }*/
 
   .affine-drag-handle-grabber-icons {
     display: flex;
