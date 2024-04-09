@@ -71,9 +71,9 @@ const DocPageSpec: BlockSpec<PageRootBlockWidgetName> = {
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
       )}`,
-      [AFFINE_ADD_BLOCK_HANDLE_WIDGET]: literal`${unsafeStatic(
+      /*[AFFINE_ADD_BLOCK_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_ADD_BLOCK_HANDLE_WIDGET
-      )}`,
+      )}`,*/
       [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
         AFFINE_FORMAT_BAR_WIDGET
       )}`,

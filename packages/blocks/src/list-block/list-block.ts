@@ -69,7 +69,7 @@ export class ListBlockComponent extends BlockElement<
       if (this.model.checked) {
         const checkEl = this.querySelector('.affine-list-block__todo-prefix');
         assertExists(checkEl);
-        playCheckAnimation(checkEl).catch(console.error);
+        //playCheckAnimation(checkEl).catch(console.error);
       }
       return;
     }
@@ -197,9 +197,7 @@ export class ListBlockComponent extends BlockElement<
             .enableUndoRedo=${false}
           ></rich-text>
         </div>
-
         ${collapsed ? nothing : children}
-
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;

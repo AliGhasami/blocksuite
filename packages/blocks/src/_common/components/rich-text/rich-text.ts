@@ -379,6 +379,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       'nowrap-lines': !this.wrapText,
     });
 
+    //return html`<div class=${classes}></div>`;
     return html`<div class=${classes}></div>`;
   }
 }

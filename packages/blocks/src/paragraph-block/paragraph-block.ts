@@ -64,33 +64,33 @@ export class ParagraphBlockComponent extends BlockElement<
     code {
       font-size: calc(var(--affine-font-base) - 3px);
     }
-    .claytap-h1 {
+    /*.claytap-h1 {
       font-size: var(--affine-font-h-1);
       font-weight: 600;
       line-height: calc(1em + 8px);
       margin-top: 18px;
       margin-bottom: 10px;
-    }
+    }*/
     .claytap-h1 code {
       font-size: calc(var(--affine-font-base) + 8px);
     }
-    .claytap-h2 {
+    /*.claytap-h2 {
       font-size: var(--affine-font-h-2);
       font-weight: 600;
       line-height: calc(1em + 10px);
       margin-top: 14px;
       margin-bottom: 10px;
-    }
+    }*/
     .claytap-h2 code {
       font-size: calc(var(--affine-font-base) + 6px);
     }
-    .claytap-h3 {
+    /*.claytap-h3 {
       font-size: var(--affine-font-h-3);
       font-weight: 600;
       line-height: calc(1em + 8px);
       margin-top: 12px;
       margin-bottom: 10px;
-    }
+    }*/
     .claytap-h3 code {
       font-size: calc(var(--affine-font-base) + 4px);
     }
@@ -253,6 +253,9 @@ export class ParagraphBlockComponent extends BlockElement<
     if (paragraphList.length == 1) {
       isEmpty = true;
     }
+    //console.log('this.selected', this.selected);
+    //console.log('this.inlineEditor.isComposing', this.inlineEditor.isComposing);
+    //console.log('this.inlineEditor.yTextLength', this.inlineEditor.yTextLength);
     if (
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
@@ -310,7 +313,6 @@ export class ParagraphBlockComponent extends BlockElement<
             .enableUndoRedo=${false}
           ></rich-text>
         </div>
-
         ${children}
 
         <affine-block-selection .block=${this}></affine-block-selection>

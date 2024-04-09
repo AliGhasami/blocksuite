@@ -989,7 +989,7 @@ export class AffineAddBlockHandleWidget extends WidgetElement<
    * Should clear selection if current block is the first selected block
    */
   private _clickHandler: UIEventHandler = ctx => {
-    debugger;
+    //debugger;
     if (!this._isHoverDragHandleVisible) return;
 
     const state = ctx.get('pointerState');
