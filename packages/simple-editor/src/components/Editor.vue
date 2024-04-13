@@ -256,7 +256,8 @@ defineExpose({
   }*/
 
   .place-holder{
-    @apply text-neutral-4;
+    @apply text-neutral-4 mt-body;
+    line-height: unset;
     transition: all 0.3s ease-in-out;
     //background-color: red;
     .short-code{
@@ -282,18 +283,22 @@ defineExpose({
 
   .claytap-text{
     //background-color: red;
-  //  @apply text-neutral-8 mt-body;
+   @apply text-neutral-8 mt-body;
+    line-height: unset;
   }
 
   .claytap-h1{
     @apply mt-page-display text-neutral-8;
+    line-height: unset;
   }
 
   .claytap-h2{
     @apply mt-page-heading text-neutral-8;
+    line-height: unset;
   }
   .claytap-h3{
     @apply mt-page-subheading text-neutral-8;
+    line-height: unset;
   }
 
 

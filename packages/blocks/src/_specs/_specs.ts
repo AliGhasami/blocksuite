@@ -23,6 +23,8 @@ import { ImageBlockSchema } from '../image-block/image-model.js';
 import { ImageService } from '../image-block/index.js';
 import { ListBlockSchema } from '../list-block/list-model.js';
 import { ListService } from '../list-block/list-service.js';
+//import { MentionBlockSchema } from '../mention-block/mention-model.js';
+//import { MentionService } from '../mention-block/mention-service.js';
 import { NoteService } from '../note-block/index.js';
 import { NoteBlockSchema } from '../note-block/note-model.js';
 import { ParagraphBlockSchema } from '../paragraph-block/paragraph-model.js';
@@ -34,7 +36,7 @@ import {
 } from '../root-block/index.js';
 import { PageRootService } from '../root-block/page/page-root-service.js';
 import { RootBlockSchema } from '../root-block/root-model.js';
-import { AFFINE_ADD_BLOCK_HANDLE_WIDGET } from '../root-block/widgets/add-block-handle/add-block-handle.js';
+//import { AFFINE_ADD_BLOCK_HANDLE_WIDGET } from '../root-block/widgets/add-block-handle/add-block-handle.js';
 import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../root-block/widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../root-block/widgets/drag-handle/drag-handle.js';
 import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../root-block/widgets/edgeless-remote-selection/index.js';
@@ -179,6 +181,13 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
     },
     service: ParagraphService,
   },
+  /*{
+    schema: MentionBlockSchema,
+    view: {
+      component: literal`affine-mention`,
+    },
+    service: MentionService,
+  },*/
   {
     schema: BookmarkBlockSchema,
     view: {

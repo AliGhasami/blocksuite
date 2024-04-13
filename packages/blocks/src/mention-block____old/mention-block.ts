@@ -12,10 +12,10 @@ import type { RichText } from '../_common/components/rich-text/rich-text.js';
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/note-block.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
-import type { ParagraphBlockModel } from './paragraph-model.js';
-import type { ParagraphService } from './paragraph-service.js';
+import type { MentionBlockModel } from './mention-model.js';
+import type { MentionService } from './mention-service.js';
 
-const getPlaceholder = (model: ParagraphBlockModel) => {
+const getPlaceholder = (model: MentionBlockModel) => {
   if (model.type === 'text') {
     return html`<span class="place-holder">
       Press
@@ -39,10 +39,10 @@ const getPlaceholder = (model: ParagraphBlockModel) => {
   return placeholders[model.type];
 };
 
-@customElement('affine-paragraph')
-export class ParagraphBlockComponent extends BlockElement<
-  ParagraphBlockModel,
-  ParagraphService
+@customElement('affine-mention')
+export class MentionBlockComponent extends BlockElement<
+  MentionBlockModel,
+  MentionService
 > {
   static override styles = css`
     affine-paragraph {
@@ -294,7 +294,7 @@ export class ParagraphBlockComponent extends BlockElement<
     </div>`;
 
     return html`
-      <div class="affine-paragraph-block-container">
+      <!-- <div class="affine-paragraph-block-container">
         <div class="affine-paragraph-rich-text-wrapper claytap-${type}">
           <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}
@@ -314,15 +314,14 @@ export class ParagraphBlockComponent extends BlockElement<
           ></rich-text>
         </div>
         ${children}
-
         <affine-block-selection .block=${this}></affine-block-selection>
-      </div>
+      </div> -->
     `;
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-paragraph': ParagraphBlockComponent;
+    'affine-mention': MentionBlockComponent;
   }
 }

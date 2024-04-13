@@ -17,6 +17,7 @@ import { splitElements } from './root-block/edgeless/utils/clipboard-utils.js';
 import { isCanvasElement } from './root-block/edgeless/utils/query.js';
 import { deserializeXYWH } from './surface-block/index.js';
 
+//export * from '././mention-block/index.js';
 export * from './_common/adapters/index.js';
 export type { SelectTag } from './_common/components/index.js';
 export {
@@ -81,6 +82,7 @@ export * from './embed-youtube-block/index.js';
 export * from './frame-block/index.js';
 export * from './image-block/index.js';
 export * from './list-block/index.js';
+export * from './mention-block/index.js';
 export * from './note-block/index.js';
 export * from './paragraph-block/index.js';
 export { EdgelessComponentToolbar } from './root-block/edgeless/components/component-toolbar/component-toolbar.js';
