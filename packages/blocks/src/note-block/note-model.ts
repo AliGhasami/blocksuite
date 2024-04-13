@@ -39,6 +39,7 @@ export const NoteBlockSchema = defineBlockSchema({
       'affine:list',
       'affine:code',
       'affine:divider',
+      'affine:mention',
       'affine:database',
       'affine:data-view',
       'affine:image',

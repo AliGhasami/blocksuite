@@ -6,6 +6,7 @@ import './list-block/index.js';
 import './note-block/index.js';
 import './frame-block/index.js';
 import './divider-block/index.js';
+import './mention-block/index.js';
 import './code-block/affine-code-line.js';
 import './image-block/index.js';
 import './database-block/index.js';

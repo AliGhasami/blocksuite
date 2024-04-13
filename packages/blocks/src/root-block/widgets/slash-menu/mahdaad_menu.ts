@@ -154,7 +154,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: mention,
         action: ({ rootElement, model }) => {
-          runCommand(rootElement, 'affine:mention', 'divider');
+          runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'h1');
         },

@@ -74,7 +74,8 @@ export const updateBlockType: Command<
     return next({ updatedBlocks: [model] });
   };
   const appendDivider: Command<never, 'updatedBlocks'> = (_, next) => {
-    if (flavour !== 'affine:divider') {
+    //debugger;
+    if (flavour !== 'affine:divider' || flavour !== 'affine:mention') {
       return false;
     }
     const model = blockModels.at(-1);
@@ -88,6 +89,7 @@ export const updateBlockType: Command<
     const index = parent.children.indexOf(model);
     const nextSibling = doc.getNextSibling(model);
     let nextSiblingId = nextSibling?.id as string;
+    debugger;
     const id = doc.addBlock('affine:divider', {}, parent, index + 1);
     if (!nextSibling) {
       nextSiblingId = doc.addBlock('affine:paragraph', {}, parent);
@@ -199,7 +201,10 @@ export const updateBlockType: Command<
     // focus
     .try(chain => [
       chain.inline((_, next) => {
-        if (['affine:code', 'affine:divider'].includes(flavour)) {
+        debugger;
+        if (
+          ['affine:code', 'affine:divider', 'affine:mention'].includes(flavour)
+        ) {
           return next();
         }
         return false;

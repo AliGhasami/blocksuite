@@ -23,6 +23,7 @@ import { ImageBlockSchema } from '../image-block/image-model.js';
 import { ImageService } from '../image-block/index.js';
 import { ListBlockSchema } from '../list-block/list-model.js';
 import { ListService } from '../list-block/list-service.js';
+import { MentionBlockSchema } from '../mention-block/mention-model.js';
 //import { MentionBlockSchema } from '../mention-block/mention-model.js';
 //import { MentionService } from '../mention-block/mention-service.js';
 import { NoteService } from '../note-block/index.js';
@@ -156,6 +157,12 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
     schema: DividerBlockSchema,
     view: {
       component: literal`affine-divider`,
+    },
+  },
+  {
+    schema: MentionBlockSchema,
+    view: {
+      component: literal`affine-mention`,
     },
   },
   {
