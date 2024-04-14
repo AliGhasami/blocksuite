@@ -11,3 +11,4 @@ packages:
   - 'packages/presets'
   - 'packages/simple'
   - 'packages/simple-editor'
+  - 'packages/vue-web-component'

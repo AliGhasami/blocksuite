@@ -73,7 +73,7 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
           <div contenteditable="false" class="affine-paragraph-placeholder">
             this is place holder
           </div>
-          <rich-text
+          <!-- <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
             .undoManager=${this.doc.history}
@@ -82,7 +82,7 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
             .readonly=${this.doc.readonly}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-          ></rich-text>
+          ></rich-text> -->
         </div>
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
