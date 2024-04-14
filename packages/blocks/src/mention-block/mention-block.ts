@@ -1,11 +1,15 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
+import { assertExists } from '@blocksuite/global/utils';
 import { BlockElement } from '@blocksuite/lit';
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { z } from 'zod';
 
-import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
+//import { getStandardLanguage } from '../code-block/utils/code-languages.js';
+//import { getCodeLineRenderer } from '../code-block/utils/code-line-renderer.js';
+//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
 import type { MentionBlockModel } from './mention-model.js';
 
 @customElement('affine-mention')
@@ -28,6 +32,18 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
     }
   `;
 
+  readonly attributesSchema = z.object({});
+
+  /* get inlineManager() {
+    const inlineManager = this.service?.inlineManager;
+    assertExists(inlineManager);
+    return inlineManager;
+  }*/
+
+  /*get attributeRenderer() {
+    return this.inlineManager.getRenderer();
+  }*/
+
   override connectedCallback() {
     super.connectedCallback();
 
@@ -43,24 +59,40 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
   }
 
   override renderBlock() {
-    const children = html`<div
+    //const { type } = this.model;
+    /*const children = html`<div
       class="affine-block-children-container"
       style="padding-left: ${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px"
     >
       ${this.renderChildren(this.model)}
-    </div>`;
+    </div>`;*/
 
     return html`
-      <div class="affine-divider-block-container">
-        <hr />
-
-        ${children}
-
+      <div class="affine-paragraph-block-container">
+        <div class="affine-paragraph-rich-text-wrapper">
+          <div contenteditable="false" class="affine-paragraph-placeholder">
+            this is place holder
+          </div>
+          <rich-text
+            .yText=${this.model.text.yText}
+            .inlineEventSource=${this.topContenteditableElement ?? nothing}
+            .undoManager=${this.doc.history}
+            .attributesSchema=${this.attributesSchema}
+            .inlineRangeProvider=${this._inlineRangeProvider}
+            .readonly=${this.doc.readonly}
+            .enableClipboard=${false}
+            .enableUndoRedo=${false}
+          ></rich-text>
+        </div>
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;
   }
 }
+//  .markdownShortcutHandler=${this.markdownShortcutHandler}
+// .embedChecker=${this.embedChecker}
+//
+// .attributeRenderer=${this.attributeRenderer}
 
 declare global {
   interface HTMLElementTagNameMap {
