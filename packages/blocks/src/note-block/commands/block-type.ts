@@ -89,7 +89,6 @@ export const updateBlockType: Command<
     const index = parent.children.indexOf(model);
     const nextSibling = doc.getNextSibling(model);
     let nextSiblingId = nextSibling?.id as string;
-    debugger;
     const id = doc.addBlock('affine:divider', {}, parent, index + 1);
     if (!nextSibling) {
       nextSiblingId = doc.addBlock('affine:paragraph', {}, parent);
@@ -201,7 +200,6 @@ export const updateBlockType: Command<
     // focus
     .try(chain => [
       chain.inline((_, next) => {
-        debugger;
         if (
           ['affine:code', 'affine:divider', 'affine:mention'].includes(flavour)
         ) {

@@ -13,7 +13,6 @@ export async function onModelTextUpdated(
   model: BlockModel,
   callback?: (text: RichText) => void
 ) {
-  debugger;
   const richText = await asyncGetRichTextByModel(editorHost, model);
   assertExists(richText, 'RichText is not ready yet.');
   await richText.updateComplete;

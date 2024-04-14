@@ -30,7 +30,6 @@ import { type ExtendedModel } from '../../types.js';
  * Whether the block supports rendering its children.
  */
 function supportsChildren(model: BlockModel): boolean {
-  debugger;
   if (
     matchFlavours(model, [
       // 'affine:database',
@@ -554,7 +553,6 @@ function handleEmbedDividerCodeSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
-  debugger;
   const doc = model.doc;
   if (matchFlavours(previousSibling, ['affine:divider'])) {
     doc.deleteBlock(previousSibling);

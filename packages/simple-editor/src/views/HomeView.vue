@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import Editor from "@/components/Editor.vue";
 import {ref} from "vue";
-import {data} from "@/components/temp/tempData";
+import {data} from "@/components/template/tempData";
 
 const refEditor=ref(null)
 async function handleGetData(){

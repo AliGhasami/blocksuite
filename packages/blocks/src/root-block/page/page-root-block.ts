@@ -347,7 +347,7 @@ export class PageRootBlockComponent extends BlockElement<
         newTextSelectionPath = [this.model.id, noteId, paragraphId];
       } else {
         const last = lastNote.children.at(-1);
-        debugger;
+
         if (
           !last ||
           !last.text ||

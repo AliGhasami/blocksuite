@@ -110,7 +110,6 @@ export function convertToDivider(
   element: BlockElement,
   prefix: string
 ): boolean {
-  debugger;
   const { doc, model } = element;
   if (
     matchFlavours(model, ['affine:divider']) ||
@@ -130,7 +129,7 @@ export function convertToDivider(
     const blockProps = {
       children: model.children,
     };
-    debugger;
+
     doc.addBlock('affine:divider', blockProps, parent, index);
 
     const nextBlock = parent.children[index + 1];
