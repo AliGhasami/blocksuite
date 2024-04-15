@@ -1,12 +1,13 @@
 <template>
   <div style="padding-top: 30px;">
+<!--    1111
+    <current-time></current-time>-->
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
     <input id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
-
     <MobileEditor  />
   </div>
 </template>
@@ -15,7 +16,10 @@
 import {ref} from "vue";
 import {data} from "@/components/template/tempData";
 import MobileEditor from "@/components/MobileEditor.vue";
-
+//import { defineCustomElement } from 'vue'
+/*import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
+const CurrentTimeElement = defineCustomElement(CurrentTime)
+customElements.define('current-time', CurrentTimeElement)*/
 const refEditor=ref(null)
 async function handleGetData(){
     await refEditor?.value?.getData()

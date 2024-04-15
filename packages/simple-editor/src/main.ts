@@ -8,6 +8,7 @@ import {defineCssVars} from "@mahdaad/tokens";
 import '@mahdaad/tokens/dist/index.css'
 
 const app = createApp(App)
+//app.config.compilerOptions.isCustomElement = (tag) => tag.includes('-')
 defineCssVars()
 app.use(createPinia())
 app.use(router)

@@ -35,6 +35,9 @@
   },
   "dependencies": {
     "@mahdaad/tokens": "^0.0.29",
+    "@unhead/vue": "^1.9.5",
+    "@vueuse/core": "^10.9.0",
+    "ant-design-vue": "4.x",
     "less": "^4.2.0",
     "pinia": "^2.1.7",
     "unocss-preset-autoprefixer": "^0.0.7",

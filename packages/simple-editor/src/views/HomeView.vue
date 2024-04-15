@@ -1,5 +1,10 @@
 <template>
   <div style="padding-top: 30px;">
+    <div>
+<!--      <current-time-1 id="sample"></current-time-1>
+      <my-vue-element></my-vue-element>-->
+<!--      <Button>111111</Button>-->
+    </div>
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
@@ -12,8 +17,43 @@
 
 <script setup lang="ts">
 import Editor from "@/components/Editor.vue";
-import {ref} from "vue";
+import {defineCustomElement, defineSSRCustomElement, onMounted, ref,getCurrentInstance } from "vue";
 import {data} from "@/components/template/tempData";
+//import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
+//import {HTMLElement} from "happy-dom";
+//console.log(CurrentTime)
+/*********************************************/
+/*const MyVueElement = defineCustomElement({
+  // normal Vue component options here
+  //props: {},
+  //emits: {},
+  template: `<div>this is my vue element</div>`,
+  // defineCustomElement only: CSS to be injected into shadow root
+  styles: [`/!* inlined css *!/`]
+})*/
+//const Test = defineCustomElement(CurrentTime)
+//customElements.define('my-vue-element', MyVueElement)
+/*********************************************/
+//console.log("111",CurrentTime)
+//CurrentTime.styles=['* {  background-color:red }']
+//const CurrentTimeElement = defineCustomElement(CurrentTime,)//{},{CurrentTime,styles:[]}
+//CurrentTime
+//{mode:'open'},
+//const CurrentTimeElement = defineCustomElement(CurrentTime)//{},{CurrentTime,styles:[]}
+//console.log(CurrentTimeElement())
+/*customElements.define('current-time-1', CurrentTimeElement,{
+  //shadow:false,
+  /!*extends:{
+  }*!/
+})*/
+/*const app = getCurrentInstance()
+onMounted(()=>{
+  console.log("this is app",app)
+  //const element=document.getElementById('sample')
+  //element.attachShadow({ mode: "open" });
+  //console.log("1111",element)
+})*/
+
 
 const refEditor=ref(null)
 async function handleGetData(){

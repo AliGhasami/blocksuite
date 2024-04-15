@@ -1,49 +1,25 @@
-import '../_common/components/rich-text/rich-text.js';
+/// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
 import { assertExists } from '@blocksuite/global/utils';
-import { type InlineRangeProvider } from '@blocksuite/inline';
+import type { InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
+import { z } from 'zod';
 
+import type { RichText } from '../_common/components/index.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
-import type { RichText } from '../_common/components/rich-text/rich-text.js';
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import type { NoteBlockComponent } from '../note-block/note-block.js';
-import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
-import type { ParagraphBlockModel } from './paragraph-model.js';
-import type { ParagraphService } from './paragraph-service.js';
+import type { NoteBlockComponent } from '../note-block/index.js';
+import { EdgelessRootBlockComponent } from '../root-block/index.js';
+//import { getStandardLanguage } from '../code-block/utils/code-languages.js';
+//import { getCodeLineRenderer } from '../code-block/utils/code-line-renderer.js';
+//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
+import type { MentionBlockModel } from './mention-model.js';
 
-const getPlaceholder = (model: ParagraphBlockModel) => {
-  if (model.type === 'text') {
-    return html`<span class="place-holder">
-      Press
-      <span class="short-code">@</span>
-      for AI &
-      <span class="short-code">/</span>
-      for Commands ...
-    </span>`;
-    //return "Type '/' for commands";
-  }
-
-  const placeholders = {
-    h1: 'Heading 1',
-    h2: 'Heading 2',
-    h3: 'Heading 3',
-    h4: 'Heading 4',
-    h5: 'Heading 5',
-    h6: 'Heading 6',
-    quote: '',
-  };
-  return placeholders[model.type];
-};
-
-@customElement('affine-paragraph')
-export class ParagraphBlockComponent extends BlockElement<
-  ParagraphBlockModel,
-  ParagraphService
-> {
+@customElement('affine-mention')
+export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
   static override styles = css`
     affine-paragraph {
       display: block;
@@ -285,7 +261,7 @@ export class ParagraphBlockComponent extends BlockElement<
   };
 
   override renderBlock(): TemplateResult<1> {
-    const { type } = this.model;
+    //const { type } = this.model;
     const children = html`<div
       class="affine-block-children-container"
       style="padding-left: ${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px"
@@ -295,10 +271,7 @@ export class ParagraphBlockComponent extends BlockElement<
 
     return html`
       <div class="affine-paragraph-block-container">
-        <div class="affine-paragraph-rich-text-wrapper claytap-${type}">
-          <div contenteditable="false" class="affine-paragraph-placeholder">
-            ${getPlaceholder(this.model)}
-          </div>
+        <div class="affine-paragraph-rich-text-wrapper claytap">
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
@@ -314,15 +287,18 @@ export class ParagraphBlockComponent extends BlockElement<
           ></rich-text>
         </div>
         ${children}
-
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;
   }
 }
+//  .markdownShortcutHandler=${this.markdownShortcutHandler}
+// .embedChecker=${this.embedChecker}
+//
+// .attributeRenderer=${this.attributeRenderer}
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-paragraph': ParagraphBlockComponent;
+    'affine-mention': MentionBlockComponent;
   }
 }
