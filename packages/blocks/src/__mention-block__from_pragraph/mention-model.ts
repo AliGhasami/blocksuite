@@ -10,9 +10,10 @@ export type ParagraphType =
   | 'h5'
   | 'h6';
 
-export const ParagraphBlockSchema = defineBlockSchema({
-  flavour: 'affine:paragraph',
+export const MentionBlockSchema = defineBlockSchema({
+  flavour: 'affine:mention',
   props: internal => {
+    //console.log('1111', internal);
     return {
       type: 'text' as ParagraphType,
       text: internal.Text(),
@@ -30,4 +31,4 @@ export const ParagraphBlockSchema = defineBlockSchema({
   },
 });
 
-export type ParagraphBlockModel = SchemaToModel<typeof ParagraphBlockSchema>;
+export type MentionBlockModel = SchemaToModel<typeof MentionBlockSchema>;

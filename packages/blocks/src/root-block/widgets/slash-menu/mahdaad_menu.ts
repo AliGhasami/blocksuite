@@ -154,7 +154,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: mention,
         action: ({ rootElement, model }) => {
-          runCommand(rootElement, 'affine:mention', 'mention');
+          runCommand(rootElement, 'affine:mention', 'text');
+          //runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'h1');
         },
@@ -219,7 +220,9 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Code',
         description: 'Description',
         icon: code,
-        action: ({ rootElement, model }) => {},
+        action: ({ rootElement, model }) => {
+          runCommand(rootElement, 'affine:code', undefined);
+        },
       },
       {
         title: 'File',
@@ -437,13 +440,18 @@ function runCommand(
       props: { type },
     })
     .inline((ctx, next) => {
+      console.log('change inline menu');
+      //console.log('2222');
       const newModels = ctx.updatedBlocks;
       if (!newModels) {
         return false;
       }
 
       // Reset selection if the target is code block
-      if (flavour === 'affine:code') {
+      //flavour === 'affine:code'
+      // 'affine:mention'
+      if (['affine:code', 'affine:mention'].includes(flavour)) {
+        //console.log('3333');
         if (newModels.length !== 1) {
           console.error("Failed to reset selection! New model length isn't 1");
           return false;
@@ -452,6 +460,7 @@ function runCommand(
         onModelTextUpdated(rootElement.host, codeModel, richText => {
           const inlineEditor = richText.inlineEditor;
           assertExists(inlineEditor);
+          //console.log('1111');
           inlineEditor.focusEnd();
         }).catch(console.error);
       }

@@ -7,11 +7,11 @@ import {
 } from '../_common/inline/presets/affine-inline-specs.js';
 import { affineInlineMarkdownMatches } from '../_common/inline/presets/markdown.js';
 import { ReferenceNodeConfig } from '../_common/inline/presets/nodes/reference-node/reference-config.js';
-import type { ParagraphBlockModel } from './paragraph-model.js';
+import type { MentionBlockModel } from './mention-model.js';
 
-export class ParagraphService<
+export class MentionService<
   TextAttributes extends AffineTextAttributes = AffineTextAttributes,
-> extends BlockService<ParagraphBlockModel> {
+> extends BlockService<MentionBlockModel> {
   readonly inlineManager = new InlineManager<TextAttributes>();
   readonly referenceNodeConfig = new ReferenceNodeConfig();
 
