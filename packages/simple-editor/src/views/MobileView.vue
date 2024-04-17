@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue";
-import {data} from "@/components/temp/tempData";
+import {data} from "@/components/template/tempData";
 import MobileEditor from "@/components/MobileEditor.vue";
 
 const refEditor=ref(null)
