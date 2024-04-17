@@ -84,7 +84,9 @@ export class AffineFormatBarWidget extends WidgetElement {
     const layout = document.querySelector('side-layout-modal');
     if (layout) return false;
 
-    const readonly = this.doc.awarenessStore.isReadonly(this.doc);
+    const readonly = this.doc.awarenessStore.isReadonly(
+      this.doc.blockCollection
+    );
     if (readonly) return false;
 
     if (
@@ -100,7 +102,12 @@ export class AffineFormatBarWidget extends WidgetElement {
     ) {
       const selectedBlock = this._selectedBlockElements[0];
       if (
-        !matchFlavours(selectedBlock.model, ['affine:paragraph', 'affine:list'])
+        !matchFlavours(selectedBlock.model, [
+          'affine:paragraph',
+          'affine:list',
+          'affine:code',
+          'affine:image',
+        ])
       ) {
         return false;
       }
@@ -530,7 +537,7 @@ export class AffineFormatBarWidget extends WidgetElement {
 
     const items = ConfigRenderer(this);
 
-    return html` <div
+    return html`<div
       class="${AFFINE_FORMAT_BAR_WIDGET}"
       @pointerdown="${stopPropagation}"
       @wheel="${stopPropagation}"

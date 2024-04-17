@@ -17,7 +17,6 @@ import {
   DualLinkIcon,
   DuplicateIcon,
   FrameIcon,
-  GroupingIcon,
   ImageIcon20,
   NewDocIcon,
   NowIcon,
@@ -35,6 +34,8 @@ import {
 } from '../../../_common/utils/index.js';
 import { clearMarksOnDiscontinuousInput } from '../../../_common/utils/inline-editor.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
+import { GroupingIcon } from '../../../database-block/data-view/common/icons/index.js';
+import { viewPresets } from '../../../database-block/data-view/index.js';
 import { FigmaIcon } from '../../../embed-figma-block/styles.js';
 import { GithubIcon } from '../../../embed-github-block/styles.js';
 import { LoomIcon } from '../../../embed-loom-block/styles.js';
@@ -484,7 +485,13 @@ export const menuGroups: SlashMenuOptions['menus'] = [
             index + 1
           );
           const service = rootElement.std.spec.getService('affine:database');
-          service.initDatabaseBlock(rootElement.doc, model, id, 'table', false);
+          service.initDatabaseBlock(
+            rootElement.doc,
+            model,
+            id,
+            viewPresets.tableViewConfig,
+            false
+          );
           tryRemoveEmptyLine(model);
         },
       },
@@ -519,7 +526,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
             rootElement.doc,
             model,
             id,
-            'kanban',
+            viewPresets.kanbanViewConfig,
             false
           );
           tryRemoveEmptyLine(model);
@@ -620,7 +627,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         icon: ArrowUpBigIcon,
         action: ({ rootElement, model }) => {
           const doc = rootElement.doc;
-          const previousSiblingModel = doc.getPreviousSibling(model);
+          const previousSiblingModel = doc.getPrev(model);
           if (!previousSiblingModel) return;
 
           const parentModel = doc.getParent(previousSiblingModel);
@@ -634,7 +641,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         icon: ArrowDownBigIcon,
         action: ({ rootElement, model }) => {
           const doc = rootElement.doc;
-          const nextSiblingModel = doc.getNextSibling(model);
+          const nextSiblingModel = doc.getNext(model);
           if (!nextSiblingModel) return;
 
           const parentModel = doc.getParent(nextSiblingModel);

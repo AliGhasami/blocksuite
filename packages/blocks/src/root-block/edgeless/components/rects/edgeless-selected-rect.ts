@@ -455,9 +455,6 @@ export class EdgelessSelectedRect extends WithDisposable(LitElement) {
   @property({ attribute: false })
   toolbarVisible = false;
 
-  @property({ attribute: false })
-  setToolbarVisible!: (visible: boolean) => void;
-
   private _resizeManager: HandleResizeManager;
   private _cursorRotate = 0;
   private _propDiposables: Disposable[] = [];
@@ -610,7 +607,6 @@ export class EdgelessSelectedRect extends WithDisposable(LitElement) {
         }
       });
     });
-    this.setToolbarVisible(false);
     this._updateResizeManagerState(true);
   };
 
@@ -810,7 +806,6 @@ export class EdgelessSelectedRect extends WithDisposable(LitElement) {
     this._scaleDirection = undefined;
     this._updateMode();
 
-    this.setToolbarVisible(true);
     this.edgeless.slots.elementResizeEnd.emit();
   };
 
@@ -1143,6 +1138,7 @@ export class EdgelessSelectedRect extends WithDisposable(LitElement) {
               top: `${y - top - borderWidth}px`,
               width: `${w * this.zoom}px`,
               height: `${h * this.zoom}px`,
+              transform: `rotate(${element.rotate}deg)`,
               border: `1px solid var(--affine-primary-color)`,
             };
             return html`<div

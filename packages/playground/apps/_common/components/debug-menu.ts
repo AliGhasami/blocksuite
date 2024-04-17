@@ -484,7 +484,7 @@ export class DebugMenu extends ShadowlessElement {
 
   private _toggleReadonly() {
     const doc = this.doc;
-    doc.awarenessStore.setReadonly(doc, !doc.readonly);
+    doc.awarenessStore.setReadonly(doc.blockCollection, !doc.readonly);
   }
 
   private _shareSelection() {

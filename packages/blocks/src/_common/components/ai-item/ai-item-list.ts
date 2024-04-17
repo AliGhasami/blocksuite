@@ -41,22 +41,27 @@ export class AIItemList extends WithDisposable(LitElement) {
   @property({ attribute: false })
   groups!: AIItemGroupConfig[];
 
-  private _getGroupName(name: string) {
-    const groupName = name === 'others' ? name : name + ' with ai';
-    return groupName.toLocaleUpperCase();
-  }
+  @property({ attribute: false })
+  onClick?: () => void;
 
   override render() {
     return html`${repeat(this.groups, group => {
       return html`
         ${group.name
           ? html`<div class="group-name">
-              ${this._getGroupName(group.name)}
+              ${group.name.toLocaleUpperCase()}
             </div>`
           : nothing}
         ${repeat(
           group.items,
-          item => html`<ai-item .item=${item} .host=${this.host}></ai-item>`
+          item =>
+            html`<ai-item
+              .onClick=${() => {
+                this.onClick?.();
+              }}
+              .item=${item}
+              .host=${this.host}
+            ></ai-item>`
         )}
       `;
     })}`;
