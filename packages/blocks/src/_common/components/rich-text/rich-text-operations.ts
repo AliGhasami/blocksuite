@@ -937,6 +937,7 @@ export function handleLineStartBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  console.log('handleLineStartBackspace');
   if (
     handleListBlockBackspace(editorHost, model) ||
     handleParagraphBlockBackspace(editorHost, model)
@@ -951,6 +952,7 @@ export function handleLineEndForwardDelete(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  console.log('handleLineEndForwardDelete');
   if (
     handleCodeBlockForwardDelete(model) ||
     handleListBlockForwardDelete(editorHost, model) ||

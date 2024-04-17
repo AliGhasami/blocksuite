@@ -202,7 +202,20 @@ export class HintBlockComponent extends BlockElement<
       <div class=${'affine-list-block-container'}>
         <!-- <span>11111</span>-->
         <div class=${`affine-list-rich-text-wrapper ${checked}`}>
-          ${this._toggleTemplate(collapsed)} ${listIcon}
+          <rich-text
+            .yText=${this.model.text.yText}
+            .undoManager=${this.doc.history}
+            .attributeRenderer=${this.attributeRenderer}
+            .attributesSchema=${this.attributesSchema}
+            .markdownShortcutHandler=${this.markdownShortcutHandler}
+            .embedChecker=${this.embedChecker}
+            .readonly=${this.doc.readonly}
+            .inlineRangeProvider=${this._inlineRangeProvider}
+            .enableClipboard=${false}
+            .enableUndoRedo=${false}
+            .wrapText=${true}
+          ></rich-text>
+          <span>1111111</span>
           <rich-text
             .yText=${this.model.text.yText}
             .undoManager=${this.doc.history}

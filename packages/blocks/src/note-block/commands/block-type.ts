@@ -75,7 +75,8 @@ export const updateBlockType: Command<
   };
   const appendDivider: Command<never, 'updatedBlocks'> = (_, next) => {
     //debugger;
-    if (flavour !== 'affine:divider' || flavour !== 'affine:mention') {
+    // || flavour !== 'affine:mention'
+    if (flavour !== 'affine:divider') {
       return false;
     }
     const model = blockModels.at(-1);
@@ -200,9 +201,9 @@ export const updateBlockType: Command<
     // focus
     .try(chain => [
       chain.inline((_, next) => {
-        if (
-          ['affine:code', 'affine:divider', 'affine:mention'].includes(flavour)
-        ) {
+        //'affine:mention'
+        console.log('for check and focus ');
+        if (['affine:code', 'affine:divider'].includes(flavour)) {
           return next();
         }
         return false;

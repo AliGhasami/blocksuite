@@ -135,6 +135,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: hint,
         action: ({ rootElement }) => {
+          console.log('rootElement', rootElement);
           runCommand(rootElement, 'affine:hint', 'numbered');
         },
       },
@@ -156,7 +157,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: mention,
         action: ({ rootElement, model }) => {
-          runCommand(rootElement, 'affine:mention', 'text');
+          runCommand(rootElement, 'affine:mention', undefined);
+          //runCommand(rootElement, 'affine:mention', 'text');
           //runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'h1');
@@ -442,6 +444,8 @@ function runCommand(
       props: { type },
     })
     .inline((ctx, next) => {
+      //console.log('this is inline in menu ', ctx);
+      // return;
       console.log('change inline menu');
       //console.log('2222');
       const newModels = ctx.updatedBlocks;
