@@ -54,6 +54,7 @@ export function handleBlockEndEnter(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  console.log('handleBlockEndEnter');
   //debugger;
   const doc = model.doc;
   const parent = doc.getParent(model);
@@ -354,6 +355,7 @@ export function handleMultiBlockOutdent(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
+  console.log('handleMultiBlockOutdent');
   if (!models.length) return;
   const doc = models[0].doc;
 
@@ -541,6 +543,7 @@ function handleParagraphOrListSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
+  console.log('handleParagraphOrListSibling');
   const doc = model.doc;
   if (!matchFlavours(previousSibling, ['affine:paragraph', 'affine:list']))
     return false;
@@ -565,6 +568,7 @@ function handleEmbedDividerCodeSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
+  console.log('handleEmbedDividerCodeSibling');
   const doc = model.doc;
   if (matchFlavours(previousSibling, ['affine:divider'])) {
     doc.deleteBlock(previousSibling);
@@ -593,6 +597,7 @@ function handleEmbedDividerCodeSibling(
 }
 
 function handleNoPreviousSibling(editorHost: EditorHost, model: ExtendedModel) {
+  console.log('handleNoPreviousSibling');
   const doc = model.doc;
   const text = model.text;
   const titleElement = getDocTitleByEditorHost(
@@ -629,6 +634,7 @@ function handleParagraphDeleteActions(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  console.log('handleParagraphDeleteActions');
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent) return false;
@@ -712,6 +718,7 @@ function handleParagraphBlockBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  console.log('handleParagraphBlockBackspace');
   const doc = model.doc;
   if (!matchFlavours(model, ['affine:paragraph'])) return false;
 
@@ -754,6 +761,7 @@ function handleParagraphBlockForwardDelete(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  console.log('handleParagraphBlockForwardDelete');
   const doc = model.doc;
   function handleParagraphOrList(
     doc: Doc,

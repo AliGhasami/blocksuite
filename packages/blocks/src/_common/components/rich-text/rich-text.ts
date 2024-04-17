@@ -374,6 +374,8 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
+    //console.log('rich text render');
+    //console.log('nowrap-lines', this.wrapText);
     const classes = classMap({
       'inline-editor': true,
       'nowrap-lines': !this.wrapText,

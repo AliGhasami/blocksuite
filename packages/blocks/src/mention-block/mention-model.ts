@@ -5,7 +5,13 @@ export const MentionBlockSchema = defineBlockSchema({
   metadata: {
     version: 1,
     role: 'content',
-    children: [],
+    //children: [],
+    parent: [
+      'affine:note',
+      'affine:database',
+      'affine:list',
+      'affine:paragraph',
+    ],
   },
 });
 

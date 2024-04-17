@@ -134,7 +134,9 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Hint',
         description: 'Description',
         icon: hint,
-        action: ({ rootElement }) => {},
+        action: ({ rootElement }) => {
+          runCommand(rootElement, 'affine:hint', 'numbered');
+        },
       },
       {
         title: 'Divider',
@@ -450,21 +452,23 @@ function runCommand(
       // Reset selection if the target is code block
       //flavour === 'affine:code'
       // 'affine:mention'
-      if (['affine:code', 'affine:mention'].includes(flavour)) {
+      if (['affine:code'].includes(flavour)) {
         //console.log('3333');
         if (newModels.length !== 1) {
           console.error("Failed to reset selection! New model length isn't 1");
           return false;
         }
         const codeModel = newModels[0];
+        console.log('onModelTextUpdated');
         onModelTextUpdated(rootElement.host, codeModel, richText => {
+          console.log('model update ');
           const inlineEditor = richText.inlineEditor;
           assertExists(inlineEditor);
           //console.log('1111');
           inlineEditor.focusEnd();
         }).catch(console.error);
       }
-
+      console.log('next - change inline menu');
       return next();
     })
     .run();

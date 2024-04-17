@@ -287,7 +287,7 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
     /*    console.log('');
     console.log('');
     console.log('');*/
-
+    //            .wrapText=${false}
     return html`
       <div>
         <div
@@ -299,7 +299,6 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .wrapText=${false}
             .inlineRangeProvider=${this._inlineRangeProvider}
           ></rich-text>
           <affine-block-selection .block=${this}></affine-block-selection>
