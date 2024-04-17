@@ -1,165 +1,153 @@
-/// <reference types="vite/client" />
-import '../_common/components/block-selection.js';
+import '../_common/components/rich-text/rich-text.js';
+import './components/code-option.js';
+import './components/lang-list.js';
 
 import { assertExists } from '@blocksuite/global/utils';
-import type { InlineRangeProvider } from '@blocksuite/inline';
+import {
+  INLINE_ROOT_ATTR,
+  type InlineRangeProvider,
+  type InlineRootElement,
+} from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
-import { css, html, nothing, type TemplateResult } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { limitShift, offset, shift } from '@floating-ui/dom';
+import { css, html, nothing, render, type TemplateResult } from 'lit';
+import { customElement, query, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { ref } from 'lit/directives/ref.js';
+import { repeat } from 'lit/directives/repeat.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { type BundledLanguage, type Highlighter } from 'shiki';
 import { z } from 'zod';
 
-import type { RichText } from '../_common/components/index.js';
+import { HoverController } from '../_common/components/index.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
-import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import type { NoteBlockComponent } from '../note-block/index.js';
-import { EdgelessRootBlockComponent } from '../root-block/index.js';
-//import { getStandardLanguage } from '../code-block/utils/code-languages.js';
-//import { getCodeLineRenderer } from '../code-block/utils/code-line-renderer.js';
-//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import type { MentionBlockModel } from './mention-model.js';
+import type { RichText } from '../_common/components/rich-text/rich-text.js';
+import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
+import { ArrowDownIcon } from '../_common/icons/index.js';
+import { listenToThemeChange } from '../_common/theme/utils.js';
+import type { NoteBlockComponent } from '../note-block/note-block.js';
+import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
+import { CodeClipboardController } from './clipboard/index.js';
+import type { CodeBlockModel, HighlightOptionsGetter } from './code-model.js';
+import { CodeOptionTemplate } from './components/code-option.js';
+import { createLangList } from './components/lang-list.js';
+import { getStandardLanguage, isPlaintext } from './utils/code-languages.js';
+import { getCodeLineRenderer } from './utils/code-line-renderer.js';
+import {
+  DARK_THEME,
+  FALLBACK_LANG,
+  LIGHT_THEME,
+  PLAIN_TEXT_LANG_INFO,
+  type StrictLanguageInfo,
+} from './utils/consts.js';
+import { getHighLighter } from './utils/high-lighter.js';
 
-@customElement('affine-mention')
-export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
+@customElement('affine-code')
+export class CodeBlockComponent extends BlockElement<CodeBlockModel> {
   static override styles = css`
-    affine-mention {
-      display: block;
-      margin: 10px 0;
-      //font-size: var(--affine-font-base);
+    code-block {
+      position: relative;
+      z-index: 1;
     }
 
-    .affine-paragraph-block-container {
+    .affine-code-block-container {
+      font-size: var(--affine-font-sm);
+      line-height: var(--affine-line-height);
+      position: relative;
+      padding: 32px 0px 12px 0px;
+      background: var(--affine-background-code-block);
+      border-radius: 10px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+
+    .affine-code-block-container .inline-editor {
+      font-family: var(--affine-font-code-family);
+      font-variant-ligatures: none;
+    }
+
+    .affine-code-block-container .lang-list-wrapper {
+      position: absolute;
+      font-size: var(--affine-font-sm);
+      line-height: var(--affine-line-height);
+      top: 12px;
+      left: 12px;
+    }
+
+    .affine-code-block-container > .lang-list-wrapper {
+      visibility: hidden;
+    }
+    .affine-code-block-container:hover > .lang-list-wrapper {
+      visibility: visible;
+    }
+
+    .affine-code-block-container > .lang-list-wrapper > .lang-button {
+      display: flex;
+      justify-content: flex-start;
+      padding: 0 8px;
+    }
+
+    .affine-code-block-container rich-text {
+      /* to make sure the resize observer can be triggered as expected */
+      display: block;
+      position: relative;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 20px;
+      width: 90%;
+    }
+
+    .affine-code-block-container .rich-text-container {
       position: relative;
       border-radius: 4px;
-    }
-    .affine-paragraph-rich-text-wrapper {
-      position: relative;
-    }
-    /* .affine-paragraph-rich-text-wrapper rich-text {
-      -webkit-font-smoothing: antialiased;
-    } */
-    code {
-      font-size: calc(var(--affine-font-base) - 3px);
-    }
-    /*.claytap-h1 {
-      font-size: var(--affine-font-h-1);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 18px;
-      margin-bottom: 10px;
-    }*/
-    .claytap-h1 code {
-      font-size: calc(var(--affine-font-base) + 8px);
-    }
-    /*.claytap-h2 {
-      font-size: var(--affine-font-h-2);
-      font-weight: 600;
-      line-height: calc(1em + 10px);
-      margin-top: 14px;
-      margin-bottom: 10px;
-    }*/
-    .claytap-h2 code {
-      font-size: calc(var(--affine-font-base) + 6px);
-    }
-    /*.claytap-h3 {
-      font-size: var(--affine-font-h-3);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }*/
-    .claytap-h3 code {
-      font-size: calc(var(--affine-font-base) + 4px);
-    }
-    .claytap-h4 {
-      font-size: var(--affine-font-h-4);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-    .claytap-h4 code {
-      font-size: calc(var(--affine-font-base) + 2px);
-    }
-    .claytap-h5 {
-      font-size: var(--affine-font-h-5);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-    .claytap-h5 code {
-      font-size: calc(var(--affine-font-base));
-    }
-    .claytap-h6 {
-      font-size: var(--affine-font-h-6);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-    .claytap-h6 code {
-      font-size: calc(var(--affine-font-base) - 2px);
-    }
-    .quote {
-      line-height: 26px;
-      padding-left: 17px;
-      margin-top: var(--affine-paragraph-space);
-      padding-top: 10px;
-      padding-bottom: 10px;
-      position: relative;
-    }
-    .quote::after {
-      content: '';
-      width: 2px;
-      height: calc(100% - 20px);
-      margin-top: 10px;
-      margin-bottom: 10px;
-      position: absolute;
-      left: 0;
-      top: 0;
-      background: var(--affine-quote-color);
-      border-radius: 18px;
+      padding: 4px 12px 4px 60px;
     }
 
-    .affine-paragraph-placeholder {
+    #line-numbers {
       position: absolute;
-      display: none;
-      left: 0;
-      bottom: 0;
-      pointer-events: none;
-      color: var(--affine-black-30);
-      fill: var(--affine-black-30);
+      text-align: right;
+      left: 20px;
+      line-height: var(--affine-line-height);
+      color: var(--affine-text-secondary-color);
     }
-    .affine-paragraph-placeholder.visible {
-      display: block;
+
+    .affine-code-block-container.wrap #line-numbers {
+      top: calc(var(--affine-line-height) + 4px);
+    }
+
+    .affine-code-block-container.wrap #line-numbers > div {
+      margin-top: calc(var(--top, 0) / 1 - var(--affine-line-height));
+    }
+
+    .code-block-option {
+      box-shadow: var(--affine-shadow-2);
+      border-radius: 8px;
+      list-style: none;
+      padding: 4px;
+      width: 40px;
+      background-color: var(--affine-background-overlay-panel-color);
+      margin: 0;
     }
   `;
 
-  get inlineManager() {
-    const inlineManager = this.service?.inlineManager;
-    assertExists(inlineManager);
-    return inlineManager;
-  }
-  get attributesSchema() {
-    return this.inlineManager.getSchema();
-  }
-  get attributeRenderer() {
-    return this.inlineManager.getRenderer();
-  }
-  get markdownShortcutHandler() {
-    return this.inlineManager.markdownShortcutHandler;
-  }
-  get embedChecker() {
-    return this.inlineManager.embedChecker;
+  @state()
+  private _wrap = false;
+
+  @query('.lang-button')
+  private _langButton!: HTMLButtonElement;
+
+  @state()
+  private _langListAbortController?: AbortController;
+
+  clipboardController = new CodeClipboardController(this);
+
+  private get _showLangList() {
+    return !!this._langListAbortController;
   }
 
-  private _inlineRangeProvider: InlineRangeProvider | null = null;
-
-  @query('rich-text')
-  private _richTextElement?: RichText;
-
-  @query('.affine-paragraph-placeholder')
-  private _placeholderContainer?: HTMLElement;
+  get readonly() {
+    return this.doc.readonly;
+  }
 
   override get topContenteditableElement() {
     if (this.rootElement instanceof EdgelessRootBlockComponent) {
@@ -169,9 +157,135 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
     return this.rootElement;
   }
 
-  get inlineEditor() {
-    return this._richTextElement?.inlineEditor;
+  highlightOptionsGetter: HighlightOptionsGetter | null = null;
+
+  readonly attributesSchema = z.object({});
+  readonly getAttributeRenderer = () =>
+    getCodeLineRenderer(() => ({
+      lang:
+        getStandardLanguage(this.model.language.toLowerCase())?.id ??
+        'plaintext',
+      highlighter: this._highlighter,
+    }));
+
+  private _richTextResizeObserver: ResizeObserver = new ResizeObserver(() => {
+    this._updateLineNumbers();
+  });
+
+  /**
+   * Given the high cost associated with updating the highlight,
+   * it is preferable to do so only when a change in language occurs.
+   *
+   * The variable is used to store the "current" language info,
+   * also known as the "previous" language
+   * when a language change occurs and the highlighter is not updated.
+   *
+   * In most cases, the language will be equal to normalizing the language of the model.
+   *
+   * See {@link updated}
+   */
+  private _perviousLanguage: StrictLanguageInfo = PLAIN_TEXT_LANG_INFO;
+  private _highlighter: Highlighter | null = null;
+  private async _startHighlight(lang: StrictLanguageInfo) {
+    if (this._highlighter) {
+      const loadedLangs = this._highlighter.getLoadedLanguages();
+      if (!isPlaintext(lang.id) && !loadedLangs.includes(lang.id)) {
+        this._highlighter
+          .loadLanguage(lang.id)
+          .then(() => {
+            const richText = this.querySelector('rich-text');
+            const inlineEditor = richText?.inlineEditor;
+            if (inlineEditor) {
+              inlineEditor.requestUpdate();
+            }
+          })
+          .catch(console.error);
+      }
+      return;
+    }
+    this._highlighter = await getHighLighter({
+      themes: [LIGHT_THEME, DARK_THEME],
+      langs: [lang.id],
+    });
+
+    const richText = this.querySelector('rich-text');
+    assertExists(richText);
+    const inlineEditor = richText.inlineEditor;
+    assertExists(inlineEditor);
+    const range = inlineEditor.getInlineRange();
+    inlineEditor.requestUpdate();
+    if (range) {
+      inlineEditor.setInlineRange(range);
+    }
   }
+
+  private _inlineRangeProvider: InlineRangeProvider | null = null;
+
+  get inlineEditor() {
+    const inlineRoot = this.querySelector<InlineRootElement>(
+      `[${INLINE_ROOT_ATTR}]`
+    );
+    if (!inlineRoot) {
+      throw new Error('Inline editor root not found');
+    }
+    return inlineRoot.inlineEditor;
+  }
+
+  @query('rich-text')
+  private _richTextElement?: RichText;
+
+  private _whenHover = new HoverController(this, ({ abortController }) => {
+    const selection = this.host.selection;
+    const textSelection = selection.find('text');
+    if (
+      !!textSelection &&
+      (!!textSelection.to || !!textSelection.from.length)
+    ) {
+      return null;
+    }
+
+    const blockSelections = selection.filter('block');
+    if (
+      blockSelections.length > 1 ||
+      (blockSelections.length === 1 && blockSelections[0].path !== this.path)
+    ) {
+      return null;
+    }
+
+    return {
+      template: ({ updatePortal }) =>
+        CodeOptionTemplate({
+          anchor: this,
+          model: this.model,
+          wrap: this._wrap,
+          onClickWrap: () => {
+            this._wrap = !this._wrap;
+            updatePortal();
+          },
+          abortController,
+        }),
+      computePosition: {
+        referenceElement: this,
+        placement: 'right-start',
+        middleware: [
+          offset({
+            mainAxis: 12,
+            crossAxis: 10,
+          }),
+          shift({
+            crossAxis: true,
+            padding: {
+              top: PAGE_HEADER_HEIGHT + 12,
+              bottom: 12,
+              right: 12,
+            },
+            limiter: limitShift(),
+          }),
+        ],
+        autoUpdate: true,
+      },
+    };
+  });
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
@@ -181,139 +295,326 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
 
   override connectedCallback() {
     super.connectedCallback();
+    // set highlight options getter used by "exportToHtml"
+    this.clipboardController.hostConnected();
+    this.setHighlightOptionsGetter(() => {
+      return {
+        lang: this._perviousLanguage.id as BundledLanguage,
+        highlighter: this._highlighter,
+      };
+    });
+
+    this._disposables.add(
+      listenToThemeChange(this, () => {
+        if (!this._highlighter) return;
+        const richText = this.querySelector('rich-text');
+        const inlineEditor = richText?.inlineEditor;
+        if (!inlineEditor) return;
+
+        // update code-line theme
+        setTimeout(() => {
+          inlineEditor.requestUpdate();
+        });
+      })!
+    );
+
     bindContainerHotkey(this);
+
+    const selectionManager = this.host.selection;
+    const INDENT_SYMBOL = '  ';
+    const LINE_BREAK_SYMBOL = '\n';
+    const allIndexOf = (
+      text: string,
+      symbol: string,
+      start = 0,
+      end = text.length
+    ) => {
+      const indexArr: number[] = [];
+      let i = start;
+
+      while (i < end) {
+        const index = text.indexOf(symbol, i);
+        if (index === -1 || index > end) {
+          break;
+        }
+        indexArr.push(index);
+        i = index + 1;
+      }
+      return indexArr;
+    };
+
+    this.bindHotKey({
+      Backspace: ctx => {
+        const state = ctx.get('keyboardState');
+        const textSelection = selectionManager.find('text');
+        if (!textSelection) {
+          state.raw.preventDefault();
+          return;
+        }
+
+        const from = textSelection.from;
+
+        if (from.index === 0 && from.length === 0) {
+          state.raw.preventDefault();
+          selectionManager.setGroup('note', [
+            selectionManager.create('block', { path: this.path }),
+          ]);
+          return true;
+        }
+
+        return;
+      },
+      Tab: ctx => {
+        const state = ctx.get('keyboardState');
+        const event = state.raw;
+        const inlineEditor = this.inlineEditor;
+        const inlineRange = inlineEditor.getInlineRange();
+        if (inlineRange) {
+          event.stopPropagation();
+          event.preventDefault();
+
+          const text = this.inlineEditor.yText.toString();
+          const index = text.lastIndexOf(
+            LINE_BREAK_SYMBOL,
+            inlineRange.index - 1
+          );
+          const indexArr = allIndexOf(
+            text,
+            LINE_BREAK_SYMBOL,
+            inlineRange.index,
+            inlineRange.index + inlineRange.length
+          )
+            .map(i => i + 1)
+            .reverse();
+          if (index !== -1) {
+            indexArr.push(index + 1);
+          } else {
+            indexArr.push(0);
+          }
+          indexArr.forEach(i => {
+            this.inlineEditor.insertText(
+              {
+                index: i,
+                length: 0,
+              },
+              INDENT_SYMBOL
+            );
+          });
+          this.inlineEditor.setInlineRange({
+            index: inlineRange.index + 2,
+            length:
+              inlineRange.length + (indexArr.length - 1) * INDENT_SYMBOL.length,
+          });
+
+          return true;
+        }
+
+        return;
+      },
+      'Shift-Tab': ctx => {
+        const state = ctx.get('keyboardState');
+        const event = state.raw;
+        const inlineEditor = this.inlineEditor;
+        const inlineRange = inlineEditor.getInlineRange();
+        if (inlineRange) {
+          event.stopPropagation();
+          event.preventDefault();
+
+          const text = this.inlineEditor.yText.toString();
+          const index = text.lastIndexOf(
+            LINE_BREAK_SYMBOL,
+            inlineRange.index - 1
+          );
+          let indexArr = allIndexOf(
+            text,
+            LINE_BREAK_SYMBOL,
+            inlineRange.index,
+            inlineRange.index + inlineRange.length
+          )
+            .map(i => i + 1)
+            .reverse();
+          if (index !== -1) {
+            indexArr.push(index + 1);
+          } else {
+            indexArr.push(0);
+          }
+          indexArr = indexArr.filter(
+            i => text.slice(i, i + 2) === INDENT_SYMBOL
+          );
+          indexArr.forEach(i => {
+            this.inlineEditor.deleteText({
+              index: i,
+              length: 2,
+            });
+          });
+          if (indexArr.length > 0) {
+            this.inlineEditor.setInlineRange({
+              index:
+                inlineRange.index -
+                (indexArr[indexArr.length - 1] < inlineRange.index ? 2 : 0),
+              length:
+                inlineRange.length -
+                (indexArr.length - 1) * INDENT_SYMBOL.length,
+            });
+          }
+
+          return true;
+        }
+
+        return;
+      },
+    });
 
     this._inlineRangeProvider = getInlineRangeProvider(this);
   }
 
-  override firstUpdated() {
-    this.model.propsUpdated.on(this._updatePlaceholder);
-    this.host.selection.slots.changed.on(this._updatePlaceholder);
-
-    this.updateComplete
-      .then(() => {
-        this._updatePlaceholder();
-
-        const inlineEditor = this.inlineEditor;
-        if (!inlineEditor) return;
-        this.disposables.add(
-          inlineEditor.slots.inputting.on(this._updatePlaceholder)
-        );
-      })
-      .catch(console.error);
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this.clipboardController.hostDisconnected();
+    this._richTextResizeObserver.disconnect();
   }
 
-  //TODO(@Flrande) wrap placeholder in `rich-text` or inline-editor to make it more developer-friendly
-  private _updatePlaceholder = () => {
-    if (
-      !this._placeholderContainer ||
-      !this._richTextElement ||
-      !this.inlineEditor
-    )
-      return;
-
-    //TODO(@alighasami) check is last Paragraph
-    /*let isLastParagraph = false;
-    const note = this.doc.getBlockByFlavour('affine:note');
-    const paragraphList = note.length ? note[0].children : [];
-    const currentBlockId = this.dataset.blockId;
-    if (
-      paragraphList.length &&
-      paragraphList[paragraphList.length - 1].id == currentBlockId
-    ) {
-      isLastParagraph = true;
-    }*/
-    let isEmpty = false;
-    const note = this.doc.getBlockByFlavour('affine:note');
-    const paragraphList = note.length ? note[0].children : [];
-    if (paragraphList.length == 1) {
-      isEmpty = true;
-    }
-    //console.log('this.selected', this.selected);
-    //console.log('this.inlineEditor.isComposing', this.inlineEditor.isComposing);
-    //console.log('this.inlineEditor.yTextLength', this.inlineEditor.yTextLength);
-    if (
-      this.inlineEditor.yTextLength > 0 ||
-      this.inlineEditor.isComposing ||
-      (!this.selected && !isEmpty) ||
-      this._isInDatabase()
-    ) {
-      this._placeholderContainer.classList.remove('visible');
-    } else {
-      this._placeholderContainer.classList.add('visible');
-    }
-    if (this.selected) {
-      this._placeholderContainer.classList.add('hover');
-    }
-    //console.log('is selected', this.selected);
-    //if()
-  };
-
-  private _isInDatabase = () => {
-    let parent = this.parentElement;
-    while (parent && parent !== document.body) {
-      if (parent.tagName.toLowerCase() === 'affine-database') {
-        return true;
+  override updated() {
+    if (this.model.language !== this._perviousLanguage.id) {
+      const lang = getStandardLanguage(this.model.language);
+      this._perviousLanguage = lang ?? PLAIN_TEXT_LANG_INFO;
+      if (lang) {
+        this._startHighlight(lang).catch(console.error);
+      } else {
+        this._highlighter = null;
       }
-      parent = parent.parentElement;
+
+      const richText = this.querySelector('rich-text');
+      const inlineEditor = richText?.inlineEditor;
+      if (inlineEditor) {
+        inlineEditor.requestUpdate();
+      }
     }
-    return false;
-  };
+
+    assertExists(this._richTextElement);
+    this._richTextResizeObserver.disconnect();
+    this._richTextResizeObserver.observe(this._richTextElement);
+  }
+
+  setHighlightOptionsGetter(fn: HighlightOptionsGetter) {
+    this.highlightOptionsGetter = fn;
+  }
+
+  setLang(lang: string | null) {
+    const standardLang = lang ? getStandardLanguage(lang) : null;
+    const langName = standardLang?.id ?? FALLBACK_LANG;
+    this.doc.updateBlock(this.model, {
+      language: langName,
+    });
+  }
+
+  private _onClickLangBtn() {
+    if (this.readonly) return;
+    if (this._langListAbortController) return;
+    const abortController = new AbortController();
+    this._langListAbortController = abortController;
+    abortController.signal.addEventListener('abort', () => {
+      this._langListAbortController = undefined;
+    });
+
+    createLangList({
+      abortController,
+      currentLanguage: this._perviousLanguage,
+      onSelectLanguage: lang => {
+        this.setLang(lang ? lang.id : null);
+        abortController.abort();
+      },
+      referenceElement: this._langButton,
+    });
+  }
+
+  private _curLanguageButtonTemplate() {
+    const curLanguage =
+      getStandardLanguage(this.model.language) ?? PLAIN_TEXT_LANG_INFO;
+    const curLanguageDisplayName = curLanguage.name ?? curLanguage.id;
+    return html`<div
+      contenteditable="false"
+      class="lang-list-wrapper caret-ignore"
+      style="${this._showLangList ? 'visibility: visible;' : ''}"
+    >
+      <icon-button
+        class="lang-button"
+        data-testid="lang-button"
+        width="auto"
+        height="24px"
+        ?hover=${this._showLangList}
+        ?disabled=${this.readonly}
+        @click=${this._onClickLangBtn}
+      >
+        ${curLanguageDisplayName} ${!this.readonly ? ArrowDownIcon : nothing}
+      </icon-button>
+    </div>`;
+  }
+
+  private _updateLineNumbers() {
+    const lineNumbersContainer =
+      this.querySelector<HTMLElement>('#line-numbers');
+    assertExists(lineNumbersContainer);
+
+    const next = this._wrap ? generateLineNumberRender() : lineNumberRender;
+
+    render(
+      repeat(Array.from(this.querySelectorAll('v-line')), next),
+      lineNumbersContainer
+    );
+  }
 
   override renderBlock(): TemplateResult<1> {
-    //const { type } = this.model;
-    const children = html`<div
-      class="affine-block-children-container"
-      style="padding-left: ${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px"
-    >
-      ${this.renderChildren(this.model)}
-    </div>`;
-    console.log('yText', this.model.text.yText);
-    console.log('inlineEventSource', this.topContenteditableElement ?? nothing);
-    /*  console.log('undoManager', this.doc.history);
-    console.log('attributesSchema', this.attributesSchema);
-    console.log('attributeRenderer', this.attributeRenderer);
-    console.log('markdownShortcutHandler', this.markdownShortcutHandler);
-    console.log('embedChecker', this.embedChecker);
-    console.log('readonly', this.doc.readonly);
-    console.log('inlineRangeProvider', this._inlineRangeProvider);*/
-    /*.undoManager=${this.doc.history}
-  .attributesSchema=${this.attributesSchema}
-  .attributeRenderer=${this.attributeRenderer}
-  .markdownShortcutHandler=${this.markdownShortcutHandler}
-  .embedChecker=${this.embedChecker}
-  .readonly=${this.doc.readonly}
-  .inlineRangeProvider=${this._inlineRangeProvider}*/
-    /*    console.log('');
-    console.log('');
-    console.log('');*/
-    //            .wrapText=${false}
+    //console.log('inlineEventSource', this.topContenteditableElement ?? nothing);
+
     return html`
-      <div>
-        <div
-          style="display: flex;gap:4px;border: 1px solid #535bf2;width: fit-content;padding: 0 10px"
-        >
-          <span contenteditable="false">@</span>
+      <div
+        ${ref(this._whenHover.setReference)}
+        class=${classMap({
+          'affine-code-block-container': true,
+          wrap: this._wrap,
+        })}
+      >
+        ${this._curLanguageButtonTemplate()}
+        <div class="rich-text-container">
+          <div contenteditable="false" id="line-numbers"></div>
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
+            .undoManager=${this.doc.history}
+            .attributesSchema=${this.attributesSchema}
+            .attributeRenderer=${this.getAttributeRenderer()}
+            .readonly=${this.doc.readonly}
+            .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .inlineRangeProvider=${this._inlineRangeProvider}
-          ></rich-text>
-          <affine-block-selection .block=${this}></affine-block-selection>
+            .wrapText=${this._wrap}
+          >
+          </rich-text>
         </div>
+        ${this.renderChildren(this.model)}
+        <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;
   }
 }
-//  .markdownShortcutHandler=${this.markdownShortcutHandler}
-// .embedChecker=${this.embedChecker}
-//
-// .attributeRenderer=${this.attributeRenderer}
+
+function generateLineNumberRender(top = 0) {
+  return function lineNumberRender(e: HTMLElement, index: number) {
+    const style = {
+      '--top': `${top}px`,
+    };
+    top = e.getBoundingClientRect().height;
+    return html`<div style=${styleMap(style)}>${index + 1}</div>`;
+  };
+}
+
+function lineNumberRender(_: HTMLElement, index: number) {
+  return html`<div>${index + 1}</div>`;
+}
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-mention': MentionBlockComponent;
+    'affine-code': CodeBlockComponent;
   }
 }

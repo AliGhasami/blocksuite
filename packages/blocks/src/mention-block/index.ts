@@ -1,12 +1,13 @@
-import type { MentionBlockModel } from './mention-model.js';
+import type { CodeBlockModel } from './code-model.js';
 
-export * from './mention-block.js';
-export * from './mention-model.js';
+export * from './code-block.js';
+export * from './code-model.js';
+export * from './components/index.js';
 
 declare global {
   namespace BlockSuite {
     interface BlockModels {
-      'affine:mention': MentionBlockModel;
+      'affine:code': CodeBlockModel;
     }
   }
 }
