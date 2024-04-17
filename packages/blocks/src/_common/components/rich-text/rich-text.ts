@@ -392,7 +392,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       readonly: this.readonly,
     });
 
-    //return html`<div class=${classes}></div>`;
+    //return html`<span>1111</span>`;
     return html`<div class=${classes}></div>`;
   }
 }

@@ -115,12 +115,14 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
 
   blockElement.bindHotKey({
     Escape: () => {
+      console.log('rich text escape');
       if (blockElement.selected?.is('text')) {
         return _selectBlock();
       }
       return;
     },
     Enter: ctx => {
+      console.log('rich text - enter');
       _preventDefault(ctx);
 
       if (blockElement.selected?.is('block')) return _selectText(false);
@@ -153,6 +155,8 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Mod-Enter': ctx => {
+      console.log('Mod-Enter');
+      console.log('rich text Mod-Enter');
       if (!blockElement.selected?.is('text')) return;
 
       const state = ctx.get('keyboardState');
@@ -167,6 +171,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     Space: ctx => handleMarkdown(ctx),
     'Shift-Space': ctx => handleMarkdown(ctx),
     'Mod-a': ctx => {
+      console.log('Mod-a');
       _preventDefault(ctx);
       if (!blockElement.selected?.is('text')) return;
 
@@ -184,6 +189,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return _selectAllText();
     },
     Tab: ctx => {
+      console.log('Tab');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -223,6 +229,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Mod-Backspace': ctx => {
+      console.log('Mod-Backspace');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -269,6 +276,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Shift-Tab': ctx => {
+      console.log('Shift-Tab');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -314,6 +322,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     Backspace: ctx => {
+      console.log('Backspace');
       if (!blockElement.selected?.is('text')) return;
       const state = ctx.get('keyboardState');
       const inlineEditor = _getInlineEditor();
@@ -367,6 +376,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   });
 
   function handleMarkdown(ctx: UIEventStateContext) {
+    console.log('rich text handle mark down');
     if (!blockElement.selected?.is('text')) return;
 
     const inlineEditor = _getInlineEditor();
@@ -383,6 +393,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   }
 
   function handleDelete(ctx: UIEventStateContext) {
+    console.log('rich text - continer - handle delete');
     if (!blockElement.selected?.is('text')) return;
     const state = ctx.get('keyboardState');
     const inlineEditor = _getInlineEditor();

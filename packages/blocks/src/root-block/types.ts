@@ -26,7 +26,7 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_DRAG_HANDLE_WIDGET
   | typeof AFFINE_FORMAT_BAR_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
-  | typeof AFFINE_ADD_BLOCK_HANDLE_WIDGET;
+  | typeof AFFINE_ADD_BLOCK_HANDLE_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET;
 
 export type EdgelessRootBlockWidgetName =

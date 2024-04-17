@@ -297,6 +297,7 @@ export class InlineEditor<
   }
 
   private _onYTextChange = (_: Y.YTextEvent, transaction: Y.Transaction) => {
+    console.log('_onYTextChange');
     if (this.yText.toString().includes('\r')) {
       throw new Error(
         'yText must not contain "\\r" because it will break the range synchronization'

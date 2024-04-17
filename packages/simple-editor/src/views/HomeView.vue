@@ -8,7 +8,7 @@
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
-    <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
+    <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus" @keydown="handleKeyDown"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
     <Editor ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
@@ -78,6 +78,10 @@ async function handleSetData2(){
   await refEditor?.value?.setData(2)
 }
 */
+
+function handleKeyDown(e){
+  //console.log("handleKeyDown",e)
+}
 
 function handleChange(data){
   //console.log("this is change event",data)

@@ -23,6 +23,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     text: string,
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
+    console.log('insertText');
     if (this.editor.attributeService.marks) {
       attributes = { ...attributes, ...this.editor.attributeService.marks };
     }
@@ -40,6 +41,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   };
 
   insertLineBreak = (inlineRange: InlineRange): void => {
+    console.log('insertLineBreak');
     this.transact(() => {
       this.yText.delete(inlineRange.index, inlineRange.length);
       this.yText.insert(inlineRange.index, '\n');

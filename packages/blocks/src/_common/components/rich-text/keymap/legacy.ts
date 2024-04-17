@@ -34,6 +34,7 @@ export function onSoftEnter(
   inlineRange: InlineRange,
   inlineEditor: AffineInlineEditor
 ) {
+  console.log('onSoftEnter');
   inlineEditor.insertText(inlineRange, '\n');
   inlineEditor.setInlineRange({
     index: inlineRange.index + 1,
@@ -53,6 +54,7 @@ export function hardEnter(
   e: KeyboardEvent,
   shortKey = false
 ) {
+  console.log('hardEnter');
   const doc = model.doc;
   e.stopPropagation();
   const parent = doc.getParent(model);
@@ -165,6 +167,7 @@ export function onBackspace(
   e: KeyboardEvent,
   inlineEditor: AffineInlineEditor
 ) {
+  console.log('onBackspace');
   if (isCollapsedAtBlockStart(inlineEditor)) {
     if (model.flavour === 'affine:code') {
       return KEYBOARD_ALLOW_DEFAULT;
@@ -183,6 +186,7 @@ export function onForwardDelete(
   e: KeyboardEvent,
   inlineEditor: AffineInlineEditor
 ) {
+  console.log('onForwardDelete');
   e.stopPropagation();
   if (isCollapsedAtBlockEnd(inlineEditor)) {
     handleLineEndForwardDelete(editorHost, model);

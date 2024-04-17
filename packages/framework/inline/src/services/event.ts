@@ -69,6 +69,8 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _isRangeCompletelyInRoot = (range: Range) => {
+    //debugger;
+    console.log('_isRangeCompletelyInRoot', range);
     const rootElement = this.editor.rootElement;
     const rootRange = document.createRange();
     rootRange.selectNode(rootElement);
@@ -77,11 +79,21 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       range.startContainer.compareDocumentPosition(range.endContainer) &
       Node.DOCUMENT_POSITION_FOLLOWING
     ) {
+      console.log(
+        '22222',
+        rootRange.comparePoint(range.startContainer, range.startOffset) >= 0 &&
+          rootRange.comparePoint(range.endContainer, range.endOffset) <= 0
+      );
       return (
         rootRange.comparePoint(range.startContainer, range.startOffset) >= 0 &&
         rootRange.comparePoint(range.endContainer, range.endOffset) <= 0
       );
     } else {
+      console.log(
+        '11111',
+        rootRange.comparePoint(range.endContainer, range.startOffset) >= 0 &&
+          rootRange.comparePoint(range.startContainer, range.endOffset) <= 0
+      );
       return (
         rootRange.comparePoint(range.endContainer, range.startOffset) >= 0 &&
         rootRange.comparePoint(range.startContainer, range.endOffset) <= 0
@@ -154,6 +166,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
   private _compositionInlineRange: InlineRange | null = null;
   private _onCompositionStart = () => {
+    ///console.log('_onCompositionStart');
     this._isComposing = true;
     // embeds is not editable and it will break IME
     const embeds = this.editor.rootElement.querySelectorAll(
@@ -164,7 +177,9 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     });
 
     const range = this.editor.rangeService.getNativeRange();
+    //console.log('3333', range);
     if (range) {
+      //console.log('44444', this.editor.toInlineRange(range));
       this._compositionInlineRange = this.editor.toInlineRange(range);
     } else {
       this._compositionInlineRange = null;
@@ -186,6 +201,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onCompositionEnd = async (event: CompositionEvent) => {
+    console.log('_onCompositionEnd');
     this._isComposing = false;
     if (!this.editor.rootElement.isConnected) return;
 
@@ -230,6 +246,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onBeforeInput = (event: InputEvent) => {
+    console.log('_onBeforeInput');
     const range = this.editor.rangeService.getNativeRange();
     if (
       this.editor.isReadonly ||
@@ -314,10 +331,14 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onKeyDown = (event: KeyboardEvent) => {
+    return;
+    //debugger;
+    console.log('_onKeyDown', event);
+    console.log('this is editor', this.editor);
     const inlineRange = this.editor.getInlineRange();
     if (!inlineRange) return;
 
-    this.editor.slots.keydown.emit(event);
+    //this.editor.slots.keydown.emit(event);
 
     if (
       !event.shiftKey &&
@@ -373,6 +394,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onClick = (event: MouseEvent) => {
+    console.log('_onClick');
     // select embed element when click on it
     if (event.target instanceof Node && isInEmbedElement(event.target)) {
       const selectionRoot = findDocumentOrShadowRoot(this.editor);
