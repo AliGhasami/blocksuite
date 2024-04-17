@@ -35,6 +35,7 @@ export async function onModelElementUpdated(
   model: BlockModel,
   callback: (blockElement: BlockElement) => void
 ) {
+  console.log('onModelElementUpdated');
   const page = model.doc;
   assertExists(page.root);
 

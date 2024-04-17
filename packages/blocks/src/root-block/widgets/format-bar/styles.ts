@@ -69,7 +69,6 @@ export const formatBarStyle = css`
     gap: 8px;
     height: 40px;
     width: max-content;
-
     border-radius: 8px;
     background: var(--affine-background-overlay-panel-color);
     box-shadow: var(--affine-shadow-2);

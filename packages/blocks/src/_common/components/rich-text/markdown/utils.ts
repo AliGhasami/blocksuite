@@ -129,6 +129,7 @@ export function convertToDivider(
     const blockProps = {
       children: model.children,
     };
+
     doc.addBlock('affine:divider', blockProps, parent, index);
 
     const nextBlock = parent.children[index + 1];

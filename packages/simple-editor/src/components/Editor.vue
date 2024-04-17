@@ -256,7 +256,8 @@ defineExpose({
   }*/
 
   .place-holder{
-    @apply text-neutral-4;
+    @apply text-neutral-4 mt-body;
+    line-height: unset;
     transition: all 0.3s ease-in-out;
     //background-color: red;
     .short-code{
@@ -279,12 +280,42 @@ defineExpose({
       display: block;
       height: 650px;
   }*/
+
+  .claytap-text{
+    //background-color: red;
+   @apply text-neutral-8 mt-body;
+    line-height: unset;
+  }
+
+  .claytap-h1{
+    @apply mt-page-display text-neutral-8;
+    line-height: unset;
+  }
+
+  .claytap-h2{
+    @apply mt-page-heading text-neutral-8;
+    line-height: unset;
+  }
+  .claytap-h3{
+    @apply mt-page-subheading text-neutral-8;
+    line-height: unset;
+  }
+
+
 }
+
+
 
 .slash-menu{
   //background-color: red;
   @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
   border-radius: var(--mt-roundness-3);
+
+  .icon{
+    width: 32px;
+    height: 32px;
+  }
+
 
   .group-title {
     @apply mt-footnote text-neutral-5 block my-2;
@@ -295,7 +326,7 @@ defineExpose({
   }
 
   .item-title{
-    @apply py-2 flex flex-col ;//gap-2
+    @apply flex flex-col mt-body;//gap-2
   }
 
   .description{
@@ -308,12 +339,13 @@ defineExpose({
   }
 
   .claytap-slash-menu-item {
-    @apply py-1 gap-4 items-center flex px-2 cursor-pointer;
+    @apply py-2 px-3 gap-2 items-center flex px-2 cursor-pointer;
     border-radius: 4px;
     &:hover,&.hover{
     background: #F4F4F5;
     }
   }
+
 }
 
 

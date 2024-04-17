@@ -68,6 +68,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onArrowDown = (ctx: UIEventStateContext) => {
+    console.log('keymap - controller - _onArrowDown');
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -162,6 +163,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onArrowUp = (ctx: UIEventStateContext) => {
+    console.log('keymap - controller - _onArrowUp');
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -255,6 +257,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onShiftArrowDown = () => {
+    console.log('keymap - controller - _onShiftArrowDown');
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -267,6 +270,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onBlockShiftDown = (cmd: BlockSuite.CommandChain) => {
+    console.log('keymap - controller - _onBlockShiftDown');
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {
@@ -306,6 +310,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onShiftArrowUp = () => {
+    console.log('keymap - controller - _onShiftArrowUp');
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -318,6 +323,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onBlockShiftUp = (cmd: BlockSuite.CommandChain) => {
+    console.log('keymap - controller - _onBlockShiftUp');
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {
@@ -356,6 +362,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onEsc = () => {
+    console.log('keymap - controller - _onEsc');
     const [result] = this._std.command
       .chain()
       .getBlockSelections()
@@ -377,6 +384,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onEnter = (ctx: UIEventStateContext) => {
+    console.log('keymap - controller - _onEnter');
     const event = ctx.get('defaultState').event;
     const [result] = this._std.command
       .chain()
@@ -529,6 +537,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _bindMoveBlockHotKey = () => {
+    console.log('_bindMoveBlockHotKey');
     moveBlockConfigs.forEach(config => {
       config.hotkey.forEach(key => {
         this.host.bindHotKey({

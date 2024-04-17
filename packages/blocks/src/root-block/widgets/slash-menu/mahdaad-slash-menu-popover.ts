@@ -347,9 +347,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
                     return this._handleClickItem(currentIndex);
                   }}
                 >
-                  <div style="width: 40px;height: 40px">
-                    ${html`${unsafeSVG(item.icon)}`}
-                  </div>
+                  <div class="icon">${html`${unsafeSVG(item.icon)}`}</div>
                   <div class="item-title">
                     <span class="title">${item.title}</span>
                     <span class="description">${item.description}</span>

@@ -1,6 +1,7 @@
 import type { Command } from '@blocksuite/block-std';
 
 export const focusBlockEnd: Command<'focusBlock'> = (ctx, next) => {
+  console.log('focusBlockEnd');
   const { focusBlock, std } = ctx;
   if (!focusBlock || !focusBlock.model.text) return;
 

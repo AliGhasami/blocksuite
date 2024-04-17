@@ -482,6 +482,8 @@ export class CodeBlockComponent extends BlockElement<CodeBlockModel> {
   }
 
   override renderBlock(): TemplateResult<1> {
+    //console.log('inlineEventSource', this.topContenteditableElement ?? nothing);
+
     return html`
       <div
         ${ref(this._whenHover.setReference)}
@@ -510,9 +512,7 @@ export class CodeBlockComponent extends BlockElement<CodeBlockModel> {
           >
           </rich-text>
         </div>
-
         ${this.renderChildren(this.model)}
-
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;

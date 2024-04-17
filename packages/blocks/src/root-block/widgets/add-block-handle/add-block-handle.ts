@@ -11,32 +11,48 @@ import {
   throttle,
 } from '@blocksuite/global/utils';
 import { type BlockModel } from '@blocksuite/store';
-import { html, render } from 'lit';
+import { html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import {
   type EdgelessTool,
   getCurrentNativeRange,
   isInsideEdgelessEditor,
   isInsidePageEditor,
-  matchFlavours,
   Point,
   Rect,
 } from '../../../_common/utils/index.js';
-import type { NoteBlockComponent, NoteBlockModel } from '../../../index.js';
+import type { NoteBlockComponent } from '../../../index.js';
 import type { EdgelessRootBlockComponent } from '../../../root-block/edgeless/edgeless-root-block.js';
 import {
   getSelectedRect,
   isTopLevelBlock,
 } from '../../../root-block/edgeless/utils/query.js';
 import type { PageRootBlockComponent } from '../../../root-block/page/page-root-block.js';
-import { autoScroll } from '../../../root-block/text-selection/utils.js';
-import { Bound, type IVec } from '../../../surface-block/index.js';
+//import { autoScroll } from '../../../root-block/text-selection/utils.js';
+import { type IVec } from '../../../surface-block/index.js';
 import type { EdgelessBlockModel } from '../../edgeless/type.js';
+import {
+  //calcDropTarget,
+  captureEventTarget,
+  containBlock,
+  //containChildBlock,
+  getClosestBlockByPoint,
+  getClosestNoteBlock,
+  getDragHandleContainerHeight,
+  getDragHandleLeftPadding,
+  getNoteId,
+  includeTextSelection,
+  insideDatabaseTable,
+  isBlockPathEqual,
+  isOutOfNoteBlock,
+  updateDragHandleClassName,
+} from '../drag-handle/utils.js';
 //import { DragPreview } from './components/drag-preview.js';
 //import { DropIndicator } from './components/drop-indicator.js';
-import type { DragHandleOption, DropResult, DropType } from './config.js';
+import type { DragHandleOption, DropType } from './config.js';
 import { DragHandleOptionsRunner } from './config.js';
 import {
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_TOP_LEVEL,
@@ -50,24 +66,9 @@ import {
   DRAG_HOVER_RECT_PADDING,
   HOVER_AREA_RECT_PADDING_TOP_LEVEL,
 } from './config.js';
+import { plus } from './icons.js';
 //import { gripVertical } from './icons.js';
 import { styles } from './styles.js';
-import {
-  calcDropTarget,
-  captureEventTarget,
-  containBlock,
-  containChildBlock,
-  getClosestBlockByPoint,
-  getClosestNoteBlock,
-  getDragHandleContainerHeight,
-  getDragHandleLeftPadding,
-  getNoteId,
-  includeTextSelection,
-  insideDatabaseTable,
-  isBlockPathEqual,
-  isOutOfNoteBlock,
-  updateDragHandleClassName,
-} from './utils.js';
 
 export const AFFINE_ADD_BLOCK_HANDLE_WIDGET = 'affine-add-block-widget';
 
@@ -433,14 +434,14 @@ export class AffineAddBlockHandleWidget extends WidgetElement<
     }
   };
 */
-  private _changeCursorToGrabbing = () => {
+  /*private _changeCursorToGrabbing = () => {
     document.documentElement.classList.add('affine-drag-preview-grabbing');
-  };
+  };*/
 
-  private _resetCursor = () => {
+  /* private _resetCursor = () => {
     document.documentElement.classList.remove('affine-drag-preview-grabbing');
   };
-
+*/
   /*  private _startDragging = (
     blockElements: BlockElement[],
     state: PointerEventState,
@@ -508,7 +509,7 @@ export class AffineAddBlockHandleWidget extends WidgetElement<
 
     //this._removeDragPreview();
     // this._removeDropIndicator();
-    this._resetCursor();
+    //this._resetCursor();
   };
 
   private _handleAnchorModelDisposables = (blockModel: BlockModel) => {
@@ -598,7 +599,7 @@ export class AffineAddBlockHandleWidget extends WidgetElement<
       container.style.width = `${
         DRAG_HANDLE_CONTAINER_WIDTH * this.scale * this.noteScale
       }px`;
-      container.style.left = `${draggingAreaRect.left}px`;
+      //container.style.left = `${draggingAreaRect.left}px`;
       container.style.top = `${draggingAreaRect.top}px`;
       container.style.display = 'flex';
       container.style.height = `${draggingAreaRect.height}px`;
@@ -988,6 +989,7 @@ export class AffineAddBlockHandleWidget extends WidgetElement<
    * Should clear selection if current block is the first selected block
    */
   private _clickHandler: UIEventHandler = ctx => {
+    //debugger;
     if (!this._isHoverDragHandleVisible) return;
 
     const state = ctx.get('pointerState');
@@ -1646,7 +1648,7 @@ export class AffineAddBlockHandleWidget extends WidgetElement<
             111
           </span>-->
           <div class="affine-drag-handle-grabber">
-            11
+            ${unsafeSVG(plus)}
             <!--           <svg
               width="8"
               height="12"

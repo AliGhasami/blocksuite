@@ -18,7 +18,14 @@ import { paragraphBlockStyles } from './styles.js';
 
 const getPlaceholder = (model: ParagraphBlockModel) => {
   if (model.type === 'text') {
-    return "Type '/' for commands";
+    return html`<span class="place-holder">
+      Press
+      <span class="short-code">@</span>
+      for AI &
+      <span class="short-code">/</span>
+      for Commands ...
+    </span>`;
+    //return "Type '/' for commands";
   }
 
   const placeholders = {
@@ -38,6 +45,121 @@ export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockModel,
   ParagraphService
 > {
+  static override styles = css`
+    affine-paragraph {
+      display: block;
+      margin: 10px 0;
+      //font-size: var(--affine-font-base);
+    }
+
+    .affine-paragraph-block-container {
+      position: relative;
+      border-radius: 4px;
+    }
+    .affine-paragraph-rich-text-wrapper {
+      position: relative;
+    }
+    /* .affine-paragraph-rich-text-wrapper rich-text {
+      -webkit-font-smoothing: antialiased;
+    } */
+    code {
+      font-size: calc(var(--affine-font-base) - 3px);
+    }
+    /*.claytap-h1 {
+      font-size: var(--affine-font-h-1);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }*/
+    .claytap-h1 code {
+      font-size: calc(var(--affine-font-base) + 8px);
+    }
+    /*.claytap-h2 {
+      font-size: var(--affine-font-h-2);
+      font-weight: 600;
+      line-height: calc(1em + 10px);
+      margin-top: 14px;
+      margin-bottom: 10px;
+    }*/
+    .claytap-h2 code {
+      font-size: calc(var(--affine-font-base) + 6px);
+    }
+    /*.claytap-h3 {
+      font-size: var(--affine-font-h-3);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }*/
+    .claytap-h3 code {
+      font-size: calc(var(--affine-font-base) + 4px);
+    }
+    .claytap-h4 {
+      font-size: var(--affine-font-h-4);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+    .claytap-h4 code {
+      font-size: calc(var(--affine-font-base) + 2px);
+    }
+    .claytap-h5 {
+      font-size: var(--affine-font-h-5);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+    .claytap-h5 code {
+      font-size: calc(var(--affine-font-base));
+    }
+    .claytap-h6 {
+      font-size: var(--affine-font-h-6);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+    .claytap-h6 code {
+      font-size: calc(var(--affine-font-base) - 2px);
+    }
+    .quote {
+      line-height: 26px;
+      padding-left: 17px;
+      margin-top: var(--affine-paragraph-space);
+      padding-top: 10px;
+      padding-bottom: 10px;
+      position: relative;
+    }
+    .quote::after {
+      content: '';
+      width: 2px;
+      height: calc(100% - 20px);
+      margin-top: 10px;
+      margin-bottom: 10px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: var(--affine-quote-color);
+      border-radius: 18px;
+    }
+
+    .affine-paragraph-placeholder {
+      position: absolute;
+      display: none;
+      left: 0;
+      bottom: 0;
+      pointer-events: none;
+      color: var(--affine-black-30);
+      fill: var(--affine-black-30);
+    }
+    .affine-paragraph-placeholder.visible {
+      display: block;
+    }
+  `;
+
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
     assertExists(inlineManager);
@@ -115,17 +237,41 @@ export class ParagraphBlockComponent extends BlockElement<
     )
       return;
 
+    //TODO(@alighasami) check is last Paragraph
+    /*let isLastParagraph = false;
+    const note = this.doc.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].children : [];
+    const currentBlockId = this.dataset.blockId;
     if (
-      this.doc.readonly ||
+      paragraphList.length &&
+      paragraphList[paragraphList.length - 1].id == currentBlockId
+    ) {
+      isLastParagraph = true;
+    }*/
+    let isEmpty = false;
+    const note = this.doc.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].children : [];
+    if (paragraphList.length == 1) {
+      isEmpty = true;
+    }
+    //console.log('this.selected', this.selected);
+    //console.log('this.inlineEditor.isComposing', this.inlineEditor.isComposing);
+    //console.log('this.inlineEditor.yTextLength', this.inlineEditor.yTextLength);
+    if (
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
-      !this.selected ||
+      (!this.selected && !isEmpty) ||
       this._isInDatabase()
     ) {
       this._placeholderContainer.classList.remove('visible');
     } else {
       this._placeholderContainer.classList.add('visible');
     }
+    if (this.selected) {
+      this._placeholderContainer.classList.add('hover');
+    }
+    //console.log('is selected', this.selected);
+    //if()
   };
 
   private _isInDatabase = () => {
@@ -171,7 +317,6 @@ export class ParagraphBlockComponent extends BlockElement<
             ${getPlaceholder(this.model)}
           </div>
         </div>
-
         ${children}
 
         <affine-block-selection .block=${this}></affine-block-selection>

@@ -48,7 +48,6 @@ function handleSetData(){
 
 onMounted(async ()=>{
   //const doc = createEmptyDoc().init();
-
   //debugger;
   //console.log('AffineSchemas', AffineSchemas);
   const schema = new Schema().register(AffineSchemas);

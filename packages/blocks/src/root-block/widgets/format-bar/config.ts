@@ -85,7 +85,7 @@ export type FormatBarConfigItem =
 export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
   toolbar
     .clearConfig()
-    .addParagraphDropdown()
+    //.addParagraphDropdown()
     .addDivider()
     .addTextStyleToggle({
       key: 'bold',
@@ -112,15 +112,15 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
       action: chain => chain.toggleCode().run(),
       icon: CodeIcon,
     })
-    .addTextStyleToggle({
+    /*.addTextStyleToggle({
       key: 'link',
       action: chain => chain.toggleLink().run(),
       icon: LinkIcon,
-    })
-    .addDivider()
-    .addHighlighterDropdown()
-    .addDivider()
-    .addInlineAction({
+    })*/
+    //.addDivider()
+    //.addHighlighterDropdown()
+    //.addDivider()
+    /*.addInlineAction({
       id: 'copy',
       name: 'Copy',
       icon: CopyIcon,
@@ -137,8 +137,8 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
           .run();
       },
       showWhen: () => true,
-    })
-    .addInlineAction({
+    })*/
+    /*.addInlineAction({
       id: 'convert-to-database',
       name: 'Group as Database',
       icon: DatabaseTableViewIcon20,
@@ -163,8 +163,8 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
           DATABASE_CONVERT_WHITE_LIST.includes(block.flavour)
         );
       },
-    })
-    .addInlineAction({
+    })*/
+    /*.addInlineAction({
       id: 'convert-to-linked-doc',
       name: 'Create Linked Doc',
       icon: FontLinkedDocIcon,
@@ -202,7 +202,7 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
         const { selectedModels } = ctx;
         return !!selectedModels && selectedModels.length > 0;
       },
-    })
+    })*/
     .addBlockTypeSwitch({
       flavour: 'affine:paragraph',
       type: 'text',
