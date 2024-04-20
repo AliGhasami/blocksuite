@@ -7,6 +7,7 @@ import type { BaseTextAttributes } from './base-attributes.js';
 export function findDocumentOrShadowRoot<
   TextAttributes extends BaseTextAttributes,
 >(editor: InlineEditor<TextAttributes>): Document {
+  console.log('findDocumentOrShadowRoot');
   const el = editor.rootElement;
 
   if (!el) {
@@ -26,6 +27,7 @@ export function findDocumentOrShadowRoot<
 }
 
 export function getInlineEditorInsideRoot(element: Element): InlineEditor {
+  console.log('getInlineEditorInsideRoot');
   const rootElement = element.closest(
     `[${INLINE_ROOT_ATTR}]`
   ) as InlineRootElement;

@@ -1,6 +1,7 @@
 import { ZERO_WIDTH_SPACE } from '../consts.js';
 
 export function calculateTextLength(text: Text): number {
+  console.log('calculateTextLength');
   if (text.wholeText === ZERO_WIDTH_SPACE) {
     return 0;
   } else {
@@ -9,6 +10,7 @@ export function calculateTextLength(text: Text): number {
 }
 
 export function getTextNodesFromElement(element: Element): Text[] {
+  console.log('7-getTextNodesFromElement');
   const textSpanElements = Array.from(
     element.querySelectorAll('[data-v-text="true"]')
   );

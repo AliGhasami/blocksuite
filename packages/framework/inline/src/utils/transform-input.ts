@@ -8,6 +8,7 @@ function handleInsertText<TextAttributes extends BaseTextAttributes>(
   editor: InlineEditor,
   attributes: TextAttributes
 ) {
+  console.log('handleInsertText');
   if (!data) return;
   editor.insertText(inlineRange, data, attributes);
   editor.setInlineRange({
@@ -17,6 +18,7 @@ function handleInsertText<TextAttributes extends BaseTextAttributes>(
 }
 
 function handleInsertParagraph(inlineRange: InlineRange, editor: InlineEditor) {
+  console.log('handleInsertParagraph');
   editor.insertLineBreak(inlineRange);
   editor.setInlineRange({
     index: inlineRange.index + 1,
@@ -25,6 +27,7 @@ function handleInsertParagraph(inlineRange: InlineRange, editor: InlineEditor) {
 }
 
 function handleDelete(inlineRange: InlineRange, editor: InlineEditor) {
+  console.log('handleDelete');
   editor.deleteText(inlineRange);
   editor.setInlineRange({
     index: inlineRange.index,
@@ -39,6 +42,7 @@ export function transformInput<TextAttributes extends BaseTextAttributes>(
   inlineRange: InlineRange,
   editor: InlineEditor
 ) {
+  console.log('transformInput');
   if (!editor.isValidInlineRange(inlineRange)) return;
 
   if (inputType === 'insertText') {

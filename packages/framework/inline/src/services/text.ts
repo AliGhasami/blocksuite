@@ -13,6 +13,8 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   }
 
   deleteText = (inlineRange: InlineRange): void => {
+    console.log('deleteText');
+    //return;
     this.transact(() => {
       this.yText.delete(inlineRange.index, inlineRange.length);
     });
@@ -23,6 +25,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     text: string,
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
+    //return;
     console.log('insertText');
     if (this.editor.attributeService.marks) {
       attributes = { ...attributes, ...this.editor.attributeService.marks };

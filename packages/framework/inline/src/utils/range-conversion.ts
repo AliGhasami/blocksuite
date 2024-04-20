@@ -31,6 +31,7 @@ const rangeHasAnchorAndFocus: Predict = ({
   startText,
   endText,
 }) => {
+  console.log('5-rangeHasAnchorAndFocus');
   return rootElement.contains(startText) && rootElement.contains(endText);
 };
 
@@ -41,16 +42,21 @@ const rangeHasAnchorAndFocusHandler: Handler = ({
   startTextOffset,
   endTextOffset,
 }) => {
+  console.log('6-rangeHasAnchorAndFocusHandler');
   const anchorDomPoint = textPointToDomPoint(
     startText,
     startTextOffset,
     rootElement
   );
+
+  console.log('6-1', anchorDomPoint);
+
   const focusDomPoint = textPointToDomPoint(
     endText,
     endTextOffset,
     rootElement
   );
+  console.log('6-2', focusDomPoint);
 
   if (!anchorDomPoint || !focusDomPoint) {
     return null;
@@ -63,6 +69,7 @@ const rangeHasAnchorAndFocusHandler: Handler = ({
 };
 
 const rangeOnlyHasFocus: Predict = ({ rootElement, startText, endText }) => {
+  console.log('rangeOnlyHasFocus');
   return !rootElement.contains(startText) && rootElement.contains(endText);
 };
 
@@ -71,6 +78,7 @@ const rangeOnlyHasFocusHandler: Handler = ({
   endText,
   endTextOffset,
 }) => {
+  console.log('rangeOnlyHasFocusHandler');
   const focusDomPoint = textPointToDomPoint(
     endText,
     endTextOffset,
@@ -88,6 +96,7 @@ const rangeOnlyHasFocusHandler: Handler = ({
 };
 
 const rangeOnlyHasAnchor: Predict = ({ rootElement, startText, endText }) => {
+  console.log('rangeOnlyHasAnchor');
   return rootElement.contains(startText) && !rootElement.contains(endText);
 };
 
@@ -97,6 +106,7 @@ const rangeOnlyHasAnchorHandler: Handler = ({
   startText,
   startTextOffset,
 }) => {
+  console.log('rangeOnlyHasAnchorHandler');
   const startDomPoint = textPointToDomPoint(
     startText,
     startTextOffset,
@@ -119,6 +129,7 @@ const rangeHasNoAnchorAndFocus: Predict = ({
   endText,
   range,
 }) => {
+  console.log('rangeHasNoAnchorAndFocus');
   return (
     !rootElement.contains(startText) &&
     !rootElement.contains(endText) &&
@@ -127,6 +138,7 @@ const rangeHasNoAnchorAndFocus: Predict = ({
 };
 
 const rangeHasNoAnchorAndFocusHandler: Handler = ({ yText }) => {
+  console.log('rangeHasNoAnchorAndFocusHandler');
   return {
     index: 0,
     length: yText.length,
@@ -138,6 +150,7 @@ const buildContext = (
   rootElement: HTMLElement,
   yText: Y.Text
 ): InlineRangeRunnerContext | null => {
+  console.log('3-buildContext');
   const { startContainer, startOffset, endContainer, endOffset } = range;
 
   const startTextPoint = nativePointToTextPoint(startContainer, startOffset);
@@ -196,6 +209,8 @@ export function domRangeToInlineRange(
   rootElement: HTMLElement,
   yText: Y.Text
 ): InlineRange | null {
+  // debugger;
+  console.log('2-domRangeToInlineRange');
   const context = buildContext(range, rootElement, yText);
 
   if (!context) return null;
@@ -213,6 +228,11 @@ export function domRangeToInlineRange(
     );
 
     if (anchorDomPoint) {
+      console.log('8569', {
+        index: anchorDomPoint.index,
+        length: 1,
+      });
+
       return {
         index: anchorDomPoint.index,
         length: 1,
@@ -222,21 +242,25 @@ export function domRangeToInlineRange(
 
   // case 1
   if (rangeHasAnchorAndFocus(context)) {
+    console.log('if rangeHasAnchorAndFocus');
     return rangeHasAnchorAndFocusHandler(context);
   }
 
   // case 2.1
   if (rangeOnlyHasFocus(context)) {
+    console.log('if rangeOnlyHasFocus');
     return rangeOnlyHasFocusHandler(context);
   }
 
   // case 2.2
   if (rangeOnlyHasAnchor(context)) {
+    console.log('if rangeOnlyHasAnchor');
     return rangeOnlyHasAnchorHandler(context);
   }
 
   // case 3
   if (rangeHasNoAnchorAndFocus(context)) {
+    console.log('if rangeHasNoAnchorAndFocus');
     return rangeHasNoAnchorAndFocusHandler(context);
   }
 
@@ -250,6 +274,7 @@ export function inlineRangeToDomRange(
   rootElement: HTMLElement,
   inlineRange: InlineRange
 ): Range | null {
+  console.log('inlineRangeToDomRange');
   const lineElements = Array.from(rootElement.querySelectorAll('v-line'));
 
   // calculate anchorNode and focusNode

@@ -128,8 +128,9 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   }
 
   private _init() {
+    //return;
     //debugger;
-    console.log('rich text editor init');
+    //console.log('rich text editor init');
     if (this._inlineEditor) {
       throw new Error('Inline editor already exists.');
     }
@@ -321,7 +322,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   }
 
   override connectedCallback() {
-    console.log('rich text connectedCallback');
+    //console.log('rich text connectedCallback');
     super.connectedCallback();
 
     assertExists(this._yText, 'rich-text need yText to init.');
@@ -393,6 +394,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
     });
 
     //return html`<span>1111</span>`;
+    //console.log('1111', classes);
     return html`<div class=${classes}></div>`;
   }
 }

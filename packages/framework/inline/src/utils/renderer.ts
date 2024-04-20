@@ -10,6 +10,7 @@ export function renderElement<TextAttributes extends BaseTextAttributes>(
   ) => TextAttributes | undefined,
   selected: boolean
 ): TemplateResult<1> {
+  console.log('renderElement');
   return html`<v-element
     .selected=${selected}
     .delta=${{

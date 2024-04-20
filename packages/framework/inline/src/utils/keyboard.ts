@@ -40,6 +40,7 @@ export function createInlineKeyDownHandler(
   inlineEditor: InlineEditor,
   bindings: KeyboardBindingRecord
 ): (evt: KeyboardEvent) => void {
+  //console.log('createInlineKeyDownHandler');
   const bindingStore: Record<string, KeyboardBinding[]> = {};
 
   function normalize(binding: KeyboardBinding): KeyboardBinding {
@@ -51,6 +52,7 @@ export function createInlineKeyDownHandler(
   }
 
   function keyMatch(evt: KeyboardEvent, binding: KeyboardBinding) {
+    //console.log('keyMatch');
     if (
       (['altKey', 'ctrlKey', 'metaKey', 'shiftKey'] as const).some(
         key => Object.hasOwn(binding, key) && binding[key] !== evt[key]
@@ -62,6 +64,7 @@ export function createInlineKeyDownHandler(
   }
 
   function addBinding(keyBinding: KeyboardBinding) {
+    // console.log('addBinding');
     const binding = normalize(keyBinding);
     const keys = Array.isArray(binding.key) ? binding.key : [binding.key];
     keys.forEach(key => {
@@ -78,7 +81,11 @@ export function createInlineKeyDownHandler(
     addBinding(binding);
   });
 
+  //TODO Ali Ghasami
   function keyDownHandler(evt: KeyboardEvent) {
+    //console.log('keyDownHandler');
+    //return;
+    //console.log('111111');
     if (evt.defaultPrevented || evt.isComposing) return;
     const keyBindings = bindingStore[evt.key] ?? [];
 
@@ -87,6 +94,7 @@ export function createInlineKeyDownHandler(
 
     const inlineRange = inlineEditor.getInlineRange();
     if (!inlineRange) return;
+    //console.log('1000000');
 
     const [leafStart, offsetStart] = inlineEditor.getTextPoint(
       inlineRange.index

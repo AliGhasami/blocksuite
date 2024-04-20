@@ -87,6 +87,7 @@ export class AttributeService<TextAttributes extends BaseTextAttributes> {
   };
 
   normalizeAttributes = (textAttributes?: TextAttributes) => {
+    console.log('normalizeAttributes');
     if (!textAttributes) {
       return undefined;
     }

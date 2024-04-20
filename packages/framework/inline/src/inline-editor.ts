@@ -123,6 +123,7 @@ export class InlineEditor<
   }
 
   get rangeService() {
+    //console.log('rangeService');
     return this._rangeService;
   }
 

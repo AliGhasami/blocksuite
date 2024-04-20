@@ -167,7 +167,7 @@ export function onBackspace(
   e: KeyboardEvent,
   inlineEditor: AffineInlineEditor
 ) {
-  console.log('onBackspace');
+  //console.log('onBackspace');
   if (isCollapsedAtBlockStart(inlineEditor)) {
     if (model.flavour === 'affine:code') {
       return KEYBOARD_ALLOW_DEFAULT;

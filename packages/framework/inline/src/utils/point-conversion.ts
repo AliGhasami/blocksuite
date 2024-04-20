@@ -13,6 +13,7 @@ export function nativePointToTextPoint(
   node: unknown,
   offset: number
 ): TextPoint | null {
+  console.log('4-nativePointToTextPoint');
   if (isNativeTextInVText(node)) {
     return [node, offset];
   }
@@ -55,6 +56,8 @@ export function textPointToDomPoint(
   offset: number,
   rootElement: HTMLElement
 ): DomPoint | null {
+  //debugger;
+  console.log('5-textPointToDomPoint');
   if (rootElement.dataset.vRoot !== 'true') {
     throw new Error(
       'textRangeToDomPoint should be called with editor root element'
@@ -73,6 +76,7 @@ export function textPointToDomPoint(
   }
 
   if (text.wholeText !== ZERO_WIDTH_SPACE) {
+    //debugger;
     index += offset;
   }
 
@@ -95,6 +99,7 @@ export function textPointToDomPoint(
 }
 
 function getVNodesFromNode(node: Node): VElement[] | VLine[] | null {
+  console.log('getVNodesFromNode');
   const vLine = node.parentElement?.closest('v-line');
 
   if (vLine) {
@@ -118,6 +123,7 @@ function getTextPointFromVNodes(
   node: Node,
   offset: number
 ): TextPoint | null {
+  console.log('getTextPointFromVNodes');
   const first = vNodes[0];
   for (let i = 0; i < vNodes.length; i++) {
     const vNode = vNodes[i];
@@ -147,6 +153,7 @@ function getTextPointFromVNodes(
 }
 
 function getTextPointRoughlyFromElement(element: Element): TextPoint | null {
+  console.log('getTextPointRoughlyFromElement');
   const texts = getTextNodesFromElement(element);
   if (texts.length === 0) return null;
   const text = texts[texts.length - 1];
@@ -158,6 +165,7 @@ function getTextPointRoughlyFromElementByOffset(
   offset: number,
   fromStart: boolean
 ): TextPoint | null {
+  console.log('getTextPointRoughlyFromElementByOffset');
   const texts = getTextNodesFromElement(element);
   if (texts.length === 0) return null;
   const text = fromStart ? texts[0] : texts[texts.length - 1];

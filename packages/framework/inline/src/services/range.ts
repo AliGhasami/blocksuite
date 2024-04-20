@@ -47,6 +47,8 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     newInlineRange,
     sync,
   ]: InlineRangeUpdatedProp) => {
+    console.log('onInlineRangeUpdated');
+    //debugger;
     const eq = isMaybeInlineRangeEqual(this._inlineRange, newInlineRange);
     if (eq) {
       return;
@@ -108,6 +110,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   getNativeSelection(): Selection | null {
+    //console.log('getNativeSelection');
     const selectionRoot = findDocumentOrShadowRoot(this.editor);
     const selection = selectionRoot.getSelection();
     if (!selection) return null;
@@ -117,22 +120,27 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   }
 
   getNativeRange(): Range | null {
+    //console.log('getNativeRange');
     const selection = this.getNativeSelection();
     if (!selection) return null;
     return selection.getRangeAt(0);
   }
 
   getInlineRange = (): InlineRange | null => {
+    //console.log('getInlineRange 100');
+    //debugger;
     if (this.inlineRangeProvider) {
+      //console.log('20000');
       return this.inlineRangeProvider.getInlineRange();
     }
-
+    ///console.log('30000');
     return this._inlineRange;
   };
 
   getInlineRangeFromElement = (element: Element): InlineRange | null => {
+    console.log('getInlineRangeFromElement');
     const range = document.createRange();
-    const text = element.querySelector('[data-v-text');
+    const text = element.querySelector('[data-v-text]');
     if (!text) {
       return null;
     }
@@ -145,6 +153,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   getTextPoint(rangeIndex: InlineRange['index']): TextPoint {
+    console.log('getTextPoint');
     const vLines = Array.from(this.rootElement.querySelectorAll('v-line'));
 
     let index = 0;
@@ -173,6 +182,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     lineIndex: number;
     rangeIndexRelatedToLine: number;
   } {
+    console.log('getLine');
     const lineElements = Array.from(
       this.rootElement.querySelectorAll('v-line')
     );
@@ -196,6 +206,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   }
 
   isValidInlineRange = (inlineRange: InlineRange | null): boolean => {
+    //console.log('isValidInlineRange');
     return !(
       inlineRange &&
       (inlineRange.index < 0 ||
@@ -209,6 +220,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * 2. soft break
    */
   isFirstLine = (inlineRange: InlineRange | null): boolean => {
+    console.log('isFirstLine');
     if (!inlineRange) return false;
 
     if (inlineRange.length > 0) {
@@ -253,6 +265,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * 2. soft break
    */
   isLastLine = (inlineRange: InlineRange | null): boolean => {
+    console.log('isLastLine');
     if (!inlineRange) return false;
 
     if (inlineRange.length > 0) {
@@ -296,6 +309,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * if sync is true, the native selection will be synced immediately
    */
   setInlineRange = (inlineRange: InlineRange | null, sync = true): void => {
+    console.log('setInlineRange');
     if (!this.isValidInlineRange(inlineRange)) {
       throw new Error('invalid inline range');
     }
@@ -309,6 +323,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   focusEnd = (): void => {
+    console.log('focusEnd');
     this.setInlineRange({
       index: this.editor.yTextLength,
       length: 0,
@@ -316,6 +331,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   focusStart = (): void => {
+    console.log('focusStart');
     this.setInlineRange({
       index: 0,
       length: 0,
@@ -350,6 +366,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * calculate the dom selection from inline ranage for **this Editor**
    */
   toDomRange = (inlineRange: InlineRange): Range | null => {
+    console.log('toDomRange');
     const rootElement = this.editor.rootElement;
     return inlineRangeToDomRange(rootElement, inlineRange);
   };
@@ -387,12 +404,19 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    *    the second is `{index: 0, length: 6}`, the third is `{index: 0, length: 4}`
    */
   toInlineRange = (range: Range): InlineRange | null => {
+    console.log('1-toInlineRange');
+    //debugger;
     const { rootElement, yText } = this.editor;
-
+    /*console.log(
+      '1111111111111111111111111111111111111',
+      domRangeToInlineRange(range, rootElement, yText)
+    );*/
+    //debugger;
     return domRangeToInlineRange(range, rootElement, yText);
   };
 
   private _applyInlineRange = (inlineRange: InlineRange): void => {
+    console.log('_applyInlineRange');
     const selectionRoot = findDocumentOrShadowRoot(this.editor);
     const selection = selectionRoot.getSelection();
     if (!selection) {

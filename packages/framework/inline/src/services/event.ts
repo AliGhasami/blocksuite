@@ -70,7 +70,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
   private _isRangeCompletelyInRoot = (range: Range) => {
     //debugger;
-    console.log('_isRangeCompletelyInRoot', range);
+    //console.log('_isRangeCompletelyInRoot', range)
     const rootElement = this.editor.rootElement;
     const rootRange = document.createRange();
     rootRange.selectNode(rootElement);
@@ -79,21 +79,21 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       range.startContainer.compareDocumentPosition(range.endContainer) &
       Node.DOCUMENT_POSITION_FOLLOWING
     ) {
-      console.log(
-        '22222',
-        rootRange.comparePoint(range.startContainer, range.startOffset) >= 0 &&
-          rootRange.comparePoint(range.endContainer, range.endOffset) <= 0
-      );
+      // console.log(
+      //   '22222',
+      //   rootRange.comparePoint(range.startContainer, range.startOffset) >= 0 &&
+      //     rootRange.comparePoint(range.endContainer, range.endOffset) <= 0
+      // );
       return (
         rootRange.comparePoint(range.startContainer, range.startOffset) >= 0 &&
         rootRange.comparePoint(range.endContainer, range.endOffset) <= 0
       );
     } else {
-      console.log(
+      /*console.log(
         '11111',
         rootRange.comparePoint(range.endContainer, range.startOffset) >= 0 &&
           rootRange.comparePoint(range.startContainer, range.endOffset) <= 0
-      );
+      );*/
       return (
         rootRange.comparePoint(range.endContainer, range.startOffset) >= 0 &&
         rootRange.comparePoint(range.startContainer, range.endOffset) <= 0
@@ -246,6 +246,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onBeforeInput = (event: InputEvent) => {
+    //return;
     console.log('_onBeforeInput');
     const range = this.editor.rangeService.getNativeRange();
     if (
@@ -330,16 +331,18 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     this.editor.slots.inputting.emit();
   };
 
+  /** ok - Ali Ghasami */
   private _onKeyDown = (event: KeyboardEvent) => {
-    return;
     //debugger;
-    console.log('_onKeyDown', event);
-    console.log('this is editor', this.editor);
+    //return;
+    //debugger;
+    console.log('0-_onKeyDown', event);
+    //console.log('this is editor', this.editor);
+    //this.editor?.setText('test');
     const inlineRange = this.editor.getInlineRange();
     if (!inlineRange) return;
-
+    console.log('00-inlineRange', inlineRange);
     //this.editor.slots.keydown.emit(event);
-
     if (
       !event.shiftKey &&
       (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
@@ -352,6 +355,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       };
 
       const deltas = this.editor.getDeltasByInlineRange(inlineRange);
+      console.log('deltas');
       if (deltas.length === 2) {
         if (event.key === 'ArrowLeft' && this.editor.isEmbed(deltas[0][0])) {
           prevent();
@@ -394,7 +398,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onClick = (event: MouseEvent) => {
-    console.log('_onClick');
+    //console.log('_onClick');
     // select embed element when click on it
     if (event.target instanceof Node && isInEmbedElement(event.target)) {
       const selectionRoot = findDocumentOrShadowRoot(this.editor);
