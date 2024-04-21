@@ -59,6 +59,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
       mode?: 'replace' | 'merge';
     } = {}
   ): void => {
+    console.log('formatText');
     const { match = () => true, mode = 'merge' } = options;
     const deltas = this.editor.deltaService.getDeltasByInlineRange(inlineRange);
 
@@ -90,6 +91,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   };
 
   resetText = (inlineRange: InlineRange): void => {
+    console.log('resetText');
     const coverDeltas: DeltaInsert[] = [];
     for (
       let i = inlineRange.index;
@@ -111,6 +113,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     );
 
     this.transact(() => {
+      console.log('transact');
       this.yText.format(inlineRange.index, inlineRange.length, {
         ...unset,
       });
@@ -121,6 +124,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     text: string,
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
+    console.log('setText');
     this.transact(() => {
       this.yText.delete(0, this.yText.length);
       this.yText.insert(0, text, attributes);

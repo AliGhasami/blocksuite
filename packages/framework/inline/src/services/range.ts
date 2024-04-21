@@ -110,7 +110,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   getNativeSelection(): Selection | null {
-    //console.log('getNativeSelection');
+    console.log('getNativeSelection');
     const selectionRoot = findDocumentOrShadowRoot(this.editor);
     const selection = selectionRoot.getSelection();
     if (!selection) return null;
@@ -120,7 +120,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   }
 
   getNativeRange(): Range | null {
-    //console.log('getNativeRange');
+    console.log('getNativeRange');
     const selection = this.getNativeSelection();
     if (!selection) return null;
     return selection.getRangeAt(0);
@@ -206,7 +206,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   }
 
   isValidInlineRange = (inlineRange: InlineRange | null): boolean => {
-    //console.log('isValidInlineRange');
+    console.log('isValidInlineRange');
     return !(
       inlineRange &&
       (inlineRange.index < 0 ||
@@ -339,6 +339,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   selectAll = (): void => {
+    console.log('selectAll');
     this.setInlineRange({
       index: 0,
       length: this.editor.yTextLength,
@@ -346,6 +347,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   focusIndex = (index: number): void => {
+    console.log('focusIndex');
     this.setInlineRange({
       index,
       length: 0,
@@ -356,7 +358,9 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * sync the dom selection from inline ranage for **this Editor**
    */
   syncInlineRange = (): void => {
+    //console.log('syncInlineRange');
     const inlineRange = this.getInlineRange();
+    //console.log('100000', inlineRange);
     if (inlineRange && this.editor.mounted) {
       this._applyInlineRange(inlineRange);
     }
@@ -416,7 +420,8 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _applyInlineRange = (inlineRange: InlineRange): void => {
-    console.log('_applyInlineRange');
+    console.log('_applyInlineRange', inlineRange);
+    //return;
     const selectionRoot = findDocumentOrShadowRoot(this.editor);
     const selection = selectionRoot.getSelection();
     if (!selection) {

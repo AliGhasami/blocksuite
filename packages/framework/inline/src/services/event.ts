@@ -245,6 +245,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     this.editor.slots.inputting.emit();
   };
 
+  /** TODO ali ghasami for check not run in mobile  */
   private _onBeforeInput = (event: InputEvent) => {
     //return;
     console.log('_onBeforeInput');
@@ -399,7 +400,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onClick = (event: MouseEvent) => {
-    //console.log('_onClick');
+    console.log('_onClick');
     // select embed element when click on it
     if (event.target instanceof Node && isInEmbedElement(event.target)) {
       const selectionRoot = findDocumentOrShadowRoot(this.editor);

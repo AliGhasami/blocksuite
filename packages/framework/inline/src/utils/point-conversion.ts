@@ -56,6 +56,7 @@ export function textPointToDomPoint(
   offset: number,
   rootElement: HTMLElement
 ): DomPoint | null {
+  //return {}
   //debugger;
   console.log('5-textPointToDomPoint');
   if (rootElement.dataset.vRoot !== 'true') {
@@ -95,6 +96,7 @@ export function textPointToDomPoint(
     lineElement
   );
 
+  //return { text, index: 0 };
   return { text, index: index + lineIndex };
 }
 

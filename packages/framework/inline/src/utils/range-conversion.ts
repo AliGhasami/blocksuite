@@ -31,7 +31,13 @@ const rangeHasAnchorAndFocus: Predict = ({
   startText,
   endText,
 }) => {
-  console.log('5-rangeHasAnchorAndFocus');
+  console.log(
+    '5-rangeHasAnchorAndFocus',
+    rootElement,
+    startText,
+    endText,
+    rootElement.contains(startText) && rootElement.contains(endText)
+  );
   return rootElement.contains(startText) && rootElement.contains(endText);
 };
 
@@ -61,6 +67,11 @@ const rangeHasAnchorAndFocusHandler: Handler = ({
   if (!anchorDomPoint || !focusDomPoint) {
     return null;
   }
+
+  console.log('resssssss', {
+    index: Math.min(anchorDomPoint.index, focusDomPoint.index),
+    length: Math.abs(anchorDomPoint.index - focusDomPoint.index),
+  });
 
   return {
     index: Math.min(anchorDomPoint.index, focusDomPoint.index),
@@ -212,6 +223,7 @@ export function domRangeToInlineRange(
   // debugger;
   console.log('2-domRangeToInlineRange');
   const context = buildContext(range, rootElement, yText);
+  console.log('this is context', context);
 
   if (!context) return null;
 

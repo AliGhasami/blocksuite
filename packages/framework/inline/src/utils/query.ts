@@ -20,9 +20,10 @@ export function findDocumentOrShadowRoot<
     (root instanceof Document || root instanceof ShadowRoot) &&
     'getSelection' in root
   ) {
+    console.log('20000', el.ownerDocument);
     return root;
   }
-
+  console.log('1000', el.ownerDocument);
   return el.ownerDocument;
 }
 
