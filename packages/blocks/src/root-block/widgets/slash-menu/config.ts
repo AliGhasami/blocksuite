@@ -1,32 +1,32 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { Slice, Text, type Y } from '@blocksuite/store';
+import { type Y } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/embed-card-create-modal.js';
-import { toast } from '../../../_common/components/toast.js';
+//import { toast } from '../../../_common/components/toast.js';
 import { textConversionConfigs } from '../../../_common/configs/text-conversion.js';
 import { textFormatConfigs } from '../../../_common/configs/text-format/config.js';
 import {
-  ArrowDownBigIcon,
-  ArrowUpBigIcon,
+  //ArrowDownBigIcon,
+  //ArrowUpBigIcon,
   AttachmentIcon,
   BookmarkIcon,
-  CopyIcon,
+  //CopyIcon,
   DatabaseKanbanViewIcon20,
   DatabaseTableViewIcon20,
-  DeleteIcon,
+  /*DeleteIcon,
   DualLinkIcon,
-  DuplicateIcon,
+  DuplicateIcon,*/
   FrameIcon,
   ImageIcon20,
-  NewDocIcon,
+  /*NewDocIcon,
   NowIcon,
   TodayIcon,
   TomorrowIcon,
-  YesterdayIcon,
+  YesterdayIcon,*/
 } from '../../../_common/icons/index.js';
-import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+//import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import {
-  createDefaultDoc,
+  //createDefaultDoc,
   getImageFilesFromLocal,
   getInlineEditorByModel,
   matchFlavours,
@@ -43,14 +43,14 @@ import { YoutubeIcon } from '../../../embed-youtube-block/styles.js';
 import type { FrameBlockModel } from '../../../frame-block/index.js';
 import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { NoteBlockModel } from '../../../note-block/index.js';
-import type { ParagraphBlockModel } from '../../../paragraph-block/index.js';
+//import type { ParagraphBlockModel } from '../../../paragraph-block/index.js';
 import { onModelTextUpdated } from '../../../root-block/utils/index.js';
 import type { SurfaceBlockModel } from '../../../surface-block/index.js';
 import { CanvasElementType } from '../../../surface-block/index.js';
-import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+//import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import {
-  formatDate,
-  insertContent,
+  /*formatDate,
+  insertContent,*/
   insideDatabase,
   type SlashItem,
   type SlashMenuOptions,

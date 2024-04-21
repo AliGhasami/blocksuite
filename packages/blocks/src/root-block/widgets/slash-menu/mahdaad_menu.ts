@@ -156,6 +156,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Mention',
         description: 'Description',
         icon: mention,
+        //@ts-ignore
         action: ({ rootElement, model }) => {
           runCommand(rootElement, 'affine:mention', undefined);
           //runCommand(rootElement, 'affine:mention', 'text');
@@ -194,37 +195,37 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Link To Page',
         description: 'Description',
         icon: link_to_page,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Table View',
         description: 'Description',
         icon: table_view,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Image',
         description: 'Description',
         icon: image,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Video',
         description: 'Description',
         icon: video,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Audio',
         description: 'Description',
         icon: audio,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Code',
         description: 'Description',
         icon: code,
-        action: ({ rootElement, model }) => {
+        action: ({ rootElement }) => {
           runCommand(rootElement, 'affine:code', undefined);
         },
       },
@@ -232,55 +233,55 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'File',
         description: 'Description',
         icon: file,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Link',
         description: 'Description',
         icon: link,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Table Of Content',
         description: 'Description',
         icon: table_of_content,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Button Link',
         description: 'Description',
         icon: button_link,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Bread Crumb',
         description: 'Description',
         icon: bread_crumb,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Accordion Heading 1',
         description: 'Description',
         icon: accordion_h1,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Accordion Heading 2',
         description: 'Description',
         icon: accordion_h2,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Accordion Heading 3',
         description: 'Description',
         icon: accordion_h3,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Multi Column',
         description: 'Description',
         icon: multi_column,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       //todo
       /*{
@@ -347,31 +348,31 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Title ',
         description: 'Description',
         icon: empty_title,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Title  ',
         description: 'Description',
         icon: empty_title,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Title   ',
         description: 'Description',
         icon: empty_title,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Title     ',
         description: 'Description',
         icon: empty_title,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       {
         title: 'Title         ',
         description: 'Description',
         icon: empty_title,
-        action: ({ rootElement, model }) => {},
+        action: () => {},
       },
       /*{
         title: 'Embed',
