@@ -2,7 +2,9 @@ import './chat-panel-input.js';
 import './chat-panel-messages.js';
 
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import { css, html } from 'lit';
+import type { AIError } from '@blocksuite/blocks';
+import type { Doc } from '@blocksuite/store';
+import { css, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createRef, type Ref, ref } from 'lit/directives/ref.js';
 
@@ -14,6 +16,8 @@ import type { ChatPanelMessages } from './chat-panel-messages.js';
 export type ChatMessage = {
   content: string;
   role: 'user' | 'assistant';
+  blobs?: Blob[];
+  createdAt: string;
 };
 
 export type ChatAction = {
@@ -24,7 +28,12 @@ export type ChatAction = {
 
 export type ChatItem = ChatMessage | ChatAction;
 
-export type ChatStatus = 'loading' | 'success' | 'error' | 'idle';
+export type ChatStatus =
+  | 'loading'
+  | 'success'
+  | 'error'
+  | 'idle'
+  | 'transmitting';
 
 @customElement('chat-panel')
 export class ChatPanel extends WithDisposable(ShadowlessElement) {
@@ -86,38 +95,55 @@ export class ChatPanel extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   editor!: AffineEditorContainer;
 
+  @property({ attribute: false })
+  doc!: Doc;
+
   @state()
   items: ChatItem[] = [];
 
   @state()
   status: ChatStatus = 'idle';
 
+  @state()
+  error?: AIError;
+
   private _chatMessages: Ref<ChatPanelMessages> =
     createRef<ChatPanelMessages>();
 
   public override async connectedCallback() {
     super.connectedCallback();
+    if (!this.doc) throw new Error('doc is required');
+    await this._resetItems();
+  }
 
-    const { editor } = this;
+  private async _resetItems() {
+    const { doc } = this;
 
     const histories =
-      (await AIProvider.histories?.chats(
-        editor.doc.collection.id,
-        editor.doc.id
-      )) ?? [];
+      (await AIProvider.histories?.chats(doc.collection.id, doc.id)) ?? [];
 
     const actions =
-      (await AIProvider.histories?.actions(
-        editor.doc.collection.id,
-        editor.doc.id
-      )) ?? [];
+      (await AIProvider.histories?.actions(doc.collection.id, doc.id)) ?? [];
 
-    this.items = [...actions.reverse()];
+    const items: ChatItem[] = [...actions];
+
     if (histories[0]) {
-      this.items = [...this.items, ...histories[0].messages];
+      items.push(...histories[0].messages);
     }
 
+    this.items = items.sort((a, b) => {
+      const aDate = 'role' in a ? a.createdAt : a.messages[0].createdAt;
+      const bDate = 'role' in b ? b.createdAt : b.messages[0].createdAt;
+      return new Date(aDate).getTime() - new Date(bDate).getTime();
+    });
+
     this.scrollToDown();
+  }
+
+  protected override updated(_changedProperties: PropertyValues) {
+    if (_changedProperties.has('doc')) {
+      this._resetItems().catch(console.error);
+    }
   }
 
   get rootService() {
@@ -138,6 +164,10 @@ export class ChatPanel extends WithDisposable(ShadowlessElement) {
     this.scrollToDown();
   };
 
+  updateError = (error: AIError) => {
+    this.error = error;
+  };
+
   scrollToDown() {
     requestAnimationFrame(() => this._chatMessages.value?.scrollToDown());
   }
@@ -150,6 +180,7 @@ export class ChatPanel extends WithDisposable(ShadowlessElement) {
         .host=${this.editor.host}
         .items=${this.items}
         .status=${this.status}
+        .error=${this.error}
       ></chat-panel-messages>
       <chat-panel-input
         .host=${this.editor.host}
@@ -158,6 +189,8 @@ export class ChatPanel extends WithDisposable(ShadowlessElement) {
         .addToItems=${this.addToItems}
         .status=${this.status}
         .updateStatus=${this.updateStatus}
+        .error=${this.error}
+        .updateError=${this.updateError}
       ></chat-panel-input>
       <div class="chat-panel-footer">
         ${SmallHintIcon}

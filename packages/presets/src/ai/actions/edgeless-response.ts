@@ -1,16 +1,15 @@
 import type { EditorHost } from '@blocksuite/block-std';
 import type {
+  AffineAIPanelWidget,
+  AIItemConfig,
+  CopilotSelectionController,
   EdgelessCopilotWidget,
   EdgelessElementToolbarWidget,
-} from '@blocksuite/blocks';
-import {
-  type AffineAIPanelWidget,
-  type CopilotSelectionController,
-  type EdgelessModel,
-  type EdgelessRootService,
-  type MindmapElementModel,
-  type ShapeElementModel,
-  type SurfaceBlockModel,
+  EdgelessModel,
+  EdgelessRootService,
+  MindmapElementModel,
+  ShapeElementModel,
+  SurfaceBlockModel,
 } from '@blocksuite/blocks';
 import {
   AFFINE_EDGELESS_COPILOT_WIDGET,
@@ -26,8 +25,11 @@ import {
 import { insertFromMarkdown } from '../_common/markdown-utils.js';
 import { getSurfaceElementFromEditor } from '../_common/selection-utils.js';
 import { getAIPanel } from '../ai-panel.js';
+import { copyTextAnswer } from '../utils/editor-actions.js';
+import { preprocessHtml } from '../utils/html.js';
 import { fetchImageToFile } from '../utils/image.js';
 import { getEdgelessRootFromEditor } from '../utils/selection-utils.js';
+import { EXCLUDING_COPY_ACTIONS } from './consts.js';
 
 export type CtxRecord = {
   get(): Record<string, unknown>;
@@ -86,7 +88,7 @@ export function getCopilotSelectedElems(host: EditorHost): EdgelessModel[] {
 export function discard(
   panel: AffineAIPanelWidget,
   copilot: EdgelessCopilotWidget
-): FinishConfig['responses'][number] {
+): AIItemConfig {
   return {
     name: 'Discard',
     icon: DeleteIcon,
@@ -100,9 +102,7 @@ export function discard(
   };
 }
 
-export function retry(
-  panel: AffineAIPanelWidget
-): FinishConfig['responses'][number] {
+export function retry(panel: AffineAIPanelWidget): AIItemConfig {
   return {
     name: 'Retry',
     icon: ResetIcon,
@@ -116,7 +116,7 @@ export function createInsertResp(
   handler: (host: EditorHost, ctx: CtxRecord) => void,
   host: EditorHost,
   ctx: CtxRecord
-): FinishConfig['responses'][number] {
+): AIItemConfig {
   return {
     name: 'Insert below',
     icon: InsertBelowIcon,
@@ -180,8 +180,9 @@ export const responses: {
   },
   makeItReal: host => {
     const aiPanel = getAIPanel(host);
-    const html = aiPanel.answer;
+    let html = aiPanel.answer;
     if (!html) return;
+    html = preprocessHtml(html);
 
     const edgelessCopilot = getEdgelessCopilotWidget(host);
     const [surface] = host.doc.getBlockByFlavour(
@@ -311,10 +312,21 @@ export function actionToResponse<T extends keyof BlockSuitePresets.AIActions>(
 ): FinishConfig {
   return {
     responses: [
-      getResponseHandler(id, host, ctx),
-      retry(getAIPanel(host)),
-      discard(getAIPanel(host), getEdgelessCopilotWidget(host)),
+      {
+        name: 'Response',
+        items: [
+          getResponseHandler(id, host, ctx),
+          retry(getAIPanel(host)),
+          discard(getAIPanel(host), getEdgelessCopilotWidget(host)),
+        ],
+      },
     ],
     actions: [],
+    copy: {
+      allowed: !EXCLUDING_COPY_ACTIONS.includes(id),
+      onCopy: () => {
+        return copyTextAnswer(getAIPanel(host));
+      },
+    },
   };
 }
