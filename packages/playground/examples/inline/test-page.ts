@@ -172,6 +172,7 @@ export class TestRichText extends ShadowlessElement {
     this.addEventListener('keydown', keydownHandler);
 
     this.inlineEditor.slots.textChange.on(() => {
+      //debugger;
       const el = this.querySelector('.y-text');
       if (el) {
         const text = this.inlineEditor.yText.toDelta();
@@ -194,6 +195,7 @@ export class TestRichText extends ShadowlessElement {
   }
 
   override render() {
+    //console.log('11111');
     return html`<style>
         test-rich-text {
           display: grid;
@@ -448,11 +450,12 @@ export class TestPage extends ShadowlessElement {
               .undoManager=${this._undoManagerA}
             ></custom-toolbar>
             <test-rich-text
+                style="border:1px solid red"
               .inlineEditor=${this._editorA}
               .undoManager=${this._undoManagerA!}
             ></test-rich-text>
           </div>
-          <div class="doc-b">
+         <!-- <div class="doc-b">
             <custom-toolbar
               .inlineEditor=${this._editorB}
               .undoManager=${this._undoManagerB!}
@@ -460,7 +463,7 @@ export class TestPage extends ShadowlessElement {
             <test-rich-text
               .inlineEditor=${this._editorB}
               .undoManager=${this._undoManagerB}
-            ></test-rich-text>
+            ></test-rich-text> -->
           </div>
         </div>
       </div>
