@@ -198,9 +198,9 @@ export class ParagraphBlockComponent extends BlockElement<
             .enableClipboard=${false}
             .enableUndoRedo=${false}
           ></rich-text>
-          <div contenteditable="false" class="affine-paragraph-placeholder">
+          <!-- <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}
-          </div>
+          </div> -->
         </div>
 
         ${children}

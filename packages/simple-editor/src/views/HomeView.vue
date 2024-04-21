@@ -102,6 +102,26 @@ function handleUpdateBlock(data){
 </script>
 
 <style>
+affine-paragraph{
+  border:1px solid darkseagreen;
+  padding: 5px;
+}
+rich-text{
+  border:1px solid #646cff;
+  padding: 5px;
+  //background-color: red;
+}
+
+v-line{
+  border:1px solid coral;
+  padding: 5px;
+}
+
+v-text{
+  border:1px solid gold;
+}
+
+
 </style>
 
 

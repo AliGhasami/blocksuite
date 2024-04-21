@@ -341,8 +341,9 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     //this.editor?.setText('test');
     const inlineRange = this.editor.getInlineRange();
     if (!inlineRange) return;
-    console.log('00-inlineRange', inlineRange);
-    //this.editor.slots.keydown.emit(event);
+
+    this.editor.slots.keydown.emit(event);
+
     if (
       !event.shiftKey &&
       (event.key === 'ArrowLeft' || event.key === 'ArrowRight')

@@ -140,7 +140,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   getInlineRangeFromElement = (element: Element): InlineRange | null => {
     console.log('getInlineRangeFromElement');
     const range = document.createRange();
-    const text = element.querySelector('[data-v-text]');
+    const text = element.querySelector('[data-v-text');
     if (!text) {
       return null;
     }
