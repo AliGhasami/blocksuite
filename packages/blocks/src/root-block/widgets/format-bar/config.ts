@@ -1,18 +1,21 @@
 import type { Chain, InitCommandCtx } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
-import { html, type TemplateResult } from 'lit';
+//import { assertExists } from '@blocksuite/global/utils';
+import {
+  //html,
+  type TemplateResult,
+} from 'lit';
 
-import { toast } from '../../../_common/components/index.js';
-import { createSimplePortal } from '../../../_common/components/portal.js';
-import { DATABASE_CONVERT_WHITE_LIST } from '../../../_common/configs/quick-action/database-convert-view.js';
+//import { toast } from '../../../_common/components/index.js';
+//import { createSimplePortal } from '../../../_common/components/portal.js';
+///import { DATABASE_CONVERT_WHITE_LIST } from '../../../_common/configs/quick-action/database-convert-view.js';
 import {
   BoldIcon,
   BulletedListIcon,
   CheckBoxIcon,
   CodeIcon,
-  CopyIcon,
-  DatabaseTableViewIcon20,
-  FontLinkedDocIcon,
+  //CopyIcon,
+  //DatabaseTableViewIcon20,
+  //FontLinkedDocIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -20,14 +23,14 @@ import {
   Heading5Icon,
   Heading6Icon,
   ItalicIcon,
-  LinkIcon,
+  //LinkIcon,
   NumberedListIcon,
   QuoteIcon,
   StrikethroughIcon,
   TextIcon,
   UnderlineIcon,
 } from '../../../_common/icons/index.js';
-import { createLinkedDocFromSelectedBlocks } from '../../../_common/utils/render-linked-doc.js';
+//import { createLinkedDocFromSelectedBlocks } from '../../../_common/utils/render-linked-doc.js';
 import type { AffineFormatBarWidget } from './format-bar.js';
 
 export type DividerConfigItem = {

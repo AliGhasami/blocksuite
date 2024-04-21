@@ -6,7 +6,6 @@ import { assertExists } from '@blocksuite/global/utils';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { z } from 'zod';
 
 import type { RichText } from '../_common/components/index.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
