@@ -23,49 +23,59 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   constructor(public readonly editor: InlineEditor<TextAttributes>) {}
 
   get inlineRangeProvider() {
+    //console.log('1111', this.editor.inlineRangeProvider);
     return this.editor.inlineRangeProvider;
   }
 
   mount = () => {
+    //return;
     const eventSource = this.editor.eventSource;
+    //console.log('this is eventSource', eventSource);
     const rootElement = this.editor.rootElement;
 
     if (!this.inlineRangeProvider) {
-      this.editor.disposables.addFromEvent(
+      //console.log('11111111111');
+      /*this.editor.disposables.addFromEvent(
         document,
         'selectionchange',
         this._onSelectionChange
-      );
+      );*/
     }
 
-    this.editor.disposables.addFromEvent(
+    this.editor.disposables.addFromEvent(eventSource, 'beforeinput', () => {
+      return;
+      //console.log('1111', eventSource);
+      ///debugger;
+    });
+
+    /*this.editor.disposables.addFromEvent(
       eventSource,
       'beforeinput',
       this._onBeforeInput
-    );
-    this.editor.disposables.addFromEvent(
+    );*/
+    /*this.editor.disposables.addFromEvent(
       eventSource,
       'compositionstart',
       this._onCompositionStart
-    );
-    this.editor.disposables.addFromEvent(
+    );*/
+    /* this.editor.disposables.addFromEvent(
       eventSource,
       'compositionupdate',
       this._onCompositionUpdate
-    );
-    this.editor.disposables.addFromEvent(
+    );*/
+    /*this.editor.disposables.addFromEvent(
       eventSource,
       'compositionend',
       (event: CompositionEvent) => {
         this._onCompositionEnd(event).catch(console.error);
       }
-    );
-    this.editor.disposables.addFromEvent(
+    );*/
+    /* this.editor.disposables.addFromEvent(
       eventSource,
       'keydown',
       this._onKeyDown
-    );
-    this.editor.disposables.addFromEvent(rootElement, 'click', this._onClick);
+    );*/
+    //this.editor.disposables.addFromEvent(rootElement, 'click', this._onClick);
   };
 
   private _isRangeCompletelyInRoot = (range: Range) => {
@@ -102,6 +112,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onSelectionChange = () => {
+    debugger;
     const rootElement = this.editor.rootElement;
     const previousInlineRange = this.editor.getInlineRange();
     if (this._isComposing) {
@@ -166,6 +177,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
   private _compositionInlineRange: InlineRange | null = null;
   private _onCompositionStart = () => {
+    debugger;
     ///console.log('_onCompositionStart');
     this._isComposing = true;
     // embeds is not editable and it will break IME
@@ -187,6 +199,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onCompositionUpdate = () => {
+    debugger;
     if (!this.editor.rootElement.isConnected) return;
 
     const range = this.editor.rangeService.getNativeRange();
@@ -202,6 +215,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
   private _onCompositionEnd = async (event: CompositionEvent) => {
     console.log('_onCompositionEnd');
+    debugger;
     this._isComposing = false;
     if (!this.editor.rootElement.isConnected) return;
 
@@ -247,18 +261,36 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
   /** TODO ali ghasami for check not run in mobile  */
   private _onBeforeInput = (event: InputEvent) => {
+    //debugger;
+    //debugger;
+    //event.data = '1';
+
     //return;
-    console.log('_onBeforeInput');
+    console.log('_onBeforeInput', this._isComposing);
+    //return;
     const range = this.editor.rangeService.getNativeRange();
+    console.log('_onBeforeInput range', range);
     if (
       this.editor.isReadonly ||
-      this._isComposing ||
+      /** TODO ali ghasami for check not run in mobile  */
+      //this._isComposing ||
       !range ||
       !this._isRangeCompletelyInRoot(range)
-    )
+    ) {
+      /* console.log(
+        'zzzzzzzzzzzzzzzzzzzz',
+        this.editor.isReadonly,
+        this._isComposing,
+        range,
+        this._isRangeCompletelyInRoot(range)
+      );*/
+      //debugger;
       return;
+    }
 
+    // debugger;
     const tmpInlineRange = this.editor.toInlineRange(range);
+    //console.log('_onBeforeInput tmpInlineRange', tmpInlineRange);
     if (!tmpInlineRange) return;
 
     let ifHandleTargetRange = true;
@@ -297,7 +329,6 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
         range.setStart(staticRange.startContainer, staticRange.startOffset);
         range.setEnd(staticRange.endContainer, staticRange.endOffset);
         const inlineRange = this.editor.toInlineRange(range);
-
         if (
           !isMaybeInlineRangeEqual(this.editor.getInlineRange(), inlineRange)
         ) {
@@ -321,6 +352,9 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     this.editor.hooks.beforeinput?.(ctx);
 
     const { raw: newEvent, data, inlineRange: newInlineRange } = ctx;
+    //debugger;
+    //return;
+    console.log('_onBeforeInput transformInput');
     transformInput<TextAttributes>(
       newEvent.inputType,
       data,
@@ -337,7 +371,9 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     //debugger;
     //return;
     //debugger;
+    //return;
     console.log('0-_onKeyDown', event);
+
     //console.log('this is editor', this.editor);
     //this.editor?.setText('test');
     const inlineRange = this.editor.getInlineRange();
@@ -400,7 +436,9 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
   };
 
   private _onClick = (event: MouseEvent) => {
+    //return;
     console.log('_onClick');
+    //debugger;
     // select embed element when click on it
     if (event.target instanceof Node && isInEmbedElement(event.target)) {
       const selectionRoot = findDocumentOrShadowRoot(this.editor);

@@ -25,6 +25,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   constructor(public readonly editor: InlineEditor<TextAttributes>) {}
 
   get yText() {
+    console.log('yText', this.editor.yText);
     return this.editor.yText;
   }
 
@@ -111,6 +112,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
 
   getNativeSelection(): Selection | null {
     console.log('getNativeSelection');
+    // debugger;
     const selectionRoot = findDocumentOrShadowRoot(this.editor);
     const selection = selectionRoot.getSelection();
     if (!selection) return null;
@@ -121,13 +123,14 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
 
   getNativeRange(): Range | null {
     console.log('getNativeRange');
+    // debugger;
     const selection = this.getNativeSelection();
     if (!selection) return null;
     return selection.getRangeAt(0);
   }
 
   getInlineRange = (): InlineRange | null => {
-    //console.log('getInlineRange 100');
+    console.log('getInlineRange 100');
     //debugger;
     if (this.inlineRangeProvider) {
       //console.log('20000');
@@ -358,7 +361,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * sync the dom selection from inline ranage for **this Editor**
    */
   syncInlineRange = (): void => {
-    //console.log('syncInlineRange');
+    console.log('syncInlineRange');
     const inlineRange = this.getInlineRange();
     //console.log('100000', inlineRange);
     if (inlineRange && this.editor.mounted) {
@@ -408,6 +411,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    *    the second is `{index: 0, length: 6}`, the third is `{index: 0, length: 4}`
    */
   toInlineRange = (range: Range): InlineRange | null => {
+    console.log('bbbbbbbbbbbbbbbbbbbbb');
     console.log('1-toInlineRange');
     //debugger;
     const { rootElement, yText } = this.editor;

@@ -143,11 +143,12 @@ export class TestRichText extends ShadowlessElement {
   undoManager!: Y.UndoManager;
 
   override firstUpdated() {
+    //debugger;
     this.contentEditable = 'true';
     this.style.outline = 'none';
     this.inlineEditor.mount(this._container, this);
 
-    const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
+    /*const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
       inputRule: {
         key: ' ',
         handler: context => {
@@ -169,7 +170,7 @@ export class TestRichText extends ShadowlessElement {
         },
       },
     });
-    this.addEventListener('keydown', keydownHandler);
+    this.addEventListener('keydown', keydownHandler);*/
 
     this.inlineEditor.slots.textChange.on(() => {
       //debugger;

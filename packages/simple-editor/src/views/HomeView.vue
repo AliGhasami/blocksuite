@@ -80,7 +80,8 @@ async function handleSetData2(){
 */
 
 function handleKeyDown(e){
-  //console.log("handleKeyDown",e)
+  //debugger
+  console.log("handleKeyDown",e)
 }
 
 function handleChange(data){

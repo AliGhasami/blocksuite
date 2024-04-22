@@ -4,7 +4,7 @@ import type { BaseTextAttributes } from './base-attributes.js';
 export function transformDelta<TextAttributes extends BaseTextAttributes>(
   delta: DeltaInsert<TextAttributes>
 ): (DeltaInsert<TextAttributes> | '\n')[] {
-  //console.log('transformDelta');
+  console.log('transformDelta');
   const result: (DeltaInsert<TextAttributes> | '\n')[] = [];
 
   let tmpString = delta.insert;
@@ -38,7 +38,7 @@ export function transformDelta<TextAttributes extends BaseTextAttributes>(
 export function deltaInsertsToChunks<TextAttributes extends BaseTextAttributes>(
   delta: DeltaInsert<TextAttributes>[]
 ): DeltaInsert<TextAttributes>[][] {
-  //console.log('deltaInsertsToChunks');
+  console.log('deltaInsertsToChunks');
   if (delta.length === 0) {
     return [[]];
   }

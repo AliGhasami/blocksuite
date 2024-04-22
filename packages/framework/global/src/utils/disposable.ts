@@ -17,6 +17,7 @@ export class DisposableGroup implements Disposable {
    * This will be immediately disposed if this group has already been disposed.
    */
   add(d: Disposable | DisposeCallback) {
+    //debugger;
     if (typeof d === 'function') {
       if (this._disposed) d();
       else this._disposables.push({ dispose: d });
@@ -50,6 +51,7 @@ export class DisposableGroup implements Disposable {
     handler: (e: Event) => void,
     eventOptions?: boolean | AddEventListenerOptions
   ) {
+    //debugger;
     this.add({
       dispose: () => {
         target.removeEventListener(type, handler as () => void, eventOptions);

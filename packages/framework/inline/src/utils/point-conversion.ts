@@ -57,7 +57,8 @@ export function textPointToDomPoint(
   rootElement: HTMLElement
 ): DomPoint | null {
   //return {}
-  //debugger;
+  // debugger;
+  console.log('this is textPointToDomPoint', offset);
   console.log('5-textPointToDomPoint');
   if (rootElement.dataset.vRoot !== 'true') {
     throw new Error(
@@ -78,6 +79,7 @@ export function textPointToDomPoint(
 
   if (text.wholeText !== ZERO_WIDTH_SPACE) {
     //debugger;
+    console.log('this is offset', offset);
     index += offset;
   }
 

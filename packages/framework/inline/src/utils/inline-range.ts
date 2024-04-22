@@ -23,10 +23,12 @@ export function isInlineRangeIntersect(
 }
 
 export function isInlineRangeBefore(a: InlineRange, b: InlineRange): boolean {
+  console.log('isInlineRangeBefore');
   return a.index + a.length <= b.index;
 }
 
 export function isInlineRangeAfter(a: InlineRange, b: InlineRange): boolean {
+  console.log('isInlineRangeAfter');
   return a.index >= b.index + b.length;
 }
 
@@ -34,6 +36,7 @@ export function isInlineRangeEdge(
   index: InlineRange['index'],
   range: InlineRange
 ): boolean {
+  console.log('isInlineRangeEdge');
   return index === range.index || index === range.index + range.length;
 }
 
@@ -41,6 +44,7 @@ export function isInlineRangeEdgeBefore(
   index: InlineRange['index'],
   range: InlineRange
 ): boolean {
+  console.log('isInlineRangeEdgeBefore');
   return index === range.index;
 }
 
@@ -48,14 +52,17 @@ export function isInlineRangeEdgeAfter(
   index: InlineRange['index'],
   range: InlineRange
 ): boolean {
+  console.log('isInlineRangeEdgeAfter');
   return index === range.index + range.length;
 }
 
 export function isPoint(range: InlineRange): boolean {
+  console.log('isPoint');
   return range.length === 0;
 }
 
 export function mergeInlineRange(a: InlineRange, b: InlineRange): InlineRange {
+  console.log('mergeInlineRange');
   const index = Math.min(a.index, b.index);
   const length = Math.max(a.index + a.length, b.index + b.length) - index;
   return { index, length };
@@ -65,6 +72,7 @@ export function intersectInlineRange(
   a: InlineRange,
   b: InlineRange
 ): InlineRange | null {
+  console.log('intersectInlineRange');
   if (!isInlineRangeIntersect(a, b)) {
     return null;
   }

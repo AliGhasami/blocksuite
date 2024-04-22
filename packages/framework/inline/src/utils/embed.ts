@@ -4,6 +4,7 @@ import type { DeltaInsert } from '../types.js';
 import type { BaseTextAttributes } from './base-attributes.js';
 
 export function isInEmbedElement(node: Node): boolean {
+  console.log('isInEmbedElement');
   if (node instanceof Element) {
     if (node instanceof VElement) {
       return node.querySelector('[data-v-embed="true"]') !== null;
@@ -17,6 +18,7 @@ export function isInEmbedElement(node: Node): boolean {
 }
 
 export function isInEmbedGap(node: Node): boolean {
+  console.log('isInEmbedGap');
   const el = node instanceof Element ? node : node.parentElement;
   if (!el) return false;
   return !!el.closest('[data-v-embed-gap="true"]');
@@ -28,6 +30,8 @@ export function transformDeltasToEmbedDeltas<
   editor: InlineEditor<TextAttributes>,
   deltas: DeltaInsert<TextAttributes>[]
 ): DeltaInsert<TextAttributes>[] {
+  //return;
+  console.log('transformDeltasToEmbedDeltas');
   // According to our regulations, the length of each "embed" node should only be 1.
   // Therefore, if the length of an "embed" type node is greater than 1,
   // we will divide it into multiple parts.

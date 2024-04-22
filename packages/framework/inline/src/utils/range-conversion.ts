@@ -48,6 +48,7 @@ const rangeHasAnchorAndFocusHandler: Handler = ({
   startTextOffset,
   endTextOffset,
 }) => {
+  console.log('ttttttttttttttttttttttt');
   console.log('6-rangeHasAnchorAndFocusHandler');
   const anchorDomPoint = textPointToDomPoint(
     startText,
@@ -251,7 +252,7 @@ export function domRangeToInlineRange(
       };
     }
   }
-
+  console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
   // case 1
   if (rangeHasAnchorAndFocus(context)) {
     console.log('if rangeHasAnchorAndFocus');

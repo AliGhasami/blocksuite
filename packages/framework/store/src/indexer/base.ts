@@ -137,6 +137,7 @@ export class BlockIndexer {
     _transaction: Y.Transaction,
     { docId, yDoc }: { docId: DocId; yDoc: Y.Map<YBlock> }
   ) => {
+    // debugger;
     events.forEach(e => {
       if (e instanceof YArrayEvent) {
         // sys:children

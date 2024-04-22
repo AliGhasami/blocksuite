@@ -9,7 +9,9 @@ function handleInsertText<TextAttributes extends BaseTextAttributes>(
   attributes: TextAttributes
 ) {
   console.log('handleInsertText');
+  //return;
   if (!data) return;
+  console.log('555555555555555555555555555555555555', data);
   editor.insertText(inlineRange, data, attributes);
   editor.setInlineRange({
     index: inlineRange.index + data.length,
@@ -42,11 +44,16 @@ export function transformInput<TextAttributes extends BaseTextAttributes>(
   inlineRange: InlineRange,
   editor: InlineEditor
 ) {
-  console.log('transformInput');
+  //return;
+  //debugger;
+  console.log('transformInput', data, inlineRange, inputType);
+  //debugger;
+  //return;
   if (!editor.isValidInlineRange(inlineRange)) return;
-
-  if (inputType === 'insertText') {
-    handleInsertText(inlineRange, data, editor, attributes);
+  //debugger
+  if (inputType === 'insertText' || inputType === 'insertCompositionText') {
+    console.log('1111', inlineRange, data, editor, attributes);
+    //handleInsertText(inlineRange, data, editor, attributes);
   } else if (
     inputType === 'insertParagraph' ||
     inputType === 'insertLineBreak'

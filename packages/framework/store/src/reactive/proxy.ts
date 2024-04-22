@@ -211,6 +211,7 @@ export class ReactiveYMap extends BaseReactiveYData<UnRecord, YMap<unknown>> {
   };
 
   private _observer = (event: YMapEvent<unknown>) => {
+    //debugger;
     this._onObserve(event, () => {
       event.keysChanged.forEach(key => {
         const type = event.changes.keys.get(key);
@@ -238,6 +239,7 @@ export function createYProxy<Data>(
   yAbstract: unknown,
   options: ProxyOptions<Data> = {}
 ): Data {
+  //debugger;
   if (proxies.has(yAbstract)) {
     return proxies.get(yAbstract)!.proxy as Data;
   }

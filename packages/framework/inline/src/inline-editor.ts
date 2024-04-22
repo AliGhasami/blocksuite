@@ -136,6 +136,7 @@ export class InlineEditor<
   }
 
   get mounted() {
+    //debugger;
     return this._mounted;
   }
 
@@ -233,6 +234,7 @@ export class InlineEditor<
     eventSource: HTMLElement = rootElement,
     isReadonly = false
   ) {
+    //debugger;
     const inlineRoot = rootElement as InlineRootElement<TextAttributes>;
     inlineRoot.inlineEditor = this;
     this._rootElement = inlineRoot;
@@ -263,11 +265,15 @@ export class InlineEditor<
   }
 
   requestUpdate(syncInlineRange = true): void {
+    console.log('requestUpdate');
     this._deltaService.render(syncInlineRange).catch(console.error);
   }
 
   async waitForUpdate() {
+    //return;
+    //console.log('waitForUpdate');
     const vLines = Array.from(this.rootElement.querySelectorAll('v-line'));
+    console.log('vLines', vLines);
     await Promise.all(vLines.map(line => line.updateComplete));
   }
 
@@ -283,12 +289,14 @@ export class InlineEditor<
   }
 
   rerenderWholeEditor() {
+    console.log('rerenderWholeEditor');
     if (!this.rootElement.isConnected) return;
     render(nothing, this.rootElement);
     this._deltaService.render().catch(console.error);
   }
 
   transact(fn: () => void): void {
+    console.log('transact');
     const doc = this.yText.doc;
     if (!doc) {
       throw new Error('yText is not attached to a doc');
@@ -298,6 +306,8 @@ export class InlineEditor<
   }
 
   private _onYTextChange = (_: Y.YTextEvent, transaction: Y.Transaction) => {
+    //debugger;
+    //return;
     console.log('_onYTextChange');
     if (this.yText.toString().includes('\r')) {
       throw new Error(
@@ -347,9 +357,16 @@ export class InlineEditor<
   };
 
   private _bindYTextObserver() {
+    ///console.log('_bindYTextObserver');
+    //debugger;
+    //console.log('1111', this.yText);
+    /*this.yText.observe(() => {
+      console.log('this is my yText observe');
+    });*/
     this.yText.observe(this._onYTextChange);
     this.disposables.add({
       dispose: () => {
+        //debugger;
         this.yText.unobserve(this._onYTextChange);
       },
     });

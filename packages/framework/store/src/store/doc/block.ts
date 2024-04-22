@@ -109,6 +109,7 @@ export class Block {
 
     this.yBlock.observe(event => {
       event.keysChanged.forEach(key => {
+        //debugger;
         const type = event.changes.keys.get(key);
         if (!type) {
           return;
