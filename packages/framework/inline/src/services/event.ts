@@ -42,7 +42,8 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       );*/
     }
 
-    this.editor.disposables.addFromEvent(eventSource, 'beforeinput', () => {
+    this.editor.disposables.addFromEvent(eventSource, 'beforeinput', event => {
+      console.log('11111', event);
       return;
       //console.log('1111', eventSource);
       ///debugger;
