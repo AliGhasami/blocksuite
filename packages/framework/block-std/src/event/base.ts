@@ -23,7 +23,6 @@ export class UIEventStateContext {
   }
 
   add = <State extends UIEventState = UIEventState>(state: State) => {
-    debugger;
     const name = state.type;
     if (this._map[name]) {
       console.warn('UIEventStateContext: state name duplicated', name);

@@ -12,7 +12,6 @@ export class RangeControl {
   constructor(private _dispatcher: UIEventDispatcher) {}
 
   listen() {
-    debugger;
     this._dispatcher.disposables.addFromEvent(
       document,
       'selectionchange',
@@ -36,7 +35,6 @@ export class RangeControl {
   }
 
   private _compositionUpdate = (event: Event) => {
-    debugger;
     const scope = this._buildScope('compositionUpdate');
 
     this._dispatcher.run(
@@ -47,21 +45,18 @@ export class RangeControl {
   };
 
   private _compositionStart = (event: Event) => {
-    debugger;
     const scope = this._buildScope('compositionStart');
 
     this._dispatcher.run('compositionStart', this._createContext(event), scope);
   };
 
   private _compositionEnd = (event: Event) => {
-    debugger;
     const scope = this._buildScope('compositionEnd');
 
     this._dispatcher.run('compositionEnd', this._createContext(event), scope);
   };
 
   private _selectionChange = (event: Event) => {
-    debugger;
     const selection = document.getSelection();
     if (!selection) return;
 
@@ -123,7 +118,6 @@ export class RangeControl {
   }
 
   private _findBlockElementPath(range: Range): string[][] {
-    debugger;
     const start = range.startContainer;
     const end = range.endContainer;
     const ancestor = range.commonAncestorContainer;

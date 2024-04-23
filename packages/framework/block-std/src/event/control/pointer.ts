@@ -19,7 +19,6 @@ export class PointerControl {
   constructor(private _dispatcher: UIEventDispatcher) {}
 
   listen() {
-    debugger;
     this._dispatcher.disposables.addFromEvent(
       this._dispatcher.host,
       'pointerdown',

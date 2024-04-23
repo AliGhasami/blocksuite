@@ -8,7 +8,6 @@ const mac =
     : false;
 
 function normalizeKeyName(name: string) {
-  debugger;
   const parts = name.split(/-(?!$)/);
   let result = parts.at(-1);
   if (result === 'Space') {
@@ -59,7 +58,6 @@ function modifiers(name: string, event: KeyboardEvent, shift = true) {
 }
 
 function normalize(map: Record<string, UIEventHandler>) {
-  debugger;
   const copy: Record<string, UIEventHandler> = Object.create(null);
   for (const prop in map) copy[normalizeKeyName(prop)] = map[prop];
   return copy;
@@ -68,7 +66,6 @@ function normalize(map: Record<string, UIEventHandler>) {
 export function bindKeymap(
   bindings: Record<string, UIEventHandler>
 ): UIEventHandler {
-  debugger;
   const map = normalize(bindings);
   return ctx => {
     const state = ctx.get('keyboardState');
