@@ -141,9 +141,10 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   getInlineRangeFromElement = (element: Element): InlineRange | null => {
+    //debugger;
     console.log('getInlineRangeFromElement');
     const range = document.createRange();
-    const text = element.querySelector('[data-v-text');
+    const text = element.querySelector('[data-v-text]');
     if (!text) {
       return null;
     }
@@ -312,6 +313,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    * if sync is true, the native selection will be synced immediately
    */
   setInlineRange = (inlineRange: InlineRange | null, sync = true): void => {
+    //debugger;
     console.log('setInlineRange');
     if (!this.isValidInlineRange(inlineRange)) {
       throw new Error('invalid inline range');
@@ -326,6 +328,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   focusEnd = (): void => {
+    // debugger;
     console.log('focusEnd');
     this.setInlineRange({
       index: this.editor.yTextLength,
@@ -334,6 +337,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   focusStart = (): void => {
+    //  debugger;
     console.log('focusStart');
     this.setInlineRange({
       index: 0,
@@ -343,6 +347,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
 
   selectAll = (): void => {
     console.log('selectAll');
+    // debugger;
     this.setInlineRange({
       index: 0,
       length: this.editor.yTextLength,
@@ -350,6 +355,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   focusIndex = (index: number): void => {
+    //  debugger;
     console.log('focusIndex');
     this.setInlineRange({
       index,

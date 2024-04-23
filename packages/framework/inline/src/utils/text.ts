@@ -11,6 +11,7 @@ export function calculateTextLength(text: Text): number {
 
 export function getTextNodesFromElement(element: Element): Text[] {
   console.log('getTextNodesFromElement');
+  //debugger;
   const textSpanElements = Array.from(
     element.querySelectorAll('[data-v-text="true"]')
   );

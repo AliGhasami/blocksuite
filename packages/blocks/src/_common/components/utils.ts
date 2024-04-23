@@ -63,6 +63,7 @@ export const createKeydownObserver = ({
   };
 
   const keyDownListener = (e: KeyboardEvent) => {
+    //debugger;
     e.stopPropagation();
 
     if (e.defaultPrevented) return;

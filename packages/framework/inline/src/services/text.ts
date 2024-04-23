@@ -25,6 +25,8 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     text: string,
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
+    // return;
+    //debugger;
     //return;
     console.log('insertText', inlineRange, text);
     if (this.editor.attributeService.marks) {

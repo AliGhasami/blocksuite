@@ -24,6 +24,7 @@ export class KeyboardControl {
   }
 
   listen() {
+    debugger;
     this._dispatcher.disposables.addFromEvent(document, 'keydown', this._down);
     this._dispatcher.disposables.addFromEvent(document, 'keyup', this._up);
     this._dispatcher.disposables.addFromEvent(
@@ -43,6 +44,7 @@ export class KeyboardControl {
   }
 
   bindHotkey(keymap: Record<string, UIEventHandler>, options?: EventOptions) {
+    debugger;
     return this._dispatcher.add(
       'keyDown',
       ctx => {
@@ -57,6 +59,7 @@ export class KeyboardControl {
   }
 
   private _down = (event: KeyboardEvent) => {
+    debugger;
     const keyboardEventState = new KeyboardEventState({
       event,
       composing: this.composition,
@@ -68,6 +71,7 @@ export class KeyboardControl {
   };
 
   private _up = (event: KeyboardEvent) => {
+    debugger;
     const keyboardEventState = new KeyboardEventState({
       event,
       composing: this.composition,

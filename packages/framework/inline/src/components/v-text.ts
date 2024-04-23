@@ -19,7 +19,7 @@ export class VText extends LitElement {
   override render() {
     // we need to avoid \n appearing before and after the span element, which will
     // cause the sync problem about the cursor position
-    //console.log('this is text', this.str);
+    //console.log('this is textttttttttttttttttt', this.str);
     return html`<span style=${styleMap(this.styles)} data-v-text="true"
       >${this.str}</span
     >`;

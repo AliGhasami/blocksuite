@@ -8,6 +8,7 @@ function handleInsertText<TextAttributes extends BaseTextAttributes>(
   editor: InlineEditor,
   attributes: TextAttributes
 ) {
+  //debugger;
   console.log('handleInsertText');
   //return;
   if (!data) return;
@@ -51,9 +52,12 @@ export function transformInput<TextAttributes extends BaseTextAttributes>(
   //return;
   if (!editor.isValidInlineRange(inlineRange)) return;
   //debugger
+  /** TODO ali ghasami */
   if (inputType === 'insertText' || inputType === 'insertCompositionText') {
     console.log('1111', inlineRange, data, editor, attributes);
-    //handleInsertText(inlineRange, data, editor, attributes);
+    //debugger;
+    //handleInsertText(inlineRange, 'cd', editor, attributes);
+    handleInsertText(inlineRange, data, editor, attributes);
   } else if (
     inputType === 'insertParagraph' ||
     inputType === 'insertLineBreak'

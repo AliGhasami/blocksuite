@@ -297,6 +297,7 @@ export class InlineEditor<
 
   transact(fn: () => void): void {
     console.log('transact');
+    //debugger;
     const doc = this.yText.doc;
     if (!doc) {
       throw new Error('yText is not attached to a doc');

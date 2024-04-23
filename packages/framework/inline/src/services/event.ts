@@ -44,16 +44,16 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
     this.editor.disposables.addFromEvent(eventSource, 'beforeinput', event => {
       console.log('11111', event);
-      return;
+      // return;
       //console.log('1111', eventSource);
       ///debugger;
     });
 
-    /*this.editor.disposables.addFromEvent(
+    this.editor.disposables.addFromEvent(
       eventSource,
       'beforeinput',
       this._onBeforeInput
-    );*/
+    );
     /*this.editor.disposables.addFromEvent(
       eventSource,
       'compositionstart',
@@ -262,11 +262,12 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
 
   /** TODO ali ghasami for check not run in mobile  */
   private _onBeforeInput = (event: InputEvent) => {
+    console.log('222222', event);
+    // debugger;
     //debugger;
-    //debugger;
-    //event.data = '1';
-
     //return;
+    //event.data = '1';
+    // return;
     console.log('_onBeforeInput', this._isComposing);
     //return;
     const range = this.editor.rangeService.getNativeRange();

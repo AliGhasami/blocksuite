@@ -13,6 +13,7 @@ export class KeyboardEventState extends UIEventState {
   composing: boolean;
 
   constructor({ event, composing }: KeyboardEventStateOptions) {
+    debugger;
     super(event);
 
     this.raw = event;

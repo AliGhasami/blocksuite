@@ -74,6 +74,7 @@ export class BlockService<_Model extends BlockModel = BlockModel> {
     keymap: Record<string, UIEventHandler>,
     options?: { global: boolean }
   ) {
+    debugger;
     this.disposables.add(
       this.uiEventDispatcher.bindHotkey(keymap, {
         flavour: options?.global ? undefined : this.flavour,

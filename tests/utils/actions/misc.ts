@@ -853,6 +853,7 @@ export async function setInlineRangeInSelectedRichText(
   index: number,
   length: number
 ) {
+  debugger;
   await page.evaluate(
     ({ index, length }) => {
       const selection = window.getSelection() as Selection;
