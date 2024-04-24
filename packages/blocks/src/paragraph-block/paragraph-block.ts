@@ -17,13 +17,18 @@ import type { ParagraphService } from './paragraph-service.js';
 
 const getPlaceholder = (model: ParagraphBlockModel) => {
   if (model.type === 'text') {
-    return html`<span class="place-holder">
-      Press
-      <span class="short-code">@</span>
-      for AI &
-      <span class="short-code">/</span>
-      for Commands ...
-    </span>`;
+    return html`<div class="affine-paragraph-placeholder-content">
+      <div>
+        <span class="place-holder">
+          Press
+          <span class="short-code">@</span>
+          for AI &
+          <span class="short-code">/</span>
+          for Commands ...
+        </span>
+      </div>
+      <div>1111</div>
+    </div>`;
     //return "Type '/' for commands";
   }
 
@@ -153,7 +158,16 @@ export class ParagraphBlockComponent extends BlockElement<
       pointer-events: none;
       color: var(--affine-black-30);
       fill: var(--affine-black-30);
+      width: 100%;
+      padding-right: 30px;
     }
+
+    .affine-paragraph-placeholder-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .affine-paragraph-placeholder.visible {
       display: block;
     }

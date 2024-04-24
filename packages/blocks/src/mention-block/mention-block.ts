@@ -6,7 +6,6 @@ import type { InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { z } from 'zod';
 
 import type { RichText } from '../_common/components/index.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
@@ -157,6 +156,10 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
   };
 
   override renderBlock(): TemplateResult<1> {
+    const children = html`<div>${this.renderChildren(this.model)}</div>`;
+
+    console.log('11111', children);
+
     //const { type } = this.model;
     /* const children = html`<div
       class="affine-block-children-container"
@@ -164,8 +167,8 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
     >
       ${this.renderChildren(this.model)}
     </div>`;*/
-    console.log('yText', this.model.text.yText);
-    console.log('inlineEventSource', this.topContenteditableElement ?? nothing);
+    //console.log('yText', this.model.text.yText);
+    //console.log('inlineEventSource', this.topContenteditableElement ?? nothing);
     /*  console.log('undoManager', this.doc.history);
     console.log('attributesSchema', this.attributesSchema);
     console.log('attributeRenderer', this.attributeRenderer);
@@ -185,11 +188,12 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
     console.log('');*/
     //            .wrapText=${false}
     return html`
-      <div>
+      <div style="position: relative">
         <div
           style="display: flex;gap:4px;border: 1px solid #535bf2;width: fit-content;padding: 0 10px"
         >
           <span contenteditable="false">@</span>
+          <!-- <span>111111</span> -->
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
@@ -197,6 +201,7 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
             .enableUndoRedo=${false}
             .inlineRangeProvider=${this._inlineRangeProvider}
           ></rich-text>
+          ${children}
           <affine-block-selection .block=${this}></affine-block-selection>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
+import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
@@ -32,7 +33,7 @@ import table_view from './icons/table_view.svg?raw';
 import text from './icons/text.svg?raw';
 import today from './icons/today.svg?raw';
 import video from './icons/video.svg?raw';
-import { formatDate, insertContent } from './utils.js';
+import { formatDate, insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
   groupName: string;
   children: ClayTapSlashMenu[];
@@ -157,7 +158,30 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: mention,
         action: ({ rootElement, model }) => {
-          runCommand(rootElement, 'affine:mention', undefined);
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:mention',
+              props: {}, //type
+            })
+            .inline((ctx, next) => {
+              console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              /*const codeModel = newModels[0];
+              onModelTextUpdated(rootElement.host, codeModel, richText => {
+                console.log('model update ');
+                const inlineEditor = richText.inlineEditor;
+                assertExists(inlineEditor);
+                inlineEditor.setText('sdfsdfsdfds');
+                inlineEditor.focusEnd();
+              }).catch(console.error);*/
+              return next();
+            })
+            .run();
+          //runCommand(rootElement, 'affine:mention', undefined);
           //runCommand(rootElement, 'affine:mention', 'text');
           //runCommand(rootElement, 'affine:mention', 'mention');
           //runCommand(rootElement, 'affine:mention', 'mention');
@@ -177,6 +201,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
+          console.log('11111', rootElement, model);
           const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));
         },
@@ -372,6 +397,25 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: empty_title,
         action: ({ rootElement, model }) => {},
+      },
+      {
+        title: 'figma',
+        description: 'Description',
+        icon: empty_title,
+        action: async ({ rootElement, model }) => {
+          const parentModel = rootElement.doc.getParent(model);
+          if (!parentModel) {
+            return;
+          }
+          const index = parentModel.children.indexOf(model) + 1;
+          await toggleEmbedCardCreateModal(
+            rootElement.host,
+            'Figma',
+            'The added Figma link will be displayed as an embed view.',
+            { mode: 'page', parentModel, index }
+          );
+          tryRemoveEmptyLine(model);
+        },
       },
       /*{
         title: 'Embed',

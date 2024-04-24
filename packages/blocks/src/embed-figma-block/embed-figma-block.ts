@@ -45,6 +45,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
   private _isResizing = false;
 
   private _selectBlock() {
+    debugger;
     const selectionManager = this.host.selection;
     const blockSelection = selectionManager.create('block', {
       path: this.path,
@@ -88,6 +89,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
 
     this.disposables.add(
       this.model.propsUpdated.on(({ key }) => {
+        debugger;
         if (key === 'url') {
           this.refreshData();
         }
@@ -97,6 +99,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
     // this is required to prevent iframe from capturing pointer events
     this.disposables.add(
       this.std.selection.slots.changed.on(() => {
+        debugger;
         this._isSelected =
           !!this.selected?.is('block') || !!this.selected?.is('surface');
 
@@ -116,6 +119,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
       assertExists(surface);
       this.disposables.add(
         this.model.propsUpdated.on(() => {
+          debugger;
           this.requestUpdate();
         })
       );

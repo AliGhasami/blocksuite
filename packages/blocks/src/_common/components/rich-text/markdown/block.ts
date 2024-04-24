@@ -25,6 +25,7 @@ export function tryConvertBlock(
   prefixText: string,
   range: { index: number; length: number }
 ) {
+  console.log('tryConvertBlock');
   const { model } = element;
   if (
     !prefixText.match(

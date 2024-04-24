@@ -527,7 +527,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _bindMoveBlockHotKey = () => {
-    console.log('_bindMoveBlockHotKey');
     moveBlockConfigs.forEach(config => {
       config.hotkey.forEach(key => {
         this.host.bindHotKey({
