@@ -27,7 +27,8 @@ const getPlaceholder = (model: ParagraphBlockModel) => {
           for Commands ...
         </span>
       </div>
-      <div>1111</div>
+      <!-- TODO ali ghasami  -->
+      <div>&nbsp;</div>
     </div>`;
     //return "Type '/' for commands";
   }

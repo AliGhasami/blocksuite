@@ -363,6 +363,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
 
     blockElement.bindHotKey({
       [config.hotkey]: ctx => {
+        console.log(' blockElement.bindHotKey');
         if (blockElement.doc.readonly) return;
 
         const textSelection = blockElement.selection.find('text');
@@ -514,6 +515,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   // Convert the selected text into inline code
   blockElement.bindHotKey({
     '`': ctx => {
+      console.log('blockElement.bindHotKey');
       if (blockElement.doc.readonly) return;
 
       const textSelection = blockElement.selection.find('text');

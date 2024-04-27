@@ -114,15 +114,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           runCommand(rootElement, 'affine:list', 'todo');
         },
       },
-      //TODO(@alighasami) implement after
-      /*{
-        title: 'Hint',
-        description: 'Description',
-        icon: check_list,
-        action: ({ rootElement }) => {
-          //console.log(1111);
-        },
-      },*/
       {
         title: 'Quote',
         description: 'Description',
@@ -136,8 +127,25 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: hint,
         action: ({ rootElement }) => {
-          console.log('rootElement', rootElement);
-          runCommand(rootElement, 'affine:hint', 'numbered');
+          //console.log('rootElement', rootElement);
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:hint',
+              props: {
+                //title: 'this is title',
+                //description: 'this is description',
+              },
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
         },
       },
       {
@@ -170,32 +178,11 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               if (!newModels || newModels.length == 0) {
                 return false;
               }
-              /*const codeModel = newModels[0];
-              onModelTextUpdated(rootElement.host, codeModel, richText => {
-                console.log('model update ');
-                const inlineEditor = richText.inlineEditor;
-                assertExists(inlineEditor);
-                inlineEditor.setText('sdfsdfsdfds');
-                inlineEditor.focusEnd();
-              }).catch(console.error);*/
               return next();
             })
             .run();
-          //runCommand(rootElement, 'affine:mention', undefined);
-          //runCommand(rootElement, 'affine:mention', 'text');
-          //runCommand(rootElement, 'affine:mention', 'mention');
-          //runCommand(rootElement, 'affine:mention', 'mention');
-          //runCommand(rootElement, 'affine:mention', 'h1');
         },
       },
-      //todo for implement
-      /*{
-        title: 'Calendar',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {
-        },
-      },*/
       {
         title: 'Date',
         description: 'Description',
@@ -225,7 +212,21 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Table View',
         description: 'Description',
         icon: table_view,
-        action: ({ rootElement, model }) => {},
+        action: ({ rootElement, model }) => {
+          const parent = rootElement.doc.getParent(model);
+          assertExists(parent);
+          const index = parent.children.indexOf(model);
+
+          const id = rootElement.doc.addBlock(
+            'affine:database',
+            {},
+            rootElement.doc.getParent(model),
+            index + 1
+          );
+          const service = rootElement.std.spec.getService('affine:database');
+          service.initDatabaseBlock(rootElement.doc, model, id, 'table', false);
+          tryRemoveEmptyLine(model);
+        },
       },
       {
         title: 'Image',

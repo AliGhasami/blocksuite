@@ -9,7 +9,7 @@ import { customElement, query } from 'lit/decorators.js';
 
 import type { RichText } from '../_common/components/index.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
-import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
+//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
 //import { getStandardLanguage } from '../code-block/utils/code-languages.js';
@@ -156,10 +156,8 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
   };
 
   override renderBlock(): TemplateResult<1> {
-    const children = html`<div>${this.renderChildren(this.model)}</div>`;
-
-    console.log('11111', children);
-
+    //const children = html`<div>${this.renderChildren(this.model)}</div>`;
+    //console.log('11111', children);
     //const { type } = this.model;
     /* const children = html`<div
       class="affine-block-children-container"
@@ -201,7 +199,6 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
             .enableUndoRedo=${false}
             .inlineRangeProvider=${this._inlineRangeProvider}
           ></rich-text>
-          ${children}
           <affine-block-selection .block=${this}></affine-block-selection>
         </div>
       </div>

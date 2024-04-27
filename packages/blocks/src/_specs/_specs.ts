@@ -19,7 +19,7 @@ import { EmbedLoomBlockSpec } from '../embed-loom-block/embed-loom-spec.js';
 import { EmbedSyncedDocBlockSpec } from '../embed-synced-doc-block/embed-synced-doc-spec.js';
 import { EmbedYoutubeBlockSpec } from '../embed-youtube-block/embed-youtube-spec.js';
 import { FrameBlockSchema } from '../frame-block/frame-model.js';
-import { HintBlockSchema, HintService } from '../hint-block/index.js';
+import { HintBlockSchema } from '../hint-block/index.js';
 import { ImageBlockSchema } from '../image-block/image-model.js';
 import { ImageService } from '../image-block/index.js';
 import { ListBlockSchema } from '../list-block/list-model.js';
@@ -139,7 +139,7 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
     view: {
       component: literal`affine-hint`,
     },
-    service: HintService,
+    //service: HintService,
   },
   {
     schema: NoteBlockSchema,

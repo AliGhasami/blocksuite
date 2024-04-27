@@ -12,6 +12,7 @@ const GLOBAL_IGNORED_ATTRIBUTES = [] as const;
 
 const autoIdentifyLink = (ctx: HookContext<AffineTextAttributes>) => {
   console.log('autoIdentifyLink');
+  //return;
   // auto identify link only on pressing space
   if (ctx.data !== ' ') {
     return;

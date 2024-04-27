@@ -156,8 +156,8 @@ export function hardEnter(
 // 2. In the middle and start of block, press Enter will insert a \n to break the line
 // TODO this should be configurable per-block
 function isSoftEnterable(model: BlockModel) {
-  console.log('isSoftEnterable');
-  if (matchFlavours(model, ['affine:code'])) return true;
+  console.log('isSoftEnterable', model);
+  if (matchFlavours(model, ['affine:code', 'affine:hint'])) return true;
   if (matchFlavours(model, ['affine:paragraph'])) {
     return model.type === 'quote';
   }

@@ -191,7 +191,7 @@ export class HeaderAreaTextCellEditing extends BaseTextCell {
     const yText = this.getYText(
       this.titleColumn.getValue(this.rowId) as Y.Text | string | undefined
     );
-
+    //console.log('|111111', this.topContenteditableElement);
     return html`${this.renderIcon()}
       <rich-text
         .yText=${yText}

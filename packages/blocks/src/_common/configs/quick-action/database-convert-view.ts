@@ -162,6 +162,7 @@ export class DatabaseConvertView extends WithDisposable(LitElement) {
   }
 
   private _convertToDatabase(viewType: DataViewTypes) {
+    console.log('_convertToDatabase');
     const [_, ctx] = this.host.std.command
       .chain()
       .getSelectedModels({

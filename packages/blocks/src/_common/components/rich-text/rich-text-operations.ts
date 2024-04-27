@@ -853,6 +853,7 @@ function handleParagraphBlockForwardDelete(
     nextSibling: ExtendedModel | null,
     firstChild: ExtendedModel | null
   ) {
+    console.log('handleEmbedDividerCode');
     function handleEmbedDividerCodeChild(firstChild: ExtendedModel | null) {
       if (
         !firstChild ||

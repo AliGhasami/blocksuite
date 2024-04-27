@@ -40,9 +40,11 @@ export function createInlineKeyDownHandler(
   inlineEditor: InlineEditor,
   bindings: KeyboardBindingRecord
 ): (evt: KeyboardEvent) => void {
+  console.log('createInlineKeyDownHandler');
   const bindingStore: Record<string, KeyboardBinding[]> = {};
 
   function normalize(binding: KeyboardBinding): KeyboardBinding {
+    console.log('normalize');
     if (binding.shortKey) {
       binding[SHORT_KEY_PROPERTY] = binding.shortKey;
       delete binding.shortKey;
@@ -62,6 +64,7 @@ export function createInlineKeyDownHandler(
   }
 
   function addBinding(keyBinding: KeyboardBinding) {
+    console.log('addBinding');
     const binding = normalize(keyBinding);
     const keys = Array.isArray(binding.key) ? binding.key : [binding.key];
     keys.forEach(key => {
@@ -79,6 +82,7 @@ export function createInlineKeyDownHandler(
   });
 
   function keyDownHandler(evt: KeyboardEvent) {
+    console.log('keyDownHandler');
     if (evt.defaultPrevented || evt.isComposing) return;
     const keyBindings = bindingStore[evt.key] ?? [];
 
