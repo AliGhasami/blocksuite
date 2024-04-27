@@ -705,7 +705,7 @@ export function getModelByBlockComponent(component: Element) {
  * https://github.com/toeverything/blocksuite/pull/1121
  */
 export function getRectByBlockElement(element: Element | BlockComponent) {
-  console.log('getRectByBlockElement');
+  //console.log('getRectByBlockElement');
   if (isDatabase(element)) return element.getBoundingClientRect();
   return (element.firstElementChild ?? element).getBoundingClientRect();
 }
@@ -736,7 +736,7 @@ export function getBlockElementsExcludeSubtrees(
  * In Chrome/Safari, `document.elementsFromPoint` does not include `affine-image`.
  */
 function findBlockElement(elements: Element[], parent?: Element) {
-  console.log('findBlockElement');
+  //console.log('findBlockElement');
   const len = elements.length;
   let element = null;
   let i = 0;
@@ -830,7 +830,7 @@ export function getDropRectByPoint(
   rect: DOMRect;
   flag: DropFlags;
 } {
-  console.log('getDropRectByPoint');
+  //console.log('getDropRectByPoint');
   const result = {
     rect: getRectByBlockElement(element),
     flag: DropFlags.Normal,

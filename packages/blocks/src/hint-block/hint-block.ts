@@ -216,25 +216,24 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         >
           <div>
             <rich-text
-              .yText=${this.model.text.yText}
+              .yText=${this.model.title.yText}
               .inlineEventSource=${this.topContenteditableElement ?? nothing}
               .enableClipboard=${false}
               .enableUndoRedo=${false}
               .inlineRangeProvider=${this._inlineRangeProvider}
-            ></rich-text>
+            ></rich-text> 
           </div>
-          <div>
-            <rich-text
-              .yText=${yText}
+             <rich-text
+              .yText=${this.model.description.yText}
               .inlineEventSource=${this.topContenteditableElement ?? nothing}
-            ></rich-text>
-          </div>
+            ></rich-text> 
           <affine-block-selection .block=${this}></affine-block-selection>
         </div>
       </div>
     `;
   }
 }
+//.yText=${yText}
 //  .markdownShortcutHandler=${this.markdownShortcutHandler}
 // .embedChecker=${this.embedChecker}
 // .attributeRenderer=${this.attributeRenderer}

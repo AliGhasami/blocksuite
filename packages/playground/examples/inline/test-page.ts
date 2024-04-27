@@ -244,10 +244,12 @@ const yDocA = new Y.Doc();
 const yDocB = new Y.Doc();
 
 yDocA.on('update', update => {
+  //console.log("AAAAAAAA",update);
   Y.applyUpdate(yDocB, update);
 });
 
 yDocB.on('update', update => {
+  //console.log("BBBBBBB",update);
   Y.applyUpdate(yDocA, update);
 });
 
