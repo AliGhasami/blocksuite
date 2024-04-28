@@ -45,6 +45,7 @@ export class KeymapController implements ReactiveController {
 
   bind = () => {
     this.host.handleEvent('keyDown', ctx => {
+      console.log('keymap-controller-keyDown');
       const state = ctx.get('keyboardState');
       if (state.raw.key === 'Shift') {
         return;

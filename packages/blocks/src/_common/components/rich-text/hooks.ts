@@ -100,6 +100,7 @@ function handleExtendedAttributes(
 export const onVBeforeinput = (
   ctx: BeforeinputHookCtx<AffineTextAttributes>
 ) => {
+  console.log('onVBeforeinput');
   handleExtendedAttributes(ctx);
   autoIdentifyLink(ctx);
 };
@@ -107,5 +108,6 @@ export const onVBeforeinput = (
 export const onVCompositionEnd = (
   ctx: CompositionEndHookCtx<AffineTextAttributes>
 ) => {
+  console.log("onVCompositionEnd")
   handleExtendedAttributes(ctx);
 };
