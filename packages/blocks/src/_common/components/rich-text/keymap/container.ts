@@ -121,12 +121,15 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
 
   blockElement.bindHotKey({
     Escape: () => {
+      console.log('Escape');
       if (blockElement.selected?.is('text')) {
         return _selectBlock();
       }
       return;
     },
     Enter: ctx => {
+      //debugger;
+      console.log('Enter');
       _preventDefault(ctx);
 
       if (blockElement.selected?.is('block')) return _selectText(false);
@@ -159,6 +162,8 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Mod-Enter': ctx => {
+      //debugger;
+      console.log('Mod-Enter');
       if (!blockElement.selected?.is('text')) return;
 
       const state = ctx.get('keyboardState');
@@ -173,6 +178,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     Space: ctx => handleMarkdown(ctx),
     'Shift-Space': ctx => handleMarkdown(ctx),
     'Mod-a': ctx => {
+      console.log('Mod-a');
       _preventDefault(ctx);
       if (!blockElement.selected?.is('text')) return;
 
@@ -190,6 +196,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return _selectAllText();
     },
     Tab: ctx => {
+      console.log('Tab');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -276,6 +283,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Shift-Tab': ctx => {
+      console.log('Shift-Tab');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -322,7 +330,6 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     },
     Backspace: ctx => {
       console.log('Backspace');
-      //debugger;
       if (!blockElement.selected?.is('text')) return;
       const state = ctx.get('keyboardState');
       const inlineEditor = _getInlineEditor();
@@ -354,6 +361,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     },
     Delete: ctx => handleDelete(ctx),
     'Control-d': ctx => {
+      console.log('Control-d');
       if (IS_MAC) handleDelete(ctx);
     },
   });

@@ -223,22 +223,49 @@ defineExpose({
 </script>
 
 <style lang="less">
-
+/* TODO ali ghasami for fix token */
 .vue-block-editor{
+  /* Mention Style */
+  .affine-mention-container .affine-mention{
+    @apply flex gap-2 mt-overline;
+    color:#64428F;
+    //border: 1px solid #535bf2;
+    width: fit-content;
+    border-radius: @roundness-sm;
+    padding: 0 @space-2;
+    background: @dreampurple-0;
+  }
 
+  /* Hint Style */
+  .affine-hint-container .affine-hint{
+    @apply flex  gap-2;
+    padding: @space-4 @space-6 @space-4 @space-6;
+    border-radius: @roundness-lg;
+    border: 1px solid #C1EBCD;
+    background: #EAFAEF;
+
+    .affine-content{
+      @apply flex flex-col gap-2;
+    }
+    .affine-hint-title{
+      @apply  mt-section-tittle text-gray-5;
+    }
+    .affine-hint-description{
+      @apply mt-overline text-gray-7 pl-;
+    }
+  }
+
+  /* reset Style */
   .affine-paragraph-block-container{
     &:hover .place-holder{
       @apply text-neutral-6;
     }
-
     /*&:hover{
       //background-color: red;
     }*/
-
     /*&:active{
       background-color: red;
     }*/
-
   }
 
   /*.with-drag-handle{
@@ -248,13 +275,10 @@ defineExpose({
   /*.affine-paragraph-placeholder{
     //background-color: red;
     cursor: pointer !important;
-
    !* &.hover{
       //background-color: green;
     }*!
-
   }*/
-
   .place-holder{
     @apply text-neutral-4 mt-body;
     line-height: unset;
@@ -273,7 +297,6 @@ defineExpose({
       color: red;
       background-color:red;
     }*/
-
   }
 
   /*.editor{
@@ -300,8 +323,6 @@ defineExpose({
     @apply mt-page-subheading text-neutral-8;
     line-height: unset;
   }
-
-
 }
 
 

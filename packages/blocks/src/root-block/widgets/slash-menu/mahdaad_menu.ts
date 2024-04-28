@@ -1,5 +1,6 @@
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
+import { Text } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import type { RootBlockComponent } from '../../types.js';
@@ -33,7 +34,6 @@ import table_view from './icons/table_view.svg?raw';
 import text from './icons/text.svg?raw';
 import today from './icons/today.svg?raw';
 import video from './icons/video.svg?raw';
-import { Text } from '@blocksuite/store';
 import { formatDate, insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
   groupName: string;
@@ -134,9 +134,9 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             .updateBlockType({
               flavour: 'affine:hint',
               props: {
-                title: new Text('Hello World!---titiel '),
+                title: new Text('Title'),
                 //title: new Text('Hello World!---titiel '),
-                description: new Text('dessssss'),
+                description: new Text(''),
               },
             })
             .inline((ctx, next) => {

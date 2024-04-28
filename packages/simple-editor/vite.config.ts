@@ -7,6 +7,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import { resolve } from 'path'
 import dts from "vite-plugin-dts";
+import { lessVars } from '@mahdaad/tokens'
 
 
 
@@ -38,6 +39,7 @@ export default defineConfig({
     preprocessorOptions: {
       less: {
         modifyVars: {
+          ...lessVars,
           // Used for global import to avoid the need to import each style file separately
           // reference:  Avoid repeated references
           //hack: ` ; @import (reference) "${resolve('./assets/css/var.less')}"`

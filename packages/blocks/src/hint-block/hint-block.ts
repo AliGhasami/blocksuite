@@ -2,9 +2,12 @@
 import '../_common/components/block-selection.js';
 
 import { assertExists } from '@blocksuite/global/utils';
-import type { InlineRangeProvider } from '@blocksuite/inline';
+import {
+  createInlineKeyDownHandler,
+  type InlineRangeProvider,
+  KEYBOARD_ALLOW_DEFAULT,
+} from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
-import { DocCollection, type Y } from '@blocksuite/store';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
@@ -24,10 +27,11 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     affine-hint {
       display: block;
       margin: 10px 0;
+      padding-right: 10px;
       //font-size: var(--affine-font-base);
     }
-    code {
-      font-size: calc(var(--affine-font-base) - 3px);
+    .affine-hint-container {
+      position: relative;
     }
   `;
 
@@ -54,8 +58,8 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   @query('rich-text')
   private _richTextElement?: RichText;
 
-  @query('.affine-paragraph-placeholder')
-  private _placeholderContainer?: HTMLElement;
+  //@query('.affine-paragraph-placeholder')
+  //private _placeholderContainer?: HTMLElement;
 
   override get topContenteditableElement() {
     if (this.rootElement instanceof EdgelessRootBlockComponent) {
@@ -66,6 +70,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
 
   get inlineEditor() {
+    //return null
     return this._richTextElement?.inlineEditor;
   }
 
@@ -79,165 +84,103 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     super.connectedCallback();
     bindContainerHotkey(this);
 
+    this.bindHotKey({
+      Escape: () => {
+        alert('1111');
+      },
+      'Mod-b': () => {},
+      'Shift-Enter': ctx => {
+        ctx._map.keyboardState.raw.preventDefault();
+        console.log('11111', ctx._map.keyboardState.raw);
+        return false;
+      },
+    });
+
+    /*this.bindHotkey({
+      'Mod-b': () => {},
+      'Alt-Space': () => {
+        //debugger;
+      },
+    });*/
     this._inlineRangeProvider = getInlineRangeProvider(this);
   }
 
   override firstUpdated() {
-    this.model.propsUpdated.on(this._updatePlaceholder);
-    this.host.selection.slots.changed.on(this._updatePlaceholder);
+    console.log('hint-firstUpdated');
+
+    //this.model.propsUpdated.on(this._updatePlaceholder);
+    //this.host.selection.slots.changed.on(this._updatePlaceholder);
 
     this.updateComplete
       .then(() => {
-        this._updatePlaceholder();
+        console.log('hint-updateComplete', this.model);
 
         const inlineEditor = this.inlineEditor;
+        console.log('uuuuuuuuuuu', inlineEditor);
         if (!inlineEditor) return;
-        this.disposables.add(
+
+        /* const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
+          inputRule: {
+            key: ' ',
+            handler: context => {
+              debugger;
+              const { inlineEditor, prefixText, inlineRange } = context;
+              /!*for (const match of markdownMatches) {
+                const matchedText = prefixText.match(match.pattern);
+                if (matchedText) {
+                  return match.action({
+                    inlineEditor,
+                    prefixText,
+                    inlineRange,
+                    pattern: match.pattern,
+                    undoManager: this.undoManager,
+                  });
+                }
+              }*!/
+              return KEYBOARD_ALLOW_DEFAULT;
+            },
+          },
+        });
+        console.log('tttttttttt', this);
+        this.addEventListener('keydown', keydownHandler);*/
+
+        /*this.disposables.add(
           inlineEditor.slots.inputting.on(this._updatePlaceholder)
-        );
+        );*/
       })
       .catch(console.error);
   }
 
-  //TODO(@Flrande) wrap placeholder in `rich-text` or inline-editor to make it more developer-friendly
-  private _updatePlaceholder = () => {
-    if (
-      !this._placeholderContainer ||
-      !this._richTextElement ||
-      !this.inlineEditor
-    )
-      return;
-
-    //TODO(@alighasami) check is last Paragraph
-    /*let isLastParagraph = false;
-    const note = this.doc.getBlockByFlavour('affine:note');
-    const paragraphList = note.length ? note[0].children : [];
-    const currentBlockId = this.dataset.blockId;
-    if (
-      paragraphList.length &&
-      paragraphList[paragraphList.length - 1].id == currentBlockId
-    ) {
-      isLastParagraph = true;
-    }*/
-    let isEmpty = false;
-    const note = this.doc.getBlockByFlavour('affine:note');
-    const paragraphList = note.length ? note[0].children : [];
-    if (paragraphList.length == 1) {
-      isEmpty = true;
-    }
-    //console.log('this.selected', this.selected);
-    //console.log('this.inlineEditor.isComposing', this.inlineEditor.isComposing);
-    //console.log('this.inlineEditor.yTextLength', this.inlineEditor.yTextLength);
-    if (
-      this.inlineEditor.yTextLength > 0 ||
-      this.inlineEditor.isComposing ||
-      (!this.selected && !isEmpty) ||
-      this._isInDatabase()
-    ) {
-      this._placeholderContainer.classList.remove('visible');
-    } else {
-      this._placeholderContainer.classList.add('visible');
-    }
-    if (this.selected) {
-      this._placeholderContainer.classList.add('hover');
-    }
-    //console.log('is selected', this.selected);
-    //if()
-  };
-
-  private _isInDatabase = () => {
-    let parent = this.parentElement;
-    while (parent && parent !== document.body) {
-      if (parent.tagName.toLowerCase() === 'affine-database') {
-        return true;
-      }
-      parent = parent.parentElement;
-    }
-    return false;
-  };
-
-  getYText(text?: string | Y.Text) {
-    // debugger;
-    if (text instanceof DocCollection.Y.Text || text == null) {
-      let yText = text;
-      if (!yText) {
-        yText = new DocCollection.Y.Text();
-        //this.titleColumn?.setValue(this.rowId, yText);
-      }
-      return yText;
-    }
-    const yText = new DocCollection.Y.Doc().getText('title');
-    if (text instanceof DocCollection.Y.Text) {
-      return text;
-    }
-    yText.insert(0, text ?? '');
-    return yText;
-  }
-
   override renderBlock(): TemplateResult<1> {
-    //console.log('111111', this.model);
-    //const children = html`<div>${this.renderChildren(this.model)}</div>`;
-    //console.log('11111', children);
-    //const { type } = this.model;
-    /* const children = html`<div
-      class="affine-block-children-container"
-      style="padding-left: ${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px"
-    >
-      ${this.renderChildren(this.model)}
-    </div>`;*/
-    //console.log('yText', this.model.text.yText);
-    //console.log('inlineEventSource', this.topContenteditableElement ?? nothing);
-    /*  console.log('undoManager', this.doc.history);
-    console.log('attributesSchema', this.attributesSchema);
-    console.log('attributeRenderer', this.attributeRenderer);
-    console.log('markdownShortcutHandler', this.markdownShortcutHandler);
-    console.log('embedChecker', this.embedChecker);
-    console.log('readonly', this.doc.readonly);
-    console.log('inlineRangeProvider', this._inlineRangeProvider);*/
-    /*.undoManager=${this.doc.history}
-  .attributesSchema=${this.attributesSchema}
-  .attributeRenderer=${this.attributeRenderer}
-  .markdownShortcutHandler=${this.markdownShortcutHandler}
-  .embedChecker=${this.embedChecker}
-  .readonly=${this.doc.readonly}
-  .inlineRangeProvider=${this._inlineRangeProvider}*/
-    /*    console.log('');
-    console.log('');
-    console.log('');*/
-    //            .wrapText=${false}
-    console.log('this is model', this.model);
-    console.log('topContenteditableElement', this.topContenteditableElement);
-    const yText = this.getYText('this is description');
+    console.log('00000000000000000', this.topContenteditableElement);
 
     return html`
-      <div style="position: relative">
-        <div
-          style="display: flex;gap:4px;border: 1px solid green;padding: 0 10px;display: flex;flex-direction: column"
-        >
-          <div>
-            <rich-text
-              .yText=${this.model.title.yText}
-              .inlineEventSource=${this.topContenteditableElement ?? nothing}
-              .enableClipboard=${false}
-              .enableUndoRedo=${false}
-              .inlineRangeProvider=${this._inlineRangeProvider}
-            ></rich-text> 
+      <div class="affine-hint-container">
+        <div class="affine-hint">
+          <span></span>
+          <div class="affine-content">
+            <div class="affine-hint-title">
+              <rich-text
+                .yText=${this.model.title.yText}
+                .enableClipboard=${false}
+                .enableUndoRedo=${false}
+                .inlineRangeProvider=${this._inlineRangeProvider}
+              ></rich-text>
+            </div>
+            <div class="affine-hint-description">
+              <!-- <rich-text
+                .yText=${this.model.description.yText}
+                .inlineEventSource=${this.topContenteditableElement ?? nothing}
+              ></rich-text> -->
+            </div>
           </div>
-             <rich-text
-              .yText=${this.model.description.yText}
-              .inlineEventSource=${this.topContenteditableElement ?? nothing}
-            ></rich-text> 
-          <affine-block-selection .block=${this}></affine-block-selection>
         </div>
+        <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;
   }
 }
-//.yText=${yText}
-//  .markdownShortcutHandler=${this.markdownShortcutHandler}
-// .embedChecker=${this.embedChecker}
-// .attributeRenderer=${this.attributeRenderer}
-
+//.inlineEventSource=${this.topContenteditableElement ?? nothing}
 declare global {
   interface HTMLElementTagNameMap {
     'affine-hint': HintBlockComponent;
