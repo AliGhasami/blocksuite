@@ -137,6 +137,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
                 title: new Text('Title'),
                 //title: new Text('Hello World!---titiel '),
                 description: new Text(''),
+                type: 'success',
               },
             })
             .inline((ctx, next) => {
@@ -418,6 +419,33 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             { mode: 'page', parentModel, index }
           );
           tryRemoveEmptyLine(model);
+        },
+      },
+      {
+        title: 'simple',
+        description: 'simple',
+        icon: empty_title,
+        action: async ({ rootElement, model }) => {
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:simple',
+              props: {
+                test_props: 'test_value',
+                title: new Text('Title'),
+                //title: new Text('Hello World!---titiel '),
+                description: new Text(''),
+              }, //type
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
         },
       },
       /*{

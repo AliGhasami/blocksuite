@@ -241,18 +241,54 @@ defineExpose({
     @apply flex  gap-2;
     padding: @space-4 @space-6 @space-4 @space-6;
     border-radius: @roundness-lg;
-    border: 1px solid #C1EBCD;
-    background: #EAFAEF;
+    border: 1px solid @gray-2;
 
     .affine-content{
       @apply flex flex-col gap-2;
     }
     .affine-hint-title{
-      @apply  mt-section-tittle text-gray-5;
+      @apply  mt-section-tittle ;
     }
     .affine-hint-description{
       @apply mt-overline text-gray-7 pl-;
     }
+
+    &.affine-hint-success{
+      border-color: #C1EBCD;
+      background: #EAFAEF;
+      .affine-hint-title{
+        @apply text-green-5;
+      }
+    }
+
+    &.affine-hint-error{
+      border-color: #FAC7C7;
+      background: #FCF2F2;
+      .affine-hint-title{
+        @apply text-red-5;
+      }
+    }
+
+    &.affine-hint-info{
+      border-color: #AFE2FD;
+      background: #EBF7FF;
+      .affine-hint-title{
+        color:#0BA2E8;
+      }
+    }
+
+    &.affine-hint-default{
+      border-color: @gray-2;
+      background: #FAFAFA;
+      .affine-hint-title{
+        @apply text-gray-7;
+      }
+    }
+
+
+
+
+
   }
 
   /* reset Style */

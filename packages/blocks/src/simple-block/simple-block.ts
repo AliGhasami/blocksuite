@@ -1,182 +1,194 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
-import { assertExists } from '@blocksuite/global/utils';
-import { type InlineRangeProvider } from '@blocksuite/inline';
+import {
+  createInlineKeyDownHandler,
+  type InlineRangeProvider,
+  KEYBOARD_ALLOW_DEFAULT,
+} from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import type { RichText } from '../_common/components/index.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
-//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import type { NoteBlockComponent } from '../note-block/index.js';
-import { EdgelessRootBlockComponent } from '../root-block/index.js';
-//import { getStandardLanguage } from '../code-block/utils/code-languages.js';
-//import { getCodeLineRenderer } from '../code-block/utils/code-line-renderer.js';
-//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import type { HintBlockModel } from './hint-model.js';
+import type { SimpleBlockModel } from './simple-model.js';
 
 @customElement('affine-simple')
-export class SimpleBlockComponent extends BlockElement<HintBlockModel> {
+export class SimpleBlockComponent extends BlockElement<SimpleBlockModel> {
   static override styles = css`
-    affine-hint {
-      display: block;
-      margin: 10px 0;
-      padding-right: 10px;
-      //font-size: var(--affine-font-base);
-    }
-    .affine-hint-container {
-      position: relative;
+    affine-simple {
+      margin: 0 10px;
+      padding: 10px;
+      border: 1px solid #454ce1;
+      display: flex;
     }
   `;
 
-  get inlineManager() {
-    const inlineManager = this.service?.inlineManager;
-    assertExists(inlineManager);
-    return inlineManager;
-  }
-  get attributesSchema() {
-    return this.inlineManager.getSchema();
-  }
-  get attributeRenderer() {
-    return this.inlineManager.getRenderer();
-  }
-  get markdownShortcutHandler() {
-    return this.inlineManager.markdownShortcutHandler;
-  }
-  get embedChecker() {
-    return this.inlineManager.embedChecker;
-  }
+  @query('rich-text#description')
+  private _richTextElementDescription?: RichText;
 
-  private _inlineRangeProvider: InlineRangeProvider | null = null;
-
-  @query('rich-text')
-  private _richTextElement?: RichText;
-
-  //@query('.affine-paragraph-placeholder')
-  //private _placeholderContainer?: HTMLElement;
-
-  override get topContenteditableElement() {
-    if (this.rootElement instanceof EdgelessRootBlockComponent) {
-      const note = this.closest<NoteBlockComponent>('affine-note');
-      return note;
-    }
-    return this.rootElement;
-  }
-
-  get inlineEditor() {
-    //return null
-    return this._richTextElement?.inlineEditor;
-  }
-
-  override async getUpdateComplete() {
-    const result = await super.getUpdateComplete();
-    await this._richTextElement?.updateComplete;
-    return result;
-  }
+  //private _inlineRangeProvider: InlineRangeProvider | null = null;
 
   override connectedCallback() {
     super.connectedCallback();
-    bindContainerHotkey(this);
+    /*this.addEventListener('keydown', e => {
+      console.log('lllllllllllllllll');
+      //e.stopPropagation();
+      //e.preventDefault();
+    });*/
+    /*this.addEventListener('click', e => {
+      e.stopPropagation();
+      e.preventDefault();
+    });*/
 
     this.bindHotKey({
-      Escape: () => {
-        alert('1111');
+      Enter: e => {
+        console.log('qqqqqq', e);
+        e._map.keyboardState.raw.preventDefault();
+        console.log('11111', this._richTextElementDescription?.inlineEditor);
+        //debugger;
+        this._richTextElementDescription?.inlineEditor?.focusEnd();
+        console.log('1111');
+        //console.log('|1111', this.model.description);
+        //debugger;
+      },
+      'Shift-Enter': e => {
+        e._map.keyboardState.raw.preventDefault();
+        //console.log('tttttttttttt', e);
+        //alert('11111');
       },
       'Mod-b': () => {},
-      'Shift-Enter': ctx => {
-        ctx._map.keyboardState.raw.preventDefault();
-        console.log('11111', ctx._map.keyboardState.raw);
-        return false;
+      'Alt-Space': () => {
+        //debugger;
       },
     });
-
-    /*this.bindHotkey({
-          'Mod-b': () => {},
-          'Alt-Space': () => {
-            //debugger;
-          },
-        });*/
-    this._inlineRangeProvider = getInlineRangeProvider(this);
+    //console.log('ffffffffff', this._richTextElementDescription?.inlineEditor);
+    //blockElement
+    //bindContainerHotkey(this);
+    ///    this._inlineRangeProvider = getInlineRangeProvider(this);
   }
 
   override firstUpdated() {
-    console.log('hint-firstUpdated');
+    console.log('simple-firstUpdated', this._richTextElementDescription);
 
-    //this.model.propsUpdated.on(this._updatePlaceholder);
-    //this.host.selection.slots.changed.on(this._updatePlaceholder);
+    //this._richTextElementDescription?.inlineEventSource.
+    //this._richTextElementDescription?.inlineEditor.
+
+    console.log('111111', this._richTextElementDescription?.inlineEditor);
+    //debugger;
 
     this.updateComplete
       .then(() => {
         console.log('hint-updateComplete', this.model);
 
-        const inlineEditor = this.inlineEditor;
-        console.log('uuuuuuuuuuu', inlineEditor);
-        if (!inlineEditor) return;
+        /*this._richTextElementDescription.addEventListener('keydown', () => {
+          debugger;
+        });*/
+
+        //this._richTextElementDescription?.inlineEditor.
+
+        //const inlineEditor = this.inlineEditor;
+        //console.log('uuuuuuuuuuu', inlineEditor);
+        //if (!inlineEditor) return;
+        /*const keyDownHandler = createInlineKeyDownHandler(
+          this._richTextElementDescription.inlineEditor,
+          {
+            inputRule: {
+              key: [' ', 'Enter'],
+              handler: context => {
+                debugger;
+                console.log('rich-text-keyDownHandler');
+                //return markdownShortcutHandler(context, this.undoManager);
+              },
+            },
+          }
+        );*/
+
+        /*const keydownHandler = createInlineKeyDownHandler(
+          this._richTextElementDescription.inlineEditor,
+          {
+            inputRule: {
+              key: ' ',
+              handler: context => {
+                debugger;
+                /!*const { inlineEditor, prefixText, inlineRange } = context;
+                for (const match of markdownMatches) {
+                  const matchedText = prefixText.match(match.pattern);
+                  if (matchedText) {
+                    return match.action({
+                      inlineEditor,
+                      prefixText,
+                      inlineRange,
+                      pattern: match.pattern,
+                      undoManager: this.undoManager,
+                    });
+                  }
+                }*!/
+
+                return KEYBOARD_ALLOW_DEFAULT;
+              },
+            },
+          }
+        );
+        this.addEventListener('keydown', keydownHandler);*/
 
         /* const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
-                  inputRule: {
-                    key: ' ',
-                    handler: context => {
-                      debugger;
-                      const { inlineEditor, prefixText, inlineRange } = context;
-                      /!*for (const match of markdownMatches) {
-                        const matchedText = prefixText.match(match.pattern);
-                        if (matchedText) {
-                          return match.action({
-                            inlineEditor,
-                            prefixText,
-                            inlineRange,
-                            pattern: match.pattern,
-                            undoManager: this.undoManager,
-                          });
-                        }
-                      }*!/
-                      return KEYBOARD_ALLOW_DEFAULT;
-                    },
-                  },
-                });
-                console.log('tttttttttt', this);
-                this.addEventListener('keydown', keydownHandler);*/
+            inputRule: {
+              key: ' ',
+              handler: context => {
+                debugger;
+                const { inlineEditor, prefixText, inlineRange } = context;
+                /!*for (const match of markdownMatches) {
+                  const matchedText = prefixText.match(match.pattern);
+                  if (matchedText) {
+                    return match.action({
+                      inlineEditor,
+                      prefixText,
+                      inlineRange,
+                      pattern: match.pattern,
+                      undoManager: this.undoManager,
+                    });
+                  }
+                }*!/
+                return KEYBOARD_ALLOW_DEFAULT;
+              },
+            },
+          });
+          console.log('tttttttttt', this);
+          this.addEventListener('keydown', keydownHandler);*/
 
         /*this.disposables.add(
-                  inlineEditor.slots.inputting.on(this._updatePlaceholder)
-                );*/
+            inlineEditor.slots.inputting.on(this._updatePlaceholder)
+          );*/
       })
       .catch(console.error);
   }
 
   override renderBlock(): TemplateResult<1> {
-    console.log('00000000000000000', this.topContenteditableElement);
+    //console.log('11111', this, this.model);
 
-    return html`
-      <div class="affine-hint-container">
-        <div class="affine-hint">
-          <span></span>
-          <div class="affine-content">
-            <div class="affine-hint-title">
-              <rich-text
-                .yText=${this.model.title.yText}
-                .enableClipboard=${false}
-                .enableUndoRedo=${false}
-                .inlineRangeProvider=${this._inlineRangeProvider}
-              ></rich-text>
-            </div>
-            <div class="affine-hint-description">
-              <!-- <rich-text
-                .yText=${this.model.description.yText}
-                .inlineEventSource=${this.topContenteditableElement ?? nothing}
-              ></rich-text> -->
-            </div>
-          </div>
+    return html`<span>
+      <div style="display: flex ;flex-direction: column">
+        <div style="border:1px solid red">
+          <rich-text
+            .yText=${this.model.title.yText}
+            .inlineEventSource=${this.topContenteditableElement ?? nothing}
+          >
+          </rich-text>
         </div>
-        <affine-block-selection .block=${this}></affine-block-selection>
+        <div style="border: 1px solid chartreuse">
+          <rich-text
+            id="description"
+            .yText=${this.model.description.yText}
+            .inlineEventSource=${this.topContenteditableElement ?? nothing}
+          >
+          </rich-text>
+        </div>
       </div>
-    `;
+    </span>`;
   }
 }
-//.inlineEventSource=${this.topContenteditableElement ?? nothing}
 declare global {
   interface HTMLElementTagNameMap {
     'affine-simple': SimpleBlockComponent;

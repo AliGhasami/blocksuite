@@ -48,6 +48,7 @@ import { AFFINE_LINKED_DOC_WIDGET } from '../root-block/widgets/linked-doc/index
 import { AFFINE_MODAL_WIDGET } from '../root-block/widgets/modal/modal.js';
 import { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from '../root-block/widgets/page-dragging-area/page-dragging-area.js';
 import { AFFINE_SLASH_MENU_WIDGET } from '../root-block/widgets/slash-menu/index.js';
+import { SimpleBlockSchema } from '../simple-block/index.js';
 import { SurfaceBlockSchema } from '../surface-block/surface-model.js';
 import { SurfacePageService } from '../surface-block/surface-page-service.js';
 import { SurfaceService } from '../surface-block/surface-service.js';
@@ -138,6 +139,13 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
     schema: HintBlockSchema,
     view: {
       component: literal`affine-hint`,
+    },
+    //service: HintService,
+  },
+  {
+    schema: SimpleBlockSchema,
+    view: {
+      component: literal`affine-simple`,
     },
     //service: HintService,
   },

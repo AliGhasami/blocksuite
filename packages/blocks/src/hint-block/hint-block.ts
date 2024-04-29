@@ -82,7 +82,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 
   override connectedCallback() {
     super.connectedCallback();
-    bindContainerHotkey(this);
+    //bindContainerHotkey(this);
 
     this.bindHotKey({
       Escape: () => {
@@ -152,26 +152,23 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
 
   override renderBlock(): TemplateResult<1> {
-    console.log('00000000000000000', this.topContenteditableElement);
-
+    //console.log('00000000000000000', this.topContenteditableElement);
     return html`
-      <div class="affine-hint-container">
+      <div class="affine-hint-container affine-hint-${this.model.type}">
         <div class="affine-hint">
           <span></span>
           <div class="affine-content">
             <div class="affine-hint-title">
               <rich-text
                 .yText=${this.model.title.yText}
-                .enableClipboard=${false}
-                .enableUndoRedo=${false}
-                .inlineRangeProvider=${this._inlineRangeProvider}
+                .inlineEventSource=${this.topContenteditableElement ?? nothing}
               ></rich-text>
             </div>
             <div class="affine-hint-description">
-              <!-- <rich-text
+              <rich-text
                 .yText=${this.model.description.yText}
                 .inlineEventSource=${this.topContenteditableElement ?? nothing}
-              ></rich-text> -->
+              ></rich-text>
             </div>
           </div>
         </div>

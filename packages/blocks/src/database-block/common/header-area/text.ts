@@ -188,10 +188,11 @@ export class HeaderAreaTextCellEditing extends BaseTextCell {
   }
 
   override render() {
+    console.log('99999999999', this.titleColumn.getValue(this.rowId));
     const yText = this.getYText(
       this.titleColumn.getValue(this.rowId) as Y.Text | string | undefined
     );
-    //console.log('|111111', this.topContenteditableElement);
+    console.log('|111111', this.topContenteditableElement);
     return html`${this.renderIcon()}
       <rich-text
         .yText=${yText}

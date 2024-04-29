@@ -1,12 +1,12 @@
-import type { HintBlockModel } from './hint-model.js';
+import type { SimpleBlockModel } from './simple-model.js';
 
-export * from './hint-block.js';
-export * from './hint-model.js';
+export * from './simple-block.js';
+export * from './simple-model.js';
 
 declare global {
   namespace BlockSuite {
     interface BlockModels {
-      'affine:hint': HintBlockModel;
+      'affine:simple': SimpleBlockModel;
     }
   }
 }
