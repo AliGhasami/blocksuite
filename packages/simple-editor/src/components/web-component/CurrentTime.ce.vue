@@ -23,12 +23,10 @@
     </StyleProvider>
 
   </div>
-
-
 </template>
 
 <script setup>
-import {defineCustomElement, onBeforeUnmount, onMounted, ref,getCurrentInstance } from 'vue'
+import {onBeforeUnmount, onMounted, ref } from 'vue'
 import {Button,StyleProvider,createCache, extractStyle, Select,SelectOption} from "ant-design-vue"
 //import useStyle  from 'ant-design-vue/es/button/style'
 //import {useHead} from "@unhead/vue"
@@ -88,9 +86,7 @@ onMounted(()=>{
 
 
 let currentDateTime = ref(new Date())
-
 setInterval(() => {
-
   currentDateTime.value = new Date()
 })
 </script>

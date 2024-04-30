@@ -2,24 +2,27 @@
 import '../_common/components/block-selection.js';
 
 import { assertExists } from '@blocksuite/global/utils';
-import {
-  createInlineKeyDownHandler,
-  type InlineRangeProvider,
-  KEYBOARD_ALLOW_DEFAULT,
-} from '@blocksuite/inline';
+import { type InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
+import { limitShift, offset, shift } from '@floating-ui/dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
+import { ref } from 'lit/directives/ref.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
-import type { RichText } from '../_common/components/index.js';
-import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
-//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
+import { HoverController, type RichText } from '../_common/components/index.js';
+import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
-//import { getStandardLanguage } from '../code-block/utils/code-languages.js';
-//import { getCodeLineRenderer } from '../code-block/utils/code-line-renderer.js';
-//import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
+import { HintOptionTemplate } from './component/hint-option.js';
 import type { HintBlockModel } from './hint-model.js';
+import DefaultIcon from './icons/default.svg?raw';
+import ErrorIcon from './icons/error.svg?raw';
+import InfoIcon from './icons/info.svg?raw';
+import SuccessIcon from './icons/success.svg?raw';
+import WarningIcon from './icons/warning.svg?raw';
+
+export type HintType = 'default' | 'warning' | 'info' | 'success' | 'error';
 
 @customElement('affine-hint')
 export class HintBlockComponent extends BlockElement<HintBlockModel> {
@@ -67,6 +70,21 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       return note;
     }
     return this.rootElement;
+  }
+
+  getIcon(type: HintType) {
+    switch (type) {
+      case 'success':
+        return SuccessIcon;
+      case 'warning':
+        return WarningIcon;
+      case 'info':
+        return InfoIcon;
+      case 'error':
+        return ErrorIcon;
+      default:
+        return DefaultIcon;
+    }
   }
 
   get inlineEditor() {
@@ -151,12 +169,69 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       .catch(console.error);
   }
 
+  private _whenHover = new HoverController(this, ({ abortController }) => {
+    //debugger;
+    const selection = this.host.selection;
+    const textSelection = selection.find('text');
+    if (
+      !!textSelection &&
+      (!!textSelection.to || !!textSelection.from.length)
+    ) {
+      return null;
+    }
+
+    const blockSelections = selection.filter('block');
+    if (
+      blockSelections.length > 1 ||
+      (blockSelections.length === 1 && blockSelections[0].path !== this.path)
+    ) {
+      return null;
+    }
+
+    return {
+      template: ({ updatePortal }) =>
+        HintOptionTemplate({
+          anchor: this,
+          model: this.model,
+          //wrap: this._wrap,
+          onClickWrap: () => {
+            //this._wrap = !this._wrap;
+            //updatePortal();
+          },
+          abortController,
+        }),
+      computePosition: {
+        referenceElement: this,
+        placement: 'top',
+        middleware: [
+          offset({
+            mainAxis: 12,
+            crossAxis: 10,
+          }),
+          shift({
+            crossAxis: true,
+            padding: {
+              top: PAGE_HEADER_HEIGHT + 12,
+              bottom: 12,
+              right: 12,
+            },
+            limiter: limitShift(),
+          }),
+        ],
+        autoUpdate: true,
+      },
+    };
+  });
+
   override renderBlock(): TemplateResult<1> {
     //console.log('00000000000000000', this.topContenteditableElement);
     return html`
-      <div class="affine-hint-container affine-hint-${this.model.type}">
+      <div
+        ${ref(this._whenHover.setReference)}
+        class="affine-hint-container affine-hint-${this.model.type}"
+      >
         <div class="affine-hint">
-          <span></span>
+          <span>${html`${unsafeSVG(this.getIcon(this.model.type))}`}</span>
           <div class="affine-content">
             <div class="affine-hint-title">
               <rich-text
@@ -177,7 +252,6 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     `;
   }
 }
-//.inlineEventSource=${this.topContenteditableElement ?? nothing}
 declare global {
   interface HTMLElementTagNameMap {
     'affine-hint': HintBlockComponent;

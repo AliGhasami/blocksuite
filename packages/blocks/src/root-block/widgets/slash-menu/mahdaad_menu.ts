@@ -3,6 +3,8 @@ import type { BlockModel } from '@blocksuite/store';
 import { Text } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
+import { openFileOrFiles } from '../../../_common/utils/index.js';
+import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
@@ -135,8 +137,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               flavour: 'affine:hint',
               props: {
                 title: new Text('Title'),
-                //title: new Text('Hello World!---titiel '),
-                description: new Text(''),
+                description: new Text('Description'),
                 type: 'success',
               },
             })
@@ -261,7 +262,23 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'File',
         description: 'Description',
         icon: file,
-        action: ({ rootElement, model }) => {},
+        action: async ({ rootElement, model }) => {
+          const file = await openFileOrFiles();
+          if (!file) return;
+
+          const attachmentService =
+            rootElement.host.spec.getService('affine:attachment');
+          assertExists(attachmentService);
+          const maxFileSize = attachmentService.maxFileSize;
+
+          addSiblingAttachmentBlocks(
+            rootElement.host,
+            [file],
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);
+        },
       },
       {
         title: 'Link',

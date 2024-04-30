@@ -1,9 +1,12 @@
 <template>
   <div style="padding-top: 30px;">
     <div>
+<!--      <current-time id="sample"></current-time>-->
+<!--      <CurrentTimeElement />-->
 <!--      <current-time-1 id="sample"></current-time-1>
       <my-vue-element></my-vue-element>-->
 <!--      <Button>111111</Button>-->
+      <my-foo></my-foo>
     </div>
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
@@ -19,7 +22,18 @@
 import Editor from "@/components/Editor.vue";
 import {defineCustomElement, defineSSRCustomElement, onMounted, ref,getCurrentInstance } from "vue";
 import {data} from "@/components/template/tempData";
+import Foo from '@/components/web-component/MyFoo.ce.vue'
+const MyFoo = defineCustomElement(Foo)
+customElements.define('my-foo', MyFoo,{
+  //shadow:false,
+  /*extends:{
+  }*/
+})
+//import CounterSFC from '@/components/web-component/CurrentTime.ce.vue'
+//const Counter = defineCustomElement(CounterSFC)
 //import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
+//const ExampleElement = defineCustomElement(CurrentTime)
+//const CurrentTimeElement = defineCustomElement(CurrentTime)
 //import {HTMLElement} from "happy-dom";
 //console.log(CurrentTime)
 /*********************************************/

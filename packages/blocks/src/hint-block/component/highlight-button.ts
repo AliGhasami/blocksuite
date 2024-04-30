@@ -4,16 +4,23 @@ import { computePosition, flip, offset, shift } from '@floating-ui/dom';
 import { html } from 'lit';
 import { ref, type RefOrCallback } from 'lit/directives/ref.js';
 
-import { whenHover } from '../../../../../_common/components/hover/index.js';
+//import { whenHover } from '../../../../../_common/components/hover/index.js';
+//import type { AffineTextAttributes } from '../../../../../_common/inline/presets/affine-inline-specs.js';
+import { whenHover } from '../../_common/components/index.js';
 import {
   ArrowDownIcon,
   HighLightDuotoneIcon,
   TextBackgroundDuotoneIcon,
   TextForegroundDuotoneIcon,
-} from '../../../../../_common/icons/index.js';
-import type { AffineTextAttributes } from '../../../../../_common/inline/presets/affine-inline-specs.js';
-import type { AffineFormatBarWidget } from '../../format-bar.js';
-import { backgroundConfig, foregroundConfig } from './consts.js';
+} from '../../_common/icons/index.js';
+import type { AffineTextAttributes } from '../../_common/inline/presets/affine-inline-specs.js';
+import type { AffineFormatBarWidget } from '../../root-block/index.js';
+import {
+  backgroundConfig,
+  foregroundConfig,
+} from '../../root-block/widgets/format-bar/components/highlight/consts.js';
+//import type { AffineFormatBarWidget } from '../../format-bar.js';
+//import { backgroundConfig, foregroundConfig } from './consts.js';
 
 enum HighlightType {
   Foreground,
@@ -49,77 +56,38 @@ const updateHighlight = (
     .run();
 };
 
-const HighlightPanel = (
-  formatBar: AffineFormatBarWidget,
-  containerRef?: RefOrCallback
-) => {
+const HighlightPanel = (containerRef?: RefOrCallback) => {
   return html`<div ${ref(containerRef)} class="highlight-panel">
     <!-- Text Color Highlight -->
     <div class="highligh-panel-heading">Color</div>
-    ${foregroundConfig.map(
-      ({ name, color }) =>
-        html`<icon-button
-          width="100%"
-          height="32px"
-          style="padding-left: 4px; justify-content: flex-start; gap: 8px;"
-          text="${name}"
-          data-testid="${color ?? 'unset'}"
-          @click="${() => {
-            updateHighlight(formatBar.host, color, HighlightType.Foreground);
-            formatBar.requestUpdate();
-          }}"
-        >
-          <span style="color: ${color}; display: flex; align-items: center;">
-            ${TextForegroundDuotoneIcon}
-          </span>
-        </icon-button>`
-    )}
-
     <!-- Text Background Highlight -->
     <div class="highligh-panel-heading">Background</div>
-    ${backgroundConfig.map(
-      ({ name, color }) =>
-        html`<icon-button
-          width="100%"
-          height="32px"
-          style="padding-left: 4px; justify-content: flex-start; gap: 8px;"
-          text="${name}"
-          @click="${() => {
-            updateHighlight(formatBar.host, color, HighlightType.Background);
-            formatBar.requestUpdate();
-          }}"
-        >
-          <span
-            style="color: ${color ??
-            'rgba(0,0,0,0)'}; display: flex; align-items: center;"
-          >
-            ${TextBackgroundDuotoneIcon}
-          </span>
-        </icon-button>`
-    )}
   </div>`;
 };
 
-export const HighlightButton = (formatBar: AffineFormatBarWidget) => {
-  debugger;
-  const editorHost = formatBar.host;
+export const HighlightButton = elm => {
+  console.log('vvvvvvvvvvv', elm);
+  console.log('ppppppppp', elm);
+  //const editorHost = formatBar.host;
 
   const { setFloating, setReference } = whenHover(isHover => {
     if (!isHover) {
-      const panel =
+      //debugger;
+      // debugger;
+      /* const panel =
         formatBar.shadowRoot?.querySelector<HTMLElement>('.highlight-panel');
       if (!panel) return;
-      panel.style.display = 'none';
+      panel.style.display = 'none';*/
       return;
     }
-    const button =
+    /* const button =
       formatBar.shadowRoot?.querySelector<HTMLElement>('.highlight-button');
     const panel =
-      formatBar.shadowRoot?.querySelector<HTMLElement>('.highlight-panel');
-    assertExists(button);
-    assertExists(panel);
-    panel.style.display = 'block';
-    computePosition(button, panel, {
+      formatBar.shadowRoot?.querySelector<HTMLElement>('.highlight-panel');*/
+    //assertExists(button);
+    //assertExists(panel);
+    //panel.style.display = 'block';
+    /*computePosition(button, panel, {
       placement: 'bottom',
       middleware: [
         flip(),
@@ -133,10 +101,10 @@ export const HighlightButton = (formatBar: AffineFormatBarWidget) => {
         panel.style.left = `${x}px`;
         panel.style.top = `${y}px`;
       })
-      .catch(console.error);
+      .catch(console.error);*/
   });
 
-  const highlightPanel = HighlightPanel(formatBar, setFloating);
+  const highlightPanel = HighlightPanel(setFloating);
 
   return html`<div ${ref(setReference)} class="highlight-button">
     <icon-button
@@ -144,8 +112,6 @@ export const HighlightButton = (formatBar: AffineFormatBarWidget) => {
       data-last-used="${lastUsedColor ?? 'unset'}"
       width="52px"
       height="32px"
-      @click="${() =>
-        updateHighlight(editorHost, lastUsedColor, lastUsedHighlightType)}"
     >
       <span
         style="color: ${lastUsedColor}; display: flex; align-items: center; "

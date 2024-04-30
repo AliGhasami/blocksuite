@@ -87,6 +87,8 @@ export class HoverController implements ReactiveController {
     // Start a timer when the host is connected
     const { setReference, setFloating, dispose } = whenHover(isHover => {
       if (!isHover) {
+        //debugger;
+        //return;
         const abortController = this._abortController;
         if (!abortController) return;
         if (!this._portal || !this._hoverOptions.transition) {
@@ -130,6 +132,7 @@ export class HoverController implements ReactiveController {
         ...portalOptions,
         abortController: this._abortController,
       });
+      console.log('this._portal', this._portal);
 
       const transition = this._hoverOptions.transition;
       if (transition) {
