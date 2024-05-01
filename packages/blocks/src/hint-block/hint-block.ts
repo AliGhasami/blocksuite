@@ -195,8 +195,9 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
           model: this.model,
           //wrap: this._wrap,
           onClickWrap: () => {
+            debugger;
             //this._wrap = !this._wrap;
-            //updatePortal();
+            updatePortal();
           },
           abortController,
         }),
@@ -225,6 +226,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 
   override renderBlock(): TemplateResult<1> {
     //console.log('00000000000000000', this.topContenteditableElement);
+    console.log('0000000', this._whenHover);
     return html`
       <div
         ${ref(this._whenHover.setReference)}
