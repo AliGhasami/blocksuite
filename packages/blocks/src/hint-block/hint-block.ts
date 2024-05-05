@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
+//import 'tippy.js/dist/tippy.css';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
@@ -9,6 +10,7 @@ import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { ref } from 'lit/directives/ref.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import tippy from 'tippy.js';
 
 import { HoverController, type RichText } from '../_common/components/index.js';
 import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
@@ -101,7 +103,19 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   override connectedCallback() {
     super.connectedCallback();
     //bindContainerHotkey(this);
-
+    console.log('tttttttttttttttttt', this);
+    //'#myButton'
+    tippy('affine-hint', {
+      content: '<my-foo></my-foo>',
+      allowHTML: true,
+      placement: 'top',
+      appendTo: () => {
+        return document.body;
+      },
+      interactive: true,
+      hideOnClick: false,
+      //trigger: 'hover',
+    });
     this.bindHotKey({
       Escape: () => {
         alert('1111');
@@ -227,11 +241,9 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   override renderBlock(): TemplateResult<1> {
     //console.log('00000000000000000', this.topContenteditableElement);
     console.log('0000000', this._whenHover);
+    // ${ref(this._whenHover.setReference)}
     return html`
-      <div
-        ${ref(this._whenHover.setReference)}
-        class="affine-hint-container affine-hint-${this.model.type}"
-      >
+      <div class="affine-hint-container affine-hint-${this.model.type}">
         <div class="affine-hint">
           <span>${html`${unsafeSVG(this.getIcon(this.model.type))}`}</span>
           <div class="affine-content">

@@ -86,8 +86,9 @@ export class HoverController implements ReactiveController {
     }
     // Start a timer when the host is connected
     const { setReference, setFloating, dispose } = whenHover(isHover => {
+      console.log('this is hover');
       if (!isHover) {
-        //debugger;
+        // debugger;
         //return;
         const abortController = this._abortController;
         if (!abortController) return;
