@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
-//import 'tippy.js/dist/tippy.css';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
@@ -105,8 +104,8 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     //bindContainerHotkey(this);
     console.log('tttttttttttttttttt', this);
     //'#myButton'
-    tippy('affine-hint', {
-      content: '<my-foo></my-foo>',
+    tippy(this, {
+      content: '<select-hint-type />',
       allowHTML: true,
       placement: 'top',
       appendTo: () => {
@@ -114,6 +113,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       },
       interactive: true,
       hideOnClick: false,
+      arrow: false,
       //trigger: 'hover',
     });
     this.bindHotKey({
@@ -183,64 +183,8 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       .catch(console.error);
   }
 
-  private _whenHover = new HoverController(this, ({ abortController }) => {
-    //debugger;
-    const selection = this.host.selection;
-    const textSelection = selection.find('text');
-    if (
-      !!textSelection &&
-      (!!textSelection.to || !!textSelection.from.length)
-    ) {
-      return null;
-    }
-
-    const blockSelections = selection.filter('block');
-    if (
-      blockSelections.length > 1 ||
-      (blockSelections.length === 1 && blockSelections[0].path !== this.path)
-    ) {
-      return null;
-    }
-
-    return {
-      template: ({ updatePortal }) =>
-        HintOptionTemplate({
-          anchor: this,
-          model: this.model,
-          //wrap: this._wrap,
-          onClickWrap: () => {
-            debugger;
-            //this._wrap = !this._wrap;
-            updatePortal();
-          },
-          abortController,
-        }),
-      computePosition: {
-        referenceElement: this,
-        placement: 'top',
-        middleware: [
-          offset({
-            mainAxis: 12,
-            crossAxis: 10,
-          }),
-          shift({
-            crossAxis: true,
-            padding: {
-              top: PAGE_HEADER_HEIGHT + 12,
-              bottom: 12,
-              right: 12,
-            },
-            limiter: limitShift(),
-          }),
-        ],
-        autoUpdate: true,
-      },
-    };
-  });
-
   override renderBlock(): TemplateResult<1> {
-    //console.log('00000000000000000', this.topContenteditableElement);
-    console.log('0000000', this._whenHover);
+    // console.log('0000000', this._whenHover);
     // ${ref(this._whenHover.setReference)}
     return html`
       <div class="affine-hint-container affine-hint-${this.model.type}">

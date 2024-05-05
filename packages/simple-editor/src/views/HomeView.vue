@@ -6,7 +6,13 @@
 <!--      <current-time-1 id="sample"></current-time-1>
       <my-vue-element></my-vue-element>-->
 <!--      <Button>111111</Button>-->
-      <my-foo></my-foo>
+      <div>
+        <my-foo ></my-foo>
+        <my-custom-element></my-custom-element>
+      </div>
+      <select-hint-type></select-hint-type>
+<!--      <div>11111</div>
+      <my-bar ></my-bar>-->
     </div>
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
@@ -22,13 +28,11 @@
 import Editor from "@/components/Editor.vue";
 import {defineCustomElement, defineSSRCustomElement, onMounted, ref,getCurrentInstance } from "vue";
 import {data} from "@/components/template/tempData";
-import Foo from '@/components/web-component/MyFoo.ce.vue'
-const MyFoo = defineCustomElement(Foo)
-customElements.define('my-foo', MyFoo,{
-  //shadow:false,
-  /*extends:{
-  }*/
-})
+/*********************************/
+import MyBarComponent from '@/components/web-component/MyBar.vue'
+const MyBar = defineCustomElement(MyBarComponent)
+customElements.define('my-bar', MyBar,{})
+ /***********************************/
 //import CounterSFC from '@/components/web-component/CurrentTime.ce.vue'
 //const Counter = defineCustomElement(CounterSFC)
 //import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
@@ -112,6 +116,12 @@ function handleUpdateBlock(data){
 </script>
 
 <style>
+select-hint-type{
+  //display: none;
+  background-color: gold !important;
+}
+
+
 </style>
 
 

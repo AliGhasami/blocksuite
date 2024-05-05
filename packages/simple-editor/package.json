@@ -41,6 +41,7 @@
     "less": "^4.2.0",
     "pinia": "^2.1.7",
     "radix-vue": "^1.7.3",
+    "tippy.js": "^6.3.7",
     "unocss-preset-autoprefixer": "^0.0.7",
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",

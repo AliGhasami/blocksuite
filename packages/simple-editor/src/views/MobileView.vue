@@ -1,6 +1,6 @@
 <template>
   <div style="padding-top: 30px;">
-    <current-time></current-time>
+<!--    <current-time></current-time>-->
 <!--    1111 -->
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
@@ -17,9 +17,9 @@ import {defineCustomElement, ref} from "vue";
 import {data} from "@/components/template/tempData";
 import MobileEditor from "@/components/MobileEditor.vue";
 //import { defineCustomElement } from 'vue'
-import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
-const CurrentTimeElement = defineCustomElement(CurrentTime)
-customElements.define('current-time', CurrentTimeElement)
+//import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
+//const CurrentTimeElement = defineCustomElement(CurrentTime)
+//customElements.define('current-time', CurrentTimeElement)
 const refEditor=ref(null)
 async function handleGetData(){
     await refEditor?.value?.getData()

@@ -9,13 +9,50 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor } from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import {onMounted, ref} from "vue";
+import {createApp, defineCustomElement, onMounted, ref} from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 //let editor: any = null
 let myCollection: DocCollection | null = null
+import 'tippy.js/dist/tippy.css';
+/** */
+import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
+const SelectHintType = defineCustomElement(SelectHintTypeComponent)
+customElements.define('select-hint-type', SelectHintType,{})
+/**************************/
+import MyFooComponent from '@/components/web-component/MyFoo.vue'
+// Create a Vue app
+const app = createApp(MyFooComponent);
 
+// Define the custom element without shadow DOM
+const MyFoo = defineCustomElement(MyFooComponent,{ shadowRoot: false });
+
+// Register the custom element globally
+customElements.define('my-foo', MyFoo);
+/************************/
+/**********************************/
+// Define your Vue component
+const MyComponent = {
+  template: `
+    <div>
+      <p>{{ message }}</p>
+    </div>
+  `
+};
+
+// Create a Vue app
+const app2 = createApp(MyComponent);
+
+// Define the custom element without shadow DOM
+const MyCustomElement = defineCustomElement(app2,{ shadowRoot: false });
+
+// Register the custom element globally
+customElements.define('my-custom-element', MyCustomElement);
+/************************************/
+
+
+/** */
 type IBlockChange= {
   type: 'add';
   id: string;
@@ -223,7 +260,22 @@ defineExpose({
 </script>
 
 <style lang="less">
-/* TODO ali ghasami for fix token */
+/**{
+  //display: none;
+}
+:host(.SelectContent){
+    background-color: red;
+}
+:host-context(div){
+  background-color: red;
+}
+
+:host(#shadow-dom-host) {
+  border: 2px dashed blue;
+}*/
+
+
+  /* TODO ali ghasami for fix token */
 .vue-block-editor{
   /* Mention Style */
   .affine-mention-container .affine-mention{
@@ -337,20 +389,8 @@ defineExpose({
       @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
     }
 
-    /*& .hover{
-      color:red;
-    }*/
 
-   /* &:hover{
-      color: red;
-      background-color:red;
-    }*/
   }
-
-  /*.editor{
-      display: block;
-      height: 650px;
-  }*/
 
   .claytap-text{
     //background-color: red;
@@ -371,9 +411,10 @@ defineExpose({
     @apply mt-page-subheading text-neutral-8;
     line-height: unset;
   }
+
+
+
 }
-
-
 
 .slash-menu{
   //background-color: red;
@@ -417,6 +458,19 @@ defineExpose({
 
 }
 
+.tippy-box{
+  @apply bg-white shadow-floated;
+  color:red;
+  border-radius: @roundness-3;
+  position: relative;
+}
+
+/*
+.SelectViewport{
+  display: none;
+  background-color: red;
+}
+*/
 
 
 </style>
