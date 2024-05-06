@@ -1,6 +1,5 @@
 <template>
   <div class="vue-block-editor">
-    <my-custom-element title="Hello" content="This is my custom Vue component"></my-custom-element>
     <div ref="refEditor" class="editor"></div>
   </div>
 </template>
@@ -10,7 +9,7 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor } from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import {createApp, defineCustomElement, onMounted, ref} from "vue";
+import {defineCustomElement, onMounted, ref} from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
@@ -52,7 +51,6 @@ const MyCustomElement = defineCustomElement(app2,{ shadowRoot: false });
 // Register the custom element globally
 customElements.define('my-custom-element', MyCustomElement);*/
 /************************************/
-
 
 /** */
 type IBlockChange= {

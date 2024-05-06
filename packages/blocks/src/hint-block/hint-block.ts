@@ -4,18 +4,18 @@ import '../_common/components/block-selection.js';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
-import { limitShift, offset, shift } from '@floating-ui/dom';
+///import { limitShift, offset, shift } from '@floating-ui/dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { ref } from 'lit/directives/ref.js';
+///import { ref } from 'lit/directives/ref.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import tippy from 'tippy.js';
 
 import { HoverController, type RichText } from '../_common/components/index.js';
-import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
+//import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
-import { HintOptionTemplate } from './component/hint-option.js';
+//import { HintOptionTemplate } from './component/hint-option.js';
 import type { HintBlockModel } from './hint-model.js';
 import DefaultIcon from './icons/default.svg?raw';
 import ErrorIcon from './icons/error.svg?raw';
@@ -99,13 +99,30 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     return result;
   }
 
+  handleChangeType(type: string) {
+    console.log('this is type', type);
+  }
+
+  popover() {
+    return html`<p>
+      <button @click="${this.handleChangeType}">Click Me!</button>
+    </p>`;
+  }
+
   override connectedCallback() {
     super.connectedCallback();
+
     //bindContainerHotkey(this);
-    console.log('tttttttttttttttttt', this);
+    console.log('tttttttttttttttttt', this.popover());
     //'#myButton'
-    tippy(this, {
-      content: '<select-hint-type />',
+
+    /*  ) => {
+      const event = this.handleChangeType;
+      return `<button onclick="event()">The time is?</button>
+<select-hint-type onclick={this.handleChangeType} onchange={this.handleChangeType} />
+`;*/
+    const temp = tippy(this, {
+      content: `<button id="test1">Add To Cart</button>`,
       allowHTML: true,
       placement: 'top',
       appendTo: () => {
@@ -116,14 +133,15 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       arrow: false,
       //trigger: 'hover',
     });
+    temp.show();
     this.bindHotKey({
       Escape: () => {
         alert('1111');
       },
       'Mod-b': () => {},
       'Shift-Enter': ctx => {
-        ctx._map.keyboardState.raw.preventDefault();
-        console.log('11111', ctx._map.keyboardState.raw);
+        //ctx._map.keyboardState.raw.preventDefault();
+        //console.log('11111', ctx._map.keyboardState.raw);
         return false;
       },
     });
