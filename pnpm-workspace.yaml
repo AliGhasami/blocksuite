@@ -13,3 +13,4 @@ packages:
   - 'packages/simple-editor'
   - 'packages/vue-web-component'
   - 'packages/lit-component'
+  - 'packages/web-component'

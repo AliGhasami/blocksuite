@@ -1,6 +1,7 @@
 <template>
   <div class="vue-block-editor">
-      <div ref="refEditor" class="editor"></div>
+    <my-custom-element title="Hello" content="This is my custom Vue component"></my-custom-element>
+    <div ref="refEditor" class="editor"></div>
   </div>
 </template>
 
@@ -21,34 +22,35 @@ import SelectHintTypeComponent from '@/components/web-component/SelectHintType.c
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
 customElements.define('select-hint-type', SelectHintType,{})
 /**************************/
-import MyFooComponent from '@/components/web-component/MyFoo.vue'
+/*import MyFooComponent from '@/components/web-component/MyFoo.vue'
 // Create a Vue app
 const app = createApp(MyFooComponent);
-
 // Define the custom element without shadow DOM
 const MyFoo = defineCustomElement(MyFooComponent,{ shadowRoot: false });
-
 // Register the custom element globally
-customElements.define('my-foo', MyFoo);
+customElements.define('my-foo', MyFoo);*/
 /************************/
+/*import MyCustomComponent from './web-component/Test3.vue';
+// Define the custom element
+const app = createApp(MyCustomComponent);
+const MyCustomElement = app.mount(document.createElement('div'));
+// Register the custom element
+customElements.define('my-custom-element', MyCustomElement);*/
 /**********************************/
 // Define your Vue component
-const MyComponent = {
+/*const MyComponent = {
   template: `
     <div>
       <p>{{ message }}</p>
     </div>
   `
 };
-
 // Create a Vue app
 const app2 = createApp(MyComponent);
-
 // Define the custom element without shadow DOM
 const MyCustomElement = defineCustomElement(app2,{ shadowRoot: false });
-
 // Register the custom element globally
-customElements.define('my-custom-element', MyCustomElement);
+customElements.define('my-custom-element', MyCustomElement);*/
 /************************************/
 
 
