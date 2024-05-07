@@ -114,6 +114,9 @@ export const styles = css`
   .slash-item.ask-ai {
     color: var(--affine-brand-color);
   }
+  .slash-item.github .github-icon {
+    color: var(--affine-black);
+  }
 
   .claytap-slash-menu-item.hover {
     background-color: #1e96eb;

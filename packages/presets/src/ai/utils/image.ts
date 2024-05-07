@@ -34,6 +34,8 @@ function fetchImageFallback(
       c.height = img.height;
       const ctx = c.getContext('2d');
       assertExists(ctx);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0);
       c.toBlob(blob => {
         if (blob) {
@@ -59,6 +61,8 @@ function convertToPng(blob: Blob): Promise<Blob | null> {
         c.height = img.height;
         const ctx = c.getContext('2d');
         assertExists(ctx);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0);
         c.toBlob(resolve, 'image/png');
       };
@@ -68,4 +72,33 @@ function convertToPng(blob: Blob): Promise<Blob | null> {
     reader.addEventListener('error', () => resolve(null));
     reader.readAsDataURL(blob);
   });
+}
+
+export function readBlobAsURL(blob: Blob | File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      if (typeof e.target?.result === 'string') {
+        resolve(e.target.result);
+      } else {
+        reject();
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+export function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type = 'image/png',
+  quality?: number
+) {
+  return new Promise<Blob | null>(resolve =>
+    canvas.toBlob(resolve, type, quality)
+  );
+}
+
+export function randomSeed(min = 0, max = Date.now()) {
+  return Math.round(Math.random() * (max - min)) + min;
 }

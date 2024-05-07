@@ -3,6 +3,7 @@
 import { handleError } from '@blocksuite/global/exceptions';
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel, Doc } from '@blocksuite/store';
+import { css } from 'lit';
 import {
   LitElement,
   nothing,
@@ -26,6 +27,12 @@ import { ShadowlessElement } from './shadowless-element.js';
 
 @customElement('editor-host')
 export class EditorHost extends WithDisposable(ShadowlessElement) {
+  static override styles = css`
+    editor-host {
+      outline: none;
+    }
+  `;
+
   @property({ attribute: false })
   specs!: BlockSpec[];
 
@@ -116,6 +123,7 @@ export class EditorHost extends WithDisposable(ShadowlessElement) {
     this.std.mount();
     this.std.spec.applySpecs(this.specs);
     this.rangeManager = new RangeManager(this);
+    this.tabIndex = 0;
   }
 
   override disconnectedCallback() {

@@ -13,23 +13,28 @@ import type {
 } from '@blocksuite/blocks';
 import {
   AFFINE_EDGELESS_COPILOT_WIDGET,
+  ChatWithAIIcon,
   DeleteIcon,
   EDGELESS_ELEMENT_TOOLBAR_WIDGET,
   EmbedHtmlBlockSpec,
+  fitContent,
   InsertBelowIcon,
   NoteDisplayMode,
   ResetIcon,
-  updateMindmapNodeRect,
 } from '@blocksuite/blocks';
 
 import { insertFromMarkdown } from '../_common/markdown-utils.js';
 import { getSurfaceElementFromEditor } from '../_common/selection-utils.js';
 import { getAIPanel } from '../ai-panel.js';
-import { copyTextAnswer } from '../utils/editor-actions.js';
+import { AIProvider } from '../provider.js';
+import { reportResponse } from '../utils/action-reporter.js';
+import { isMindMapRoot } from '../utils/edgeless.js';
 import { preprocessHtml } from '../utils/html.js';
 import { fetchImageToFile } from '../utils/image.js';
-import { getEdgelessRootFromEditor } from '../utils/selection-utils.js';
-import { EXCLUDING_COPY_ACTIONS } from './consts.js';
+import {
+  getEdgelessRootFromEditor,
+  getEdgelessService,
+} from '../utils/selection-utils.js';
 
 export type CtxRecord = {
   get(): Record<string, unknown>;
@@ -73,11 +78,17 @@ export function getElementToolbar(
   return elementToolbar;
 }
 
+export function getTriggerEntry(host: EditorHost) {
+  const copilotWidget = getEdgelessCopilotWidget(host);
+
+  return copilotWidget.visible ? 'selection' : 'toolbar';
+}
+
 export function getCopilotSelectedElems(host: EditorHost): EdgelessModel[] {
   const service = getService(host);
-  const copilogWidget = getEdgelessCopilotWidget(host);
+  const copilotWidget = getEdgelessCopilotWidget(host);
 
-  if (copilogWidget.visible) {
+  if (copilotWidget.visible) {
     return (service.tool.controllers['copilot'] as CopilotSelectionController)
       .selectedElements;
   }
@@ -87,17 +98,13 @@ export function getCopilotSelectedElems(host: EditorHost): EdgelessModel[] {
 
 export function discard(
   panel: AffineAIPanelWidget,
-  copilot: EdgelessCopilotWidget
+  _: EdgelessCopilotWidget
 ): AIItemConfig {
   return {
     name: 'Discard',
     icon: DeleteIcon,
     handler: () => {
-      const callback = () => {
-        panel.hide();
-        copilot.visible = false;
-      };
-      panel.discard(callback);
+      panel.discard();
     },
   };
 }
@@ -107,6 +114,7 @@ export function retry(panel: AffineAIPanelWidget): AIItemConfig {
     name: 'Retry',
     icon: ResetIcon,
     handler: () => {
+      reportResponse('result:retry');
       panel.generate();
     },
   };
@@ -115,12 +123,14 @@ export function retry(panel: AffineAIPanelWidget): AIItemConfig {
 export function createInsertResp(
   handler: (host: EditorHost, ctx: CtxRecord) => void,
   host: EditorHost,
-  ctx: CtxRecord
+  ctx: CtxRecord,
+  buttonText: string = 'Insert below'
 ): AIItemConfig {
   return {
-    name: 'Insert below',
+    name: buttonText,
     icon: InsertBelowIcon,
     handler: () => {
+      reportResponse('result:insert');
       handler(host, ctx);
       const panel = getAIPanel(host);
       panel.hide();
@@ -128,22 +138,91 @@ export function createInsertResp(
   };
 }
 
+type MindMapNode = {
+  text: string;
+  children: MindMapNode[];
+};
+
 export const responses: {
   [key in keyof Partial<BlockSuitePresets.AIActions>]: (
     host: EditorHost,
     ctx: CtxRecord
   ) => void;
 } = {
-  brainstormMindmap: (host, ctx) => {
-    const aiPanel = getAIPanel(host);
-    const edgelessCopilot = getEdgelessCopilotWidget(host);
+  expandMindmap: (host, ctx) => {
     const [surface] = host.doc.getBlockByFlavour(
       'affine:surface'
     ) as SurfaceBlockModel[];
 
+    const elements = ctx.get()['selectedElements'] as EdgelessModel[];
+    const data = ctx.get() as {
+      node: MindMapNode;
+    };
+
+    queueMicrotask(() => {
+      getAIPanel(host).hide();
+    });
+
+    const mindmap = elements[0].group as MindmapElementModel;
+
+    if (!data?.node) return;
+
+    if (data.node.children) {
+      data.node.children.forEach(childTree => {
+        mindmap.addTree(elements[0].id, childTree);
+      });
+
+      const subtree = mindmap.getNode(elements[0].id);
+
+      if (!subtree) return;
+
+      surface.doc.transact(() => {
+        const updateNodeSize = (node: typeof subtree) => {
+          fitContent(node.element as ShapeElementModel);
+
+          node.children.forEach(child => {
+            updateNodeSize(child);
+          });
+        };
+
+        updateNodeSize(subtree);
+      });
+
+      setTimeout(() => {
+        const edgelessService = getEdgelessService(host);
+
+        edgelessService.selection.set({
+          elements: [subtree.element.id],
+          editing: false,
+        });
+      });
+    }
+  },
+  brainstormMindmap: (host, ctx) => {
+    const aiPanel = getAIPanel(host);
+    const edgelessService = getEdgelessService(host);
+    const edgelessCopilot = getEdgelessCopilotWidget(host);
+    const selectionRect = edgelessCopilot.selectionModelRect;
+    const [surface] = host.doc.getBlockByFlavour(
+      'affine:surface'
+    ) as SurfaceBlockModel[];
+    const elements = ctx.get()['selectedElements'] as EdgelessModel[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = ctx.get() as any;
-    const selectionRect = edgelessCopilot.selectionModelRect;
+    let newGenerated = true;
+
+    // This means regenerate
+    if (isMindMapRoot(elements[0])) {
+      const mindmap = elements[0].group as MindmapElementModel;
+      const xywh = mindmap.tree.element.xywh;
+
+      surface.removeElement(mindmap.id);
+
+      if (data.node) {
+        data.node.xywh = xywh;
+        newGenerated = false;
+      }
+    }
 
     edgelessCopilot.hideCopilotPanel();
     aiPanel.hide();
@@ -156,29 +235,37 @@ export const responses: {
     const mindmap = surface.getElementById(mindmapId) as MindmapElementModel;
 
     host.doc.transact(() => {
-      const rootElement = mindmap.tree.element;
-
-      if (selectionRect) {
-        rootElement.xywh = `[${selectionRect.x},${selectionRect.y},${rootElement.w},${rootElement.h}]`;
-      }
-
       mindmap.childElements.forEach(shape => {
-        updateMindmapNodeRect(shape as ShapeElementModel);
+        fitContent(shape as ShapeElementModel);
       });
+    });
 
-      if (selectionRect) {
-        queueMicrotask(() => {
-          mindmap.moveTo([
-            selectionRect.x,
-            selectionRect.y,
-            selectionRect.width,
-            selectionRect.height,
-          ]);
-        });
+    queueMicrotask(() => {
+      if (newGenerated && selectionRect) {
+        mindmap.moveTo([
+          selectionRect.x,
+          selectionRect.y,
+          selectionRect.width,
+          selectionRect.height,
+        ]);
       }
     });
+
+    // This is a workaround to make sure mindmap and other microtask are done
+    setTimeout(() => {
+      edgelessService.viewport.setViewportByBound(
+        mindmap.elementBound,
+        [20, 20, 20, 20],
+        true
+      );
+
+      edgelessService.selection.set({
+        elements: [mindmap.tree.element.id],
+        editing: false,
+      });
+    });
   },
-  makeItReal: host => {
+  makeItReal: (host, ctx) => {
     const aiPanel = getAIPanel(host);
     let html = aiPanel.answer;
     if (!html) return;
@@ -189,19 +276,25 @@ export const responses: {
       'affine:surface'
     ) as SurfaceBlockModel[];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const selectionRect = edgelessCopilot.selectionModelRect;
+    const data = ctx.get();
+    const bounds = edgelessCopilot.determineInsertionBounds(
+      (data['width'] as number) || 800,
+      (data['height'] as number) || 600
+    );
 
     edgelessCopilot.hideCopilotPanel();
     aiPanel.hide();
 
     const edgelessRoot = getEdgelessRootFromEditor(host);
-    const { left, top, height } = selectionRect;
 
     host.doc.transact(() => {
       edgelessRoot.doc.addBlock(
         EmbedHtmlBlockSpec.schema.model.flavour as 'affine:embed-html',
-        { html, xywh: `[${left},${top + height + 20},400,200]` },
+        {
+          html,
+          design: 'ai:makeItReal', // as tag
+          xywh: bounds.serialize(),
+        },
         surface.id
       );
     });
@@ -209,6 +302,7 @@ export const responses: {
   createSlides: (host, ctx) => {
     const data = ctx.get();
     const contents = data.contents as unknown[];
+    if (!contents) return;
     const images = data.images as { url: string; id: string }[][];
     const service = host.spec.getService<EdgelessRootService>('affine:page');
 
@@ -236,8 +330,7 @@ export const responses: {
     if (!data) return;
 
     const edgelessCopilot = getEdgelessCopilotWidget(host);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const selectionRect = edgelessCopilot.selectionModelRect;
+    const bounds = edgelessCopilot.determineInsertionBounds();
 
     edgelessCopilot.hideCopilotPanel();
     aiPanel.hide();
@@ -250,14 +343,11 @@ export const responses: {
         if (!img) return;
 
         const edgelessRoot = getEdgelessRootFromEditor(host);
-        const { left, top, height } = selectionRect;
-        const [x, y] = edgelessRoot.service.viewport.toViewCoord(
-          left,
-          top + height + 20
-        );
+        const { minX, minY } = bounds;
+        const [x, y] = edgelessRoot.service.viewport.toViewCoord(minX, minY);
 
         host.doc.transact(() => {
-          edgelessRoot.addImages([img], { x, y }).catch(console.error);
+          edgelessRoot.addImages([img], { x, y }, true).catch(console.error);
         });
       })
       .catch(console.error);
@@ -265,16 +355,16 @@ export const responses: {
 };
 
 const defaultHandler = (host: EditorHost) => {
-  const edgelessCopilot = getEdgelessCopilotWidget(host);
   const doc = host.doc;
-  const currentRect = edgelessCopilot.selectionModelRect;
   const panel = getAIPanel(host);
+  const edgelessCopilot = getEdgelessCopilotWidget(host);
+  const bounds = edgelessCopilot.determineInsertionBounds(800, 95);
 
   doc.transact(() => {
     const noteBlockId = doc.addBlock(
       'affine:note',
       {
-        xywh: `[${currentRect.x},${currentRect.y + currentRect.height + 20},800,95]`,
+        xywh: bounds.serialize(),
         displayMode: NoteDisplayMode.EdgelessOnly,
       },
       doc.root!.id
@@ -295,38 +385,69 @@ const defaultHandler = (host: EditorHost) => {
   });
 };
 
-export function getResponseHandler<T extends keyof BlockSuitePresets.AIActions>(
+const getButtonText: {
+  [key in keyof Partial<BlockSuitePresets.AIActions>]: (
+    variants?: Omit<
+      Parameters<BlockSuitePresets.AIActions[key]>[0],
+      keyof BlockSuitePresets.AITextActionOptions
+    >
+  ) => string | undefined;
+} = {
+  brainstormMindmap: variants => {
+    return variants?.regenerate ? 'Replace' : undefined;
+  },
+};
+
+export function getInsertAndReplaceHandler<
+  T extends keyof BlockSuitePresets.AIActions,
+>(
   id: T,
   host: EditorHost,
-  ctx: CtxRecord
+  ctx: CtxRecord,
+  variants?: Omit<
+    Parameters<BlockSuitePresets.AIActions[T]>[0],
+    keyof BlockSuitePresets.AITextActionOptions
+  >
 ) {
   const handler = responses[id] ?? defaultHandler;
+  const buttonText = getButtonText[id]?.(variants) ?? undefined;
 
-  return createInsertResp(handler, host, ctx);
+  return createInsertResp(handler, host, ctx, buttonText);
 }
 
 export function actionToResponse<T extends keyof BlockSuitePresets.AIActions>(
   id: T,
   host: EditorHost,
-  ctx: CtxRecord
+  ctx: CtxRecord,
+  variants?: Omit<
+    Parameters<BlockSuitePresets.AIActions[T]>[0],
+    keyof BlockSuitePresets.AITextActionOptions
+  >
 ): FinishConfig {
   return {
     responses: [
       {
         name: 'Response',
         items: [
-          getResponseHandler(id, host, ctx),
+          {
+            name: 'Continue in chat',
+            icon: ChatWithAIIcon,
+            handler: () => {
+              reportResponse('result:continue-in-chat');
+              const panel = getAIPanel(host);
+              AIProvider.slots.requestContinueInChat.emit({
+                host: host,
+                show: true,
+              });
+              panel.hide();
+            },
+          },
+          getInsertAndReplaceHandler(id, host, ctx, variants),
           retry(getAIPanel(host)),
           discard(getAIPanel(host), getEdgelessCopilotWidget(host)),
         ],
       },
     ],
     actions: [],
-    copy: {
-      allowed: !EXCLUDING_COPY_ACTIONS.includes(id),
-      onCopy: () => {
-        return copyTextAnswer(getAIPanel(host));
-      },
-    },
   };
 }

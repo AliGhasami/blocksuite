@@ -54,7 +54,9 @@ export async function createDefaultDocCollection() {
           main: new IndexedDBDocSource(),
           shadow: [new BroadcastChannelDocSource()],
         };
-        awarenessSources = [new BroadcastChannelAwarenessSource()];
+        awarenessSources = [
+          new BroadcastChannelAwarenessSource('quickEdgeless'),
+        ];
       });
   }
 
@@ -68,6 +70,8 @@ export async function createDefaultDocCollection() {
     defaultFlags: {
       enable_synced_doc_block: true,
       enable_pie_menu: true,
+      enable_lasso_tool: true,
+      enable_mindmap_entry: true,
     },
   };
   const collection = new DocCollection(options);

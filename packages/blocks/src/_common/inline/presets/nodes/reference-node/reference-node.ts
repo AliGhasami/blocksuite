@@ -58,13 +58,10 @@ export class AffineReference extends WithDisposable(ShadowlessElement) {
       margin-left: 4px;
       border-bottom: 0.5px solid var(--affine-divider-color);
       transition: border 0.2s ease-out;
+      white-space: break-spaces;
     }
     .affine-reference-title:hover {
       border-bottom: 0.5px solid var(--affine-icon-color);
-    }
-
-    .affine-reference > span {
-      white-space: break-spaces;
     }
   `;
 
@@ -147,7 +144,6 @@ export class AffineReference extends WithDisposable(ShadowlessElement) {
     }
 
     const doc = this.doc;
-    this._updateRefMeta(doc);
     this._disposables.add(
       doc.collection.slots.docUpdated.on(() => this._updateRefMeta(doc))
     );
@@ -160,6 +156,13 @@ export class AffineReference extends WithDisposable(ShadowlessElement) {
         );
       })
       .catch(console.error);
+  }
+
+  override willUpdate(_changedProperties: Map<PropertyKey, unknown>) {
+    super.willUpdate(_changedProperties);
+
+    const doc = this.doc;
+    this._updateRefMeta(doc);
   }
 
   private _updateRefMeta = (doc: Doc) => {

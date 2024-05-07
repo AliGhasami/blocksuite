@@ -106,6 +106,9 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
     set(data: Record<string, unknown>): void;
   };
 
+  @property({ attribute: false })
+  mindmapStyle?: MindmapStyle;
+
   @query('editor-host')
   portalHost!: EditorHost;
 
@@ -145,61 +148,7 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
   }
 
   private _toMindmapNode(answer: string) {
-    type Node = {
-      text: string;
-      children: Node[];
-    };
-    let result: Node | null = null;
-    const markdown = new MarkdownAdapter();
-    const ast = markdown['_markdownToAst'](answer);
-    const traverse = (
-      markdownNode: Unpacked<(typeof ast)['children']>,
-      firstLevel = false
-    ): Node | null => {
-      switch (markdownNode.type) {
-        case 'list':
-          {
-            const listItems = markdownNode.children
-              .map(child => traverse(child))
-              .filter(val => val);
-
-            if (firstLevel) {
-              return listItems[0];
-            }
-          }
-          break;
-        case 'listItem': {
-          const paragraph = markdownNode.children[0];
-          const list = markdownNode.children[1];
-          const node: Node = {
-            text: '',
-            children: [],
-          };
-
-          if (paragraph?.type === 'paragraph') {
-            if (paragraph.children[0]?.type === 'text') {
-              node.text = paragraph.children[0].value;
-            }
-          }
-
-          if (list?.type === 'list') {
-            node.children = list.children
-              .map(child => traverse(child))
-              .filter(val => val) as Node[];
-          }
-
-          return node;
-        }
-      }
-
-      return null;
-    };
-
-    if (ast?.children?.[0]?.type === 'list') {
-      result = traverse(ast.children[0], true);
-    }
-
-    return result;
+    return markdownToMindmap(answer);
   }
 
   private _switchStyle(style: MindmapStyle) {
@@ -233,6 +182,7 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
     this.mindmapId = this.surface.addElement({
       type: 'mindmap',
       children: mindmapNode,
+      style: this.mindmapStyle ?? MindmapStyle.FOUR,
     });
 
     const centerPosition = this._mindmap.tree.element.xywh;
@@ -278,3 +228,62 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
     </div>`;
   }
 }
+
+type Node = {
+  text: string;
+  children: Node[];
+};
+
+export const markdownToMindmap = (answer: string) => {
+  let result: Node | null = null;
+  const markdown = new MarkdownAdapter();
+  const ast = markdown['_markdownToAst'](answer);
+  const traverse = (
+    markdownNode: Unpacked<(typeof ast)['children']>,
+    firstLevel = false
+  ): Node | null => {
+    switch (markdownNode.type) {
+      case 'list':
+        {
+          const listItems = markdownNode.children
+            .map(child => traverse(child))
+            .filter(val => val);
+
+          if (firstLevel) {
+            return listItems[0];
+          }
+        }
+        break;
+      case 'listItem': {
+        const paragraph = markdownNode.children[0];
+        const list = markdownNode.children[1];
+        const node: Node = {
+          text: '',
+          children: [],
+        };
+
+        if (paragraph?.type === 'paragraph') {
+          if (paragraph.children[0]?.type === 'text') {
+            node.text = paragraph.children[0].value;
+          }
+        }
+
+        if (list?.type === 'list') {
+          node.children = list.children
+            .map(child => traverse(child))
+            .filter(val => val) as Node[];
+        }
+
+        return node;
+      }
+    }
+
+    return null;
+  };
+
+  if (ast?.children?.[0]?.type === 'list') {
+    result = traverse(ast.children[0], true);
+  }
+
+  return result;
+};

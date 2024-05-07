@@ -1,32 +1,34 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { type Y } from '@blocksuite/store';
+import { Slice, Text, type Y } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/embed-card-create-modal.js';
-//import { toast } from '../../../_common/components/toast.js';
+import { toast } from '../../../_common/components/toast.js';
 import { textConversionConfigs } from '../../../_common/configs/text-conversion.js';
 import { textFormatConfigs } from '../../../_common/configs/text-format/config.js';
 import {
-  //ArrowDownBigIcon,
-  //ArrowUpBigIcon,
+  ArrowDownBigIcon,
+  ArrowUpBigIcon,
   AttachmentIcon,
   BookmarkIcon,
-  //CopyIcon,
+  CopyIcon,
   DatabaseKanbanViewIcon20,
   DatabaseTableViewIcon20,
-  /*DeleteIcon,
+  DeleteIcon,
   DualLinkIcon,
-  DuplicateIcon,*/
+  DuplicateIcon,
   FrameIcon,
   ImageIcon20,
-  /*NewDocIcon,
+  NewDocIcon,
   NowIcon,
   TodayIcon,
   TomorrowIcon,
-  YesterdayIcon,*/
+  YesterdayIcon,
 } from '../../../_common/icons/index.js';
-//import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import {
-  //createDefaultDoc,
+  buildPath,
+  createDefaultDoc,
+  getBlockComponentByPath,
   getImageFilesFromLocal,
   getInlineEditorByModel,
   matchFlavours,
@@ -34,6 +36,7 @@ import {
 } from '../../../_common/utils/index.js';
 import { clearMarksOnDiscontinuousInput } from '../../../_common/utils/inline-editor.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
+import type { DataViewBlockComponent } from '../../../data-view-block/index.js';
 import { GroupingIcon } from '../../../database-block/data-view/common/icons/index.js';
 import { viewPresets } from '../../../database-block/data-view/index.js';
 import { FigmaIcon } from '../../../embed-figma-block/styles.js';
@@ -76,7 +79,6 @@ export const menuGroups: SlashMenuOptions['menus'] = [
           return true;
         },
         action: ({ rootElement }) => {
-          //debugger;
           rootElement.host.std.command
             .chain()
             .updateBlockType({
@@ -169,7 +171,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
       })),
   },
 
-  /* {
+  {
     name: 'Docs',
     items: [
       {
@@ -222,7 +224,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         },
       },
     ],
-  },*/
+  },
   {
     name: 'Content & Media',
     items: [
@@ -301,7 +303,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
           assertExists(attachmentService);
           const maxFileSize = attachmentService.maxFileSize;
 
-          addSiblingAttachmentBlocks(
+          await addSiblingAttachmentBlocks(
             rootElement.host,
             [file],
             maxFileSize,
@@ -408,7 +410,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
       },
     ],
   },
-  /* {
+  {
     name: 'Date & Time',
     items: [
       {
@@ -455,7 +457,51 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         },
       },
     ],
-  },*/
+  },
+  {
+    name: 'Query',
+    items: [
+      {
+        name: 'Todo',
+        alias: ['todo view'],
+        icon: DatabaseTableViewIcon20,
+        showWhen: model => {
+          if (!model.doc.schema.flavourSchemaMap.has('affine:database')) {
+            return false;
+          }
+          if (insideDatabase(model)) {
+            // You can't add a database block inside another database block
+            return false;
+          }
+          if (!model.doc.awarenessStore.getFlag('enable_block_query')) {
+            return false;
+          }
+          return true;
+        },
+        action: ({ model, rootElement }) => {
+          const parent = rootElement.doc.getParent(model);
+          assertExists(parent);
+          const index = parent.children.indexOf(model);
+          const id = rootElement.doc.addBlock(
+            'affine:data-view',
+            {},
+            rootElement.doc.getParent(model),
+            index + 1
+          );
+          const dataViewModel = rootElement.doc.getBlock(id)!;
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          Promise.resolve().then(() => {
+            const dataView = getBlockComponentByPath(
+              rootElement.host,
+              buildPath(dataViewModel.model)
+            ) as DataViewBlockComponent;
+            dataView.viewSource.viewAdd('table');
+          });
+          tryRemoveEmptyLine(model);
+        },
+      },
+    ],
+  },
   {
     name: 'Database',
     items: [
@@ -619,7 +665,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
       );
     },
   },
-  /*{
+  {
     name: 'Actions',
     items: [
       {
@@ -711,5 +757,5 @@ export const menuGroups: SlashMenuOptions['menus'] = [
         },
       },
     ],
-  },*/
+  },
 ];

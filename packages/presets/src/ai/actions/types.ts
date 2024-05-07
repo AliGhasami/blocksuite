@@ -1,3 +1,7 @@
+import type { EditorHost } from '@blocksuite/block-std';
+import type { ElementModel } from '@blocksuite/blocks';
+import type { BlockModel } from '@blocksuite/store';
+
 export const translateLangs = [
   'English',
   'Spanish',
@@ -12,10 +16,11 @@ export const translateLangs = [
 ] as const;
 
 export const textTones = [
-  'professional',
-  'informal',
-  'friendly',
-  'critical',
+  'Professional',
+  'Informal',
+  'Friendly',
+  'Critical',
+  'Humorous',
 ] as const;
 
 declare global {
@@ -24,15 +29,22 @@ declare global {
       input: string;
       stream?: boolean;
       attachments?: (string | File | Blob)[]; // blob could only be strings for the moments (url or data urls)
+      signal?: AbortSignal;
 
-      // the following seems not necessary?
+      // action's context
       docId: string;
       workspaceId: string;
+
+      // internal context
+      host: EditorHost;
+      models?: (BlockModel | ElementModel)[];
+      control: 'format-bar' | 'slash-menu' | 'chat-send';
+      where: 'chat-panel' | 'inline-chat-panel' | 'ai-panel';
     }
 
     interface AIImageActionOptions extends AITextActionOptions {
       content?: string;
-      params?: Record<string, string>;
+      seed?: string;
     }
 
     type TextStream = {
@@ -48,6 +60,14 @@ declare global {
 
     interface ChangeToneOptions extends AITextActionOptions {
       tone: (typeof textTones)[number];
+    }
+
+    interface ExpandMindMap extends AITextActionOptions {
+      mindmap: string;
+    }
+
+    interface BrainstormMindMap extends AITextActionOptions {
+      regenerate?: boolean;
     }
 
     interface AIActions {
@@ -73,6 +93,9 @@ declare global {
         options: T
       ): AIActionTextResponse<T>;
       makeShorter<T extends AITextActionOptions>(
+        options: T
+      ): AIActionTextResponse<T>;
+      continueWriting<T extends AITextActionOptions>(
         options: T
       ): AIActionTextResponse<T>;
       checkCodeErrors<T extends AITextActionOptions>(
@@ -109,10 +132,10 @@ declare global {
       ): AIActionTextResponse<T>;
 
       // mindmap
-      brainstormMindmap<T extends AITextActionOptions>(
+      brainstormMindmap<T extends BrainstormMindMap>(
         options: T
       ): AIActionTextResponse<T>;
-      expandMindmap<T extends AITextActionOptions>(
+      expandMindmap<T extends ExpandMindMap>(
         options: T
       ): AIActionTextResponse<T>;
 
@@ -148,6 +171,7 @@ declare global {
       sessionId: string;
       tokens: number;
       action: string;
+      createdAt: string;
       messages: {
         content: string;
         createdAt: string;

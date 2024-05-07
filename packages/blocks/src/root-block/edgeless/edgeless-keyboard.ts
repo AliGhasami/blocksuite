@@ -2,8 +2,12 @@ import { IS_MAC } from '@blocksuite/global/env';
 
 import { type EdgelessTool, LassoMode } from '../../_common/types.js';
 import { matchFlavours } from '../../_common/utils/model.js';
-import type { MindmapElementModel } from '../../surface-block/element-model/mindmap.js';
-import type { ShapeElementModel } from '../../surface-block/index.js';
+import { MindmapElementModel } from '../../surface-block/element-model/mindmap.js';
+import { LayoutType } from '../../surface-block/element-model/utils/mindmap/layout.js';
+import type {
+  ElementModel,
+  ShapeElementModel,
+} from '../../surface-block/index.js';
 import {
   Bound,
   ConnectorElementModel,
@@ -52,6 +56,9 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
           });
         },
         l: () => {
+          if (!rootElement.doc.awarenessStore.getFlag('enable_lasso_tool')) {
+            return;
+          }
           // select the current lasso mode
           const edgeless = rootElement;
           const lassoController = edgeless.tools.controllers['lasso'];
@@ -66,6 +73,9 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
           this._setEdgelessTool(edgeless, tool);
         },
         'Shift-l': () => {
+          if (!rootElement.doc.awarenessStore.getFlag('enable_lasso_tool')) {
+            return;
+          }
           // toggle between lasso modes
           const edgeless = rootElement;
           const cur = edgeless.edgelessTool;
@@ -87,6 +97,10 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
           });
         },
         m: () => {
+          if (!rootElement.doc.awarenessStore.getFlag('enable_mindmap_entry')) {
+            return;
+          }
+
           if (this.rootElement.service.locked) return;
           if (this.rootElement.service.selection.editing) return;
           const edgelessService = this.rootElement.service;
@@ -471,6 +485,54 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
 
     const { elements } = edgeless.service.selection;
     const inc = shift ? 10 : 1;
+    const mindmapNodes = elements.filter(
+      el => el.group instanceof MindmapElementModel
+    );
+
+    if (mindmapNodes.length > 0) {
+      const node = mindmapNodes[0];
+      const mindmap = node.group as MindmapElementModel;
+      const nodeDirection = mindmap.getLayoutDir(node.id);
+      let targetNode: ElementModel | null = null;
+
+      switch (key) {
+        case 'ArrowUp':
+        case 'ArrowDown':
+          targetNode = mindmap.getSiblingNode(
+            node.id,
+            key === 'ArrowDown' ? 'next' : 'prev',
+            nodeDirection === LayoutType.RIGHT
+              ? 'right'
+              : nodeDirection === LayoutType.LEFT
+                ? 'left'
+                : undefined
+          );
+          break;
+        case 'ArrowLeft':
+          targetNode =
+            nodeDirection === LayoutType.RIGHT
+              ? mindmap.getParentNode(node.id)
+              : mindmap.getChildNodes(node.id, 'left')[0] ?? null;
+
+          break;
+        case 'ArrowRight':
+          targetNode =
+            nodeDirection === LayoutType.RIGHT ||
+            nodeDirection === LayoutType.BALANCE
+              ? mindmap.getChildNodes(node.id, 'right')[0] ?? null
+              : mindmap.getParentNode(node.id);
+          break;
+      }
+
+      if (targetNode) {
+        edgeless.service.selection.set({
+          elements: [targetNode.id],
+          editing: false,
+        });
+      }
+
+      return;
+    }
 
     elements.forEach(element => {
       const bound = Bound.deserialize(element.xywh).clone();

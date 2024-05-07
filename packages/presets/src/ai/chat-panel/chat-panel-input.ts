@@ -5,8 +5,15 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-import { ChatSendIcon, CloseIcon, ImageIcon } from '../_common/icons.js';
+import {
+  ChatAbortIcon,
+  ChatSendIcon,
+  CloseIcon,
+  ImageIcon,
+} from '../_common/icons.js';
 import { AIProvider } from '../provider.js';
+import { reportResponse } from '../utils/action-reporter.js';
+import { readBlobAsURL } from '../utils/image.js';
 import type { ChatItem, ChatMessage, ChatStatus } from './index.js';
 
 const MaximumImageCount = 8;
@@ -35,7 +42,7 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
 
     .chat-panel-input textarea {
       resize: none;
-      padding: 8px 12px;
+      margin: 8px 12px;
       width: calc(100% - 32px);
       min-height: 100px;
       border: none;
@@ -123,10 +130,10 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
   items!: ChatItem[];
 
   @property({ attribute: false })
-  error?: Error;
+  error!: Error | null;
 
   @property({ attribute: false })
-  updateError!: (error: AIError) => void;
+  updateError!: (error: AIError | null) => void;
 
   @property({ attribute: false })
   updateStatus!: (status: ChatStatus) => void;
@@ -149,38 +156,53 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
   @state()
   focused = false;
 
+  @state()
+  abortController?: AbortController;
+
   send = async () => {
-    if (this.status !== 'idle' && this.status !== 'success') return;
+    if (this.status === 'loading' || this.status === 'transmitting') return;
 
     const text = this.textarea.value;
-    if (!text) {
+    const { images } = this;
+    if (!text && images.length === 0) {
       return;
     }
-    const { images } = this;
     const { doc } = this.host;
     this.textarea.value = '';
     this.isInputEmpty = true;
     this.images = [];
     this.updateStatus('loading');
+    this.updateError(null);
+
+    const attachments = await Promise.all(
+      images?.map(image => readBlobAsURL(image))
+    );
     this.addToItems([
       {
         role: 'user',
         content: text,
         createdAt: new Date().toISOString(),
-        blobs: images ? images : undefined,
+        attachments,
       },
       { role: 'assistant', content: '', createdAt: new Date().toISOString() },
     ]);
     try {
+      const abortController = new AbortController();
       const stream = AIProvider.actions.chat?.({
         input: text,
         docId: doc.id,
         attachments: images,
         workspaceId: doc.collection.id,
+        host: this.host,
         stream: true,
+        signal: abortController.signal,
+        where: 'chat-panel',
+        control: 'chat-send',
       });
 
       if (stream) {
+        this.abortController = abortController;
+
         for await (const text of stream) {
           this.updateStatus('transmitting');
           const items = [...this.items];
@@ -194,6 +216,8 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
     } catch (error) {
       this.updateStatus('error');
       this.updateError(error as AIError);
+    } finally {
+      this.abortController = undefined;
     }
   };
 
@@ -294,9 +318,19 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
           >
             ${ImageIcon}
           </div>
-          <div @click="${this.send}" class="chat-panel-send">
-            ${ChatSendIcon}
-          </div>
+          ${this.status === 'transmitting'
+            ? html`<div
+                @click=${() => {
+                  this.abortController?.abort();
+                  this.updateStatus('success');
+                  reportResponse('aborted:stop');
+                }}
+              >
+                ${ChatAbortIcon}
+              </div>`
+            : html`<div @click="${this.send}" class="chat-panel-send">
+                ${ChatSendIcon}
+              </div>`}
         </div>
       </div>`;
   }

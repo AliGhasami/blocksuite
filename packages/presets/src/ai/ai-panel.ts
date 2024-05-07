@@ -10,9 +10,11 @@ import {
   ResetIcon,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
+import type { ComputePositionConfig } from '@floating-ui/dom';
 
 import { createTextRenderer } from './messages/text.js';
 import { AIProvider } from './provider.js';
+import { reportResponse } from './utils/action-reporter.js';
 import {
   copyTextAnswer,
   insertBelow,
@@ -76,6 +78,7 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
           name: 'Insert below',
           icon: InsertBelowIcon,
           handler: () => {
+            reportResponse('result:insert');
             _insertBelow().catch(console.error);
           },
         },
@@ -83,6 +86,7 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
           name: 'Replace selection',
           icon: ReplaceIcon,
           handler: () => {
+            reportResponse('result:replace');
             _replace().catch(console.error);
           },
         },
@@ -92,9 +96,10 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
       name: '',
       items: [
         {
-          name: 'Continue with AI',
+          name: 'Continue in chat',
           icon: ChatWithAIIcon,
           handler: () => {
+            reportResponse('result:continue-in-chat');
             AIProvider.slots.requestContinueInChat.emit({
               host: panel.host,
               show: true,
@@ -106,6 +111,7 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
           name: 'Regenerate',
           icon: ResetIcon,
           handler: () => {
+            reportResponse('result:retry');
             panel.generate();
           },
         },
@@ -121,32 +127,71 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
   ];
 }
 
+export function buildErrorResponseConfig(panel: AffineAIPanelWidget) {
+  return [
+    {
+      name: 'Response',
+      items: [
+        {
+          name: 'Regenerate',
+          icon: ResetIcon,
+          handler: () => {
+            reportResponse('result:retry');
+            panel.generate();
+          },
+        },
+        {
+          name: 'Discard',
+          icon: DiscardIcon,
+          handler: () => {
+            panel.discard();
+          },
+        },
+      ],
+    },
+  ];
+}
+
+export function buildFinishConfig(panel: AffineAIPanelWidget) {
+  return {
+    responses: buildTextResponseConfig(panel),
+    actions: [],
+  };
+}
+
+export function buildErrorConfig(panel: AffineAIPanelWidget) {
+  return {
+    upgrade: () => {
+      AIProvider.slots.requestUpgradePlan.emit({ host: panel.host });
+      panel.hide();
+    },
+    login: () => {
+      AIProvider.slots.requestLogin.emit({ host: panel.host });
+      panel.hide();
+    },
+    responses: buildErrorResponseConfig(panel),
+  };
+}
+
+export function buildCopyConfig(panel: AffineAIPanelWidget) {
+  return {
+    allowed: true,
+    onCopy: () => {
+      return copyTextAnswer(panel);
+    },
+  };
+}
+
 export function buildAIPanelConfig(
-  panel: AffineAIPanelWidget
+  panel: AffineAIPanelWidget,
+  positionConfig?: Partial<ComputePositionConfig>
 ): AffineAIPanelWidgetConfig {
   return {
     answerRenderer: createTextRenderer(panel.host, 320),
-    finishStateConfig: {
-      responses: buildTextResponseConfig(panel),
-      actions: [], // ???
-      copy: {
-        allowed: true,
-        onCopy: () => {
-          return copyTextAnswer(panel);
-        },
-      },
-    },
-    errorStateConfig: {
-      upgrade: () => {
-        AIProvider.slots.requestUpgradePlan.emit({ host: panel.host });
-        panel.hide();
-      },
-      login: () => {
-        AIProvider.slots.requestLogin.emit({ host: panel.host });
-        panel.hide();
-      },
-      responses: [],
-    },
+    finishStateConfig: buildFinishConfig(panel),
+    errorStateConfig: buildErrorConfig(panel),
+    positionConfig,
+    copy: buildCopyConfig(panel),
   };
 }
 

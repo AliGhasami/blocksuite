@@ -18,7 +18,10 @@ import type {
   GroupElementModel,
   SurfaceBlockModel,
 } from '../../surface-block/index.js';
-import { getCommonBound } from '../../surface-block/index.js';
+import {
+  getCommonBound,
+  MindmapElementModel,
+} from '../../surface-block/index.js';
 import type { ReorderingDirection } from '../../surface-block/managers/layer-manager.js';
 import { LayerManager } from '../../surface-block/managers/layer-manager.js';
 import { compare } from '../../surface-block/managers/layer-utils.js';
@@ -83,6 +86,8 @@ export class EdgelessRootService extends RootService {
     }>(),
     tagClicked: new Slot<{ tagId: string }>(),
     editorModeSwitch: new Slot<'edgeless' | 'page'>(),
+
+    toolbarLocked: new Slot<boolean>(),
   };
 
   private _surface!: SurfaceBlockModel;
@@ -492,9 +497,11 @@ export class EdgelessRootService extends RootService {
     const { selection } = this;
 
     if (
-      selection.elements.length <= 0 ||
+      selection.elements.length === 0 ||
       !selection.elements.every(
-        element => element.group === selection.firstElement.group
+        element =>
+          element.group === selection.firstElement.group &&
+          !(element.group instanceof MindmapElementModel)
       )
     ) {
       return;
@@ -526,6 +533,10 @@ export class EdgelessRootService extends RootService {
     const { selection } = this;
     const elements = group.childElements;
     const parent = group.group as GroupElementModel;
+
+    if (group instanceof MindmapElementModel) {
+      return;
+    }
 
     if (parent !== null) {
       parent.removeDescendant(group.id);

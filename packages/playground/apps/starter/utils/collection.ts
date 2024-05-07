@@ -47,17 +47,20 @@ export function createStarterDocCollection() {
       main: new BroadcastChannelDocSource(),
     };
   }
+  const id = room ?? `starter-${Math.random().toString(16).slice(2, 8)}`;
 
   const options: DocCollectionOptions = {
-    id: room ?? 'starter',
+    id,
     schema,
     idGenerator,
     blobStorages,
     defaultFlags: {
       enable_synced_doc_block: true,
       enable_pie_menu: true,
+      enable_lasso_tool: true,
+      enable_mindmap_entry: true,
     },
-    awarenessSources: [new BroadcastChannelAwarenessSource()],
+    awarenessSources: [new BroadcastChannelAwarenessSource(id)],
     docSources,
   };
   const collection = new DocCollection(options);

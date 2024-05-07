@@ -93,7 +93,13 @@ const BLOCKSUITE_SURFACE = 'blocksuite/surface';
 const IMAGE_PNG = 'image/png';
 
 const { GROUP, MINDMAP } = CanvasElementType;
-const IMAGE_PADDING = 10; // for rotated shapes some padding is needed
+const IMAGE_PADDING = 5; // for rotated shapes some padding is needed
+
+interface CanvasExportOptions {
+  dpr?: number;
+  padding?: number;
+  background?: string;
+}
 
 export class EdgelessClipboardController extends PageClipboard {
   constructor(public override host: EdgelessRootBlockComponent) {
@@ -1087,7 +1093,11 @@ export class EdgelessClipboardController extends PageClipboard {
     );
   }
 
-  async toCanvas(blocks: TopLevelBlockModel[], shapes: CanvasElement[]) {
+  async toCanvas(
+    blocks: TopLevelBlockModel[],
+    shapes: CanvasElement[],
+    options?: CanvasExportOptions
+  ) {
     blocks.sort(compare);
     shapes.sort(compare);
 
@@ -1105,7 +1115,8 @@ export class EdgelessClipboardController extends PageClipboard {
       this.host,
       bound,
       blocks,
-      shapes
+      shapes,
+      options
     );
     return canvas;
   }
@@ -1186,7 +1197,12 @@ export class EdgelessClipboardController extends PageClipboard {
     edgeless: EdgelessRootBlockComponent,
     bound: IBound,
     nodes?: TopLevelBlockModel[],
-    canvasElements: CanvasElement[] = []
+    canvasElements: CanvasElement[] = [],
+    {
+      background,
+      padding = IMAGE_PADDING,
+      dpr = window.devicePixelRatio || 1,
+    }: CanvasExportOptions = {}
   ): Promise<HTMLCanvasElement | undefined> {
     const host = edgeless.host;
     const rootModel = this.doc.root;
@@ -1206,12 +1222,15 @@ export class EdgelessClipboardController extends PageClipboard {
     );
     if (!container) return;
 
-    const dpr = window.devicePixelRatio || 1;
     const canvas = document.createElement('canvas');
-    canvas.width = (bound.w + IMAGE_PADDING) * dpr;
-    canvas.height = (bound.h + IMAGE_PADDING) * dpr;
+    canvas.width = (bound.w + padding * 2) * dpr;
+    canvas.height = (bound.h + padding * 2) * dpr;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    if (background) {
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     ctx.scale(dpr, dpr);
 
     const replaceImgSrcWithSvg = this._exportManager.replaceImgSrcWithSvg;
@@ -1288,8 +1307,8 @@ export class EdgelessClipboardController extends PageClipboard {
       );
       ctx.drawImage(
         canvasData,
-        blockBound.x - bound.x + IMAGE_PADDING / 2,
-        blockBound.y - bound.y + IMAGE_PADDING / 2,
+        blockBound.x - bound.x + padding,
+        blockBound.y - bound.y + padding,
         blockBound.w,
         isInFrame
           ? (blockBound.w / canvasData.width) * canvasData.height
@@ -1331,13 +1350,7 @@ export class EdgelessClipboardController extends PageClipboard {
       bound,
       canvasElements
     );
-    ctx.drawImage(
-      surfaceCanvas,
-      IMAGE_PADDING / 2,
-      IMAGE_PADDING / 2,
-      bound.w,
-      bound.h
-    );
+    ctx.drawImage(surfaceCanvas, padding, padding, bound.w, bound.h);
 
     return canvas;
   }

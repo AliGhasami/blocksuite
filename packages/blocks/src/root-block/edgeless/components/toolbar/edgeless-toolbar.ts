@@ -58,6 +58,10 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
       bottom: 28px;
     }
 
+    :host([disabled]) {
+      pointer-events: none;
+    }
+
     .edgeless-toolbar-container-placeholder {
       position: absolute;
       width: 463px;
@@ -303,7 +307,7 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
       })
     );
     _disposables.add(
-      this.edgeless.slots.navigatorSettingUpdated.on(
+      edgeless.slots.navigatorSettingUpdated.on(
         ({ hideToolbar, fillScreen }) => {
           if (hideToolbar !== undefined && hideToolbar !== this._hideToolbar) {
             this._hideToolbar = hideToolbar;
@@ -314,6 +318,12 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
           }
         }
       )
+    );
+    // The toolbar should be disabled while edgeless AI is in progress.
+    _disposables.add(
+      edgeless.slots.toolbarLocked.on(disabled => {
+        this.toggleAttribute('disabled', disabled);
+      })
     );
 
     this._tryLoadNavigatorStateLocalRecord();
@@ -525,11 +535,13 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
           .setEdgelessTool=${this.setEdgelessTool}
         ></edgeless-default-tool-button>
 
-        <edgeless-lasso-tool-button
-          .edgelessTool=${this.edgelessTool}
-          .edgeless=${this.edgeless}
-          .setEdgelessTool=${this.setEdgelessTool}
-        ></edgeless-lasso-tool-button>
+        ${doc.awarenessStore.getFlag('enable_lasso_tool')
+          ? html`<edgeless-lasso-tool-button
+              .edgelessTool=${this.edgelessTool}
+              .edgeless=${this.edgeless}
+              .setEdgelessTool=${this.setEdgelessTool}
+            ></edgeless-lasso-tool-button>`
+          : nothing}
 
         <edgeless-connector-tool-button
           .edgeless=${this.edgeless}

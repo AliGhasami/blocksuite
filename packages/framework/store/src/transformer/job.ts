@@ -110,7 +110,7 @@ export class Job {
       id: docMeta.id,
       title: docMeta.title,
       createDate: docMeta.createDate,
-      tags: [...docMeta.tags],
+      tags: docMeta.tags ?? [],
     };
   }
 

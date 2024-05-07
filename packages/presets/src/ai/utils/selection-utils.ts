@@ -109,9 +109,10 @@ export async function getSelectedTextContent(editorHost: EditorHost) {
   const selectedModels = getSelectedModels(editorHost);
   assertExists(selectedModels);
 
-  // Currently only filter out images
+  // Currently only filter out images and databases
   const selectedTextModels = selectedModels.filter(
-    model => !BlocksUtils.matchFlavours(model, ['affine:image'])
+    model =>
+      !BlocksUtils.matchFlavours(model, ['affine:image', 'affine:database'])
   );
   const drafts = selectedTextModels.map(toDraftModel);
   drafts.forEach(draft => traverse(draft, drafts));
@@ -189,4 +190,8 @@ export const getSelectedImagesAsBlobs = async (host: EditorHost) => {
     }) ?? []
   );
   return blobs.filter((blob): blob is File => !!blob);
+};
+
+export const getSelectedNoteAnchor = (host: EditorHost, id: string) => {
+  return host.querySelector(`[data-portal-block-id="${id}"] .note-background`);
 };
