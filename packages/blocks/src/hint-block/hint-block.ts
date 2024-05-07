@@ -3,15 +3,12 @@ import '../_common/components/block-selection.js';
 
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { InlineRangeProvider } from '@blocksuite/inline';
-import { html, nothing, type TemplateResult } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
 import { type InlineRangeProvider } from '@blocksuite/inline';
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
 import type { HTMLElement } from 'happy-dom';
 ///import { limitShift, offset, shift } from '@floating-ui/dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
+import {} from 'lit/decorators.js';
 ///import { ref } from 'lit/directives/ref.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import tippy from 'tippy.js';

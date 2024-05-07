@@ -170,7 +170,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: mention,
         //@ts-ignore
-        action: ({ rootElement, model }) => {
+        action: ({ rootElement }) => {
           rootElement.host.std.command
             .chain()
             .updateBlockType({
@@ -217,7 +217,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Table View',
         description: 'Description',
         icon: table_view,
-        action: () => {},
         action: ({ rootElement, model }) => {
           const parent = rootElement.doc.getParent(model);
           assertExists(parent);
@@ -444,7 +443,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'simple',
         description: 'simple',
         icon: empty_title,
-        action: async ({ rootElement, model }) => {
+        action: async ({ rootElement }) => {
           rootElement.host.std.command
             .chain()
             .updateBlockType({

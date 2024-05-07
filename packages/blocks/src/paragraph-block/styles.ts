@@ -4,7 +4,7 @@ export const paragraphBlockStyles = css`
   affine-paragraph {
     display: block;
     margin: 10px 0;
-    font-size: var(--affine-font-base);
+    //font-size: var(--affine-font-base);
   }
 
   .affine-paragraph-block-container {
@@ -14,67 +14,70 @@ export const paragraphBlockStyles = css`
   .affine-paragraph-rich-text-wrapper {
     position: relative;
   }
+  /* .affine-paragraph-rich-text-wrapper rich-text {
+      -webkit-font-smoothing: antialiased;
+    } */
   code {
     font-size: calc(var(--affine-font-base) - 3px);
   }
-  .h1 {
-    font-size: var(--affine-font-h-1);
-    font-weight: 600;
-    line-height: calc(1em + 8px);
-    margin-top: 18px;
-    margin-bottom: 10px;
-  }
-  .h1 code {
+  /*.claytap-h1 {
+      font-size: var(--affine-font-h-1);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }*/
+  .claytap-h1 code {
     font-size: calc(var(--affine-font-base) + 8px);
   }
-  .h2 {
-    font-size: var(--affine-font-h-2);
-    font-weight: 600;
-    line-height: calc(1em + 10px);
-    margin-top: 14px;
-    margin-bottom: 10px;
-  }
-  .h2 code {
+  /*.claytap-h2 {
+      font-size: var(--affine-font-h-2);
+      font-weight: 600;
+      line-height: calc(1em + 10px);
+      margin-top: 14px;
+      margin-bottom: 10px;
+    }*/
+  .claytap-h2 code {
     font-size: calc(var(--affine-font-base) + 6px);
   }
-  .h3 {
-    font-size: var(--affine-font-h-3);
-    font-weight: 600;
-    line-height: calc(1em + 8px);
-    margin-top: 12px;
-    margin-bottom: 10px;
-  }
-  .h3 code {
+  /*.claytap-h3 {
+      font-size: var(--affine-font-h-3);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }*/
+  .claytap-h3 code {
     font-size: calc(var(--affine-font-base) + 4px);
   }
-  .h4 {
+  .claytap-h4 {
     font-size: var(--affine-font-h-4);
     font-weight: 600;
     line-height: calc(1em + 8px);
     margin-top: 12px;
     margin-bottom: 10px;
   }
-  .h4 code {
+  .claytap-h4 code {
     font-size: calc(var(--affine-font-base) + 2px);
   }
-  .h5 {
+  .claytap-h5 {
     font-size: var(--affine-font-h-5);
     font-weight: 600;
     line-height: calc(1em + 8px);
     margin-top: 12px;
     margin-bottom: 10px;
   }
-  .h5 code {
+  .claytap-h5 code {
     font-size: calc(var(--affine-font-base));
   }
-  .h6 {
+  .claytap-h6 {
     font-size: var(--affine-font-h-6);
     font-weight: 600;
     line-height: calc(1em + 8px);
     margin-top: 12px;
     margin-bottom: 10px;
   }
-  .h6 code {
+  .claytap-h6 code {
     font-size: calc(var(--affine-font-base) - 2px);
   }
   .quote {
@@ -110,6 +113,7 @@ export const paragraphBlockStyles = css`
   .affine-paragraph-placeholder.visible {
     display: block;
   }
+
   @media print {
     .affine-paragraph-placeholder.visible {
       display: none;

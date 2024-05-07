@@ -4,7 +4,7 @@ import '../_common/components/block-selection.js';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
-import { html, nothing, type TemplateResult } from 'lit';
+import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
@@ -51,6 +51,130 @@ export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockModel,
   ParagraphService
 > {
+  static override styles = css`
+    affine-paragraph {
+      display: block;
+      margin: 10px 0;
+      //font-size: var(--affine-font-base);
+    }
+
+    .affine-paragraph-block-container {
+      position: relative;
+      border-radius: 4px;
+    }
+    .affine-paragraph-rich-text-wrapper {
+      position: relative;
+    }
+    /* .affine-paragraph-rich-text-wrapper rich-text {
+      -webkit-font-smoothing: antialiased;
+    } */
+    code {
+      font-size: calc(var(--affine-font-base) - 3px);
+    }
+    /*.claytap-h1 {
+      font-size: var(--affine-font-h-1);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }*/
+    .claytap-h1 code {
+      font-size: calc(var(--affine-font-base) + 8px);
+    }
+    /*.claytap-h2 {
+      font-size: var(--affine-font-h-2);
+      font-weight: 600;
+      line-height: calc(1em + 10px);
+      margin-top: 14px;
+      margin-bottom: 10px;
+    }*/
+    .claytap-h2 code {
+      font-size: calc(var(--affine-font-base) + 6px);
+    }
+    /*.claytap-h3 {
+      font-size: var(--affine-font-h-3);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }*/
+    .claytap-h3 code {
+      font-size: calc(var(--affine-font-base) + 4px);
+    }
+    .claytap-h4 {
+      font-size: var(--affine-font-h-4);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+    .claytap-h4 code {
+      font-size: calc(var(--affine-font-base) + 2px);
+    }
+    .claytap-h5 {
+      font-size: var(--affine-font-h-5);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+    .claytap-h5 code {
+      font-size: calc(var(--affine-font-base));
+    }
+    .claytap-h6 {
+      font-size: var(--affine-font-h-6);
+      font-weight: 600;
+      line-height: calc(1em + 8px);
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+    .claytap-h6 code {
+      font-size: calc(var(--affine-font-base) - 2px);
+    }
+    .quote {
+      line-height: 26px;
+      padding-left: 17px;
+      margin-top: var(--affine-paragraph-space);
+      padding-top: 10px;
+      padding-bottom: 10px;
+      position: relative;
+    }
+    .quote::after {
+      content: '';
+      width: 2px;
+      height: calc(100% - 20px);
+      margin-top: 10px;
+      margin-bottom: 10px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: var(--affine-quote-color);
+      border-radius: 18px;
+    }
+
+    .affine-paragraph-placeholder {
+      position: absolute;
+      display: none;
+      left: 0;
+      bottom: 0;
+      pointer-events: none;
+      color: var(--affine-black-30);
+      fill: var(--affine-black-30);
+      width: 100%;
+      padding-right: 30px;
+    }
+
+    .affine-paragraph-placeholder-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .affine-paragraph-placeholder.visible {
+      display: block;
+    }
+  `;
+
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
     assertExists(inlineManager);
@@ -187,10 +311,13 @@ export class ParagraphBlockComponent extends BlockElement<
 
     return html`
       <div class="affine-paragraph-block-container">
-        <style>
+        <!-- <style>
           ${paragraphBlockStyles}
-        </style>
-        <div class="affine-paragraph-rich-text-wrapper ${type}">
+        </style> -->
+        <div class="affine-paragraph-rich-text-wrapper claytap-${type}">
+          <div contenteditable="false" class="affine-paragraph-placeholder">
+            ${getPlaceholder(this.model)}
+          </div>
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
@@ -204,9 +331,6 @@ export class ParagraphBlockComponent extends BlockElement<
             .enableClipboard=${false}
             .enableUndoRedo=${false}
           ></rich-text>
-          <div contenteditable="false" class="affine-paragraph-placeholder">
-            ${getPlaceholder(this.model)}
-          </div>
         </div>
         ${children}
 

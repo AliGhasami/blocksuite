@@ -1,12 +1,12 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
+import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import {
   createInlineKeyDownHandler,
   type InlineRangeProvider,
   KEYBOARD_ALLOW_DEFAULT,
 } from '@blocksuite/inline';
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
