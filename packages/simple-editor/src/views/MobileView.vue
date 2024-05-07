@@ -8,14 +8,14 @@
     <input id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
-    <MobileEditor  />
+<!--    <MobileEditor  />-->
   </div>
 </template>
 
 <script setup lang="ts">
 import {defineCustomElement, ref} from "vue";
 import {data} from "@/components/template/tempData";
-import MobileEditor from "@/components/MobileEditor.vue";
+//import MobileEditor from "@/components/MobileEditor.vue";
 //import { defineCustomElement } from 'vue'
 //import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
 //const CurrentTimeElement = defineCustomElement(CurrentTime)

@@ -19,7 +19,10 @@ import 'tippy.js/dist/tippy.css';
 /** */
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
-customElements.define('select-hint-type', SelectHintType,{})
+if(!customElements.get('select-hint-type')){
+  customElements.define('select-hint-type', SelectHintType,{})
+}
+
 /**************************/
 /*import MyFooComponent from '@/components/web-component/MyFoo.vue'
 // Create a Vue app
