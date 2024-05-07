@@ -1,6 +1,7 @@
 <template>
   <div style="padding-top: 30px;">
-    <div style="height: 350px;width: fit-content">
+    <div>
+<!--      style="height: 350px;width: fit-content"-->
 <!--      <current-time id="sample"></current-time>-->
 <!--      <CurrentTimeElement />-->
 <!--      <current-time-1 id="sample"></current-time-1>
@@ -13,7 +14,7 @@
       <select-hint-type></select-hint-type>-->
 <!--      <div>11111</div>
       <my-bar ></my-bar>-->
-      <select-hint-type ></select-hint-type>
+<!--      <select-hint-type @change="handleChange"></select-hint-type>-->
     </div>
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
@@ -27,7 +28,7 @@
 
 <script setup lang="ts">
 import Editor from "@/components/Editor.vue";
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import {data} from "@/components/template/tempData";
 /*********************************/
 /*import MyBarComponent from '@/components/web-component/MyBar.vue'
@@ -106,6 +107,7 @@ async function handleSetData2(){
 */
 
 function handleChange(data){
+  console.log("this is data",data)
  // alert("111")
   //console.log("this is change event",data)
 }

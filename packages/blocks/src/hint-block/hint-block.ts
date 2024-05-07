@@ -4,6 +4,7 @@ import '../_common/components/block-selection.js';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
+import type { HTMLElement } from 'happy-dom';
 ///import { limitShift, offset, shift } from '@floating-ui/dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
@@ -62,6 +63,9 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   @query('rich-text')
   private _richTextElement?: RichText;
 
+  @query('.popover')
+  private popover?: HTMLElement;
+
   //@query('.affine-paragraph-placeholder')
   //private _placeholderContainer?: HTMLElement;
 
@@ -99,21 +103,22 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     return result;
   }
 
-  handleChangeType(type: string) {
-    console.log('this is type', type);
+  handleChangeType(event: CustomEvent) {
+    console.log('11111', event);
+    this.model.type = event.detail[0];
+    //console.log('this is type', type, test);
   }
 
-  popover() {
+  /*popover() {
     return html`<p>
       <button @click="${this.handleChangeType}">Click Me!</button>
     </p>`;
-  }
+  }*/
 
   override connectedCallback() {
     super.connectedCallback();
-
     //bindContainerHotkey(this);
-    console.log('tttttttttttttttttt', this.popover());
+    //console.log('tttttttttttttttttt', this.popover());
     //'#myButton'
 
     /*  ) => {
@@ -121,19 +126,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       return `<button onclick="event()">The time is?</button>
 <select-hint-type onclick={this.handleChangeType} onchange={this.handleChangeType} />
 `;*/
-    const temp = tippy(this, {
-      content: `<button id="test1">Add To Cart</button>`,
-      allowHTML: true,
-      placement: 'top',
-      appendTo: () => {
-        return document.body;
-      },
-      interactive: true,
-      hideOnClick: false,
-      arrow: false,
-      //trigger: 'hover',
-    });
-    temp.show();
+
     this.bindHotKey({
       Escape: () => {
         alert('1111');
@@ -157,13 +150,35 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 
   override firstUpdated() {
     console.log('hint-firstUpdated');
+    console.log('lllllllllllllll');
 
+    //temp.show();
     //this.model.propsUpdated.on(this._updatePlaceholder);
     //this.host.selection.slots.changed.on(this._updatePlaceholder);
 
     this.updateComplete
       .then(() => {
         console.log('hint-updateComplete', this.model);
+
+        const temp = tippy(this, {
+          //content: `<button id="test1">Add To Cart</button>`,
+          content: this.popover,
+          /*content(reference) {
+            console.log('zzzzzz', reference.popover);
+            //const id = reference.dataset.template;
+            //const template = document.getElementById(id);
+            return reference.popover;
+          },*/
+          allowHTML: true,
+          placement: 'top',
+          appendTo: () => {
+            return document.body;
+          },
+          interactive: true,
+          hideOnClick: false,
+          arrow: false,
+          //trigger: 'hover',
+        });
 
         const inlineEditor = this.inlineEditor;
         console.log('uuuuuuuuuuu', inlineEditor);
@@ -201,10 +216,24 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       .catch(console.error);
   }
 
+  private _increment(e: Event) {
+    console.log('11111', e);
+    //this.count++;
+  }
+
   override renderBlock(): TemplateResult<1> {
     // console.log('0000000', this._whenHover);
     // ${ref(this._whenHover.setReference)}
+
+    //const temp = ``;
     return html`
+      <div class="popover">
+        <!--  <p><button @click="${this._increment}">Click Me!</button></p> -->
+        <select-hint-type
+          .type=${this.model.type}
+          @change="${this.handleChangeType}"
+        ></select-hint-type>
+      </div>
       <div class="affine-hint-container affine-hint-${this.model.type}">
         <div class="affine-hint">
           <span>${html`${unsafeSVG(this.getIcon(this.model.type))}`}</span>

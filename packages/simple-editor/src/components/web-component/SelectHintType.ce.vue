@@ -71,7 +71,7 @@ import {
 } from 'radix-vue'
 
 interface Props{
-  value?:string
+  type?:string
 }
 const emits=defineEmits<{
   (e:'change',val:string):void
@@ -79,8 +79,9 @@ const emits=defineEmits<{
 }>()
 const props=withDefaults(defineProps<Props>(),{})
 const val = ref()
-watch(()=>props,()=>{
-  console.log("222222")
+watch(()=>props.type,()=>{
+  if(props.type)
+    val.value=props.type
   //emits('change',val.value)
 },{immediate:true})
 
@@ -93,10 +94,10 @@ watch(val,()=>{
 //'Apple', 'Banana', 'Blueberry', 'Grapes', 'Pineapple'
 const options = [
     {label:'Success',icon:'',value:'success'},
-    {label:'Danger',icon:'',value:'danger'},
+    {label:'Danger',icon:'',value:'error'},
     {label:'Warning',icon:'',value:'warning'},
     {label:'Info',icon:'',value:'info'},
-    {label:'Hint',icon:'',value:'hint'},
+    {label:'Hint',icon:'',value:'default'},
 ]
 //const vegetables = ['Aubergine', 'Broccoli', 'Carrot', 'Courgette', 'Leek']
 </script>
