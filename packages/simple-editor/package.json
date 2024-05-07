@@ -1,6 +1,6 @@
 {
   "name": "alighasami_vue-block-editor",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "private": false,
   "type": "module",
   "files": [
@@ -40,6 +40,8 @@
     "ant-design-vue": "4.x",
     "less": "^4.2.0",
     "pinia": "^2.1.7",
+    "radix-vue": "^1.7.3",
+    "tippy.js": "^6.3.7",
     "unocss-preset-autoprefixer": "^0.0.7",
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",

@@ -20,7 +20,7 @@ import { EmbedLoomBlockSpec } from '../embed-loom-block/embed-loom-spec.js';
 import { EmbedSyncedDocBlockSpec } from '../embed-synced-doc-block/embed-synced-doc-spec.js';
 import { EmbedYoutubeBlockSpec } from '../embed-youtube-block/embed-youtube-spec.js';
 import { FrameBlockSchema } from '../frame-block/frame-model.js';
-import { HintBlockSchema, HintService } from '../hint-block/index.js';
+import { HintBlockSchema } from '../hint-block/index.js';
 import { ImageBlockSchema } from '../image-block/image-model.js';
 import { ImageService } from '../image-block/index.js';
 import { ListBlockSchema } from '../list-block/list-model.js';
@@ -53,6 +53,7 @@ import { AFFINE_MODAL_WIDGET } from '../root-block/widgets/modal/modal.js';
 import { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from '../root-block/widgets/page-dragging-area/page-dragging-area.js';
 import { AFFINE_PIE_MENU_WIDGET } from '../root-block/widgets/pie-menu/index.js';
 import { AFFINE_SLASH_MENU_WIDGET } from '../root-block/widgets/slash-menu/index.js';
+import { SimpleBlockSchema } from '../simple-block/index.js';
 import { SurfaceBlockSchema } from '../surface-block/surface-model.js';
 import { SurfacePageService } from '../surface-block/surface-page-service.js';
 import { SurfaceService } from '../surface-block/surface-service.js';
@@ -150,7 +151,14 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
     view: {
       component: literal`affine-hint`,
     },
-    service: HintService,
+    //service: HintService,
+  },
+  {
+    schema: SimpleBlockSchema,
+    view: {
+      component: literal`affine-simple`,
+    },
+    //service: HintService,
   },
   {
     schema: NoteBlockSchema,

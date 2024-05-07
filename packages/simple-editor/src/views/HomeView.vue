@@ -1,9 +1,20 @@
 <template>
   <div style="padding-top: 30px;">
     <div>
+<!--      style="height: 350px;width: fit-content"-->
+<!--      <current-time id="sample"></current-time>-->
+<!--      <CurrentTimeElement />-->
 <!--      <current-time-1 id="sample"></current-time-1>
       <my-vue-element></my-vue-element>-->
 <!--      <Button>111111</Button>-->
+<!--      <div>
+        <my-foo ></my-foo>
+        <my-custom-element></my-custom-element>
+      </div>
+      <select-hint-type></select-hint-type>-->
+<!--      <div>11111</div>
+      <my-bar ></my-bar>-->
+<!--      <select-hint-type @change="handleChange"></select-hint-type>-->
     </div>
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
@@ -17,9 +28,18 @@
 
 <script setup lang="ts">
 import Editor from "@/components/Editor.vue";
-import {defineCustomElement, defineSSRCustomElement, onMounted, ref,getCurrentInstance } from "vue";
+import {ref} from "vue";
 import {data} from "@/components/template/tempData";
+/*********************************/
+/*import MyBarComponent from '@/components/web-component/MyBar.vue'
+const MyBar = defineCustomElement(MyBarComponent)
+customElements.define('my-bar', MyBar,{})*/
+ /***********************************/
+//import CounterSFC from '@/components/web-component/CurrentTime.ce.vue'
+//const Counter = defineCustomElement(CounterSFC)
 //import CurrentTime from '@/components/web-component/CurrentTime.ce.vue'
+//const ExampleElement = defineCustomElement(CurrentTime)
+//const CurrentTimeElement = defineCustomElement(CurrentTime)
 //import {HTMLElement} from "happy-dom";
 //console.log(CurrentTime)
 /*********************************************/
@@ -53,6 +73,13 @@ onMounted(()=>{
   //element.attachShadow({ mode: "open" });
   //console.log("1111",element)
 })*/
+/*
+const temp=ref('111')
+
+watch(temp,()=>{
+  console.log("this is change temp")
+})
+*/
 
 
 const refEditor=ref(null)
@@ -80,6 +107,8 @@ async function handleSetData2(){
 */
 
 function handleChange(data){
+  console.log("this is data",data)
+ // alert("111")
   //console.log("this is change event",data)
 }
 
@@ -98,6 +127,11 @@ function handleUpdateBlock(data){
 </script>
 
 <style>
+
+/*select-hint-type{
+  //display: none;
+  background-color: gold !important;
+}*/
 </style>
 
 

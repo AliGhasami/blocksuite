@@ -28,6 +28,7 @@ export const updateBlockType: Command<
   const doc = std.doc;
 
   const getSelectedBlocks = () => {
+    console.log('getSelectedBlocks');
     let { selectedBlocks } = ctx;
 
     if (selectedBlocks == null) {
@@ -59,6 +60,7 @@ export const updateBlockType: Command<
   }
 
   const mergeToCode: Command<never, 'updatedBlocks'> = (_, next) => {
+    console.log('mergeToCode');
     if (flavour !== 'affine:code') {
       return false;
     }
@@ -74,6 +76,7 @@ export const updateBlockType: Command<
     return next({ updatedBlocks: [model] });
   };
   const appendDivider: Command<never, 'updatedBlocks'> = (_, next) => {
+    console.log('appendDivider');
     //debugger;
     // || flavour !== 'affine:mention'
     if (flavour !== 'affine:divider') {
@@ -103,6 +106,7 @@ export const updateBlockType: Command<
   };
 
   const focusText: Command<'updatedBlocks'> = (ctx, next) => {
+    console.log('focusText');
     const { updatedBlocks } = ctx;
     if (!updatedBlocks || updatedBlocks.length === 0) {
       return false;
@@ -143,6 +147,7 @@ export const updateBlockType: Command<
   };
 
   const focusBlock: Command<'updatedBlocks'> = (ctx, next) => {
+    console.log('focusBlock');
     const { updatedBlocks } = ctx;
     if (!updatedBlocks || updatedBlocks.length === 0) {
       return false;
@@ -183,6 +188,7 @@ export const updateBlockType: Command<
             'affine:paragraph',
             'affine:list',
             'affine:code',
+            'affine:mention',
           ]);
           if (model.flavour === flavour) {
             doc.updateBlock(model, props ?? {});

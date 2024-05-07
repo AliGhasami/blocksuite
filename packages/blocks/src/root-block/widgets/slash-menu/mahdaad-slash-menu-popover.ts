@@ -1,7 +1,7 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel } from '@blocksuite/store';
-import { html, LitElement, nothing } from 'lit'; //LitElement
+import { html,  nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -13,16 +13,12 @@ import {
 } from '../../../_common/components/utils.js';
 import {
   getRichTextByModel,
-  isControlledKeyboardEvent,
 } from '../../../_common/utils/index.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { RootBlockComponent } from '../../../root-block/types.js';
 import { clayTapGroupMenu, type ClayTapSlashMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
 import {
-  collectGroupNames,
-  type InternSlashItem as InternalSlashItem,
-  type SlashItem,
   type SlashMenuOptions,
 } from './utils.js';
 

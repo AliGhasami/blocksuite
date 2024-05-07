@@ -1,5 +1,5 @@
 import { AffineSchemas } from '@blocksuite/blocks/schemas';
-import {DocCollection, Schema} from '@blocksuite/store';
+import {DocCollection, Schema,Text} from '@blocksuite/store';
 export function createEmptyDoc() {
   //console.log('AffineSchemas', AffineSchemas);
   //AffineSchemas
@@ -14,7 +14,6 @@ export function createEmptyDoc() {
   })*/
   //const doc =  await collection.importDocSnapshot(data,'11111125')
 
-
   return {
     doc,
     init() {
@@ -25,12 +24,15 @@ export function createEmptyDoc() {
       doc.addBlock('affine:surface', {}, rootId);
       const noteId = doc.addBlock('affine:note', {}, rootId);
       //console.log("this is note id",noteId)
-      doc.addBlock('affine:paragraph', {}, noteId);
+      //doc.addBlock('affine:paragraph', {}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('1')}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('2')}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('3')}, noteId);
+      doc.addBlock('affine:hint', {title: new Text('this is title'),description:new Text('this is description'),type:'success'}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('4')}, noteId);
+      doc.addBlock('affine:paragraph', {text: new Text('5')}, noteId);
+      //doc.addBlock('affine:mention', {text: new Text('Hello World!')}, noteId);
       //doc.addBlock('affine:mention', {}, noteId);
-      //doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
-      //doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
-      //doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
-      //doc.addBlock('affine:paragraph', {text: new Text('Hello World!')}, noteId);
       //doc.addBlock('affine:divider', {}, noteId);
       return {doc,noteId,collection};
     },

@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import '../_common/components/rich-text/rich-text.js';
 import '../_common/components/block-selection.js';
 
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
@@ -7,24 +6,43 @@ import { assertExists } from '@blocksuite/global/utils';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
+import { type InlineRangeProvider } from '@blocksuite/inline';
+import { BlockElement, getInlineRangeProvider } from '@blocksuite/lit';
+import type { HTMLElement } from 'happy-dom';
+///import { limitShift, offset, shift } from '@floating-ui/dom';
+import { css, html, nothing, type TemplateResult } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
+///import { ref } from 'lit/directives/ref.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import tippy from 'tippy.js';
 
-import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
-import type { RichText } from '../_common/components/rich-text/rich-text.js';
-import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import type { NoteBlockComponent } from '../note-block/note-block.js';
-import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
+import { HoverController, type RichText } from '../_common/components/index.js';
+//import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
+import type { NoteBlockComponent } from '../note-block/index.js';
+import { EdgelessRootBlockComponent } from '../root-block/index.js';
+//import { HintOptionTemplate } from './component/hint-option.js';
 import type { HintBlockModel } from './hint-model.js';
-import type { HintService } from './hint-service.js';
-import { styles } from './styles.js';
-import { ListIcon } from './utils/get-list-icon.js';
-import { toggleDown, toggleRight } from './utils/icons.js';
+import DefaultIcon from './icons/default.svg?raw';
+import ErrorIcon from './icons/error.svg?raw';
+import InfoIcon from './icons/info.svg?raw';
+import SuccessIcon from './icons/success.svg?raw';
+import WarningIcon from './icons/warning.svg?raw';
+
+export type HintType = 'default' | 'warning' | 'info' | 'success' | 'error';
 
 @customElement('affine-hint')
-export class HintBlockComponent extends BlockElement<
-  HintBlockModel,
-  HintService
-> {
-  static override styles = styles;
+export class HintBlockComponent extends BlockElement<HintBlockModel> {
+  static override styles = css`
+    affine-hint {
+      display: block;
+      margin: 10px 0;
+      padding-right: 10px;
+      //font-size: var(--affine-font-base);
+    }
+    .affine-hint-container {
+      position: relative;
+    }
+  `;
 
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
@@ -44,42 +62,16 @@ export class HintBlockComponent extends BlockElement<
     return this.inlineManager.embedChecker;
   }
 
-  @state()
-  private _isCollapsedWhenReadOnly = !!this.model?.collapsed;
-
-  private _select() {
-    const selection = this.host.selection;
-    selection.update(selList => {
-      return selList
-        .filter(sel => !sel.is('text') && !sel.is('block'))
-        .concat(selection.create('block', { path: this.path }));
-    });
-  }
-
-  private _onClickIcon = (e: MouseEvent) => {
-    e.stopPropagation();
-
-    if (this.model.type === 'toggle') {
-      this._toggleChildren();
-      return;
-    } else if (this.model.type === 'todo') {
-      this.doc.captureSync();
-      const checkedPropObj = { checked: !this.model.checked };
-      this.doc.updateBlock(this.model, checkedPropObj);
-      if (this.model.checked) {
-        const checkEl = this.querySelector('.affine-list-block__todo-prefix');
-        assertExists(checkEl);
-        //playCheckAnimation(checkEl).catch(console.error);
-      }
-      return;
-    }
-    this._select();
-  };
+  private _inlineRangeProvider: InlineRangeProvider | null = null;
 
   @query('rich-text')
   private _richTextElement?: RichText;
 
-  private _inlineRangeProvider: InlineRangeProvider | null = null;
+  @query('.popover')
+  private popover?: HTMLElement;
+
+  //@query('.affine-paragraph-placeholder')
+  //private _placeholderContainer?: HTMLElement;
 
   override get topContenteditableElement() {
     if (this.rootElement instanceof EdgelessRootBlockComponent) {
@@ -89,154 +81,186 @@ export class HintBlockComponent extends BlockElement<
     return this.rootElement;
   }
 
-  /*override async getUpdateComplete() {
+  getIcon(type: HintType) {
+    switch (type) {
+      case 'success':
+        return SuccessIcon;
+      case 'warning':
+        return WarningIcon;
+      case 'info':
+        return InfoIcon;
+      case 'error':
+        return ErrorIcon;
+      default:
+        return DefaultIcon;
+    }
+  }
+
+  get inlineEditor() {
+    //return null
+    return this._richTextElement?.inlineEditor;
+  }
+
+  override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
     await this._richTextElement?.updateComplete;
     return result;
+  }
+
+  handleChangeType(event: CustomEvent) {
+    console.log('11111', event);
+    this.model.type = event.detail[0];
+    //console.log('this is type', type, test);
+  }
+
+  /*popover() {
+    return html`<p>
+      <button @click="${this.handleChangeType}">Click Me!</button>
+    </p>`;
   }*/
 
-  /* override firstUpdated() {
-    console.log('hint firstUpdated');
-    this._updateFollowingListSiblings();
-    this.model.childrenUpdated.on(() => {
-      this._updateFollowingListSiblings();
+  override connectedCallback() {
+    super.connectedCallback();
+    //bindContainerHotkey(this);
+    //console.log('tttttttttttttttttt', this.popover());
+    //'#myButton'
+
+    /*  ) => {
+      const event = this.handleChangeType;
+      return `<button onclick="event()">The time is?</button>
+<select-hint-type onclick={this.handleChangeType} onchange={this.handleChangeType} />
+`;*/
+
+    this.bindHotKey({
+      Escape: () => {
+        alert('1111');
+      },
+      'Mod-b': () => {},
+      'Shift-Enter': ctx => {
+        //ctx._map.keyboardState.raw.preventDefault();
+        //console.log('11111', ctx._map.keyboardState.raw);
+        return false;
+      },
     });
-  }*/
 
-  private _updateFollowingListSiblings() {
+    /*this.bindHotkey({
+      'Mod-b': () => {},
+      'Alt-Space': () => {
+        //debugger;
+      },
+    });*/
+    this._inlineRangeProvider = getInlineRangeProvider(this);
+  }
+
+  override firstUpdated() {
+    console.log('hint-firstUpdated');
+    console.log('lllllllllllllll');
+
+    //temp.show();
+    //this.model.propsUpdated.on(this._updatePlaceholder);
+    //this.host.selection.slots.changed.on(this._updatePlaceholder);
+
     this.updateComplete
       .then(() => {
-        let current: BlockElement | undefined = this as BlockElement;
-        while (current && current.tagName == 'AFFINE-LIST') {
-          current.requestUpdate();
-          current = this.std.view.findNext(current.path, () => {
-            return true;
-          })?.view as BlockElement;
-        }
+        console.log('hint-updateComplete', this.model);
+
+        const temp = tippy(this, {
+          //content: `<button id="test1">Add To Cart</button>`,
+          content: this.popover,
+          /*content(reference) {
+            console.log('zzzzzz', reference.popover);
+            //const id = reference.dataset.template;
+            //const template = document.getElementById(id);
+            return reference.popover;
+          },*/
+          allowHTML: true,
+          placement: 'top',
+          appendTo: () => {
+            return document.body;
+          },
+          interactive: true,
+          hideOnClick: false,
+          arrow: false,
+          //trigger: 'hover',
+        });
+
+        const inlineEditor = this.inlineEditor;
+        console.log('uuuuuuuuuuu', inlineEditor);
+        if (!inlineEditor) return;
+
+        /* const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
+          inputRule: {
+            key: ' ',
+            handler: context => {
+              debugger;
+              const { inlineEditor, prefixText, inlineRange } = context;
+              /!*for (const match of markdownMatches) {
+                const matchedText = prefixText.match(match.pattern);
+                if (matchedText) {
+                  return match.action({
+                    inlineEditor,
+                    prefixText,
+                    inlineRange,
+                    pattern: match.pattern,
+                    undoManager: this.undoManager,
+                  });
+                }
+              }*!/
+              return KEYBOARD_ALLOW_DEFAULT;
+            },
+          },
+        });
+        console.log('tttttttttt', this);
+        this.addEventListener('keydown', keydownHandler);*/
+
+        /*this.disposables.add(
+          inlineEditor.slots.inputting.on(this._updatePlaceholder)
+        );*/
       })
       .catch(console.error);
   }
 
-  override connectedCallback() {
-    console.log('this is hnit connectedCallback');
-    super.connectedCallback();
-
-    bindContainerHotkey(this);
-
-    this._inlineRangeProvider = getInlineRangeProvider(this);
-  }
-
-  private _toggleChildren() {
-    if (this.doc.readonly) {
-      this._isCollapsedWhenReadOnly = !this._isCollapsedWhenReadOnly;
-      return;
-    }
-    const newCollapsedState = !this.model.collapsed;
-    this._isCollapsedWhenReadOnly = newCollapsedState;
-    this.doc.captureSync();
-    this.doc.updateBlock(this.model, {
-      collapsed: newCollapsedState,
-    } as Partial<HintBlockModel>);
-  }
-
-  private _toggleTemplate(isCollapsed: boolean) {
-    const noChildren = this.model.children.length === 0;
-    if (noChildren) return nothing;
-
-    const toggleDownTemplate = html`<div
-      contenteditable="false"
-      class="toggle-icon"
-      @click=${this._toggleChildren}
-    >
-      ${toggleDown}
-    </div>`;
-
-    const toggleRightTemplate = html`<div
-      contenteditable="false"
-      class="toggle-icon toggle-icon__collapsed"
-      @click=${this._toggleChildren}
-    >
-      ${toggleRight}
-    </div>`;
-
-    return isCollapsed ? toggleRightTemplate : toggleDownTemplate;
+  private _increment(e: Event) {
+    console.log('11111', e);
+    //this.count++;
   }
 
   override renderBlock(): TemplateResult<1> {
-    const { model, _onClickIcon } = this;
-    const collapsed = this.doc.readonly
-      ? this._isCollapsedWhenReadOnly
-      : !!model.collapsed;
-    const listIcon = ListIcon(model, !collapsed, _onClickIcon);
+    // console.log('0000000', this._whenHover);
+    // ${ref(this._whenHover.setReference)}
 
-    const checked =
-      this.model.type === 'todo' && this.model.checked
-        ? 'affine-list--checked'
-        : '';
-
-    const children = html`<div
-      class="affine-block-children-container"
-      style="padding-left: ${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px"
-    >
-      ${this.renderChildren(this.model)}
-    </div>`;
-
-    /* return html`<div>
-      <rich-text
-        .yText=${this.model.text.yText}
-        .inlineEventSource=${this.topContenteditableElement ?? nothing}
-        .undoManager=${this.doc.history}
-        .attributeRenderer=${this.attributeRenderer}
-        .attributesSchema=${this.attributesSchema}
-        .markdownShortcutHandler=${this.markdownShortcutHandler}
-        .embedChecker=${this.embedChecker}
-        .readonly=${this.doc.readonly}
-        .inlineRangeProvider=${this._inlineRangeProvider}
-        .enableClipboard=${false}
-        .enableUndoRedo=${false}
-        .wrapText=${true}
-      ></rich-text>
-    </div>`;*/
-
+    //const temp = ``;
     return html`
-      <div class=${'affine-list-block-container'}>
-        <!-- <span>11111</span>-->
-        <div class=${`affine-list-rich-text-wrapper ${checked}`}>
-          <rich-text
-            .yText=${this.model.text.yText}
-            .undoManager=${this.doc.history}
-            .attributeRenderer=${this.attributeRenderer}
-            .attributesSchema=${this.attributesSchema}
-            .markdownShortcutHandler=${this.markdownShortcutHandler}
-            .embedChecker=${this.embedChecker}
-            .readonly=${this.doc.readonly}
-            .inlineRangeProvider=${this._inlineRangeProvider}
-            .enableClipboard=${false}
-            .enableUndoRedo=${false}
-            .wrapText=${true}
-          ></rich-text>
-          <span>1111111</span>
-          <rich-text
-            .yText=${this.model.text.yText}
-            .undoManager=${this.doc.history}
-            .attributeRenderer=${this.attributeRenderer}
-            .attributesSchema=${this.attributesSchema}
-            .markdownShortcutHandler=${this.markdownShortcutHandler}
-            .embedChecker=${this.embedChecker}
-            .readonly=${this.doc.readonly}
-            .inlineRangeProvider=${this._inlineRangeProvider}
-            .enableClipboard=${false}
-            .enableUndoRedo=${false}
-            .wrapText=${true}
-          ></rich-text>
+      <div class="popover">
+        <!--  <p><button @click="${this._increment}">Click Me!</button></p> -->
+        <select-hint-type
+          .type=${this.model.type}
+          @change="${this.handleChangeType}"
+        ></select-hint-type>
+      </div>
+      <div class="affine-hint-container affine-hint-${this.model.type}">
+        <div class="affine-hint">
+          <span>${html`${unsafeSVG(this.getIcon(this.model.type))}`}</span>
+          <div class="affine-content">
+            <div class="affine-hint-title">
+              <rich-text
+                .yText=${this.model.title.yText}
+                .inlineEventSource=${this.topContenteditableElement ?? nothing}
+              ></rich-text>
+            </div>
+            <div class="affine-hint-description">
+              <rich-text
+                .yText=${this.model.description.yText}
+                .inlineEventSource=${this.topContenteditableElement ?? nothing}
+              ></rich-text>
+            </div>
+          </div>
         </div>
-        ${collapsed ? nothing : children}
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;
   }
 }
-
 declare global {
   interface HTMLElementTagNameMap {
     'affine-hint': HintBlockComponent;

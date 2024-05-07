@@ -128,8 +128,6 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   }
 
   private _init() {
-    //debugger;
-    console.log('rich text editor init');
     if (this._inlineEditor) {
       throw new Error('Inline editor already exists.');
     }
@@ -137,7 +135,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
     if (!this.enableFormat) {
       this.attributesSchema = z.object({});
     }
-
+    console.log('777777', this.inlineRangeProvider);
     // init inline editor
     this._inlineEditor = new InlineEditor<AffineTextAttributes>(this._yText, {
       isEmbed: delta => this.embedChecker(delta),
@@ -147,6 +145,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       },
       inlineRangeProvider: this.inlineRangeProvider,
     });
+    console.log('init _inlineEditor', this._inlineEditor);
     if (this.attributesSchema) {
       this._inlineEditor.setAttributeSchema(this.attributesSchema);
     }
@@ -161,11 +160,17 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       const keyDownHandler = createInlineKeyDownHandler(inlineEditor, {
         inputRule: {
           key: [' ', 'Enter'],
-          handler: context =>
-            markdownShortcutHandler(context, this.undoManager),
+          handler: context => {
+            console.log('rich-text-keyDownHandler');
+            return markdownShortcutHandler(context, this.undoManager);
+          },
         },
       });
-
+      console.log(
+        '444444444',
+        this.inlineEventSource,
+        this.inlineEditorContainer
+      );
       inlineEditor.disposables.addFromEvent(
         this.inlineEventSource ?? this.inlineEditorContainer,
         'keydown',
@@ -321,7 +326,6 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   }
 
   override connectedCallback() {
-    console.log('rich text connectedCallback');
     super.connectedCallback();
 
     assertExists(this._yText, 'rich-text need yText to init.');

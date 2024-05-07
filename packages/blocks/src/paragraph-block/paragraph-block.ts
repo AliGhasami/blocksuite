@@ -18,7 +18,20 @@ import { paragraphBlockStyles } from './styles.js';
 
 const getPlaceholder = (model: ParagraphBlockModel) => {
   if (model.type === 'text') {
-    return "Type '/' for commands";
+    return html`<div class="affine-paragraph-placeholder-content">
+      <div>
+        <span class="place-holder">
+          Press
+          <span class="short-code">@</span>
+          for AI &
+          <span class="short-code">/</span>
+          for Commands ...
+        </span>
+      </div>
+      <!-- TODO ali ghasami  -->
+      <div>&nbsp;</div>
+    </div>`;
+    //return "Type '/' for commands";
   }
 
   const placeholders = {
@@ -115,17 +128,41 @@ export class ParagraphBlockComponent extends BlockElement<
     )
       return;
 
+    //TODO(@alighasami) check is last Paragraph
+    /*let isLastParagraph = false;
+    const note = this.doc.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].children : [];
+    const currentBlockId = this.dataset.blockId;
     if (
-      this.doc.readonly ||
+      paragraphList.length &&
+      paragraphList[paragraphList.length - 1].id == currentBlockId
+    ) {
+      isLastParagraph = true;
+    }*/
+    let isEmpty = false;
+    const note = this.doc.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].children : [];
+    if (paragraphList.length == 1) {
+      isEmpty = true;
+    }
+    //console.log('this.selected', this.selected);
+    //console.log('this.inlineEditor.isComposing', this.inlineEditor.isComposing);
+    //console.log('this.inlineEditor.yTextLength', this.inlineEditor.yTextLength);
+    if (
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
-      !this.selected ||
+      (!this.selected && !isEmpty) ||
       this._isInDatabase()
     ) {
       this._placeholderContainer.classList.remove('visible');
     } else {
       this._placeholderContainer.classList.add('visible');
     }
+    if (this.selected) {
+      this._placeholderContainer.classList.add('hover');
+    }
+    //console.log('is selected', this.selected);
+    //if()
   };
 
   private _isInDatabase = () => {

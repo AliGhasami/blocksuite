@@ -16,6 +16,7 @@ export const formatNativeCommand: Command<
     mode?: 'replace' | 'merge';
   }
 > = (ctx, next) => {
+  console.log('formatNativeCommand');
   const { styles, mode = 'merge' } = ctx;
 
   let range = ctx.range;

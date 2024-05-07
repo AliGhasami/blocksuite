@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+    <style id="css-output1">
+      *{
+        /*display: none;*/
+      }
+         /* This CSS is being applied inside the shadow DOM. */
+
+      /*:host{
+        background-color: #747bff;
+        border: 5px solid #535bf2;
+      }*/
+
+      /*:host .h2{
+        background-color: #747bff;
+        border: 5px solid #535bf2;
+      }*/
+
+
+      .content{
+        background-color: red;
+      }
+
+       ::slotted(.content) {
+         background-color: aqua;
+       }
+
+      h2 ::slotted(span) {
+        background: silver;
+      }
+
+    /* the style will be applied from inside to the custom-dialog element */
+      /*:host {
+        !*position: fixed;*!
+        !*left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: inline-block;*!
+        border: 1px solid red;
+        padding: 10px;
+      }*/
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

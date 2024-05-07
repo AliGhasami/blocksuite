@@ -25,6 +25,7 @@ import { MentionBlockSchema } from './mention-block/mention-model.js';
 import { NoteBlockSchema } from './note-block/note-model.js';
 import { ParagraphBlockSchema } from './paragraph-block/paragraph-model.js';
 import { RootBlockSchema } from './root-block/root-model.js';
+import { SimpleBlockSchema } from './simple-block/simple-model.js';
 import { SurfaceBlockSchema } from './surface-block/surface-model.js';
 import { SurfaceRefBlockSchema } from './surface-ref-block/surface-ref-model.js';
 
@@ -53,4 +54,5 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   EmbedLoomBlockSpec.schema,
   MentionBlockSchema,
   HintBlockSchema,
+  SimpleBlockSchema,
 ];

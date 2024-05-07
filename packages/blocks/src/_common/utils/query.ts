@@ -169,6 +169,7 @@ export function buildPath(model: BlockModel | null): string[] {
 }
 
 export function blockElementGetter(model: BlockModel, view: ViewStore) {
+  console.log('blockElementGetter');
   if (matchFlavours(model, ['affine:image', 'affine:frame'])) {
     let current: BlockModel | null = model;
     const path: string[] = [];
@@ -309,6 +310,7 @@ export async function asyncGetBlockComponentByModel(
   editorHost: EditorHost,
   model: BlockModel
 ): Promise<BlockComponent | null> {
+  console.log('asyncGetBlockComponentByModel');
   assertExists(model.doc.root);
   const rootElement = getRootByEditorHost(editorHost);
   if (!rootElement) return null;
@@ -329,6 +331,7 @@ export async function asyncGetBlockComponentByModel(
  * @deprecated In most cases, you not need RichText, you can use {@link getInlineEditorByModel} instead.
  */
 export function getRichTextByModel(editorHost: EditorHost, model: BlockModel) {
+  console.log('getRichTextByModel');
   const blockComponent = editorHost.view.viewFromPath(
     'block',
     buildPath(model)
@@ -354,7 +357,8 @@ export function getInlineEditorByModel(
   editorHost: EditorHost,
   model: BlockModel
 ) {
-  if (matchFlavours(model, ['affine:database'])) {
+  console.log('getInlineEditorByModel');
+  if (matchFlavours(model, ['affine:database', 'affine:hint'])) {
     // Not support database model since it's may be have multiple inline editor instances.
     // Support to enter the editing state through the Enter key in the database.
     return null;
@@ -368,6 +372,7 @@ export async function asyncGetInlineEditorByModel(
   editorHost: EditorHost,
   model: BlockModel
 ) {
+  console.log('asyncGetInlineEditorByModel');
   if (matchFlavours(model, ['affine:database'])) {
     // Not support database model since it's may be have multiple inline editor instances.
     throw new Error('Cannot get inline editor by database model!');
@@ -664,6 +669,7 @@ export function findClosestBlockElement(
 export function getClosestBlockElementByElement(
   element: Element | null
 ): BlockComponent | null {
+  console.log('getClosestBlockElementByElement');
   if (!element) return null;
   if (hasBlockId(element) && isBlock(element)) {
     return element;
@@ -679,6 +685,7 @@ export function getClosestBlockElementByElement(
  * Returns the model of the block element.
  */
 export function getModelByBlockComponent(component: Element) {
+  console.log('getModelByBlockComponent');
   const containerBlock = component as ContainerBlock;
   // In extreme cases, the block may be loading, and the model is not yet available.
   // For example
@@ -700,6 +707,7 @@ export function getModelByBlockComponent(component: Element) {
  * https://github.com/toeverything/blocksuite/pull/1121
  */
 export function getRectByBlockElement(element: Element | BlockComponent) {
+  //console.log('getRectByBlockElement');
   if (isDatabase(element)) return element.getBoundingClientRect();
   return (element.firstElementChild ?? element).getBoundingClientRect();
 }
@@ -711,6 +719,7 @@ export function getRectByBlockElement(element: Element | BlockComponent) {
 export function getBlockElementsExcludeSubtrees(
   elements: Element[] | BlockComponent[]
 ) {
+  console.log('getBlockElementsExcludeSubtrees');
   if (elements.length <= 1) return elements;
   let parent = elements[0];
   return elements.filter((node, index) => {
@@ -729,6 +738,7 @@ export function getBlockElementsExcludeSubtrees(
  * In Chrome/Safari, `document.elementsFromPoint` does not include `affine-image`.
  */
 function findBlockElement(elements: Element[], parent?: Element) {
+  //console.log('findBlockElement');
   const len = elements.length;
   let element = null;
   let i = 0;
@@ -822,6 +832,7 @@ export function getDropRectByPoint(
   rect: DOMRect;
   flag: DropFlags;
 } {
+  //console.log('getDropRectByPoint');
   const result = {
     rect: getRectByBlockElement(element),
     flag: DropFlags.Normal,
@@ -889,6 +900,7 @@ export function getDropRectByPoint(
 }
 
 function getCellRect(element: Element, bounds?: DOMRect) {
+  console.log('getCellRect');
   if (!bounds) {
     const table = element.closest('.affine-database-block-table');
     assertExists(table);
@@ -919,5 +931,6 @@ export function getEdgelessCanvasTextEditor(element: Element | Document) {
  * Return `true` if the element has class name in the class list.
  */
 export function hasClassNameInList(element: Element, classList: string[]) {
+  console.log('hasClassNameInList');
   return classList.some(className => element.classList.contains(className));
 }

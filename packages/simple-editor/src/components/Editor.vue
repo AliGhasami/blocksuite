@@ -1,6 +1,6 @@
 <template>
   <div class="vue-block-editor">
-      <div ref="refEditor" class="editor"></div>
+    <div ref="refEditor" class="editor"></div>
   </div>
 </template>
 
@@ -9,13 +9,50 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor } from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import {onMounted, ref} from "vue";
+import {defineCustomElement, onMounted, ref} from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 //let editor: any = null
 let myCollection: DocCollection | null = null
+import 'tippy.js/dist/tippy.css';
+/** */
+import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
+const SelectHintType = defineCustomElement(SelectHintTypeComponent)
+customElements.define('select-hint-type', SelectHintType,{})
+/**************************/
+/*import MyFooComponent from '@/components/web-component/MyFoo.vue'
+// Create a Vue app
+const app = createApp(MyFooComponent);
+// Define the custom element without shadow DOM
+const MyFoo = defineCustomElement(MyFooComponent,{ shadowRoot: false });
+// Register the custom element globally
+customElements.define('my-foo', MyFoo);*/
+/************************/
+/*import MyCustomComponent from './web-component/Test3.vue';
+// Define the custom element
+const app = createApp(MyCustomComponent);
+const MyCustomElement = app.mount(document.createElement('div'));
+// Register the custom element
+customElements.define('my-custom-element', MyCustomElement);*/
+/**********************************/
+// Define your Vue component
+/*const MyComponent = {
+  template: `
+    <div>
+      <p>{{ message }}</p>
+    </div>
+  `
+};
+// Create a Vue app
+const app2 = createApp(MyComponent);
+// Define the custom element without shadow DOM
+const MyCustomElement = defineCustomElement(app2,{ shadowRoot: false });
+// Register the custom element globally
+customElements.define('my-custom-element', MyCustomElement);*/
+/************************************/
 
+/** */
 type IBlockChange= {
   type: 'add';
   id: string;
@@ -223,22 +260,112 @@ defineExpose({
 </script>
 
 <style lang="less">
+/**{
+  //display: none;
+}
+:host(.SelectContent){
+    background-color: red;
+}
+:host-context(div){
+  background-color: red;
+}
 
+:host(#shadow-dom-host) {
+  border: 2px dashed blue;
+}*/
+
+
+  /* TODO ali ghasami for fix token */
 .vue-block-editor{
+  /* Mention Style */
+  .affine-mention-container .affine-mention{
+    @apply flex gap-2 mt-overline;
+    color:#64428F;
+    //border: 1px solid #535bf2;
+    width: fit-content;
+    border-radius: @roundness-sm;
+    padding: 0 @space-2;
+    background: @dreampurple-0;
+  }
 
+  /* Hint Style */
+  .affine-hint-container {
+    &,& .affine-hint{
+      border-radius: @roundness-lg;
+    }
+
+    & .affine-hint{
+      @apply flex  gap-2;
+      padding: @space-4 @space-6 @space-4 @space-6;
+      border: 1px solid @gray-2;
+      .affine-content{
+        @apply flex flex-col gap-2;
+      }
+      .affine-hint-title{
+        @apply  mt-section-tittle ;
+      }
+
+      .affine-hint-description{
+        @apply mt-overline text-gray-7 pl-;
+      }
+    }
+
+    &.affine-hint-success{
+      border-color: #C1EBCD;
+      background: #EAFAEF;
+      .affine-hint-title{
+        @apply text-green-5;
+      }
+    }
+
+    &.affine-hint-error{
+      border-color: #FAC7C7;
+      background: #FCF2F2;
+      .affine-hint-title{
+        @apply text-red-5;
+      }
+    }
+    &.affine-hint-warning{
+      border-color: #FCE49C;
+      background: #FCE49C;
+      .affine-hint-title{
+        color:#51555C;
+      }
+    }
+
+    &.affine-hint-info{
+      border-color: #AFE2FD;
+      background: #EBF7FF;
+      .affine-hint-title{
+        color:#0BA2E8;
+      }
+    }
+
+    &.affine-hint-default{
+      border-color: @gray-2;
+      background: #FAFAFA;
+      .affine-hint-title{
+        @apply text-gray-7;
+      }
+    }
+
+
+
+
+
+  }
+
+  /* reset Style */
   .affine-paragraph-block-container{
     &:hover .place-holder{
       @apply text-neutral-6;
     }
-
     /*&:hover{
       //background-color: red;
     }*/
-
     /*&:active{
       background-color: red;
     }*/
-
   }
 
   /*.with-drag-handle{
@@ -248,13 +375,10 @@ defineExpose({
   /*.affine-paragraph-placeholder{
     //background-color: red;
     cursor: pointer !important;
-
    !* &.hover{
       //background-color: green;
     }*!
-
   }*/
-
   .place-holder{
     @apply text-neutral-4 mt-body;
     line-height: unset;
@@ -265,21 +389,8 @@ defineExpose({
       @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
     }
 
-    /*& .hover{
-      color:red;
-    }*/
-
-   /* &:hover{
-      color: red;
-      background-color:red;
-    }*/
 
   }
-
-  /*.editor{
-      display: block;
-      height: 650px;
-  }*/
 
   .claytap-text{
     //background-color: red;
@@ -302,9 +413,8 @@ defineExpose({
   }
 
 
+
 }
-
-
 
 .slash-menu{
   //background-color: red;
@@ -348,6 +458,19 @@ defineExpose({
 
 }
 
+.tippy-box{
+  @apply bg-white shadow-floated;
+  color:red;
+  border-radius: @roundness-3;
+  position: relative;
+}
+
+/*
+.SelectViewport{
+  display: none;
+  background-color: red;
+}
+*/
 
 
 </style>

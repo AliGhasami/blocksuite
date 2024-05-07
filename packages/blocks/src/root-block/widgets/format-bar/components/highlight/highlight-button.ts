@@ -101,6 +101,7 @@ const HighlightPanel = (
 };
 
 export const HighlightButton = (formatBar: AffineFormatBarWidget) => {
+  debugger;
   const editorHost = formatBar.host;
 
   const { setFloating, setReference } = whenHover(isHover => {

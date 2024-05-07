@@ -1,6 +1,10 @@
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
+import { Text } from '@blocksuite/store';
 
+import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
+import { openFileOrFiles } from '../../../_common/utils/index.js';
+import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
@@ -32,7 +36,7 @@ import table_view from './icons/table_view.svg?raw';
 import text from './icons/text.svg?raw';
 import today from './icons/today.svg?raw';
 import video from './icons/video.svg?raw';
-import { formatDate, insertContent } from './utils.js';
+import { formatDate, insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
   groupName: string;
   children: ClayTapSlashMenu[];
@@ -113,15 +117,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           runCommand(rootElement, 'affine:list', 'todo');
         },
       },
-      //TODO(@alighasami) implement after
-      /*{
-        title: 'Hint',
-        description: 'Description',
-        icon: check_list,
-        action: ({ rootElement }) => {
-          //console.log(1111);
-        },
-      },*/
       {
         title: 'Quote',
         description: 'Description',
@@ -135,8 +130,26 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: hint,
         action: ({ rootElement }) => {
-          console.log('rootElement', rootElement);
-          runCommand(rootElement, 'affine:hint', 'numbered');
+          //console.log('rootElement', rootElement);
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:hint',
+              props: {
+                title: new Text('Title'),
+                description: new Text('Description'),
+                type: 'success',
+              },
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
         },
       },
       {
@@ -158,26 +171,29 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: mention,
         //@ts-ignore
         action: ({ rootElement, model }) => {
-          runCommand(rootElement, 'affine:mention', undefined);
-          //runCommand(rootElement, 'affine:mention', 'text');
-          //runCommand(rootElement, 'affine:mention', 'mention');
-          //runCommand(rootElement, 'affine:mention', 'mention');
-          //runCommand(rootElement, 'affine:mention', 'h1');
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:mention',
+              props: {}, //type
+            })
+            .inline((ctx, next) => {
+              console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
         },
       },
-      //todo for implement
-      /*{
-        title: 'Calendar',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {
-        },
-      },*/
       {
         title: 'Date',
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
+          console.log('11111', rootElement, model);
           const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));
         },
@@ -202,6 +218,21 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: table_view,
         action: () => {},
+        action: ({ rootElement, model }) => {
+          const parent = rootElement.doc.getParent(model);
+          assertExists(parent);
+          const index = parent.children.indexOf(model);
+
+          const id = rootElement.doc.addBlock(
+            'affine:database',
+            {},
+            rootElement.doc.getParent(model),
+            index + 1
+          );
+          const service = rootElement.std.spec.getService('affine:database');
+          service.initDatabaseBlock(rootElement.doc, model, id, 'table', false);
+          tryRemoveEmptyLine(model);
+        },
       },
       {
         title: 'Image',
@@ -233,7 +264,23 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'File',
         description: 'Description',
         icon: file,
-        action: () => {},
+        action: async ({ rootElement, model }) => {
+          const file = await openFileOrFiles();
+          if (!file) return;
+
+          const attachmentService =
+            rootElement.host.spec.getService('affine:attachment');
+          assertExists(attachmentService);
+          const maxFileSize = attachmentService.maxFileSize;
+
+          addSiblingAttachmentBlocks(
+            rootElement.host,
+            [file],
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);
+        },
       },
       {
         title: 'Link',
@@ -373,6 +420,52 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: empty_title,
         action: () => {},
+      },
+      {
+        title: 'figma',
+        description: 'Description',
+        icon: empty_title,
+        action: async ({ rootElement, model }) => {
+          const parentModel = rootElement.doc.getParent(model);
+          if (!parentModel) {
+            return;
+          }
+          const index = parentModel.children.indexOf(model) + 1;
+          await toggleEmbedCardCreateModal(
+            rootElement.host,
+            'Figma',
+            'The added Figma link will be displayed as an embed view.',
+            { mode: 'page', parentModel, index }
+          );
+          tryRemoveEmptyLine(model);
+        },
+      },
+      {
+        title: 'simple',
+        description: 'simple',
+        icon: empty_title,
+        action: async ({ rootElement, model }) => {
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:simple',
+              props: {
+                test_props: 'test_value',
+                title: new Text('Title'),
+                //title: new Text('Hello World!---titiel '),
+                description: new Text(''),
+              }, //type
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
+        },
       },
       /*{
         title: 'Embed',

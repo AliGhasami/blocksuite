@@ -439,10 +439,12 @@ function handleListBlockBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  //debugger;
   console.log('handleListBlockBackspace');
   const doc = model.doc;
-  if (!matchFlavours(model, ['affine:list'])) return false;
-
+  if (!matchFlavours(model, ['affine:list', 'affine:mention'])) return false;
+  //debugger;
+  //debugger;
   const parent = doc.getParent(model);
   if (!parent) return false;
 
@@ -488,7 +490,7 @@ function handleListBlockForwardDelete(
   model: ExtendedModel
 ) {
   console.log('handleListBlockForwardDelete');
-  if (!matchFlavours(model, ['affine:list'])) return false;
+  if (!matchFlavours(model, ['affine:list', 'affine:mention'])) return false;
   const doc = model.doc;
   const firstChild = model.firstChild();
   if (firstChild) {
@@ -642,7 +644,11 @@ function handleParagraphDeleteActions(
   if (!previousSibling) {
     return handleNoPreviousSibling(editorHost, model);
   } else if (
-    matchFlavours(previousSibling, ['affine:paragraph', 'affine:list'])
+    matchFlavours(previousSibling, [
+      'affine:paragraph',
+      'affine:list',
+      'affine:mention',
+    ])
   ) {
     const modelIndex = parent.children.indexOf(model);
     if (
@@ -670,6 +676,7 @@ function handleParagraphDeleteActions(
       ...EMBED_BLOCK_FLAVOUR_LIST,
     ])
   ) {
+    //debugger;
     const previousSiblingElement = getBlockComponentByModel(
       editorHost,
       previousSibling
@@ -718,9 +725,11 @@ function handleParagraphBlockBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  //debugger;
   console.log('handleParagraphBlockBackspace');
   const doc = model.doc;
   if (!matchFlavours(model, ['affine:paragraph'])) return false;
+  //debugger;
 
   // When deleting at line start of a paragraph block,
   // firstly switch it to normal text, then delete this empty block.
@@ -844,6 +853,7 @@ function handleParagraphBlockForwardDelete(
     nextSibling: ExtendedModel | null,
     firstChild: ExtendedModel | null
   ) {
+    console.log('handleEmbedDividerCode');
     function handleEmbedDividerCodeChild(firstChild: ExtendedModel | null) {
       if (
         !firstChild ||
@@ -940,11 +950,12 @@ export function handleLineStartBackspace(
   console.log('handleLineStartBackspace');
   if (
     handleListBlockBackspace(editorHost, model) ||
+    //handleMentionBlockBackspace(editorHost, model)
+    //||
     handleParagraphBlockBackspace(editorHost, model)
   ) {
     return;
   }
-
   handleUnknownBlockBackspace(model);
 }
 
@@ -962,4 +973,51 @@ export function handleLineEndForwardDelete(
     return;
   }
   handleUnknownBlockForwardDelete(model);
+}
+
+function handleMentionBlockBackspace(
+  editorHost: EditorHost,
+  model: ExtendedModel
+) {
+  console.log('handleMentionBlockBackspace');
+  const doc = model.doc;
+  if (!matchFlavours(model, ['affine:mention'])) return false;
+  //debugger;
+  doc.captureSync();
+  doc.updateBlock(model, { type: 'text' });
+
+  //debugger;
+  // When deleting at line start of a paragraph block,
+  // firstly switch it to normal text, then delete this empty block.
+  /*if (model.type !== 'text') {
+    // Try to switch to normal text
+    doc.captureSync();
+    doc.updateBlock(model, { type: 'text' });
+    return true;
+  }*/
+
+  // Before press backspace
+  // - line1
+  //   - line2
+  //   - |aaa
+  //   - line3
+  //
+  // After press backspace
+  // - line1
+  //   - line2|aaa
+  //   - line3
+  // const isHandled = handleParagraphDeleteActions(editorHost, model);
+  //if (isHandled) return true;
+
+  // Before press backspace
+  // - line1
+  //   - line2
+  //   - |aaa
+  //
+  // After press backspace
+  // - line1
+  //   - line2
+  // - |aaa
+  handleUnindent(editorHost, model);
+  return true;
 }

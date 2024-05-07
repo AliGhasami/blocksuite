@@ -23,6 +23,7 @@ export class ParagraphService<
     const inlineSpecs = getAffineInlineSpecsWithReference(
       this.referenceNodeConfig
     );
+    //console.log('9999999999999', this.inlineManager);
     this.inlineManager.registerSpecs(inlineSpecs);
     this.inlineManager.registerMarkdownMatches(affineInlineMarkdownMatches);
   }

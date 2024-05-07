@@ -45,6 +45,7 @@ export class KeymapController implements ReactiveController {
 
   bind = () => {
     this.host.handleEvent('keyDown', ctx => {
+      console.log('keymap-controller-keyDown');
       const state = ctx.get('keyboardState');
       if (state.raw.key === 'Shift') {
         return;
@@ -537,7 +538,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _bindMoveBlockHotKey = () => {
-    console.log('_bindMoveBlockHotKey');
     moveBlockConfigs.forEach(config => {
       config.hotkey.forEach(key => {
         this.host.bindHotKey({
