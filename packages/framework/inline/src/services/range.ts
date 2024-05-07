@@ -145,7 +145,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
   };
 
   getTextPoint(rangeIndex: InlineRange['index']): TextPoint {
-    console.log('getTextPoint');
+    //console.log('getTextPoint');
     const vLines = Array.from(this.rootElement.querySelectorAll('v-line'));
 
     let index = 0;

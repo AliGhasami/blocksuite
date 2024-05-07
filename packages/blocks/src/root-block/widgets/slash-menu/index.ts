@@ -20,6 +20,7 @@ import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { menuGroups } from './config.js';
 //import { SlashMenu } from './slash-menu-popover.js';
 import { SlashMenu } from './mahdaad-slash-menu-popover.js';
+import { MentionMenu } from './mention-popover.js';
 import type { SlashMenuOptions } from './utils.js';
 
 let globalAbortController = new AbortController();
@@ -46,8 +47,13 @@ function showSlashMenu({
   globalAbortController = abortController;
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
+  let slashMenu = null;
+  if (triggerKey == '/') {
+    slashMenu = new SlashMenu();
+  } else {
+    slashMenu = new MentionMenu();
+  }
 
-  const slashMenu = new SlashMenu();
   disposables.add(() => slashMenu.remove());
   slashMenu.model = model;
   slashMenu.abortController = abortController;
@@ -87,8 +93,11 @@ export class AffineSlashMenuWidget extends WidgetElement {
         '/',
         // Compatible with CJK IME
         '、',
+        //Add for support mention
+        '@',
       ];
-
+      //console.log('aaaa');
+      //debugger
       if (
         event.key === 'Process' &&
         event.code === 'Slash' &&
@@ -120,6 +129,7 @@ export class AffineSlashMenuWidget extends WidgetElement {
   }
 
   private _onKeyDown = (ctx: UIEventStateContext) => {
+    //debugger;
     const eventState = ctx.get('keyboardState');
     const event = eventState.raw;
     const triggerKey = this.options.isTriggerKey(event);

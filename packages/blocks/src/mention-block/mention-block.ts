@@ -101,10 +101,12 @@ export class MentionBlockComponent extends BlockElement<MentionBlockModel> {
   override renderBlock(): TemplateResult<1> {
     return html`
       <div class="affine-mention-container" style="position: relative">
-        <div class="affine-mention">
-          <span contenteditable="false">@</span>
+        <div class="affine-mention" contenteditable="false">
+          <span>@</span>
+          <!-- <span>${this.model.text}</span> -->
           <!--<span>111111</span>-->
           <rich-text
+            .readonly=${true}
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
             .enableClipboard=${false}

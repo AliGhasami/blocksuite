@@ -6,7 +6,7 @@ export const selectBlocksBetween: Command<
   never,
   { tail: boolean }
 > = (ctx, next) => {
-  console.log('selectBlocksBetween');
+  //console.log('selectBlocksBetween');
   const { focusBlock, anchorBlock, tail } = ctx;
   if (!focusBlock || !anchorBlock) {
     return;

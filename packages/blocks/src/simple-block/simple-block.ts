@@ -1,17 +1,17 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
-import {
+import { BlockElement } from '@blocksuite/block-std';
+/*import {
   createInlineKeyDownHandler,
   type InlineRangeProvider,
   KEYBOARD_ALLOW_DEFAULT,
-} from '@blocksuite/inline';
+} from '@blocksuite/inline';*/
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import type { RichText } from '../_common/components/index.js';
-import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
+//import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
 import type { SimpleBlockModel } from './simple-model.js';
 
 @customElement('affine-simple')
@@ -44,12 +44,12 @@ export class SimpleBlockComponent extends BlockElement<SimpleBlockModel> {
 
     this.bindHotKey({
       Enter: e => {
-        console.log('qqqqqq', e);
+        //console.log('qqqqqq', e);
         e._map.keyboardState.raw.preventDefault();
-        console.log('11111', this._richTextElementDescription?.inlineEditor);
+        //console.log('11111', this._richTextElementDescription?.inlineEditor);
         //debugger;
         this._richTextElementDescription?.inlineEditor?.focusEnd();
-        console.log('1111');
+        //console.log('1111');
         //console.log('|1111', this.model.description);
         //debugger;
       },
@@ -75,19 +75,16 @@ export class SimpleBlockComponent extends BlockElement<SimpleBlockModel> {
     //this._richTextElementDescription?.inlineEventSource.
     //this._richTextElementDescription?.inlineEditor.
 
-    console.log('111111', this._richTextElementDescription?.inlineEditor);
+    // console.log('111111', this._richTextElementDescription?.inlineEditor);
     //debugger;
 
     this.updateComplete
       .then(() => {
-        console.log('hint-updateComplete', this.model);
-
+        //console.log('hint-updateComplete', this.model);
         /*this._richTextElementDescription.addEventListener('keydown', () => {
           debugger;
         });*/
-
         //this._richTextElementDescription?.inlineEditor.
-
         //const inlineEditor = this.inlineEditor;
         //console.log('uuuuuuuuuuu', inlineEditor);
         //if (!inlineEditor) return;
@@ -104,7 +101,6 @@ export class SimpleBlockComponent extends BlockElement<SimpleBlockModel> {
             },
           }
         );*/
-
         /*const keydownHandler = createInlineKeyDownHandler(
           this._richTextElementDescription.inlineEditor,
           {
@@ -132,7 +128,6 @@ export class SimpleBlockComponent extends BlockElement<SimpleBlockModel> {
           }
         );
         this.addEventListener('keydown', keydownHandler);*/
-
         /* const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
             inputRule: {
               key: ' ',
@@ -157,7 +152,6 @@ export class SimpleBlockComponent extends BlockElement<SimpleBlockModel> {
           });
           console.log('tttttttttt', this);
           this.addEventListener('keydown', keydownHandler);*/
-
         /*this.disposables.add(
             inlineEditor.slots.inputting.on(this._updatePlaceholder)
           );*/

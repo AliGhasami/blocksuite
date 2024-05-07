@@ -1,6 +1,6 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { type BlockModel } from '@blocksuite/store';
+import { type BlockModel, Text } from '@blocksuite/store';
 import { html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -18,8 +18,16 @@ import { clayTapGroupMenu, type ClayTapSlashMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
 import { type SlashMenuOptions } from './utils.js';
 
-@customElement('affine-slash-menu')
-export class SlashMenu extends WithDisposable(ShadowlessElement) {
+//TODO ali ghasami for props
+const userList: string[] = [
+  'Ali Ghasami',
+  'Mehdi Ahmadi',
+  'Kamran Abbasi',
+  'Habib Fakari',
+];
+
+@customElement('mention-slash-menu')
+export class MentionMenu extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
   @property({ attribute: false })
@@ -37,13 +45,14 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   @query('.slash-menu')
   slashMenuElement?: HTMLElement;
 
-  @state()
+  //@state()
   //private _leftPanelActivated = false;
+
   @state()
   private _activatedItemIndex = 0;
 
   @state()
-  private _filterItems: ClayTapSlashMenu[] = [];
+  private _filterItems: string[] = [];
 
   @state()
   private _hide = false;
@@ -65,7 +74,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
    * Does not include the slash character
    */
   private _searchString = '';
-  private slasheMenuID = 'mahdaad-claytap-slash-menu';
+  private slasheMenuID = 'mahdaad-mention-slash-menu';
 
   override connectedCallback() {
     super.connectedCallback();
@@ -201,15 +210,15 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     this.abortController.abort();
   };
 
-  private _updateItem(query: string): ClayTapSlashMenu[] {
+  private _updateItem(query: string): string[] {
     this._searchString = query;
     this._activatedItemIndex = 0;
-    const _menu: ClayTapSlashMenu[] = [];
-    clayTapGroupMenu.map(group => {
+    //const _menu: ClayTapSlashMenu[] = [];
+    /*clayTapGroupMenu.map(group => {
       _menu.push(
         ...group.children.map(item => ({ ...item, group: group.groupName }))
       );
-    });
+    });*/
     // Activate the right panel when search string is not empty
     /*if (this._leftPanelActivated) {
       this._leftPanelActivated = false;
@@ -230,10 +239,10 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       showWhen(this.model, this.rootElement)
     );*/
     if (!searchStr) {
-      return _menu;
+      return userList;
     }
 
-    return _menu.filter(item => isFuzzyMatch(item.title, searchStr));
+    return userList.filter(item => isFuzzyMatch(item, searchStr));
   }
 
   private _scrollToItem(item: ClayTapSlashMenu, force = true) {
@@ -257,14 +266,14 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     });
   }
 
-  private _handleClickItem(index: number) {
-    if (
+  private _handleClickItem(item: string) {
+    /*if (
       //this._leftPanelActivated ||
       index < 0 ||
       index >= this._filterItems.length
     ) {
       return;
-    }
+    }*/
     // Need to remove the search string
     // We must to do clean the slash string before we do the action
     // Otherwise, the action may change the model and cause the slash string to be changed
@@ -274,11 +283,29 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       this.triggerKey + this._searchString
     );
     this.abortController.abort();
-
-    const { action } = this._filterItems[index];
-    action({ rootElement: this.rootElement, model: this.model })?.catch(
+    console.log('this is item', item);
+    //const { action } = this._filterItems[index];
+    /*action({ rootElement: this.rootElement, model: this.model })?.catch(
       console.error
-    );
+    );*/
+
+    this.rootElement.host.std.command
+      .chain()
+      .updateBlockType({
+        flavour: 'affine:mention',
+        props: {
+          text: new Text(item),
+        }, //type
+      })
+      .inline((ctx, next) => {
+        //console.log('this is inline in menu ', ctx);
+        const newModels = ctx.updatedBlocks;
+        if (!newModels || newModels.length == 0) {
+          return false;
+        }
+        return next();
+      })
+      .run();
   }
 
   /*private _handleClickCategory(groupName: string) {
@@ -313,39 +340,23 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     </div>`;
   }*/
 
-  private _clayTapMenu() {
+  private _menu() {
     //console.log('this._activatedItemIndex', this._activatedItemIndex);
-    const group: string[] = [];
-    this._filterItems.forEach(item => {
+    //const group: string[] = [];
+    /*this._filterItems.forEach(item => {
       if (item.group && !group.includes(item.group)) group.push(item.group);
-    });
-    let index = 0;
-    return html`<div>
-      ${group.map(itemGroup => {
-        return html`<span class="group-title"> ${itemGroup} </span>
-          <div class="claytap-slash-menu">
-            ${this._filterItems
-              .filter(item => item.group == itemGroup)
-              .map(item => {
-                const currentIndex = index;
-                return html`<div
-                  class="claytap-slash-menu-item ${this._activatedItemIndex ==
-                  index++
-                    ? 'hover'
-                    : ''}"
-                  text="menu-item-${item.title}"
-                  @click=${() => {
-                    return this._handleClickItem(currentIndex);
-                  }}
-                >
-                  <div class="icon">${html`${unsafeSVG(item.icon)}`}</div>
-                  <div class="item-title">
-                    <span class="title">${item.title}</span>
-                    <span class="description">${item.description}</span>
-                  </div>
-                </div>`;
-              })}
-          </div>`;
+    });*/
+    //let index = 0;
+    return html`<div class="mention-menu-container">
+      ${this._filterItems.map(item => {
+        return html`<div
+          class="mention-item"
+          @click=${() => {
+            return this._handleClickItem(item);
+          }}
+        >
+          ${item}
+        </div>`;
       })}
     </div>`;
   }
@@ -418,7 +429,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
         @click="${() => this.abortController.abort()}"
       ></div>
       <div class="slash-menu" style="${slashMenuStyles}">
-        <div class="slash-item-container">${this._clayTapMenu()}</div>
+        <div class="slash-item-container">${this._menu()}</div>
       </div>
     </div>`;
   }

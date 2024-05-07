@@ -115,7 +115,7 @@ function getNotesFromDoc(linkedDoc: Doc) {
   );
 
   if (!note || !note.length) {
-    console.log('No note block found in linked doc.');
+  //  console.log('No note block found in linked doc.');
     return null;
   }
 

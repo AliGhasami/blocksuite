@@ -98,8 +98,8 @@ export class DocsPanel extends WithDisposable(ShadowlessElement) {
           });
           const click = () => {
             this.editor.doc = doc.getDoc();
-            console.log('this is editor', this.editor);
-            console.log('this is editor', doc);
+           // console.log('this is editor', this.editor);
+           //console.log('this is editor', doc);
             //  debugger;
             this.editor.doc = doc;
             this.editor.doc.load();

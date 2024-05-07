@@ -49,7 +49,7 @@ export function asyncFocusRichText(
   id: string,
   inlineRange: InlineRange = { index: 0, length: 0 }
 ) {
-  console.log('asyncFocusRichText');
+ // console.log('asyncFocusRichText');
   const doc = editorHost.doc;
   const model = doc.getBlockById(id);
   assertExists(model);

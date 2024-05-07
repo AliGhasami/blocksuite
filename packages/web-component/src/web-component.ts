@@ -8,12 +8,12 @@ class DemoWebC extends HTMLElement {
     const style = document.createElement('style');
     style.textContent = `p { color: blue; } *{ background-color:red }`;
     shadow.append(style);
-    console.log('11111', document.querySelectorAll('span'));
+    //console.log('11111', document.querySelectorAll('span'));
     const text = document.createElement('p');
     text.setAttribute('class', 'sample-text');
     text.textContent = 'hello';
     //this.append(text);
-    console.log('22222', shadow);
+    //console.log('22222', shadow);
     shadow.append(text);
   }
 }

@@ -1,7 +1,7 @@
 import type { Command } from '@blocksuite/block-std';
 
 export const selectBlock: Command<'focusBlock'> = (ctx, next) => {
-  console.log('selectBlock');
+ // console.log('selectBlock');
   const { focusBlock, std } = ctx;
   if (!focusBlock) {
     return;

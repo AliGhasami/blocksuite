@@ -17,10 +17,10 @@ async function exportDocs(collection: DocCollection, docs: Doc[]) {
   //debugger;
   const job = new Job({ collection });
   const snapshots = await Promise.all(docs.map(job.docToSnapshot));
-  console.log('snapshots', snapshots);
+  //console.log('snapshots', snapshots);
 
   const collectionInfo = job.collectionInfoToSnapshot();
-  console.log('collectionInfo', collectionInfo);
+  //console.log('collectionInfo', collectionInfo);
   zip.file('info.json', JSON.stringify(collectionInfo, null, 2));
 
   snapshots.forEach(snapshot => {
@@ -140,7 +140,7 @@ async function importDocs(collection: DocCollection, imported: Blob) {
       });
 
       await Promise.all(tasks);
-      console.log('this is snapshot', cloneDeep(snapshot));
+     // console.log('this is snapshot', cloneDeep(snapshot));
       return job.snapshotToDoc(snapshot);
     })
   );

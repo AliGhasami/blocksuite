@@ -7,13 +7,13 @@ import { type InlineRangeProvider } from '@blocksuite/inline';
 import type { HTMLElement } from 'happy-dom';
 ///import { limitShift, offset, shift } from '@floating-ui/dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
-import {} from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
+//import {} from 'lit/decorators.js';
 ///import { ref } from 'lit/directives/ref.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import tippy from 'tippy.js';
 
-import { HoverController, type RichText } from '../_common/components/index.js';
+import { type RichText } from '../_common/components/index.js';
 //import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
@@ -105,16 +105,10 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
 
   handleChangeType(event: CustomEvent) {
-    console.log('11111', event);
+    //console.log('11111', event);
     this.model.type = event.detail[0];
     //console.log('this is type', type, test);
   }
-
-  /*popover() {
-    return html`<p>
-      <button @click="${this.handleChangeType}">Click Me!</button>
-    </p>`;
-  }*/
 
   override connectedCallback() {
     super.connectedCallback();
@@ -128,9 +122,8 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 <select-hint-type onclick={this.handleChangeType} onchange={this.handleChangeType} />
 `;*/
 
-    this.bindHotKey({
+    /*this.bindHotKey({
       Escape: () => {
-        alert('1111');
       },
       'Mod-b': () => {},
       'Shift-Enter': ctx => {
@@ -138,7 +131,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         //console.log('11111', ctx._map.keyboardState.raw);
         return false;
       },
-    });
+    });*/
 
     /*this.bindHotkey({
       'Mod-b': () => {},
@@ -150,8 +143,8 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
 
   override firstUpdated() {
-    console.log('hint-firstUpdated');
-    console.log('lllllllllllllll');
+    //console.log('hint-firstUpdated');
+    //console.log('lllllllllllllll');
 
     //temp.show();
     //this.model.propsUpdated.on(this._updatePlaceholder);
@@ -159,17 +152,10 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 
     this.updateComplete
       .then(() => {
-        console.log('hint-updateComplete', this.model);
+        //console.log('hint-updateComplete', this.model);
 
-        const temp = tippy(this, {
-          //content: `<button id="test1">Add To Cart</button>`,
+        tippy(this, {
           content: this.popover,
-          /*content(reference) {
-            console.log('zzzzzz', reference.popover);
-            //const id = reference.dataset.template;
-            //const template = document.getElementById(id);
-            return reference.popover;
-          },*/
           allowHTML: true,
           placement: 'top',
           appendTo: () => {
@@ -178,11 +164,9 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
           interactive: true,
           hideOnClick: false,
           arrow: false,
-          //trigger: 'hover',
         });
 
         const inlineEditor = this.inlineEditor;
-        console.log('uuuuuuuuuuu', inlineEditor);
         if (!inlineEditor) return;
 
         /* const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
@@ -217,19 +201,9 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       .catch(console.error);
   }
 
-  private _increment(e: Event) {
-    console.log('11111', e);
-    //this.count++;
-  }
-
   override renderBlock(): TemplateResult<1> {
-    // console.log('0000000', this._whenHover);
-    // ${ref(this._whenHover.setReference)}
-
-    //const temp = ``;
     return html`
       <div class="popover">
-        <!--  <p><button @click="${this._increment}">Click Me!</button></p> -->
         <select-hint-type
           .type=${this.model.type}
           @change="${this.handleChangeType}"

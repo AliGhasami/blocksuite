@@ -169,13 +169,13 @@ export class QuickEdgelessMenu extends ShadowlessElement {
   }
 
   private _exportPng() {
-    console.log('this is root', this.rootService);
+   // console.log('this is root', this.rootService);
     this.rootService.exportManager.exportPng().catch(console.error);
   }
 
   private async _exportSnapshot() {
-    console.log('this is collection', this.collection);
-    console.log('this is docs', this.doc);
+   // console.log('this is collection', this.collection);
+  //  console.log('this is docs', this.doc);
     const zipTransformer = this.rootService.transformers.zip;
     const file = await zipTransformer.exportDocs(this.collection, [this.doc]);
     const url = URL.createObjectURL(file);
@@ -199,13 +199,13 @@ export class QuickEdgelessMenu extends ShadowlessElement {
       }
       try {
         const zipTransformer = this.rootService.transformers.zip;
-        console.log('this is file', file);
+       // console.log('this is file', file);
         const docs = await zipTransformer.importDocs(this.collection, file);
-        console.log('this is docs', docs);
+        //console.log('this is docs', docs);
         for (const doc of docs) {
-          console.log('this is doc 1111', window.doc);
+        //  console.log('this is doc 1111', window.doc);
           const noteBlock = window.doc.getBlockByFlavour('affine:note');
-          console.log('this is note block', noteBlock);
+         // console.log('this is note block', noteBlock);
           window.doc.addBlock(
             'affine:paragraph',
             {

@@ -27,7 +27,6 @@ import hint from './icons/hint.svg?raw';
 import image from './icons/image.svg?raw';
 import link from './icons/link.svg?raw';
 import link_to_page from './icons/link_to_page.svg?raw';
-import mention from './icons/mention.svg?raw';
 import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
@@ -165,7 +164,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: 'Insert',
     children: [
-      {
+      /*{
         title: 'Mention',
         description: 'Description',
         icon: mention,
@@ -187,13 +186,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             })
             .run();
         },
-      },
+      },*/
       {
         title: 'Date',
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
-          console.log('11111', rootElement, model);
+          //console.log('11111', rootElement, model);
           const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));
         },
@@ -439,7 +438,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           tryRemoveEmptyLine(model);
         },
       },
-      {
+      /*{
         title: 'simple',
         description: 'simple',
         icon: empty_title,
@@ -465,7 +464,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             })
             .run();
         },
-      },
+      },*/
       /*{
         title: 'Embed',
         description: 'Description',
@@ -539,7 +538,7 @@ function runCommand(
     .inline((ctx, next) => {
       //console.log('this is inline in menu ', ctx);
       // return;
-      console.log('change inline menu');
+      //  console.log('change inline menu');
       //console.log('2222');
       const newModels = ctx.updatedBlocks;
       if (!newModels) {

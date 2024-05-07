@@ -34,7 +34,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   const leftBrackets = bracketPairs.map(pair => pair.left);
 
   const _selectBlock = () => {
-    console.log('_selectBlock');
+    //console.log('_selectBlock');
     selection.update(selList => {
       return selList.map(sel => {
         if (PathFinder.equals(sel.path, blockElement.path)) {
@@ -47,7 +47,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   };
 
   const _selectText = (start: boolean) => {
-    console.log('_selectText');
+    //console.log('_selectText');
     selection.update(selList => {
       return selList.map(sel => {
         if (PathFinder.equals(sel.path, blockElement.path)) {
@@ -67,7 +67,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   };
 
   const _getInlineEditor = () => {
-    console.log('_getInlineEditor');
+    // console.log('_getInlineEditor');
     const inlineRoot = blockElement.querySelector<InlineRootElement>(
       `[${INLINE_ROOT_ATTR}]`
     );
@@ -78,7 +78,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   };
 
   const _getPrefixText = (inlineEditor: InlineEditor) => {
-    console.log('_getPrefixText');
+    // console.log('_getPrefixText');
     const inlineRange = inlineEditor.getInlineRange();
     assertExists(inlineRange);
     const firstLineEnd = inlineEditor.yTextString.search(/\n/);
@@ -99,7 +99,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   };
 
   const _selectAllText = () => {
-    console.log('_selectAllText');
+    // console.log('_selectAllText');
     selection.update(selList => {
       return selList.map(sel => {
         if (!PathFinder.equals(sel.path, blockElement.path)) {
@@ -120,7 +120,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
 
   blockElement.bindHotKey({
     Escape: () => {
-      console.log('Escape');
+      //  console.log('Escape');
       if (blockElement.selected?.is('text')) {
         return _selectBlock();
       }
@@ -128,7 +128,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     },
     Enter: ctx => {
       //debugger;
-      console.log('Enter');
+      // console.log('Enter');
       _preventDefault(ctx);
 
       if (blockElement.selected?.is('block')) return _selectText(false);
@@ -162,7 +162,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     },
     'Mod-Enter': ctx => {
       //debugger;
-      console.log('Mod-Enter');
+      // console.log('Mod-Enter');
       if (!blockElement.selected?.is('text')) return;
 
       const state = ctx.get('keyboardState');
@@ -177,7 +177,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     Space: ctx => handleMarkdown(ctx),
     'Shift-Space': ctx => handleMarkdown(ctx),
     'Mod-a': ctx => {
-      console.log('Mod-a');
+      // console.log('Mod-a');
       _preventDefault(ctx);
       if (!blockElement.selected?.is('text')) return;
 
@@ -195,7 +195,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return _selectAllText();
     },
     Tab: ctx => {
-      console.log('Tab');
+      // console.log('Tab');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -235,7 +235,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Mod-Backspace': ctx => {
-      console.log('Mod-Backspace');
+      //  console.log('Mod-Backspace');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -282,7 +282,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     'Shift-Tab': ctx => {
-      console.log('Shift-Tab');
+      // console.log('Shift-Tab');
       if (
         !(
           blockElement.selected?.is('block') ||
@@ -328,7 +328,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
       return true;
     },
     Backspace: ctx => {
-      console.log('Backspace');
+      // console.log('Backspace');
       if (!blockElement.selected?.is('text')) return;
       const state = ctx.get('keyboardState');
       const inlineEditor = _getInlineEditor();
@@ -360,7 +360,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
     },
     Delete: ctx => handleDelete(ctx),
     'Control-d': ctx => {
-      console.log('Control-d');
+      // console.log('Control-d');
       if (IS_MAC) handleDelete(ctx);
     },
   });
@@ -370,7 +370,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
 
     blockElement.bindHotKey({
       [config.hotkey]: ctx => {
-        console.log(' blockElement.bindHotKey');
+        // console.log(' blockElement.bindHotKey');
         if (blockElement.doc.readonly) return;
 
         const textSelection = blockElement.selection.find('text');
@@ -385,7 +385,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   });
 
   function handleMarkdown(ctx: UIEventStateContext) {
-    console.log('handleMarkdown');
+    // console.log('handleMarkdown');
     if (!blockElement.selected?.is('text')) return;
 
     const inlineEditor = _getInlineEditor();
@@ -402,7 +402,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   }
 
   function handleDelete(ctx: UIEventStateContext) {
-    console.log('handleDelete');
+    //console.log('handleDelete');
     if (!blockElement.selected?.is('text')) return;
     const state = ctx.get('keyboardState');
     const inlineEditor = _getInlineEditor();
@@ -415,7 +415,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   function tryConvertToLinkedDoc() {
     const root = model.doc.root;
     assertExists(root);
-    console.log('tryConvertToLinkedDoc');
+    //  console.log('tryConvertToLinkedDoc');
     const docBlock = blockElement.host.view.viewFromPath(
       'block',
       buildPath(model.doc.root)
@@ -525,7 +525,7 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   // Convert the selected text into inline code
   blockElement.bindHotKey({
     '`': ctx => {
-      console.log('blockElement.bindHotKey');
+      //  console.log('blockElement.bindHotKey');
       if (blockElement.doc.readonly) return;
 
       const textSelection = blockElement.selection.find('text');

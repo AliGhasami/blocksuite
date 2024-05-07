@@ -28,7 +28,7 @@ export const updateBlockType: Command<
   const doc = std.doc;
 
   const getSelectedBlocks = () => {
-    console.log('getSelectedBlocks');
+    //console.log('getSelectedBlocks');
     let { selectedBlocks } = ctx;
 
     if (selectedBlocks == null) {

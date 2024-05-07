@@ -45,7 +45,7 @@ export class KeymapController implements ReactiveController {
 
   bind = () => {
     this.host.handleEvent('keyDown', ctx => {
-      console.log('keymap-controller-keyDown');
+     // console.log('keymap-controller-keyDown');
       const state = ctx.get('keyboardState');
       if (state.raw.key === 'Shift') {
         return;
@@ -69,7 +69,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onArrowDown = (ctx: UIEventStateContext) => {
-    console.log('keymap - controller - _onArrowDown');
+    //console.log('keymap - controller - _onArrowDown');
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -164,7 +164,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onArrowUp = (ctx: UIEventStateContext) => {
-    console.log('keymap - controller - _onArrowUp');
+    //console.log('keymap - controller - _onArrowUp');
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -258,7 +258,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onShiftArrowDown = () => {
-    console.log('keymap - controller - _onShiftArrowDown');
+  //  console.log('keymap - controller - _onShiftArrowDown');
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -271,7 +271,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onBlockShiftDown = (cmd: BlockSuite.CommandChain) => {
-    console.log('keymap - controller - _onBlockShiftDown');
+    //console.log('keymap - controller - _onBlockShiftDown');
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {
@@ -311,7 +311,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onShiftArrowUp = () => {
-    console.log('keymap - controller - _onShiftArrowUp');
+    //console.log('keymap - controller - _onShiftArrowUp');
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -324,7 +324,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onBlockShiftUp = (cmd: BlockSuite.CommandChain) => {
-    console.log('keymap - controller - _onBlockShiftUp');
+   // console.log('keymap - controller - _onBlockShiftUp');
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {

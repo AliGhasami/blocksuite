@@ -16,46 +16,13 @@ let  currentDocument : Doc | null=null
 //let editor: any = null
 let myCollection: DocCollection | null = null
 import 'tippy.js/dist/tippy.css';
-/** */
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
 if(!customElements.get('select-hint-type')){
   customElements.define('select-hint-type', SelectHintType,{})
 }
 
-/**************************/
-/*import MyFooComponent from '@/components/web-component/MyFoo.vue'
-// Create a Vue app
-const app = createApp(MyFooComponent);
-// Define the custom element without shadow DOM
-const MyFoo = defineCustomElement(MyFooComponent,{ shadowRoot: false });
-// Register the custom element globally
-customElements.define('my-foo', MyFoo);*/
-/************************/
-/*import MyCustomComponent from './web-component/Test3.vue';
-// Define the custom element
-const app = createApp(MyCustomComponent);
-const MyCustomElement = app.mount(document.createElement('div'));
-// Register the custom element
-customElements.define('my-custom-element', MyCustomElement);*/
-/**********************************/
-// Define your Vue component
-/*const MyComponent = {
-  template: `
-    <div>
-      <p>{{ message }}</p>
-    </div>
-  `
-};
-// Create a Vue app
-const app2 = createApp(MyComponent);
-// Define the custom element without shadow DOM
-const MyCustomElement = defineCustomElement(app2,{ shadowRoot: false });
-// Register the custom element globally
-customElements.define('my-custom-element', MyCustomElement);*/
-/************************************/
 
-/** */
 type IBlockChange= {
   type: 'add';
   id: string;
@@ -263,21 +230,6 @@ defineExpose({
 </script>
 
 <style lang="less">
-/**{
-  //display: none;
-}
-:host(.SelectContent){
-    background-color: red;
-}
-:host-context(div){
-  background-color: red;
-}
-
-:host(#shadow-dom-host) {
-  border: 2px dashed blue;
-}*/
-
-
   /* TODO ali ghasami for fix token */
 .vue-block-editor{
   /* Mention Style */
@@ -352,10 +304,6 @@ defineExpose({
       }
     }
 
-
-
-
-
   }
 
   /* reset Style */
@@ -391,8 +339,6 @@ defineExpose({
       border-radius: 4px;
       @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
     }
-
-
   }
 
   .claytap-text{
@@ -414,8 +360,6 @@ defineExpose({
     @apply mt-page-subheading text-neutral-8;
     line-height: unset;
   }
-
-
 
 }
 
@@ -462,8 +406,8 @@ defineExpose({
 }
 
 .tippy-box{
-  @apply bg-white shadow-floated;
-  color:red;
+  @apply bg-white shadow-floated text-black;
+  //color:red;
   border-radius: @roundness-3;
   position: relative;
 }

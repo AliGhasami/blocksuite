@@ -107,7 +107,7 @@ async function handleSetData2(){
 */
 
 function handleChange(data){
-  console.log("this is data",data)
+  //console.log("this is data",data)
  // alert("111")
   //console.log("this is change event",data)
 }
