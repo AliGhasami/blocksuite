@@ -23,6 +23,7 @@ import {
   Heading5Icon,
   Heading6Icon,
   ItalicIcon,
+  LinkIcon,
   //LinkIcon,
   NumberedListIcon,
   QuoteIcon,

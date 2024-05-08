@@ -52,8 +52,8 @@ import type { SurfaceBlockModel } from '../../../surface-block/index.js';
 import { CanvasElementType } from '../../../surface-block/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import {
-  /*formatDate,
-  insertContent,*/
+  formatDate,
+  insertContent,
   insideDatabase,
   type SlashItem,
   type SlashMenuOptions,

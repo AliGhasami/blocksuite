@@ -78,9 +78,9 @@ const DocPageSpec: BlockSpec<PageRootBlockWidgetName> = {
       [AFFINE_SLASH_MENU_WIDGET]: literal`${unsafeStatic(
         AFFINE_SLASH_MENU_WIDGET
       )}`,
-      /*[AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
+      [AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
         AFFINE_LINKED_DOC_WIDGET
-      )}`,*/
+      )}`,
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
       )}`,

@@ -101,6 +101,7 @@ export class AffineLinkedDocWidget extends WidgetElement {
   options = AffineLinkedDocWidget.DEFAULT_OPTIONS;
 
   override connectedCallback() {
+    console.log('zzzzz');
     super.connectedCallback();
     this.handleEvent('keyDown', this._onKeyDown);
   }

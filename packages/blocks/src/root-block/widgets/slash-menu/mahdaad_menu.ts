@@ -3,10 +3,14 @@ import type { BlockModel } from '@blocksuite/store';
 import { Text } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
-import { openFileOrFiles } from '../../../_common/utils/index.js';
+import {
+  getInlineEditorByModel,
+  openFileOrFiles,
+} from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
+import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
@@ -327,6 +331,30 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: multi_column,
         action: () => {},
+      },
+      {
+        title: 'Link Doc',
+        description: 'Description',
+        icon: multi_column,
+        action: ({ rootElement, model }) => {
+          const triggerKey = '@';
+          insertContent(rootElement.host, model, triggerKey);
+          assertExists(model.doc.root);
+          const widgetEle =
+            rootElement.widgetElements['affine-linked-doc-widget'];
+          assertExists(widgetEle);
+          // We have checked the existence of showLinkedDoc method in the showWhen
+          const linkedDocWidget = widgetEle as AffineLinkedDocWidget;
+          // Wait for range to be updated
+          setTimeout(() => {
+            const inlineEditor = getInlineEditorByModel(
+              rootElement.host,
+              model
+            );
+            assertExists(inlineEditor);
+            linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+          });
+        },
       },
       //todo
       /*{

@@ -52,6 +52,7 @@ export function insertLinkedNode({
   inlineEditor: AffineInlineEditor;
   docId: string;
 }) {
+  debugger;
   assertExists(inlineEditor, 'Editor not found');
   const inlineRange = inlineEditor.getInlineRange();
   assertExists(inlineRange);
