@@ -233,8 +233,8 @@ defineExpose({
   /* TODO ali ghasami for fix token */
 .vue-block-editor{
   /* Mention Style */
-  .affine-mention-container .affine-mention{
-    @apply flex gap-2 mt-overline;
+  .affine-mention{
+    @apply flex-inline gap-2 mt-overline;
     color:#64428F;
     //border: 1px solid #535bf2;
     width: fit-content;
@@ -319,6 +319,9 @@ defineExpose({
     }*/
   }
 
+
+
+
   /*.with-drag-handle{
     //background-color: red;
   }*/
@@ -363,7 +366,8 @@ defineExpose({
 
 }
 
-.slash-menu{
+
+.slash-menu,.popover-menu{
   //background-color: red;
   @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
   border-radius: var(--mt-roundness-3);
@@ -412,12 +416,7 @@ defineExpose({
   position: relative;
 }
 
-/*
-.SelectViewport{
-  display: none;
-  background-color: red;
-}
-*/
+
 
 
 </style>

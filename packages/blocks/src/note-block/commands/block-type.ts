@@ -188,7 +188,7 @@ export const updateBlockType: Command<
             'affine:paragraph',
             'affine:list',
             'affine:code',
-            'affine:mention',
+            //'affine:mention',
           ]);
           if (model.flavour === flavour) {
             doc.updateBlock(model, props ?? {});

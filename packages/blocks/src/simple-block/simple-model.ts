@@ -11,7 +11,7 @@ export const SimpleBlockSchema = defineBlockSchema({
       'affine:database',
       //'affine:list',
       'affine:paragraph',
-      'affine:mention',
+      //'affine:mention',
     ],
   },
 });

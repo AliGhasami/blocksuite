@@ -25,7 +25,7 @@ import { ImageBlockSchema } from '../image-block/image-model.js';
 import { ImageService } from '../image-block/index.js';
 import { ListBlockSchema } from '../list-block/list-model.js';
 import { ListService } from '../list-block/list-service.js';
-import { MentionBlockSchema } from '../mention-block/mention-model.js';
+//import { MentionBlockSchema } from '../mention-block/mention-model.js';
 //import { MentionBlockSchema } from '../mention-block/mention-model.js';
 //import { MentionService } from '../mention-block/mention-service.js';
 import { NoteService } from '../note-block/index.js';
@@ -49,6 +49,7 @@ import { EMBED_CARD_TOOLBAR } from '../root-block/widgets/embed-card-toolbar/emb
 import { AFFINE_FORMAT_BAR_WIDGET } from '../root-block/widgets/format-bar/format-bar.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../root-block/widgets/inner-modal/inner-modal.js';
 import { AFFINE_LINKED_DOC_WIDGET } from '../root-block/widgets/linked-doc/index.js';
+import { AFFINE_MENTION_WIDGET } from '../root-block/widgets/mention/index.js';
 import { AFFINE_MODAL_WIDGET } from '../root-block/widgets/modal/modal.js';
 import { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from '../root-block/widgets/page-dragging-area/page-dragging-area.js';
 import { AFFINE_PIE_MENU_WIDGET } from '../root-block/widgets/pie-menu/index.js';
@@ -78,15 +79,13 @@ const DocPageSpec: BlockSpec<PageRootBlockWidgetName> = {
       [AFFINE_SLASH_MENU_WIDGET]: literal`${unsafeStatic(
         AFFINE_SLASH_MENU_WIDGET
       )}`,
+      [AFFINE_MENTION_WIDGET]: literal`${unsafeStatic(AFFINE_MENTION_WIDGET)}`,
       [AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
         AFFINE_LINKED_DOC_WIDGET
       )}`,
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
       )}`,
-      /*[AFFINE_ADD_BLOCK_HANDLE_WIDGET]: literal`${unsafeStatic(
-        AFFINE_ADD_BLOCK_HANDLE_WIDGET
-      )}`,*/
       [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
         AFFINE_FORMAT_BAR_WIDGET
       )}`,
@@ -187,12 +186,12 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
       component: literal`affine-divider`,
     },
   },
-  {
+  /*{
     schema: MentionBlockSchema,
     view: {
       component: literal`affine-mention`,
     },
-  },
+  },*/
   {
     schema: CodeBlockSchema,
     view: {

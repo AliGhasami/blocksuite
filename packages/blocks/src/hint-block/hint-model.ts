@@ -11,7 +11,7 @@ export const HintBlockSchema = defineBlockSchema({
       'affine:database',
       //'affine:list',
       'affine:paragraph',
-      'affine:mention',
+      // 'affine:mention',
     ],
   },
 });

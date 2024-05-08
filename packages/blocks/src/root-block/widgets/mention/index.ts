@@ -17,16 +17,16 @@ import {
 } from '../../../_common/utils/query.js';
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
-import { getMenus, type LinkedDocOptions } from './config.js';
-import { LinkedDocPopover } from './linked-doc-popover.js';
+//import { getMenus, type LinkedDocOptions } from './config.js';
+import { MentionPopover } from './mention-popover.js';
 
-export function showLinkedDocPopover({
+export function showMentionPopover({
   editorHost,
   inlineEditor,
   range,
   container = document.body,
   abortController = new AbortController(),
-  options,
+  //options,
   triggerKey,
 }: {
   editorHost: EditorHost;
@@ -34,32 +34,28 @@ export function showLinkedDocPopover({
   range: Range;
   container?: HTMLElement;
   abortController?: AbortController;
-  options: LinkedDocOptions;
+  options: any;
   triggerKey: string;
 }) {
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
 
-  const linkedDoc = new LinkedDocPopover(
-    editorHost,
-    inlineEditor,
-    abortController
-  );
-  linkedDoc.options = options;
-  linkedDoc.triggerKey = triggerKey;
+  const mention = new MentionPopover(editorHost, inlineEditor, abortController);
+  //linkedDoc.options = options;
+  mention.triggerKey = triggerKey;
   // Mount
-  container.append(linkedDoc);
-  disposables.add(() => linkedDoc.remove());
+  container.append(mention);
+  disposables.add(() => mention.remove());
 
   // Handle position
   const updatePosition = throttle(() => {
-    const linkedDocElement = linkedDoc.linkedDocElement;
+    const linkedDocElement = mention.linkedDocElement;
     assertExists(
       linkedDocElement,
       'You should render the linked doc node even if no position'
     );
     const position = getPopperPosition(linkedDocElement, range);
-    linkedDoc.updatePosition(position);
+    mention.updatePosition(position);
   }, 10);
   disposables.addFromEvent(window, 'resize', updatePosition);
   const scrollContainer = getViewportElement(editorHost);
@@ -74,49 +70,46 @@ export function showLinkedDocPopover({
   setTimeout(updatePosition);
 
   disposables.addFromEvent(window, 'mousedown', (e: Event) => {
-    if (e.target === linkedDoc) return;
+    if (e.target === mention) return;
     abortController.abort();
   });
 
-  return linkedDoc;
+  return mention;
 }
 
-export const AFFINE_LINKED_DOC_WIDGET = 'affine-linked-doc-widget';
+export const AFFINE_MENTION_WIDGET = 'affine-mention-widget';
 
-@customElement(AFFINE_LINKED_DOC_WIDGET)
-export class AffineLinkedDocWidget extends WidgetElement {
-  static DEFAULT_OPTIONS: LinkedDocOptions = {
+@customElement(AFFINE_MENTION_WIDGET)
+export class AffineMentionWidget extends WidgetElement {
+  static DEFAULT_OPTIONS: any = {
     /**
      * The first item of the trigger keys will be the primary key
      */
     triggerKeys: [
       //comment for support mention
-      //'@',
-      '[[',
-      '【【',
+      '@',
     ],
     ignoreBlockTypes: ['affine:code'],
     /**
      * Convert trigger key to primary key (the first item of the trigger keys)
      */
     convertTriggerKey: true,
-    getMenus,
+    //getMenus,
   };
 
-  options = AffineLinkedDocWidget.DEFAULT_OPTIONS;
+  options = AffineMentionWidget.DEFAULT_OPTIONS;
 
   override connectedCallback() {
-    //console.log('zzzzz');
     super.connectedCallback();
     this.handleEvent('keyDown', this._onKeyDown);
   }
 
-  public showLinkedDoc = (
+  public showMention = (
     inlineEditor: AffineInlineEditor,
     triggerKey: string
   ) => {
     const curRange = getCurrentNativeRange();
-    showLinkedDocPopover({
+    showMentionPopover({
       editorHost: this.host,
       inlineEditor,
       range: curRange,
@@ -180,6 +173,7 @@ export class AffineLinkedDocWidget extends WidgetElement {
     const primaryTriggerKey = this.options.triggerKeys[0];
     inlineEditor.slots.inlineRangeApply.once(() => {
       if (this.options.convertTriggerKey && primaryTriggerKey !== matchedKey) {
+        //debugger;
         // Convert to the primary trigger key
         // e.g. [[ -> @
         const startIdxBeforeMatchKey =
@@ -197,17 +191,17 @@ export class AffineLinkedDocWidget extends WidgetElement {
           length: 0,
         });
         inlineEditor.slots.inlineRangeApply.once(() => {
-          this.showLinkedDoc(inlineEditor, primaryTriggerKey);
+          this.showMention(inlineEditor, primaryTriggerKey);
         });
         return;
       }
-      this.showLinkedDoc(inlineEditor, matchedKey);
+      this.showMention(inlineEditor, matchedKey);
     });
   };
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    [AFFINE_LINKED_DOC_WIDGET]: AffineLinkedDocWidget;
+    [AFFINE_MENTION_WIDGET]: AffineMentionWidget;
   }
 }

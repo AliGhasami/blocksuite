@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import Editor from "@/components/Editor.vue";
 import {ref} from "vue";
-import {data} from "@/components/template/tempData";
+import {data} from "../my_temp/template/tempData";
 /*********************************/
 /*import MyBarComponent from '@/components/web-component/MyBar.vue'
 const MyBar = defineCustomElement(MyBarComponent)

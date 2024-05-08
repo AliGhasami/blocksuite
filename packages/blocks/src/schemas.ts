@@ -21,7 +21,6 @@ import { FrameBlockSchema } from './frame-block/frame-model.js';
 import { HintBlockSchema } from './hint-block/hint-model.js';
 import { ImageBlockSchema } from './image-block/image-model.js';
 import { ListBlockSchema } from './list-block/list-model.js';
-import { MentionBlockSchema } from './mention-block/mention-model.js';
 import { NoteBlockSchema } from './note-block/note-model.js';
 import { ParagraphBlockSchema } from './paragraph-block/paragraph-model.js';
 import { RootBlockSchema } from './root-block/root-model.js';
@@ -52,7 +51,6 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   EmbedLinkedDocBlockSpec.schema,
   EmbedSyncedDocBlockSpec.schema,
   EmbedLoomBlockSpec.schema,
-  MentionBlockSchema,
   HintBlockSchema,
   SimpleBlockSchema,
 ];

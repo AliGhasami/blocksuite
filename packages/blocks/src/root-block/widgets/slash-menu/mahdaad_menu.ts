@@ -11,6 +11,7 @@ import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+import type { AffineMentionWidget } from '../mention/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
@@ -31,6 +32,7 @@ import hint from './icons/hint.svg?raw';
 import image from './icons/image.svg?raw';
 import link from './icons/link.svg?raw';
 import link_to_page from './icons/link_to_page.svg?raw';
+import mention from './icons/mention.svg?raw';
 import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
@@ -168,29 +170,32 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: 'Insert',
     children: [
-      /*{
+      {
         title: 'Mention',
         description: 'Description',
         icon: mention,
-        //@ts-ignore
-        action: ({ rootElement }) => {
-          rootElement.host.std.command
-            .chain()
-            .updateBlockType({
-              flavour: 'affine:mention',
-              props: {}, //type
-            })
-            .inline((ctx, next) => {
-              console.log('this is inline in menu ', ctx);
-              const newModels = ctx.updatedBlocks;
-              if (!newModels || newModels.length == 0) {
-                return false;
-              }
-              return next();
-            })
-            .run();
+        action: ({ rootElement, model }) => {
+          const triggerKey = '@';
+          insertContent(rootElement.host, model, triggerKey);
+          assertExists(model.doc.root);
+          //console.log('|11111', rootElement.widgetElements);
+          //todo fix ali ghasami
+          const widgetEle = rootElement.widgetElements['affine-mention-widget'];
+          assertExists(widgetEle);
+          // We have checked the existence of showLinkedDoc method in the showWhen
+          const mentionWidget = widgetEle as AffineMentionWidget;
+          // Wait for range to be updated
+          setTimeout(() => {
+            const inlineEditor = getInlineEditorByModel(
+              rootElement.host,
+              model
+            );
+            assertExists(inlineEditor);
+            mentionWidget.showMention(inlineEditor, triggerKey);
+            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+          });
         },
-      },*/
+      },
       {
         title: 'Date',
         description: 'Description',
@@ -373,13 +378,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
       //todo
       /* {
         title: 'Table of Content',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Mention',
         description: 'Description',
         icon: h1,
         action: ({ rootElement }) => {},
