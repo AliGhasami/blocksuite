@@ -230,8 +230,22 @@ defineExpose({
 </script>
 
 <style lang="less">
-  /* TODO ali ghasami for fix token */
-.vue-block-editor{
+/* TODO ali ghasami for fix token */
+@prefix:~'vue-block-editor';
+.@{prefix}{
+
+
+  .place-holder{
+  @apply text-neutral-4 mt-body;
+    line-height: unset;
+    transition: all 0.3s ease-in-out;
+    //background-color: red;
+    .short-code{
+      border-radius: 4px;
+    @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
+    }
+  }
+
   /* Mention Style */
   .affine-mention{
     @apply flex-inline gap-2 mt-overline;
@@ -320,8 +334,6 @@ defineExpose({
   }
 
 
-
-
   /*.with-drag-handle{
     //background-color: red;
   }*/
@@ -333,17 +345,10 @@ defineExpose({
       //background-color: green;
     }*!
   }*/
-  .place-holder{
-    @apply text-neutral-4 mt-body;
-    line-height: unset;
-    transition: all 0.3s ease-in-out;
-    //background-color: red;
-    .short-code{
-      border-radius: 4px;
-      @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
-    }
-  }
 
+  /* Place Holder - paragraph style */
+
+  /* paragraph Style */
   .claytap-text{
     //background-color: red;
    @apply text-neutral-8 mt-body;
@@ -366,49 +371,95 @@ defineExpose({
 
 }
 
-
-.slash-menu,.popover-menu{
-  //background-color: red;
+/* popover Style */
+.@{prefix}-popover{
   @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
-  border-radius: var(--mt-roundness-3);
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  //font-size: var(--affine-font-base);
+  //padding: 12px 0;
+  display: flex;
+  //background: var(--affine-background-overlay-panel-color);
+  //box-shadow: var(--affine-shadow-2);
+  border-radius: 12px;
+  z-index: var(--affine-z-index-popover);
+  /* transition: max-height 0.2s ease-in-out; */
+}
 
+/* popover container Style */
+.@{prefix}-popover-container{
+  z-index: var(--affine-z-index-popover);
+  user-select: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 0 8px;
+  width: 200px;
+}
+
+/* overlay mask */
+.@{prefix}-overlay-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--affine-z-index-popover);
+}
+
+/* slash Menu Style */
+.@{prefix}-slash-menu{
   .icon{
     width: 32px;
     height: 32px;
   }
 
-
   .group-title {
-    @apply mt-footnote text-neutral-5 block my-2;
+  @apply mt-footnote text-neutral-5 block my-2;
   }
 
   .title{
-    @apply mt-overline;
+  @apply mt-overline;
   }
 
   .item-title{
-    @apply flex flex-col mt-body;//gap-2
+  @apply flex flex-col mt-body;//gap-2
   }
 
   .description{
-     @apply mt-footnote text-neutral-5;
+  @apply mt-footnote text-neutral-5;
   }
 
   .claytap-slash-menu {
-    @apply flex flex-col gap-2;
+  @apply flex flex-col gap-2;
     //width: 260px;
   }
 
   .claytap-slash-menu-item {
-    @apply py-2 px-3 gap-2 items-center flex px-2 cursor-pointer;
+  @apply py-2 px-3 gap-2 items-center flex px-2 cursor-pointer;
     border-radius: 4px;
     &:hover,&.hover{
-    background: #F4F4F5;
+      background: #F4F4F5;
     }
   }
-
 }
 
+/* Mention menu Style */
+.@{prefix}-mention-menu-container{
+  @apply flex flex-col gap-2;
+
+  .mention-item{
+    @apply mt-overline cursor-pointer;
+    color:#6E737C;
+    padding: @space-1;
+    border-radius: @roundness-sm;
+  }
+}
+
+
+
+/* TOdo ali ghasami for fix style **/
 .tippy-box{
   @apply bg-white shadow-floated text-black;
   //color:red;
@@ -417,7 +468,11 @@ defineExpose({
 }
 
 
-
+//.slash-menu,
+/*.popover-menu{
+  border-radius: var(--mt-roundness-3);
+  //background-color: red;
+}*/
 
 </style>
 

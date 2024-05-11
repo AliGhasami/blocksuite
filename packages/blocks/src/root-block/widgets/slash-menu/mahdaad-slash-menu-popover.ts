@@ -1,4 +1,5 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
+import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel } from '@blocksuite/store';
 import { html, nothing } from 'lit';
@@ -34,7 +35,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   triggerKey!: string;
 
-  @query('.slash-menu')
+  @query(`.${Prefix}-slash-menu`)
   slashMenuElement?: HTMLElement;
 
   @state()
@@ -409,16 +410,18 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       }
     );
 */
-    return html`<div
-      id="${this.slasheMenuID}"
-      class="slash-menu-container blocksuite-overlay"
-    >
+    //class="slash-menu-container blocksuite-overlay"
+    //slash-item-container
+    return html`<div id="${this.slasheMenuID}">
       <div
-        class="overlay-mask"
+        class="${Prefix}-overlay-mask"
         @click="${() => this.abortController.abort()}"
       ></div>
-      <div class="slash-menu" style="${slashMenuStyles}">
-        <div class="slash-item-container">${this._clayTapMenu()}</div>
+      <div
+        class="${Prefix}-popover ${Prefix}-slash-menu"
+        style="${slashMenuStyles}"
+      >
+        <div class="${Prefix}-popover-container">${this._clayTapMenu()}</div>
       </div>
     </div>`;
   }

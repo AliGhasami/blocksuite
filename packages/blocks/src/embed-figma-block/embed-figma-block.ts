@@ -38,7 +38,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
   private _isResizing = false;
 
   private _selectBlock() {
-    debugger;
+    // debugger;
     const selectionManager = this.host.selection;
     const blockSelection = selectionManager.create('block', {
       path: this.path,
@@ -82,7 +82,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
 
     this.disposables.add(
       this.model.propsUpdated.on(({ key }) => {
-        debugger;
+        // debugger;
         if (key === 'url') {
           this.refreshData();
         }

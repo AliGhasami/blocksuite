@@ -1,9 +1,10 @@
 import '../../../_common/components/button.js';
 
-import type { EditorHost } from '@blocksuite/block-std';
+import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
+import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
-//import { Text } from '@blocksuite/store';
+import type { InlineEditor } from '@blocksuite/inline';
 import { html, LitElement } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -16,8 +17,6 @@ import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { ClayTapSlashMenu } from '../slash-menu/mahdaad_menu.js';
-//import type { LinkedDocOptions } from './config.js';
-//import { type LinkedDocGroup } from './config.js';
 import { styles } from './styles.js';
 
 //TODO ali ghasami for props
@@ -26,10 +25,38 @@ const userList: string[] = [
   'Mehdi Ahmadi',
   'Kamran Abbasi',
   'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
+  'Habib Fakari',
 ];
-
+//ShadowlessElement
 @customElement('affine-mention-popover')
-export class MentionPopover extends WithDisposable(LitElement) {
+export class MentionPopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
   @property({ attribute: false })
@@ -116,8 +143,8 @@ export class MentionPopover extends WithDisposable(LitElement) {
     });
   }*/
 
-  @query('.mention-popover')
-  linkedDocElement?: Element;
+  @query(`.${Prefix}-mention-popover`)
+  MentionPopOverElement?: Element;
 
   /* private get _doc() {
     return this.editorHost.doc;
@@ -144,15 +171,22 @@ export class MentionPopover extends WithDisposable(LitElement) {
     });*/
   }
 
+  private temp: any = null;
+
   constructor(
     private editorHost: EditorHost,
     private inlineEditor: AffineInlineEditor,
     private abortController = new AbortController()
   ) {
+    //debugger;
+    console.log('ppppp', inlineEditor.getInlineRange());
     super();
+    this.temp = inlineEditor;
+    console.log('ppppp 22222', this.inlineEditor.getInlineRange());
   }
 
   override connectedCallback() {
+    console.log('111111');
     super.connectedCallback();
     const inlineEditor = this.inlineEditor;
     assertExists(inlineEditor, 'RichText InlineEditor not found');
@@ -310,9 +344,9 @@ export class MentionPopover extends WithDisposable(LitElement) {
           this.inlineEditor,
           this.triggerKey + this._query
         );
-        /*this._flattenActionList[this._activatedItemIndex]
+        /*/!*this._flattenActionList[this._activatedItemIndex]
           .action()
-          ?.catch(console.error);*/
+          ?.catch(console.error);*!/*/
       },
       onEsc: () => {
         this.abortController.abort();
@@ -321,6 +355,7 @@ export class MentionPopover extends WithDisposable(LitElement) {
   }
 
   updatePosition(position: { height: number; x: string; y: string }) {
+    console.log('11111', this.inlineEditor.getInlineRange());
     this._position = position;
   }
 
@@ -393,7 +428,7 @@ export class MentionPopover extends WithDisposable(LitElement) {
       if (item.group && !group.includes(item.group)) group.push(item.group);
     });*/
     //let index = 0;
-    return html`<div class="mention-menu-container">
+    return html`<div class="${Prefix}-mention-menu-container">
       ${this._filterItems.map(item => {
         return html`<div
           class="mention-item"
@@ -419,11 +454,13 @@ export class MentionPopover extends WithDisposable(LitElement) {
         });
     // XXX This is a side effect
     //const accIdx = 0;
+    //mention-popover popover-menu-container blocksuite-overlay
+    //${Prefix}-popover
     return html`<div
-      class="popover-menu-container mention-popover blocksuite-overlay"
+      class="${Prefix}-popover  ${Prefix}-mention-popover"
       style="${style}"
     >
-      <div class="slash-item-container">${this._menu()}</div>
+      <div class="${Prefix}-popover-container">${this._menu()}</div>
     </div>`;
   }
 }

@@ -26,7 +26,7 @@ export function showMentionPopover({
   range,
   container = document.body,
   abortController = new AbortController(),
-  //options,
+  options,
   triggerKey,
 }: {
   editorHost: EditorHost;
@@ -40,6 +40,7 @@ export function showMentionPopover({
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
 
+  console.log(55555, inlineEditor.getInlineRange());
   const mention = new MentionPopover(editorHost, inlineEditor, abortController);
   //linkedDoc.options = options;
   mention.triggerKey = triggerKey;
@@ -49,12 +50,12 @@ export function showMentionPopover({
 
   // Handle position
   const updatePosition = throttle(() => {
-    const linkedDocElement = mention.linkedDocElement;
+    const mentionPopOverElement = mention.MentionPopOverElement;
     assertExists(
-      linkedDocElement,
-      'You should render the linked doc node even if no position'
+      mentionPopOverElement,
+      'You should render the mention PopOver Element node even if no position'
     );
-    const position = getPopperPosition(linkedDocElement, range);
+    const position = getPopperPosition(mentionPopOverElement, range);
     mention.updatePosition(position);
   }, 10);
   disposables.addFromEvent(window, 'resize', updatePosition);
@@ -69,10 +70,14 @@ export function showMentionPopover({
   // Wait for node to be mounted
   setTimeout(updatePosition);
 
-  disposables.addFromEvent(window, 'mousedown', (e: Event) => {
+  //todo ali ghasami
+  /* disposables.addFromEvent(window, 'mousedown', (e: Event) => {
+    //console.log('e.target', e.target);
+    //return;
+    //console.log('77777', inlineEditor.getInlineRange());
     if (e.target === mention) return;
     abortController.abort();
-  });
+  });*/
 
   return mention;
 }
@@ -109,6 +114,7 @@ export class AffineMentionWidget extends WidgetElement {
     triggerKey: string
   ) => {
     const curRange = getCurrentNativeRange();
+    //debugger;
     showMentionPopover({
       editorHost: this.host,
       inlineEditor,

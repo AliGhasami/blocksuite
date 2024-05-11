@@ -1,24 +1,25 @@
+import { Prefix } from '@blocksuite/global/env';
 import { baseTheme } from '@toeverything/theme';
 import { css, unsafeCSS } from 'lit';
 
 import { scrollbarStyle } from '../../../_common/components/utils.js';
 
 export const styles = css`
-  .overlay-mask {
+ /* .overlay-mask {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     z-index: var(--affine-z-index-popover);
-  }
+  }*/
 
-  .slash-menu-container {
+  /*.slash-menu-container {
     z-index: var(--affine-z-index-popover);
     user-select: none;
-  }
+  }*/
 
-  .slash-menu {
+ /* .slash-menu {
     position: fixed;
     left: 0;
     top: 0;
@@ -30,10 +31,10 @@ export const styles = css`
     //box-shadow: var(--affine-shadow-2);
     border-radius: 12px;
     z-index: var(--affine-z-index-popover);
-    /* transition: max-height 0.2s ease-in-out; */
-  }
+    !* transition: max-height 0.2s ease-in-out; *!
+  }*/
 
-  .slash-category {
+  /*.slash-category {
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
@@ -44,7 +45,7 @@ export const styles = css`
     color: var(--affine-text-secondary-color);
     gap: 5px;
     margin-bottom: 20px;
-    /* transition: max-width 0.2s ease-in-out; */
+    !* transition: max-width 0.2s ease-in-out; *!
   }
   .slash-category::before {
     content: '';
@@ -54,22 +55,22 @@ export const styles = css`
     height: 100%;
     width: 1px;
     background-color: var(--affine-border-color);
-  }
+  }*/
 
-  .slash-category-hide {
+  /*.slash-category-hide {
     max-width: 0;
     padding: 0;
     margin: 0;
     height: 0;
-  }
+  }*/
 
-  .slash-category-name {
+  /*.slash-category-name {
     font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
     font-size: var(--affine-font-sm);
     white-space: nowrap;
     cursor: pointer;
     padding: 4px 20px;
-  }
+  }*/
 
   .slash-active-category {
     position: relative;
@@ -93,16 +94,18 @@ export const styles = css`
     border-radius: 1px;
   }
 
-  .slash-item-container {
+  /*.slash-item-container {
     box-sizing: border-box;
     overflow-y: auto;
     padding: 0 8px;
     width: 200px;
-  }
+  }*/
 
-  ${scrollbarStyle('.slash-item-container')}
+  ${scrollbarStyle(`.${Prefix}-popover-container`)}
+  
+  
 
-  .slash-item-divider {
+ /* .slash-item-divider {
     border-top: 1px dashed var(--affine-border-color);
     margin: 8px 0;
   }
@@ -116,11 +119,9 @@ export const styles = css`
   }
   .slash-item.github .github-icon {
     color: var(--affine-black);
-  }
+  }*/
 
-  .claytap-slash-menu-item.hover {
-    background-color: #1e96eb;
-  }
+  
   
   }
 `;
