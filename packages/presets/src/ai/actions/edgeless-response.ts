@@ -13,7 +13,6 @@ import type {
 } from '@blocksuite/blocks';
 import {
   AFFINE_EDGELESS_COPILOT_WIDGET,
-  ChatWithAIIcon,
   DeleteIcon,
   EDGELESS_ELEMENT_TOOLBAR_WIDGET,
   EmbedHtmlBlockSpec,
@@ -23,6 +22,7 @@ import {
   ResetIcon,
 } from '@blocksuite/blocks';
 
+import { ChatWithAIIcon } from '../_common/icons.js';
 import { insertFromMarkdown } from '../_common/markdown-utils.js';
 import { getSurfaceElementFromEditor } from '../_common/selection-utils.js';
 import { getAIPanel } from '../ai-panel.js';
@@ -45,6 +45,11 @@ type FinishConfig = Exclude<
   AffineAIPanelWidget['config'],
   null
 >['finishStateConfig'];
+
+type ErrorConfig = Exclude<
+  AffineAIPanelWidget['config'],
+  null
+>['errorStateConfig'];
 
 export function getService(host: EditorHost) {
   const edgelessService = host.spec.getService(
@@ -103,6 +108,7 @@ export function discard(
   return {
     name: 'Discard',
     icon: DeleteIcon,
+    showWhen: () => !!panel.answer,
     handler: () => {
       panel.discard();
     },
@@ -129,6 +135,10 @@ export function createInsertResp(
   return {
     name: buttonText,
     icon: InsertBelowIcon,
+    showWhen: () => {
+      const panel = getAIPanel(host);
+      return !!panel.answer;
+    },
     handler: () => {
       reportResponse('result:insert');
       handler(host, ctx);
@@ -449,5 +459,45 @@ export function actionToResponse<T extends keyof BlockSuitePresets.AIActions>(
       },
     ],
     actions: [],
+  };
+}
+
+export function actionToErrorResponse<
+  T extends keyof BlockSuitePresets.AIActions,
+>(
+  panel: AffineAIPanelWidget,
+  id: T,
+  host: EditorHost,
+  ctx: CtxRecord,
+  variants?: Omit<
+    Parameters<BlockSuitePresets.AIActions[T]>[0],
+    keyof BlockSuitePresets.AITextActionOptions
+  >
+): ErrorConfig {
+  return {
+    upgrade: () => {
+      AIProvider.slots.requestUpgradePlan.emit({ host: panel.host });
+      panel.hide();
+    },
+    login: () => {
+      AIProvider.slots.requestLogin.emit({ host: panel.host });
+      panel.hide();
+    },
+    cancel: () => {
+      panel.hide();
+    },
+    responses: [
+      {
+        name: 'Response',
+        items: [getInsertAndReplaceHandler(id, host, ctx, variants)],
+      },
+      {
+        name: '',
+        items: [
+          retry(getAIPanel(host)),
+          discard(getAIPanel(host), getEdgelessCopilotWidget(host)),
+        ],
+      },
+    ],
   };
 }

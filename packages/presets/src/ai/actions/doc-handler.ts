@@ -5,8 +5,14 @@ import {
   type AffineAIPanelWidgetConfig,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
+import type { TemplateResult } from 'lit';
 
-import { buildCopyConfig, buildFinishConfig, getAIPanel } from '../ai-panel.js';
+import {
+  buildCopyConfig,
+  buildErrorConfig,
+  buildFinishConfig,
+  getAIPanel,
+} from '../ai-panel.js';
 import { createTextRenderer } from '../messages/text.js';
 import { AIProvider } from '../provider.js';
 import { reportResponse } from '../utils/action-reporter.js';
@@ -134,6 +140,7 @@ export function actionToGenerateAnswer<
 function updateAIPanelConfig<T extends keyof BlockSuitePresets.AIActions>(
   aiPanel: AffineAIPanelWidget,
   id: T,
+  generatingIcon: TemplateResult<1>,
   variants?: Omit<
     Parameters<BlockSuitePresets.AIActions[T]>[0],
     keyof BlockSuitePresets.AITextActionOptions
@@ -144,15 +151,18 @@ function updateAIPanelConfig<T extends keyof BlockSuitePresets.AIActions>(
   config.generateAnswer = actionToGenerateAnswer(id, variants)(host);
   config.answerRenderer = createTextRenderer(host, 320);
   config.finishStateConfig = buildFinishConfig(aiPanel);
+  config.errorStateConfig = buildErrorConfig(aiPanel);
   config.copy = buildCopyConfig(aiPanel);
   config.discardCallback = () => {
     aiPanel.hide();
     reportResponse('result:discard');
   };
+  config.generatingIcon = generatingIcon;
 }
 
 export function actionToHandler<T extends keyof BlockSuitePresets.AIActions>(
   id: T,
+  generatingIcon: TemplateResult<1>,
   variants?: Omit<
     Parameters<BlockSuitePresets.AIActions[T]>[0],
     keyof BlockSuitePresets.AITextActionOptions
@@ -160,7 +170,7 @@ export function actionToHandler<T extends keyof BlockSuitePresets.AIActions>(
 ) {
   return (host: EditorHost) => {
     const aiPanel = getAIPanel(host);
-    updateAIPanelConfig(aiPanel, id, variants);
+    updateAIPanelConfig(aiPanel, id, generatingIcon, variants);
     const { selectedBlocks: blocks } = getSelections(aiPanel.host);
     if (!blocks || blocks.length === 0) return;
     aiPanel.toggle(blocks.at(-1)!, 'placeholder');

@@ -390,8 +390,10 @@ export class AffineDragHandleWidget extends WidgetElement<
       const doc = this.doc.blockCollection.getDoc(selector);
 
       const previewSpec = SpecProvider.getInstance().getSpec('preview');
-      assertExists(previewSpec, 'Preview spec is not found');
-      const previewTemplate = this.host.renderSpecPortal(doc, previewSpec);
+      const previewTemplate = this.host.renderSpecPortal(
+        doc,
+        previewSpec.value
+      );
 
       const offset = this._calculatePreviewOffset(blockElements, state);
       const posX = state.raw.x - offset.x;
@@ -729,6 +731,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     // When current selection is TextSelection, should cover all the blocks in native range
     if (selections.length > 0 && includeTextSelection(selections)) {
       const range = getCurrentNativeRange();
+      if (!range) return [];
       blockElements = this._rangeManager.getSelectedBlockElementsByRange(
         range,
         {

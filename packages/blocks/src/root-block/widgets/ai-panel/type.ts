@@ -1,4 +1,3 @@
-import type { ComputePositionConfig } from '@floating-ui/dom';
 import type { nothing, TemplateResult } from 'lit';
 
 import type {
@@ -19,6 +18,7 @@ export type AIPanelAnswerConfig = {
 export interface AIPanelErrorConfig {
   login: () => void;
   upgrade: () => void;
+  cancel: () => void;
   responses: AIItemGroupConfig[];
   error?: AIError;
 }
@@ -41,8 +41,9 @@ export interface AffineAIPanelWidgetConfig {
   hideCallback?: () => void;
   discardCallback?: () => void;
 
-  positionConfig?: Partial<ComputePositionConfig>;
   copy?: CopyConfig;
+
+  generatingIcon: TemplateResult<1>;
 }
 
 export type AffineAIPanelState =

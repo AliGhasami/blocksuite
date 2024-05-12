@@ -17,6 +17,7 @@ import type { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from './widgets/page-dragging-a
 import type { AFFINE_PIE_MENU_ID_EDGELESS_TOOLS } from './widgets/pie-menu/config.js';
 import type { AFFINE_PIE_MENU_WIDGET } from './widgets/pie-menu/index.js';
 import type { AFFINE_SLASH_MENU_WIDGET } from './widgets/slash-menu/index.js';
+import type { AFFINE_VIEWPORT_OVERLAY_WIDGET } from './widgets/viewport-overlay/viewport-overlay.js';
 
 export type PageRootBlockWidgetName =
   // | typeof AFFINE_BLOCK_HUB_WIDGET
@@ -27,6 +28,7 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_PAGE_DRAGGING_AREA_WIDGET
   | typeof AFFINE_DRAG_HANDLE_WIDGET
   | typeof AFFINE_FORMAT_BAR_WIDGET
+  | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_ADD_BLOCK_HANDLE_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
@@ -45,7 +47,8 @@ export type EdgelessRootBlockWidgetName =
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET
-  | typeof EDGELESS_ELEMENT_TOOLBAR_WIDGET;
+  | typeof EDGELESS_ELEMENT_TOOLBAR_WIDGET
+  | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET;
 
 export type RootBlockComponent =
   | PageRootBlockComponent
