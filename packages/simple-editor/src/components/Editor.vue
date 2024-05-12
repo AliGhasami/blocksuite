@@ -451,9 +451,15 @@ defineExpose({
 
   .mention-item{
     @apply mt-overline cursor-pointer;
+    transition: all 30ms ease-in-out;
     color:#6E737C;
     padding: @space-1;
     border-radius: @roundness-sm;
+
+    &:hover,&.hover{
+      color:#0BA2E8;
+      background-color: #EBF7FF;
+    }
   }
 }
 

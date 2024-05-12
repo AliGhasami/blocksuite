@@ -40,7 +40,7 @@ export function showMentionPopover({
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
 
-  console.log(55555, inlineEditor.getInlineRange());
+  //console.log(55555, inlineEditor.getInlineRange());
   const mention = new MentionPopover(editorHost, inlineEditor, abortController);
   //linkedDoc.options = options;
   mention.triggerKey = triggerKey;

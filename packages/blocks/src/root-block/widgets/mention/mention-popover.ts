@@ -4,8 +4,8 @@ import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
-import type { InlineEditor } from '@blocksuite/inline';
-import { html, LitElement } from 'lit';
+//import type { InlineEditor } from '@blocksuite/inline';
+import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
@@ -78,9 +78,6 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
   @state()
   private _query = '';
 
-  /**
-   * Does not include the slash character
-   */
   private _searchString = '';
 
   @state()
@@ -150,14 +147,13 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     return this.editorHost.doc;
   }*/
 
-  private _scrollToItem(item: ClayTapSlashMenu, force = true) {
-    /*const shadowRoot = this.rootElement;
+  private _scrollToItem(index: number, force = true) {
+    //console.log('index,this', index, this);
+    /* const shadowRoot = this.rootElement;
     if (!shadowRoot) {
       return;
     }*/
-    /* const ele = this.renderRoot.querySelector(
-      `#${this.slasheMenuID} div[text="menu-item-${item.title}"]`
-    );
+    const ele = this.querySelector(`[data-index='${index}']`);
     if (!ele) {
       return;
     }
@@ -168,10 +164,8 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     }
     ele.scrollIntoView({
       block: 'nearest',
-    });*/
+    });
   }
-
-  private temp: any = null;
 
   constructor(
     private editorHost: EditorHost,
@@ -179,14 +173,14 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     private abortController = new AbortController()
   ) {
     //debugger;
-    console.log('ppppp', inlineEditor.getInlineRange());
+    //console.log('ppppp', inlineEditor.getInlineRange());
     super();
-    this.temp = inlineEditor;
-    console.log('ppppp 22222', this.inlineEditor.getInlineRange());
+    //this.temp = inlineEditor;
+    //console.log('ppppp 22222', this.inlineEditor.getInlineRange());
   }
 
   override connectedCallback() {
-    console.log('111111');
+    //console.log('111111');
     super.connectedCallback();
     const inlineEditor = this.inlineEditor;
     assertExists(inlineEditor, 'RichText InlineEditor not found');
@@ -213,60 +207,61 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
      * - When the search item is empty, the slash menu will be hidden temporarily,
      *   and if the following key is not the backspace key, the slash menu will be closed
      */
-    /*createKeydownObserver({
+    createKeydownObserver({
       target: inlineEditor.eventSource,
       inlineEditor,
       abortController: this.abortController,
       interceptor: (e, next) => {
+        //console.log('interceptor');
         if (e.key === '/') {
           // Can not stopPropagation here,
           // otherwise the rich text will not be able to trigger a new the slash menu
           return;
         }
-        if (this._hide && e.key !== 'Backspace') {
+        /*if (this._hide && e.key !== 'Backspace') {
           // if the following key is not the backspace key,
           // the slash menu will be closed
           this.abortController.abort();
           return;
-        }
-        if (e.key === ' ') {
+        }*/
+        /* if (e.key === ' ') {
           this._hide = true;
           next();
           return;
         }
         if (this._hide) {
           this._hide = false;
-        }
+        }*/
 
         //const isControlled = isControlledKeyboardEvent(e);
         //const isShift = e.shiftKey;
-        /!*if (e.key === 'ArrowLeft' && !isControlled && !isShift) {
+        /*if (e.key === 'ArrowLeft' && !isControlled && !isShift) {
           e.stopPropagation();
           e.preventDefault();
           // If the left panel is hidden, should not activate it
           if (this._searchString.length) return;
           this._leftPanelActivated = true;
           return;
-        }*!/
-        /!*if (e.key === 'ArrowRight' && !isControlled && !isShift) {
+        }*/
+        /*if (e.key === 'ArrowRight' && !isControlled && !isShift) {
           e.stopPropagation();
           e.preventDefault();
           this._leftPanelActivated = false;
           return;
-        }*!/
+        }*/
         next();
       },
       onUpdateQuery: val => {
         const newFilteredItems = this._updateItem(val);
         this._filterItems = newFilteredItems;
-        if (!newFilteredItems.length) {
+        /*if (!newFilteredItems.length) {
           this._hide = true;
-        }
+        }*/
       },
       onMove: step => {
         //console.log('this is move');
         const configLen = this._filterItems.length;
-        /!*if (this._leftPanelActivated) {
+        /*if (this._leftPanelActivated) {
           const groupNames = collectGroupNames(this._filterItems);
           const nowGroupIdx = groupNames.findIndex(
             groupName =>
@@ -279,11 +274,11 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
             ];
           this._handleClickCategory(targetGroup);
           return;
-        }*!/
+        }*/
         //let ejectedCnt = configLen;
         this._activatedItemIndex =
           (this._activatedItemIndex + step + configLen) % configLen;
-        /!*do {
+        /* do {
           this._activatedItemIndex =
             (this._activatedItemIndex + step + configLen) % configLen;
           // Skip disabled items
@@ -292,19 +287,20 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
           false &&
           // If all items are disabled, the loop will never end
           ejectedCnt--
-        );*!/
-
-        this._scrollToItem(this._filterItems[this._activatedItemIndex], false);
+        );*/
+        console.log('1111', this._activatedItemIndex);
+        this._scrollToItem(this._activatedItemIndex, false);
       },
       onConfirm: () => {
-        this._handleClickItem(this._activatedItemIndex);
+        //console.log('11111', this._activatedItemIndex);
+        this._handleClickItem(this._filterItems[this._activatedItemIndex]);
       },
       onEsc: () => {
         this.abortController.abort();
       },
-    });*/
+    });
 
-    createKeydownObserver({
+    /* createKeydownObserver({
       target: inlineEditor.eventSource,
       inlineEditor,
       onUpdateQuery: str => {
@@ -314,7 +310,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
       },
       abortController: this.abortController,
       onMove: step => {
-        /*const itemLen = this._flattenActionList.length;
+        /!*const itemLen = this._flattenActionList.length;
         this._activatedItemIndex =
           (itemLen + this._activatedItemIndex + step) % itemLen;
 
@@ -334,7 +330,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
         }
         ele.scrollIntoView({
           block: 'nearest',
-        });*/
+        });*!/
       },
       onConfirm: () => {
         //debugger;
@@ -344,18 +340,18 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
           this.inlineEditor,
           this.triggerKey + this._query
         );
-        /*/!*this._flattenActionList[this._activatedItemIndex]
+        /!*!/!*this._flattenActionList[this._activatedItemIndex]
           .action()
-          ?.catch(console.error);*!/*/
+          ?.catch(console.error);*!/!*!/
       },
       onEsc: () => {
         this.abortController.abort();
       },
-    });
+    });*/
   }
 
   updatePosition(position: { height: number; x: string; y: string }) {
-    console.log('11111', this.inlineEditor.getInlineRange());
+    //console.log('11111', this.inlineEditor.getInlineRange());
     this._position = position;
   }
 
@@ -396,7 +392,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
       this.triggerKey + this._searchString
     );*/
     this.abortController.abort();
-    console.log('this is item', item);
+    //console.log('this is item', item);
     //const { action } = this._filterItems[index];
     /*action({ rootElement: this.rootElement, model: this.model })?.catch(
       console.error
@@ -422,16 +418,14 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
   }
 
   private _menu() {
-    //console.log('this._activatedItemIndex', this._activatedItemIndex);
-    //const group: string[] = [];
-    /*this._filterItems.forEach(item => {
-      if (item.group && !group.includes(item.group)) group.push(item.group);
-    });*/
-    //let index = 0;
+    let index = 0;
     return html`<div class="${Prefix}-mention-menu-container">
       ${this._filterItems.map(item => {
         return html`<div
-          class="mention-item"
+          class="mention-item ${index == this._activatedItemIndex
+            ? 'hover'
+            : ''}"
+          data-index="${index++}"
           @click=${() => {
             return this._handleClickItem(item);
           }}
@@ -443,7 +437,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
-    const MAX_HEIGHT = 396;
+    const MAX_HEIGHT = 200;
     const style = this._position
       ? styleMap({
           transform: `translate(${this._position.x}, ${this._position.y})`,
