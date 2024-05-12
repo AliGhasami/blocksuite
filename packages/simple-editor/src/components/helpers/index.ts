@@ -19,7 +19,9 @@ export function createEmptyDoc() {
     init() {
       doc.load();
       //console.log("this is doc",doc)
-      const rootId = doc.addBlock('affine:page', {});
+      const rootId = doc.addBlock('affine:page', {
+        //userList:['1','2','3','4','5']
+      });
       //console.log("this is root id",rootId)
       doc.addBlock('affine:surface', {}, rootId);
       const noteId = doc.addBlock('affine:note', {}, rootId);

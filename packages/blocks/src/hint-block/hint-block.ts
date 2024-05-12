@@ -33,7 +33,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     affine-hint {
       display: block;
       margin: 10px 0;
-      padding-right: 10px;
+      padding-inline-end: 10px;
       //font-size: var(--affine-font-base);
     }
     .affine-hint-container {

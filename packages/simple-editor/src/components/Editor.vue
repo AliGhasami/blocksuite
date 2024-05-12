@@ -9,7 +9,7 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor } from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import {defineCustomElement, onMounted, ref} from "vue";
+import { defineCustomElement, onMounted, ref, watch } from 'vue';
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
@@ -17,11 +17,15 @@ let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
 import 'tippy.js/dist/tippy.css';
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
+import type { UserMention } from '@/components/types';
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
 if(!customElements.get('select-hint-type')){
   customElements.define('select-hint-type', SelectHintType,{})
 }
 
+interface Props{
+  mentionUserList?:UserMention[]
+}
 
 type IBlockChange= {
   type: 'add';
@@ -42,6 +46,9 @@ type IBlockChange= {
   props: { key: string };
 }
 
+const props=withDefaults(defineProps<Props>(),{
+  mentionUserList:()=>[]
+})
 
 const emit=defineEmits<{
   (e:'change',val:IBlockChange):void
@@ -122,6 +129,12 @@ function bindEvent(doc:Doc){
 }
 
 
+watch(()=>props.mentionUserList,()=>{
+  //debugger
+  updateMentionList()
+},{deep:true})
+
+
 /*
 function handleGetData(){
   //console.log("1111")
@@ -158,6 +171,7 @@ onMounted(async ()=>{
     refEditor.value.appendChild(editor);
   }
   bindEvent(doc)
+  updateMentionList()
   //console.log("1111",editor)
   //console.log("2222",doc)
   //const a=doc.getBlockByFlavour('affine:paragraph')
@@ -184,6 +198,17 @@ async function exportData(collection : DocCollection, docs:any[]) {
   return null
 }
 
+function updateMentionList(){
+  const root=currentDocument?.getBlocksByFlavour('affine:page')
+  if(root && root.length > 0){
+    currentDocument?.updateBlock(root[0].model,{mentionUserList:props.mentionUserList})
+    //root[0].mentionUserList=props.mentionUserList
+  }
+  console.log("1111",currentDocument,root);
+  //console.log(1111);
+}
+
+
 function setFocus(){
   if(refEditor.value){
     const editor=(refEditor.value as HTMLElement).querySelector('rich-text')
@@ -199,7 +224,6 @@ function setFocus(){
   setTimeout(()=>{
     setFocus()
   },5000)
-
   //console.log("111",refEditor.value)
 })*/
 
@@ -224,7 +248,6 @@ defineExpose({
     //const paragraph = paragraphs[0];
     //doc.updateBlock(paragraph, { text: new Text('Hello World!') });
   }
-
 }*/
 
 </script>
@@ -333,21 +356,6 @@ defineExpose({
     }*/
   }
 
-
-  /*.with-drag-handle{
-    //background-color: red;
-  }*/
-
-  /*.affine-paragraph-placeholder{
-    //background-color: red;
-    cursor: pointer !important;
-   !* &.hover{
-      //background-color: green;
-    }*!
-  }*/
-
-  /* Place Holder - paragraph style */
-
   /* paragraph Style */
   .claytap-text{
     //background-color: red;
@@ -368,6 +376,27 @@ defineExpose({
     @apply mt-page-subheading text-neutral-8;
     line-height: unset;
   }
+
+  /* Fix rtl - ltr Style */
+  .affine-paragraph-placeholder{
+    //background-color: red;
+  }
+
+
+  /*.with-drag-handle{
+   //background-color: red;
+ }*/
+
+  /*.affine-paragraph-placeholder{
+    //background-color: red;
+    cursor: pointer !important;
+   !* &.hover{
+      //background-color: green;
+    }*!
+  }*/
+
+  /* Place Holder - paragraph style */
+
 
 }
 

@@ -19,10 +19,11 @@
     <button @click="handleGetData">get data</button>
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
+    <button @click="handleAddUserMention">Add user Mention</button>
     <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
-    <Editor ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
+    <Editor :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
   </div>
 </template>
 
@@ -30,6 +31,8 @@
 import Editor from "@/components/Editor.vue";
 import {ref} from "vue";
 import {data} from "../my_temp/template/tempData";
+import type { UserMention } from '@/components/types';
+
 /*********************************/
 /*import MyBarComponent from '@/components/web-component/MyBar.vue'
 const MyBar = defineCustomElement(MyBarComponent)
@@ -80,11 +83,11 @@ watch(temp,()=>{
   console.log("this is change temp")
 })
 */
-
-
 const refEditor=ref(null)
+const userMentionList=ref<UserMention[]>([{id:'1',name:'test 1'}])
 async function handleGetData(){
-    await refEditor?.value?.getData()
+  const temp=  await refEditor?.value?.getData()
+  //console.log("this is temp",temp);
 }
 
 async function handleSetData(){
@@ -99,6 +102,11 @@ async function handleSetFocus(){
   //console.log("1111",document.querySelector('rich-text')?.inlineEditor)
   //document.querySelector('rich-text')?.inlineEditor.focusEnd()
 }
+
+function handleAddUserMention(){
+  userMentionList.value.push({name:'test is test2',id:'2'})
+}
+
 
 /*
 async function handleSetData2(){

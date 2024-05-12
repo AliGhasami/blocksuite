@@ -24,7 +24,7 @@ import { ListBlockSchema } from './list-block/list-model.js';
 import { NoteBlockSchema } from './note-block/note-model.js';
 import { ParagraphBlockSchema } from './paragraph-block/paragraph-model.js';
 import { RootBlockSchema } from './root-block/root-model.js';
-import { SimpleBlockSchema } from './simple-block/simple-model.js';
+//import { SimpleBlockSchema } from './simple-block/simple-model.js';
 import { SurfaceBlockSchema } from './surface-block/surface-model.js';
 import { SurfaceRefBlockSchema } from './surface-ref-block/surface-ref-model.js';
 
@@ -52,5 +52,5 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   EmbedSyncedDocBlockSpec.schema,
   EmbedLoomBlockSpec.schema,
   HintBlockSchema,
-  SimpleBlockSchema,
+  //SimpleBlockSchema,
 ];

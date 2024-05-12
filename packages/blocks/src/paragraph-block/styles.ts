@@ -14,9 +14,7 @@ export const paragraphBlockStyles = css`
   .affine-paragraph-rich-text-wrapper {
     position: relative;
   }
-  /* .affine-paragraph-rich-text-wrapper rich-text {
-      -webkit-font-smoothing: antialiased;
-    } */
+
   code {
     font-size: calc(var(--affine-font-base) - 3px);
   }
@@ -40,6 +38,7 @@ export const paragraphBlockStyles = css`
   .claytap-h2 code {
     font-size: calc(var(--affine-font-base) + 6px);
   }
+
   /*.claytap-h3 {
       font-size: var(--affine-font-h-3);
       font-weight: 600;
@@ -50,6 +49,7 @@ export const paragraphBlockStyles = css`
   .claytap-h3 code {
     font-size: calc(var(--affine-font-base) + 4px);
   }
+
   .claytap-h4 {
     font-size: var(--affine-font-h-4);
     font-weight: 600;
@@ -80,6 +80,7 @@ export const paragraphBlockStyles = css`
   .claytap-h6 code {
     font-size: calc(var(--affine-font-base) - 2px);
   }
+
   .quote {
     line-height: 26px;
     padding-left: 17px;
@@ -109,7 +110,16 @@ export const paragraphBlockStyles = css`
     pointer-events: none;
     color: var(--affine-black-30);
     fill: var(--affine-black-30);
+    width: 100%;
+    padding-inline-end: 30px;
   }
+
+  .affine-paragraph-placeholder-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .affine-paragraph-placeholder.visible {
     display: block;
   }

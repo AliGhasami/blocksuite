@@ -16,11 +16,11 @@ import {
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
-import type { ClayTapSlashMenu } from '../slash-menu/mahdaad_menu.js';
 import { styles } from './styles.js';
+import type { UserMention } from './types.js';
 
 //TODO ali ghasami for props
-const userList: string[] = [
+/*const userList: string[] = [
   'Ali Ghasami',
   'Mehdi Ahmadi',
   'Kamran Abbasi',
@@ -53,14 +53,14 @@ const userList: string[] = [
   'Habib Fakari',
   'Habib Fakari',
   'Habib Fakari',
-];
+];*/
 //ShadowlessElement
 @customElement('affine-mention-popover')
 export class MentionPopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
-  @property({ attribute: false })
-  options!: any;
+  //@property({ attribute: false })
+  ///options!: any;
 
   @property({ attribute: false })
   triggerKey!: string;
@@ -81,7 +81,10 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
   private _searchString = '';
 
   @state()
-  private _filterItems: string[] = [];
+  private _filterItems: UserMention[] = [];
+
+  @state()
+  public userList: UserMention[] = [];
 
   @state()
   private _activatedItemIndex = 0;
@@ -96,7 +99,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
       .flat();
   }*/
 
-  private _updateItem(query: string): string[] {
+  private _updateItem(query: string): UserMention[] {
     this._searchString = query;
     this._activatedItemIndex = 0;
     //const _menu: ClayTapSlashMenu[] = [];
@@ -125,10 +128,10 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
       showWhen(this.model, this.rootElement)
     );*/
     if (!searchStr) {
-      return userList;
+      return this.userList;
     }
 
-    return userList.filter(item => isFuzzyMatch(item, searchStr));
+    return this.userList.filter(item => isFuzzyMatch(item.name, searchStr));
   }
 
   /* private _updateActionList() {
@@ -182,6 +185,13 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
   override connectedCallback() {
     //console.log('111111');
     super.connectedCallback();
+    /*this._disposables.addFromEvent(window, 'mousedown', () => {
+      this.abortController.abort();
+    });
+    this._disposables.addFromEvent(this, 'mousedown', e => {
+      // Prevent input from losing focus
+      e.preventDefault();
+    });*/
     const inlineEditor = this.inlineEditor;
     assertExists(inlineEditor, 'RichText InlineEditor not found');
     this._filterItems = this._updateItem('');
@@ -355,10 +365,8 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     this._position = position;
   }
 
-  private _handleClickItem(item: string) {
-    //debugger;
+  private _handleClickItem(user: UserMention) {
     // assertExists(inlineEditor, 'Editor not found');
-
     cleanSpecifiedTail(
       this.editorHost,
       this.inlineEditor,
@@ -368,7 +376,8 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     const inlineRange = this.inlineEditor.getInlineRange();
     assertExists(inlineRange);
     this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
-      mention: { name: item, id: '1' },
+      mention: user,
+      //mention: { name: user., id: '1' },
       //mention: { type: 'LinkedPage', pageId: '11' },
     });
     this.inlineEditor.setInlineRange({
@@ -430,7 +439,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
             return this._handleClickItem(item);
           }}
         >
-          ${item}
+          ${item.name}
         </div>`;
       })}
     </div>`;
@@ -450,11 +459,17 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     //const accIdx = 0;
     //mention-popover popover-menu-container blocksuite-overlay
     //${Prefix}-popover
-    return html`<div
-      class="${Prefix}-popover  ${Prefix}-mention-popover"
-      style="${style}"
-    >
-      <div class="${Prefix}-popover-container">${this._menu()}</div>
+    return html`<div>
+      <!--<div
+        class="${Prefix}-overlay-mask"
+        @click="${() => this.abortController.abort()}"
+      ></div> -->
+      <div
+        class="${Prefix}-popover  ${Prefix}-mention-popover"
+        style="${style}"
+      >
+        <div class="${Prefix}-popover-container">${this._menu()}</div>
+      </div>
     </div>`;
   }
 }

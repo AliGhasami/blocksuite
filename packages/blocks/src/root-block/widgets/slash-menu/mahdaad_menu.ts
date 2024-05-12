@@ -4,10 +4,12 @@ import { Text } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
+  getImageFilesFromLocal,
   getInlineEditorByModel,
   openFileOrFiles,
 } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
+import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
@@ -31,13 +33,13 @@ import h3 from './icons/h3.svg?raw';
 import hint from './icons/hint.svg?raw';
 import image from './icons/image.svg?raw';
 import link from './icons/link.svg?raw';
-import link_to_page from './icons/link_to_page.svg?raw';
+//import link_to_page from './icons/link_to_page.svg?raw';
 import mention from './icons/mention.svg?raw';
 import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
 import table_of_content from './icons/table_of_content.svg?raw';
-import table_view from './icons/table_view.svg?raw';
+//import table_view from './icons/table_view.svg?raw';
 import text from './icons/text.svg?raw';
 import today from './icons/today.svg?raw';
 import video from './icons/video.svg?raw';
@@ -201,7 +203,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
-          //console.log('11111', rootElement, model);
           const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));
         },
@@ -215,17 +216,18 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           insertContent(rootElement.host, model, formatDate(date));
         },
       },
-      {
+      /*{
         title: 'Link To Page',
         description: 'Description',
         icon: link_to_page,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Table View',
         description: 'Description',
         icon: table_view,
         action: ({ rootElement, model }) => {
+          //return;
           const parent = rootElement.doc.getParent(model);
           assertExists(parent);
           const index = parent.children.indexOf(model);
@@ -240,12 +242,31 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           service.initDatabaseBlock(rootElement.doc, model, id, 'table', false);
           tryRemoveEmptyLine(model);
         },
-      },
+      },*/
       {
         title: 'Image',
         description: 'Description',
         icon: image,
-        action: () => {},
+        action: async ({ rootElement, model }) => {
+          const parent = rootElement.doc.getParent(model);
+          if (!parent) {
+            return;
+          }
+
+          const imageFiles = await getImageFilesFromLocal();
+          if (!imageFiles.length) return;
+
+          const imageService = rootElement.host.spec.getService('affine:image');
+          const maxFileSize = imageService.maxFileSize;
+
+          addSiblingImageBlock(
+            rootElement.host,
+            imageFiles,
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);
+        },
       },
       {
         title: 'Video',
