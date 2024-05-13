@@ -22,6 +22,7 @@ export interface AffineTextAttributes {
     pageId: string;
   } | null;
   mention?: {
+    user_id: string;
     name: string;
     id: string;
   } | null;
@@ -139,6 +140,7 @@ export function getAffineInlineSpecsWithReference(
       schema: z
         .object({
           name: z.string(),
+          user_id: z.string(),
           id: z.string(),
         })
         .optional()

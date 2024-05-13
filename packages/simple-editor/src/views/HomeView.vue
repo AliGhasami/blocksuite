@@ -87,7 +87,7 @@ const refEditor=ref(null)
 const userMentionList=ref<UserMention[]>([{id:'1',name:'test 1'}])
 async function handleGetData(){
   const temp=  await refEditor?.value?.getData()
-  //console.log("this is temp",temp);
+  console.log("this is temp",temp);
 }
 
 async function handleSetData(){

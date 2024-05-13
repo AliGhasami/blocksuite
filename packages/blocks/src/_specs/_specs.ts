@@ -25,6 +25,10 @@ import { ImageBlockSchema } from '../image-block/image-model.js';
 import { ImageService } from '../image-block/index.js';
 import { ListBlockSchema } from '../list-block/list-model.js';
 import { ListService } from '../list-block/list-service.js';
+/*import {
+  MahdaadImageBlockSchema,
+  MahdaadImageService,
+} from '../mahdaad-image-block/index.js';*/
 //import { MentionBlockSchema } from '../mention-block/mention-model.js';
 //import { MentionBlockSchema } from '../mention-block/mention-model.js';
 //import { MentionService } from '../mention-block/mention-service.js';
@@ -54,8 +58,8 @@ import { AFFINE_MODAL_WIDGET } from '../root-block/widgets/modal/modal.js';
 import { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from '../root-block/widgets/page-dragging-area/page-dragging-area.js';
 import { AFFINE_PIE_MENU_WIDGET } from '../root-block/widgets/pie-menu/index.js';
 import { AFFINE_SLASH_MENU_WIDGET } from '../root-block/widgets/slash-menu/index.js';
-import { SimpleBlockSchema } from '../simple-block/index.js';
 import { AFFINE_VIEWPORT_OVERLAY_WIDGET } from '../root-block/widgets/viewport-overlay/viewport-overlay.js';
+import { SimpleBlockSchema } from '../simple-block/index.js';
 import { SurfaceBlockSchema } from '../surface-block/surface-model.js';
 import { SurfacePageService } from '../surface-block/surface-page-service.js';
 import { SurfaceService } from '../surface-block/surface-service.js';
@@ -215,6 +219,16 @@ const CommonFirstPartyBlockSpecs: BlockSpec[] = [
       },
     },
   },
+  /*{
+    schema: MahdaadImageBlockSchema,
+    service: MahdaadImageService,
+    view: {
+      component: literal`affine-mahdaad-image`,
+      widgets: {
+        imageToolbar: literal`affine-image-toolbar-widget`,
+      },
+    },
+  },*/
   {
     schema: ParagraphBlockSchema,
     view: {

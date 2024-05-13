@@ -4,7 +4,7 @@ import '../_common/components/block-selection.js';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
-import { css, html, nothing, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';

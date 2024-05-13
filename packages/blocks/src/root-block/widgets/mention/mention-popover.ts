@@ -4,6 +4,7 @@ import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
+import { uuidv4 } from '@blocksuite/store';
 //import type { InlineEditor } from '@blocksuite/inline';
 import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -376,7 +377,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     const inlineRange = this.inlineEditor.getInlineRange();
     assertExists(inlineRange);
     this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
-      mention: user,
+      mention: { ...user, user_id: user.id, id: uuidv4() },
       //mention: { name: user., id: '1' },
       //mention: { type: 'LinkedPage', pageId: '11' },
     });

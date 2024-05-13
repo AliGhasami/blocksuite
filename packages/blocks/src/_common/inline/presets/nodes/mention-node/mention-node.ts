@@ -12,18 +12,18 @@ import {
 import type { Doc, DocMeta } from '@blocksuite/store';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ref } from 'lit/directives/ref.js';
 
+//import { ref } from 'lit/directives/ref.js';
 import type { RootBlockComponent } from '../../../../../root-block/types.js';
 import { HoverController } from '../../../../components/hover/controller.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
-import { FontDocIcon, FontLinkedDocIcon } from '../../../../icons/text.js';
+//import { FontDocIcon, FontLinkedDocIcon } from '../../../../icons/text.js';
 import {
   getModelByElement,
   getRootByElement,
 } from '../../../../utils/query.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
-import { affineTextStyles } from '../affine-text.js';
+//import { affineTextStyles } from '../affine-text.js';
 import { DEFAULT_DOC_NAME, REFERENCE_NODE } from '../consts.js';
 import type { ReferenceNodeConfig } from './mention-config.js';
 import { toggleReferencePopup } from './mention-popup.js';
@@ -202,7 +202,7 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
     rootElement.slots.docLinkClicked.emit({ docId: targetDocId });
   }
 
-  private _whenHover = new HoverController(this, ({ abortController }) => {
+  /*private _whenHover = new HoverController(this, ({ abortController }) => {
     if (this.doc.readonly) {
       return null;
     }
@@ -229,7 +229,7 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
         abortController
       ),
     };
-  });
+  });*/
 
   override render() {
     //const refMeta = this._refMeta;

@@ -8,8 +8,11 @@ import type { AttachmentBlockProps } from '../attachment-block/attachment-model.
 import { readImageSize } from '../root-block/edgeless/components/utils.js';
 import { transformModel } from '../root-block/utils/operations/model.js';
 import { toast } from './../_common/components/toast.js';
-import type { ImageBlockComponent } from './image-block.js';
-import type { ImageBlockModel, ImageBlockProps } from './image-model.js';
+import type { MahdaadImageBlockComponent } from './image-block.js';
+import type {
+  MahdaadImageBlockModel,
+  MahdaadImageBlockProps,
+} from './image-model.js';
 
 const MAX_RETRY_COUNT = 3;
 const DEFAULT_ATTACHMENT_NAME = 'affine-attachment';
@@ -51,18 +54,20 @@ export async function uploadBlobForImage(
   } finally {
     setImageUploaded(blockId);
 
-    const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
+    const imageModel = doc.getBlockById(
+      blockId
+    ) as MahdaadImageBlockModel | null;
     assertExists(imageModel);
 
     doc.withoutTransact(() => {
       doc.updateBlock(imageModel, {
         sourceId,
-      } satisfies Partial<ImageBlockProps>);
+      } satisfies Partial<MahdaadImageBlockProps>);
     });
   }
 }
 
-async function getImageBlob(model: ImageBlockModel) {
+async function getImageBlob(model: MahdaadImageBlockModel) {
   const sourceId = model.sourceId;
   if (!sourceId) {
     return null;
@@ -97,7 +102,7 @@ async function getImageBlob(model: ImageBlockModel) {
   return blob;
 }
 
-export async function fetchImageBlob(block: ImageBlockComponent) {
+export async function fetchImageBlob(block: MahdaadImageBlockComponent) {
   try {
     if (block.model.sourceId !== block.lastSourceId || !block.blobUrl) {
       block.loading = true;
@@ -148,7 +153,7 @@ export async function fetchImageBlob(block: ImageBlockComponent) {
   }
 }
 
-export async function downloadImageBlob(block: ImageBlockComponent) {
+export async function downloadImageBlob(block: MahdaadImageBlockComponent) {
   const { host, downloading } = block;
   if (downloading) {
     toast(host, 'Download in progress...');
@@ -170,7 +175,7 @@ export async function downloadImageBlob(block: ImageBlockComponent) {
   block.downloading = false;
 }
 
-export async function resetImageSize(block: ImageBlockComponent) {
+export async function resetImageSize(block: MahdaadImageBlockComponent) {
   const { blob, model } = block;
   if (!blob) {
     return;
@@ -215,7 +220,7 @@ function convertToPng(blob: Blob): Promise<Blob | null> {
   });
 }
 
-export async function copyImageBlob(blockElement: ImageBlockComponent) {
+export async function copyImageBlob(blockElement: MahdaadImageBlockComponent) {
   const { host, model } = blockElement;
   let blob = await getImageBlob(model);
   if (!blob) {
@@ -277,7 +282,6 @@ export function addSiblingImageBlock(
   targetModel: BlockModel,
   place: 'after' | 'before' = 'after'
 ) {
-  console.log('1111', files);
   const imageFiles = files.filter(file => file.type.startsWith('image/'));
   if (!imageFiles.length) {
     return;
@@ -296,7 +300,7 @@ export function addSiblingImageBlock(
     return;
   }
 
-  const imageBlockProps: Partial<ImageBlockProps> &
+  const imageBlockProps: Partial<MahdaadImageBlockProps> &
     {
       flavour: 'affine:image';
     }[] = imageFiles.map(file => ({
@@ -352,7 +356,7 @@ export function addImageBlocks(
 /**
  * Turn the image block into a attachment block.
  */
-export async function turnImageIntoCardView(block: ImageBlockComponent) {
+export async function turnImageIntoCardView(block: MahdaadImageBlockComponent) {
   const doc = block.doc;
   if (!doc.schema.flavourSchemaMap.has('affine:attachment')) {
     throw new Error('The attachment flavour is not supported!');

@@ -12,7 +12,7 @@ import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
-import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+//import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMentionWidget } from '../mention/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
@@ -300,7 +300,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             rootElement.host.spec.getService('affine:attachment');
           assertExists(attachmentService);
           const maxFileSize = attachmentService.maxFileSize;
-
           addSiblingAttachmentBlocks(
             rootElement.host,
             [file],
@@ -358,7 +357,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: multi_column,
         action: () => {},
       },
-      {
+      /* {
         title: 'Link Doc',
         description: 'Description',
         icon: multi_column,
@@ -381,7 +380,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
-      },
+      },*/
       //todo
       /*{
         title: 'Sketch',
@@ -391,42 +390,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
       },*/
       //todo
       /* {
-        title: 'Table',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /* {
         title: 'Table of Content',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Link',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Image',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Video',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Code blank',
         description: 'Description',
         icon: h1,
         action: ({ rootElement }) => {},
