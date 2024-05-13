@@ -54,6 +54,7 @@ export function handleBlockEndEnter(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
+  return;
   console.log('handleBlockEndEnter');
   //debugger;
   const doc = model.doc;
@@ -147,7 +148,7 @@ export function handleBlockEndEnter(
     }
   }
 
-  asyncFocusRichText(editorHost, id)?.catch(console.error);
+  //asyncFocusRichText(editorHost, id)?.catch(console.error);
 }
 
 export function handleBlockSplit(

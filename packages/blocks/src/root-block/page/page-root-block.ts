@@ -253,6 +253,7 @@ export class PageRootBlockComponent extends BlockElement<
         return true;
       },
       ArrowUp: () => {
+        console.log("this is ArrowUp");
         const selection = this.host.selection;
         const sel = selection.value.find(
           sel => sel.is('text') || sel.is('block')
@@ -273,6 +274,7 @@ export class PageRootBlockComponent extends BlockElement<
           const isFirstText = sel.is('text') && sel.start.index === 0;
           const isBlock = sel.is('block');
           if (isBlock || isFirstText) {
+            //todo ali ghasami for comment
             focusTitle(this.host);
           }
           return;

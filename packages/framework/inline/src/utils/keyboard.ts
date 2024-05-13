@@ -40,7 +40,7 @@ export function createInlineKeyDownHandler(
   inlineEditor: InlineEditor,
   bindings: KeyboardBindingRecord
 ): (evt: KeyboardEvent) => void {
-  // console.log('createInlineKeyDownHandler');
+  console.log('createInlineKeyDownHandler');
   const bindingStore: Record<string, KeyboardBinding[]> = {};
 
   function normalize(binding: KeyboardBinding): KeyboardBinding {
