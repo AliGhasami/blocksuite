@@ -20,6 +20,7 @@
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
     <button @click="handleAddUserMention">Add user Mention</button>
+    <button @click="handleStartCollaboration">start collaboration</button>
     <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
@@ -106,6 +107,33 @@ async function handleSetFocus(){
 function handleAddUserMention(){
   userMentionList.value.push({name:'test is test2',id:'2'})
 }
+
+
+async function  handleStartCollaboration(){
+  if (window.wsProvider) {
+    /*notify('There is already a websocket provider exists', 'neutral').catch(
+      console.error
+    );*/
+    return;
+  }
+
+  const params = new URLSearchParams(location.search);
+  const id = params.get('room') || (await generateRoomId());
+
+  params.set('room', id);
+  const url = new URL(location.href);
+  url.search = params.toString();
+  location.href = url.href;
+}
+
+async function generateRoomId(): Promise<string> {
+  return fetch(new URL('/room/', 'https://blocksuite-playground.toeverything.workers.dev'), {
+    method: 'post',
+  })
+    .then(res => res.json())
+    .then(({ id }) => id);
+}
+
 
 
 /*

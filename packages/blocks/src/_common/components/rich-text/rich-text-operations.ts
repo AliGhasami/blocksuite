@@ -54,7 +54,7 @@ export function handleBlockEndEnter(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  return;
+  //  return;
   console.log('handleBlockEndEnter');
   //debugger;
   const doc = model.doc;
@@ -148,7 +148,7 @@ export function handleBlockEndEnter(
     }
   }
 
-  //asyncFocusRichText(editorHost, id)?.catch(console.error);
+  asyncFocusRichText(editorHost, id)?.catch(console.error);
 }
 
 export function handleBlockSplit(
@@ -421,7 +421,7 @@ export function handleRemoveAllIndentForMultiBlocks(
 // When deleting at line end of a code block,
 // do nothing
 function handleCodeBlockForwardDelete(model: ExtendedModel) {
-  console.log('handleCodeBlockForwardDelete');
+  console.log('handleCodeBlockForwardDelete', model); //'affine:hint'
   if (!matchFlavours(model, ['affine:code'])) return false;
   return true;
 }

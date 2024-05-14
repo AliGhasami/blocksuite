@@ -271,13 +271,18 @@ defineExpose({
 
   /* Mention Style */
   .affine-mention{
-    @apply flex-inline gap-2 mt-overline;
-    color:#64428F;
+    @apply flex-inline gap-2 mt-overline cursor-pointer text-neutral-8 bg-gray-1;
     //border: 1px solid #535bf2;
     width: fit-content;
     border-radius: @roundness-sm;
     padding: 0 @space-2;
-    background: @dreampurple-0;
+
+    &:hover,&[data-selected='true'] {
+      background:#F7F6FE;
+      color:#64428F;
+      //background: red;
+    }
+
   }
 
   /* Hint Style */

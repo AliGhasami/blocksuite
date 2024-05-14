@@ -139,7 +139,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 <select-hint-type onclick={this.handleChangeType} onchange={this.handleChangeType} />
 `;*/
 
-    this.bindHotKey({
+    /*this.bindHotKey({
       Escape: () => {},
       'Mod-b': () => {},
       'Shift-Enter': ctx => {
@@ -148,7 +148,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         //console.log('11111', ctx._map.keyboardState.raw);
         return false;
       },
-    });
+    });*/
 
     /*this.bindHotkey({
       'Mod-b': () => {},
@@ -170,10 +170,11 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
           'description Inline Editor not define'
         );
 
-        const keydownHandler = createInlineKeyDownHandler(titleInlineEditor, {
+        /* const keydownHandler = createInlineKeyDownHandler(titleInlineEditor, {
           inputRule: {
-            key: ' ',
+            key: 'q',
             handler: context => {
+              debugger
               console.log('this is 1000');
               return KEYBOARD_ALLOW_DEFAULT;
             },
@@ -182,18 +183,35 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         titleInlineEditor.eventSource.addEventListener(
           'keydown',
           keydownHandler
+        );*/
+
+        /* const keydownHandler2 = createInlineKeyDownHandler(
+          descriptionInlineEditor,
+          {
+            inputRule: {
+              key: 'q',
+              handler: context => {
+                debugger
+                console.log('this is 1000');
+                return KEYBOARD_ALLOW_DEFAULT;
+              },
+            },
+          }
         );
+        descriptionInlineEditor.eventSource.addEventListener(
+          'keydown',
+          keydownHandler2
+        );*/
 
         //return;
         titleInlineEditor?.eventSource.addEventListener(
           'keydown',
           (e: KeyboardEvent) => {
-            console.log('this is title enter', e);
-            //debugger;
+            const inlineRange = titleInlineEditor.getInlineRange();
+            if (!inlineRange) return;
             if (e.key === 'Enter') {
               e.preventDefault();
               descriptionInlineEditor.focusEnd();
-              //console.log('250000');
             }
             if (e.key === 'Enter' && e.shiftKey) {
               e.preventDefault();
@@ -201,19 +219,19 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
           }
         );
 
-        descriptionInlineEditor?.eventSource.addEventListener(
+        /*descriptionInlineEditor?.eventSource.addEventListener(
           'keydown',
           (e: KeyboardEvent) => {
             //debugger;
-            /*if (e.key === 'Enter' && e.shiftKey) {
+            /!*if (e.key === 'Enter' && e.shiftKey) {
               console.log('bbbbbbb');
               e.preventDefault();
               return false;
             }
             console.log(e);
-            return true;*/
+            return true;*!/
           }
-        );
+        );*/
         tippy(this, {
           content: this.popover,
           allowHTML: true,
