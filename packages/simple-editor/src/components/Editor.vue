@@ -17,14 +17,15 @@ let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
 import 'tippy.js/dist/tippy.css';
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
-import type { UserMention } from '@/components/types';
+//todo fix import
+//import type { UserMention } from '@/components/types';
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
 if(!customElements.get('select-hint-type')){
   customElements.define('select-hint-type', SelectHintType,{})
 }
 
 interface Props{
-  mentionUserList?:UserMention[]
+  mentionUserList?:any[]
 }
 
 type IBlockChange= {
@@ -256,8 +257,6 @@ defineExpose({
 /* TODO ali ghasami for fix token */
 @prefix:~'vue-block-editor';
 .@{prefix}{
-
-
   .place-holder{
   @apply text-neutral-4 mt-body;
     line-height: unset;
@@ -276,13 +275,11 @@ defineExpose({
     width: fit-content;
     border-radius: @roundness-sm;
     padding: 0 @space-2;
-
     &:hover,&[data-selected='true'] {
       background:#F7F6FE;
+      //color:@amethyst-5;
       color:#64428F;
-      //background: red;
     }
-
   }
 
   /* Hint Style */

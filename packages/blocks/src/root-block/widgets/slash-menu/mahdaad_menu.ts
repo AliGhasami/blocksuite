@@ -301,7 +301,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             rootElement.host.spec.getService('affine:attachment');
           assertExists(attachmentService);
           const maxFileSize = attachmentService.maxFileSize;
-          addSiblingAttachmentBlocks(
+          await addSiblingAttachmentBlocks(
             rootElement.host,
             [file],
             maxFileSize,

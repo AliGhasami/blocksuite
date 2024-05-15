@@ -227,6 +227,7 @@ export async function addSiblingAttachmentBlocks(
     type: types[index],
   }));
 
+  //debugger;
   const blockIds = doc.addSiblingBlocks(
     targetModel,
     attachmentBlockProps,
