@@ -25,6 +25,7 @@ export class ImageBlockEdgelessComponent extends WithDisposable(
   }
 
   override render() {
+    console.log('22222', this.url);
     return html`<div class="resizable-img">
       <img
         class="drag-target"

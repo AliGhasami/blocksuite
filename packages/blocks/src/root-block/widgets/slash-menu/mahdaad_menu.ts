@@ -253,13 +253,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           if (!parent) {
             return;
           }
-
           const imageFiles = await getImageFilesFromLocal();
           if (!imageFiles.length) return;
-
           const imageService = rootElement.host.spec.getService('affine:image');
           const maxFileSize = imageService.maxFileSize;
-
           addSiblingImageBlock(
             rootElement.host,
             imageFiles,

@@ -161,7 +161,7 @@ export class AttachmentBlockComponent extends BlockElement<
   override connectedCallback() {
     super.connectedCallback();
 
-    this.refreshData();
+    //this.refreshData();
 
     this.contentEditable = 'false';
 
@@ -183,7 +183,7 @@ export class AttachmentBlockComponent extends BlockElement<
           URL.revokeObjectURL(this.blobUrl);
           this.blobUrl = undefined;
         }
-        this.refreshData();
+        //this.refreshData();
       }
     });
 
@@ -304,7 +304,6 @@ export class AttachmentBlockComponent extends BlockElement<
                   <div class="affine-attachment-content-title-icon">
                     ${titleIcon}
                   </div>
-                  111111
                   <div class="affine-attachment-content-title-text">
                     ${titleText}
                   </div>

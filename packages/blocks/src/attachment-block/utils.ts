@@ -3,6 +3,7 @@ import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
 import { toast } from '../_common/components/toast.js';
+import { uploadFile } from '../_common/upload.js';
 import { humanFileSize } from '../_common/utils/math.js';
 import type { AttachmentBlockComponent } from './attachment-block.js';
 import type {
@@ -48,11 +49,22 @@ async function uploadAttachmentBlob(
   }
 
   const doc = editorHost.doc;
-  let sourceId: string | undefined;
-
+  //let sourceId: string | undefined;
+  const attachmentModel = doc.getBlockById(
+    blockId
+  ) as AttachmentBlockModel | null;
+  assertExists(attachmentModel);
   try {
-    setAttachmentUploading(blockId);
-    sourceId = await doc.blob.set(blob);
+    //setAttachmentUploading(blockId);
+    //sourceId = await doc.blob.set(blob);
+    const { data } = await uploadFile(blob);
+    //console.log('12111', data.data.storage);
+    doc.withoutTransact(() => {
+      doc.updateBlock(attachmentModel, {
+        src: data.data.storage,
+        //sourceId,
+      } satisfies Partial<AttachmentBlockProps>);
+    });
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -62,18 +74,7 @@ async function uploadAttachmentBlob(
       );
     }
   } finally {
-    setAttachmentUploaded(blockId);
-
-    const attachmentModel = doc.getBlockById(
-      blockId
-    ) as AttachmentBlockModel | null;
-    assertExists(attachmentModel);
-
-    doc.withoutTransact(() => {
-      doc.updateBlock(attachmentModel, {
-        sourceId,
-      } satisfies Partial<AttachmentBlockProps>);
-    });
+    //setAttachmentUploaded(blockId);
   }
 }
 
