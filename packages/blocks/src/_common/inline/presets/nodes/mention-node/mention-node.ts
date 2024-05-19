@@ -11,21 +11,12 @@ import {
 } from '@blocksuite/inline';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { customElement, property, state } from 'lit/decorators.js';
 
 //import { ref } from 'lit/directives/ref.js';
-import type { RootBlockComponent } from '../../../../../root-block/types.js';
-import { HoverController } from '../../../../components/hover/controller.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 //import { FontDocIcon, FontLinkedDocIcon } from '../../../../icons/text.js';
-import {
-  getModelByElement,
-  getRootByElement,
-} from '../../../../utils/query.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
 import { REFERENCE_NODE } from '../consts.js';
-//import { affineTextStyles } from '../affine-text.js';
-import { DEFAULT_DOC_NAME, REFERENCE_NODE } from '../consts.js';
 import type { ReferenceNodeConfig } from './mention-config.js';
 
 export type RefNodeSlots = {

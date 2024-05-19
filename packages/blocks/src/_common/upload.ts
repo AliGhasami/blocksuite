@@ -43,15 +43,17 @@ instance.interceptors.response.use(
   }
 );
 
-export async function uploadFile(file) {
+export async function uploadFile(file: File) {
   const formData = new FormData();
   formData.append('file', file);
   return instance.post('/v2/file/upload', formData, {
     onUploadProgress: progressEvent => {
-      const percentCompleted = Math.round(
-        (progressEvent.loaded * 100) / progressEvent.total
-      );
-      console.log('percentCompleted', percentCompleted);
+      if (progressEvent) {
+        const percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / (progressEvent.total ?? 1)
+        );
+        console.log('percentCompleted', percentCompleted);
+      }
       // uploadProgress.value = percentCompleted;
       // uploadStatus.textContent = `Upload ${percentCompleted}% completed`;
       console.log('progressEvent', progressEvent);
