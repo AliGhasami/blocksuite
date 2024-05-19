@@ -18,6 +18,7 @@ import {
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { MentionPopover } from './mention-popover.js';
+import type { UserMention } from './types.js';
 
 export type MentionOptions = {
   triggerKeys: string[];
@@ -39,6 +40,7 @@ export function showMentionPopover({
   abortController = new AbortController(),
   options,
   triggerKey,
+  userList = [],
 }: {
   editorHost: EditorHost;
   inlineEditor: AffineInlineEditor;
@@ -47,6 +49,7 @@ export function showMentionPopover({
   abortController?: AbortController;
   options: MentionOptions;
   triggerKey: string;
+  userList: UserMention[];
 }) {
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
@@ -56,6 +59,8 @@ export function showMentionPopover({
   mention.options = options;
   //linkedDoc.options = options;
   mention.triggerKey = triggerKey;
+  //console.log('this is user List', userList);
+  mention.userList = userList;
   // Mount
   container.append(mention);
   disposables.add(() => mention.remove());
@@ -83,13 +88,18 @@ export function showMentionPopover({
   setTimeout(updatePosition);
 
   //todo ali ghasami
-  /* disposables.addFromEvent(window, 'mousedown', (e: Event) => {
-    //console.log('e.target', e.target);
+  disposables.addFromEvent(window, 'mousedown', (e: Event) => {
+    const elm: HTMLElement = e.target as HTMLElement;
+    if (elm && elm.className.includes('mention-item')) return;
+    //console.log('e.target', e.target, mention, container, elm.className);
+    //if()
     //return;
     //console.log('77777', inlineEditor.getInlineRange());
-    if (e.target === mention) return;
+    //if(e.target)
+    //return;
+    //if (e.target === mention) return;
     abortController.abort();
-  });*/
+  });
 
   return mention;
 }
@@ -118,6 +128,7 @@ export class AffineMentionWidget extends WidgetElement {
 
   override connectedCallback() {
     super.connectedCallback();
+    //console.log('this is block', this.blockElement.model);
     this.handleEvent('keyDown', this._onKeyDown);
   }
 
@@ -133,6 +144,7 @@ export class AffineMentionWidget extends WidgetElement {
       range: curRange,
       options: this.options,
       triggerKey,
+      userList: this.blockElement.model.mentionUserList,
     });
   };
 

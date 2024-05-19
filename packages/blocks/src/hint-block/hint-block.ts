@@ -1,6 +1,18 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
+import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
+import { assertExists } from '@blocksuite/global/utils';
+//import { assertExists } from '@blocksuite/global/utils';
+import {
+  createInlineKeyDownHandler,
+  //createInlineKeyDownHandler,
+  type InlineRangeProvider,
+  KEYBOARD_ALLOW_DEFAULT,
+  //KEYBOARD_ALLOW_DEFAULT,
+} from '@blocksuite/inline';
+import type { HTMLElement } from 'happy-dom';
+///import { limitShift, offset, shift } from '@floating-ui/dom';
 import { BlockElement } from '@blocksuite/block-std';
 //import type { HTMLElement } from 'happy-dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
@@ -9,6 +21,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import tippy from 'tippy.js';
 
 import { type RichText } from '../_common/components/index.js';
+//import { createKeydownObserver } from '../_common/components/utils.js';
+//import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
 import type { HintBlockModel, HintType } from './hint-model.js';
@@ -24,7 +38,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     affine-hint {
       display: block;
       margin: 10px 0;
-      padding-right: 10px;
+      padding-inline-end: 10px;
       //font-size: var(--affine-font-base);
     }
     .affine-hint-container {
@@ -36,17 +50,17 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     const inlineManager = this.service?.inlineManager;
     assertExists(inlineManager);
     return inlineManager;
-  }
-  get attributesSchema() {
+  }*/
+  /* get attributesSchema() {
     return this.inlineManager.getSchema();
-  }
-  get attributeRenderer() {
+  }*/
+  /*  get attributeRenderer() {
     return this.inlineManager.getRenderer();
-  }
-  get markdownShortcutHandler() {
+  }*/
+  /*get markdownShortcutHandler() {
     return this.inlineManager.markdownShortcutHandler;
-  }
-  get embedChecker() {
+  }*/
+  /* get embedChecker() {
     return this.inlineManager.embedChecker;
   }*/
 
@@ -58,6 +72,12 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   //@query('.popover')
   //popover?: HTMLElement | null;
   //popover?: HTMLElement | null;
+
+  @query('.title-text')
+  private _richTextTitle?: RichText;
+
+  @query('.description-text')
+  private _richTextDescription?: RichText;
 
   //@query('.affine-paragraph-placeholder')
   //private _placeholderContainer?: HTMLElement;
@@ -105,6 +125,9 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   override connectedCallback() {
     super.connectedCallback();
     //bindContainerHotkey(this);
+
+    //console.log('2222', this._richTextTitle);
+
     //console.log('tttttttttttttttttt', this.popover());
     //'#myButton'
 
@@ -115,10 +138,10 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 `;*/
 
     /*this.bindHotKey({
-      Escape: () => {
-      },
+      Escape: () => {},
       'Mod-b': () => {},
       'Shift-Enter': ctx => {
+        console.log('Shift-Enter');
         //ctx._map.keyboardState.raw.preventDefault();
         //console.log('11111', ctx._map.keyboardState.raw);
         return false;
@@ -135,17 +158,78 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
 
   override firstUpdated() {
-    //console.log('hint-firstUpdated');
-    //console.log('lllllllllllllll');
-
-    //temp.show();
-    //this.model.propsUpdated.on(this._updatePlaceholder);
-    //this.host.selection.slots.changed.on(this._updatePlaceholder);
-
     this.updateComplete
       .then(() => {
-        //console.log('hint-updateComplete', this.model);
+        const titleInlineEditor = this._richTextTitle?.inlineEditor;
+        assertExists(titleInlineEditor, 'title Inline Editor not define');
+        const descriptionInlineEditor = this._richTextDescription?.inlineEditor;
+        assertExists(
+          descriptionInlineEditor,
+          'description Inline Editor not define'
+        );
 
+        /* const keydownHandler = createInlineKeyDownHandler(titleInlineEditor, {
+          inputRule: {
+            key: 'q',
+            handler: context => {
+              debugger
+              console.log('this is 1000');
+              return KEYBOARD_ALLOW_DEFAULT;
+            },
+          },
+        });
+        titleInlineEditor.eventSource.addEventListener(
+          'keydown',
+          keydownHandler
+        );*/
+
+        /* const keydownHandler2 = createInlineKeyDownHandler(
+          descriptionInlineEditor,
+          {
+            inputRule: {
+              key: 'q',
+              handler: context => {
+                debugger
+                console.log('this is 1000');
+                return KEYBOARD_ALLOW_DEFAULT;
+              },
+            },
+          }
+        );
+        descriptionInlineEditor.eventSource.addEventListener(
+          'keydown',
+          keydownHandler2
+        );*/
+
+        //return;
+        titleInlineEditor?.eventSource.addEventListener(
+          'keydown',
+          (e: KeyboardEvent) => {
+            const inlineRange = titleInlineEditor.getInlineRange();
+            if (!inlineRange) return;
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              descriptionInlineEditor.focusEnd();
+            }
+            if (e.key === 'Enter' && e.shiftKey) {
+              e.preventDefault();
+            }
+          }
+        );
+
+        /*descriptionInlineEditor?.eventSource.addEventListener(
+          'keydown',
+          (e: KeyboardEvent) => {
+            //debugger;
+            /!*if (e.key === 'Enter' && e.shiftKey) {
+              console.log('bbbbbbb');
+              e.preventDefault();
+              return false;
+            }
+            console.log(e);
+            return true;*!/
+          }
+        );*/
         //@ts-ignore
         tippy(this, {
           content: this.popover,
@@ -158,38 +242,6 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
           hideOnClick: false,
           arrow: false,
         });
-
-        const inlineEditor = this.inlineEditor;
-        if (!inlineEditor) return;
-
-        /* const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
-          inputRule: {
-            key: ' ',
-            handler: context => {
-              debugger;
-              const { inlineEditor, prefixText, inlineRange } = context;
-              /!*for (const match of markdownMatches) {
-                const matchedText = prefixText.match(match.pattern);
-                if (matchedText) {
-                  return match.action({
-                    inlineEditor,
-                    prefixText,
-                    inlineRange,
-                    pattern: match.pattern,
-                    undoManager: this.undoManager,
-                  });
-                }
-              }*!/
-              return KEYBOARD_ALLOW_DEFAULT;
-            },
-          },
-        });
-        console.log('tttttttttt', this);
-        this.addEventListener('keydown', keydownHandler);*/
-
-        /*this.disposables.add(
-          inlineEditor.slots.inputting.on(this._updatePlaceholder)
-        );*/
       })
       .catch(console.error);
   }
@@ -208,12 +260,14 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
           <div class="affine-content">
             <div class="affine-hint-title">
               <rich-text
+                class="title-text"
                 .yText=${this.model.title.yText}
                 .inlineEventSource=${this.topContenteditableElement ?? nothing}
               ></rich-text>
             </div>
             <div class="affine-hint-description">
               <rich-text
+                class="description-text"
                 .yText=${this.model.description.yText}
                 .inlineEventSource=${this.topContenteditableElement ?? nothing}
               ></rich-text>

@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css';
-import { PageEditor } from '@blocksuite/presets';
+import { PageEditor,EdgelessEditor } from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
 import { defineCustomElement, onMounted, ref, watch } from 'vue';
@@ -60,17 +60,17 @@ const emit=defineEmits<{
 
 
 async function getData(){
-  if(myCollection){
+ /* if(myCollection){
     return  await exportData(myCollection, [currentDocument])
   }
-  return null
+  return null*/
   //console.log("this is temp",temp)
   //console.log("ref editor",refEditor.value)
 }
 
 //TODO(@ali ghasami) for fix after and check performance
 async function setData(data:any){
- // console.log("this is set data",data)
+ /*// console.log("this is set data",data)
   if(myCollection){
     const editor = new PageEditor();
     const job = new Job({ collection: myCollection, middlewares: [
@@ -113,10 +113,10 @@ async function setData(data:any){
     //bindEvent(editor.doc)
     //editor.doc.load()
     //editor.doc.resetHistory()
-  }
+  }*/
 }
 
-function bindEvent(doc:Doc){
+/*function bindEvent(doc:Doc){
   doc.slots.blockUpdated.on((data)=>{
     emit('change',data)
     if(data.type=='add')
@@ -127,13 +127,13 @@ function bindEvent(doc:Doc){
       emit('updateBlock',data)
     //console.log("block updated",data)
   })
-}
+}*/
 
 
-watch(()=>props.mentionUserList,()=>{
+/*watch(()=>props.mentionUserList,()=>{
   //debugger
   updateMentionList()
-},{deep:true})
+},{deep:true})*/
 
 
 /*
@@ -159,20 +159,31 @@ function handleSetData(){
   doc.updateBlock(paragraph, { text: new Text('Hello World!') });
   console.log("this is doc",doc)
 })*/
+import '@blocksuite/presets/themes/affine.css';
 
 onMounted(async ()=>{
-  const {doc,collection} = createEmptyDoc().init();
+  const doc = createEmptyDoc().init();
+  const editor = new EdgelessEditor();
+  editor.doc = doc;
+  if(refEditor.value){
+   refEditor.value.appendChild(editor);
+  }
+  //document.body.append(editor);
+
+
+  /*const {doc,collection} = createEmptyDoc().init();
   myCollection= collection
   currentDocument=doc
   //myNoteId=noteId
-  const editor = new PageEditor();
-  editor.doc = doc;
+ // const editor = new PageEditor();
+  const editor = new EdgelessEditor();
+  //editor.doc = doc;
   //document.body.appendChild(editor);
   if(refEditor.value){
     refEditor.value.appendChild(editor);
   }
   bindEvent(doc)
-  updateMentionList()
+  updateMentionList()*/
   //console.log("1111",editor)
   //console.log("2222",doc)
   //const a=doc.getBlockByFlavour('affine:paragraph')
@@ -210,6 +221,7 @@ function updateMentionList(){
 }
 
 
+/*
 function setFocus(){
   if(refEditor.value){
     const editor=(refEditor.value as HTMLElement).querySelector('rich-text')
@@ -220,6 +232,7 @@ function setFocus(){
   }
   //console.log("ggg",refEditor.value)
 }
+*/
 
 /*onMounted(()=>{
   setTimeout(()=>{
@@ -232,7 +245,7 @@ function setFocus(){
 defineExpose({
   getData,
   setData,
-  setFocus
+  //setFocus
 })
 
 

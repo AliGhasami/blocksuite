@@ -4,13 +4,13 @@ import '../_common/components/block-selection.js';
 import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
-import { css, html, nothing, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
 import type { RichText } from '../_common/components/rich-text/rich-text.js';
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-import { getViewportElement } from '../_common/utils/query.js';
+//import { getViewportElement } from '../_common/utils/query.js';
 import type { NoteBlockComponent } from '../note-block/note-block.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
 import type { ParagraphBlockModel } from './paragraph-model.js';
@@ -52,86 +52,8 @@ export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockModel,
   ParagraphBlockService
 > {
-  static override styles = css`
-    affine-paragraph {
-      display: block;
-      margin: 10px 0;
-      //font-size: var(--affine-font-base);
-    }
-
-    .affine-paragraph-block-container {
-      position: relative;
-      border-radius: 4px;
-    }
-    .affine-paragraph-rich-text-wrapper {
-      position: relative;
-    }
-    /* .affine-paragraph-rich-text-wrapper rich-text {
-      -webkit-font-smoothing: antialiased;
-    } */
-    code {
-      font-size: calc(var(--affine-font-base) - 3px);
-    }
-    /*.claytap-h1 {
-      font-size: var(--affine-font-h-1);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 18px;
-      margin-bottom: 10px;
-    }*/
-    .claytap-h1 code {
-      font-size: calc(var(--affine-font-base) + 8px);
-    }
-    /*.claytap-h2 {
-      font-size: var(--affine-font-h-2);
-      font-weight: 600;
-      line-height: calc(1em + 10px);
-      margin-top: 14px;
-      margin-bottom: 10px;
-    }*/
-    .claytap-h2 code {
-      font-size: calc(var(--affine-font-base) + 6px);
-    }
-    /*.claytap-h3 {
-      font-size: var(--affine-font-h-3);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }*/
-    .claytap-h3 code {
-      font-size: calc(var(--affine-font-base) + 4px);
-    }
-    .claytap-h4 {
-      font-size: var(--affine-font-h-4);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-    .claytap-h4 code {
-      font-size: calc(var(--affine-font-base) + 2px);
-    }
-    .claytap-h5 {
-      font-size: var(--affine-font-h-5);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-    .claytap-h5 code {
-      font-size: calc(var(--affine-font-base));
-    }
-    .claytap-h6 {
-      font-size: var(--affine-font-h-6);
-      font-weight: 600;
-      line-height: calc(1em + 8px);
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-    .claytap-h6 code {
-      font-size: calc(var(--affine-font-base) - 2px);
-    }
+  static override styles = paragraphBlockStyles;
+  /*  static override styles = css`
     .quote {
       line-height: 26px;
       padding-left: 17px;
@@ -174,7 +96,7 @@ export class ParagraphBlockComponent extends BlockElement<
     .affine-paragraph-placeholder.visible {
       display: block;
     }
-  `;
+  `;*/
 
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
@@ -228,10 +150,8 @@ export class ParagraphBlockComponent extends BlockElement<
   }
 
   override firstUpdated() {
-    this._disposables.add(this.model.propsUpdated.on(this._updatePlaceholder));
-    this._disposables.add(
-      this.host.selection.slots.changed.on(this._updatePlaceholder)
-    );
+    this.model.propsUpdated.on(this._updatePlaceholder);
+    this.host.selection.slots.changed.on(this._updatePlaceholder);
 
     this.updateComplete
       .then(() => {
@@ -334,7 +254,6 @@ export class ParagraphBlockComponent extends BlockElement<
             .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .verticalScrollContainer=${getViewportElement(this.host)}
           ></rich-text>
         </div>
         ${children}

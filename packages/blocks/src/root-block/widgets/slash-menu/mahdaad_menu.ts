@@ -4,14 +4,17 @@ import { Text } from '@blocksuite/store';
 
 import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
+  getImageFilesFromLocal,
   getInlineEditorByModel,
   openFileOrFiles,
 } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import { viewPresets } from '../../../database-block/index.js';
+import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+//import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMentionWidget } from '../mention/index.js';
 import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
@@ -32,7 +35,7 @@ import h3 from './icons/h3.svg?raw';
 import hint from './icons/hint.svg?raw';
 import image from './icons/image.svg?raw';
 import link from './icons/link.svg?raw';
-import link_to_page from './icons/link_to_page.svg?raw';
+//import link_to_page from './icons/link_to_page.svg?raw';
 import mention from './icons/mention.svg?raw';
 import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
@@ -203,7 +206,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
-          //console.log('11111', rootElement, model);
           const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));
         },
@@ -217,17 +219,18 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           insertContent(rootElement.host, model, formatDate(date));
         },
       },
-      {
+      /*{
         title: 'Link To Page',
         description: 'Description',
         icon: link_to_page,
         action: () => {},
-      },
+      },*/
       {
         title: 'Table View',
         description: 'Description',
         icon: table_view,
         action: ({ rootElement, model }) => {
+          //return;
           const parent = rootElement.doc.getParent(model);
           assertExists(parent);
           const index = parent.children.indexOf(model);
@@ -253,7 +256,23 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Image',
         description: 'Description',
         icon: image,
-        action: () => {},
+        action: async ({ rootElement, model }) => {
+          const parent = rootElement.doc.getParent(model);
+          if (!parent) {
+            return;
+          }
+          const imageFiles = await getImageFilesFromLocal();
+          if (!imageFiles.length) return;
+          const imageService = rootElement.host.spec.getService('affine:image');
+          const maxFileSize = imageService.maxFileSize;
+          addSiblingImageBlock(
+            rootElement.host,
+            imageFiles,
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);
+        },
       },
       {
         title: 'Video',
@@ -372,48 +391,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
       //todo
       /*{
         title: 'Sketch',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /* {
-        title: 'Table',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /* {
-        title: 'Table of Content',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Link',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Image',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Video',
-        description: 'Description',
-        icon: h1,
-        action: ({ rootElement }) => {},
-      },*/
-      //todo
-      /*{
-        title: 'Code blank',
         description: 'Description',
         icon: h1,
         action: ({ rootElement }) => {},

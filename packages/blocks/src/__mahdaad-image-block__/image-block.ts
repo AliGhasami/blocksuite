@@ -10,13 +10,12 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { EmbedCardCaption } from '../_common/components/embed-card/embed-card-caption.js';
-import { baseURL } from '../_common/upload.js';
 import { Bound } from '../surface-block/utils/bound.js';
-import type { ImageBlockEdgelessComponent } from './components/edgeless-image-block.js';
+import type { MahdaadImageBlockEdgelessComponent } from './components/edgeless-image-block.js';
 import type { AffineImageCard } from './components/image-card.js';
-import type { ImageBlockPageComponent } from './components/page-image-block.js';
-import { type ImageBlockModel } from './image-model.js';
-import type { ImageBlockService } from './image-service.js';
+import type { MahdaadImageBlockPageComponent } from './components/page-image-block.js';
+import { type MahdaadImageBlockModel } from './image-model.js';
+import type { MahdaadImageService } from './image-service.js';
 import {
   copyImageBlob,
   downloadImageBlob,
@@ -25,10 +24,10 @@ import {
   turnImageIntoCardView,
 } from './utils.js';
 
-@customElement('affine-image')
-export class ImageBlockComponent extends BlockElement<
-  ImageBlockModel,
-  ImageBlockService
+@customElement('affine-mahdaad-image')
+export class MahdaadImageBlockComponent extends BlockElement<
+  MahdaadImageBlockModel,
+  MahdaadImageService
 > {
   @property({ attribute: false })
   loading = false;
@@ -55,10 +54,10 @@ export class ImageBlockComponent extends BlockElement<
   private _imageCard?: AffineImageCard;
 
   @query('affine-page-image')
-  private _pageImage?: ImageBlockPageComponent;
+  private _pageImage?: MahdaadImageBlockPageComponent;
 
   @query('affine-edgeless-image')
-  private _edgelessImage?: ImageBlockEdgelessComponent;
+  private _edgelessImage?: MahdaadImageBlockEdgelessComponent;
 
   @query('embed-card-caption')
   captionElement!: EmbedCardCaption;
@@ -91,17 +90,10 @@ export class ImageBlockComponent extends BlockElement<
     return this._imageCard;
   }
 
-  get src() {
-    if (!this.model.src?.startsWith('blob')) {
-      return `${baseURL}/v2/${this.model.src}`;
-    }
-    return this.model.src;
-  }
-
   private _selectBlock() {
     const selectionManager = this.host.selection;
     const blockSelection = selectionManager.create('block', {
-      blockId: this.blockId,
+      path: this.path,
     });
     selectionManager.setGroup('note', [blockSelection]);
   }
@@ -153,9 +145,8 @@ export class ImageBlockComponent extends BlockElement<
     this._isInSurface = parent?.flavour === 'affine:surface';
 
     this.model.propsUpdated.on(({ key }) => {
-      console.log('this.model.propsUpdated', key);
       if (key === 'sourceId') {
-        // this.refreshData();
+        this.refreshData();
       }
     });
   }
@@ -172,9 +163,6 @@ export class ImageBlockComponent extends BlockElement<
   }
 
   override renderBlock() {
-    console.log('7777', this.model.src);
-    this.loading = false;
-    this.error = false;
     let containerStyleMap = styleMap({
       position: 'relative',
       width: '100%',
@@ -206,7 +194,7 @@ export class ImageBlockComponent extends BlockElement<
             ></affine-image-block-card>`
           : this.isInSurface
             ? html`<affine-edgeless-image
-                .url=${this.src}
+                .url=${this.blobUrl}
                 @error=${(_: CustomEvent<Error>) => {
                   this.error = true;
                 }}
@@ -214,6 +202,7 @@ export class ImageBlockComponent extends BlockElement<
             : html`<affine-page-image .block=${this}></affine-page-image>`}
 
         <embed-card-caption .block=${this}></embed-card-caption>
+
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
 
@@ -221,9 +210,9 @@ export class ImageBlockComponent extends BlockElement<
     `;
   }
 }
-//     .url=${this.blobUrl}
+
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-image': ImageBlockComponent;
+    'affine-mahdaad-image': MahdaadImageBlockComponent;
   }
 }

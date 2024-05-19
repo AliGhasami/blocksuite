@@ -10,6 +10,11 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
+    {
+      path: '/board',
+      name: 'board',
+      component: ()=> import('../views/BoardView.vue')
+    },
     /*{
       path: '/mobile',
       name: 'mobile',

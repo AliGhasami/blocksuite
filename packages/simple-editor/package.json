@@ -1,6 +1,6 @@
 {
   "name": "alighasami_vue-block-editor",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "private": false,
   "type": "module",
   "files": [
@@ -34,7 +34,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@mahdaad/tokens": "^0.0.29",
+    "@mahdaad/tokens": "^0.0.30",
     "@unhead/vue": "^1.9.5",
     "@vueuse/core": "^10.9.0",
     "ant-design-vue": "4.x",

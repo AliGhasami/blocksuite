@@ -4,10 +4,9 @@ import { selectable } from '../_common/edgeless/mixin/edgeless-selectable.js';
 import { type SerializedXYWH } from '../surface-block/index.js';
 import { ImageBlockTransformer } from './image-transformer.js';
 
-export type ImageBlockProps = {
+export type MahdaadImageBlockProps = {
   caption?: string;
   sourceId?: string;
-  src?: string;
   width?: number;
   height?: number;
   index: string;
@@ -16,10 +15,9 @@ export type ImageBlockProps = {
   size?: number;
 };
 
-const defaultImageProps: ImageBlockProps = {
+const defaultImageProps: MahdaadImageBlockProps = {
   caption: '',
   sourceId: '',
-  src: '',
   width: 0,
   height: 0,
   index: 'a0',
@@ -28,15 +26,17 @@ const defaultImageProps: ImageBlockProps = {
   size: -1,
 };
 
-export const ImageBlockSchema = defineBlockSchema({
-  flavour: 'affine:image',
+export const MahdaadImageBlockSchema = defineBlockSchema({
+  flavour: 'affine:mahdaad-image',
   props: () => defaultImageProps,
   metadata: {
     version: 1,
     role: 'content',
   },
   transformer: () => new ImageBlockTransformer(),
-  toModel: () => new ImageBlockModel(),
+  toModel: () => new MahdaadImageBlockModel(),
 });
 
-export class ImageBlockModel extends selectable<ImageBlockProps>(BlockModel) {}
+export class MahdaadImageBlockModel extends selectable<MahdaadImageBlockProps>(
+  BlockModel
+) {}

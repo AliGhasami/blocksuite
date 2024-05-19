@@ -3,4 +3,5 @@
     PersonalButton
 }*/
 import Editor from "./components/Editor.vue";
+//import './components/types'
 export { Editor };

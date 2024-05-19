@@ -194,6 +194,9 @@ importers:
       '@types/webfontloader':
         specifier: ^1.6.38
         version: 1.6.38
+      axios:
+        specifier: ^1.6.8
+        version: 1.6.8
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -656,8 +659,8 @@ importers:
   packages/simple-editor:
     dependencies:
       '@mahdaad/tokens':
-        specifier: ^0.0.29
-        version: 0.0.29
+        specifier: ^0.0.30
+        version: 0.0.30
       '@unhead/vue':
         specifier: ^1.9.5
         version: 1.9.5(vue@3.4.21)
@@ -2503,6 +2506,13 @@ packages:
 
   /@mahdaad/tokens@0.0.29:
     resolution: {integrity: sha512-rlmCKN2iTs7yzHiemlaoQGKa0DiacUqomyN++9DH1bxOkdND7AjJQ2cbgeT8c5NqIV+/C8E/I/9VNj/HwY7YLw==}
+    dependencies:
+      mitt: 3.0.1
+      tinycolor2: 1.6.0
+    dev: false
+
+  /@mahdaad/tokens@0.0.30:
+    resolution: {integrity: sha512-s7/ChwMuXCDg4tROH40/poxlvXbDVKIrXXjbVrvkJgqNTSzmhYGniFrnOK1o42g4Bi/HUiY3e7LlUyE3F9LoOw==}
     dependencies:
       mitt: 3.0.1
       tinycolor2: 1.6.0
@@ -4932,6 +4942,16 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
+  /axios@1.6.8:
+    resolution: {integrity: sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==}
+    dependencies:
+      follow-redirects: 1.15.6
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /bail@2.0.2:
     resolution: {integrity: sha512-0xO6mYd7JB2YesxDKplafRpsiOzPt9V02ddPCLbY1xYGPOX24NTyN50qnUxgCPcSoYMhKpAuBTjQoRZCAkUDRw==}
     dev: false
@@ -6360,6 +6380,16 @@ packages:
     resolution: {integrity: sha512-N7kHdlgsO/v+iD/dMoJKtsSqs5Dz/dXZVebRgJw23LDk+jMi/974zyiOYDziY2JPp8xivq9BmUGwIJMiuSBi7w==}
     dependencies:
       tabbable: 6.2.0
+
+  /follow-redirects@1.15.6:
+    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+    dev: false
 
   /foreground-child@2.0.0:
     resolution: {integrity: sha512-dCIq9FpEcyQyXKCkyzmlPTFNgrCzPudOe+mhvJU5zAtlBnGVy2yKxtfsxK2tQBThwq225jcvBjpw1Gr40uzZCA==}
@@ -9011,6 +9041,10 @@ packages:
 
   /property-information@6.4.1:
     resolution: {integrity: sha512-OHYtXfu5aI2sS2LWFSN5rgJjrQ4pCy8i1jubJLe2QvMF8JJ++HXTUIVWFLfXJoaOfvYYjk2SN8J2wFUWIGXT4w==}
+    dev: false
+
+  /proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
     dev: false
 
   /prr@1.0.1:

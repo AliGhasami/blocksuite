@@ -52,6 +52,8 @@ export type EmbedOptions = {
 export class RootService extends BlockService<RootBlockModel> {
   readonly fontLoader = new FontLoader();
   readonly editPropsStore: EditPropsStore = new EditPropsStore(this);
+  public readonly copilot = new Copilot();
+  readonly editPropsStore: EditPropsStore = new EditPropsStore(this);
 
   fileDropManager!: FileDropManager;
   exportManager!: ExportManager;

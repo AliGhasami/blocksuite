@@ -78,14 +78,13 @@ export class PageRootBlockComponent extends BlockElement<
       //margin: 0 auto;
       /* cursor: crosshair; */
       cursor: default;
-
       /* Leave a place for drag-handle */
       /* Do not use prettier format this style, or it will be broken */
       /* prettier-ignore */
       //padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
       /* prettier-ignore */
       //padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
-      padding-left: 50px;
+      padding-inline-start: 50px;
     }
 
     /* Extra small devices (phones, 640px and down) */
@@ -258,6 +257,7 @@ export class PageRootBlockComponent extends BlockElement<
         return true;
       },
       ArrowUp: () => {
+        console.log("this is ArrowUp");
         const selection = this.host.selection;
         const sel = selection.value.find(
           sel => sel.is('text') || sel.is('block')
@@ -278,6 +278,7 @@ export class PageRootBlockComponent extends BlockElement<
           const isFirstText = sel.is('text') && sel.start.index === 0;
           const isBlock = sel.is('block');
           if (isBlock || isFirstText) {
+            //todo ali ghasami for comment
             focusTitle(this.host);
           }
           return;

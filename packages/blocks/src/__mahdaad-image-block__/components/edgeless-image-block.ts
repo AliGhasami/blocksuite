@@ -2,8 +2,8 @@ import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
-@customElement('affine-edgeless-image')
-export class ImageBlockEdgelessComponent extends WithDisposable(
+@customElement('affine-edgeless-mahdaad-image')
+export class MahdaadImageBlockEdgelessComponent extends WithDisposable(
   ShadowlessElement
 ) {
   static override styles = css`
@@ -25,7 +25,6 @@ export class ImageBlockEdgelessComponent extends WithDisposable(
   }
 
   override render() {
-    console.log('22222', this.url);
     return html`<div class="resizable-img">
       <img
         class="drag-target"
@@ -39,6 +38,6 @@ export class ImageBlockEdgelessComponent extends WithDisposable(
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-edgeless-image': ImageBlockEdgelessComponent;
+    'affine-edgeless-mahdaad-image': MahdaadImageBlockEdgelessComponent;
   }
 }

@@ -1,16 +1,19 @@
 import type { UIEventStateContext } from '@blocksuite/block-std';
+import { PathFinder } from '@blocksuite/block-std';
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css, html, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { ImageBlockComponent } from '../image-block.js';
+import type { MahdaadImageBlockComponent } from '../image-block.js';
 import { ImageResizeManager } from '../image-resize-manager.js';
 import { shouldResizeImage } from '../utils.js';
 import { ImageSelectedRect } from './image-selected-rect.js';
 
-@customElement('affine-page-image')
-export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
+@customElement('affine-page-mahdaad-image')
+export class MahdaadImageBlockPageComponent extends WithDisposable(
+  ShadowlessElement
+) {
   static override styles = css`
     affine-page-image {
       display: flex;
@@ -34,7 +37,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
   `;
 
   @property({ attribute: false })
-  block!: ImageBlockComponent;
+  block!: MahdaadImageBlockComponent;
 
   @state()
   _isSelected = false;
@@ -109,7 +112,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
           .concat(
             selection.create('text', {
               from: {
-                blockId,
+                path: this.block.parentPath.concat(blockId),
                 index: 0,
                 length: 0,
               },
@@ -124,9 +127,9 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
         selection.update(selList => {
           return selList.map(sel => {
             const current =
-              sel.is('image') && sel.blockId === this.block.blockId;
+              sel.is('image') && PathFinder.equals(sel.path, this.block.path);
             if (current) {
-              return selection.create('block', { blockId: this.block.blockId });
+              return selection.create('block', { path: this.block.path });
             }
             return sel;
           });
@@ -161,7 +164,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
     this._disposables.add(
       selection.slots.changed.on(selList => {
         this._isSelected = selList.some(
-          sel => sel.blockId === this.block.blockId && sel.is('image')
+          sel => PathFinder.equals(sel.path, this.block.path) && sel.is('image')
         );
       })
     );
@@ -180,7 +183,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
         selection.update(selList => {
           return selList
             .filter(sel => !['text', 'block', 'image'].includes(sel.type))
-            .concat(selection.create('image', { blockId: this.block.blockId }));
+            .concat(selection.create('image', { path: this.block.path }));
         });
         return true;
       }
@@ -193,7 +196,8 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
 
         selection.update(selList =>
           selList.filter(
-            sel => !(sel.is('image') && sel.blockId === this.block.blockId)
+            sel =>
+              !(sel.is('image') && PathFinder.equals(sel.path, this.block.path))
           )
         );
       },
@@ -251,6 +255,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
     if (this._isDragging && this.resizeImg) {
       return {
         width: this.resizeImg.style.width,
+        height: this.resizeImg.style.height,
       };
     }
 
@@ -264,6 +269,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
 
     return {
       width: `${width}px`,
+      height: `${height}px`,
     };
   }
 
@@ -278,7 +284,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
       <div class="resizable-img" style=${styleMap(imageSize)}>
         <img
           class="drag-target"
-          src=${this.block.src ?? ''}
+          src=${this.block.blobUrl ?? ''}
           draggable="false"
           @error=${this._handleError}
         />
@@ -291,6 +297,6 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-page-image': ImageBlockPageComponent;
+    'affine-page-mahdaad-image': MahdaadImageBlockPageComponent;
   }
 }
