@@ -91,6 +91,7 @@ export * from './embed-loom-block/index.js';
 export * from './embed-synced-doc-block/index.js';
 export * from './embed-youtube-block/index.js';
 export * from './frame-block/index.js';
+export * from './hint-block/index.js';
 export * from './image-block/index.js';
 export * from './list-block/index.js';
 export * from './note-block/index.js';

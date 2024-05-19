@@ -137,13 +137,15 @@ export class AffineMentionWidget extends WidgetElement {
     triggerKey: string
   ) => {
     const curRange = getCurrentNativeRange();
-    //debugger;
+    if (!curRange) return;
     showMentionPopover({
       editorHost: this.host,
       inlineEditor,
       range: curRange,
       options: this.options,
       triggerKey,
+      //TODO ali ghasami - important
+      //@ts-ignore
       userList: this.blockElement.model.mentionUserList,
     });
   };

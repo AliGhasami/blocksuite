@@ -1,4 +1,4 @@
-export interface UserMention{
-  id:string
-  name:string
+export interface UserMention {
+  id: string;
+  name: string;
 }

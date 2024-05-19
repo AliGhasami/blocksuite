@@ -43,7 +43,7 @@ instance.interceptors.response.use(
   }
 );
 
-export async function uploadFile(file: File) {
+export async function uploadFile(file: Blob) {
   const formData = new FormData();
   formData.append('file', file);
   return instance.post('/v2/file/upload', formData, {

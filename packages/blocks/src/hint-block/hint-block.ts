@@ -1,19 +1,10 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
+import { BlockElement } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 //import { assertExists } from '@blocksuite/global/utils';
-import {
-  createInlineKeyDownHandler,
-  //createInlineKeyDownHandler,
-  type InlineRangeProvider,
-  KEYBOARD_ALLOW_DEFAULT,
-  //KEYBOARD_ALLOW_DEFAULT,
-} from '@blocksuite/inline';
-import type { HTMLElement } from 'happy-dom';
 ///import { limitShift, offset, shift } from '@floating-ui/dom';
-import { BlockElement } from '@blocksuite/block-std';
 //import type { HTMLElement } from 'happy-dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';

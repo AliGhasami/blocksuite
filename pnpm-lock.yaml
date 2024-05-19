@@ -275,6 +275,9 @@ importers:
       sortablejs:
         specifier: ^1.15.2
         version: 1.15.2
+      tippy.js:
+        specifier: ^6.3.7
+        version: 6.3.7
       unified:
         specifier: ^11.0.4
         version: 11.0.4

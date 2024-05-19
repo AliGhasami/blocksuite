@@ -142,12 +142,10 @@ export class TestRichText extends ShadowlessElement {
     this.style.outline = 'none';
     this.inlineEditor.mount(this._container, this);
 
-    console.log('1000000', this.inlineEditor);
     const keydownHandler = createInlineKeyDownHandler(this.inlineEditor, {
       inputRule: {
         key: ' ',
         handler: context => {
-          //debugger;
           const { inlineEditor, prefixText, inlineRange } = context;
           for (const match of markdownMatches) {
             const matchedText = prefixText.match(match.pattern);
@@ -241,12 +239,10 @@ const yDocA = new Y.Doc();
 const yDocB = new Y.Doc();
 
 yDocA.on('update', update => {
-  //console.log("AAAAAAAA",update);
   Y.applyUpdate(yDocB, update);
 });
 
 yDocB.on('update', update => {
-  //console.log("BBBBBBB",update);
   Y.applyUpdate(yDocA, update);
 });
 
@@ -437,7 +433,6 @@ export class TestPage extends ShadowlessElement {
     if (!this._editorA) {
       return nothing;
     }
-    console.log('this._editorA', this._editorA);
 
     return html`
       <div class="container">
@@ -448,12 +443,11 @@ export class TestPage extends ShadowlessElement {
               .undoManager=${this._undoManagerA}
             ></custom-toolbar>
             <test-rich-text
-                style="border:1px solid red"
               .inlineEditor=${this._editorA}
               .undoManager=${this._undoManagerA!}
             ></test-rich-text>
           </div>
-         <!-- <div class="doc-b">
+          <div class="doc-b">
             <custom-toolbar
               .inlineEditor=${this._editorB}
               .undoManager=${this._undoManagerB!}
@@ -461,7 +455,7 @@ export class TestPage extends ShadowlessElement {
             <test-rich-text
               .inlineEditor=${this._editorB}
               .undoManager=${this._undoManagerB}
-            ></test-rich-text> -->
+            ></test-rich-text>
           </div>
         </div>
       </div>

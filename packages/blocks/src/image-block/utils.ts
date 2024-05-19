@@ -2,7 +2,7 @@ import type { EditorHost } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { baseURL, uploadFile } from '../_common/upload.js';
+import { uploadFile } from '../_common/upload.js';
 import { downloadBlob, withTempBlobData } from '../_common/utils/filesys.js';
 import { humanFileSize } from '../_common/utils/math.js';
 import type { AttachmentBlockProps } from '../attachment-block/attachment-model.js';

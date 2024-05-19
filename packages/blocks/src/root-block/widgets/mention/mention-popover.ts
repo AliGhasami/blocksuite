@@ -19,6 +19,7 @@ import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js'
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { styles } from './styles.js';
 import type { UserMention } from './types.js';
+import type { MentionOptions } from "./index.js";
 
 //TODO ali ghasami for props
 /*const userList: string[] = [
@@ -60,8 +61,8 @@ import type { UserMention } from './types.js';
 export class MentionPopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
-  //@property({ attribute: false })
-  ///options!: any;
+  @property({ attribute: false })
+  options!: MentionOptions;
 
   @property({ attribute: false })
   triggerKey!: string;
