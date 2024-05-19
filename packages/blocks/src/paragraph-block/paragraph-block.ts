@@ -10,10 +10,11 @@ import { customElement, query } from 'lit/decorators.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
 import type { RichText } from '../_common/components/rich-text/rich-text.js';
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
+import { getViewportElement } from '../_common/utils/query.js';
 import type { NoteBlockComponent } from '../note-block/note-block.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
 import type { ParagraphBlockModel } from './paragraph-model.js';
-import type { ParagraphService } from './paragraph-service.js';
+import type { ParagraphBlockService } from './paragraph-service.js';
 import { paragraphBlockStyles } from './styles.js';
 
 const getPlaceholder = (model: ParagraphBlockModel) => {
@@ -49,7 +50,7 @@ const getPlaceholder = (model: ParagraphBlockModel) => {
 @customElement('affine-paragraph')
 export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockModel,
-  ParagraphService
+  ParagraphBlockService
 > {
   static override styles = css`
     affine-paragraph {
@@ -227,8 +228,10 @@ export class ParagraphBlockComponent extends BlockElement<
   }
 
   override firstUpdated() {
-    this.model.propsUpdated.on(this._updatePlaceholder);
-    this.host.selection.slots.changed.on(this._updatePlaceholder);
+    this._disposables.add(this.model.propsUpdated.on(this._updatePlaceholder));
+    this._disposables.add(
+      this.host.selection.slots.changed.on(this._updatePlaceholder)
+    );
 
     this.updateComplete
       .then(() => {
@@ -318,6 +321,7 @@ export class ParagraphBlockComponent extends BlockElement<
           <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}
           </div>
+        <div class="affine-paragraph-rich-text-wrapper ${type}">
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
@@ -330,6 +334,7 @@ export class ParagraphBlockComponent extends BlockElement<
             .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
+            .verticalScrollContainer=${getViewportElement(this.host)}
           ></rich-text>
         </div>
         ${children}

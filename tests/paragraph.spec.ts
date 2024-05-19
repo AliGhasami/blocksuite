@@ -6,6 +6,7 @@ import {
   enterPlaygroundRoom,
   focusRichText,
   focusTitle,
+  getIndexCoordinate,
   initEmptyEdgelessState,
   initEmptyParagraphState,
   initThreeDividers,
@@ -1411,6 +1412,26 @@ test('should placeholder works', async ({ page }) => {
   await expect(placeholder).toHaveCount(1);
 });
 
+test('should placeholder not show when multiple blocks are selected', async ({
+  page,
+}) => {
+  await enterPlaygroundRoom(page);
+  await initEmptyParagraphState(page);
+  await focusRichText(page);
+  await pressEnter(page);
+  await assertRichTexts(page, ['', '']);
+  const coord = await getIndexCoordinate(page, [0, 0]);
+  // blur
+  await page.mouse.click(0, 0);
+  await page.mouse.move(coord.x - 26 - 24, coord.y - 10, { steps: 20 });
+  await page.mouse.down();
+  // ←
+  await page.mouse.move(coord.x + 20, coord.y + 50, { steps: 20 });
+  await page.mouse.up();
+  const placeholder = page.locator('.affine-paragraph-placeholder.visible');
+  await expect(placeholder).toBeHidden();
+});
+
 test('should placeholder not show at readonly mode', async ({ page }) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
@@ -1892,13 +1913,13 @@ test('select divider using delete keyboard from prev/next paragraph', async ({
 
   await focusRichText(page, 0);
   await pressForwardDelete(page);
-  await assertBlockSelections(page, [['0', '1', '4']]);
+  await assertBlockSelections(page, ['4']);
   await assertDivider(page, 3);
 
   await focusRichText(page, 1);
   await pressArrowLeft(page, 3);
   await pressBackspace(page);
-  await assertBlockSelections(page, [['0', '1', '6']]);
+  await assertBlockSelections(page, ['6']);
   await assertDivider(page, 3);
 
   await assertRichTexts(page, ['123', '123']);

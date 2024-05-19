@@ -94,6 +94,12 @@ export const styles = css`
     border-radius: 1px;
   }
 
+   /* .slash-vertical-divider {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        width: 1px;
+        background-color: var(--affine-border-color);
+    }*/
   /*.slash-item-container {
     box-sizing: border-box;
     overflow-y: auto;
@@ -103,6 +109,7 @@ export const styles = css`
 
   ${scrollbarStyle(`.${Prefix}-popover-container`)}
   
+  ${scrollbarStyle('.slash-item-container')}
   
 
  /* .slash-item-divider {

@@ -1,6 +1,6 @@
 {
   "name": "@blocksuite/global",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "types": "./index.d.ts",
   "type": "module",
   "repository": "toeverything/blocksuite",
@@ -49,6 +49,6 @@
     "!dist/__tests__"
   ],
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^3.23.8"
   }
 }

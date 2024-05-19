@@ -28,12 +28,12 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
 
   static override styles = css`
     .edgeless-text-editor {
-      box-sizing: content-box;
       position: absolute;
       left: 0;
       top: 0;
       z-index: 10;
       transform-origin: left top;
+      font-kerning: none;
       border: ${EdgelessTextEditor.BORDER_WIDTH}px solid
         var(--affine-primary-color, #1e96eb);
       border-radius: 4px;
@@ -370,6 +370,7 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
         color: isCssVariable(color) ? `var(${color})` : color,
         textAlign,
         lineHeight: `${lineHeight}px`,
+        boxSizing: 'content-box',
       })}
       class="edgeless-text-editor"
     >
@@ -377,7 +378,6 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
         .yText=${text}
         .enableFormat=${false}
         .enableAutoScrollHorizontally=${false}
-        .enableAutoScrollVertically=${false}
         style=${isEmpty
           ? styleMap({
               position: 'absolute',
