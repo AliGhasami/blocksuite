@@ -4,7 +4,6 @@ import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
-//import type { InlineEditor } from '@blocksuite/inline';
 import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -16,7 +15,6 @@ import {
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
-import type { ClayTapSlashMenu } from '../slash-menu/mahdaad_menu.js';
 import { styles } from './styles.js';
 
 //TODO ali ghasami for props

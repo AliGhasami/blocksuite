@@ -1,31 +1,22 @@
 /// <reference types="vite/client" />
 import '../_common/components/block-selection.js';
 
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
-import { type InlineRangeProvider } from '@blocksuite/inline';
-import type { HTMLElement } from 'happy-dom';
-///import { limitShift, offset, shift } from '@floating-ui/dom';
+import { BlockElement } from '@blocksuite/block-std';
+//import type { HTMLElement } from 'happy-dom';
 import { css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-//import {} from 'lit/decorators.js';
-///import { ref } from 'lit/directives/ref.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import tippy from 'tippy.js';
 
 import { type RichText } from '../_common/components/index.js';
-//import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
-//import { HintOptionTemplate } from './component/hint-option.js';
-import type { HintBlockModel } from './hint-model.js';
+import type { HintBlockModel, HintType } from './hint-model.js';
 import DefaultIcon from './icons/default.svg?raw';
 import ErrorIcon from './icons/error.svg?raw';
 import InfoIcon from './icons/info.svg?raw';
 import SuccessIcon from './icons/success.svg?raw';
 import WarningIcon from './icons/warning.svg?raw';
-
-export type HintType = 'default' | 'warning' | 'info' | 'success' | 'error';
 
 @customElement('affine-hint')
 export class HintBlockComponent extends BlockElement<HintBlockModel> {
@@ -41,7 +32,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     }
   `;
 
-  get inlineManager() {
+  /*get inlineManager() {
     const inlineManager = this.service?.inlineManager;
     assertExists(inlineManager);
     return inlineManager;
@@ -57,15 +48,16 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
   get embedChecker() {
     return this.inlineManager.embedChecker;
-  }
+  }*/
 
-  private _inlineRangeProvider: InlineRangeProvider | null = null;
+  //private _inlineRangeProvider: InlineRangeProvider | null = null;
 
   @query('rich-text')
-  private _richTextElement?: RichText;
+  _richTextElement?: RichText | null;
 
-  @query('.popover')
-  private popover?: HTMLElement;
+  //@query('.popover')
+  //popover?: HTMLElement | null;
+  //popover?: HTMLElement | null;
 
   //@query('.affine-paragraph-placeholder')
   //private _placeholderContainer?: HTMLElement;
@@ -139,7 +131,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         //debugger;
       },
     });*/
-    this._inlineRangeProvider = getInlineRangeProvider(this);
+    //this._inlineRangeProvider = getInlineRangeProvider(this);
   }
 
   override firstUpdated() {
@@ -154,6 +146,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       .then(() => {
         //console.log('hint-updateComplete', this.model);
 
+        //@ts-ignore
         tippy(this, {
           content: this.popover,
           allowHTML: true,

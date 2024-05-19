@@ -82,16 +82,6 @@ export const affineInlineSpecsWithoutReference: InlineSpecs<AffineTextAttributes
       },
     },
     {
-      name: 'link',
-      schema: z.string().optional().nullable().catch(undefined),
-      match: delta => {
-        return !!delta.attributes?.link;
-      },
-      renderer: delta => {
-        return html`<affine-link .delta=${delta}></affine-link>`;
-      },
-    },
-    {
       name: 'background',
       schema: z.string().optional().nullable().catch(undefined),
       match: delta => {
@@ -143,6 +133,16 @@ export function getAffineInlineSpecsWithReference(
         ></affine-reference>`;
       },
       embed: true,
+    },
+    {
+      name: 'link',
+      schema: z.string().optional().nullable().catch(undefined),
+      match: delta => {
+        return !!delta.attributes?.link;
+      },
+      renderer: delta => {
+        return html`<affine-link .delta=${delta}></affine-link>`;
+      },
     },
     {
       name: 'mention',

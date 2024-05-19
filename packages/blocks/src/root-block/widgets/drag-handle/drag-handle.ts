@@ -49,7 +49,7 @@ import type { DragHandleOption, DropResult, DropType } from './config.js';
 import { DragHandleOptionsRunner } from './config.js';
 import {
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_TOP_LEVEL,
-  DRAG_HANDLE_CONTAINER_PADDING,
+  //DRAG_HANDLE_CONTAINER_PADDING,
   DRAG_HANDLE_CONTAINER_WIDTH,
   DRAG_HANDLE_CONTAINER_WIDTH_TOP_LEVEL,
   DRAG_HANDLE_GRABBER_BORDER_RADIUS,
@@ -616,10 +616,10 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     // use padding to control grabber's height
     const paddingTop = rowPaddingY + posTop - draggingAreaRect.top;
-    const paddingBottom =
+    /*const paddingBottom =
       draggingAreaRect.height -
       paddingTop -
-      DRAG_HANDLE_GRABBER_HEIGHT * this.scale * this.noteScale;
+      DRAG_HANDLE_GRABBER_HEIGHT * this.scale * this.noteScale;*/
 
     const applyStyle = (transition?: boolean) => {
       container.style.transition = transition ? 'padding 0.25s ease' : 'none';
@@ -1441,7 +1441,7 @@ export class AffineDragHandleWidget extends WidgetElement<
       const blockElement = this.anchorBlockElement;
       if (!blockElement) return;
 
-      const padding = DRAG_HANDLE_CONTAINER_PADDING * this.scale;
+      //const padding = DRAG_HANDLE_CONTAINER_PADDING * this.scale;
       //container.style.paddingTop = `${padding - 4}px`;
       //container.style.paddingBottom = `${padding}px`;
       container.style.transition = `padding 0.25s ease`;

@@ -112,8 +112,6 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   enableUndoRedo = true;
   @property({ attribute: false })
-  enableAutoScrollVertically = true;
-  @property({ attribute: false })
   enableAutoScrollHorizontally = true;
   @property({ attribute: false })
   wrapText = true;
@@ -121,6 +119,9 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   // `attributesSchema` will be overwritten to `z.object({})` if `enableFormat` is false.
   @property({ attribute: false })
   enableFormat = true;
+
+  @property({ attribute: false })
+  verticalScrollContainer?: HTMLElement;
 
   private _inlineEditor: AffineInlineEditor | null = null;
   get inlineEditor() {
@@ -135,7 +136,7 @@ export class RichText extends WithDisposable(ShadowlessElement) {
     if (!this.enableFormat) {
       this.attributesSchema = z.object({});
     }
-    // console.log('777777', this.inlineRangeProvider);
+
     // init inline editor
     this._inlineEditor = new InlineEditor<AffineTextAttributes>(this._yText, {
       isEmbed: delta => this.embedChecker(delta),
@@ -145,7 +146,6 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       },
       inlineRangeProvider: this.inlineRangeProvider,
     });
-    // console.log('init _inlineEditor', this._inlineEditor);
     if (this.attributesSchema) {
       this._inlineEditor.setAttributeSchema(this.attributesSchema);
     }
@@ -153,24 +153,17 @@ export class RichText extends WithDisposable(ShadowlessElement) {
       this._inlineEditor.setAttributeRenderer(this.attributeRenderer);
     }
     const inlineEditor = this._inlineEditor;
-    //console.log('this is inline editor', inlineEditor);
-    //inlineEditor.focusStart();
+
     const markdownShortcutHandler = this.markdownShortcutHandler;
     if (markdownShortcutHandler) {
       const keyDownHandler = createInlineKeyDownHandler(inlineEditor, {
         inputRule: {
           key: [' ', 'Enter'],
-          handler: context => {
-            // console.log('rich-text-keyDownHandler');
-            return markdownShortcutHandler(context, this.undoManager);
-          },
+          handler: context =>
+            markdownShortcutHandler(context, this.undoManager),
         },
       });
-      /*console.log(
-        '444444444',
-        this.inlineEventSource,
-        this.inlineEditorContainer
-      );*/
+
       inlineEditor.disposables.addFromEvent(
         this.inlineEventSource ?? this.inlineEditorContainer,
         'keydown',
@@ -191,13 +184,14 @@ export class RichText extends WithDisposable(ShadowlessElement) {
             const range = inlineEditor.toDomRange(inlineRange);
             if (!range) return;
 
-            // scroll container is window
-            if (this.enableAutoScrollVertically) {
+            if (this.verticalScrollContainer) {
+              const containerRect =
+                this.verticalScrollContainer.getBoundingClientRect();
               const rangeRect = range.getBoundingClientRect();
 
-              if (rangeRect.top < 0) {
+              if (rangeRect.top < containerRect.top) {
                 this.scrollIntoView({ block: 'start' });
-              } else if (rangeRect.bottom > window.innerHeight) {
+              } else if (rangeRect.bottom > containerRect.bottom) {
                 this.scrollIntoView({ block: 'end' });
               }
             }
@@ -388,16 +382,16 @@ export class RichText extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
-    //console.log('rich text render');
-    //console.log('nowrap-lines', this.wrapText);
     const classes = classMap({
       'inline-editor': true,
       'nowrap-lines': !this.wrapText,
       readonly: this.readonly,
     });
 
-    //return html`<div class=${classes}></div>`;
-    return html`<div class=${classes}></div>`;
+    return html`<div
+      contenteditable=${this.readonly ? 'false' : 'true'}
+      class=${classes}
+    ></div>`;
   }
 }
 

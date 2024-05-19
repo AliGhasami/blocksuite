@@ -3,15 +3,14 @@ import {
   AFFINE_AI_PANEL_WIDGET,
   AffineAIPanelWidget,
   type AffineAIPanelWidgetConfig,
-  ChatWithAIIcon,
-  DiscardIcon,
+  AIStarIconWithAnimation,
   InsertBelowIcon,
   ReplaceIcon,
   ResetIcon,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
-import type { ComputePositionConfig } from '@floating-ui/dom';
 
+import { ChatWithAIIcon, DiscardIcon } from './_common/icons.js';
 import { createTextRenderer } from './messages/text.js';
 import { AIProvider } from './provider.js';
 import { reportResponse } from './utils/action-reporter.js';
@@ -22,28 +21,28 @@ import {
 } from './utils/editor-actions.js';
 import { getSelections } from './utils/selection-utils.js';
 
+function getSelection(host: EditorHost) {
+  const textSelection = host.selection.find('text');
+  const mode = textSelection ? 'flat' : 'highest';
+  const { selectedBlocks } = getSelections(host, mode);
+  assertExists(selectedBlocks);
+  const length = selectedBlocks.length;
+  const firstBlock = selectedBlocks[0];
+  const lastBlock = selectedBlocks[length - 1];
+  const selectedModels = selectedBlocks.map(block => block.model);
+  return {
+    textSelection,
+    selectedModels,
+    firstBlock,
+    lastBlock,
+  };
+}
+
 export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
   const host = panel.host;
 
-  const getSelection = () => {
-    const textSelection = host.selection.find('text');
-    const mode = textSelection ? 'flat' : 'highest';
-    const { selectedBlocks } = getSelections(host, mode);
-    assertExists(selectedBlocks);
-    const length = selectedBlocks.length;
-    const firstBlock = selectedBlocks[0];
-    const lastBlock = selectedBlocks[length - 1];
-    const selectedModels = selectedBlocks.map(block => block.model);
-    return {
-      textSelection,
-      selectedModels,
-      firstBlock,
-      lastBlock,
-    };
-  };
-
   const _replace = async () => {
-    const selection = getSelection();
+    const selection = getSelection(host);
     if (!selection || !panel.answer) return;
 
     const { textSelection, firstBlock, selectedModels } = selection;
@@ -59,7 +58,7 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
   };
 
   const _insertBelow = async () => {
-    const selection = getSelection();
+    const selection = getSelection(host);
 
     if (!selection || !panel.answer) {
       return;
@@ -128,13 +127,64 @@ export function buildTextResponseConfig(panel: AffineAIPanelWidget) {
 }
 
 export function buildErrorResponseConfig(panel: AffineAIPanelWidget) {
+  const host = panel.host;
+  const _replace = async () => {
+    const selection = getSelection(host);
+    if (!selection || !panel.answer) return;
+
+    const { textSelection, firstBlock, selectedModels } = selection;
+    await replace(
+      host,
+      panel.answer,
+      firstBlock,
+      selectedModels,
+      textSelection
+    );
+
+    panel.hide();
+  };
+
+  const _insertBelow = async () => {
+    const selection = getSelection(host);
+
+    if (!selection || !panel.answer) {
+      return;
+    }
+
+    const { lastBlock } = selection;
+    await insertBelow(host, panel.answer ?? '', lastBlock);
+    panel.hide();
+  };
+
   return [
     {
       name: 'Response',
       items: [
         {
-          name: 'Regenerate',
+          name: 'Replace selection',
           icon: ResetIcon,
+          showWhen: () => !!panel.answer,
+          handler: () => {
+            _replace().catch(console.error);
+          },
+        },
+        {
+          name: 'Insert below',
+          icon: DiscardIcon,
+          showWhen: () => !!panel.answer,
+          handler: () => {
+            _insertBelow().catch(console.error);
+          },
+        },
+      ],
+    },
+    {
+      name: '',
+      items: [
+        {
+          name: 'Retry',
+          icon: ResetIcon,
+          showWhen: () => true,
           handler: () => {
             reportResponse('result:retry');
             panel.generate();
@@ -143,6 +193,7 @@ export function buildErrorResponseConfig(panel: AffineAIPanelWidget) {
         {
           name: 'Discard',
           icon: DiscardIcon,
+          showWhen: () => !!panel.answer,
           handler: () => {
             panel.discard();
           },
@@ -169,6 +220,9 @@ export function buildErrorConfig(panel: AffineAIPanelWidget) {
       AIProvider.slots.requestLogin.emit({ host: panel.host });
       panel.hide();
     },
+    cancel: () => {
+      panel.hide();
+    },
     responses: buildErrorResponseConfig(panel),
   };
 }
@@ -183,15 +237,14 @@ export function buildCopyConfig(panel: AffineAIPanelWidget) {
 }
 
 export function buildAIPanelConfig(
-  panel: AffineAIPanelWidget,
-  positionConfig?: Partial<ComputePositionConfig>
+  panel: AffineAIPanelWidget
 ): AffineAIPanelWidgetConfig {
   return {
-    answerRenderer: createTextRenderer(panel.host, 320),
+    answerRenderer: createTextRenderer(panel.host, { maxHeight: 320 }),
     finishStateConfig: buildFinishConfig(panel),
     errorStateConfig: buildErrorConfig(panel),
-    positionConfig,
     copy: buildCopyConfig(panel),
+    generatingIcon: AIStarIconWithAnimation,
   };
 }
 

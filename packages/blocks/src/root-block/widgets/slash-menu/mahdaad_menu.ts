@@ -8,6 +8,7 @@ import {
   openFileOrFiles,
 } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
+import { viewPresets } from '../../../database-block/index.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
@@ -180,6 +181,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           assertExists(model.doc.root);
           //console.log('|11111', rootElement.widgetElements);
           //todo fix ali ghasami
+          //@ts-ignore
           const widgetEle = rootElement.widgetElements['affine-mention-widget'];
           assertExists(widgetEle);
           // We have checked the existence of showLinkedDoc method in the showWhen
@@ -237,7 +239,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             index + 1
           );
           const service = rootElement.std.spec.getService('affine:database');
-          service.initDatabaseBlock(rootElement.doc, model, id, 'table', false);
+          service.initDatabaseBlock(
+            rootElement.doc,
+            model,
+            id,
+            viewPresets.tableViewConfig,
+            false
+          );
           tryRemoveEmptyLine(model);
         },
       },
@@ -264,7 +272,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: code,
         action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:code', undefined);
+          runCommand(rootElement, 'affine:code');
         },
       },
       {
@@ -280,7 +288,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           assertExists(attachmentService);
           const maxFileSize = attachmentService.maxFileSize;
 
-          addSiblingAttachmentBlocks(
+          await addSiblingAttachmentBlocks(
             rootElement.host,
             [file],
             maxFileSize,
@@ -552,7 +560,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
 function runCommand(
   rootElement: RootBlockComponent,
   flavour: BlockSuite.Flavour,
-  type: string
+  type?: string
 ) {
   //console.log('this is root element', rootElement);
   rootElement.host.std.command

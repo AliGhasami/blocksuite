@@ -12,13 +12,13 @@ import { EmbedBlockElement } from '../_common/embed-block-helper/embed-block-ele
 import { OpenIcon } from '../_common/icons/text.js';
 import type { EmbedFigmaStyles } from './embed-figma-model.js';
 import { type EmbedFigmaModel } from './embed-figma-model.js';
-import type { EmbedFigmaService } from './embed-figma-service.js';
+import type { EmbedFigmaBlockService } from './embed-figma-service.js';
 import { FigmaIcon, styles } from './styles.js';
 
 @customElement('affine-embed-figma-block')
 export class EmbedFigmaBlockComponent extends EmbedBlockElement<
   EmbedFigmaModel,
-  EmbedFigmaService
+  EmbedFigmaBlockService
 > {
   static override styles = styles;
 
@@ -38,10 +38,9 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
   private _isResizing = false;
 
   private _selectBlock() {
-    // debugger;
     const selectionManager = this.host.selection;
     const blockSelection = selectionManager.create('block', {
-      path: this.path,
+      blockId: this.blockId,
     });
     selectionManager.setGroup('note', [blockSelection]);
   }
@@ -82,7 +81,6 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
 
     this.disposables.add(
       this.model.propsUpdated.on(({ key }) => {
-        // debugger;
         if (key === 'url') {
           this.refreshData();
         }
@@ -92,7 +90,6 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
     // this is required to prevent iframe from capturing pointer events
     this.disposables.add(
       this.std.selection.slots.changed.on(() => {
-        debugger;
         this._isSelected =
           !!this.selected?.is('block') || !!this.selected?.is('surface');
 
@@ -112,7 +109,6 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
       assertExists(surface);
       this.disposables.add(
         this.model.propsUpdated.on(() => {
-          debugger;
           this.requestUpdate();
         })
       );

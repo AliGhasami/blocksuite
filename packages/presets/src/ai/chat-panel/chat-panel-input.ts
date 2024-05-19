@@ -112,6 +112,10 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
     .close-wrapper:hover svg path {
       fill: var(--affine-error-color);
     }
+
+    .image-upload {
+      background-color: var(--affine-white);
+    }
   `;
 
   @property({ attribute: false })
@@ -156,8 +160,11 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
   @state()
   focused = false;
 
-  @state()
-  abortController?: AbortController;
+  @property({ attribute: false })
+  abortController!: AbortController | null;
+
+  @property({ attribute: false })
+  updateAbortController!: (abortController: AbortController | null) => void;
 
   send = async () => {
     if (this.status === 'loading' || this.status === 'transmitting') return;
@@ -201,7 +208,7 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
       });
 
       if (stream) {
-        this.abortController = abortController;
+        this.updateAbortController(abortController);
 
         for await (const text of stream) {
           this.updateStatus('transmitting');
@@ -217,9 +224,13 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
       this.updateStatus('error');
       this.updateError(error as AIError);
     } finally {
-      this.abortController = undefined;
+      this.updateAbortController(null);
     }
   };
+
+  private _addImages(images: File[]) {
+    this.images = [...this.images, ...images].slice(0, MaximumImageCount);
+  }
 
   protected override render() {
     return html`<style>
@@ -300,6 +311,19 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
           @blur=${() => {
             this.focused = false;
           }}
+          @paste=${(event: ClipboardEvent) => {
+            const items = event.clipboardData?.items;
+            if (!items) return;
+
+            for (const index in items) {
+              const item = items[index];
+              if (item.kind === 'file' && item.type.indexOf('image') >= 0) {
+                const blob = item.getAsFile();
+                if (!blob) continue;
+                this._addImages([blob]);
+              }
+            }
+          }}
         ></textarea>
         <div class="chat-panel-input-actions">
           <div
@@ -310,10 +334,7 @@ export class ChatPanelInput extends WithDisposable(LitElement) {
                 multiple: true,
               });
               if (!images) return;
-              this.images = [...this.images, ...images].slice(
-                0,
-                MaximumImageCount
-              );
+              this._addImages(images);
             }}
           >
             ${ImageIcon}

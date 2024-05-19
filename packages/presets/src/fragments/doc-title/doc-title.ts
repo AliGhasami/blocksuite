@@ -80,10 +80,14 @@ export class DocTitle extends WithDisposable(ShadowlessElement) {
     return this._richTextElement.inlineEditor;
   }
 
+  private get _viewport() {
+    const el = this.closest<HTMLElement>('.affine-page-viewport');
+    assertExists(el);
+    return el;
+  }
+
   private get _pageRoot() {
-    const docViewport = this.closest('.affine-page-viewport') as HTMLElement;
-    assertExists(docViewport);
-    const pageRoot = docViewport.querySelector('affine-page-root');
+    const pageRoot = this._viewport.querySelector('affine-page-root');
     assertExists(pageRoot);
     return pageRoot;
   }
@@ -144,9 +148,13 @@ export class DocTitle extends WithDisposable(ShadowlessElement) {
       () => (this._isComposing = false)
     );
 
-    this._rootModel.title.yText.observe(() => {
+    const updateMetaTitle = () => {
       this._updateTitleInMeta();
       this.requestUpdate();
+    };
+    this._rootModel.title.yText.observe(updateMetaTitle);
+    this._disposables.add(() => {
+      this._rootModel.title.yText.unobserve(updateMetaTitle);
     });
   }
 
@@ -163,6 +171,7 @@ export class DocTitle extends WithDisposable(ShadowlessElement) {
         <rich-text
           .yText=${this._rootModel.title.yText}
           .undoManager=${this.doc.history}
+          .verticalScrollContainer=${this._viewport}
           .readonly=${this.doc.readonly}
           .enableFormat=${false}
         ></rich-text>

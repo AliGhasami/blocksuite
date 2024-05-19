@@ -26,7 +26,6 @@ import {
 } from '../../../_common/icons/index.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import {
-  buildPath,
   createDefaultDoc,
   getBlockComponentByPath,
   getImageFilesFromLocal,
@@ -46,11 +45,11 @@ import { YoutubeIcon } from '../../../embed-youtube-block/styles.js';
 import type { FrameBlockModel } from '../../../frame-block/index.js';
 import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { NoteBlockModel } from '../../../note-block/index.js';
-//import type { ParagraphBlockModel } from '../../../paragraph-block/index.js';
+import type { ParagraphBlockModel } from '../../../paragraph-block/index.js';
 import { onModelTextUpdated } from '../../../root-block/utils/index.js';
 import type { SurfaceBlockModel } from '../../../surface-block/index.js';
 import { CanvasElementType } from '../../../surface-block/index.js';
-//import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import {
   formatDate,
   insertContent,
@@ -493,7 +492,7 @@ export const menuGroups: SlashMenuOptions['menus'] = [
           Promise.resolve().then(() => {
             const dataView = getBlockComponentByPath(
               rootElement.host,
-              buildPath(dataViewModel.model)
+              dataViewModel.model.id
             ) as DataViewBlockComponent;
             dataView.viewSource.viewAdd('table');
           });

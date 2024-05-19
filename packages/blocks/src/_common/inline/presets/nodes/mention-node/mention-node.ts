@@ -9,24 +9,13 @@ import {
   ZERO_WIDTH_NON_JOINER,
   ZERO_WIDTH_SPACE,
 } from '@blocksuite/inline';
-import type { Doc, DocMeta } from '@blocksuite/store';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ref } from 'lit/directives/ref.js';
+import { customElement, property } from 'lit/decorators.js';
 
-import type { RootBlockComponent } from '../../../../../root-block/types.js';
-import { HoverController } from '../../../../components/hover/controller.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
-import { FontDocIcon, FontLinkedDocIcon } from '../../../../icons/text.js';
-import {
-  getModelByElement,
-  getRootByElement,
-} from '../../../../utils/query.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
-import { affineTextStyles } from '../affine-text.js';
-import { DEFAULT_DOC_NAME, REFERENCE_NODE } from '../consts.js';
+import { REFERENCE_NODE } from '../consts.js';
 import type { ReferenceNodeConfig } from './mention-config.js';
-import { toggleReferencePopup } from './mention-popup.js';
 
 export type RefNodeSlots = {
   docLinkClicked: Slot<{ docId: string; blockId?: string }>;
@@ -78,13 +67,15 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
   config!: ReferenceNodeConfig;
 
   // Since the linked doc may be deleted, the `_refMeta` could be undefined.
-  @state()
-  private _refMeta?: DocMeta;
+  //@state()
+  //private _refMeta?: DocMeta;
 
-  private _refAttribute: NonNullable<AffineTextAttributes['reference']> = {
-    type: 'LinkedPage',
-    pageId: '0',
-  };
+  /*private _refAttribute: NonNullable<AffineTextAttributes['mention']> = {
+    name: '',
+    id: '0',
+    //type: 'LinkedPage',
+    //pageId: '0',
+  };*/
 
   get inlineEditor() {
     const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
@@ -120,17 +111,17 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
     return doc;
   }
 
-  get customIcon() {
+  /*get customIcon() {
     return this.config.customIcon;
-  }
+  }*/
 
-  get customTitle() {
+  /*get customTitle() {
     return this.config.customTitle;
-  }
+  }*/
 
-  get customContent() {
+  /*get customContent() {
     return this.config.customContent;
-  }
+  }*/
 
   override connectedCallback() {
     //debugger;
@@ -144,7 +135,7 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
       );
     }
 
-    const doc = this.doc;
+    /*const doc = this.doc;
     this._disposables.add(
       doc.collection.slots.docUpdated.on(() => this._updateRefMeta(doc))
     );
@@ -156,17 +147,17 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
           this.inlineEditor.slots.textChange.on(() => this._updateRefMeta(doc))
         );
       })
-      .catch(console.error);
+      .catch(console.error);*/
   }
 
   override willUpdate(_changedProperties: Map<PropertyKey, unknown>) {
     super.willUpdate(_changedProperties);
 
-    const doc = this.doc;
-    this._updateRefMeta(doc);
+    //const doc = this.doc;
+    //this._updateRefMeta(doc);
   }
 
-  private _updateRefMeta = (doc: Doc) => {
+  /*private _updateRefMeta = (doc: Doc) => {
     const refAttribute = this.delta.attributes?.mention;
     assertExists(refAttribute, 'Failed to get reference attribute!');
     this._refAttribute = refAttribute;
@@ -178,9 +169,9 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
           ...refMeta,
         }
       : undefined;
-  };
+  };*/
 
-  private _onClick() {
+  /* private _onClick() {
     if (!this.config.interactable) return;
 
     const refMeta = this._refMeta;
@@ -200,9 +191,9 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
     const rootElement = getRootByElement(this) as RootBlockComponent;
     assertExists(rootElement);
     rootElement.slots.docLinkClicked.emit({ docId: targetDocId });
-  }
+  }*/
 
-  private _whenHover = new HoverController(this, ({ abortController }) => {
+  /*private _whenHover = new HoverController(this, ({ abortController }) => {
     if (this.doc.readonly) {
       return null;
     }
@@ -229,7 +220,7 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
         abortController
       ),
     };
-  });
+  });*/
 
   override render() {
     //const refMeta = this._refMeta;

@@ -30,7 +30,6 @@ import { type ExtendedModel } from '../../types.js';
  * Whether the block supports rendering its children.
  */
 function supportsChildren(model: BlockModel): boolean {
-  // console.log('supportsChildren');
   if (
     matchFlavours(model, [
       // 'affine:database',
@@ -49,13 +48,11 @@ function supportsChildren(model: BlockModel): boolean {
   }
   return true;
 }
-//TODO Ali Ghasami
+
 export function handleBlockEndEnter(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  // console.log('handleBlockEndEnter');
-  //debugger;
   const doc = model.doc;
   const parent = doc.getParent(model);
   const nextSibling = doc.getNext(model);
@@ -156,7 +153,6 @@ export function handleBlockSplit(
   splitIndex: number,
   splitLength: number
 ) {
-  //console.log('handleBlockSplit');
   if (!(model.text instanceof Text)) return;
 
   // On press enter, it may convert symbols from yjs ContentString
@@ -212,7 +208,6 @@ export function handleIndent(
   model: ExtendedModel,
   offset = 0
 ) {
-  // console.log('handleIndent');
   const doc = model.doc;
   const previousSibling = doc.getPrev(model);
   if (!previousSibling || !supportsChildren(previousSibling)) {
@@ -256,7 +251,6 @@ export function handleMultiBlockIndent(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
-  // console.log('handleMultiBlockIndent');
   if (!models.length) return;
 
   const doc = models[0].doc;
@@ -311,7 +305,6 @@ export function handleUnindent(
   model: ExtendedModel,
   offset = 0
 ) {
-  // console.log('handleUnindent');
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent || parent.role !== 'content') {
@@ -355,7 +348,6 @@ export function handleMultiBlockOutdent(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
-  //console.log('handleMultiBlockOutdent');
   if (!models.length) return;
   const doc = models[0].doc;
 
@@ -391,7 +383,6 @@ export function handleRemoveAllIndent(
   model: ExtendedModel,
   offset = 0
 ) {
-  //console.log('handleRemoveAllIndent');
   const doc = model.doc;
   let parent = doc.getParent(model);
   while (parent && !matchFlavours(parent, ['affine:note'])) {
@@ -404,7 +395,6 @@ export function handleRemoveAllIndentForMultiBlocks(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
-  // console.log('handleRemoveAllIndentForMultiBlocks');
   if (!models.length) return;
   const doc = models[0].doc;
   for (let i = models.length - 1; i >= 0; i--) {
@@ -420,13 +410,11 @@ export function handleRemoveAllIndentForMultiBlocks(
 // When deleting at line end of a code block,
 // do nothing
 function handleCodeBlockForwardDelete(model: ExtendedModel) {
-  //console.log('handleCodeBlockForwardDelete');
   if (!matchFlavours(model, ['affine:code'])) return false;
   return true;
 }
 
 function handleDatabaseBlockForwardDelete(model: ExtendedModel) {
-  // console.log('handleDatabaseBlockForwardDelete');
   const doc = model.doc;
   if (!isInsideBlockByFlavour(doc, model, 'affine:database')) return false;
 
@@ -439,13 +427,9 @@ function handleListBlockBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  //debugger;
-  // console.log('handleListBlockBackspace');
   const doc = model.doc;
-  //affine:mention
   if (!matchFlavours(model, ['affine:list'])) return false;
-  //debugger;
-  //debugger;
+
   const parent = doc.getParent(model);
   if (!parent) return false;
 
@@ -490,8 +474,6 @@ function handleListBlockForwardDelete(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  //console.log('handleListBlockForwardDelete');
-  //'affine:mention'
   if (!matchFlavours(model, ['affine:list'])) return false;
   const doc = model.doc;
   const firstChild = model.firstChild();
@@ -547,7 +529,6 @@ function handleParagraphOrListSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
-  //console.log('handleParagraphOrListSibling');
   const doc = model.doc;
   if (!matchFlavours(previousSibling, ['affine:paragraph', 'affine:list']))
     return false;
@@ -572,7 +553,6 @@ function handleEmbedDividerCodeSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
-  //console.log('handleEmbedDividerCodeSibling');
   const doc = model.doc;
   if (matchFlavours(previousSibling, ['affine:divider'])) {
     doc.deleteBlock(previousSibling);
@@ -601,7 +581,6 @@ function handleEmbedDividerCodeSibling(
 }
 
 function handleNoPreviousSibling(editorHost: EditorHost, model: ExtendedModel) {
-  //console.log('handleNoPreviousSibling');
   const doc = model.doc;
   const text = model.text;
   const titleElement = getDocTitleByEditorHost(
@@ -638,7 +617,6 @@ function handleParagraphDeleteActions(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  //console.log('handleParagraphDeleteActions');
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent) return false;
@@ -646,11 +624,7 @@ function handleParagraphDeleteActions(
   if (!previousSibling) {
     return handleNoPreviousSibling(editorHost, model);
   } else if (
-    matchFlavours(previousSibling, [
-      'affine:paragraph',
-      'affine:list',
-      //'affine:mention',
-    ])
+    matchFlavours(previousSibling, ['affine:paragraph', 'affine:list'])
   ) {
     const modelIndex = parent.children.indexOf(model);
     if (
@@ -678,14 +652,13 @@ function handleParagraphDeleteActions(
       ...EMBED_BLOCK_FLAVOUR_LIST,
     ])
   ) {
-    //debugger;
     const previousSiblingElement = getBlockComponentByModel(
       editorHost,
       previousSibling
     );
     assertExists(previousSiblingElement);
     const selection = editorHost.selection.create('block', {
-      path: previousSiblingElement.path,
+      blockId: previousSiblingElement.blockId,
     });
     editorHost.selection.setGroup('note', [selection]);
 
@@ -727,11 +700,8 @@ function handleParagraphBlockBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  //debugger;
-  // console.log('handleParagraphBlockBackspace');
   const doc = model.doc;
   if (!matchFlavours(model, ['affine:paragraph'])) return false;
-  //debugger;
 
   // When deleting at line start of a paragraph block,
   // firstly switch it to normal text, then delete this empty block.
@@ -772,7 +742,6 @@ function handleParagraphBlockForwardDelete(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  console.log('handleParagraphBlockForwardDelete');
   const doc = model.doc;
   function handleParagraphOrList(
     doc: Doc,
@@ -855,7 +824,6 @@ function handleParagraphBlockForwardDelete(
     nextSibling: ExtendedModel | null,
     firstChild: ExtendedModel | null
   ) {
-    console.log('handleEmbedDividerCode');
     function handleEmbedDividerCodeChild(firstChild: ExtendedModel | null) {
       if (
         !firstChild ||
@@ -878,7 +846,7 @@ function handleParagraphBlockForwardDelete(
         assertExists(nextSiblingComponent);
         editorHost.selection.setGroup('note', [
           editorHost.selection.create('block', {
-            path: nextSiblingComponent.path,
+            blockId: nextSiblingComponent.blockId,
           }),
         ]);
         return true;
@@ -949,15 +917,13 @@ export function handleLineStartBackspace(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  console.log('handleLineStartBackspace');
   if (
     handleListBlockBackspace(editorHost, model) ||
-    //handleMentionBlockBackspace(editorHost, model)
-    //||
     handleParagraphBlockBackspace(editorHost, model)
   ) {
     return;
   }
+
   handleUnknownBlockBackspace(model);
 }
 
@@ -965,7 +931,6 @@ export function handleLineEndForwardDelete(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  console.log('handleLineEndForwardDelete');
   if (
     handleCodeBlockForwardDelete(model) ||
     handleListBlockForwardDelete(editorHost, model) ||
@@ -976,50 +941,3 @@ export function handleLineEndForwardDelete(
   }
   handleUnknownBlockForwardDelete(model);
 }
-
-/*function handleMentionBlockBackspace(
-  editorHost: EditorHost,
-  model: ExtendedModel
-) {
-  console.log('handleMentionBlockBackspace');
-  const doc = model.doc;
-  if (!matchFlavours(model, ['affine:mention'])) return false;
-  //debugger;
-  doc.captureSync();
-  doc.updateBlock(model, { type: 'text' });
-
-  //debugger;
-  // When deleting at line start of a paragraph block,
-  // firstly switch it to normal text, then delete this empty block.
-  /!*if (model.type !== 'text') {
-    // Try to switch to normal text
-    doc.captureSync();
-    doc.updateBlock(model, { type: 'text' });
-    return true;
-  }*!/
-
-  // Before press backspace
-  // - line1
-  //   - line2
-  //   - |aaa
-  //   - line3
-  //
-  // After press backspace
-  // - line1
-  //   - line2|aaa
-  //   - line3
-  // const isHandled = handleParagraphDeleteActions(editorHost, model);
-  //if (isHandled) return true;
-
-  // Before press backspace
-  // - line1
-  //   - line2
-  //   - |aaa
-  //
-  // After press backspace
-  // - line1
-  //   - line2
-  // - |aaa
-  handleUnindent(editorHost, model);
-  return true;
-}*/

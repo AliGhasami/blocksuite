@@ -17,7 +17,7 @@ import type { ListBlockModel } from './list-model.js';
 import type { ListService } from './list-service.js';
 import { listBlockStyles } from './styles.js';
 import { ListIcon } from './utils/get-list-icon.js';
-import { playCheckAnimation, toggleDown, toggleRight } from './utils/icons.js';
+import { toggleDown, toggleRight } from './utils/icons.js';
 
 @customElement('affine-list')
 export class ListBlockComponent extends BlockElement<

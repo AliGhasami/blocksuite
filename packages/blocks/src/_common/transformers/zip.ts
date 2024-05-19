@@ -9,18 +9,15 @@ import type {
 import { extMimeMap, getAssetName, Job, sha } from '@blocksuite/store';
 import JSZip from 'jszip';
 
-import { cloneDeep } from '../../root-block/edgeless/components/toolbar/template/utils.js';
-import { replaceIdMiddleware } from './middlewares.js';
+import { replaceIdMiddleware, titleMiddleware } from './middlewares.js';
 
 async function exportDocs(collection: DocCollection, docs: Doc[]) {
   const zip = new JSZip();
-  //debugger;
+
   const job = new Job({ collection });
   const snapshots = await Promise.all(docs.map(job.docToSnapshot));
-  //console.log('snapshots', snapshots);
 
   const collectionInfo = job.collectionInfoToSnapshot();
-  //console.log('collectionInfo', collectionInfo);
   zip.file('info.json', JSON.stringify(collectionInfo, null, 2));
 
   snapshots.forEach(snapshot => {
@@ -42,7 +39,6 @@ async function exportDocs(collection: DocCollection, docs: Doc[]) {
 }
 
 async function importDocs(collection: DocCollection, imported: Blob) {
-  //debugger;
   const zip = new JSZip();
   const { files } = await zip.loadAsync(imported);
 
@@ -91,7 +87,7 @@ async function importDocs(collection: DocCollection, imported: Blob) {
   };
   const job = new Job({
     collection,
-    middlewares: [replaceIdMiddleware, migrationMiddleware],
+    middlewares: [replaceIdMiddleware, migrationMiddleware, titleMiddleware],
   });
   const assetsMap = job.assets;
 
@@ -140,7 +136,7 @@ async function importDocs(collection: DocCollection, imported: Blob) {
       });
 
       await Promise.all(tasks);
-     // console.log('this is snapshot', cloneDeep(snapshot));
+
       return job.snapshotToDoc(snapshot);
     })
   );

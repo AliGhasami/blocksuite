@@ -17,8 +17,19 @@ import {
 } from '../../../_common/utils/query.js';
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
-//import { getMenus, type LinkedDocOptions } from './config.js';
 import { MentionPopover } from './mention-popover.js';
+
+export type MentionOptions = {
+  triggerKeys: string[];
+  ignoreBlockTypes: BlockSuite.Flavour[];
+  convertTriggerKey: boolean;
+  /*getMenus: (ctx: {
+    editorHost: EditorHost;
+    query: string;
+    inlineEditor: AffineInlineEditor;
+    docMetas: DocMeta[];
+  }) => LinkedDocGroup[];*/
+};
 
 export function showMentionPopover({
   editorHost,
@@ -34,7 +45,7 @@ export function showMentionPopover({
   range: Range;
   container?: HTMLElement;
   abortController?: AbortController;
-  options: any;
+  options: MentionOptions;
   triggerKey: string;
 }) {
   const disposables = new DisposableGroup();
@@ -42,6 +53,7 @@ export function showMentionPopover({
 
   //console.log(55555, inlineEditor.getInlineRange());
   const mention = new MentionPopover(editorHost, inlineEditor, abortController);
+  mention.options = options;
   //linkedDoc.options = options;
   mention.triggerKey = triggerKey;
   // Mount
@@ -86,7 +98,7 @@ export const AFFINE_MENTION_WIDGET = 'affine-mention-widget';
 
 @customElement(AFFINE_MENTION_WIDGET)
 export class AffineMentionWidget extends WidgetElement {
-  static DEFAULT_OPTIONS: any = {
+  static DEFAULT_OPTIONS: MentionOptions = {
     /**
      * The first item of the trigger keys will be the primary key
      */
