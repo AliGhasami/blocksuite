@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+//import HomeView from '../views/HomeView.vue'
 //import MobileView from "@/views/MobileView.vue";
 
 const router = createRouter({
@@ -7,14 +7,14 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: 'editor',
+      component: ()=> import('../views/EditorView.vue')
     },
-    /*{
-      path: '/mobile',
-      name: 'mobile',
-      component: MobileView
-    },*/
+    {
+      path: '/board',
+      name: 'board',
+      component: ()=> import('../views/BoardView.vue')
+    },
     /*{
       path: '/about',
       name: 'about',

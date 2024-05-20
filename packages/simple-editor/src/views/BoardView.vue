@@ -24,16 +24,15 @@
     <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
-    <Editor :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
+    <Board :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
   </div>
 </template>
 
 <script setup lang="ts">
-import Editor from "@/components/Editor.vue";
+import Board from "@/components/Board.vue";
 import {ref} from "vue";
 import {data} from "../my_temp/template/tempData";
 //import type { UserMention } from '@/components/types';
-
 /*********************************/
 /*import MyBarComponent from '@/components/web-component/MyBar.vue'
 const MyBar = defineCustomElement(MyBarComponent)
@@ -85,9 +84,9 @@ watch(temp,()=>{
 })
 */
 const refEditor=ref(null)
-const userMentionList=ref<UserMention[]>([{id:'1',name:'test 1'}])
+const userMentionList=ref<any[]>([{id:'1',name:'test 1'}])
 async function handleGetData(){
-  const temp=  await refEditor?.value?.getData()
+  const temp=  await refEditor?.value.instance.getData()
   console.log("this is temp",temp);
 }
 
@@ -110,10 +109,10 @@ function handleAddUserMention(){
 
 
 async function  handleStartCollaboration(){
-  if (window.wsProvider) {
-    /*notify('There is already a websocket provider exists', 'neutral').catch(
+  /*if (window.wsProvider) {
+    /!*notify('There is already a websocket provider exists', 'neutral').catch(
       console.error
-    );*/
+    );*!/
     return;
   }
 
@@ -123,9 +122,10 @@ async function  handleStartCollaboration(){
   params.set('room', id);
   const url = new URL(location.href);
   url.search = params.toString();
-  location.href = url.href;
+  location.href = url.href;*/
 }
 
+/*
 async function generateRoomId(): Promise<string> {
   return fetch(new URL('/room/', 'https://blocksuite-playground.toeverything.workers.dev'), {
     method: 'post',
@@ -133,6 +133,7 @@ async function generateRoomId(): Promise<string> {
     .then(res => res.json())
     .then(({ id }) => id);
 }
+*/
 
 
 

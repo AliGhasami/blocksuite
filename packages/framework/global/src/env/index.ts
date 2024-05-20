@@ -21,4 +21,4 @@ export const IS_MAC = /Mac/i.test(platform);
 
 export const IS_WINDOWS = /Win/.test(platform);
 
-export const Prefix = 'vue-block-editor';
+export const Prefix = 'vue-block-board-editor';

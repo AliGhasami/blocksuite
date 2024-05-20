@@ -27,7 +27,7 @@ export function createEmptyDoc() {
       const noteId = doc.addBlock('affine:note', {}, rootId);
       //console.log("this is note id",noteId)
       doc.addBlock('affine:paragraph', {}, noteId);
-      doc.addBlock('affine:hint', {title: new Text('this is title'),description:new Text('this is description'),type:'success'}, noteId);
+      //doc.addBlock('affine:hint', {title: new Text('this is title'),description:new Text('this is description'),type:'success'}, noteId);
       /*doc.addBlock('affine:paragraph', {text: new Text('1')}, noteId);
       doc.addBlock('affine:paragraph', {text: new Text('2')}, noteId);
       doc.addBlock('affine:paragraph', {text: new Text('3')}, noteId);
