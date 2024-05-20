@@ -60,9 +60,10 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   @query('rich-text')
   _richTextElement?: RichText | null;
 
-  //@query('.popover')
   //popover?: HTMLElement | null;
   //popover?: HTMLElement | null;
+  @query('.popover')
+  optionPopover?: HTMLElement | null;
 
   @query('.title-text')
   private _richTextTitle?: RichText;
@@ -223,7 +224,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         );*/
         //@ts-ignore
         tippy(this, {
-          content: this.popover,
+          content: this.optionPopover,
           allowHTML: true,
           placement: 'top',
           appendTo: () => {

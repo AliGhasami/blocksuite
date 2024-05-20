@@ -6,23 +6,23 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css';
-import { PageEditor,EdgelessEditor } from '@blocksuite/presets';
-import {createEmptyDoc} from './helpers'
+import { PageEditor, EdgelessEditor, createEmptyDoc } from "@blocksuite/presets";
+//import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
 import { defineCustomElement, onMounted, ref, watch } from 'vue';
-import {replaceIdMiddleware} from "@blocksuite/blocks";
+//import {replaceIdMiddleware} from "@blocksuite/blocks";
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 //let editor: any = null
-let myCollection: DocCollection | null = null
+//let myCollection: DocCollection | null = null
 import 'tippy.js/dist/tippy.css';
-import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
+//import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
 //todo fix import
 //import type { UserMention } from '@/components/types';
-const SelectHintType = defineCustomElement(SelectHintTypeComponent)
-if(!customElements.get('select-hint-type')){
-  customElements.define('select-hint-type', SelectHintType,{})
-}
+// const SelectHintType = defineCustomElement(SelectHintTypeComponent)
+// if(!customElements.get('select-hint-type')){
+//   customElements.define('select-hint-type', SelectHintType,{})
+// }
 
 interface Props{
   mentionUserList?:any[]
@@ -165,12 +165,12 @@ onMounted(async ()=>{
   const doc = createEmptyDoc().init();
   const editor = new EdgelessEditor();
   editor.doc = doc;
+  console.log("1111",editor);
+  //document.body.append(editor);
   if(refEditor.value){
-   refEditor.value.appendChild(editor);
+    refEditor.value.appendChild(editor);
   }
   //document.body.append(editor);
-
-
   /*const {doc,collection} = createEmptyDoc().init();
   myCollection= collection
   currentDocument=doc
@@ -270,6 +270,20 @@ defineExpose({
 /* TODO ali ghasami for fix token */
 @prefix:~'vue-block-editor';
 .@{prefix}{
+
+
+  height: 800px;
+  width: 100%;
+
+ /* width: 100%;
+  height:100%;*/
+  .editor{
+    height: 500px;
+    width: 100%;
+   /* width: 100%;
+    height:100%;*/
+  }
+
   .place-holder{
   @apply text-neutral-4 mt-body;
     line-height: unset;
@@ -527,3 +541,26 @@ defineExpose({
 </style>
 
 
+
+<!--<template>
+    <div>111</div>
+</template>
+
+<script setup >
+
+  import { onMounted } from "vue";
+  import '@blocksuite/presets/themes/affine.css';
+  import { createEmptyDoc, EdgelessEditor } from '@blocksuite/presets';
+
+  onMounted(()=>{
+    const doc = createEmptyDoc().init();
+    const editor = new EdgelessEditor();
+    editor.doc = doc;
+    document.body.append(editor);
+  })
+
+</script>
+
+<style>
+
+</style>-->

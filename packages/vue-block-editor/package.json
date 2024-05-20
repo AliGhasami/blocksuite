@@ -1,0 +1,75 @@
+{
+  "name": "alighasami_vue-block-editor",
+  "version": "0.0.12",
+  "private": false,
+  "type": "module",
+  "files": [
+    "dist",
+    "src/components/"
+  ],
+  "main": "./dist/vue-block-editor.umd.cjs",
+  "module": "./dist/vue-block-editor.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-block-editor.js",
+      "require": "./dist/vue-block-editor.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "author": "Ali Ghasami",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@mahdaad/tokens": "^0.0.30",
+    "@unhead/vue": "^1.9.5",
+    "@vueuse/core": "^10.9.0",
+    "ant-design-vue": "4.x",
+    "less": "^4.2.0",
+    "pinia": "^2.1.7",
+    "radix-vue": "^1.7.3",
+    "tippy.js": "^6.3.7",
+    "unocss-preset-autoprefixer": "^0.0.7",
+    "vite-plugin-dts": "^3.7.3",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@blocksuite/blocks": "workspace:*",
+    "@blocksuite/global": "workspace:*",
+    "@blocksuite/inline": "workspace:*",
+    "@blocksuite/presets": "workspace:*",
+    "@blocksuite/store": "workspace:*",
+    "@blocksuite/sync": "workspace:*",
+    "@rushstack/eslint-patch": "^1.3.3",
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.11.28",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@vue/eslint-config-prettier": "^8.0.0",
+    "@vue/eslint-config-typescript": "^12.0.0",
+    "@vue/tsconfig": "^0.5.1",
+    "eslint": "^8.49.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "npm-run-all2": "^6.1.2",
+    "prettier": "^3.0.3",
+    "typescript": "~5.4.0",
+    "unocss": "^0.58.6",
+    "vite": "^5.1.6",
+    "vite-plugin-vue-devtools": "^7.0.18",
+    "vue-tsc": "^2.0.6"
+  }
+}

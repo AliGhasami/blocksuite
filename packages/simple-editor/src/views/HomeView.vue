@@ -32,7 +32,7 @@
 import Editor from "@/components/Editor.vue";
 import {ref} from "vue";
 import {data} from "../my_temp/template/tempData";
-import type { UserMention } from '@/components/types';
+//import type { UserMention } from '@/components/types';
 
 /*********************************/
 /*import MyBarComponent from '@/components/web-component/MyBar.vue'

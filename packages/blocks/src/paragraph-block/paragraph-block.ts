@@ -10,7 +10,6 @@ import { customElement, query } from 'lit/decorators.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
 import type { RichText } from '../_common/components/rich-text/rich-text.js';
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
-//import { getViewportElement } from '../_common/utils/query.js';
 import type { NoteBlockComponent } from '../note-block/note-block.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
 import type { ParagraphBlockModel } from './paragraph-model.js';
@@ -53,50 +52,6 @@ export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockService
 > {
   static override styles = paragraphBlockStyles;
-  /*  static override styles = css`
-    .quote {
-      line-height: 26px;
-      padding-left: 17px;
-      margin-top: var(--affine-paragraph-space);
-      padding-top: 10px;
-      padding-bottom: 10px;
-      position: relative;
-    }
-    .quote::after {
-      content: '';
-      width: 2px;
-      height: calc(100% - 20px);
-      margin-top: 10px;
-      margin-bottom: 10px;
-      position: absolute;
-      left: 0;
-      top: 0;
-      background: var(--affine-quote-color);
-      border-radius: 18px;
-    }
-
-    .affine-paragraph-placeholder {
-      position: absolute;
-      display: none;
-      left: 0;
-      bottom: 0;
-      pointer-events: none;
-      color: var(--affine-black-30);
-      fill: var(--affine-black-30);
-      width: 100%;
-      padding-right: 30px;
-    }
-
-    .affine-paragraph-placeholder-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .affine-paragraph-placeholder.visible {
-      display: block;
-    }
-  `;*/
 
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
@@ -150,8 +105,10 @@ export class ParagraphBlockComponent extends BlockElement<
   }
 
   override firstUpdated() {
-    this.model.propsUpdated.on(this._updatePlaceholder);
-    this.host.selection.slots.changed.on(this._updatePlaceholder);
+    this._disposables.add(this.model.propsUpdated.on(this._updatePlaceholder));
+    this._disposables.add(
+      this.host.selection.slots.changed.on(this._updatePlaceholder)
+    );
 
     this.updateComplete
       .then(() => {
@@ -192,9 +149,6 @@ export class ParagraphBlockComponent extends BlockElement<
     if (paragraphList.length == 1) {
       isEmpty = true;
     }
-    //console.log('this.selected', this.selected);
-    //console.log('this.inlineEditor.isComposing', this.inlineEditor.isComposing);
-    //console.log('this.inlineEditor.yTextLength', this.inlineEditor.yTextLength);
     if (
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
@@ -208,8 +162,6 @@ export class ParagraphBlockComponent extends BlockElement<
     if (this.selected) {
       this._placeholderContainer.classList.add('hover');
     }
-    //console.log('is selected', this.selected);
-    //if()
   };
 
   private _isInDatabase = () => {
@@ -241,24 +193,25 @@ export class ParagraphBlockComponent extends BlockElement<
           <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}
           </div>
-        <div class="affine-paragraph-rich-text-wrapper ${type}">
-          <rich-text
-            .yText=${this.model.text.yText}
-            .inlineEventSource=${this.topContenteditableElement ?? nothing}
-            .undoManager=${this.doc.history}
-            .attributesSchema=${this.attributesSchema}
-            .attributeRenderer=${this.attributeRenderer}
-            .markdownShortcutHandler=${this.markdownShortcutHandler}
-            .embedChecker=${this.embedChecker}
-            .readonly=${this.doc.readonly}
-            .inlineRangeProvider=${this._inlineRangeProvider}
-            .enableClipboard=${false}
-            .enableUndoRedo=${false}
-          ></rich-text>
-        </div>
-        ${children}
+          <div class="affine-paragraph-rich-text-wrapper ${type}">
+            <rich-text
+              .yText=${this.model.text.yText}
+              .inlineEventSource=${this.topContenteditableElement ?? nothing}
+              .undoManager=${this.doc.history}
+              .attributesSchema=${this.attributesSchema}
+              .attributeRenderer=${this.attributeRenderer}
+              .markdownShortcutHandler=${this.markdownShortcutHandler}
+              .embedChecker=${this.embedChecker}
+              .readonly=${this.doc.readonly}
+              .inlineRangeProvider=${this._inlineRangeProvider}
+              .enableClipboard=${false}
+              .enableUndoRedo=${false}
+            ></rich-text>
+          </div>
+          ${children}
 
-        <affine-block-selection .block=${this}></affine-block-selection>
+          <affine-block-selection .block=${this}></affine-block-selection>
+        </div>
       </div>
     `;
   }

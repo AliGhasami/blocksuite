@@ -20,21 +20,20 @@
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
     <button @click="handleAddUserMention">Add user Mention</button>
-<!--    <button @click="handleStartCollaboration">start collaboration</button>-->
-<!--    <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />-->
+    <button @click="handleStartCollaboration">start collaboration</button>
+    <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
-<!--    <Editor :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />-->
-    <Board />
+    <Editor :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
   </div>
 </template>
 
 <script setup lang="ts">
-import Board from "@/components/Board.vue";
+import {Editor} from "alighasami_vue-block-editor";
+import 'alighasami_vue-block-editor/dist/style.css'
 import {ref} from "vue";
 import {data} from "../my_temp/template/tempData";
 //import type { UserMention } from '@/components/types';
-
 /*********************************/
 /*import MyBarComponent from '@/components/web-component/MyBar.vue'
 const MyBar = defineCustomElement(MyBarComponent)
