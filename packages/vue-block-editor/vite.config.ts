@@ -52,7 +52,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "Editor",
-      fileName: "vue-block-editor",
+      fileName: "index",
     },
     rollupOptions: {
       external: ["vue"],

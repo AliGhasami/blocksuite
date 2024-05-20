@@ -9,15 +9,13 @@
   ],
   "main": "./dist/vue-block-editor.umd.cjs",
   "module": "./dist/vue-block-editor.js",
+  "./dist/*": "./dist/*",
+  ".": "./src/index.ts",
+  "./schemas": "./src/schemas.ts",
   "exports": {
-    ".": {
-      "import": "./dist/vue-block-editor.js",
-      "require": "./dist/vue-block-editor.umd.cjs"
-    },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    }
+    "./dist/*": "./dist/*",
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas.ts"
   },
   "types": "./dist/index.d.ts",
   "author": "Ali Ghasami",
