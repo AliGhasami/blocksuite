@@ -16,11 +16,15 @@ import {
   BroadcastChannelDocSource,
   IndexedDBDocSource,
 } from '@blocksuite/sync';
+import PartySocket from 'partysocket';
 
 import { WebSocketAwarenessSource } from '../../_common/sync/websocket/awareness';
 import { WebSocketDocSource } from '../../_common/sync/websocket/doc';
 
-const BASE_WEBSOCKET_URL = new URL(import.meta.env.PLAYGROUND_WS);
+//const BASE_WEBSOCKET_URL = new URL(import.meta.env.PLAYGROUND_WS);
+const BASE_WEBSOCKET_URL = new URL('ws://192.168.254.124:9080/');
+//const BASE_WEBSOCKET_URL = new URL('127.0.0.1:61041');
+//console.log('1111', import.meta.env, import.meta.env.PLAYGROUND_WS);
 
 export async function createDefaultDocCollection() {
   const blobStorages: ((id: string) => BlobStorage)[] = [
@@ -37,7 +41,13 @@ export async function createDefaultDocCollection() {
   let awarenessSources: StoreOptions['awarenessSources'];
   const room = params.get('room');
   if (room) {
-    const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
+    //const ws = new WebSocket(new URL(`/my-new-room`, BASE_WEBSOCKET_URL));
+    const ws = new PartySocket({
+      //host: `${BASE_WEBSOCKET_URL}`,
+      host: '127.0.0.1:55466',
+      room: 'my-new-room',
+    });
+
     await new Promise((resolve, reject) => {
       ws.addEventListener('open', resolve);
       ws.addEventListener('error', reject);
