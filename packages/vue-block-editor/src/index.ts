@@ -1,2 +1,3 @@
 import Editor from "./components/Editor.vue";
-export { Editor };
+import Board from "./components/Board.vue";
+export { Editor,Board };
