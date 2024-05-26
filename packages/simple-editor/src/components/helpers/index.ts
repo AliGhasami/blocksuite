@@ -1,6 +1,6 @@
 import { AffineSchemas } from '@blocksuite/blocks/schemas';
 import {DocCollection, Schema,Text} from '@blocksuite/store';
-export function createEmptyDoc() {
+export function createEmptyDoc(isBoard:boolean=false) {
   //console.log('AffineSchemas', AffineSchemas);
   //AffineSchemas
   const schema = new Schema().register(AffineSchemas);
@@ -24,9 +24,13 @@ export function createEmptyDoc() {
       });
       //console.log("this is root id",rootId)
       doc.addBlock('affine:surface', {}, rootId);
-      const noteId = doc.addBlock('affine:note', {}, rootId);
+      if(!isBoard)
+      {
+        const noteId = doc.addBlock('affine:note', {}, rootId);
+        doc.addBlock('affine:paragraph', {}, noteId);
+      }
       //console.log("this is note id",noteId)
-      doc.addBlock('affine:paragraph', {}, noteId);
+
       //doc.addBlock('affine:hint', {title: new Text('this is title'),description:new Text('this is description'),type:'success'}, noteId);
       /*doc.addBlock('affine:paragraph', {text: new Text('1')}, noteId);
       doc.addBlock('affine:paragraph', {text: new Text('2')}, noteId);
@@ -35,7 +39,7 @@ export function createEmptyDoc() {
       doc.addBlock('affine:paragraph', {text: new Text('4')}, noteId);
       doc.addBlock('affine:paragraph', {text: new Text('5')}, noteId);*/
 
-      return {doc,noteId,collection};
+      return {doc,collection};
     },
   };
 }

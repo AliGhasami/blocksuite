@@ -2,7 +2,6 @@
 /*export {
     PersonalButton
 }*/
-import Editor from "./components/Editor.vue";
-import Board from "./components/Board.vue";
 //import './components/types'
-export { Editor ,Board};
+import BoardEditor from "./components/board-editor.vue";
+export { BoardEditor };

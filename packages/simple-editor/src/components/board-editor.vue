@@ -74,7 +74,13 @@ async function getData(){
 async function setData(data:any){
  // console.log("this is set data",data)
   if(myCollection){
-    const editor = new PageEditor();
+    //const editor = new PageEditor();
+    let editor = null
+    if(props.isBoardView){
+      editor = new EdgelessEditor();
+    }else{
+      editor = new PageEditor();
+    }
     const job = new Job({ collection: myCollection, middlewares: [
         replaceIdMiddleware
       ]})
@@ -163,7 +169,7 @@ function handleSetData(){
 })*/
 
 onMounted(async ()=>{
-  const {doc,collection} = createEmptyDoc().init();
+  const {doc,collection} = createEmptyDoc(props.isBoardView).init();
   myCollection= collection
   currentDocument=doc
   //myNoteId=noteId
@@ -406,6 +412,12 @@ defineExpose({
   }*/
 
   /* Place Holder - paragraph style */
+
+  /*  Board Style */
+  .board{
+    width: 100%;
+    height: 600px;
+  }
 
 
 }

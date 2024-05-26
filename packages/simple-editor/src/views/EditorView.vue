@@ -24,12 +24,12 @@
     <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
-    <Editor :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
+    <BoardEditor :mention-user-list="userMentionList" ref="refEditor"  style="border:1px solid pink;min-height: 600px;padding-left: 0px" @change="handleChange" @update-block="handleUpdateBlock"  @add-block="handleAddBlock" @delete-block="handleDeleteBlock" />
   </div>
 </template>
 
 <script setup lang="ts">
-import Editor from "@/components/Editor.vue";
+import  BoardEditor from "@/components/board-editor.vue";
 import {ref} from "vue";
 import {data} from "../my_temp/template/tempData";
 //import type { UserMention } from '@/components/types';
@@ -95,12 +95,12 @@ async function handleGetData(){
 }
 
 async function handleSetData(){
-  await refEditor?.value?.setData(data)
+  await refEditor?.value.instance.setData(data)
 }
 
 
 async function handleSetFocus(){
-   refEditor?.value?.setFocus()
+  await refEditor?.value.instance.setFocus()
     //document.querySelector('#input').focus();
     //document.querySelector('affine-note').focus();
   //console.log("1111",document.querySelector('rich-text')?.inlineEditor)
@@ -110,35 +110,6 @@ async function handleSetFocus(){
 function handleAddUserMention(){
   userMentionList.value.push({name:'test is test2',id:'2'})
 }
-
-
-async function  handleStartCollaboration(){
-  if (window.wsProvider) {
-    /*notify('There is already a websocket provider exists', 'neutral').catch(
-      console.error
-    );*/
-    return;
-  }
-
-  const params = new URLSearchParams(location.search);
-  const id = params.get('room') || (await generateRoomId());
-
-  params.set('room', id);
-  const url = new URL(location.href);
-  url.search = params.toString();
-  location.href = url.href;
-}
-
-async function generateRoomId(): Promise<string> {
-  return fetch(new URL('/room/', 'https://blocksuite-playground.toeverything.workers.dev'), {
-    method: 'post',
-  })
-    .then(res => res.json())
-    .then(({ id }) => id);
-}
-
-
-
 /*
 async function handleSetData2(){
   await refEditor?.value?.setData(2)
