@@ -14,11 +14,8 @@ import {replaceIdMiddleware} from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css';
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
-//let editor: any = null
 let myCollection: DocCollection | null = null
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
-//todo fix import
-//import type { UserMention } from '@/components/types';
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
 if(!customElements.get('select-hint-type')){
   customElements.define('select-hint-type', SelectHintType,{})
@@ -66,13 +63,10 @@ async function getData(){
     return  await exportData(myCollection, [currentDocument])
   }
   return null
-  //console.log("this is temp",temp)
-  //console.log("ref editor",refEditor.value)
 }
 
 //TODO(@ali ghasami) for fix after and check performance
 async function setData(data:any){
- // console.log("this is set data",data)
   if(myCollection){
     //const editor = new PageEditor();
     let editor = null
@@ -85,42 +79,17 @@ async function setData(data:any){
         replaceIdMiddleware
       ]})
      const new_doc = await job.snapshotToDoc(data)
-   // console.log("this is doc",new_doc)
     bindEvent(new_doc)
-    //console.log("this is doc",new_doc)
-    //console.log("this is collcetion",myCollection)
-    //console.log("this is new doc",new_doc)
-    //myCollection
-    //const _collection = editor.doc.collection;
-    //console.log("11111",_collection)
-    //const docs = [..._collection.docs.values()];
     editor.doc = new_doc
     currentDocument=new_doc
-    //editor.doc.load();
-    //editor.doc.resetHistory();
-    //currentDocument = editor.doc
-    if (refEditor.value) {
-      //debugger
+    appendTODOM(editor)
+    /*if (refEditor.value) {
       const children = refEditor.value.children
-      //console.log('refEditor', refEditor.value.children)
       if (children.length) {
        refEditor.value.removeChild(children[0])
       }
       refEditor.value.appendChild(editor)
-      //const childs = refEditor.value //refEditor.value.removeChild(ed)
-      //.appendChild(editor)
-    }
-    //return
-    //editor = new PageEditor()
-    //new_doc.load()
-    //editor.doc.load();
-    //editor.doc.resetHistory();
-    //editor.doc.
-    //console.log('this is set data', data)
-    //currentDocument = editor.doc
-    //bindEvent(editor.doc)
-    //editor.doc.load()
-    //editor.doc.resetHistory()
+    }*/
   }
 }
 
@@ -133,42 +102,31 @@ function bindEvent(doc:Doc){
       emit('deleteBlock',data)
     if(data.type=='update')
       emit('updateBlock',data)
-    //console.log("block updated",data)
   })
 }
 
 
+function appendTODOM(element:HTMLElement){
+  if (refEditor.value) {
+    const children = refEditor.value.children
+    if (children.length) {
+      refEditor.value.removeChild(children[0])
+    }
+    refEditor.value.appendChild(element)
+  }
+}
+
+
+watch(()=>props.isBoardView,()=>{
+  init()
+})
+
+
 watch(()=>props.mentionUserList,()=>{
-  //debugger
   updateMentionList()
 },{deep:true})
 
-
-/*
-function handleGetData(){
-  //console.log("1111")
-}
-function handleSetData(){
-}
-*/
-/*onMounted(()=>{
-  const doc = createEmptyDoc().init();
-  //const editor = new EdgelessEditor();
-  const editor = new PageEditor();
-  //const editor = new AffineEditorContainer();
-  editor.doc = doc;
-  //document.body.appendChild(editor);
-  if(refEditor.value){
-    refEditor.value.appendChild(editor);
-  }
-  // Update block node with some initial text content
-  const paragraphs = doc.getBlockByFlavour('affine:paragraph');
-  const paragraph = paragraphs[0];
-  doc.updateBlock(paragraph, { text: new Text('Hello World!') });
-  console.log("this is doc",doc)
-})*/
-
-onMounted(async ()=>{
+function init(){
   const {doc,collection} = createEmptyDoc(props.isBoardView).init();
   myCollection= collection
   currentDocument=doc
@@ -179,33 +137,21 @@ onMounted(async ()=>{
   }else{
     editor = new PageEditor();
   }
-  //const editor = new EdgelessEditor();
   editor.doc = doc;
-  //document.body.appendChild(editor);
-  if(refEditor.value){
+  appendTODOM(editor)
+  /*if(refEditor.value){
     refEditor.value.appendChild(editor);
-  }
+  }*/
   bindEvent(doc)
   updateMentionList()
-  //console.log("1111",editor)
-  //console.log("2222",doc)
-  //const a=doc.getBlockByFlavour('affine:paragraph')
-  //console.log("this is a",a[0])
-  //console.log("editor",editor,editor.slots)
-  //console.log("doc",doc)
-  //editor.doc.destroy()
-  //doc.destroy()
-  // Update block node with some initial text content
-  //const paragraphs = doc.getBlockByFlavour('affine:paragraph');
-  //const paragraph = paragraphs[0];
-  //doc.updateBlock(paragraph, { text: new Text('Hello World!') });
-})
+}
+
+
 
 async function exportData(collection : DocCollection, docs:any[]) {
   const job = new Job({ collection })
   //job.snapshotToDoc()
   const snapshots = await Promise.all(docs.map(job.docToSnapshot))
-  // console.log('this is snapShoot111', snapshots[0])
   if (snapshots.length > 0) {
     return snapshots[0]
     //return Object.assign(snapshots[0].blocks, { id: null })
@@ -217,10 +163,7 @@ function updateMentionList(){
   const root=currentDocument?.getBlocksByFlavour('affine:page')
   if(root && root.length > 0){
     currentDocument?.updateBlock(root[0].model,{mentionUserList:props.mentionUserList})
-    //root[0].mentionUserList=props.mentionUserList
   }
-  console.log("1111",currentDocument,root);
-  //console.log(1111);
 }
 
 
@@ -230,41 +173,19 @@ function setFocus(){
     if(editor && editor.inlineEditor){
       editor.inlineEditor.focusEnd()
     }
-    //console.log("55555",editor)
   }
-  //console.log("ggg",refEditor.value)
 }
 
-/*onMounted(()=>{
-  setTimeout(()=>{
-    setFocus()
-  },5000)
-  //console.log("111",refEditor.value)
-})*/
 
+onMounted(async ()=>{
+  init()
+})
 
 defineExpose({
   getData,
   setData,
   setFocus
 })
-
-
-/*function handleAddDivider(){
-  if(myDoc){
-    console.log("this is doc",myDoc)
-    //const noteId=doc.
-    //doc.addBlock('affine:divider', {}, doc.root?.id);
-    //doc.addBlock('affine:divider', {}, noteId);
-    //debugger
-    myDoc.addBlock('affine:divider', {},myNoteId);
-    //doc.addBlocks([],)
-    //const paragraphs = doc.getBlockByFlavour('affine:paragraph');
-    //const paragraph = paragraphs[0];
-    //doc.updateBlock(paragraph, { text: new Text('Hello World!') });
-  }
-}*/
-
 </script>
 
 <style lang="less">
@@ -275,23 +196,20 @@ defineExpose({
   @apply text-neutral-4 mt-body;
     line-height: unset;
     transition: all 0.3s ease-in-out;
-    //background-color: red;
     .short-code{
       border-radius: 4px;
-    @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
+      @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
     }
   }
 
   /* Mention Style */
   .affine-mention{
     @apply flex-inline gap-2 mt-overline cursor-pointer text-neutral-8 bg-gray-1;
-    //border: 1px solid #535bf2;
     width: fit-content;
     border-radius: @roundness-sm;
     padding: 0 @space-2;
     &:hover,&[data-selected='true'] {
       background:#F7F6FE;
-      //color:@amethyst-5;
       color:#64428F;
     }
   }
@@ -395,21 +313,9 @@ defineExpose({
 
   /* Fix rtl - ltr Style */
   .affine-paragraph-placeholder{
-    //background-color: red;
   }
 
 
-  /*.with-drag-handle{
-   //background-color: red;
- }*/
-
-  /*.affine-paragraph-placeholder{
-    //background-color: red;
-    cursor: pointer !important;
-   !* &.hover{
-      //background-color: green;
-    }*!
-  }*/
 
   /* Place Holder - paragraph style */
 
@@ -525,11 +431,11 @@ defineExpose({
 }
 
 
-//.slash-menu,
-/*.popover-menu{
+/*//.slash-menu,
+!*.popover-menu{
   border-radius: var(--mt-roundness-3);
   //background-color: red;
-}*/
+}*!*/
 
 </style>
 
