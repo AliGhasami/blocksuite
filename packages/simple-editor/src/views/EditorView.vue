@@ -20,7 +20,8 @@
     <button @click="handleSetData">set data</button>
     <button @click="handleSetFocus">set focus</button>
     <button @click="handleAddUserMention">Add user Mention</button>
-    <button @click="handleStartCollaboration">start collaboration</button>
+    <button @click="handleRest">Rest Data</button>
+<!--    <button @click="handleStartCollaboration">start collaboration</button>-->
     <input style="margin-left: 30px" id="input" @keydown.enter="handleSetFocus"  />
 <!--    <button @click="handleSetData2">set data 2</button>-->
 <!--    min-height: 450px;max-height: 450px;ov erflow-y: scroll-->
@@ -90,17 +91,22 @@ async function handleGetData(){
   //console.log("1111",refEditor?.value.instance.getData());
   //debugger
   //const temp=  await refEditor?.value?.getData()
-  const temp= await refEditor?.value.instance.getData()
+  const temp= await refEditor?.value.getData()
   console.log("this is temp",temp);
 }
 
 async function handleSetData(){
-  await refEditor?.value.instance.setData(data)
+  await refEditor?.value.setData(data)
+}
+
+
+function handleRest(){
+  refEditor?.value.reset()
 }
 
 
 async function handleSetFocus(){
-  await refEditor?.value.instance.setFocus()
+  await refEditor?.value.setFocus()
     //document.querySelector('#input').focus();
     //document.querySelector('affine-note').focus();
   //console.log("1111",document.querySelector('rich-text')?.inlineEditor)

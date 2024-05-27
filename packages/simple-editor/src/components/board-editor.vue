@@ -93,6 +93,11 @@ async function setData(data:any){
   }
 }
 
+function reset(){
+  init()
+}
+
+
 function bindEvent(doc:Doc){
   doc.slots.blockUpdated.on((data)=>{
     emit('change',data)
@@ -184,7 +189,8 @@ onMounted(async ()=>{
 defineExpose({
   getData,
   setData,
-  setFocus
+  setFocus,
+  reset
 })
 </script>
 
