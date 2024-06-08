@@ -10,7 +10,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { EmbedCardCaption } from '../_common/components/embed-card/embed-card-caption.js';
-import { baseURL } from '../_common/upload.js';
+import { getBaseURLUpload } from '../_common/upload.js';
 import { Bound } from '../surface-block/utils/bound.js';
 import type { ImageBlockEdgelessComponent } from './components/edgeless-image-block.js';
 import type { AffineImageCard } from './components/image-card.js';
@@ -93,7 +93,7 @@ export class ImageBlockComponent extends BlockElement<
 
   get src() {
     if (!this.model.src?.startsWith('blob')) {
-      return `${baseURL}/v2/${this.model.src}`;
+      return `${getBaseURLUpload()}/v2/${this.model.src}`;
     }
     return this.model.src;
   }

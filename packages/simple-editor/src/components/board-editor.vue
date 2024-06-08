@@ -24,6 +24,7 @@ if(!customElements.get('select-hint-type')){
 interface Props{
   isBoardView?:boolean,
   mentionUserList?:any[]
+  uploadUrl?:string
 }
 
 type IBlockChange= {
@@ -56,6 +57,20 @@ const emit=defineEmits<{
   (e:'deleteBlock',val:IBlockChange):void
   (e:'updateBlock',val:IBlockChange):void
 }>()
+
+
+watch(()=>props.uploadUrl,()=>{
+  const temp={
+    uploadURL:props.uploadUrl ?? ''
+  }
+
+  if(window.$blockEditor){
+    Object.assign(window.$blockEditor,temp)
+  }else{
+    window.$blockEditor=temp
+  }
+
+},{immediate:true})
 
 
 async function getData(){

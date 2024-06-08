@@ -1,8 +1,13 @@
 // Set config defaults when creating the instance
 import axios from 'axios';
-export const baseURL = 'https://clourage.dev.misdc.com';
+//export const baseURL = window.$blockEditor ? window.$blockEditor.uploadURL : '' //'https://clourage.dev.misdc.com';
+
+export function getBaseURLUpload() {
+  return window.$blockEditor ? window.$blockEditor.uploadURL : '';
+}
+
 const instance = axios.create({
-  baseURL: baseURL,
+  baseURL: getBaseURLUpload(),
   //baseURL: 'https://api.example.com',
 });
 instance.defaults.headers.common['Auth-Type'] = 'casdoor';
@@ -14,6 +19,7 @@ instance.defaults.headers.common['Auth-Type'] = 'casdoor';
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    config.baseURL = getBaseURLUpload();
     if (config.headers) {
       const token = localStorage.getItem('upload_token');
       if (token) {
@@ -46,7 +52,7 @@ instance.interceptors.response.use(
 export async function uploadFile(file: Blob) {
   const formData = new FormData();
   formData.append('file', file);
-  return instance.post('/v2/file/upload', formData, {
+  return instance.post('', formData, {
     onUploadProgress: progressEvent => {
       if (progressEvent) {
         const percentCompleted = Math.round(
@@ -59,4 +65,12 @@ export async function uploadFile(file: Blob) {
       console.log('progressEvent', progressEvent);
     },
   });
+}
+
+declare global {
+  interface Window {
+    $blockEditor: {
+      uploadURL: string;
+    };
+  }
 }
