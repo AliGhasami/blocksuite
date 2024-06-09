@@ -25,6 +25,8 @@ interface Props{
   isBoardView?:boolean,
   mentionUserList?:any[]
   uploadUrl?:string
+  storageUrl?:string
+  apiToken?:string
 }
 
 type IBlockChange= {
@@ -59,10 +61,13 @@ const emit=defineEmits<{
 }>()
 
 
-watch(()=>props.uploadUrl,()=>{
+watch(()=>[props.uploadUrl,props.storageUrl,props.apiToken],()=>{
   const temp={
-    uploadURL:props.uploadUrl ?? ''
+    uploadUrl:props.uploadUrl ?? '',
+    storageUrl:props.storageUrl ?? '',
+    apiToken:props.apiToken ?? ''
   }
+
 
   if(window.$blockEditor){
     Object.assign(window.$blockEditor,temp)
