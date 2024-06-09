@@ -18,6 +18,7 @@ import {
   EMBED_CARD_WIDTH,
 } from '../../_common/consts.js';
 import { ThemeObserver } from '../../_common/theme/theme-observer.js';
+import { uploadFile } from '../../_common/upload.js';
 import {
   type EdgelessTool,
   type IPoint,
@@ -405,6 +406,7 @@ export class EdgelessRootBlockComponent extends BlockElement<
       const blockId = this.service.addBlock(
         'affine:image',
         {
+          src: URL.createObjectURL(file),
           size: file.size,
           xywh: bound.serialize(),
         },
@@ -416,8 +418,9 @@ export class EdgelessRootBlockComponent extends BlockElement<
     // upload image data and update the image model
     const uploadPromises = imageFiles.map(async (file, index) => {
       const { point, blockId } = dropInfos[index];
-
-      const sourceId = await this.doc.blob.set(file);
+      const { data } = await uploadFile(file);
+      console.log('11111', data);
+      // const sourceId = await this.doc.blob.set(file);
       const imageSize = await readImageSize(file);
 
       const center = Vec.toVec(point);
@@ -430,7 +433,8 @@ export class EdgelessRootBlockComponent extends BlockElement<
 
       this.doc.withoutTransact(() => {
         this.service.updateElement(blockId, {
-          sourceId,
+          //sourceId,
+          src: data.data.storage,
           ...imageSize,
           xywh: bound.serialize(),
         } satisfies Partial<ImageBlockProps>);

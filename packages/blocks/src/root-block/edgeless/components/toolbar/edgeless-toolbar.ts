@@ -518,8 +518,8 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
           ${EdgelessImageIcon}
         </edgeless-toolbar-button>
 
-        <edgeless-template-button .edgeless=${this.edgeless}>
-        </edgeless-template-button>
+        <!--  <edgeless-template-button .edgeless=${this.edgeless}>
+        </edgeless-template-button> -->
       </div>
     `;
   }

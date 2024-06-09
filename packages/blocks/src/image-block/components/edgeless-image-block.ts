@@ -2,6 +2,8 @@ import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
+import { getStorageURL } from '../../_common/upload.js';
+
 @customElement('affine-edgeless-image')
 export class ImageBlockEdgelessComponent extends WithDisposable(
   ShadowlessElement
@@ -17,12 +19,22 @@ export class ImageBlockEdgelessComponent extends WithDisposable(
   @property({ attribute: false })
   url?: string;
 
+  /* @property({ attribute: false })
+  model!: Model;*/
+
   @query('.resizable-img')
   public readonly resizeImg?: HTMLElement;
 
   private _handleError(error: Error) {
     this.dispatchEvent(new CustomEvent('error', { detail: error }));
   }
+
+  /*get src() {
+    if (!this.model.src?.startsWith('blob')) {
+      return `${getStorageURL()}${this.model.src}`;
+    }
+    return this.model.src;
+  }*/
 
   override render() {
     console.log('22222', this.url);
