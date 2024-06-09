@@ -9,7 +9,7 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor ,EdgelessEditor} from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import { defineCustomElement, onMounted, ref, watch } from 'vue';
+import { defineCustomElement, nextTick, onMounted, ref, watch } from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css';
 const refEditor = ref<HTMLElement | null>(null)
@@ -103,6 +103,7 @@ async function setData(data:any){
     editor.doc = new_doc
     currentDocument=new_doc
     appendTODOM(editor)
+    checkNotEmptyDocBlock(currentDocument)
     /*if (refEditor.value) {
       const children = refEditor.value.children
       if (children.length) {
@@ -124,11 +125,26 @@ function bindEvent(doc:Doc){
     if(data.type=='add')
       emit('addBlock',data)
     if(data.type=='delete')
+    {
+      checkNotEmptyDocBlock(doc)
       emit('deleteBlock',data)
+    }
     if(data.type=='update')
       emit('updateBlock',data)
   })
 }
+
+function checkNotEmptyDocBlock(doc:Doc){
+  const noteList = doc.getBlockByFlavour('affine:note');
+  const note=noteList.length ? noteList[0] : null;
+  if(note && note.children.length == 0){
+    doc.addBlock('affine:paragraph', {}, note);
+    /*nextTick(()=>{
+      setFocus()
+    })*/
+  }
+}
+
 
 
 function appendTODOM(element:HTMLElement){

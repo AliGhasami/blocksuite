@@ -153,7 +153,7 @@ export class ImageBlockComponent extends BlockElement<
     this._isInSurface = parent?.flavour === 'affine:surface';
 
     this.model.propsUpdated.on(({ key }) => {
-      console.log('this.model.propsUpdated', key);
+      //console.log('this.model.propsUpdated', key);
       if (key === 'sourceId') {
         // this.refreshData();
       }

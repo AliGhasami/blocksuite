@@ -258,6 +258,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: image,
         action: async ({ rootElement, model }) => {
           const parent = rootElement.doc.getParent(model);
+          console.log('1111', parent);
           if (!parent) {
             return;
           }
@@ -272,6 +273,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             model
           );
           tryRemoveEmptyLine(model);
+          rootElement.doc.addBlock('affine:paragraph', {}, parent);
         },
       },
       {
@@ -566,16 +568,16 @@ function runCommand(
           return false;
         }
         const codeModel = newModels[0];
-        console.log('onModelTextUpdated');
+        //console.log('onModelTextUpdated');
         onModelTextUpdated(rootElement.host, codeModel, richText => {
-          console.log('model update ');
+          // console.log('model update ');
           const inlineEditor = richText.inlineEditor;
           assertExists(inlineEditor);
           //console.log('1111');
           inlineEditor.focusEnd();
         }).catch(console.error);
       }
-      console.log('next - change inline menu');
+      //console.log('next - change inline menu');
       return next();
     })
     .run();
