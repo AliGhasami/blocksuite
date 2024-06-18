@@ -137,21 +137,21 @@ async function  handleStartCollaboration(){
 
 
 function handleChange(data){
-  console.log("this is handle change",data)
+ // console.log("this is handle change",data)
  // alert("111")
   //console.log("this is change event",data)
 }
 
 function handleAddBlock(data){
-  console.log("this is add block event",data)
+ // console.log("this is add block event",data)
 }
 
 function handleDeleteBlock(data){
-  console.log("this is delete block event",data)
+  //console.log("this is delete block event",data)
 }
 
 function handleUpdateBlock(data){
-  console.log("this is update block event",data)
+ // console.log("this is update block event",data)
 }
 
 </script>

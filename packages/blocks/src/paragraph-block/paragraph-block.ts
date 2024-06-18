@@ -193,7 +193,8 @@ export class ParagraphBlockComponent extends BlockElement<
           <div contenteditable="false" class="affine-paragraph-placeholder">
             ${getPlaceholder(this.model)}
           </div>
-          <div class="affine-paragraph-rich-text-wrapper ${type}">
+          <!-- ${type} -->
+          <div class="affine-paragraph-rich-text-wrapper ">
             <rich-text
               .yText=${this.model.text.yText}
               .inlineEventSource=${this.topContenteditableElement ?? nothing}
