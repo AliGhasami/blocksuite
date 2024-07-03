@@ -2,7 +2,6 @@ import type { BlockElement, EditorHost } from '@blocksuite/block-std';
 import { BlockService } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 
-import { Copilot } from '../../dist/_common/copilot/schema/index.js';
 import {
   FileDropManager,
   type FileDropOptions,
@@ -50,8 +49,6 @@ export type EmbedOptions = {
 export class RootService extends BlockService<RootBlockModel> {
   readonly fontLoader = new FontLoader();
   readonly editPropsStore: EditPropsStore = new EditPropsStore(this);
-  public readonly copilot = new Copilot();
-  //readonly editPropsStore: EditPropsStore = new EditPropsStore(this);
 
   fileDropManager!: FileDropManager;
   exportManager!: ExportManager;

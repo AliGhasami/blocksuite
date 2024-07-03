@@ -22,7 +22,7 @@ import { WebSocketAwarenessSource } from '../../_common/sync/websocket/awareness
 import { WebSocketDocSource } from '../../_common/sync/websocket/doc';
 
 //const BASE_WEBSOCKET_URL = new URL(import.meta.env.PLAYGROUND_WS);
-const BASE_WEBSOCKET_URL = new URL('ws://192.168.254.124:9080/');
+//const BASE_WEBSOCKET_URL = new URL('ws://192.168.254.124:9080/');
 //const BASE_WEBSOCKET_URL = new URL('127.0.0.1:61041');
 //console.log('1111', import.meta.env, import.meta.env.PLAYGROUND_WS);
 
@@ -55,9 +55,9 @@ export async function createDefaultDocCollection() {
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadow: [new WebSocketDocSource(ws)],
+          shadow: [new WebSocketDocSource(ws as WebSocket)],
         };
-        awarenessSources = [new WebSocketAwarenessSource(ws)];
+        awarenessSources = [new WebSocketAwarenessSource(ws as WebSocket)];
       })
       .catch(() => {
         docSources = {

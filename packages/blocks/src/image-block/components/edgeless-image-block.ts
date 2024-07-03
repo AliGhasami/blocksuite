@@ -2,8 +2,6 @@ import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
-import { getStorageURL } from '../../_common/upload.js';
-
 @customElement('affine-edgeless-image')
 export class ImageBlockEdgelessComponent extends WithDisposable(
   ShadowlessElement

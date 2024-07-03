@@ -59,17 +59,11 @@ export async function uploadFile(file: Blob) {
   const formData = new FormData();
   formData.append('file', file);
   return instance.post('', formData, {
-    onUploadProgress: progressEvent => {
-     /* if (progressEvent) {
-        const percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / (progressEvent.total ?? 1)
-        );
-        //console.log('percentCompleted', percentCompleted);
-      }*/
+    /*onUploadProgress: progressEvent => {
       // uploadProgress.value = percentCompleted;
       // uploadStatus.textContent = `Upload ${percentCompleted}% completed`;
       //console.log('progressEvent', progressEvent);
-    },
+    },*/
   });
 }
 
