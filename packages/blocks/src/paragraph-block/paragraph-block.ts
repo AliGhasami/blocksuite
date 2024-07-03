@@ -1,7 +1,7 @@
 import '../_common/components/rich-text/rich-text.js';
 import '../_common/components/block-selection.js';
 
-import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
+import { BlockElement, getInlineRangeProvider, TextSelection } from "@blocksuite/block-std";
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
 import { html, nothing, type TemplateResult } from 'lit';
@@ -31,7 +31,7 @@ const getPlaceholder = (model: ParagraphBlockModel) => {
       <!-- TODO ali ghasami  -->
       <div>&nbsp;</div>
     </div>`;
-    //return "Type '/' for commands";
+    // return "Type '/' for commands";
   }
 
   const placeholders = {
@@ -52,7 +52,7 @@ export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockService
 > {
   static override styles = paragraphBlockStyles;
-
+  
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
     assertExists(inlineManager);
@@ -72,6 +72,7 @@ export class ParagraphBlockComponent extends BlockElement<
   }
 
   private _inlineRangeProvider: InlineRangeProvider | null = null;
+  private _currentTextSelection: TextSelection | undefined = undefined;
 
   @query('rich-text')
   private _richTextElement?: RichText;
@@ -104,10 +105,43 @@ export class ParagraphBlockComponent extends BlockElement<
     this._inlineRangeProvider = getInlineRangeProvider(this);
   }
 
+  // override firstUpdated() {
+  //   this._disposables.add(this.model.propsUpdated.on(this._updatePlaceholder));
+  //   this._disposables.add(
+  //     this.host.selection.slots.changed.on(this._updatePlaceholder)
+  //   );
+  //
+  //   this.updateComplete
+  //     .then(() => {
+  //       this._updatePlaceholder();
+  //
+  //       const inlineEditor = this.inlineEditor;
+  //       if (!inlineEditor) return;
+  //       this.disposables.add(
+  //         inlineEditor.slots.inputting.on(this._updatePlaceholder)
+  //       );
+  //     })
+  //     .catch(console.error);
+  // }
+
   override firstUpdated() {
     this._disposables.add(this.model.propsUpdated.on(this._updatePlaceholder));
     this._disposables.add(
-      this.host.selection.slots.changed.on(this._updatePlaceholder)
+      this.host.selection.slots.changed.on(() => {
+        const selection = this.host.selection.find('text');
+
+        if (
+          selection === this._currentTextSelection ||
+          (this._currentTextSelection &&
+            selection &&
+            selection.equals(this._currentTextSelection))
+        ) {
+          return;
+        }
+
+        this._currentTextSelection = selection;
+        this._updatePlaceholder();
+      })
     );
 
     this.updateComplete
@@ -149,18 +183,26 @@ export class ParagraphBlockComponent extends BlockElement<
     if (paragraphList.length == 1) {
       isEmpty = true;
     }
+    const selection = this._currentTextSelection;
+    const isCollapsed = selection?.isCollapsed() ?? false;
+
     if (
+      this.doc.readonly ||
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
       (!this.selected && !isEmpty) ||
+      !isCollapsed ||
       this._isInDatabase()
     ) {
       this._placeholderContainer.classList.remove('visible');
+      this.classList.remove('selected');
     } else {
       this._placeholderContainer.classList.add('visible');
+      this.classList.add('selected');
     }
     if (this.selected) {
       this._placeholderContainer.classList.add('hover');
+      this.classList.add('selected');
     }
   };
 
