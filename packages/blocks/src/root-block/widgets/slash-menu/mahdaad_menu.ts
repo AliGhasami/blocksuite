@@ -276,18 +276,18 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           rootElement.doc.addBlock('affine:paragraph', {}, parent);
         },
       },
-      {
+      /* {
         title: 'Video',
         description: 'Description',
         icon: video,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Audio',
         description: 'Description',
         icon: audio,
         action: () => {},
-      },
+      },*/
       {
         title: 'Code',
         description: 'Description',
@@ -303,7 +303,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: async ({ rootElement, model }) => {
           const file = await openFileOrFiles();
           if (!file) return;
-
           const attachmentService =
             rootElement.host.spec.getService('affine:attachment');
           assertExists(attachmentService);
@@ -318,55 +317,55 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           tryRemoveEmptyLine(model);
         },
       },
-      {
+      /*{
         title: 'Link',
         description: 'Description',
         icon: link,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Table Of Content',
         description: 'Description',
         icon: table_of_content,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Button Link',
         description: 'Description',
         icon: button_link,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Bread Crumb',
         description: 'Description',
         icon: bread_crumb,
         action: () => {},
-      },
-      {
+      },*/
+      /* {
         title: 'Accordion Heading 1',
         description: 'Description',
         icon: accordion_h1,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Accordion Heading 2',
         description: 'Description',
         icon: accordion_h2,
         action: () => {},
-      },
-      {
+      },*/
+      /* {
         title: 'Accordion Heading 3',
         description: 'Description',
         icon: accordion_h3,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Multi Column',
         description: 'Description',
         icon: multi_column,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Link Doc',
         description: 'Description',
         icon: multi_column,
@@ -389,8 +388,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
-      },
-      //todo
+      },*/
       /*{
         title: 'Sketch',
         description: 'Description',
@@ -402,37 +400,37 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: 'Embed',
     children: [
-      {
+      /* {
         title: 'Title ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },
-      {
+      },*/
+      /* {
         title: 'Title  ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Title   ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },
-      {
+      },*/
+      /* {
         title: 'Title     ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },
-      {
+      },*/
+      /*{
         title: 'Title         ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },
-      {
+      },*/
+      /* {
         title: 'figma',
         description: 'Description',
         icon: empty_title,
@@ -450,7 +448,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           );
           tryRemoveEmptyLine(model);
         },
-      },
+      },*/
       /*{
         title: 'simple',
         description: 'simple',
