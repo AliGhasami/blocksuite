@@ -9,17 +9,26 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor ,EdgelessEditor} from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import { defineCustomElement, nextTick, onMounted, ref, watch } from "vue";
+import { defineCustomElement, onMounted, ref, watch } from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css';
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
+import DatePickerComponent from '@/components/web-component/DatePicker.ce.vue'
+
+//TODO ali ghasami for add function add and check web component
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
 if(!customElements.get('select-hint-type')){
   customElements.define('select-hint-type', SelectHintType,{})
 }
+
+const DatePicker = defineCustomElement(DatePickerComponent)
+if(!customElements.get('mahdaad-date-picker')){
+  customElements.define('mahdaad-date-picker', DatePicker,{})
+}
+
 
 interface Props{
   isBoardView?:boolean,

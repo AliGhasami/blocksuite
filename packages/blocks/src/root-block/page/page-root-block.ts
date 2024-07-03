@@ -257,7 +257,7 @@ export class PageRootBlockComponent extends BlockElement<
         return true;
       },
       ArrowUp: () => {
-        console.log("this is ArrowUp");
+        //console.log("this is ArrowUp");
         const selection = this.host.selection;
         const sel = selection.value.find(
           sel => sel.is('text') || sel.is('block')

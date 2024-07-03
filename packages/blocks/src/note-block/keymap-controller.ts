@@ -359,7 +359,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onEsc = () => {
-    console.log('keymap - controller - _onEsc');
+   // console.log('keymap - controller - _onEsc');
     const [result] = this._std.command
       .chain()
       .getBlockSelections()
@@ -381,7 +381,7 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onEnter = (ctx: UIEventStateContext) => {
-    console.log('keymap - controller - _onEnter');
+    //console.log('keymap - controller - _onEnter');
     const event = ctx.get('defaultState').event;
     const [result] = this._std.command
       .chain()

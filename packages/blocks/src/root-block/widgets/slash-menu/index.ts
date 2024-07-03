@@ -93,7 +93,6 @@ export class AffineSlashMenuWidget extends WidgetElement {
         //Add for support mention
         //'@',
       ];
-      //console.log('aaaa');
       //debugger
       if (
         event.key === 'Process' &&

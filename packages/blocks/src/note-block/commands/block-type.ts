@@ -60,7 +60,7 @@ export const updateBlockType: Command<
   }
 
   const mergeToCode: Command<never, 'updatedBlocks'> = (_, next) => {
-    console.log('mergeToCode');
+    //console.log('mergeToCode');
     if (flavour !== 'affine:code') {
       return false;
     }
@@ -76,7 +76,7 @@ export const updateBlockType: Command<
     return next({ updatedBlocks: [model] });
   };
   const appendDivider: Command<never, 'updatedBlocks'> = (_, next) => {
-    console.log('appendDivider');
+    //console.log('appendDivider');
     //debugger;
     // || flavour !== 'affine:mention'
     if (flavour !== 'affine:divider') {
@@ -106,7 +106,7 @@ export const updateBlockType: Command<
   };
 
   const focusText: Command<'updatedBlocks'> = (ctx, next) => {
-    console.log('focusText');
+   // console.log('focusText');
     const { updatedBlocks } = ctx;
     if (!updatedBlocks || updatedBlocks.length === 0) {
       return false;
@@ -147,7 +147,7 @@ export const updateBlockType: Command<
   };
 
   const focusBlock: Command<'updatedBlocks'> = (ctx, next) => {
-    console.log('focusBlock');
+    //console.log('focusBlock');
     const { updatedBlocks } = ctx;
     if (!updatedBlocks || updatedBlocks.length === 0) {
       return false;
@@ -208,7 +208,7 @@ export const updateBlockType: Command<
     .try(chain => [
       chain.inline((_, next) => {
         //'affine:mention'
-        console.log('for check and focus ');
+        //console.log('for check and focus ');
         if (['affine:code', 'affine:divider'].includes(flavour)) {
           return next();
         }

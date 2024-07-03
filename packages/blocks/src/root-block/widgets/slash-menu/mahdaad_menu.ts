@@ -206,8 +206,28 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
-          const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));
+          //old method
+          /*const date = new Date();
+          insertContent(rootElement.host, model, formatDate(date));*/
+          const triggerKey = '';
+          insertContent(rootElement.host, model, triggerKey);
+          assertExists(model.doc.root);
+          //todo fix ali ghasami
+          //@ts-ignore
+          const widgetEle = rootElement.widgetElements['affine-date-widget'];
+          assertExists(widgetEle);
+          // We have checked the existence of showLinkedDoc method in the showWhen
+          const mentionWidget = widgetEle as AffineMentionWidget;
+          // Wait for range to be updated
+          setTimeout(() => {
+            const inlineEditor = getInlineEditorByModel(
+              rootElement.host,
+              model
+            );
+            assertExists(inlineEditor);
+            mentionWidget.showMention(inlineEditor, triggerKey);
+            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+          });
         },
       },
       {

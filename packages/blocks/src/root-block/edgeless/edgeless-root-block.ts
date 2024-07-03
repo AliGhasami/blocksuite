@@ -419,7 +419,7 @@ export class EdgelessRootBlockComponent extends BlockElement<
     const uploadPromises = imageFiles.map(async (file, index) => {
       const { point, blockId } = dropInfos[index];
       const { data } = await uploadFile(file);
-      console.log('11111', data);
+      //console.log('11111', data);
       // const sourceId = await this.doc.blob.set(file);
       const imageSize = await readImageSize(file);
 

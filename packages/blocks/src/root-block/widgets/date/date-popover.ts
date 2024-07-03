@@ -22,8 +22,8 @@ import { styles } from './styles.js';
 import type { UserMention } from './types.js';
 
 //ShadowlessElement
-@customElement('affine-mention-popover')
-export class MentionPopover extends WithDisposable(ShadowlessElement) {
+@customElement('affine-date-popover')
+export class DatePopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
   @property({ attribute: false })
@@ -265,7 +265,7 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
           // If all items are disabled, the loop will never end
           ejectedCnt--
         );*/
-        //console.log('1111', this._activatedItemIndex);
+        console.log('1111', this._activatedItemIndex);
         this._scrollToItem(this._activatedItemIndex, false);
       },
       onConfirm: () => {
@@ -435,7 +435,11 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
         class="${Prefix}-popover  ${Prefix}-mention-popover"
         style="${style}"
       >
-        <div class="${Prefix}-popover-container">${this._menu()}</div>
+        <!-- ${this._menu()} -->
+        <div class="${Prefix}-popover-container">
+          <!-- <date-picker></date-picker>-->
+          <mahdaad-date-picker></mahdaad-date-picker>
+        </div>
       </div>
     </div>`;
   }

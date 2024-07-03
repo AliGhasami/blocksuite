@@ -30,7 +30,7 @@ import { type ExtendedModel } from '../../types.js';
  * Whether the block supports rendering its children.
  */
 function supportsChildren(model: BlockModel): boolean {
-  console.log('supportsChildren');
+  //console.log('supportsChildren');
   if (
     matchFlavours(model, [
       // 'affine:database',
@@ -55,7 +55,7 @@ export function handleBlockEndEnter(
   model: ExtendedModel
 ) {
   //  return;
-  console.log('handleBlockEndEnter');
+  //console.log('handleBlockEndEnter');
   //debugger;
   const doc = model.doc;
   const parent = doc.getParent(model);
@@ -213,7 +213,7 @@ export function handleIndent(
   model: ExtendedModel,
   offset = 0
 ) {
-  console.log('handleIndent');
+  //console.log('handleIndent');
   const doc = model.doc;
   const previousSibling = doc.getPrev(model);
   if (!previousSibling || !supportsChildren(previousSibling)) {
@@ -257,7 +257,7 @@ export function handleMultiBlockIndent(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
-  console.log('handleMultiBlockIndent');
+  //console.log('handleMultiBlockIndent');
   if (!models.length) return;
 
   const doc = models[0].doc;
@@ -312,7 +312,7 @@ export function handleUnindent(
   model: ExtendedModel,
   offset = 0
 ) {
-  console.log('handleUnindent');
+  //console.log('handleUnindent');
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent || parent.role !== 'content') {
@@ -356,7 +356,7 @@ export function handleMultiBlockOutdent(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
-  console.log('handleMultiBlockOutdent');
+  //console.log('handleMultiBlockOutdent');
   if (!models.length) return;
   const doc = models[0].doc;
 
@@ -392,7 +392,7 @@ export function handleRemoveAllIndent(
   model: ExtendedModel,
   offset = 0
 ) {
-  console.log('handleRemoveAllIndent');
+  //console.log('handleRemoveAllIndent');
   const doc = model.doc;
   let parent = doc.getParent(model);
   while (parent && !matchFlavours(parent, ['affine:note'])) {
@@ -405,7 +405,7 @@ export function handleRemoveAllIndentForMultiBlocks(
   editorHost: EditorHost,
   models: BlockModel[]
 ) {
-  console.log('handleRemoveAllIndentForMultiBlocks');
+  //console.log('handleRemoveAllIndentForMultiBlocks');
   if (!models.length) return;
   const doc = models[0].doc;
   for (let i = models.length - 1; i >= 0; i--) {
@@ -421,13 +421,13 @@ export function handleRemoveAllIndentForMultiBlocks(
 // When deleting at line end of a code block,
 // do nothing
 function handleCodeBlockForwardDelete(model: ExtendedModel) {
-  console.log('handleCodeBlockForwardDelete', model); //'affine:hint'
+  //console.log('handleCodeBlockForwardDelete', model); //'affine:hint'
   if (!matchFlavours(model, ['affine:code'])) return false;
   return true;
 }
 
 function handleDatabaseBlockForwardDelete(model: ExtendedModel) {
-  console.log('handleDatabaseBlockForwardDelete');
+  //console.log('handleDatabaseBlockForwardDelete');
   const doc = model.doc;
   if (!isInsideBlockByFlavour(doc, model, 'affine:database')) return false;
 
@@ -441,7 +441,7 @@ function handleListBlockBackspace(
   model: ExtendedModel
 ) {
   //debugger;
-  console.log('handleListBlockBackspace');
+  //console.log('handleListBlockBackspace');
   const doc = model.doc;
   //affine:mention
   if (!matchFlavours(model, ['affine:list', 'affine:hint'])) return false;
@@ -491,7 +491,7 @@ function handleListBlockForwardDelete(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  console.log('handleListBlockForwardDelete');
+  //console.log('handleListBlockForwardDelete');
   //'affine:mention'
   if (!matchFlavours(model, ['affine:list', 'affine:hint'])) return false;
   const doc = model.doc;
@@ -548,7 +548,7 @@ function handleParagraphOrListSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
-  console.log('handleParagraphOrListSibling');
+  //console.log('handleParagraphOrListSibling');
   const doc = model.doc;
   if (!matchFlavours(previousSibling, ['affine:paragraph', 'affine:list']))
     return false;
@@ -573,7 +573,7 @@ function handleEmbedDividerCodeSibling(
   previousSibling: ExtendedModel,
   parent: ExtendedModel
 ) {
-  console.log('handleEmbedDividerCodeSibling');
+  //console.log('handleEmbedDividerCodeSibling');
   const doc = model.doc;
   if (matchFlavours(previousSibling, ['affine:divider'])) {
     doc.deleteBlock(previousSibling);
@@ -602,7 +602,7 @@ function handleEmbedDividerCodeSibling(
 }
 
 function handleNoPreviousSibling(editorHost: EditorHost, model: ExtendedModel) {
-  console.log('handleNoPreviousSibling');
+  //console.log('handleNoPreviousSibling');
   const doc = model.doc;
   const text = model.text;
   const titleElement = getDocTitleByEditorHost(
@@ -639,7 +639,7 @@ function handleParagraphDeleteActions(
   editorHost: EditorHost,
   model: ExtendedModel
 ) {
-  console.log('handleParagraphDeleteActions');
+  //console.log('handleParagraphDeleteActions');
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent) return false;
