@@ -333,7 +333,7 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
   }
 
   private _handleClickItem(user: UserMention) {
-    return
+   // return
     // assertExists(inlineEditor, 'Editor not found');
     cleanSpecifiedTail(
       this.editorHost,
