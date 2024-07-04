@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import MobileView from "@/views/MobileView.vue";
+//import MobileView from "@/views/MobileView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,11 +10,11 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    {
+   /* {
       path: '/mobile',
       name: 'mobile',
       component: MobileView
-    },
+    },*/
     /*{
       path: '/about',
       name: 'about',

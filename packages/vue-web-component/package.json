@@ -40,7 +40,8 @@
     "unocss-preset-autoprefixer": "^0.0.7",
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "ant-design-vue": "^4.2.3"
   },
   "devDependencies": {
     "@blocksuite/blocks": "workspace:*",

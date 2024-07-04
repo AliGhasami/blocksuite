@@ -171,7 +171,7 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     );*/
     this._disposables.addFromEvent(this, 'mousedown', e => {
       // Prevent input from losing focus
-      e.preventDefault();
+     // e.preventDefault();
     });
 
     /**
@@ -333,6 +333,7 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
   }
 
   private _handleClickItem(user: UserMention) {
+    return
     // assertExists(inlineEditor, 'Editor not found');
     cleanSpecifiedTail(
       this.editorHost,

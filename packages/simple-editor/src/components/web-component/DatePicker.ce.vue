@@ -1,13 +1,18 @@
 <template>
   <div>
+    <div v-html="temp">
+
+    </div>
+    <StyleProvider :cache="cache">
     111111111111111
     <Calendar  :fullscreen="false" />
+    </StyleProvider>
   </div>
 </template>
 <script setup lang="ts">
 //import { Icon } from '@iconify/vue'
-import {ref, watch} from 'vue'
-import {Calendar} from 'ant-design-vue'
+import { onMounted, ref, watch } from 'vue';
+import { Calendar, createCache, StyleProvider,extractStyle } from 'ant-design-vue';
 import {
   SelectContent,
   SelectGroup,
@@ -34,6 +39,16 @@ const emits=defineEmits<{
 }>()
 const props=withDefaults(defineProps<Props>(),{})
 const val = ref()
+const cache = createCache()
+
+const temp=ref('')
+
+
+onMounted(()=>{
+  temp.value=extractStyle(cache)
+})
+
+
 watch(()=>props.type,()=>{
   if(props.type)
     val.value=props.type

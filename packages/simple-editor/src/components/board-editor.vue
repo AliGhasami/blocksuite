@@ -403,7 +403,9 @@ defineExpose({
   box-sizing: border-box;
   overflow-y: auto;
   padding: 0 8px;
-  width: 200px;
+  //width: 200px;
+  width: 500px;
+  height: 650px;
 }
 
 /* overlay mask */

@@ -2,5 +2,5 @@
 /*export {
     PersonalButton
 }*/
-import Editor from "./components/Editor.vue";
-export { Editor };
+//import Editor from "./components/Editor.vue";
+//export { Editor };

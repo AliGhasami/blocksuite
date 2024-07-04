@@ -13,7 +13,16 @@ import dts from "vite-plugin-dts";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue(
+      {
+        template: {
+          compilerOptions: {
+            // treat all tags with a dash as custom elements
+            isCustomElement: (tag) => tag.includes('-')
+          }
+        }
+      }
+    ),
     vueJsx(),
     VueDevTools(),
     UnoCSS(),

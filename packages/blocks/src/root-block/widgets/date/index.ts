@@ -89,6 +89,7 @@ export function showMentionPopover({
 
   //todo ali ghasami
   disposables.addFromEvent(window, 'mousedown', (e: Event) => {
+    return;
     const elm: HTMLElement = e.target as HTMLElement;
     if (elm && elm.className.includes('mention-item')) return;
     //console.log('e.target', e.target, mention, container, elm.className);
