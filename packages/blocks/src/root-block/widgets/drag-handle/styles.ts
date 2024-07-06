@@ -22,6 +22,8 @@ export const styles = css`
     pointer-events: auto;
     user-select: none;
     box-sizing: border-box;
+      align-items: center;
+      display: flex;
   }
   .affine-drag-handle-container:hover {
     cursor: grab;
@@ -33,6 +35,9 @@ export const styles = css`
     border-radius: 1px;
     //background: var(--affine-placeholder-color);
     transition: width 0.25s ease;
+    width: 20px;
+    height: fit-content;
+    display: flex;
   }
 
   /*.affine-drag-handle-grabber {

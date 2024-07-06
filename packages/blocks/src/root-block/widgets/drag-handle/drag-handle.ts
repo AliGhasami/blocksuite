@@ -624,7 +624,7 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     const applyStyle = (transition?: boolean) => {
       container.style.transition = transition ? 'padding 0.25s ease' : 'none';
-      container.style.paddingTop = `${paddingTop - 4}px`;
+      container.style.paddingTop = `0`;
       //container.style.paddingBottom = `${paddingBottom}px`;
       container.style.width = `${
         DRAG_HANDLE_CONTAINER_WIDTH * this.scale * this.noteScale

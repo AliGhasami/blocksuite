@@ -395,6 +395,9 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
 
   private _menu() {
     let index = 0;
+    if(this._filterItems.length < 1) {
+      return html`<div style="color: var(--bu-neutral-3);text-align: center">No user found</div>`;
+    }
     return html`<div class="${Prefix}-mention-menu-container">
       ${this._filterItems.map(item => {
         return html`<div

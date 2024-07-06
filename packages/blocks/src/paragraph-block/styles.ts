@@ -123,6 +123,10 @@ export const paragraphBlockStyles = css`
   .affine-paragraph-placeholder.visible {
     display: block;
   }
+  
+  .affine-block-children-container:not(:has(.selected))>affine-paragraph:last-child .affine-paragraph-placeholder {
+    display: block;
+  }
 
   @media print {
     .affine-paragraph-placeholder.visible {
