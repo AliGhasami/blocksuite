@@ -18,7 +18,7 @@ import {
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { DatePopover } from './date-popover.js';
-import type { UserMention } from './types.js';
+//import type { UserMention } from './types.js';
 
 export type MentionOptions = {
   triggerKeys: string[];
@@ -32,7 +32,7 @@ export type MentionOptions = {
   }) => LinkedDocGroup[];*/
 };
 
-export function showMentionPopover({
+export function showDatePickerPopover({
   editorHost,
   inlineEditor,
   range,
@@ -40,7 +40,7 @@ export function showMentionPopover({
   abortController = new AbortController(),
   options,
   triggerKey,
-  userList = [],
+  //userList = [],
 }: {
   editorHost: EditorHost;
   inlineEditor: AffineInlineEditor;
@@ -49,31 +49,31 @@ export function showMentionPopover({
   abortController?: AbortController;
   options: MentionOptions;
   triggerKey: string;
-  userList: UserMention[];
+  // userList: UserMention[];
 }) {
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
 
   //console.log(55555, inlineEditor.getInlineRange());
-  const mention = new DatePopover(editorHost, inlineEditor, abortController);
-  mention.options = options;
+  const datePicker = new DatePopover(editorHost, inlineEditor, abortController);
+  datePicker.options = options;
   //linkedDoc.options = options;
-  mention.triggerKey = triggerKey;
+  datePicker.triggerKey = triggerKey;
   //console.log('this is user List', userList);
-  mention.userList = userList;
+  //mention.userList = userList;
   // Mount
-  container.append(mention);
-  disposables.add(() => mention.remove());
+  container.append(datePicker);
+  disposables.add(() => datePicker.remove());
 
   // Handle position
   const updatePosition = throttle(() => {
-    const mentionPopOverElement = mention.MentionPopOverElement;
+    const datePickerPopOverElement = datePicker.DatePickerPopOverElement;
     assertExists(
-      mentionPopOverElement,
+      datePickerPopOverElement,
       'You should render the mention PopOver Element node even if no position'
     );
-    const position = getPopperPosition(mentionPopOverElement, range);
-    mention.updatePosition(position);
+    const position = getPopperPosition(datePickerPopOverElement, range);
+    datePicker.updatePosition(position);
   }, 10);
   disposables.addFromEvent(window, 'resize', updatePosition);
   const scrollContainer = getViewportElement(editorHost);
@@ -87,7 +87,7 @@ export function showMentionPopover({
   // Wait for node to be mounted
   setTimeout(updatePosition);
 
-  //todo ali ghasami
+  //todo ali ghasami for implement
   disposables.addFromEvent(window, 'mousedown', (e: Event) => {
     return;
     const elm: HTMLElement = e.target as HTMLElement;
@@ -102,7 +102,7 @@ export function showMentionPopover({
     abortController.abort();
   });
 
-  return mention;
+  return datePicker;
 }
 
 export const AFFINE_DATE_WIDGET = 'affine-date-widget';
@@ -115,8 +115,9 @@ export class AffineDateWidget extends WidgetElement {
      */
     triggerKeys: [
       //comment for support mention
-      '@',
+      //'@',
     ],
+    //TODO ali ghasami for complete ignore list
     ignoreBlockTypes: ['affine:code'],
     /**
      * Convert trigger key to primary key (the first item of the trigger keys)
@@ -126,30 +127,6 @@ export class AffineDateWidget extends WidgetElement {
   };
 
   options = AffineDateWidget.DEFAULT_OPTIONS;
-
-  override connectedCallback() {
-    super.connectedCallback();
-    //console.log('this is block', this.blockElement.model);
-    this.handleEvent('keyDown', this._onKeyDown);
-  }
-
-  public showMention = (
-    inlineEditor: AffineInlineEditor,
-    triggerKey: string
-  ) => {
-    const curRange = getCurrentNativeRange();
-    if (!curRange) return;
-    showMentionPopover({
-      editorHost: this.host,
-      inlineEditor,
-      range: curRange,
-      options: this.options,
-      triggerKey,
-      //TODO ali ghasami - important
-      //@ts-ignore
-      userList: this.blockElement.model.mentionUserList,
-    });
-  };
 
   private getInlineEditor = (evt: KeyboardEvent) => {
     if (evt.target instanceof HTMLElement) {
@@ -174,6 +151,27 @@ export class AffineDateWidget extends WidgetElement {
     }
     if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
     return getInlineEditorByModel(this.host, model);
+  };
+
+  override connectedCallback() {
+    super.connectedCallback();
+    //console.log('this is block', this.blockElement.model);
+    this.handleEvent('keyDown', this._onKeyDown);
+  }
+
+  showMention = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
+    const curRange = getCurrentNativeRange();
+    if (!curRange) return;
+    showDatePickerPopover({
+      editorHost: this.host,
+      inlineEditor,
+      range: curRange,
+      options: this.options,
+      triggerKey,
+      //TODO ali ghasami - important
+      //@ts-ignore
+      //userList: this.blockElement.model.mentionUserList,
+    });
   };
 
   private _onKeyDown = (ctx: UIEventStateContext) => {
