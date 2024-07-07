@@ -18,7 +18,7 @@ import type { ListBlockModel } from './list-model.js';
 import type { ListBlockService } from './list-service.js';
 import { listBlockStyles } from './styles.js';
 import { ListIcon } from './utils/get-list-icon.js';
-import { playCheckAnimation, toggleDown, toggleRight } from './utils/icons.js';
+import { toggleDown, toggleRight } from './utils/icons.js';
 
 @customElement('affine-list')
 export class ListBlockComponent extends BlockComponent<
@@ -93,7 +93,7 @@ export class ListBlockComponent extends BlockComponent<
       if (this.model.checked) {
         const checkEl = this.querySelector('.affine-list-block__todo-prefix');
         assertExists(checkEl);
-        playCheckAnimation(checkEl).catch(console.error);
+        //playCheckAnimation(checkEl).catch(console.error);
       }
       return;
     }

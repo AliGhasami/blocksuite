@@ -3,14 +3,14 @@ import { css } from 'lit';
 export const listPrefix = css`
   .affine-list-block__prefix {
     display: flex;
-    color: var(--affine-blue-700);
+    //color: var(--affine-blue-700);
     font-size: var(--affine-font-sm);
     user-select: none;
     position: relative;
   }
 
   .affine-list-block__numbered {
-    min-width: 22px;
+    min-width: 18px;
     height: 24px;
     margin-left: 2px;
   }
@@ -65,6 +65,7 @@ export const toggleStyles = css`
 export const listBlockStyles = css`
   affine-list {
     display: block;
+    margin: 10px 0;
     font-size: var(--affine-font-base);
   }
 
@@ -79,6 +80,7 @@ export const listBlockStyles = css`
   .affine-list-rich-text-wrapper {
     position: relative;
     display: flex;
+    position: relative;
   }
   .affine-list-rich-text-wrapper rich-text {
     flex: 1;

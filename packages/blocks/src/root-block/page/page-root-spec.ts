@@ -2,12 +2,14 @@ import type { BlockSpec } from '@blocksuite/block-std';
 import { literal, unsafeStatic } from 'lit/static-html.js';
 
 import { RootBlockSchema } from '../root-model.js';
+import { AFFINE_DATE_WIDGET } from '../widgets/date/index.js';
 import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/drag-handle.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
 import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
-import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
+//import type { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
+import { AFFINE_MENTION_WIDGET } from '../widgets/mention/index.js';
 import { AFFINE_MODAL_WIDGET } from '../widgets/modal/modal.js';
 import { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from '../widgets/page-dragging-area/page-dragging-area.js';
 import { AFFINE_SLASH_MENU_WIDGET } from '../widgets/slash-menu/index.js';
@@ -19,13 +21,15 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_MODAL_WIDGET
   | typeof AFFINE_INNER_MODAL_WIDGET
   | typeof AFFINE_SLASH_MENU_WIDGET
-  | typeof AFFINE_LINKED_DOC_WIDGET
+  //| typeof AFFINE_LINKED_DOC_WIDGET
   | typeof AFFINE_PAGE_DRAGGING_AREA_WIDGET
   | typeof AFFINE_DRAG_HANDLE_WIDGET
   | typeof AFFINE_EMBED_CARD_TOOLBAR_WIDGET
   | typeof AFFINE_FORMAT_BAR_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
-  | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET;
+  | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
+  | typeof AFFINE_MENTION_WIDGET
+  | typeof AFFINE_DATE_WIDGET;
 
 export const PageRootBlockSpec: BlockSpec<PageRootBlockWidgetName> = {
   schema: RootBlockSchema,
@@ -41,9 +45,9 @@ export const PageRootBlockSpec: BlockSpec<PageRootBlockWidgetName> = {
       [AFFINE_SLASH_MENU_WIDGET]: literal`${unsafeStatic(
         AFFINE_SLASH_MENU_WIDGET
       )}`,
-      [AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
+      /*[AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
         AFFINE_LINKED_DOC_WIDGET
-      )}`,
+      )}`,*/
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
       )}`,
@@ -62,6 +66,8 @@ export const PageRootBlockSpec: BlockSpec<PageRootBlockWidgetName> = {
       [AFFINE_VIEWPORT_OVERLAY_WIDGET]: literal`${unsafeStatic(
         AFFINE_VIEWPORT_OVERLAY_WIDGET
       )}`,
+      [AFFINE_MENTION_WIDGET]: literal`${unsafeStatic(AFFINE_MENTION_WIDGET)}`,
+      [AFFINE_DATE_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_WIDGET)}`,
     },
   },
 };

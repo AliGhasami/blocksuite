@@ -25,7 +25,11 @@ import {
   type SlashMenuStaticConfig,
   type SlashSubMenu,
 } from './config.js';
-import { SlashMenu } from './slash-menu-popover.js';
+//import { SlashMenu } from './slash-menu-popover.js';
+import {
+  type InnerSlashMenuContext,
+  SlashMenu,
+} from './mahdaad-slash-menu-popover.js';
 import { filterEnabledSlashMenuItems } from './utils.js';
 
 export type AffineSlashMenuContext = SlashMenuContext;
@@ -50,7 +54,7 @@ const showSlashMenu = debounce(
     config,
     triggerKey,
   }: {
-    context: SlashMenuContext;
+    context: InnerSlashMenuContext | SlashMenuContext;
     range: Range;
     container?: HTMLElement;
     abortController?: AbortController;

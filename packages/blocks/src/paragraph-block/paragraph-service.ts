@@ -1,4 +1,5 @@
 import { BlockService } from '@blocksuite/block-std';
+import { html, type TemplateResult } from 'lit';
 
 import { InlineManager } from '../_common/inline/inline-manager.js';
 import {
@@ -28,9 +29,42 @@ export class ParagraphBlockService<
     this.inlineManager.registerMarkdownMatches(affineInlineMarkdownMatches);
   }
 
-  placeholderGenerator: (model: ParagraphBlockModel) => string = model => {
-    if (model.type === 'text') {
+  placeholderGenerator: (
+    model: ParagraphBlockModel
+  ) => TemplateResult<1> | string = model => {
+    return this.getPlaceholder(model);
+    /*if (model.type === 'text') {
       return "Type '/' for commands";
+    }
+
+    const placeholders = {
+      h1: 'Heading 1',
+      h2: 'Heading 2',
+      h3: 'Heading 3',
+      h4: 'Heading 4',
+      h5: 'Heading 5',
+      h6: 'Heading 6',
+      quote: '',
+    };
+    return placeholders[model.type];*/
+  };
+
+  getPlaceholder = (model: ParagraphBlockModel): TemplateResult<1> | string => {
+    if (model.type === 'text') {
+      return html`<div class="affine-paragraph-placeholder-content">
+        <div>
+          <span class="place-holder">
+            Press
+            <span class="short-code">@</span>
+            for AI &
+            <span class="short-code">/</span>
+            for Commands ...
+          </span>
+        </div>
+        <!-- TODO ali ghasami  -->
+        <div>&nbsp;</div>
+      </div>`;
+      // return "Type '/' for commands";
     }
 
     const placeholders = {

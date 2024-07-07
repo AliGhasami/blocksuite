@@ -21,6 +21,11 @@ export interface AffineTextAttributes {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
   } | null;
+  mention?: {
+    user_id: string;
+    name: string;
+    id: string;
+  } | null;
   background?: string | null;
   color?: string | null;
 }
@@ -139,6 +144,29 @@ export function getAffineInlineSpecsWithReference(
       renderer: delta => {
         return html`<affine-link .delta=${delta}></affine-link>`;
       },
+    },
+    {
+      name: 'mention',
+      schema: z
+        .object({
+          name: z.string(),
+          user_id: z.string(),
+          id: z.string(),
+        })
+        .optional()
+        .nullable()
+        .catch(undefined),
+      match: delta => {
+        return !!delta.attributes?.mention;
+      },
+      renderer: (delta, selected) => {
+        return html`<affine-mention
+          .delta=${delta}
+          .selected=${selected}
+          .config=${referenceNodeConfig}
+        ></affine-mention>`;
+      },
+      embed: true,
     },
   ];
 }

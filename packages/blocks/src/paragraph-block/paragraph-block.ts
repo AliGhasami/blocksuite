@@ -85,15 +85,35 @@ export class ParagraphBlockComponent extends BlockComponent<
       !this.inlineEditor
     )
       return;
-
+    //console.log('this is ', this.host);
+    //const { selection: test, doc } = this.host;
+    //console.log('this is selection', test);
+    //console.log('22222222', test.value);
+    //const isEmpty = false;
+    //const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
+    //console.log('this is note', note.length);
+    /*const paragraphList = note.length ? note[0].children : [];
+    if (paragraphList.length == 1) {
+      isEmpty = true;
+    }*/
     const selection = this._currentTextSelection;
     const isCollapsed = selection?.isCollapsed() ?? false;
-
+    //this.doc.readonly ||
+    //this.inlineEditor.yTextLength > 0 ||
+    //this.inlineEditor.isComposing ||
+    //(!this.selected && !isEmpty) ||
+    //!isCollapsed ||
+    //this._isInDatabase()
+    //this.doc.readonly ||
+    //this.inlineEditor.yTextLength > 0 ||
+    //this.inlineEditor.isComposing ||
+    ///(!this.selected && !isEmpty) || !isCollapsed || this._isInDatabase();
     if (
       this.doc.readonly ||
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
       !this.selected ||
+      //(!this.selected && !isEmpty) ||
       !isCollapsed ||
       this._isInDatabase()
     ) {
@@ -171,7 +191,7 @@ export class ParagraphBlockComponent extends BlockComponent<
 
     return html`
       <div class="affine-paragraph-block-container">
-        <div class="affine-paragraph-rich-text-wrapper ${type}">
+        <div class="affine-paragraph-rich-text-wrapper claytap-${type}">
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
