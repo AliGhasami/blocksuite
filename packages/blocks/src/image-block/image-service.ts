@@ -166,7 +166,6 @@ export class ImageBlockService extends BlockService<ImageBlockModel> {
   fileDropManager!: FileDropManager;
 
   override mounted(): void {
-    // debugger;
     super.mounted();
 
     this.selectionManager.register(ImageSelection);

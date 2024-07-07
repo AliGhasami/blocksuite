@@ -28,7 +28,6 @@ export function convertToList(
   prefix: string,
   otherProperties?: Record<string, unknown>
 ): boolean {
-  // console.log('convertToList');
   const { doc, model } = element;
   if (matchFlavours(model, ['affine:list'])) {
     return false;
@@ -63,7 +62,6 @@ export function convertToParagraph(
   type: 'text' | 'quote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6',
   prefix: string
 ): boolean {
-  // console.log('convertToParagraph');
   const { doc, model } = element;
   if (matchFlavours(model, ['affine:paragraph']) && model['type'] === type) {
     return false;
@@ -112,7 +110,6 @@ export function convertToDivider(
   element: BlockElement,
   prefix: string
 ): boolean {
-  //console.log('convertToDivider');
   const { doc, model } = element;
   if (
     matchFlavours(model, ['affine:divider']) ||

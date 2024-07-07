@@ -51,7 +51,7 @@ export type AttachmentBlockProps = {
    * Whether to show the attachment as an embed view.
    */
   embed: boolean | BackwardCompatibleUndefined;
-  src: string;
+
   style?: (typeof AttachmentBlockStyles)[number];
 } & AttachmentBlockEdgelessProps;
 
@@ -61,7 +61,6 @@ export const defaultAttachmentProps: AttachmentBlockProps = {
   type: 'application/octet-stream',
   sourceId: undefined,
   caption: undefined,
-  src: '',
   embed: false,
   style: AttachmentBlockStyles[1],
   index: 'a0',

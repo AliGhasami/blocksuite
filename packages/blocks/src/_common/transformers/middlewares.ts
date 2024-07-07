@@ -8,7 +8,6 @@ import type { SurfaceRefBlockModel } from '../../surface-ref-block/surface-ref-m
 import { DEFAULT_IMAGE_PROXY_ENDPOINT } from '../consts.js';
 
 export const replaceIdMiddleware: JobMiddleware = ({ slots, collection }) => {
-  // console.log('replaceIdMiddleware');
   const idMap = new Map<string, string>();
   slots.afterImport.on(payload => {
     if (

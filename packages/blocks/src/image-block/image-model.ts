@@ -7,7 +7,6 @@ import { ImageBlockTransformer } from './image-transformer.js';
 export type ImageBlockProps = {
   caption?: string;
   sourceId?: string;
-  src?: string;
   width?: number;
   height?: number;
   index: string;
@@ -19,7 +18,6 @@ export type ImageBlockProps = {
 const defaultImageProps: ImageBlockProps = {
   caption: '',
   sourceId: '',
-  src: '',
   width: 0,
   height: 0,
   index: 'a0',

@@ -9,7 +9,7 @@ const allPackages = [
   'blocks',
   'docs',
   'playground',
-  //'presets',
+  'presets',
 ];
 
 const createPattern = packageName => [

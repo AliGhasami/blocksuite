@@ -17,9 +17,6 @@ export class ImageBlockEdgelessComponent extends WithDisposable(
   @property({ attribute: false })
   accessor url: string | undefined = undefined;
 
-  /* @property({ attribute: false })
-  model!: Model;*/
-
   @query('.resizable-img')
   public accessor resizeImg: HTMLElement | null = null;
 
@@ -27,15 +24,7 @@ export class ImageBlockEdgelessComponent extends WithDisposable(
     this.dispatchEvent(new CustomEvent('error', { detail: error }));
   }
 
-  /*get src() {
-    if (!this.model.src?.startsWith('blob')) {
-      return `${getStorageURL()}${this.model.src}`;
-    }
-    return this.model.src;
-  }*/
-
   override render() {
-    //console.log('22222', this.url);
     return html`<div class="resizable-img">
       <img
         class="drag-target"

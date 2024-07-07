@@ -12,12 +12,10 @@ export type ParagraphType =
 
 export const ParagraphBlockSchema = defineBlockSchema({
   flavour: 'affine:paragraph',
-  props: internal => {
-    return {
-      type: 'text' as ParagraphType,
-      text: internal.Text(),
-    };
-  },
+  props: internal => ({
+    type: 'text' as ParagraphType,
+    text: internal.Text(),
+  }),
   metadata: {
     version: 1,
     role: 'content',

@@ -38,8 +38,6 @@ export {
   showImportModal,
 } from './linked-doc/import-doc/index.js';
 export { AffineLinkedDocWidget } from './linked-doc/index.js';
-export { AffineMentionWidget } from './mention/index.js';
-export { AffineDateWidget } from './date/index.js';
 export { AffineModalWidget } from './modal/modal.js';
 export { AffinePageDraggingAreaWidget } from './page-dragging-area/page-dragging-area.js';
 export { AffinePieMenuWidget } from './pie-menu/index.js';

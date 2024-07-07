@@ -15,43 +15,24 @@ export const styles = css`
     top: 0;
     left: 0;
     position: absolute;
-    //display: flex;
-    //justify-content: center;
+    display: flex;
+    justify-content: center;
     width: ${DRAG_HANDLE_CONTAINER_WIDTH}px;
     min-height: 12px;
     pointer-events: auto;
     user-select: none;
     box-sizing: border-box;
-      align-items: center;
-      display: flex;
   }
   .affine-drag-handle-container:hover {
     cursor: grab;
   }
 
   .affine-drag-handle-grabber {
-    //width: 4px;
-    //height: 100%;
+    width: 4px;
+    height: 100%;
     border-radius: 1px;
-    //background: var(--affine-placeholder-color);
+    background: var(--affine-placeholder-color);
     transition: width 0.25s ease;
-    width: 20px;
-    height: fit-content;
-    display: flex;
-  }
-
-  /*.affine-drag-handle-grabber {
-    .add-icon {
-      cursor: pointer;
-    }
-    .drag-icon {
-      cursor: grab;
-    }
-  }*/
-
-  .affine-drag-handle-grabber-icons {
-    display: flex;
-    gap: 10px;
   }
 
   @media print {

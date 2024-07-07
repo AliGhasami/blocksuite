@@ -33,7 +33,6 @@ export const bindContainerHotkey = (blockElement: BlockElement) => {
   const leftBrackets = bracketPairs.map(pair => pair.left);
 
   const _selectBlock = () => {
-    //console.log('_selectBlock');
     selection.update(selList => {
       return selList.map(sel => {
         if (sel.blockId === blockElement.blockId) {

@@ -167,7 +167,6 @@ export class TestRichText extends ShadowlessElement {
     this.addEventListener('keydown', keydownHandler);
 
     this.inlineEditor.slots.textChange.on(() => {
-      //debugger;
       const el = this.querySelector('.y-text');
       if (el) {
         const text = this.inlineEditor.yText.toDelta();
@@ -190,7 +189,6 @@ export class TestRichText extends ShadowlessElement {
   }
 
   override render() {
-    //console.log('11111');
     return html`<style>
         test-rich-text {
           display: grid;

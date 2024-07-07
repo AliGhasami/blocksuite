@@ -278,7 +278,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
       <div class="resizable-img" style=${styleMap(imageSize)}>
         <img
           class="drag-target"
-          src=${this.block.src ?? ''}
+          src=${this.block.blobUrl ?? ''}
           draggable="false"
           @error=${this._handleError}
         />

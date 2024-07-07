@@ -322,7 +322,6 @@ export class ExportManager {
     if (isInsidePageEditor(this.editorHost)) {
       return this._docToCanvas();
     } else {
-      //console.log('this is doc root', this.doc.root);
       const rootModel = this.doc.root;
       if (!rootModel) return;
 

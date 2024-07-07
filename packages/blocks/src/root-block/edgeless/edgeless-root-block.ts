@@ -18,7 +18,6 @@ import {
   EMBED_CARD_WIDTH,
 } from '../../_common/consts.js';
 import { ThemeObserver } from '../../_common/theme/theme-observer.js';
-import { uploadFile } from '../../_common/upload.js';
 import {
   asyncFocusRichText,
   handleNativeRangeAtPoint,

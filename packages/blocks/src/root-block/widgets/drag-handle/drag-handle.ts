@@ -18,7 +18,6 @@ import {
 import { html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import {
   getBlockElementsExcludeSubtrees,
@@ -52,7 +51,7 @@ import { DropIndicator } from './components/drop-indicator.js';
 import type { DragHandleOption, DropResult, DropType } from './config.js';
 import {
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_TOP_LEVEL,
-  //DRAG_HANDLE_CONTAINER_PADDING,
+  DRAG_HANDLE_CONTAINER_PADDING,
   DRAG_HANDLE_CONTAINER_WIDTH,
   DRAG_HANDLE_CONTAINER_WIDTH_TOP_LEVEL,
   DRAG_HANDLE_GRABBER_BORDER_RADIUS,
@@ -63,7 +62,6 @@ import {
   DragHandleOptionsRunner,
   HOVER_AREA_RECT_PADDING_TOP_LEVEL,
 } from './config.js';
-import { gripVertical } from './icons.js';
 import { styles } from './styles.js';
 import {
   calcDropTarget,
@@ -702,15 +700,15 @@ export class AffineDragHandleWidget extends WidgetElement<
 
     // use padding to control grabber's height
     const paddingTop = rowPaddingY + posTop - draggingAreaRect.top;
-    /*const paddingBottom =
+    const paddingBottom =
       draggingAreaRect.height -
       paddingTop -
-      DRAG_HANDLE_GRABBER_HEIGHT * this.scale * this.noteScale;*/
+      DRAG_HANDLE_GRABBER_HEIGHT * this.scale * this.noteScale;
 
     const applyStyle = (transition?: boolean) => {
       container.style.transition = transition ? 'padding 0.25s ease' : 'none';
-      container.style.paddingTop = `0`;
-      //container.style.paddingBottom = `${paddingBottom}px`;
+      container.style.paddingTop = `${paddingTop}px`;
+      container.style.paddingBottom = `${paddingBottom}px`;
       container.style.width = `${
         DRAG_HANDLE_CONTAINER_WIDTH * this.scale * this.noteScale
       }px`;
@@ -1468,9 +1466,9 @@ export class AffineDragHandleWidget extends WidgetElement<
       const blockElement = this.anchorBlockElement;
       if (!blockElement) return;
 
-      //const padding = DRAG_HANDLE_CONTAINER_PADDING * this.scale;
-      //container.style.paddingTop = `${padding - 4}px`;
-      //container.style.paddingBottom = `${padding}px`;
+      const padding = DRAG_HANDLE_CONTAINER_PADDING * this.scale;
+      container.style.paddingTop = `${padding}px`;
+      container.style.paddingBottom = `${padding}px`;
       container.style.transition = `padding 0.25s ease`;
 
       grabber.style.width = `${
@@ -1691,60 +1689,7 @@ export class AffineDragHandleWidget extends WidgetElement<
     return html`
       <div class="affine-drag-handle-widget">
         <div class="affine-drag-handle-container">
-          <!--  <span
-            style="width: 14px;height: 14px"
-            class="affine-drag-handle-grabber"
-          >
-            111
-          </span>-->
-          <div class="affine-drag-handle-grabber">
-            ${unsafeSVG(gripVertical)}
-            <!--           <svg
-              width="8"
-              height="12"
-              viewBox="0 0 8 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2.0026 2.00033C2.37079 2.00033 2.66927 1.70185 2.66927 1.33366C2.66927 0.965469 2.37079 0.666992 2.0026 0.666992C1.63441 0.666992 1.33594 0.965469 1.33594 1.33366C1.33594 1.70185 1.63441 2.00033 2.0026 2.00033Z"
-                stroke="#3B3C40"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M2.0026 6.66699C2.37079 6.66699 2.66927 6.36852 2.66927 6.00033C2.66927 5.63214 2.37079 5.33366 2.0026 5.33366C1.63441 5.33366 1.33594 5.63214 1.33594 6.00033C1.33594 6.36852 1.63441 6.66699 2.0026 6.66699Z"
-                stroke="#3B3C40"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M2.0026 11.3337C2.37079 11.3337 2.66927 11.0352 2.66927 10.667C2.66927 10.2988 2.37079 10.0003 2.0026 10.0003C1.63441 10.0003 1.33594 10.2988 1.33594 10.667C1.33594 11.0352 1.63441 11.3337 2.0026 11.3337Z"
-                stroke="#3B3C40"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M6.0026 2.00033C6.37079 2.00033 6.66927 1.70185 6.66927 1.33366C6.66927 0.965469 6.37079 0.666992 6.0026 0.666992C5.63441 0.666992 5.33594 0.965469 5.33594 1.33366C5.33594 1.70185 5.63441 2.00033 6.0026 2.00033Z"
-                stroke="#3B3C40"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M6.0026 6.66699C6.37079 6.66699 6.66927 6.36852 6.66927 6.00033C6.66927 5.63214 6.37079 5.33366 6.0026 5.33366C5.63441 5.33366 5.33594 5.63214 5.33594 6.00033C5.33594 6.36852 5.63441 6.66699 6.0026 6.66699Z"
-                stroke="#3B3C40"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M6.0026 11.3337C6.37079 11.3337 6.66927 11.0352 6.66927 10.667C6.66927 10.2988 6.37079 10.0003 6.0026 10.0003C5.63441 10.0003 5.33594 10.2988 5.33594 10.667C5.33594 11.0352 5.63441 11.3337 6.0026 11.3337Z"
-                stroke="#3B3C40"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>-->
-          </div>
-          <!-- <span>11111</span>-->
+          <div class="affine-drag-handle-grabber"></div>
         </div>
         <div class="affine-drag-hover-rect" style=${hoverRectStyle}></div>
       </div>

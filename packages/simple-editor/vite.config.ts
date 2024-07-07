@@ -27,6 +27,9 @@ export default defineConfig({
     UnoCSS(),
     dts(),
   ],
+  esbuild: {
+    target: 'es2018',
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

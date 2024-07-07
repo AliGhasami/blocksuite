@@ -3,10 +3,6 @@ import { css } from 'lit';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
 
 export const styles = css`
-  .affine-attachment-container {
-    padding-inline-end: 12px;
-  }
-
   .affine-attachment-card {
     margin: 0 auto;
     box-sizing: border-box;

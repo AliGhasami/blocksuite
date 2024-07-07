@@ -18,13 +18,11 @@ import {
 } from '../rich-text-operations.js';
 
 function isCollapsedAtBlockStart(inlineEditor: AffineInlineEditor) {
-  //console.log('isCollapsedAtBlockStart');
   const inlineRange = inlineEditor.getInlineRange();
   return inlineRange?.index === 0 && inlineRange?.length === 0;
 }
 
 function isCollapsedAtBlockEnd(inlineEditor: AffineInlineEditor) {
-  //console.log('isCollapsedAtBlockEnd');
   const inlineRange = inlineEditor.getInlineRange();
   return (
     inlineRange?.index === inlineEditor.yText.length &&
@@ -36,7 +34,6 @@ export function onSoftEnter(
   inlineRange: InlineRange,
   inlineEditor: AffineInlineEditor
 ) {
-  // console.log('onSoftEnter');
   inlineEditor.insertText(inlineRange, '\n');
   inlineEditor.setInlineRange({
     index: inlineRange.index + 1,
@@ -56,7 +53,6 @@ export function hardEnter(
   e: KeyboardEvent,
   shortKey = false
 ) {
-  //console.log('hardEnter');
   const doc = model.doc;
   e.stopPropagation();
   const parent = doc.getParent(model);
@@ -151,7 +147,6 @@ export function hardEnter(
 // 2. In the middle and start of block, press Enter will insert a \n to break the line
 // TODO this should be configurable per-block
 function isSoftEnterable(model: BlockModel) {
-  // console.log('isSoftEnterable', model);
   if (matchFlavours(model, ['affine:code', 'affine:hint'])) return true;
   if (matchFlavours(model, ['affine:paragraph'])) {
     return model.type === 'quote';
@@ -165,7 +160,6 @@ export function onBackspace(
   e: KeyboardEvent,
   inlineEditor: AffineInlineEditor
 ) {
-  // console.log('onBackspace');
   if (isCollapsedAtBlockStart(inlineEditor)) {
     if (model.flavour === 'affine:code') {
       return KEYBOARD_ALLOW_DEFAULT;
@@ -184,7 +178,6 @@ export function onForwardDelete(
   e: KeyboardEvent,
   inlineEditor: AffineInlineEditor
 ) {
-  //console.log('onForwardDelete');
   e.stopPropagation();
   if (isCollapsedAtBlockEnd(inlineEditor)) {
     handleLineEndForwardDelete(editorHost, model);

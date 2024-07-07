@@ -11,8 +11,6 @@ const EDGE_IGNORED_ATTRIBUTES = ['code', 'link'] as const;
 const GLOBAL_IGNORED_ATTRIBUTES = [] as const;
 
 const autoIdentifyLink = (ctx: HookContext<AffineTextAttributes>) => {
-  //console.log('autoIdentifyLink');
-  //return;
   // auto identify link only on pressing space
   if (ctx.data !== ' ') {
     return;
@@ -64,7 +62,6 @@ function handleExtendedAttributes(
     | BeforeinputHookCtx<AffineTextAttributes>
     | CompositionEndHookCtx<AffineTextAttributes>
 ) {
-  // console.log('handleExtendedAttributes');
   const { data, inlineEditor, inlineRange } = ctx;
   const deltas = inlineEditor.getDeltasByInlineRange(inlineRange);
   if (data && data.length > 0 && data !== '\n') {
@@ -106,7 +103,6 @@ function handleExtendedAttributes(
 export const onVBeforeinput = (
   ctx: BeforeinputHookCtx<AffineTextAttributes>
 ) => {
-  // console.log('onVBeforeinput');
   handleExtendedAttributes(ctx);
   autoIdentifyLink(ctx);
 };
@@ -114,6 +110,5 @@ export const onVBeforeinput = (
 export const onVCompositionEnd = (
   ctx: CompositionEndHookCtx<AffineTextAttributes>
 ) => {
- // console.log('onVCompositionEnd');
   handleExtendedAttributes(ctx);
 };

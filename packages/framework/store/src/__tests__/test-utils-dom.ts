@@ -34,7 +34,7 @@ function reportTestResult() {
 }
 
 function addMessage(message: string) {
-  //console.log(message);
+  console.log(message);
   testResult.messages.push(message);
 }
 
