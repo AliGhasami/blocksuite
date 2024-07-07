@@ -2,10 +2,6 @@ import { AffineSchemas, TestUtils } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockCollection } from '@blocksuite/store';
 import {
-  type BlobStorage,
-  createIndexeddbStorage,
-  createMemoryStorage,
-  createSimpleServerStorage,
   DocCollection,
   type DocCollectionOptions,
   Generator,
@@ -14,29 +10,23 @@ import {
   type StoreOptions,
 } from '@blocksuite/store';
 import {
+  type BlobSource,
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
+  IndexedDBBlobSource,
+  MemoryBlobSource,
 } from '@blocksuite/sync';
 
+import { MockServerBlobSource } from '../../_common/sync/blob/mock-server.js';
 import type { InitFn } from '../data/utils.js';
 
 const params = new URLSearchParams(location.search);
 const room = params.get('room');
-const blobStorageArgs = (params.get('blobStorage') ?? 'memory').split(',');
 const isE2E = room?.startsWith('playwright');
+const blobSourceArgs = (params.get('blobSource') ?? '').split(',');
 
 export function createStarterDocCollection() {
-  const blobStorages: ((id: string) => BlobStorage)[] = [];
-  if (blobStorageArgs.includes('memory')) {
-    blobStorages.push(createMemoryStorage);
-  }
-  if (blobStorageArgs.includes('idb')) {
-    blobStorages.push(createIndexeddbStorage);
-  }
-  if (blobStorageArgs.includes('mock')) {
-    blobStorages.push(createSimpleServerStorage);
-  }
-
+  const collectionId = room ?? 'starter';
   const schema = new Schema();
   schema.register(AffineSchemas);
   const idGenerator = isE2E ? Generator.AutoIncrement : Generator.NanoID;
@@ -49,22 +39,39 @@ export function createStarterDocCollection() {
   }
   const id = room ?? `starter-${Math.random().toString(16).slice(2, 8)}`;
 
+  const blobSources = {
+    main: new MemoryBlobSource(),
+    shadows: [] as BlobSource[],
+  } satisfies StoreOptions['blobSources'];
+  if (blobSourceArgs.includes('mock')) {
+    blobSources.shadows.push(new MockServerBlobSource(collectionId));
+  }
+  if (blobSourceArgs.includes('idb')) {
+    blobSources.shadows.push(new IndexedDBBlobSource(collectionId));
+  }
+
+  const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
+    [...params.entries()]
+      .filter(([key]) => key.startsWith('enable_'))
+      .map(([k, v]) => [k, v === 'true'])
+  );
+
   const options: DocCollectionOptions = {
-    id,
+    id: collectionId,
     schema,
     idGenerator,
-    blobStorages,
     defaultFlags: {
       enable_synced_doc_block: true,
       enable_pie_menu: true,
       enable_lasso_tool: true,
-      enable_mindmap_entry: true,
+      enable_edgeless_text: true,
+      ...flags,
     },
     awarenessSources: [new BroadcastChannelAwarenessSource(id)],
     docSources,
+    blobSources,
   };
   const collection = new DocCollection(options);
-
   collection.start();
 
   // debug info
@@ -114,6 +121,7 @@ export async function initStarterDocCollection(collection: DocCollection) {
   ).forEach(fn => functionMap.set(fn.id, fn));
   const init = params.get('init') || 'preset';
   if (functionMap.has(init)) {
+    collection.meta.initialize();
     await functionMap.get(init)?.(collection, 'doc:home');
     const doc = collection.getDoc('doc:home');
     if (!doc?.loaded) {

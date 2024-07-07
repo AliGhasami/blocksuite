@@ -109,7 +109,7 @@ function toggleStyle(
     Object.entries(attrs).map(([k, v]) => {
       if (
         typeof v === 'boolean' &&
-        v === (oldAttributes as { [k: string]: unknown })[k]
+        v === (oldAttributes as Record<string, unknown>)[k]
       ) {
         return [k, null];
       } else {
@@ -129,13 +129,13 @@ function toggleStyle(
 @customElement('test-rich-text')
 export class TestRichText extends ShadowlessElement {
   @query('.rich-text-container')
-  private _container!: HTMLDivElement;
+  private accessor _container!: HTMLDivElement;
 
   @property({ attribute: false })
-  inlineEditor!: InlineEditor;
+  accessor inlineEditor!: InlineEditor;
 
   @property({ attribute: false })
-  undoManager!: Y.UndoManager;
+  accessor undoManager!: Y.UndoManager;
 
   override firstUpdated() {
     this.contentEditable = 'true';
@@ -257,10 +257,10 @@ export class CustomToolbar extends ShadowlessElement {
   `;
 
   @property({ attribute: false })
-  inlineEditor!: InlineEditor;
+  accessor inlineEditor!: InlineEditor;
 
   @property({ attribute: false })
-  undoManager!: Y.UndoManager;
+  accessor undoManager!: Y.UndoManager;
 
   override firstUpdated() {
     const boldButton = this.querySelector('.bold');
@@ -397,8 +397,11 @@ export class TestPage extends ShadowlessElement {
   `;
 
   private _editorA: InlineEditor | null = null;
+
   private _editorB: InlineEditor | null = null;
+
   private _undoManagerA: Y.UndoManager | null = null;
+
   private _undoManagerB: Y.UndoManager | null = null;
 
   override firstUpdated() {

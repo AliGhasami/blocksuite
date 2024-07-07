@@ -22,11 +22,12 @@ const styles = css`
 @customElement('pie-center-rotator')
 export class PieCenterRotator extends LitElement {
   static override styles = styles;
-  @property({ attribute: false })
-  isActive!: boolean;
 
   @property({ attribute: false })
-  angle: number | null = null;
+  accessor isActive!: boolean;
+
+  @property({ attribute: false })
+  accessor angle: number | null = null;
 
   protected override render() {
     if (!this.isActive || this.angle === null) return nothing;

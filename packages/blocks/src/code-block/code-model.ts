@@ -9,11 +9,17 @@ export const CodeBlockSchema = defineBlockSchema({
     text: internal.Text(),
     language: FALLBACK_LANG,
     wrap: false,
+    caption: '',
   }),
   metadata: {
     version: 1,
     role: 'content',
-    parent: ['affine:note', 'affine:paragraph', 'affine:list'],
+    parent: [
+      'affine:note',
+      'affine:paragraph',
+      'affine:list',
+      'affine:edgeless-text',
+    ],
     children: [],
   },
 });

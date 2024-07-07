@@ -7,6 +7,8 @@ export {
   type AffineAIPanelWidgetConfig,
 } from './ai-panel/type.js';
 export { BlockHubWidget } from './block-hub/block-hub.js';
+export { AffineCodeLanguageListWidget } from './code-language-list/index.js';
+export { AffineCodeToolbarWidget } from './code-toolbar/index.js';
 export { AffineDocRemoteSelectionWidget } from './doc-remote-selection/doc-remote-selection.js';
 export { AffineDragHandleWidget } from './drag-handle/drag-handle.js';
 export {
@@ -20,9 +22,16 @@ export {
   EDGELESS_ELEMENT_TOOLBAR_WIDGET,
   EdgelessElementToolbarWidget,
 } from './element-toolbar/index.js';
+export {
+  AFFINE_EMBED_CARD_TOOLBAR_WIDGET,
+  EmbedCardToolbar,
+} from './embed-card-toolbar/embed-card-toolbar.js';
 export { toolbarDefaultConfig } from './format-bar/config.js';
-export { AffineFormatBarWidget } from './format-bar/format-bar.js';
-export { AffineImageToolbarWidget } from './image-toolbar/image-toolbar.js';
+export {
+  AFFINE_FORMAT_BAR_WIDGET,
+  AffineFormatBarWidget,
+} from './format-bar/format-bar.js';
+export { AffineImageToolbarWidget } from './image-toolbar/index.js';
 export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
 export {
   // It's used in the AFFiNE!
@@ -34,5 +43,13 @@ export { AffineDateWidget } from './date/index.js';
 export { AffineModalWidget } from './modal/modal.js';
 export { AffinePageDraggingAreaWidget } from './page-dragging-area/page-dragging-area.js';
 export { AffinePieMenuWidget } from './pie-menu/index.js';
-export { AffineSlashMenuWidget } from './slash-menu/index.js';
+export {
+  type AffineSlashMenuActionItem,
+  type AffineSlashMenuContext,
+  type AffineSlashMenuGroupDivider,
+  type AffineSlashMenuItem,
+  type AffineSlashMenuItemGenerator,
+  AffineSlashMenuWidget,
+  type AffineSlashSubMenu,
+} from './slash-menu/index.js';
 export { AffineSurfaceRefToolbar } from './surface-ref-toolbar/surface-ref-toolbar.js';

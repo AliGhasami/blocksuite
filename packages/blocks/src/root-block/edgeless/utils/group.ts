@@ -1,12 +1,12 @@
 import { GroupElementModel } from '../../../surface-block/index.js';
-import type { EdgelessModel } from '../type.js';
-
-export function getElementsWithoutGroup(elements: EdgelessModel[]) {
-  const set = new Set<EdgelessModel>();
+export function getElementsWithoutGroup(
+  elements: BlockSuite.EdgelessModelType[]
+) {
+  const set = new Set<BlockSuite.EdgelessModelType>();
 
   elements.forEach(element => {
     if (element instanceof GroupElementModel) {
-      element.decendants().forEach(child => set.add(child));
+      element.descendants().forEach(child => set.add(child));
     } else {
       set.add(element);
     }

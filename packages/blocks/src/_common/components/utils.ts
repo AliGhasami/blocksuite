@@ -67,8 +67,6 @@ export const createKeydownObserver = ({
   };
 
   const keyDownListener = (e: KeyboardEvent) => {
-    e.stopPropagation();
-
     if (e.defaultPrevented) return;
 
     if (isControlledKeyboardEvent(e)) {
@@ -77,16 +75,16 @@ export const createKeydownObserver = ({
       if (isOnlyCmd && e.key.length === 1) {
         switch (e.key) {
           // Previous command
-          case 'P':
           case 'p': {
             onMove(-1);
+            e.stopPropagation();
             e.preventDefault();
             return;
           }
           // Next command
-          case 'N':
           case 'n': {
             onMove(1);
+            e.stopPropagation();
             e.preventDefault();
             return;
           }
@@ -97,6 +95,7 @@ export const createKeydownObserver = ({
       // Because we don't know the user's intention
       // Aborting here will cause the above hotkeys to not work
       if (e.key === 'Control' || e.key === 'Meta' || e.key === 'Alt') {
+        e.stopPropagation();
         return;
       }
 
@@ -105,6 +104,8 @@ export const createKeydownObserver = ({
       abortController.abort();
       return;
     }
+
+    e.stopPropagation();
 
     if (
       // input abc, 123, etc.
@@ -260,6 +261,9 @@ export const scrollbarStyle = (container: string) => {
     throw new Error('Invalid container name!');
 
   return css`
+    ${unsafeCSS(container)} {
+      scrollbar-gutter: stable;
+    }
     ${unsafeCSS(container)}::-webkit-scrollbar {
       -webkit-appearance: none;
       width: 4px;

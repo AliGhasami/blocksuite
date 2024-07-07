@@ -13,40 +13,55 @@ import {
 } from '../../../_common/components/utils.js';
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import type { LinkedDocOptions } from './config.js';
-import { type LinkedDocGroup } from './config.js';
+import type { LinkedDocGroup } from './config.js';
 import { styles } from './styles.js';
 
 @customElement('affine-linked-doc-popover')
 export class LinkedDocPopover extends WithDisposable(LitElement) {
-  static override styles = styles;
-
-  @property({ attribute: false })
-  options!: LinkedDocOptions;
-
-  @property({ attribute: false })
-  triggerKey!: string;
-
-  @state()
-  private _position: {
-    height: number;
-    x: string;
-    y: string;
-  } | null = null;
-
-  @state()
-  private _query = '';
-
-  @state()
-  private _activatedItemIndex = 0;
-
-  private _actionGroup: LinkedDocGroup[] = [];
-
   private get _flattenActionList() {
     return this._actionGroup
       .map(group =>
         group.items.map(item => ({ ...item, groupName: group.name }))
       )
       .flat();
+  }
+
+  private get _doc() {
+    return this.editorHost.doc;
+  }
+
+  static override styles = styles;
+
+  @state()
+  private accessor _position: {
+    height: number;
+    x: string;
+    y: string;
+  } | null = null;
+
+  @state()
+  private accessor _query = '';
+
+  @state()
+  private accessor _activatedItemIndex = 0;
+
+  private _actionGroup: LinkedDocGroup[] = [];
+
+  @property({ attribute: false })
+  accessor options!: LinkedDocOptions;
+
+  @property({ attribute: false })
+  accessor triggerKey!: string;
+
+  @query('.linked-doc-popover')
+  accessor linkedDocElement: Element | null = null;
+
+  constructor(
+    private editorHost: EditorHost,
+    private inlineEditor: AffineInlineEditor,
+    private abortController = new AbortController()
+  ) {
+    super();
   }
 
   private _updateActionList() {
@@ -56,21 +71,6 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
       inlineEditor: this.inlineEditor,
       docMetas: this._doc.collection.meta.docMetas,
     });
-  }
-
-  @query('.linked-doc-popover')
-  linkedDocElement?: Element;
-
-  private get _doc() {
-    return this.editorHost.doc;
-  }
-
-  constructor(
-    private editorHost: EditorHost,
-    private inlineEditor: AffineInlineEditor,
-    private abortController = new AbortController()
-  ) {
-    super();
   }
 
   override connectedCallback() {
@@ -156,10 +156,7 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
 
     // XXX This is a side effect
     let accIdx = 0;
-    return html`<div
-      class="linked-doc-popover blocksuite-overlay"
-      style="${style}"
-    >
+    return html`<div class="linked-doc-popover" style="${style}">
       ${this._actionGroup
         .filter(group => group.items.length)
         .map((group, idx) => {

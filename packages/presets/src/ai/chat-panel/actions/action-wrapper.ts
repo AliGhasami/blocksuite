@@ -23,8 +23,9 @@ import {
   ArrowUpIcon,
 } from '../../_common/icons.js';
 import { createTextRenderer } from '../../messages/text.js';
+import type { ChatAction } from '../chat-context.js';
 import { renderImages } from '../components/images.js';
-import type { ChatAction } from '../index.js';
+import { HISTORY_IMAGE_ACTIONS } from '../const.js';
 
 const icons: Record<string, TemplateResult<1>> = {
   'Fix spelling for it': AIDoneIcon,
@@ -49,6 +50,13 @@ const icons: Record<string, TemplateResult<1>> = {
   'Create a presentation': AIPresentationIcon,
   'Write a poem about this': AIPenIcon,
   'Write a blog post about this': AIPenIcon,
+  'AI image filter clay style': AIImageIcon,
+  'AI image filter sketch style': AIImageIcon,
+  'AI image filter anime style': AIImageIcon,
+  'AI image filter pixel style': AIImageIcon,
+  Clearer: AIImageIcon,
+  'Remove background': AIImageIcon,
+  'Convert to sticker': AIImageIcon,
 };
 
 @customElement('action-wrapper')
@@ -93,23 +101,22 @@ export class ActionWrapper extends WithDisposable(LitElement) {
         color: var(--affine-text-secondary-color);
         height: 20px;
         line-height: 20px;
-        margin-bottom: 4px;
       }
 
-      div:nth-child(3) {
+      .prompt {
         margin-top: 12px;
       }
     }
   `;
 
   @state()
-  promptShow = false;
+  accessor promptShow = false;
 
   @property({ attribute: false })
-  item!: ChatAction;
+  accessor item!: ChatAction;
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   protected override render() {
     const { item } = this;
@@ -134,14 +141,14 @@ export class ActionWrapper extends WithDisposable(LitElement) {
         ? html`
             <div class="answer-prompt">
               <div class="subtitle">Answer</div>
-              ${item.action === 'image'
+              ${HISTORY_IMAGE_ACTIONS.includes(item.action)
                 ? images && renderImages(images)
                 : nothing}
               ${answer
                 ? createTextRenderer(this.host, { customHeading: true })(answer)
                 : nothing}
               ${originalText
-                ? html`<div class="subtitle">Prompt</div>
+                ? html`<div class="subtitle prompt">Prompt</div>
                     ${createTextRenderer(this.host, { customHeading: true })(
                       item.messages[0].content + originalText
                     )}`

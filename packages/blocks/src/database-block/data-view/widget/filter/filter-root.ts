@@ -1,12 +1,12 @@
 import './condition.js';
 
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import type { ReferenceElement } from '@floating-ui/dom';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import { popFilterableSimpleMenu } from '../../../../_common/components/index.js';
 import {
   ArrowDownSmallIcon,
   DuplicateIcon,
@@ -18,12 +18,7 @@ import {
   MoreHorizontalIcon,
   PlusIcon,
 } from '../../common/icons/index.js';
-import {
-  eventToVRect,
-  popFilterableSimpleMenu,
-  positionToVRect,
-} from '../../utils/menu/index.js';
-import { menuTitle } from '../../utils/menu/title.js';
+import { menuTitle } from '../../utils/menu-title.js';
 import { popAddNewFilter } from './condition.js';
 import type { FilterGroupView } from './filter-group.js';
 import { getDepth } from './filter-group.js';
@@ -159,21 +154,27 @@ export class FilterRootView extends WithDisposable(ShadowlessElement) {
       margin: 8px 0;
     }
   `;
-  @property({ attribute: false })
-  data!: FilterGroup;
 
   @property({ attribute: false })
-  vars!: Variable[];
+  accessor data!: FilterGroup;
 
   @property({ attribute: false })
-  setData!: (filter: FilterGroup) => void;
+  accessor vars!: Variable[];
+
   @property({ attribute: false })
-  onBack!: () => void;
+  accessor setData!: (filter: FilterGroup) => void;
+
+  @property({ attribute: false })
+  accessor onBack!: () => void;
+
   @state()
-  containerClass?: {
-    index: number;
-    class: string;
-  };
+  accessor containerClass:
+    | {
+        index: number;
+        class: string;
+      }
+    | undefined = undefined;
+
   private _setFilter = (index: number, filter: Filter) => {
     this.setData({
       ...this.data,
@@ -184,14 +185,14 @@ export class FilterRootView extends WithDisposable(ShadowlessElement) {
   };
 
   private _addNew = (e: MouseEvent) => {
-    popAddNewFilter(eventToVRect(e), {
+    popAddNewFilter(e.target as HTMLElement, {
       value: this.data,
       onChange: this.setData,
       vars: this.vars,
     });
   };
 
-  private _clickConditionOps(target: ReferenceElement, i: number) {
+  private _clickConditionOps(target: HTMLElement, i: number) {
     const filter = this.data.conditions[i];
     popFilterableSimpleMenu(target, [
       {
@@ -268,7 +269,7 @@ export class FilterRootView extends WithDisposable(ShadowlessElement) {
           const clickOps = (e: MouseEvent) => {
             e.stopPropagation();
             e.preventDefault();
-            this._clickConditionOps(positionToVRect(e.x, e.y), i);
+            this._clickConditionOps(e.target as HTMLElement, i);
           };
           const ops = html`
             <div class="filter-root-item-ops" @click="${clickOps}">

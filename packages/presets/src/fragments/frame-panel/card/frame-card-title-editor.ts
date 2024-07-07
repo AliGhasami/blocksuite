@@ -16,25 +16,6 @@ const styles = css`
 `;
 
 export class FrameCardTitleEditor extends WithDisposable(ShadowlessElement) {
-  static override styles = styles;
-
-  @query('rich-text')
-  richText!: RichText;
-
-  @property({ attribute: false })
-  frameModel!: FrameBlockModel;
-
-  @property({ attribute: false })
-  titleContentElement!: HTMLElement;
-
-  @property({ attribute: false })
-  left!: number;
-
-  @property({ attribute: false })
-  maxWidth!: number;
-
-  private _isComposing = false;
-
   get inlineEditor(): AffineInlineEditor {
     assertExists(this.richText.inlineEditor);
     return this.richText.inlineEditor;
@@ -42,6 +23,32 @@ export class FrameCardTitleEditor extends WithDisposable(ShadowlessElement) {
 
   get inlineEditorContainer() {
     return this.inlineEditor.rootElement;
+  }
+
+  static override styles = styles;
+
+  private _isComposing = false;
+
+  @query('rich-text')
+  accessor richText!: RichText;
+
+  @property({ attribute: false })
+  accessor frameModel!: FrameBlockModel;
+
+  @property({ attribute: false })
+  accessor titleContentElement!: HTMLElement;
+
+  @property({ attribute: false })
+  accessor left!: number;
+
+  @property({ attribute: false })
+  accessor maxWidth!: number;
+
+  private _unmount() {
+    // dispose in advance to avoid execute `this.remove()` twice
+    this.disposables.dispose();
+    this.remove();
+    this.titleContentElement.style.display = 'block';
   }
 
   override async getUpdateComplete(): Promise<boolean> {
@@ -95,13 +102,6 @@ export class FrameCardTitleEditor extends WithDisposable(ShadowlessElement) {
         );
       })
       .catch(console.error);
-  }
-
-  private _unmount() {
-    // dispose in advance to avoid execute `this.remove()` twice
-    this.disposables.dispose();
-    this.remove();
-    this.titleContentElement.style.display = 'block';
   }
 
   override render() {

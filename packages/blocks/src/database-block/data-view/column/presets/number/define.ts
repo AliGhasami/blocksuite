@@ -1,5 +1,6 @@
 import { Text } from '@blocksuite/store';
 
+import { clamp } from '../../../../../_common/utils/math.js';
 import { tNumber } from '../../../logical/data-type.js';
 import { columnType } from '../../column-config.js';
 
@@ -27,8 +28,15 @@ export const numberColumnModelConfig = numberColumnType.modelConfig<
     };
   },
   cellToJson: data => data ?? null,
+  isEmpty: data => data == null,
 });
+
 numberColumnModelConfig.addConvert('rich-text', (_column, cells) => ({
   column: {},
   cells: cells.map(v => new Text(v?.toString()).yText),
+}));
+
+numberColumnModelConfig.addConvert('progress', (_column, cells) => ({
+  column: {},
+  cells: cells.map(v => clamp(v ?? 0, 0, 100)),
 }));

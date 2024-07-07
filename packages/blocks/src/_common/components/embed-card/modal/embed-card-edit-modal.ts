@@ -23,35 +23,20 @@ type EmbedCardModel =
 export class EmbedCardEditModal extends WithDisposable(ShadowlessElement) {
   static override styles = embedCardModalStyles;
 
-  @property({ attribute: false })
-  model!: EmbedCardModel;
+  @state()
+  private accessor _titleInputValue = '';
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor model!: EmbedCardModel;
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
 
   @query('.embed-card-modal-input.title')
-  titleInput!: HTMLInputElement;
+  accessor titleInput!: HTMLInputElement;
 
   @query('.embed-card-modal-input.description')
-  descInput!: HTMLTextAreaElement;
-
-  @state()
-  private _titleInputValue = '';
-
-  override connectedCallback() {
-    super.connectedCallback();
-
-    this.updateComplete
-      .then(() => {
-        this.titleInput.focus();
-        this.titleInput.setSelectionRange(0, this.titleInput.value.length);
-      })
-      .catch(console.error);
-
-    this.disposables.addFromEvent(this, 'keydown', this._onDocumentKeydown);
-
-    this._titleInputValue = this.model.title ?? '';
-  }
+  accessor descInput!: HTMLTextAreaElement;
 
   private _handleInput(e: InputEvent) {
     const target = e.target as HTMLInputElement;
@@ -82,9 +67,24 @@ export class EmbedCardEditModal extends WithDisposable(ShadowlessElement) {
     this.remove();
   }
 
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.updateComplete
+      .then(() => {
+        this.titleInput.focus();
+        this.titleInput.setSelectionRange(0, this.titleInput.value.length);
+      })
+      .catch(console.error);
+
+    this.disposables.addFromEvent(this, 'keydown', this._onDocumentKeydown);
+
+    this._titleInputValue = this.model.title ?? '';
+  }
+
   override render() {
     return html`
-      <div class="embed-card-modal blocksuite-overlay">
+      <div class="embed-card-modal">
         <div class="embed-card-modal-mask" @click=${() => this.remove()}></div>
         <div class="embed-card-modal-wrapper">
           <div class="embed-card-modal-title">Edit Link</div>

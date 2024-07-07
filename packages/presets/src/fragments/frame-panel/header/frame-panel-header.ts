@@ -3,7 +3,7 @@ import './frames-setting-menu.js';
 import type { EditorHost } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import type { EdgelessRootBlockComponent } from '@blocksuite/blocks';
-import { type NavigatorMode } from '@blocksuite/blocks';
+import type { NavigatorMode } from '@blocksuite/blocks';
 import { createButtonPopper } from '@blocksuite/blocks';
 import { DisposableGroup } from '@blocksuite/global/utils';
 import { css, html, LitElement, type PropertyValues } from 'lit';
@@ -100,37 +100,39 @@ const styles = css`
 `;
 
 export class FramePanelHeader extends WithDisposable(LitElement) {
+  get rootService() {
+    return this.editorHost.spec.getService('affine:page');
+  }
+
   static override styles = styles;
 
-  @property({ attribute: false })
-  editorHost!: EditorHost;
-
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent | null;
-
   @state()
-  private _settingPopperShow = false;
+  private accessor _settingPopperShow = false;
 
   @query('.all-frames-setting-button')
-  private _frameSettingButton!: HTMLDivElement;
+  private accessor _frameSettingButton!: HTMLDivElement;
 
   @query('.frames-setting-container')
-  private _frameSettingMenu!: HTMLDivElement;
+  private accessor _frameSettingMenu!: HTMLDivElement;
 
   private _framesSettingMenuPopper: ReturnType<
     typeof createButtonPopper
   > | null = null;
 
   private _navigatorMode: NavigatorMode = 'fit';
+
   private _edgelessDisposables: DisposableGroup | null = null;
 
-  get rootService() {
-    return this.editorHost.spec.getService('affine:page');
-  }
+  @property({ attribute: false })
+  accessor editorHost!: EditorHost;
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent | null;
 
   private _enterPresentationMode = () => {
-    if (!this.edgeless)
-      this.rootService.slots.editorModeSwitch.emit('edgeless');
+    if (!this.edgeless) {
+      this.rootService.docModeService.setMode('edgeless');
+    }
 
     setTimeout(() => {
       this.edgeless?.updateComplete
@@ -147,7 +149,7 @@ export class FramePanelHeader extends WithDisposable(LitElement) {
   private _tryLoadNavigatorStateLocalRecord() {
     this._navigatorMode = this.editorHost.spec
       .getService('affine:page')
-      .editPropsStore.getItem('presentFillScreen')
+      .editPropsStore.getStorage('presentFillScreen')
       ? 'fill'
       : 'fit';
   }
@@ -216,7 +218,6 @@ export class FramePanelHeader extends WithDisposable(LitElement) {
             : ''}"
           .tooltip=${this._settingPopperShow ? '' : 'All Frames Settings'}
           .tipPosition=${'top'}
-          .iconContainerPadding=${2}
           .active=${this._settingPopperShow}
           .activeMode=${'background'}
           @click=${() => this._framesSettingMenuPopper?.toggle()}

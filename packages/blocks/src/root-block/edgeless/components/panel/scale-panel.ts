@@ -1,46 +1,43 @@
-import { baseTheme } from '@toeverything/theme';
-import { css, html, LitElement, unsafeCSS } from 'lit';
+import '../buttons/tool-icon-button.js';
+
+import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { stopPropagation } from '../../../../_common/utils/event.js';
+import { clamp } from '../../../../_common/utils/math.js';
 
-const MIN_SCALE = 1;
+const MIN_SCALE = 0;
 const MAX_SCALE = 400;
+
+const SCALE_LIST = [50, 100, 200] as const;
+
+function format(scale: number) {
+  return `${scale}%`;
+}
+
 @customElement('edgeless-scale-panel')
 export class EdgelessScalePanel extends LitElement {
   static override styles = css`
     :host {
-      box-shadow: var(--affine-menu-shadow);
-    }
-
-    .scale-container {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      width: 180px;
-      box-sizing: border-box;
-      background: var(--affine-background-overlay-panel-color);
-      border-radius: 8px;
-      gap: 12px;
       flex-direction: column;
-      font-size: var(--affine-font-sm);
-      font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
+      align-items: flex-start;
+      gap: 4px;
+      width: 68px;
     }
 
-    .scale-input-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    edgeless-tool-icon-button {
+      align-self: stretch;
     }
 
     .scale-input {
-      width: 100%;
-      height: 22px;
-      border: 1px solid var(--affine-border-color);
-      border-radius: 4px;
-      padding: 6px 14px;
+      display: flx;
+      align-self: stretch;
+      border: 0.5px solid var(--affine-border-color);
+      border-radius: 8px;
+      padding: 4px 8px;
+      box-sizing: border-box;
     }
 
     .scale-input::placeholder {
@@ -49,79 +46,34 @@ export class EdgelessScalePanel extends LitElement {
 
     .scale-input:focus {
       outline-color: var(--affine-primary-color);
-    }
-
-    .scale-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      box-sizing: border-box;
-      gap: 4px;
-    }
-
-    .scale-button {
-      display: flex;
-      align-items: center;
-      justify-content: start;
-      box-sizing: border-box;
-      width: 100%;
-      height: 30px;
-      border-radius: 4px;
-      padding: 0 8px;
-    }
-
-    .scale-button:hover {
-      cursor: pointer;
-      background: var(--affine-hover-color);
-    }
-
-    .scale-button[active] {
-      background: var(--affine-hover-color);
-    }
-
-    .scale-button-label {
-      text-align: justify;
-      font-style: normal;
-      width: 48px;
-      height: 24px;
-      font-weight: 400;
-      line-height: 24px;
-      color: var(--affine-icon-color);
-      padding: 0 8px;
-      border-radius: 4px;
-    }
-
-    menu-divider {
-      width: 100%;
+      outline-width: 0.5px;
     }
   `;
 
   @property({ attribute: false })
-  scale!: number;
+  accessor scale!: number;
 
   @property({ attribute: false })
-  scales!: number[];
+  accessor scaleList: readonly number[] = SCALE_LIST;
 
   @property({ attribute: false })
-  onSelect?: (size: EdgelessScalePanel['scale']) => void;
+  accessor onSelect: ((size: number) => void) | undefined = undefined;
 
   @property({ attribute: false })
-  onPopperCose?: () => void;
+  accessor onPopperCose: (() => void) | undefined = undefined;
 
   @property({ attribute: false })
-  minScale: number = MIN_SCALE;
+  accessor minScale: number = MIN_SCALE;
 
   @property({ attribute: false })
-  maxScale: number = MAX_SCALE;
+  accessor maxScale: number = MAX_SCALE;
 
-  private _onSelect(scale: EdgelessScalePanel['scale']) {
-    if (this.onSelect) this.onSelect(scale / 100);
+  private _onSelect(scale: number) {
+    this.onSelect?.(scale / 100);
   }
 
   private _onPopperClose() {
-    if (this.onPopperCose) this.onPopperCose();
+    this.onPopperCose?.();
   }
 
   private _onKeydown = (e: KeyboardEvent) => {
@@ -130,21 +82,15 @@ export class EdgelessScalePanel extends LitElement {
     if (e.key === 'Enter' && !e.isComposing) {
       e.preventDefault();
       const input = e.target as HTMLInputElement;
+      const scale = parseInt(input.value.trim());
       // Handle edge case where user enters a non-number
-      if (isNaN(parseInt(input.value))) {
+      if (isNaN(scale)) {
         input.value = '';
         return;
       }
 
-      let size = parseInt(input.value);
       // Handle edge case when user enters a number that is out of range
-      if (size < this.minScale) {
-        size = this.minScale;
-      } else if (size > this.maxScale) {
-        size = this.maxScale;
-      }
-
-      this._onSelect(size);
+      this._onSelect(clamp(scale, this.minScale, this.maxScale));
       input.value = '';
       this._onPopperClose();
     }
@@ -152,43 +98,32 @@ export class EdgelessScalePanel extends LitElement {
 
   override render() {
     return html`
-      <div class="scale-container">
-        <div
-          class="scale-input-container"
-          @click=${(e: MouseEvent) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <input
-            class="scale-input"
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder=${Math.trunc(this.scale) + '%'}
-            @keydown=${this._onKeydown}
-            @input=${stopPropagation}
-            @pointerdown=${stopPropagation}
-          />
-        </div>
-        <div class="scale-content">
-          ${repeat(
-            this.scales,
-            scale => scale,
-            scale =>
-              html` <div
-                class="scale-button"
-                role="button"
-                ?active=${this.scale === scale}
-                @click=${() => {
-                  this._onSelect(scale);
-                }}
-              >
-                <div class="scale-button-label">${scale + '%'}</div>
-              </div>`
-          )}
-        </div>
-      </div>
+      ${repeat(
+        this.scaleList,
+        scale => scale,
+        scale =>
+          html`<edgeless-tool-icon-button
+            .iconContainerPadding=${[4, 8]}
+            .activeMode=${'background'}
+            .active=${this.scale === scale}
+            @click=${() => this._onSelect(scale)}
+          >
+            ${format(scale)}
+          </edgeless-tool-icon-button>`
+      )}
+
+      <input
+        class="scale-input"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        min="0"
+        placeholder=${format(Math.trunc(this.scale))}
+        @keydown=${this._onKeydown}
+        @input=${stopPropagation}
+        @click=${stopPropagation}
+        @pointerdown=${stopPropagation}
+      />
     `;
   }
 }

@@ -1,5 +1,3 @@
-import '../../_common/components/block-selection.js';
-
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { html, nothing } from 'lit';
 import { customElement, property, queryAsync } from 'lit/decorators.js';
@@ -17,28 +15,28 @@ export class EmbedSyncedDocCard extends WithDisposable(ShadowlessElement) {
   static override styles = cardStyles;
 
   @property({ attribute: false })
-  block!: EmbedSyncedDocBlockComponent;
+  accessor block!: EmbedSyncedDocBlockComponent;
 
   @property({ attribute: false })
-  isError = false;
+  accessor isError = false;
 
   @property({ attribute: false })
-  isNoteContentEmpty = false;
+  accessor isNoteContentEmpty = false;
 
   @property({ attribute: false })
-  isBannerEmpty = false;
+  accessor isBannerEmpty = false;
 
   @property({ attribute: false })
-  surfaceRefService!: SurfaceRefBlockService;
+  accessor surfaceRefService!: SurfaceRefBlockService;
 
   @property({ attribute: false })
-  surfaceRefRenderer?: SurfaceRefRenderer;
+  accessor surfaceRefRenderer: SurfaceRefRenderer | null = null;
 
   @queryAsync('.affine-embed-synced-doc-card-banner.render')
-  bannerContainer!: Promise<HTMLDivElement>;
+  accessor bannerContainer!: Promise<HTMLDivElement>;
 
   @queryAsync('.affine-embed-synced-doc-content-note.render')
-  noteContainer!: Promise<HTMLDivElement>;
+  accessor noteContainer!: Promise<HTMLDivElement>;
 
   get std() {
     return this.block.std;
@@ -190,12 +188,12 @@ export class EmbedSyncedDocCard extends WithDisposable(ShadowlessElement) {
       : isLoading
         ? ''
         : isDeleted
-          ? 'This linked page is deleted.'
+          ? 'This linked doc is deleted.'
           : isEmpty
             ? 'Preview of the page will be displayed here.'
             : '';
 
-    const dateText = this.block.docUpdatedAt.toLocaleTimeString();
+    const dateText = this.block.docUpdatedAt.toLocaleString();
 
     const showDefaultBanner = isLoading || error || isDeleted || isEmpty;
 
@@ -260,8 +258,6 @@ export class EmbedSyncedDocCard extends WithDisposable(ShadowlessElement) {
             `
           : nothing}
       </div>
-
-      <affine-block-selection .block=${this.block}></affine-block-selection>
     `;
   }
 }

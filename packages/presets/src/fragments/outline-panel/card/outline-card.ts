@@ -155,6 +155,16 @@ const styles = css`
   note-display-mode-panel {
     position: absolute;
     display: none;
+    background: var(--affine-background-overlay-panel-color);
+    border-radius: 8px;
+    box-shadow: var(--affine-shadow-2);
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: var(--affine-font-sm);
+    color: var(--affine-text-primary-color);
+    line-height: 22px;
+    font-weight: 400;
+    font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
   }
 
   note-display-mode-panel[data-show] {
@@ -210,64 +220,46 @@ const styles = css`
 export class OutlineNoteCard extends WithDisposable(LitElement) {
   static override styles = styles;
 
-  @property({ attribute: false })
-  doc!: Doc;
-
-  @property({ attribute: false })
-  editorMode: 'page' | 'edgeless' = 'page';
-
-  @property({ attribute: false })
-  note!: NoteBlockModel;
-
-  @property({ attribute: false })
-  index!: number;
-
-  @property({ attribute: false })
-  number!: number;
-
-  @property({ attribute: false })
-  showPreviewIcon!: boolean;
-
-  @property({ attribute: false })
-  enableNotesSorting!: boolean;
-
-  @property({ attribute: false })
-  status?: 'selected' | 'placeholder';
-
-  @property({ attribute: false })
-  invisible = false;
-
   @state()
-  private _showPopper = false;
+  private accessor _showPopper = false;
 
   @query('.display-mode-button-group')
-  private _displayModeButtonGroup!: HTMLDivElement;
+  private accessor _displayModeButtonGroup!: HTMLDivElement;
+
   @query('note-display-mode-panel')
-  private _displayModePanel!: HTMLDivElement;
+  private accessor _displayModePanel!: HTMLDivElement;
+
   private _displayModePopper: ReturnType<typeof createButtonPopper> | null =
     null;
 
   private _noteDisposables: DisposableGroup | null = null;
 
-  override connectedCallback(): void {
-    super.connectedCallback();
+  @property({ attribute: false })
+  accessor doc!: Doc;
 
-    const observer = new MutationObserver(() => this.requestUpdate());
+  @property({ attribute: false })
+  accessor editorMode: 'page' | 'edgeless' = 'page';
 
-    observer.observe(this.ownerDocument.documentElement, {
-      subtree: false,
-      childList: false,
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
+  @property({ attribute: false })
+  accessor note!: NoteBlockModel;
 
-    this._disposables.add(() => observer.disconnect());
-  }
+  @property({ attribute: false })
+  accessor index!: number;
 
-  override disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._clearNoteDisposables();
-  }
+  @property({ attribute: false })
+  accessor number!: number;
+
+  @property({ attribute: false })
+  accessor showPreviewIcon!: boolean;
+
+  @property({ attribute: false })
+  accessor enableNotesSorting!: boolean;
+
+  @property({ attribute: false })
+  accessor status: 'selected' | 'placeholder' | undefined = undefined;
+
+  @property({ attribute: false })
+  accessor invisible = false;
 
   private _clearNoteDisposables = () => {
     this._noteDisposables?.dispose();
@@ -298,26 +290,6 @@ export class OutlineNoteCard extends WithDisposable(LitElement) {
       default:
         return 'Both';
     }
-  }
-
-  override updated(_changedProperties: PropertyValues) {
-    if (_changedProperties.has('note') || _changedProperties.has('index')) {
-      this._setNoteDisposables();
-    }
-  }
-
-  override firstUpdated() {
-    this._displayModePopper = createButtonPopper(
-      this._displayModeButtonGroup,
-      this._displayModePanel,
-      ({ display }) => {
-        this._showPopper = display === 'show';
-      },
-      8,
-      -60
-    );
-
-    this.disposables.add(this._displayModePopper);
   }
 
   private _dispatchSelectEvent(e: MouseEvent) {
@@ -405,6 +377,46 @@ export class OutlineNoteCard extends WithDisposable(LitElement) {
     });
 
     this.dispatchEvent(event);
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+
+    const observer = new MutationObserver(() => this.requestUpdate());
+
+    observer.observe(this.ownerDocument.documentElement, {
+      subtree: false,
+      childList: false,
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    this._disposables.add(() => observer.disconnect());
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._clearNoteDisposables();
+  }
+
+  override updated(_changedProperties: PropertyValues) {
+    if (_changedProperties.has('note') || _changedProperties.has('index')) {
+      this._setNoteDisposables();
+    }
+  }
+
+  override firstUpdated() {
+    this._displayModePopper = createButtonPopper(
+      this._displayModeButtonGroup,
+      this._displayModePanel,
+      ({ display }) => {
+        this._showPopper = display === 'show';
+      },
+      8,
+      -60
+    );
+
+    this.disposables.add(this._displayModePopper);
   }
 
   override render() {

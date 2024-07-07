@@ -10,14 +10,6 @@ import { embedCardModalStyles } from './styles.js';
 export class EmbedCardEditCaptionEditModal extends WithDisposable(
   ShadowlessElement
 ) {
-  static override styles = embedCardModalStyles;
-
-  @property({ attribute: false })
-  block!: BlockComponent;
-
-  @query('.embed-card-modal-input.caption')
-  captionInput!: HTMLTextAreaElement;
-
   private get _model() {
     return this.block.model;
   }
@@ -26,17 +18,13 @@ export class EmbedCardEditCaptionEditModal extends WithDisposable(
     return this.block.doc;
   }
 
-  override connectedCallback() {
-    super.connectedCallback();
+  static override styles = embedCardModalStyles;
 
-    this.updateComplete
-      .then(() => {
-        this.captionInput.focus();
-      })
-      .catch(console.error);
+  @property({ attribute: false })
+  accessor block!: BlockComponent;
 
-    this.disposables.addFromEvent(this, 'keydown', this._onKeydown);
-  }
+  @query('.embed-card-modal-input.caption')
+  accessor captionInput!: HTMLTextAreaElement;
 
   private _onKeydown(e: KeyboardEvent) {
     e.stopPropagation();
@@ -56,9 +44,21 @@ export class EmbedCardEditCaptionEditModal extends WithDisposable(
     this.remove();
   }
 
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.updateComplete
+      .then(() => {
+        this.captionInput.focus();
+      })
+      .catch(console.error);
+
+    this.disposables.addFromEvent(this, 'keydown', this._onKeydown);
+  }
+
   override render() {
     return html`
-      <div class="embed-card-modal blocksuite-overlay">
+      <div class="embed-card-modal">
         <div class="embed-card-modal-mask" @click=${() => this.remove()}></div>
         <div class="embed-card-modal-wrapper">
           <div class="embed-card-modal-title">Caption</div>

@@ -2,11 +2,11 @@ import '../../common/ref/ref.js';
 import '../../common/literal/define.js';
 
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import type { ReferenceElement } from '@floating-ui/dom';
 import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import { popFilterableSimpleMenu } from '../../../../_common/components/index.js';
 import type {
   FilterGroup,
   SingleFilter,
@@ -23,7 +23,6 @@ import { CrossIcon } from '../../common/icons/index.js';
 import { popLiteralEdit, renderLiteral } from '../../common/literal/matcher.js';
 import { tBoolean } from '../../logical/data-type.js';
 import { typesystem } from '../../logical/typesystem.js';
-import { popFilterableSimpleMenu } from '../../utils/menu/index.js';
 import { filterMatcher } from './matcher/matcher.js';
 
 @customElement('filter-condition-view')
@@ -86,16 +85,18 @@ export class FilterConditionView extends WithDisposable(ShadowlessElement) {
       align-items: center;
     }
   `;
-  @property({ attribute: false })
-  data!: SingleFilter;
 
   @property({ attribute: false })
-  setData!: (filter: SingleFilter) => void;
+  accessor data!: SingleFilter;
 
   @property({ attribute: false })
-  vars!: Variable[];
+  accessor setData!: (filter: SingleFilter) => void;
+
   @property({ attribute: false })
-  onDelete?: () => void;
+  accessor vars!: Variable[];
+
+  @property({ attribute: false })
+  accessor onDelete: (() => void) | undefined = undefined;
 
   private _setRef = (ref: VariableOrProperty) => {
     this.setData(firstFilterByRef(this.vars, ref));
@@ -211,7 +212,7 @@ declare global {
   }
 }
 export const popAddNewFilter = (
-  target: ReferenceElement,
+  target: HTMLElement,
   props: {
     value: FilterGroup;
     onChange: (value: FilterGroup) => void;

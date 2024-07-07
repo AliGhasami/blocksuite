@@ -1,13 +1,13 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { nanoid } from '@blocksuite/store';
-import type { Middleware } from '@floating-ui/dom';
-import { autoPlacement, detectOverflow } from '@floating-ui/dom';
+import { autoPlacement, flip, offset } from '@floating-ui/dom';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { html } from 'lit/static-html.js';
 
+import { createPopup, popMenu } from '../../../../_common/components/index.js';
 import { rangeWrap } from '../../../../_common/utils/math.js';
 import {
   DatabaseSearchClose,
@@ -16,7 +16,6 @@ import {
   PlusIcon,
 } from '../../common/icons/index.js';
 import { stopPropagation } from '../event.js';
-import { createPopup, popMenu } from '../menu/menu.js';
 import { getTagColor, selectOptionColors } from './colors.js';
 import { styles } from './styles.js';
 
@@ -38,56 +37,6 @@ type RenderOption = {
 
 @customElement('affine-multi-tag-select')
 export class MultiTagSelect extends WithDisposable(ShadowlessElement) {
-  static override styles = styles;
-
-  @property()
-  mode: 'multi' | 'single' = 'multi';
-
-  @property({ attribute: false })
-  options: SelectTag[] = [];
-
-  @property({ attribute: false })
-  onOptionsChange!: (options: SelectTag[]) => void;
-
-  private filteredOptions: Array<RenderOption> = [];
-
-  @property({ attribute: false })
-  value: string[] = [];
-
-  @property({ attribute: false })
-  onChange!: (value: string[]) => void;
-
-  @property({ attribute: false })
-  editComplete!: () => void;
-
-  newTags = (tags: SelectTag[]) => {
-    this.onOptionsChange([...tags, ...this.options]);
-  };
-  deleteTag = (id: string) => {
-    this.onOptionsChange(
-      this.options
-        .filter(v => v.id !== id)
-        .map(v => ({
-          ...v,
-          parentId: v.parentId === id ? undefined : v.parentId,
-        }))
-    );
-  };
-  changeTag = (tag: SelectTag) => {
-    this.onOptionsChange(this.options.map(v => (v.id === tag.id ? tag : v)));
-  };
-
-  @query('.select-input')
-  private _selectInput!: HTMLInputElement;
-
-  @state()
-  private text = '';
-
-  @state()
-  private selectedIndex = 0;
-
-  private _currentColor: string | undefined = undefined;
-
   private get color() {
     if (!this._currentColor) {
       this._currentColor = getTagColor();
@@ -95,26 +44,49 @@ export class MultiTagSelect extends WithDisposable(ShadowlessElement) {
     return this._currentColor;
   }
 
-  private clearColor() {
-    this._currentColor = undefined;
-  }
-
   get isSingleMode() {
     return this.mode === 'single';
   }
 
-  protected override firstUpdated() {
-    this._selectInput.focus();
-    this._disposables.addFromEvent(this, 'click', () => {
-      this._selectInput.focus();
-    });
+  private get selectedTag() {
+    return this.filteredOptions[this.selectedIndex];
+  }
 
-    this._disposables.addFromEvent(this._selectInput, 'copy', e => {
-      e.stopPropagation();
-    });
-    this._disposables.addFromEvent(this._selectInput, 'cut', e => {
-      e.stopPropagation();
-    });
+  static override styles = styles;
+
+  private filteredOptions: Array<RenderOption> = [];
+
+  @query('.select-input')
+  private accessor _selectInput!: HTMLInputElement;
+
+  @state()
+  private accessor text = '';
+
+  @state()
+  private accessor selectedIndex = 0;
+
+  private _currentColor: string | undefined = undefined;
+
+  @property()
+  accessor mode: 'multi' | 'single' = 'multi';
+
+  @property({ attribute: false })
+  accessor options: SelectTag[] = [];
+
+  @property({ attribute: false })
+  accessor onOptionsChange!: (options: SelectTag[]) => void;
+
+  @property({ attribute: false })
+  accessor value: string[] = [];
+
+  @property({ attribute: false })
+  accessor onChange!: (value: string[]) => void;
+
+  @property({ attribute: false })
+  accessor editComplete!: () => void;
+
+  private clearColor() {
+    this._currentColor = undefined;
   }
 
   private _onDeleteSelected = (selectedValue: string[], value: string) => {
@@ -125,10 +97,6 @@ export class MultiTagSelect extends WithDisposable(ShadowlessElement) {
   private _onInput = (event: KeyboardEvent) => {
     this.text = (event.target as HTMLInputElement).value;
   };
-
-  private get selectedTag() {
-    return this.filteredOptions[this.selectedIndex];
-  }
 
   private optionsIdMap() {
     return Object.fromEntries(this.options.map(v => [v.id, v]));
@@ -343,6 +311,41 @@ export class MultiTagSelect extends WithDisposable(ShadowlessElement) {
     return options;
   }
 
+  protected override firstUpdated() {
+    requestAnimationFrame(() => {
+      this._selectInput.focus();
+    });
+    this._disposables.addFromEvent(this, 'click', () => {
+      this._selectInput.focus();
+    });
+
+    this._disposables.addFromEvent(this._selectInput, 'copy', e => {
+      e.stopPropagation();
+    });
+    this._disposables.addFromEvent(this._selectInput, 'cut', e => {
+      e.stopPropagation();
+    });
+  }
+
+  newTags = (tags: SelectTag[]) => {
+    this.onOptionsChange([...tags, ...this.options]);
+  };
+
+  deleteTag = (id: string) => {
+    this.onOptionsChange(
+      this.options
+        .filter(v => v.id !== id)
+        .map(v => ({
+          ...v,
+          parentId: v.parentId === id ? undefined : v.parentId,
+        }))
+    );
+  };
+
+  changeTag = (tag: SelectTag) => {
+    this.onOptionsChange(this.options.map(v => (v.id === tag.id ? tag : v)));
+  };
+
   override render() {
     this.filteredOptions = this._filterOptions();
     this.setSelectedOption(this.selectedIndex);
@@ -467,6 +470,7 @@ export const popTagSelect = (
     onOptionsChange: (options: SelectTag[]) => void;
     onComplete?: () => void;
     minWidth?: number;
+    container?: HTMLElement;
   }
 ) => {
   const component = new MultiTagSelect();
@@ -493,32 +497,8 @@ export const popTagSelect = (
   };
   const remove = createPopup(target, component, {
     onClose: ops.onComplete,
-    middleware: [middleware],
+    middleware: [flip(), offset({ mainAxis: -28, crossAxis: 112 })],
+    container: ops.container,
   });
   return remove;
-};
-
-const middleware: Middleware = {
-  name: 'middleware',
-  fn: async state => {
-    const overflow = await detectOverflow(state);
-    const referenceRect = state.elements.reference.getBoundingClientRect();
-    const top = referenceRect.top;
-    const left = referenceRect.left;
-    let y = top - 12;
-    let x = left - 12;
-    if (overflow.bottom > 0) {
-      y = top - state.elements.floating.getBoundingClientRect().height;
-    }
-    if (overflow.right > 0) {
-      x = left - overflow.right;
-    }
-    if (y < 0) {
-      y = 240;
-    }
-    return {
-      y,
-      x,
-    };
-  },
 };

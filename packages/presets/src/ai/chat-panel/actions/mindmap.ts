@@ -8,17 +8,17 @@ import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { ChatAction } from '../index.js';
+import type { ChatAction } from '../chat-context.js';
 
 noop(MiniMindmapPreview);
 
 @customElement('action-mindmap')
 export class ActionMindmap extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
-  item!: ChatAction;
+  accessor item!: ChatAction;
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   protected override render() {
     const answer = this.item.messages[2].content;

@@ -18,21 +18,22 @@ import './left-side-panel.js';
 import './side-panel.js';
 
 import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
-import type {
-  AffineTextAttributes,
-  SerializedXYWH,
-  TreeNode,
-} from '@blocksuite/blocks';
 import {
+  type AffineTextAttributes,
   BlocksUtils,
   ColorVariables,
+  defaultImageProxyMiddleware,
   extractCssVariables,
   FontFamilyVariables,
   HtmlTransformer,
   MarkdownTransformer,
+  NotionHtmlAdapter,
+  openFileOrFiles,
+  type SerializedXYWH,
   SizeVariables,
   StyleVariables,
   type SurfaceBlockComponent,
+  type TreeNode,
   ZipTransformer,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
@@ -42,8 +43,13 @@ import type {
   CommentPanel,
   CopilotPanel,
 } from '@blocksuite/presets';
-import type { BlockModel } from '@blocksuite/store';
-import { type DocCollection, Text, Utils } from '@blocksuite/store';
+import {
+  type BlockModel,
+  type DocCollection,
+  Job,
+  Text,
+  Utils,
+} from '@blocksuite/store';
 import type { SlDropdown } from '@shoelace-style/shoelace';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { css, html } from 'lit';
@@ -169,63 +175,6 @@ function getDarkModeConfig(): boolean {
 
 @customElement('debug-menu')
 export class DebugMenu extends ShadowlessElement {
-  static override styles = css`
-    :root {
-      --sl-font-size-medium: var(--affine-font-xs);
-      --sl-input-font-size-small: var(--affine-font-xs);
-    }
-
-    .dg.ac {
-      z-index: 1001 !important;
-    }
-  `;
-
-  @property({ attribute: false })
-  collection!: DocCollection;
-
-  @property({ attribute: false })
-  editor!: AffineEditorContainer;
-
-  @property({ attribute: false })
-  outlinePanel!: CustomOutlinePanel;
-
-  @property({ attribute: false })
-  framePanel!: CustomFramePanel;
-
-  @property({ attribute: false })
-  chatPanel!: CustomChatPanel;
-
-  @property({ attribute: false })
-  copilotPanel!: CopilotPanel;
-
-  @property({ attribute: false })
-  commentPanel!: CommentPanel;
-
-  @property({ attribute: false })
-  sidePanel!: SidePanel;
-  @property({ attribute: false })
-  leftSidePanel!: LeftSidePanel;
-  @property({ attribute: false })
-  docsPanel!: DocsPanel;
-
-  @state()
-  private _canUndo = false;
-
-  @state()
-  private _canRedo = false;
-
-  @property({ attribute: false })
-  readonly = false;
-
-  @state()
-  private _hasOffset = false;
-
-  @query('#block-type-dropdown')
-  blockTypeDropdown!: SlDropdown;
-
-  private _styleMenu!: Pane;
-  private _showStyleDebugMenu = false;
-
   get mode() {
     return this.editor.mode;
   }
@@ -233,9 +182,6 @@ export class DebugMenu extends ShadowlessElement {
   set mode(value: 'page' | 'edgeless') {
     this.editor.mode = value;
   }
-
-  @state()
-  private _dark = getDarkModeConfig();
 
   get host() {
     return this.editor.host;
@@ -253,49 +199,72 @@ export class DebugMenu extends ShadowlessElement {
     return this.host.command;
   }
 
-  override createRenderRoot() {
-    this._setThemeMode(this._dark);
+  static override styles = css`
+    :root {
+      --sl-font-size-medium: var(--affine-font-xs);
+      --sl-input-font-size-small: var(--affine-font-xs);
+    }
 
-    const matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
-    matchMedia.addEventListener('change', this._darkModeChange);
+    .dg.ac {
+      z-index: 1001 !important;
+    }
+  `;
 
-    return this;
-  }
+  @state()
+  private accessor _canUndo = false;
 
-  override connectedCallback() {
-    super.connectedCallback();
+  @state()
+  private accessor _canRedo = false;
 
-    const readSelectionFromURL = async () => {
-      const editorHost = this.editor.host;
-      if (!editorHost) {
-        await new Promise(resolve => {
-          setTimeout(resolve, 500);
-        });
-        readSelectionFromURL().catch(console.error);
-        return;
-      }
-      const url = new URL(window.location.toString());
-      const sel = url.searchParams.get('sel');
-      if (!sel) return;
-      try {
-        const json = JSON.parse(lz.decompressFromEncodedURIComponent(sel));
-        editorHost.std.selection.fromJSON(json);
-      } catch {
-        return;
-      }
-    };
-    readSelectionFromURL().catch(console.error);
-  }
+  @state()
+  private accessor _hasOffset = false;
 
-  override disconnectedCallback() {
-    super.disconnectedCallback();
+  private _styleMenu!: Pane;
 
-    const matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
-    matchMedia.removeEventListener('change', this._darkModeChange);
-  }
+  private _showStyleDebugMenu = false;
+
+  @state()
+  private accessor _dark = getDarkModeConfig();
+
+  @property({ attribute: false })
+  accessor collection!: DocCollection;
+
+  @property({ attribute: false })
+  accessor editor!: AffineEditorContainer;
+
+  @property({ attribute: false })
+  accessor outlinePanel!: CustomOutlinePanel;
+
+  @property({ attribute: false })
+  accessor framePanel!: CustomFramePanel;
+
+  @property({ attribute: false })
+  accessor chatPanel!: CustomChatPanel;
+
+  @property({ attribute: false })
+  accessor copilotPanel!: CopilotPanel;
+
+  @property({ attribute: false })
+  accessor commentPanel!: CommentPanel;
+
+  @property({ attribute: false })
+  accessor sidePanel!: SidePanel;
+
+  @property({ attribute: false })
+  accessor leftSidePanel!: LeftSidePanel;
+
+  @property({ attribute: false })
+  accessor docsPanel!: DocsPanel;
+
+  @property({ attribute: false })
+  accessor readonly = false;
+
+  @query('#block-type-dropdown')
+  accessor blockTypeDropdown!: SlDropdown;
 
   private _switchEditorMode() {
-    this.mode = this.mode === 'page' ? 'edgeless' : 'page';
+    const { docModeService } = this.editor.host.spec.getService('affine:page');
+    this.mode = docModeService.toggleMode();
   }
 
   private _toggleOutlinePanel() {
@@ -459,6 +428,21 @@ export class DebugMenu extends ShadowlessElement {
     input.click();
   }
 
+  private async _importNotionHTML() {
+    const file = await openFileOrFiles({ acceptType: 'Html', multiple: false });
+    if (!file) return;
+    const job = new Job({
+      collection: this.collection,
+      middlewares: [defaultImageProxyMiddleware],
+    });
+    const htmlAdapter = new NotionHtmlAdapter(job);
+    await htmlAdapter.toDoc({
+      file: await file.text(),
+      pageId: this.collection.idGenerator(),
+      assets: job.assetsManager,
+    });
+  }
+
   private _shareUrl() {
     const base64 = Utils.encodeCollectionAsYjsUpdateV2(this.collection);
     const url = new URL(window.location.toString());
@@ -543,6 +527,47 @@ export class DebugMenu extends ShadowlessElement {
     this._setThemeMode(!!e.matches);
   };
 
+  override createRenderRoot() {
+    this._setThemeMode(this._dark);
+
+    const matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    matchMedia.addEventListener('change', this._darkModeChange);
+
+    return this;
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+
+    const readSelectionFromURL = async () => {
+      const editorHost = this.editor.host;
+      if (!editorHost) {
+        await new Promise(resolve => {
+          setTimeout(resolve, 500);
+        });
+        readSelectionFromURL().catch(console.error);
+        return;
+      }
+      const url = new URL(window.location.toString());
+      const sel = url.searchParams.get('sel');
+      if (!sel) return;
+      try {
+        const json = JSON.parse(lz.decompressFromEncodedURIComponent(sel));
+        editorHost.std.selection.fromJSON(json);
+      } catch {
+        return;
+      }
+    };
+    readSelectionFromURL().catch(console.error);
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+
+    const matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    matchMedia.removeEventListener('change', this._darkModeChange);
+  }
+
   override firstUpdated() {
     this.doc.slots.historyUpdated.on(() => {
       this._canUndo = this.doc.canUndo;
@@ -622,7 +647,7 @@ export class DebugMenu extends ShadowlessElement {
           margin-right: 4px;
         }
       </style>
-      <div class="debug-menu default blocksuite-overlay">
+      <div class="debug-menu default">
         <div class="default-toolbar">
           <!-- undo/redo group -->
           <sl-button-group label="History">
@@ -671,6 +696,9 @@ export class DebugMenu extends ShadowlessElement {
               </sl-menu-item>
               <sl-menu-item @click="${this._importSnapshot}">
                 Import Snapshot
+              </sl-menu-item>
+              <sl-menu-item @click="${this._importNotionHTML}">
+                Import Notion HTML
               </sl-menu-item>
               <sl-menu-item @click="${this._shareUrl}">
                 Share URL

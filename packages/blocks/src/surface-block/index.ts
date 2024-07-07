@@ -19,8 +19,7 @@ export {
   GRID_GAP_MAX,
   GRID_GAP_MIN,
 } from './consts.js';
-export { type EdgelessBlockType } from './edgeless-types.js';
-export { ElementModel } from './element-model/base.js';
+export { SurfaceElementModel } from './element-model/base.js';
 export { BrushElementModel } from './element-model/brush.js';
 export {
   type Connection,
@@ -33,7 +32,11 @@ export {
 } from './element-model/connector.js';
 export { GroupElementModel } from './element-model/group.js';
 export { CanvasElementType } from './element-model/index.js';
-export { MindmapElementModel, MindmapStyle } from './element-model/mindmap.js';
+export {
+  LayoutType,
+  MindmapElementModel,
+  MindmapStyle,
+} from './element-model/mindmap.js';
 export { ShapeElementModel } from './element-model/shape.js';
 export { TextElementModel } from './element-model/text.js';
 export * from './elements/index.js';
@@ -75,7 +78,7 @@ export {
   toRadian,
 } from './utils/math-utils.js';
 export { PointLocation } from './utils/point-location.js';
-export { type IVec, Vec } from './utils/vec.js';
+export { type IVec, type IVec2, Vec } from './utils/vec.js';
 export * from './utils/xywh.js';
 
 declare global {

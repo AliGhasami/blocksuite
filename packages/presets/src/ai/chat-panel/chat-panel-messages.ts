@@ -8,19 +8,19 @@ import './actions/slides.js';
 import './actions/mindmap.js';
 import './actions/chat-text.js';
 import './actions/copy-more.js';
-import './actions/explain-image.js';
+import './actions/image-to-text.js';
 import './actions/image.js';
+import './chat-cards.js';
 
 import type {
   BaseSelection,
   BlockSelection,
   TextSelection,
 } from '@blocksuite/block-std';
-import { type EditorHost } from '@blocksuite/block-std';
+import type { EditorHost } from '@blocksuite/block-std';
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import type { ImageSelection } from '@blocksuite/blocks';
 import {
-  type AIError,
   isInsidePageEditor,
   PaymentRequiredError,
   UnauthorizedError,
@@ -45,10 +45,27 @@ import {
   EdgelessEditorActions,
   PageEditorActions,
 } from './actions/actions-handle.js';
-import type { ChatItem, ChatMessage, ChatStatus } from './index.js';
+import type {
+  ChatContextValue,
+  ChatItem,
+  ChatMessage,
+} from './chat-context.js';
+import { HISTORY_IMAGE_ACTIONS } from './const.js';
 
 @customElement('chat-panel-messages')
 export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
+  private get _currentTextSelection(): TextSelection | undefined {
+    return this._selectionValue.find(v => v.type === 'text') as TextSelection;
+  }
+
+  private get _currentBlockSelections(): BlockSelection[] | undefined {
+    return this._selectionValue.filter(v => v.type === 'block');
+  }
+
+  private get _currentImageSelections(): ImageSelection[] | undefined {
+    return this._selectionValue.filter(v => v.type === 'image');
+  }
+
   static override styles = css`
     chat-panel-messages {
       position: relative;
@@ -61,6 +78,12 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
       height: 100%;
       position: relative;
       overflow-y: auto;
+
+      chat-cards {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+      }
     }
 
     .chat-panel-messages-placeholder {
@@ -129,75 +152,28 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
     }
   `;
 
-  @state()
-  showDownIndicator = false;
+  private _selectionValue: BaseSelection[] = [];
 
   @state()
-  avatarUrl = '';
+  accessor showDownIndicator = false;
+
+  @state()
+  accessor avatarUrl = '';
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   @property({ attribute: false })
-  items!: ChatItem[];
+  accessor isLoading!: boolean;
 
   @property({ attribute: false })
-  status!: ChatStatus;
+  accessor chatContextValue!: ChatContextValue;
 
   @property({ attribute: false })
-  error!: AIError | null;
-
-  @property({ attribute: false })
-  isLoading!: boolean;
-
-  @property({ attribute: false })
-  updateItems!: (items: ChatItem[]) => void;
-
-  @property({ attribute: false })
-  updateStatus!: (status: ChatStatus) => void;
-
-  @property({ attribute: false })
-  updateError!: (error: AIError | null) => void;
-
-  @property({ attribute: false })
-  abortController!: AbortController | null;
-
-  @property({ attribute: false })
-  updateAbortController!: (abortController: AbortController | null) => void;
+  accessor updateContext!: (context: Partial<ChatContextValue>) => void;
 
   @query('.chat-panel-messages')
-  messagesContainer!: HTMLDivElement;
-
-  private _selectionValue: BaseSelection[] = [];
-  private get _currentTextSelection(): TextSelection | undefined {
-    return this._selectionValue.find(v => v.type === 'text') as TextSelection;
-  }
-  private get _currentBlockSelections(): BlockSelection[] | undefined {
-    return this._selectionValue.filter(v => v.type === 'block');
-  }
-  private get _currentImageSelections(): ImageSelection[] | undefined {
-    return this._selectionValue.filter(v => v.type === 'image');
-  }
-
-  public override async connectedCallback() {
-    super.connectedCallback();
-
-    const res = await AIProvider.userInfo;
-    this.avatarUrl = res?.avatarUrl ?? '';
-    this.disposables.add(
-      AIProvider.slots.userInfo.on(userInfo => {
-        this.avatarUrl = userInfo?.avatarUrl ?? '';
-        if (
-          this.status === 'error' &&
-          this.error instanceof UnauthorizedError &&
-          userInfo
-        ) {
-          this.status = 'idle';
-          this.error = null;
-        }
-      })
-    );
-  }
+  accessor messagesContainer!: HTMLDivElement;
 
   protected override updated(_changedProperties: PropertyValues) {
     if (_changedProperties.has('host')) {
@@ -209,20 +185,102 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
           this.requestUpdate();
         })
       );
-      disposables.add(
-        this.host.spec
-          .getService('affine:page')
-          .slots.editorModeSwitch.on(() => {
-            this.requestUpdate();
-          })
-      );
+      const { docModeService } = this.host.spec.getService('affine:page');
+      disposables.add(docModeService.onModeChange(() => this.requestUpdate()));
     }
   }
 
+  protected override render() {
+    const { items } = this.chatContextValue;
+    const { isLoading } = this;
+    const filteredItems = items.filter(item => {
+      return (
+        'role' in item ||
+        item.messages?.length === 3 ||
+        (HISTORY_IMAGE_ACTIONS.includes(item.action) &&
+          item.messages?.length === 2)
+      );
+    });
+
+    return html`<style>
+        .chat-panel-messages-placeholder div {
+          color: ${isLoading
+            ? 'var(--affine-text-secondary-color)'
+            : 'var(--affine-text-primary-color)'};
+          font-size: ${isLoading ? 'var(--affine-font-sm)' : '18px'};
+          font-weight: 600;
+        }
+      </style>
+
+      <div
+        class="chat-panel-messages"
+        @scroll=${(evt: Event) => {
+          const element = evt.target as HTMLDivElement;
+          this.showDownIndicator =
+            element.scrollHeight - element.scrollTop - element.clientHeight >
+            200;
+        }}
+      >
+        ${items.length === 0
+          ? html`<div class="chat-panel-messages-placeholder">
+                ${AffineIcon(
+                  isLoading
+                    ? 'var(--affine-icon-secondary)'
+                    : 'var(--affine-primary-color)'
+                )}
+                <div>
+                  ${this.isLoading
+                    ? 'AFFiNE AI is loading history...'
+                    : 'What can I help you with?'}
+                </div>
+              </div>
+              <chat-cards
+                .chatContextValue=${this.chatContextValue}
+                .updateContext=${this.updateContext}
+                .host=${this.host}
+                .selectionValue=${this._selectionValue}
+              ></chat-cards> `
+          : repeat(filteredItems, (item, index) => {
+              const isLast = index === filteredItems.length - 1;
+              return html`<div class="message">
+                ${this.renderAvatar(item)}
+                <div class="item-wrapper">${this.renderItem(item, isLast)}</div>
+              </div>`;
+            })}
+      </div>
+      ${this.showDownIndicator
+        ? html`<div class="down-indicator" @click=${() => this.scrollToDown()}>
+            ${DownArrowIcon}
+          </div>`
+        : nothing} `;
+  }
+
+  override async connectedCallback() {
+    super.connectedCallback();
+
+    const res = await AIProvider.userInfo;
+    this.avatarUrl = res?.avatarUrl ?? '';
+    this.disposables.add(
+      AIProvider.slots.userInfo.on(userInfo => {
+        const { status, error } = this.chatContextValue;
+        this.avatarUrl = userInfo?.avatarUrl ?? '';
+        if (
+          status === 'error' &&
+          error instanceof UnauthorizedError &&
+          userInfo
+        ) {
+          this.updateContext({ status: 'idle', error: null });
+        }
+      })
+    );
+  }
+
   renderError() {
-    if (this.error instanceof PaymentRequiredError) {
+    const { error } = this.chatContextValue;
+
+    if (error instanceof PaymentRequiredError) {
       return PaymentRequiredErrorRenderer(this.host);
-    } else if (this.error instanceof UnauthorizedError) {
+    } else if (error instanceof UnauthorizedError) {
       return GeneralErrorRenderer(
         html`You need to login to AFFiNE Cloud to continue using AFFiNE AI.`,
         html`<div
@@ -245,13 +303,24 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
   }
 
   renderItem(item: ChatItem, isLast: boolean) {
-    if (isLast && this.status === 'loading') {
+    const { status, error } = this.chatContextValue;
+
+    if (isLast && status === 'loading') {
       return this.renderLoading();
+    }
+
+    if (
+      isLast &&
+      status === 'error' &&
+      (error instanceof PaymentRequiredError ||
+        error instanceof UnauthorizedError)
+    ) {
+      return this.renderError();
     }
 
     if ('role' in item) {
       const state = isLast
-        ? this.status !== 'loading' && this.status !== 'transmitting'
+        ? status !== 'loading' && status !== 'transmitting'
           ? 'finished'
           : 'generating'
         : 'finished';
@@ -260,8 +329,9 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
           .attachments=${item.attachments}
           .text=${item.content}
           .state=${state}
-        ></chat-text
-        >${this.renderEditorActions(item, isLast)}`;
+        ></chat-text>
+        ${isLast && status === 'error' ? this.renderError() : nothing}
+        ${this.renderEditorActions(item, isLast)}`;
     } else {
       switch (item.action) {
         case 'Create a presentation':
@@ -280,16 +350,19 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
             .item=${item}
           ></action-mindmap>`;
         case 'Explain this image':
-          return html`<action-explain-image
+        case 'Generate a caption':
+          return html`<action-image-to-text
             .host=${this.host}
             .item=${item}
-          ></action-explain-image>`;
-        case 'image':
-          return html`<action-image
-            .host=${this.host}
-            .item=${item}
-          ></action-image>`;
+          ></action-image-to-text>`;
         default:
+          if (HISTORY_IMAGE_ACTIONS.includes(item.action)) {
+            return html`<action-image
+              .host=${this.host}
+              .item=${item}
+            ></action-image>`;
+          }
+
           return html`<action-text
             .item=${item}
             .host=${this.host}
@@ -324,9 +397,16 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
   }
 
   renderEditorActions(item: ChatMessage, isLast: boolean) {
+    const { status } = this.chatContextValue;
+
     if (item.role !== 'assistant') return nothing;
 
-    if (isLast && this.status !== 'success' && this.status !== 'idle')
+    if (
+      isLast &&
+      status !== 'success' &&
+      status !== 'idle' &&
+      status !== 'error'
+    )
       return nothing;
 
     const { host } = this;
@@ -367,6 +447,10 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
           cursor: pointer;
           user-select: none;
         }
+
+        .action svg {
+          color: var(--affine-icon-color);
+        }
       </style>
       <chat-copy-more
         .host=${host}
@@ -374,17 +458,15 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
         .isLast=${isLast}
         .curTextSelection=${this._currentTextSelection}
         .curBlockSelections=${this._currentBlockSelections}
-        .items=${this.items}
-        .abortController=${this.abortController}
-        .updateItems=${this.updateItems}
-        .updateStatus=${this.updateStatus}
-        .updateError=${this.updateError}
-        .updateAbortController=${this.updateAbortController}
+        .chatContextValue=${this.chatContextValue}
+        .updateContext=${this.updateContext}
       ></chat-copy-more>
       ${isLast
         ? html`<div class="actions-container">
             ${repeat(
               actions.filter(action => {
+                if (!content) return false;
+
                 if (action.title === 'Replace selection') {
                   if (
                     (!this._currentTextSelection ||
@@ -433,68 +515,6 @@ export class ChatPanelMessages extends WithDisposable(ShadowlessElement) {
           </div>`
         : nothing}
     `;
-  }
-
-  protected override render() {
-    const { items, isLoading } = this;
-    const filteredItems = items.filter(item => {
-      return (
-        'role' in item ||
-        item.messages?.length === 3 ||
-        (item.action === 'image' && item.messages?.length === 2)
-      );
-    });
-
-    return html`<style>
-        .chat-panel-messages-placeholder div {
-          color: ${isLoading
-            ? 'var(--affine-text-secondary-color)'
-            : 'var(--affine-text-primary-color)'};
-          font-size: ${isLoading ? 'var(--affine-font-sm)' : '18px'};
-          font-weight: 600;
-        }
-      </style>
-
-      <div
-        class="chat-panel-messages"
-        @scroll=${(evt: Event) => {
-          const element = evt.target as HTMLDivElement;
-          this.showDownIndicator =
-            element.scrollHeight - element.scrollTop - element.clientHeight >
-            200;
-        }}
-      >
-        ${items.length === 0
-          ? html`<div class="chat-panel-messages-placeholder">
-              ${AffineIcon(
-                isLoading
-                  ? 'var(--affine-icon-secondary)'
-                  : 'var(--affine-primary-color)'
-              )}
-              <div>
-                ${this.isLoading
-                  ? 'AFFiNE AI is loading history...'
-                  : 'What can I help you with?'}
-              </div>
-            </div>`
-          : repeat(filteredItems, (item, index) => {
-              const isLast = index === filteredItems.length - 1;
-              return html`<div class="message">
-                ${this.renderAvatar(item)}
-                <div class="item-wrapper">${this.renderItem(item, isLast)}</div>
-                <div class="item-wrapper">
-                  ${this.status === 'error' && isLast
-                    ? this.renderError()
-                    : nothing}
-                </div>
-              </div>`;
-            })}
-      </div>
-      ${this.showDownIndicator
-        ? html`<div class="down-indicator" @click=${() => this.scrollToDown()}>
-            ${DownArrowIcon}
-          </div>`
-        : nothing} `;
   }
 }
 

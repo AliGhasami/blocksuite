@@ -26,6 +26,7 @@ export const ParagraphBlockSchema = defineBlockSchema({
       'affine:database',
       'affine:paragraph',
       'affine:list',
+      'affine:edgeless-text',
     ],
   },
 });

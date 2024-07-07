@@ -40,7 +40,9 @@ import {
 import { test } from './utils/playwright.js';
 
 async function focusCaption(page: Page) {
-  await page.click('.embed-editing-state>icon-button:nth-child(2)');
+  await page.click(
+    '.affine-image-toolbar-container .image-toolbar-button.caption'
+  );
 }
 
 test('can drag resize image by left menu', async ({ page }) => {
@@ -138,7 +140,7 @@ test('enter shortcut on focusing embed block and its caption', async ({
   await moveToImage(page);
   await assertImageOption(page);
 
-  const caption = page.locator('affine-image embed-card-caption textarea');
+  const caption = page.locator('affine-image block-caption-editor textarea');
   await focusCaption(page);
   await type(page, '123');
 
@@ -162,7 +164,7 @@ test('should support the enter key of image caption', async ({ page }) => {
   await moveToImage(page);
   await assertImageOption(page);
 
-  const caption = page.locator('affine-image embed-card-caption textarea');
+  const caption = page.locator('affine-image block-caption-editor textarea');
   await focusCaption(page);
   await type(page, 'abc123');
   await pressArrowLeft(page, 3);
@@ -195,7 +197,7 @@ test('popup menu should follow position of image when scrolling', async ({
 
   await page.waitForTimeout(150);
 
-  const menu = page.locator('.affine-embed-editing-state-container');
+  const menu = page.locator('.affine-image-toolbar-container');
 
   await expect(menu).toBeVisible();
 
@@ -217,7 +219,7 @@ test('popup menu should follow position of image when scrolling', async ({
   const menuRect = await menu.boundingBox();
   if (!imageRect) throw new Error('image not found');
   if (!menuRect) throw new Error('menu not found');
-  expect(imageRect.y).toBeCloseTo(16, -0.325);
+  expect(imageRect.y).toBeCloseTo(-16, -0.325);
   expect(menuRect.y).toBeCloseTo(65, -0.325);
 });
 
@@ -267,7 +269,11 @@ async function initMockImage(page: Page) {
 }
 
 test('image loading but failed', async ({ page }) => {
-  expectConsoleMessage(page, 'Error: Failed to fetch blob _e2e_test_image_id_');
+  expectConsoleMessage(
+    page,
+    'Error: Failed to fetch blob _e2e_test_image_id_',
+    'warning'
+  );
   expectConsoleMessage(
     page,
     'Failed to load resource: the server responded with a status of 404 (Not Found)'
@@ -278,7 +284,7 @@ test('image loading but failed', async ({ page }) => {
     'warning'
   );
 
-  const room = await enterPlaygroundRoom(page, { blobStorage: ['mock'] });
+  const room = await enterPlaygroundRoom(page, { blobSource: ['mock'] });
   const timeout = 2000;
 
   // block image data request, force wait 100ms for loading test,
@@ -309,7 +315,11 @@ test('image loading but failed', async ({ page }) => {
 });
 
 test('image loading but success', async ({ page }) => {
-  expectConsoleMessage(page, 'Error: Failed to fetch blob _e2e_test_image_id_');
+  expectConsoleMessage(
+    page,
+    'Error: Failed to fetch blob _e2e_test_image_id_',
+    'warning'
+  );
   expectConsoleMessage(
     page,
     'Failed to load resource: the server responded with a status of 404 (Not Found)'
@@ -320,7 +330,7 @@ test('image loading but success', async ({ page }) => {
     'warning'
   );
 
-  const room = await enterPlaygroundRoom(page, { blobStorage: ['mock'] });
+  const room = await enterPlaygroundRoom(page, { blobSource: ['mock'] });
   const imageBuffer = await readFile(
     fileURLToPath(new URL('./fixtures/smile.png', import.meta.url))
   );
@@ -364,7 +374,7 @@ test('image loading but success', async ({ page }) => {
 });
 
 test('image loaded successfully', async ({ page }) => {
-  const room = await enterPlaygroundRoom(page, { blobStorage: ['mock'] });
+  const room = await enterPlaygroundRoom(page, { blobSource: ['mock'] });
   const imageBuffer = await readFile(
     fileURLToPath(new URL('./fixtures/smile.png', import.meta.url))
   );

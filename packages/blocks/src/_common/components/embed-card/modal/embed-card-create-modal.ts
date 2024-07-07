@@ -7,7 +7,6 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import type { EdgelessRootBlockComponent } from '../../../../root-block/edgeless/edgeless-root-block.js';
-import type { EdgelessElementType } from '../../../../surface-block/edgeless-types.js';
 import { Bound } from '../../../../surface-block/utils/bound.js';
 import { Vec } from '../../../../surface-block/utils/vec.js';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../../../consts.js';
@@ -21,17 +20,20 @@ import { embedCardModalStyles } from './styles.js';
 export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
   static override styles = embedCardModalStyles;
 
-  @property({ attribute: false })
-  host!: EditorHost;
+  @state()
+  private accessor _linkInputValue = '';
 
   @property({ attribute: false })
-  titleText!: string;
+  accessor host!: EditorHost;
 
   @property({ attribute: false })
-  descriptionText!: string;
+  accessor titleText!: string;
 
   @property({ attribute: false })
-  createOptions!:
+  accessor descriptionText!: string;
+
+  @property({ attribute: false })
+  accessor createOptions!:
     | {
         mode: 'page';
         parentModel: BlockModel | string;
@@ -42,26 +44,10 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
       };
 
   @property({ attribute: false })
-  onConfirm!: () => void;
+  accessor onConfirm!: () => void;
 
   @query('input')
-  input!: HTMLInputElement;
-
-  @state()
-  private _linkInputValue = '';
-
-  override connectedCallback() {
-    super.connectedCallback();
-
-    this.updateComplete
-      .then(() => {
-        requestAnimationFrame(() => {
-          this.input.focus();
-        });
-      })
-      .catch(console.error);
-    this.disposables.addFromEvent(this, 'keydown', this._onDocumentKeydown);
-  }
+  accessor input!: HTMLInputElement;
 
   private _handleInput(e: InputEvent) {
     const target = e.target as HTMLInputElement;
@@ -124,7 +110,7 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
       const surface = edgelessRoot.surface;
       const center = Vec.toVec(surface.renderer.center);
       edgelessRoot.service.addBlock(
-        flavour as EdgelessElementType,
+        flavour,
         {
           url,
           xywh: Bound.fromCenter(
@@ -149,8 +135,21 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
     this.remove();
   };
 
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.updateComplete
+      .then(() => {
+        requestAnimationFrame(() => {
+          this.input.focus();
+        });
+      })
+      .catch(console.error);
+    this.disposables.addFromEvent(this, 'keydown', this._onDocumentKeydown);
+  }
+
   override render() {
-    return html`<div class="embed-card-modal blocksuite-overlay">
+    return html`<div class="embed-card-modal">
       <div class="embed-card-modal-mask" @click=${this._onCancel}></div>
       <div class="embed-card-modal-wrapper">
         <div class="embed-card-modal-title">${this.titleText}</div>

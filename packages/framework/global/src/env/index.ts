@@ -21,4 +21,5 @@ export const IS_MAC = /Mac/i.test(platform);
 
 export const IS_WINDOWS = /Win/.test(platform);
 
-export const Prefix = 'vue-block-board-editor';
+export const REQUEST_IDLE_CALLBACK_ENABLED =
+  'requestIdleCallback' in globalThis;

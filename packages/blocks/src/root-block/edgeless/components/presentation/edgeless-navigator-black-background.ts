@@ -21,18 +21,18 @@ export class EdgelessNavigatorBlackBackground extends WithDisposable(
   `;
 
   @state()
-  private frame?: FrameBlockModel;
+  private accessor frame: FrameBlockModel | undefined = undefined;
 
   @state()
-  private show = false;
-
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
+  private accessor show = false;
 
   private _blackBackground = false;
 
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
+
   private _tryLoadBlackBackground() {
-    const value = this.edgeless.service.editPropsStore.getItem(
+    const value = this.edgeless.service.editPropsStore.getStorage(
       'presentBlackBackground'
     );
     this._blackBackground = value ?? true;
@@ -49,7 +49,7 @@ export class EdgelessNavigatorBlackBackground extends WithDisposable(
     _disposables.add(
       edgeless.slots.navigatorSettingUpdated.on(({ blackBackground }) => {
         if (blackBackground !== undefined) {
-          this.edgeless.service.editPropsStore.setItem(
+          this.edgeless.service.editPropsStore.setStorage(
             'presentBlackBackground',
             blackBackground
           );

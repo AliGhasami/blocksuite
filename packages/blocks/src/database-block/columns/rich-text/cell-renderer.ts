@@ -12,6 +12,7 @@ import type {
   AffineTextAttributes,
 } from '../../../_common/inline/presets/affine-inline-specs.js';
 import { getViewportElement } from '../../../_common/utils/query.js';
+import { HostContextKey } from '../../context/host-context.js';
 import { BaseCellRenderer } from '../../data-view/column/base-cell.js';
 import { createFromBaseCellRenderer } from '../../data-view/column/renderer.js';
 import { createIcon } from '../../data-view/utils/uni-icon.js';
@@ -47,12 +48,7 @@ function toggleStyle(
     Object.entries(attrs).map(([k, v]) => {
       if (
         typeof v === 'boolean' &&
-        v ===
-          (
-            oldAttributes as {
-              [k: string]: unknown;
-            }
-          )[k]
+        v === (oldAttributes as Record<string, unknown>)[k]
       ) {
         return [k, !v];
       } else {
@@ -104,22 +100,25 @@ export class RichTextCell extends BaseCellRenderer<Text> {
   `;
 
   get service() {
-    const database = this.closest<DatabaseBlockComponent>('affine-database');
-    return database?.service;
+    return this.view
+      .getContext(HostContextKey)
+      ?.std.spec.getService('affine:database');
   }
 
   get inlineManager() {
     return this.service?.inlineManager;
   }
+
   get attributesSchema() {
     return this.inlineManager?.getSchema();
   }
+
   get attributeRenderer() {
     return this.inlineManager?.getRenderer();
   }
 
   @query('rich-text')
-  private _richTextElement?: RichText;
+  private accessor _richTextElement: RichText | null = null;
 
   get inlineEditor() {
     assertExists(this._richTextElement);
@@ -143,7 +142,6 @@ export class RichTextCell extends BaseCellRenderer<Text> {
       this.value,
       html`<rich-text
         .yText=${this.value}
-        .inlineEventSource=${this.topContenteditableElement}
         .attributesSchema=${this.attributesSchema}
         .attributeRenderer=${this.attributeRenderer}
         .embedChecker=${this.inlineManager?.embedChecker}
@@ -157,6 +155,37 @@ export class RichTextCell extends BaseCellRenderer<Text> {
 
 @customElement('affine-database-rich-text-cell-editing')
 export class RichTextCellEditing extends BaseCellRenderer<Text> {
+  get service() {
+    return this.view
+      .getContext(HostContextKey)
+      ?.std.spec.getService('affine:database');
+  }
+
+  get inlineManager() {
+    return this.service?.inlineManager;
+  }
+
+  get attributesSchema() {
+    return this.inlineManager?.getSchema();
+  }
+
+  get attributeRenderer() {
+    return this.inlineManager?.getRenderer();
+  }
+
+  get inlineEditor() {
+    assertExists(this._richTextElement);
+    const inlineEditor = this._richTextElement.inlineEditor;
+    assertExists(inlineEditor);
+    return inlineEditor;
+  }
+
+  get topContenteditableElement() {
+    const databaseBlock =
+      this.closest<DatabaseBlockComponent>('affine-database');
+    return databaseBlock?.topContenteditableElement;
+  }
+
   static override styles = css`
     affine-database-rich-text-cell-editing {
       display: flex;
@@ -187,66 +216,8 @@ export class RichTextCellEditing extends BaseCellRenderer<Text> {
     }
   `;
 
-  get service() {
-    const database = this.closest<DatabaseBlockComponent>('affine-database');
-    return database?.service;
-  }
-
-  get inlineManager() {
-    return this.service?.inlineManager;
-  }
-  get attributesSchema() {
-    return this.inlineManager?.getSchema();
-  }
-  get attributeRenderer() {
-    return this.inlineManager?.getRenderer();
-  }
-
   @query('rich-text')
-  private _richTextElement?: RichText;
-
-  get inlineEditor() {
-    assertExists(this._richTextElement);
-    const inlineEditor = this._richTextElement.inlineEditor;
-    assertExists(inlineEditor);
-    return inlineEditor;
-  }
-
-  get topContenteditableElement() {
-    const databaseBlock =
-      this.closest<DatabaseBlockComponent>('affine-database');
-    return databaseBlock?.topContenteditableElement;
-  }
-
-  override connectedCallback() {
-    super.connectedCallback();
-
-    if (!this.value || typeof this.value === 'string') {
-      this._initYText(this.value);
-    }
-
-    const selectAll = (e: KeyboardEvent) => {
-      if (e.key === 'a' && (IS_MAC ? e.metaKey : e.ctrlKey)) {
-        e.stopPropagation();
-        e.preventDefault();
-        this.inlineEditor.selectAll();
-      }
-    };
-    this.addEventListener('keydown', selectAll);
-    this.disposables.addFromEvent(this, 'keydown', selectAll);
-  }
-
-  override firstUpdated() {
-    this._richTextElement?.updateComplete
-      .then(() => {
-        this.disposables.add(
-          this.inlineEditor.slots.keydown.on(this._handleKeyDown)
-        );
-
-        this.inlineEditor.focusEnd();
-      })
-      .catch(console.error);
-  }
+  private accessor _richTextElement: RichText | null = null;
 
   private _initYText = (text?: string) => {
     const yText = new Text(text);
@@ -336,6 +307,36 @@ export class RichTextCellEditing extends BaseCellRenderer<Text> {
     }
   };
 
+  override connectedCallback() {
+    super.connectedCallback();
+
+    if (!this.value || typeof this.value === 'string') {
+      this._initYText(this.value);
+    }
+
+    const selectAll = (e: KeyboardEvent) => {
+      if (e.key === 'a' && (IS_MAC ? e.metaKey : e.ctrlKey)) {
+        e.stopPropagation();
+        e.preventDefault();
+        this.inlineEditor.selectAll();
+      }
+    };
+    this.addEventListener('keydown', selectAll);
+    this.disposables.addFromEvent(this, 'keydown', selectAll);
+  }
+
+  override firstUpdated() {
+    this._richTextElement?.updateComplete
+      .then(() => {
+        this.disposables.add(
+          this.inlineEditor.slots.keydown.on(this._handleKeyDown)
+        );
+
+        this.inlineEditor.focusEnd();
+      })
+      .catch(console.error);
+  }
+
   override render() {
     if (!this.service) return nothing;
 
@@ -346,9 +347,10 @@ export class RichTextCellEditing extends BaseCellRenderer<Text> {
       .attributeRenderer=${this.attributeRenderer}
       .embedChecker=${this.inlineManager?.embedChecker}
       .markdownShortcutHandler=${this.inlineManager?.markdownShortcutHandler}
-      .verticalScrollContainer=${this.topContenteditableElement?.host
-        ? getViewportElement(this.topContenteditableElement.host)
-        : nothing}
+      .verticalScrollContainerGetter=${() =>
+        this.topContenteditableElement?.host
+          ? getViewportElement(this.topContenteditableElement.host)
+          : null}
       class="affine-database-rich-text inline-editor"
     ></rich-text>`;
   }

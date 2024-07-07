@@ -7,6 +7,7 @@ import {
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
+import { getBlockProps } from '../../../_common/utils/block-props.js';
 import {
   type BlockComponent,
   type EmbedCardStyle,
@@ -22,7 +23,6 @@ import {
   Rect,
 } from '../../../_common/utils/index.js';
 import type { ParagraphBlockModel } from '../../../paragraph-block/index.js';
-import type { EdgelessBlockType } from '../../../surface-block/index.js';
 import { Bound } from '../../../surface-block/index.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 import { isEmbedSyncedDocBlock } from '../../edgeless/utils/query.js';
@@ -38,7 +38,7 @@ import {
   type OnDragEndProps,
 } from './config.js';
 
-const heightMap: { [key: string]: number } = {
+const heightMap: Record<string, number> = {
   text: 23,
   h1: 40,
   h2: 36,
@@ -361,13 +361,6 @@ export function updateDragHandleClassName(blockElements: BlockElement[] = []) {
   blockElements.forEach(blockElement => blockElement.classList.add(className));
 }
 
-function getBlockProps(model: BlockModel): { [index: string]: unknown } {
-  const keys = model.keys as (keyof typeof model)[];
-  const values = keys.map(key => model[key]);
-  const blockProps = Object.fromEntries(keys.map((key, i) => [key, values[i]]));
-  return blockProps;
-}
-
 export function getDuplicateBlocks(blocks: BlockModel[]) {
   const duplicateBlocks = blocks.map(block => ({
     flavour: block.flavour,
@@ -406,8 +399,8 @@ export function convertDragPreviewDocToEdgeless({
   const border = 2;
   const { left: viewportLeft, top: viewportTop } = edgelessRoot.viewport;
   const currentViewBound = new Bound(
-    (rect.x - viewportLeft) / state.cumulativeParentScale,
-    (rect.y - viewportTop) / state.cumulativeParentScale,
+    rect.x - viewportLeft,
+    rect.y - viewportTop,
     rect.width + border / noteScale,
     rect.height + border / noteScale
   );
@@ -434,7 +427,7 @@ export function convertDragPreviewDocToEdgeless({
   const blockProps = getBlockProps(blockModel);
 
   const blockId = edgelessRoot.service.addBlock(
-    blockComponent.flavour as EdgelessBlockType,
+    blockComponent.flavour,
     {
       ...blockProps,
       xywh: newBound.serialize(),

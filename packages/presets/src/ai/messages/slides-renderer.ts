@@ -1,5 +1,3 @@
-import './_common/generating-placeholder.js';
-
 import type { EditorHost } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import {
@@ -13,6 +11,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { createRef, type Ref, ref } from 'lit/directives/ref.js';
 
+import { getAIPanel } from '../ai-panel.js';
 import { PPTBuilder } from '../slides/index.js';
 
 export const createSlidesRenderer: (
@@ -24,7 +23,9 @@ export const createSlidesRenderer: (
 ) => AffineAIPanelWidgetConfig['answerRenderer'] = (host, ctx) => {
   return (answer, state) => {
     if (state === 'generating') {
-      return html`<ai-generating-placeholder></ai-generating-placeholder>`;
+      const panel = getAIPanel(host);
+      panel.generatingElement?.updateLoadingProgress(2);
+      return nothing;
     }
 
     if (state !== 'finished' && state !== 'error') {
@@ -34,7 +35,7 @@ export const createSlidesRenderer: (
     return html`<style>
         .slides-container {
           width: 100%;
-          height: 400px;
+          height: 300px;
         }
       </style>
       <div class="slides-container">
@@ -51,40 +52,26 @@ export const createSlidesRenderer: (
 export class AISlidesRenderer extends WithDisposable(LitElement) {
   static override styles = css``;
 
-  @property({ attribute: false })
-  text!: string;
-
-  @property({ attribute: false })
-  host!: EditorHost;
-
-  @property({ attribute: false })
-  ctx?: {
-    get(): Record<string, unknown>;
-    set(data: Record<string, unknown>): void;
-  };
-
   private _editorContainer: Ref<HTMLDivElement> = createRef<HTMLDivElement>();
+
   private _doc!: Doc;
 
   @query('editor-host')
-  private _editorHost!: EditorHost;
+  private accessor _editorHost!: EditorHost;
 
-  override connectedCallback(): void {
-    super.connectedCallback();
+  @property({ attribute: false })
+  accessor text!: string;
 
-    const schema = new Schema().register(AffineSchemas);
-    const collection = new DocCollection({ schema, id: 'SLIDES_PREVIEW' });
-    collection.start();
-    const doc = collection.createDoc();
+  @property({ attribute: false })
+  accessor host!: EditorHost;
 
-    doc.load(() => {
-      const pageBlockId = doc.addBlock('affine:page', {});
-      doc.addBlock('affine:surface', {}, pageBlockId);
-    });
-
-    doc.resetHistory();
-    this._doc = doc;
-  }
+  @property({ attribute: false })
+  accessor ctx:
+    | {
+        get(): Record<string, unknown>;
+        set(data: Record<string, unknown>): void;
+      }
+    | undefined = undefined;
 
   protected override firstUpdated() {
     requestAnimationFrame(() => {
@@ -219,6 +206,24 @@ export class AISlidesRenderer extends WithDisposable(LitElement) {
         </div>
         <div class="mask"></div>
       </div>`;
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+
+    const schema = new Schema().register(AffineSchemas);
+    const collection = new DocCollection({ schema, id: 'SLIDES_PREVIEW' });
+    collection.meta.initialize();
+    collection.start();
+    const doc = collection.createDoc();
+
+    doc.load(() => {
+      const pageBlockId = doc.addBlock('affine:page', {});
+      doc.addBlock('affine:surface', {}, pageBlockId);
+    });
+
+    doc.resetHistory();
+    this._doc = doc;
   }
 }
 

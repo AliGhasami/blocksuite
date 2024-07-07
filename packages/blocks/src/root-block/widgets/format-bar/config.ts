@@ -1,21 +1,18 @@
 import type { Chain, InitCommandCtx } from '@blocksuite/block-std';
-//import { assertExists } from '@blocksuite/global/utils';
-import {
-  //html,
-  type TemplateResult,
-} from 'lit';
+import { assertExists } from '@blocksuite/global/utils';
+import { html, type TemplateResult } from 'lit';
 
-//import { toast } from '../../../_common/components/index.js';
-//import { createSimplePortal } from '../../../_common/components/portal.js';
-///import { DATABASE_CONVERT_WHITE_LIST } from '../../../_common/configs/quick-action/database-convert-view.js';
+import { toast } from '../../../_common/components/index.js';
+import { createSimplePortal } from '../../../_common/components/portal.js';
+import { DATABASE_CONVERT_WHITE_LIST } from '../../../_common/configs/quick-action/database-convert-view.js';
 import {
   BoldIcon,
   BulletedListIcon,
   CheckBoxIcon,
   CodeIcon,
-  //CopyIcon,
-  //DatabaseTableViewIcon20,
-  //FontLinkedDocIcon,
+  CopyIcon,
+  DatabaseTableViewIcon20,
+  FontLinkedDocIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -23,14 +20,19 @@ import {
   Heading5Icon,
   Heading6Icon,
   ItalicIcon,
-  //LinkIcon,
+  LinkIcon,
   NumberedListIcon,
   QuoteIcon,
   StrikethroughIcon,
   TextIcon,
   UnderlineIcon,
 } from '../../../_common/icons/index.js';
-//import { createLinkedDocFromSelectedBlocks } from '../../../_common/utils/render-linked-doc.js';
+import {
+  convertSelectedBlocksToLinkedDoc,
+  getTitleFromSelectedModels,
+  notifyDocCreated,
+  promptDocTitle,
+} from '../../../_common/utils/render-linked-doc.js';
 import type { AffineFormatBarWidget } from './format-bar.js';
 
 export type DividerConfigItem = {
@@ -88,7 +90,7 @@ export type FormatBarConfigItem =
 export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
   toolbar
     .clearConfig()
-    //.addParagraphDropdown()
+    .addParagraphDropdown()
     .addDivider()
     .addTextStyleToggle({
       key: 'bold',
@@ -115,15 +117,15 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
       action: chain => chain.toggleCode().run(),
       icon: CodeIcon,
     })
-    /*.addTextStyleToggle({
+    .addTextStyleToggle({
       key: 'link',
       action: chain => chain.toggleLink().run(),
       icon: LinkIcon,
-    })*/
-    //.addDivider()
-    //.addHighlighterDropdown()
-    //.addDivider()
-    /*.addInlineAction({
+    })
+    .addDivider()
+    .addHighlighterDropdown()
+    .addDivider()
+    .addInlineAction({
       id: 'copy',
       name: 'Copy',
       icon: CopyIcon,
@@ -140,8 +142,8 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
           .run();
       },
       showWhen: () => true,
-    })*/
-    /*.addInlineAction({
+    })
+    .addInlineAction({
       id: 'convert-to-database',
       name: 'Group as Database',
       icon: DatabaseTableViewIcon20,
@@ -166,8 +168,8 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
           DATABASE_CONVERT_WHITE_LIST.includes(block.flavour)
         );
       },
-    })*/
-    /*.addInlineAction({
+    })
+    .addInlineAction({
       id: 'convert-to-linked-doc',
       name: 'Create Linked Doc',
       icon: FontLinkedDocIcon,
@@ -175,7 +177,7 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
       action: (chain, formatBar) => {
         const [_, ctx] = chain
           .getSelectedModels({
-            types: ['block'],
+            types: ['block', 'text'],
             mode: 'highest',
           })
           .run();
@@ -187,25 +189,48 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
         host.selection.clear();
 
         const doc = host.doc;
-        const linkedDoc = createLinkedDocFromSelectedBlocks(
-          doc,
-          selectedModels
-        );
-        const linkedDocService = host.spec.getService(
-          'affine:embed-linked-doc'
-        );
-        linkedDocService.slots.linkedDocCreated.emit({ docId: linkedDoc.id });
+        const autofill = getTitleFromSelectedModels(selectedModels);
+        void promptDocTitle(host, autofill).then(title => {
+          if (title === null) return;
+          const linkedDoc = convertSelectedBlocksToLinkedDoc(
+            doc,
+            selectedModels,
+            title
+          );
+          const linkedDocService = host.spec.getService(
+            'affine:embed-linked-doc'
+          );
+          linkedDocService.slots.linkedDocCreated.emit({ docId: linkedDoc.id });
+          notifyDocCreated(host, doc);
+          host.spec
+            .getService('affine:page')
+            .telemetryService?.track('DocCreated', {
+              control: 'create linked doc',
+              page: 'doc editor',
+              module: 'format toolbar',
+              type: 'embed-linked-doc',
+            });
+          host.spec
+            .getService('affine:page')
+            .telemetryService?.track('LinkedDocCreated', {
+              control: 'create linked doc',
+              page: 'doc editor',
+              module: 'format toolbar',
+              type: 'embed-linked-doc',
+            });
+        });
       },
       showWhen: chain => {
         const [_, ctx] = chain
           .getSelectedModels({
-            types: ['block'],
+            types: ['block', 'text'],
+            mode: 'highest',
           })
           .run();
         const { selectedModels } = ctx;
         return !!selectedModels && selectedModels.length > 0;
       },
-    })*/
+    })
     .addBlockTypeSwitch({
       flavour: 'affine:paragraph',
       type: 'text',

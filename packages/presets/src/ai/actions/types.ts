@@ -1,5 +1,4 @@
 import type { EditorHost } from '@blocksuite/block-std';
-import type { ElementModel } from '@blocksuite/blocks';
 import type { BlockModel } from '@blocksuite/store';
 
 export const translateLangs = [
@@ -23,8 +22,39 @@ export const textTones = [
   'Humorous',
 ] as const;
 
+export const imageFilterStyles = [
+  'Clay style',
+  'Sketch style',
+  'Anime style',
+  'Pixel style',
+] as const;
+
+export const imageProcessingTypes = [
+  'Clearer',
+  'Remove background',
+  'Convert to sticker',
+] as const;
+
+export type CtxRecord = {
+  get(): Record<string, unknown>;
+  set(data: Record<string, unknown>): void;
+};
+
 declare global {
   namespace BlockSuitePresets {
+    type TrackerControl =
+      | 'format-bar'
+      | 'slash-menu'
+      | 'chat-send'
+      | 'block-action-bar';
+
+    type TrackerWhere = 'chat-panel' | 'inline-chat-panel' | 'ai-panel';
+
+    interface TrackerOptions {
+      control: TrackerControl;
+      where: TrackerWhere;
+    }
+
     interface AITextActionOptions {
       input?: string;
       stream?: boolean;
@@ -38,14 +68,22 @@ declare global {
 
       // internal context
       host: EditorHost;
-      models?: (BlockModel | ElementModel)[];
-      control: 'format-bar' | 'slash-menu' | 'chat-send';
-      where: 'chat-panel' | 'inline-chat-panel' | 'ai-panel';
+      models?: (BlockModel | BlockSuite.SurfaceElementModelType)[];
+      control: TrackerControl;
+      where: TrackerWhere;
     }
 
     interface AIImageActionOptions extends AITextActionOptions {
       content?: string;
       seed?: string;
+    }
+
+    interface FilterImageOptions extends AIImageActionOptions {
+      style: (typeof imageFilterStyles)[number];
+    }
+
+    interface ProcessImageOptions extends AIImageActionOptions {
+      type: (typeof imageProcessingTypes)[number];
     }
 
     type TextStream = {
@@ -165,6 +203,15 @@ declare global {
       createImage<T extends AIImageActionOptions>(
         options: T
       ): AIActionTextResponse<T>;
+      processImage<T extends ProcessImageOptions>(
+        options: T
+      ): AIActionTextResponse<T>;
+      filterImage<T extends FilterImageOptions>(
+        options: T
+      ): AIActionTextResponse<T>;
+      generateCaption<T extends AITextActionOptions>(
+        options: T
+      ): AIActionTextResponse<T>;
     }
 
     // todo: should be refactored to get rid of implement details (like messages, action, role, etc.)
@@ -190,6 +237,11 @@ declare global {
         workspaceId: string,
         docId?: string
       ) => Promise<AIHistory[] | undefined>;
+      cleanup: (
+        workspaceId: string,
+        docId: string,
+        sessionIds: string[]
+      ) => Promise<void>;
     }
 
     interface AIPhotoEngineService {

@@ -5,7 +5,7 @@ import type { z } from 'zod';
 import { SYS_KEYS } from '../consts.js';
 import { native2Y } from '../reactive/index.js';
 import type { BlockModel } from '../schema/base.js';
-import { type BlockSchema } from '../schema/base.js';
+import type { BlockSchema } from '../schema/base.js';
 import { internalPrimitives } from '../schema/base.js';
 import type { YBlock } from '../store/doc/block.js';
 import type { BlockProps, YBlocks } from '../store/doc/block-collection.js';
@@ -58,3 +58,13 @@ export function encodeCollectionAsYjsUpdateV2(
 ): string {
   return toBase64(Y.encodeStateAsUpdateV2(collection.doc));
 }
+
+export const hash = (str: string) => {
+  return str
+    .split('')
+    .reduce(
+      (prevHash, currVal) =>
+        ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
+      0
+    );
+};

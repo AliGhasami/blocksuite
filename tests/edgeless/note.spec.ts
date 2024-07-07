@@ -1,4 +1,8 @@
 import { NoteDisplayMode } from '@blocks/_common/types.js';
+import {
+  NOTE_INIT_HEIGHT,
+  NOTE_MIN_WIDTH,
+} from '@blocks/root-block/edgeless/utils/consts.js';
 import { expect } from '@playwright/test';
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
@@ -30,13 +34,16 @@ import {
   enterPlaygroundRoom,
   fillLine,
   focusRichText,
+  focusRichTextEnd,
   initEmptyEdgelessState,
   initSixParagraphs,
   initThreeParagraphs,
   pasteByKeyboard,
   pressArrowDown,
   pressArrowUp,
+  pressBackspace,
   pressEnter,
+  pressTab,
   redoByClick,
   redoByKeyboard,
   type,
@@ -46,6 +53,7 @@ import {
   waitNextFrame,
 } from '../utils/actions/index.js';
 import {
+  assertBlockChildrenIds,
   assertBlockCount,
   assertEdgelessNonSelectedRect,
   assertEdgelessNoteBackground,
@@ -84,6 +92,10 @@ test('can drag selected non-active note', async ({ page }) => {
     { x: CENTER_X, y: CENTER_Y + 100 }
   );
   await assertNoteXYWH(page, [0, 100, NOTE_WIDTH, 91]);
+
+  await undoByKeyboard(page);
+  await waitNextFrame(page);
+  await assertNoteXYWH(page, [0, 0, NOTE_WIDTH, 95]);
 });
 
 test('resize note in edgeless mode', async ({ page }) => {
@@ -741,12 +753,12 @@ test('change note color', async ({ page }) => {
   await assertEdgelessNoteBackground(
     page,
     noteId,
-    '--affine-background-secondary-color'
+    '--affine-note-background-blue'
   );
 
   await selectNoteInEdgeless(page, noteId);
   await triggerComponentToolbarAction(page, 'changeNoteColor');
-  const color = '--affine-tag-blue';
+  const color = '--affine-note-background-green';
   await changeEdgelessNoteBackground(page, color);
   await assertEdgelessNoteBackground(page, noteId, color);
 });
@@ -881,7 +893,7 @@ test('drag to add customized size note', async ({ page }) => {
   await assertEdgelessSelectedRect(page, [270, 260, 600, 300]);
 });
 
-test('drag to add customized size note: should wider than minimum width and higher than minimum height ', async ({
+test('drag to add customized size note: should clamp to min width and min height', async ({
   page,
 }) => {
   await enterPlaygroundRoom(page);
@@ -890,6 +902,7 @@ test('drag to add customized size note: should wider than minimum width and high
   await switchEditorMode(page);
   await zoomResetByKeyboard(page);
   await setEdgelessTool(page, 'note');
+
   // add note at 300,300
   await page.mouse.move(300, 300);
   await page.mouse.down();
@@ -897,17 +910,7 @@ test('drag to add customized size note: should wider than minimum width and high
   await page.mouse.up();
   await waitNextFrame(page);
 
-  // assert add note unsuccessful, note should be wider than minimum width and higher than minimum height
-  await assertBlockCount(page, 'note', 1);
-
-  await setEdgelessTool(page, 'note');
   await waitNextFrame(page);
-
-  // add note at 300,300
-  await page.mouse.move(300, 300);
-  await page.mouse.down();
-  await page.mouse.move(900, 600, { steps: 10 });
-  await page.mouse.up();
 
   // should wait for inline editor update and resizeObserver callback
   await waitForInlineEditorStateUpdated(page);
@@ -917,10 +920,15 @@ test('drag to add customized size note: should wider than minimum width and high
   // click out of note
   await page.mouse.click(250, 200);
   // click on note to select it
-  await page.mouse.click(600, 500);
+  await page.mouse.click(320, 300);
   // assert selected note
   // note add on edgeless mode will have a offsetX of 30 and offsetY of 40
-  await assertEdgelessSelectedRect(page, [270, 260, 600, 300]);
+  await assertEdgelessSelectedRect(page, [
+    270,
+    260,
+    NOTE_MIN_WIDTH,
+    NOTE_INIT_HEIGHT,
+  ]);
 });
 
 test('Note added on doc mode should display on both modes by default', async ({
@@ -1100,4 +1108,33 @@ test('Should focus at closest text block when note collapse', async ({
   await type(page, 'hello');
   await waitNextFrame(page, 200);
   await assertRichTexts(page, ['hello']);
+});
+
+test('delete first block in edgeless note', async ({ page }) => {
+  await enterPlaygroundRoom(page);
+  await initEmptyEdgelessState(page);
+  await switchEditorMode(page);
+  await zoomResetByKeyboard(page);
+  await assertNoteXYWH(page, [0, 0, NOTE_WIDTH, 91]);
+  await page.mouse.dblclick(CENTER_X, CENTER_Y);
+
+  // first block without children, nothing should happen
+  await assertRichTexts(page, ['']);
+  await assertBlockChildrenIds(page, '3', []);
+  await pressBackspace(page);
+
+  await type(page, 'aaa');
+  await pressEnter(page);
+  await type(page, 'bbb');
+  await pressTab(page);
+  await assertRichTexts(page, ['aaa', 'bbb']);
+  await assertBlockChildrenIds(page, '3', ['4']);
+
+  // first block with children, need to bring children to parent
+  await focusRichTextEnd(page);
+  await pressBackspace(page, 3);
+  await assertRichTexts(page, ['', 'bbb']);
+  await pressBackspace(page);
+  await assertRichTexts(page, ['bbb']);
+  await assertBlockChildrenIds(page, '4', []);
 });

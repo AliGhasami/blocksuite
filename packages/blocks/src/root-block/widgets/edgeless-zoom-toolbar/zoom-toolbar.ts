@@ -8,13 +8,33 @@ import {
   PlusIcon,
   ViewBarIcon,
 } from '../../../_common/icons/edgeless.js';
-import type { EdgelessTool } from '../../../_common/types.js';
 import { stopPropagation } from '../../../_common/utils/event.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+import type { EdgelessTool } from '../../edgeless/types.js';
 import { ZOOM_STEP } from '../../edgeless/utils/viewport.js';
 
 @customElement('edgeless-zoom-toolbar')
 export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
+  get edgelessTool() {
+    return this.edgeless.edgelessTool;
+  }
+
+  get edgelessService() {
+    return this.edgeless.service;
+  }
+
+  get zoom() {
+    return this.viewport.zoom;
+  }
+
+  get viewport() {
+    return this.edgelessService.viewport;
+  }
+
+  get locked() {
+    return this.edgelessService.locked;
+  }
+
   static override styles = css`
     :host {
       display: flex;
@@ -85,38 +105,18 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  layout: 'horizontal' | 'vertical' = 'horizontal';
+  accessor layout: 'horizontal' | 'vertical' = 'horizontal';
 
   @property({ attribute: false })
-  edgeless: EdgelessRootBlockComponent;
-
-  private _isVerticalBar() {
-    return this.layout === 'vertical';
-  }
+  accessor edgeless: EdgelessRootBlockComponent;
 
   constructor(edgeless: EdgelessRootBlockComponent) {
     super();
     this.edgeless = edgeless;
   }
 
-  get edgelessTool() {
-    return this.edgeless.edgelessTool;
-  }
-
-  get edgelessService() {
-    return this.edgeless.service;
-  }
-
-  get zoom() {
-    return this.viewport.zoom;
-  }
-
-  get viewport() {
-    return this.edgelessService.viewport;
-  }
-
-  get locked() {
-    return this.edgelessService.locked;
+  private _isVerticalBar() {
+    return this.layout === 'vertical';
   }
 
   setEdgelessTool = (edgelessTool: EdgelessTool) => {

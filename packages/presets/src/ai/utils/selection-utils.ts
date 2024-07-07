@@ -1,15 +1,17 @@
 import type { EditorHost } from '@blocksuite/block-std';
-import type {
-  EdgelessBlock,
-  FrameBlockModel,
+import {
+  type CopilotSelectionController,
+  type FrameBlockModel,
   ImageBlockModel,
-  SurfaceBlockComponent,
+  type SurfaceBlockComponent,
 } from '@blocksuite/blocks';
 import { BlocksUtils, EdgelessRootService } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
+import type { BlockModel } from '@blocksuite/store';
 import { type DraftModel, Slice, toDraftModel } from '@blocksuite/store';
 
-import { getMarkdownFromSlice } from './markdown-utils.js';
+import { getEdgelessCopilotWidget, getService } from './edgeless.js';
+import { getContentFromSlice } from './markdown-utils.js';
 
 export const getRootService = (host: EditorHost) => {
   return host.std.spec.getService('affine:page');
@@ -35,7 +37,7 @@ export function getEdgelessService(editor: EditorHost) {
 export async function selectedToCanvas(editor: EditorHost) {
   const edgelessRoot = getEdgelessRootFromEditor(editor);
   const { notes, frames, shapes, images } = BlocksUtils.splitElements(
-    edgelessRoot.service.selection.elements
+    edgelessRoot.service.selection.selectedElements
   );
   if (notes.length + frames.length + images.length + shapes.length === 0) {
     return;
@@ -105,19 +107,83 @@ function traverse(model: DraftModel, drafts: DraftModel[]) {
   model.children = children;
 }
 
-export async function getSelectedTextContent(editorHost: EditorHost) {
-  const selectedModels = getSelectedModels(editorHost);
-  assertExists(selectedModels);
-
+export async function getTextContentFromBlockModels(
+  editorHost: EditorHost,
+  models: BlockModel[],
+  type: 'markdown' | 'plain-text' = 'markdown'
+) {
   // Currently only filter out images and databases
-  const selectedTextModels = selectedModels.filter(
+  const selectedTextModels = models.filter(
     model =>
       !BlocksUtils.matchFlavours(model, ['affine:image', 'affine:database'])
   );
   const drafts = selectedTextModels.map(toDraftModel);
   drafts.forEach(draft => traverse(draft, drafts));
   const slice = Slice.fromModels(editorHost.std.doc, drafts);
-  return getMarkdownFromSlice(editorHost, slice);
+  return getContentFromSlice(editorHost, slice, type);
+}
+
+export async function getSelectedTextContent(
+  editorHost: EditorHost,
+  type: 'markdown' | 'plain-text' = 'markdown'
+) {
+  const selectedModels = getSelectedModels(editorHost);
+  assertExists(selectedModels);
+  return getTextContentFromBlockModels(editorHost, selectedModels, type);
+}
+
+export async function selectAboveBlocks(editorHost: EditorHost, num = 10) {
+  let selectedModels = getSelectedModels(editorHost);
+  assertExists(selectedModels);
+
+  const lastLeafModel = selectedModels[selectedModels.length - 1];
+
+  let noteModel: BlockModel | null = lastLeafModel;
+  let lastRootModel: BlockModel | null = null;
+  while (noteModel && noteModel.flavour !== 'affine:note') {
+    lastRootModel = noteModel;
+    noteModel = editorHost.doc.getParent(noteModel);
+  }
+  assertExists(noteModel);
+  assertExists(lastRootModel);
+
+  const endIndex = noteModel.children.indexOf(lastRootModel) + 1;
+  const startIndex = Math.max(0, endIndex - num);
+  const startBlock = noteModel.children[startIndex];
+
+  selectedModels = [];
+  let stop = false;
+  const traverse = (model: BlockModel): void => {
+    if (stop) return;
+
+    selectedModels.push(model);
+
+    if (model === lastLeafModel) {
+      stop = true;
+      return;
+    }
+
+    model.children.forEach(child => traverse(child));
+  };
+  noteModel.children.slice(startIndex, endIndex).forEach(traverse);
+
+  const { selection } = editorHost;
+  selection.set([
+    selection.create('text', {
+      from: {
+        blockId: startBlock.id,
+        index: 0,
+        length: startBlock.text?.length ?? 0,
+      },
+      to: {
+        blockId: lastLeafModel.id,
+        index: 0,
+        length: selection.find('text')?.from.index ?? 0,
+      },
+    }),
+  ]);
+
+  return getTextContentFromBlockModels(editorHost, selectedModels);
 }
 
 export const stopPropagation = (e: Event) => {
@@ -146,7 +212,7 @@ export const getFirstImageInFrame = (
   const elements = edgelessRoot.service.frame.getElementsInFrame(frame, false);
   const image = elements.find(ele => {
     if (!BlocksUtils.isCanvasElement(ele)) {
-      return (ele as EdgelessBlock).flavour === 'affine:image';
+      return ele.flavour === 'affine:image';
     }
     return false;
   }) as ImageBlockModel | undefined;
@@ -159,8 +225,12 @@ export const getSelections = (
 ) => {
   const [_, data] = host.command
     .chain()
-    .tryAll(chain => [chain.getTextSelection(), chain.getBlockSelections()])
-    .getSelectedBlocks({ types: ['text', 'block'], mode })
+    .tryAll(chain => [
+      chain.getTextSelection(),
+      chain.getBlockSelections(),
+      chain.getImageSelections(),
+    ])
+    .getSelectedBlocks({ types: ['text', 'block', 'image'], mode })
     .run();
 
   return data;
@@ -180,11 +250,10 @@ export const getSelectedImagesAsBlobs = async (host: EditorHost) => {
     .run();
 
   const blobs = await Promise.all(
-    data.currentBlockSelections?.map(async s => {
-      const sourceId = (host.doc.getBlock(s.blockId)?.model as ImageBlockModel)
-        ?.sourceId;
+    data.selectedBlocks?.map(async b => {
+      const sourceId = (b.model as ImageBlockModel).sourceId;
       if (!sourceId) return null;
-      const blob = await (sourceId ? host.doc.blob.get(sourceId) : null);
+      const blob = await (sourceId ? host.doc.blobSync.get(sourceId) : null);
       if (!blob) return null;
       return new File([blob], sourceId);
     }) ?? []
@@ -194,4 +263,34 @@ export const getSelectedImagesAsBlobs = async (host: EditorHost) => {
 
 export const getSelectedNoteAnchor = (host: EditorHost, id: string) => {
   return host.querySelector(`[data-portal-block-id="${id}"] .note-background`);
+};
+
+export function getCopilotSelectedElems(
+  host: EditorHost
+): BlockSuite.EdgelessModelType[] {
+  const service = getService(host);
+  const copilotWidget = getEdgelessCopilotWidget(host);
+
+  if (copilotWidget.visible) {
+    return (service.tool.controllers['copilot'] as CopilotSelectionController)
+      .selectedElements;
+  }
+
+  return service.selection.selectedElements;
+}
+
+export const imageCustomInput = async (host: EditorHost) => {
+  const selectedElements = getCopilotSelectedElems(host);
+  if (selectedElements.length !== 1) return;
+
+  const imageBlock = selectedElements[0];
+  if (!(imageBlock instanceof ImageBlockModel)) return;
+  if (!imageBlock.sourceId) return;
+
+  const blob = await host.doc.blobSync.get(imageBlock.sourceId);
+  if (!blob) return;
+
+  return {
+    attachments: [blob],
+  };
 };

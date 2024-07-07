@@ -10,12 +10,15 @@ import {
   isEmbedSyncedDocBlock,
 } from '../../../root-block/edgeless/utils/query.js';
 import {
+  CenterPeekIcon,
   CopyIcon,
   DeleteIcon,
   DuplicateIcon,
   OpenIcon,
   RefreshIcon,
 } from '../../icons/text.js';
+import { getBlockProps } from '../../utils/block-props.js';
+import { isPeekable, peek } from '../peekable.js';
 import { toast } from '../toast.js';
 import type { EmbedToolbarBlockElement } from './type.js';
 
@@ -66,10 +69,10 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  block!: EmbedToolbarBlockElement;
+  accessor block!: EmbedToolbarBlockElement;
 
   @property({ attribute: false })
-  abortController!: AbortController;
+  accessor abortController!: AbortController;
 
   private get _model() {
     return this.block.model;
@@ -81,6 +84,12 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
 
   private get _doc() {
     return this.block.doc;
+  }
+
+  get _openButtonDisabled() {
+    return (
+      isEmbedLinkedDocBlock(this._model) && this._model.pageId === this._doc.id
+    );
   }
 
   private _open() {
@@ -97,11 +106,7 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
 
   private _duplicateBlock() {
     const model = this._model;
-    const keys = model.keys as (keyof typeof model)[];
-    const values = keys.map(key => model[key]);
-    const blockProps = Object.fromEntries(
-      keys.map((key, i) => [key, values[i]])
-    );
+    const blockProps = getBlockProps(model);
     const { width, height, xywh, rotate, zIndex, ...duplicateProps } =
       blockProps;
 
@@ -122,6 +127,14 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
     this.abortController.abort();
   }
 
+  private _peekable() {
+    return isPeekable(this.block);
+  }
+
+  private _peek() {
+    peek(this.block);
+  }
+
   override render() {
     return html`
       <div class="embed-card-more-menu">
@@ -135,9 +148,22 @@ export class EmbedCardMoreMenu extends WithDisposable(LitElement) {
             class="menu-item open"
             text="Open"
             @click=${() => this._open()}
+            ?disabled=${this._openButtonDisabled}
           >
             ${OpenIcon}
           </icon-button>
+
+          ${this._peekable()
+            ? html`<icon-button
+                width="126px"
+                height="32px"
+                text="Open in center peek"
+                class="menu-item center-peek"
+                @click=${() => this._peek()}
+              >
+                ${CenterPeekIcon}
+              </icon-button>`
+            : nothing}
 
           <icon-button
             width="126px"

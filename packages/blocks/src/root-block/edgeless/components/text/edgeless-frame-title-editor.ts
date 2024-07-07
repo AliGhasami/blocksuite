@@ -20,14 +20,6 @@ import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 export class EdgelessFrameTitleEditor extends WithDisposable(
   ShadowlessElement
 ) {
-  @query('rich-text')
-  richText!: RichText;
-
-  @property({ attribute: false })
-  frameModel!: FrameBlockModel;
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
-
   get editorHost() {
     return this.edgeless.host;
   }
@@ -36,6 +28,7 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
     assertExists(this.richText.inlineEditor);
     return this.richText.inlineEditor;
   }
+
   get inlineEditorContainer() {
     return this.inlineEditor.rootElement;
   }
@@ -48,6 +41,25 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
     ]) as FrameBlockComponent | null;
     assertExists(block);
     return block;
+  }
+
+  @query('rich-text')
+  accessor richText!: RichText;
+
+  @property({ attribute: false })
+  accessor frameModel!: FrameBlockModel;
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
+
+  private _unmount() {
+    // dispose in advance to avoid execute `this.remove()` twice
+    this.disposables.dispose();
+    this.edgeless.service.selection.set({
+      elements: [],
+      editing: false,
+    });
+    this.remove();
   }
 
   override connectedCallback() {
@@ -104,21 +116,16 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
       .catch(console.error);
   }
 
-  private _unmount() {
-    // dispose in advance to avoid execute `this.remove()` twice
-    this.disposables.dispose();
-    this.edgeless.service.selection.set({
-      elements: [],
-      editing: false,
-    });
-    this.remove();
-  }
-
   override render() {
     const viewport = this.edgeless.service.viewport;
     const bound = Bound.deserialize(this.frameModel.xywh);
     const [x, y] = viewport.toViewCoord(bound.x, bound.y);
-    const isInner = this.edgeless.service.frame.getFrameInner(this.frameModel);
+    const isInner = this.edgeless.service.layer.framesGrid.has(
+      this.frameModel.elementBound,
+      true,
+      true,
+      new Set([this.frameModel])
+    );
 
     const inlineEditorStyle = styleMap({
       transformOrigin: 'top left',

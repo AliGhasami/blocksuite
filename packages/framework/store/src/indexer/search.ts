@@ -1,4 +1,8 @@
-import { IS_NODE, IS_WEB } from '@blocksuite/global/env';
+import {
+  IS_NODE,
+  IS_WEB,
+  REQUEST_IDLE_CALLBACK_ENABLED,
+} from '@blocksuite/global/env';
 import type { DocumentSearchOptions } from 'flexsearch';
 import FlexSearch from 'flexsearch';
 import type { Doc } from 'yjs';
@@ -61,7 +65,9 @@ const REINDEX_TIMEOUT = 200;
 
 export class SearchIndexer {
   private readonly _doc: BlockSuiteDoc;
+
   private readonly _indexer: FlexSearch.Document<IndexMeta, string[]>;
+
   private _reindexMap: Map<string, IndexMeta> | null = null;
 
   constructor(
@@ -119,21 +125,13 @@ export class SearchIndexer {
 
     setTimeout(() => {
       if (!this._reindexMap) return;
-      if (globalThis.requestIdleCallback !== undefined) {
+      if (REQUEST_IDLE_CALLBACK_ENABLED) {
         requestIdleCallback(this._reindex, { timeout: 1000 });
       } else {
         setTimeout(this._reindex, 1000);
       }
     }, REINDEX_TIMEOUT);
   };
-
-  search(query: QueryContent) {
-    return new Map(
-      this._search(query).flatMap(({ result }) =>
-        result.map(r => [r.id, { space: r.doc.space, content: r.doc.content }])
-      )
-    );
-  }
 
   private _search(query: QueryContent): SearchResults[] {
     if (typeof query === 'object') {
@@ -146,13 +144,6 @@ export class SearchIndexer {
         enrich: true,
       }) as unknown as SearchResults[];
     }
-  }
-
-  public refreshDocIndex(docId: string, doc: Doc) {
-    const yBlocks = doc.getMap('blocks') as YBlocks;
-    yBlocks.forEach((_, key) => {
-      this._refreshIndex(docId, key, 'add', yBlocks.get(key));
-    });
   }
 
   private _handleDocIndexing(docId: string, doc: Doc) {
@@ -228,5 +219,20 @@ export class SearchIndexer {
     } catch (_) {
       return undefined;
     }
+  }
+
+  search(query: QueryContent) {
+    return new Map(
+      this._search(query).flatMap(({ result }) =>
+        result.map(r => [r.id, { space: r.doc.space, content: r.doc.content }])
+      )
+    );
+  }
+
+  refreshDocIndex(docId: string, doc: Doc) {
+    const yBlocks = doc.getMap('blocks') as YBlocks;
+    yBlocks.forEach((_, key) => {
+      this._refreshIndex(docId, key, 'add', yBlocks.get(key));
+    });
   }
 }

@@ -6,20 +6,39 @@ import { customElement, property } from 'lit/decorators.js';
 import type { DetailSlotProps } from '../data-view/common/data-source/base.js';
 import type { DataViewKanbanManager } from '../data-view/view/presets/kanban/kanban-view-manager.js';
 import type { DataViewTableManager } from '../data-view/view/presets/table/table-view-manager.js';
-import type { DatabaseBlockComponent } from '../database-block.js';
 
 @customElement('database-datasource-block-renderer')
 export class BlockRenderer
   extends WithDisposable(ShadowlessElement)
   implements DetailSlotProps
 {
+  get model() {
+    return this.host?.doc.getBlock(this.rowId)?.model;
+  }
+
+  get service() {
+    return this.host.std.spec.getService('affine:database');
+  }
+
+  get inlineManager() {
+    return this.service.inlineManager;
+  }
+
+  get attributesSchema() {
+    return this.inlineManager.getSchema();
+  }
+
+  get attributeRenderer() {
+    return this.inlineManager.getRenderer();
+  }
+
   static override styles = css`
     database-datasource-block-renderer {
-      padding-bottom: 20px;
+      padding-bottom: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 4px;
+      gap: 16px;
+      margin-bottom: 12px;
       border-bottom: 1px solid var(--affine-border-color);
       font-size: var(--affine-font-base);
       line-height: var(--affine-line-height);
@@ -42,27 +61,38 @@ export class BlockRenderer
       height: 16px;
     }
   `;
-  @property({ attribute: false })
-  public view!: DataViewTableManager | DataViewKanbanManager;
-  @property({ attribute: false })
-  public rowId!: string;
-  host?: EditorHost;
 
-  get model() {
-    return this.host?.doc.getBlockById(this.rowId);
+  @property({ attribute: false })
+  accessor view!: DataViewTableManager | DataViewKanbanManager;
+
+  @property({ attribute: false })
+  accessor rowId!: string;
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
+
+  protected override render(): unknown {
+    const model = this.model;
+    if (!model) {
+      return;
+    }
+    return html`
+      ${this.renderIcon()}
+      <rich-text
+        .yText=${model.text}
+        .attributesSchema=${this.attributesSchema}
+        .attributeRenderer=${this.attributeRenderer}
+        .embedChecker=${this.inlineManager.embedChecker}
+        .markdownShortcutHandler=${this.inlineManager.markdownShortcutHandler}
+        class="inline-editor"
+      ></rich-text>
+    `;
   }
 
-  get topContenteditableElement() {
-    const databaseBlock =
-      this.closest<DatabaseBlockComponent>('affine-database');
-    return databaseBlock?.topContenteditableElement;
-  }
-
-  public override connectedCallback() {
+  override connectedCallback() {
     super.connectedCallback();
-    this.host = this.closest('editor-host') ?? undefined;
     this._disposables.addFromEvent(
-      this.topContenteditableElement ?? this,
+      this,
       'keydown',
       e => {
         if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
@@ -93,13 +123,5 @@ export class BlockRenderer
     return html` <div class="database-block-detail-header-icon">
       ${this.view.cellGetValue(this.rowId, iconColumn)}
     </div>`;
-  }
-
-  protected override render(): unknown {
-    const model = this.model;
-    if (!model) {
-      return;
-    }
-    return html` ${this.host?.renderModel(model)} ${this.renderIcon()} `;
   }
 }

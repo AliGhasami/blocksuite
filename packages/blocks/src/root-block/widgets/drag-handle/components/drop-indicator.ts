@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import { type Rect } from '../../../../_common/utils/index.js';
+import type { Rect } from '../../../../_common/utils/index.js';
 
 @customElement('affine-drop-indicator')
 export class DropIndicator extends LitElement {
@@ -23,7 +23,7 @@ export class DropIndicator extends LitElement {
   `;
 
   @property({ attribute: false })
-  rect: Rect | null = null;
+  accessor rect: Rect | null = null;
 
   override render() {
     if (!this.rect) {

@@ -1,6 +1,8 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockSpec, EditorHost } from '@blocksuite/block-std';
+import type { DocModeService, PageRootService } from '@blocksuite/blocks';
 import {
   AffineFormatBarWidget,
+  createDocModeService,
   EdgelessEditorBlockSpecs,
   PageEditorBlockSpecs,
   toolbarDefaultConfig,
@@ -13,7 +15,7 @@ import {
   CopilotPanel,
 } from '@blocksuite/presets';
 import type { BlockCollection } from '@blocksuite/store';
-import { type DocCollection } from '@blocksuite/store';
+import type { DocCollection } from '@blocksuite/store';
 
 import { CustomChatPanel } from '../../_common/components/custom-chat-panel.js';
 import { CustomFramePanel } from '../../_common/components/custom-frame-panel.js';
@@ -22,9 +24,19 @@ import { DebugMenu } from '../../_common/components/debug-menu.js';
 import { DocsPanel } from '../../_common/components/docs-panel.js';
 import { LeftSidePanel } from '../../_common/components/left-side-panel.js';
 import { SidePanel } from '../../_common/components/side-panel.js';
+import {
+  mockNotificationService,
+  mockQuickSearchService,
+} from '../../_common/mock-services.js';
 
-const params = new URLSearchParams(location.search);
-const defaultMode = params.get('mode') === 'edgeless' ? 'edgeless' : 'page';
+function setDocModeFromUrlParams(service: DocModeService) {
+  const params = new URLSearchParams(location.search);
+  const paramMode = params.get('mode');
+  if (paramMode) {
+    const docMode = paramMode === 'page' ? 'page' : 'edgeless';
+    service.setMode(docMode);
+  }
+}
 
 function configureFormatBar(formatBar: AffineFormatBarWidget) {
   toolbarDefaultConfig(formatBar);
@@ -47,47 +59,26 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   const app = document.getElementById('app');
   if (!app) return;
 
+  const modeService = createDocModeService(doc.id);
+  setDocModeFromUrlParams(modeService);
   const editor = new AffineEditorContainer();
   editor.pageSpecs = [...PageEditorBlockSpecs].map(spec => {
     if (spec.schema.model.flavour === 'affine:page') {
-      const setup = spec.setup;
-      spec = {
-        ...spec,
-        setup: (slots, disposable) => {
-          setup?.(slots, disposable);
-
-          const onFormatBarConnected = slots.widgetConnected.on(view => {
-            if (view.component instanceof AffineFormatBarWidget) {
-              configureFormatBar(view.component);
-            }
-          });
-
-          disposable.add(onFormatBarConnected);
-        },
-      };
+      spec = patchPageRootSpec(
+        spec as BlockSpec<'affine:page', PageRootService>
+      );
     }
     return spec;
   });
   editor.edgelessSpecs = [...EdgelessEditorBlockSpecs].map(spec => {
     if (spec.schema.model.flavour === 'affine:page') {
-      spec = {
-        ...spec,
-        setup: (slots, disposable) => {
-          slots.mounted.once(() => {
-            const onFormatBarConnected = slots.widgetConnected.on(view => {
-              if (view.component instanceof AffineFormatBarWidget) {
-                configureFormatBar(view.component);
-              }
-            });
-
-            disposable.add(onFormatBarConnected);
-          });
-        },
-      };
+      spec = patchPageRootSpec(
+        spec as BlockSpec<'affine:page', PageRootService>
+      );
     }
     return spec;
   });
-  editor.mode = defaultMode;
+  editor.mode = modeService.getMode();
   editor.doc = doc;
   editor.slots.docLinkClicked.on(({ docId }) => {
     const target = collection.getDoc(docId);
@@ -96,6 +87,9 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
     }
     target.load();
     editor.doc = target;
+  });
+  editor.slots.docUpdated.on(({ newDocId }) => {
+    editor.mode = modeService.getMode(newDocId);
   });
 
   app.append(editor);
@@ -157,4 +151,29 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   });
 
   return editor;
+
+  function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
+    const setup = spec.setup;
+    const newSpec: typeof spec = {
+      ...spec,
+      setup: (slots, disposable) => {
+        setup?.(slots, disposable);
+        slots.mounted.once(({ service }) => {
+          const pageRootService = service as PageRootService;
+          const onFormatBarConnected = slots.widgetConnected.on(view => {
+            if (view.component instanceof AffineFormatBarWidget) {
+              configureFormatBar(view.component);
+            }
+          });
+          disposable.add(onFormatBarConnected);
+          pageRootService.notificationService =
+            mockNotificationService(pageRootService);
+          pageRootService.quickSearchService =
+            mockQuickSearchService(collection);
+        });
+      },
+    };
+
+    return newSpec;
+  }
 }

@@ -1,10 +1,11 @@
 import type { TextSelection } from '@blocksuite/block-std';
-import { type EditorHost, type TextRangePoint } from '@blocksuite/block-std';
+import type { EditorHost, TextRangePoint } from '@blocksuite/block-std';
 import {
   defaultImageProxyMiddleware,
   MarkdownAdapter,
   MixTextAdapter,
   pasteMiddleware,
+  PlainTextAdapter,
   titleMiddleware,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
@@ -64,20 +65,39 @@ function processTextInSnapshot(snapshot: SliceSnapshot, host: EditorHost) {
   content.forEach(snapshot => processSnapshot(snapshot, text, host));
 }
 
-export async function getMarkdownFromSlice(host: EditorHost, slice: Slice) {
+export async function getContentFromSlice(
+  host: EditorHost,
+  slice: Slice,
+  type: 'markdown' | 'plain-text' = 'markdown'
+) {
   const job = new Job({
     collection: host.std.doc.collection,
     middlewares: [titleMiddleware],
   });
   const snapshot = await job.sliceToSnapshot(slice);
   processTextInSnapshot(snapshot, host);
-  const markdownAdapter = new MarkdownAdapter();
-  markdownAdapter.applyConfigs(job.adapterConfigs);
-  const markdown = await markdownAdapter.fromSliceSnapshot({
+  const adapter =
+    type === 'markdown' ? new MarkdownAdapter(job) : new PlainTextAdapter(job);
+  const content = await adapter.fromSliceSnapshot({
     snapshot,
     assets: job.assetsManager,
   });
-  return markdown.file;
+  return content.file;
+}
+
+export async function getPlainTextFromSlice(host: EditorHost, slice: Slice) {
+  const job = new Job({
+    collection: host.std.doc.collection,
+    middlewares: [titleMiddleware],
+  });
+  const snapshot = await job.sliceToSnapshot(slice);
+  processTextInSnapshot(snapshot, host);
+  const plainTextAdapter = new PlainTextAdapter(job);
+  const plainText = await plainTextAdapter.fromSliceSnapshot({
+    snapshot,
+    assets: job.assetsManager,
+  });
+  return plainText.file;
 }
 
 export const markdownToSnapshot = async (
@@ -88,14 +108,13 @@ export const markdownToSnapshot = async (
     collection: host.std.doc.collection,
     middlewares: [defaultImageProxyMiddleware, pasteMiddleware(host.std)],
   });
-  const markdownAdapter = new MixTextAdapter();
+  const markdownAdapter = new MixTextAdapter(job);
   const { blockVersions, workspaceVersion, pageVersion } =
     host.std.doc.collection.meta;
   if (!blockVersions || !workspaceVersion || !pageVersion)
     throw new Error(
       'Need blockVersions, workspaceVersion, pageVersion meta information to get slice'
     );
-  markdownAdapter.applyConfigs(job.adapterConfigs);
   const payload = {
     file: markdown,
     assets: job.assetsManager,
@@ -155,17 +174,16 @@ export async function markDownToDoc(host: EditorHost, answer: string) {
   const schema = host.std.doc.collection.schema;
   // Should not create a new doc in the original collection
   const collection = new DocCollection({ schema });
+  collection.meta.initialize();
   const job = new Job({
     collection,
     middlewares: [defaultImageProxyMiddleware],
   });
-  const mdAdapter = new MarkdownAdapter();
-  mdAdapter.applyConfigs(job.adapterConfigs);
-  const snapshot = await mdAdapter.toDocSnapshot({
+  const mdAdapter = new MarkdownAdapter(job);
+  const doc = await mdAdapter.toDoc({
     file: answer,
     assets: job.assetsManager,
   });
-  const doc = await job.snapshotToDoc(snapshot);
   if (!doc) {
     console.error('Failed to convert markdown to doc');
   }

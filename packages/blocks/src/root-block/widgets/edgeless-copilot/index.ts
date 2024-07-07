@@ -19,7 +19,7 @@ import {
 import { Bound, getElementsBound } from '../../../surface-block/index.js';
 import type { CopilotSelectionController } from '../../edgeless/controllers/tools/copilot-tool.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-import { type RootBlockModel } from '../../root-model.js';
+import type { RootBlockModel } from '../../root-model.js';
 import type { AffineAIPanelWidget } from '../ai-panel/ai-panel.js';
 import { AFFINE_AI_PANEL_WIDGET } from '../ai-panel/ai-panel.js';
 import { EdgelessCopilotPanel } from '../edgeless-copilot-panel/index.js';
@@ -31,38 +31,6 @@ export class EdgelessCopilotWidget extends WidgetElement<
   RootBlockModel,
   EdgelessRootBlockComponent
 > {
-  static override styles = css`
-    .copilot-selection-rect {
-      position: absolute;
-      box-sizing: border-box;
-      border-radius: 4px;
-      border: 2px dashed var(--affine-brand-color, #1e96eb);
-    }
-  `;
-
-  @state()
-  private _selectionRect: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } = { x: 0, y: 0, width: 0, height: 0 };
-
-  @state()
-  private _visible = false;
-
-  @query('.copilot-selection-rect')
-  selectionElem!: HTMLDivElement;
-
-  private _selectionModelRect!: DOMRect;
-
-  private _clickOutsideOff: (() => void) | null = null;
-  private _listenClickOutsideId: number | null = null;
-
-  private _copilotPanel!: EdgelessCopilotPanel | null;
-
-  groups: AIItemGroupConfig[] = [];
-
   get visible() {
     return !!(
       this._visible &&
@@ -79,24 +47,6 @@ export class EdgelessCopilotWidget extends WidgetElement<
     return this._selectionModelRect;
   }
 
-  determineInsertionBounds(width = 800, height = 95) {
-    const elements = this.edgeless.service.selection.elements;
-    const offsetY = 20 / this.edgeless.service.viewport.zoom;
-    const bounds = new Bound(0, 0, width, height);
-    if (elements.length) {
-      const { x, y, h } = getElementsBound(
-        elements.map(ele => ele.elementBound)
-      );
-      bounds.x = x;
-      bounds.y = y + h + offsetY;
-    } else {
-      const { x, y, height: h } = this.selectionModelRect;
-      bounds.x = x;
-      bounds.y = y + h + offsetY;
-    }
-    return bounds;
-  }
-
   get edgeless() {
     return this.blockElement;
   }
@@ -105,15 +55,38 @@ export class EdgelessCopilotWidget extends WidgetElement<
     this._visible = visible;
   }
 
-  hideCopilotPanel() {
-    this._copilotPanel?.hide();
-    this._copilotPanel = null;
-    this._clickOutsideOff = null;
-  }
+  static override styles = css`
+    .copilot-selection-rect {
+      position: absolute;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 2px dashed var(--affine-brand-color, #1e96eb);
+    }
+  `;
 
-  lockToolbar(disabled: boolean) {
-    this.edgeless.slots.toolbarLocked.emit(disabled);
-  }
+  @state()
+  private accessor _selectionRect: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } = { x: 0, y: 0, width: 0, height: 0 };
+
+  @state()
+  private accessor _visible = false;
+
+  private _selectionModelRect!: DOMRect;
+
+  private _clickOutsideOff: (() => void) | null = null;
+
+  private _listenClickOutsideId: number | null = null;
+
+  private _copilotPanel!: EdgelessCopilotPanel | null;
+
+  @query('.copilot-selection-rect')
+  accessor selectionElem!: HTMLDivElement;
+
+  groups: AIItemGroupConfig[] = [];
 
   private _updateSelection(rect: DOMRect) {
     this._selectionModelRect = rect;
@@ -224,6 +197,34 @@ export class EdgelessCopilotWidget extends WidgetElement<
           });
       });
     }, this);
+  }
+
+  determineInsertionBounds(width = 800, height = 95) {
+    const elements = this.edgeless.service.selection.selectedElements;
+    const offsetY = 20 / this.edgeless.service.viewport.zoom;
+    const bounds = new Bound(0, 0, width, height);
+    if (elements.length) {
+      const { x, y, h } = getElementsBound(
+        elements.map(ele => ele.elementBound)
+      );
+      bounds.x = x;
+      bounds.y = y + h + offsetY;
+    } else {
+      const { x, y, height: h } = this.selectionModelRect;
+      bounds.x = x;
+      bounds.y = y + h + offsetY;
+    }
+    return bounds;
+  }
+
+  hideCopilotPanel() {
+    this._copilotPanel?.hide();
+    this._copilotPanel = null;
+    this._clickOutsideOff = null;
+  }
+
+  lockToolbar(disabled: boolean) {
+    this.edgeless.slots.toolbarLocked.emit(disabled);
   }
 
   override connectedCallback(): void {

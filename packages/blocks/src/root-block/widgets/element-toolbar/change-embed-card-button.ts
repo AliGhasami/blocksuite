@@ -1,5 +1,5 @@
-import './component-toolbar-menu-divider.js';
 import '../../edgeless/components/buttons/tool-icon-button.js';
+import '../../edgeless/components/buttons/menu-button.js';
 import '../../edgeless/components/panel/card-style-panel.js';
 
 import type { EditorHost } from '@blocksuite/block-std';
@@ -14,10 +14,12 @@ import {
   type TemplateResult,
   unsafeCSS,
 } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { join } from 'lit/directives/join.js';
 
 import { toggleEmbedCardEditModal } from '../../../_common/components/embed-card/modal/embed-card-edit-modal.js';
+import { isPeekable, peek } from '../../../_common/components/index.js';
 import { toast } from '../../../_common/components/toast.js';
 import {
   EMBED_CARD_HEIGHT,
@@ -29,6 +31,7 @@ import {
 } from '../../../_common/icons/edgeless.js';
 import {
   CaptionIcon,
+  CenterPeekIcon,
   CopyIcon,
   EditIcon,
   EmbedEdgelessIcon,
@@ -39,7 +42,6 @@ import {
   PaletteIcon,
 } from '../../../_common/icons/text.js';
 import type { EmbedCardStyle } from '../../../_common/types.js';
-import { createButtonPopper } from '../../../_common/utils/button-popper.js';
 import { getEmbedCardIcons } from '../../../_common/utils/url.js';
 import { BookmarkStyles } from '../../../bookmark-block/bookmark-model.js';
 import type {
@@ -71,7 +73,8 @@ import type {
   EmbedYoutubeBlockComponent,
   EmbedYoutubeModel,
 } from '../../../embed-youtube-block/index.js';
-import { Bound, type EdgelessBlockType } from '../../../surface-block/index.js';
+import { Bound } from '../../../surface-block/index.js';
+import { renderMenuDivider } from '../../edgeless/components/buttons/menu-button.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 import {
   isBookmarkBlock,
@@ -84,191 +87,6 @@ import type { EmbedOptions } from '../../root-service.js';
 
 @customElement('edgeless-change-embed-card-button')
 export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
-  static override styles = css`
-    .change-embed-card-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .change-embed-card-button {
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .change-embed-card-button svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .change-embed-card-button.url {
-      display: flex;
-      width: 180px;
-      padding: var(--1, 0px);
-      align-items: flex-start;
-      gap: 10px;
-      border-radius: var(--1, 0px);
-      opacity: var(--add, 1);
-      margin-right: 6px;
-      user-select: none;
-      cursor: pointer;
-    }
-
-    .change-embed-card-button.url > span {
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-
-      color: var(--affine-link-color);
-      font-feature-settings:
-        'clig' off,
-        'liga' off;
-      font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
-      font-size: 15px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 24px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      opacity: var(--add, 1);
-    }
-
-    .change-embed-card-button.doc-info {
-      display: flex;
-      align-items: center;
-      width: max-content;
-      max-width: 180px;
-      padding: var(--1, 0px);
-
-      gap: 4px;
-      border-radius: var(--1, 0px);
-      opacity: var(--add, 1);
-      user-select: none;
-      cursor: pointer;
-    }
-
-    .change-embed-card-button.doc-info > svg {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-    }
-
-    .change-embed-card-button.doc-info > span {
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-
-      color: var(--affine-text-primary-color);
-      font-feature-settings:
-        'clig' off,
-        'liga' off;
-      word-break: break-all;
-      font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 22px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      opacity: var(--add, 1);
-    }
-
-    .change-embed-card-view-style {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .change-embed-card-button-view-selector {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 2px;
-      border-radius: 6px;
-      background: var(--affine-hover-color);
-    }
-    .change-embed-card-button-view-selector .change-embed-card-button {
-      width: 24px;
-      height: 24px;
-    }
-    .change-embed-card-button-view-selector > icon-button {
-      padding: 0px;
-    }
-    .change-embed-card-button-view-selector .current-view {
-      background: var(--affine-background-overlay-panel-color);
-      border-radius: 6px;
-    }
-
-    component-toolbar-menu-divider {
-      height: 24px;
-    }
-
-    .embed-scale-button {
-      display: flex;
-      border-radius: 4px;
-      align-items: center;
-      gap: 2px;
-      padding: 2px;
-      font-size: var(--affine-font-sm);
-      font-weight: 500;
-      color: var(--affine-text-secondary-color);
-      height: 26px;
-    }
-
-    .embed-scale-label {
-      display: flex;
-      padding: 2px 0px 2px 4px;
-      align-items: center;
-    }
-
-    card-style-panel,
-    edgeless-scale-panel {
-      display: none;
-    }
-    card-style-panel[data-show],
-    edgeless-scale-panel[data-show] {
-      display: flex;
-    }
-  `;
-
-  @property({ attribute: false })
-  model!:
-    | BookmarkBlockModel
-    | EmbedGithubModel
-    | EmbedYoutubeModel
-    | EmbedFigmaModel
-    | EmbedLinkedDocModel
-    | EmbedSyncedDocModel
-    | EmbedHtmlModel
-    | EmbedLoomModel;
-
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
-
-  @state()
-  private _embedScale = 1;
-
-  @state()
-  private _showCardStylePopper = false;
-  @query('.change-embed-card-button.card-style')
-  private _cardStyleButton!: HTMLDivElement;
-  @query('card-style-panel')
-  private _cardStylePanel!: HTMLDivElement;
-  private _cardStylePopper: ReturnType<typeof createButtonPopper> | null = null;
-
-  @state()
-  private _showEmbedScalePopper = false;
-  @query('.embed-scale-button')
-  private _embedScaleButton!: HTMLDivElement;
-  @query('edgeless-scale-panel')
-  private _embedScalePanel!: HTMLDivElement;
-  private _embedScalePopper: ReturnType<typeof createButtonPopper> | null =
-    null;
-
   private get _doc() {
     return this.model.doc;
   }
@@ -277,16 +95,15 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     return this.edgeless.std;
   }
 
-  private _embedOptions: EmbedOptions | null = null;
-
   private get _rootService() {
     return this.std.spec.getService('affine:page');
   }
 
   private get _blockElement() {
-    const blockSelection = this.edgeless.service.selection.selections.filter(
-      sel => sel.elements.includes(this.model.id)
-    );
+    const blockSelection =
+      this.edgeless.service.selection.surfaceSelections.filter(sel =>
+        sel.elements.includes(this.model.id)
+      );
     if (blockSelection.length !== 1) {
       return;
     }
@@ -422,15 +239,182 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     return block.docTitle;
   }
 
-  private _open() {
-    this._blockElement?.open();
+  private get _embedViewButtonDisabled() {
+    if (this._doc.readonly) {
+      return true;
+    }
+    return (
+      isEmbedLinkedDocBlock(this.model) &&
+      (!!this._blockElement?.closest('affine-embed-synced-doc-block') ||
+        this.model.pageId === this._doc.id)
+    );
   }
+
+  get _openButtonDisabled() {
+    return (
+      isEmbedLinkedDocBlock(this.model) && this.model.pageId === this._doc.id
+    );
+  }
+
+  static override styles = css`
+    .change-embed-card-button {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .change-embed-card-button svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .change-embed-card-button.url {
+      display: flex;
+      width: 180px;
+      padding: var(--1, 0px);
+      align-items: flex-start;
+      gap: 10px;
+      border-radius: var(--1, 0px);
+      opacity: var(--add, 1);
+      margin-right: 6px;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .change-embed-card-button.url > span {
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+
+      color: var(--affine-link-color);
+      font-feature-settings:
+        'clig' off,
+        'liga' off;
+      font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
+      font-size: 15px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      opacity: var(--add, 1);
+    }
+
+    .change-embed-card-button.doc-info {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      max-width: 180px;
+      padding: var(--1, 0px);
+
+      gap: 4px;
+      border-radius: var(--1, 0px);
+      opacity: var(--add, 1);
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .change-embed-card-button.doc-info > svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .change-embed-card-button.doc-info > span {
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+
+      color: var(--affine-text-primary-color);
+      font-feature-settings:
+        'clig' off,
+        'liga' off;
+      word-break: break-all;
+      font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      opacity: var(--add, 1);
+    }
+
+    .change-embed-card-view-style {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .change-embed-card-button-view-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 2px;
+      border-radius: 6px;
+      background: var(--affine-hover-color);
+    }
+    .change-embed-card-button-view-selector .change-embed-card-button {
+      width: 24px;
+      height: 24px;
+    }
+    .change-embed-card-button-view-selector > icon-button {
+      padding: 0px;
+    }
+    .change-embed-card-button-view-selector .current-view {
+      background: var(--affine-background-overlay-panel-color);
+      border-radius: 6px;
+    }
+
+    .embed-scale-button {
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      background-color: var(--affine-hover-color);
+      gap: 2px;
+      line-height: 24px;
+    }
+  `;
+
+  @state()
+  private accessor _embedScale = 1;
+
+  private _embedOptions: EmbedOptions | null = null;
+
+  @property({ attribute: false })
+  accessor model!:
+    | BookmarkBlockModel
+    | EmbedGithubModel
+    | EmbedYoutubeModel
+    | EmbedFigmaModel
+    | EmbedLinkedDocModel
+    | EmbedSyncedDocModel
+    | EmbedHtmlModel
+    | EmbedLoomModel;
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
+
+  @property({ attribute: false })
+  accessor quickConnectButton!: TemplateResult<1>;
+
+  private _open = () => {
+    this._blockElement?.open();
+  };
+
+  private _peek = () => {
+    if (!this._blockElement) return;
+    peek(this._blockElement);
+  };
 
   private _showCaption() {
-    this._blockElement?.captionElement?.show();
+    this._blockElement?.captionEditor.show();
   }
 
-  private _copyUrl() {
+  private _copyUrl = () => {
     if (!('url' in this.model)) {
       return;
     }
@@ -438,7 +422,7 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     navigator.clipboard.writeText(this.model.url).catch(console.error);
     toast(this.std.host as EditorHost, 'Copied link to clipboard');
     this.edgeless.service.selection.clear();
-  }
+  };
 
   private _setCardStyle(style: EmbedCardStyle) {
     const bounds = Bound.deserialize(this.model.xywh);
@@ -446,10 +430,9 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     bounds.h = EMBED_CARD_HEIGHT[style];
     const xywh = bounds.serialize();
     this.model.doc.updateBlock(this.model, { style, xywh });
-    this._cardStylePopper?.hide();
   }
 
-  private _convertToCardView() {
+  private _convertToCardView = () => {
     if (this._isCardView) {
       return;
     }
@@ -464,7 +447,7 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
       return;
     }
 
-    const { url, xywh, style, caption } = this.model;
+    const { id, url, xywh, style, caption } = this.model;
 
     let targetFlavour = 'affine:bookmark',
       targetStyle = style;
@@ -481,19 +464,25 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     bound.w = EMBED_CARD_WIDTH[targetStyle];
     bound.h = EMBED_CARD_HEIGHT[targetStyle];
 
-    const blockId = this.edgeless.service.addBlock(
-      targetFlavour as EdgelessBlockType,
+    const newId = this.edgeless.service.addBlock(
+      targetFlavour,
       { url, xywh: bound.serialize(), style: targetStyle, caption },
       this.edgeless.surface.model
     );
+
+    this.std.command.exec('reassociateConnectors', {
+      oldId: id,
+      newId,
+    });
+
     this.edgeless.service.selection.set({
       editing: false,
-      elements: [blockId],
+      elements: [newId],
     });
     this._doc.deleteBlock(this.model);
-  }
+  };
 
-  private _convertToEmbedView() {
+  private _convertToEmbedView = () => {
     if (this._isEmbedView) {
       return;
     }
@@ -512,7 +501,7 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
 
     const { flavour, styles } = this._embedOptions;
 
-    const { url, xywh, style } = this.model;
+    const { id, url, xywh, style } = this.model;
 
     const targetStyle = styles.includes(style) ? style : styles[0];
 
@@ -520,8 +509,8 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     bound.w = EMBED_CARD_WIDTH[targetStyle];
     bound.h = EMBED_CARD_HEIGHT[targetStyle];
 
-    const blockId = this.edgeless.service.addBlock(
-      flavour as EdgelessBlockType,
+    const newId = this.edgeless.service.addBlock(
+      flavour,
       {
         url,
         xywh: bound.serialize(),
@@ -530,12 +519,17 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
       this.edgeless.surface.model
     );
 
+    this.std.command.exec('reassociateConnectors', {
+      oldId: id,
+      newId,
+    });
+
     this.edgeless.service.selection.set({
       editing: false,
-      elements: [blockId],
+      elements: [newId],
     });
     this._doc.deleteBlock(this.model);
-  }
+  };
 
   private _getScale = () => {
     if (isEmbedSyncedDocBlock(this.model)) {
@@ -573,33 +567,6 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
     this._embedScale = this._getScale();
   }
 
-  override updated(changedProperties: Map<string, unknown>) {
-    this._cardStylePopper?.dispose();
-    if (this._canShowCardStylePanel) {
-      this._cardStylePopper = createButtonPopper(
-        this._cardStyleButton,
-        this._cardStylePanel,
-        ({ display }) => {
-          this._showCardStylePopper = display === 'show';
-        }
-      );
-      this._disposables.add(this._cardStylePopper);
-    }
-
-    if (!isEmbedHtmlBlock(this.model)) {
-      this._embedScalePopper = createButtonPopper(
-        this._embedScaleButton,
-        this._embedScalePanel,
-        ({ display }) => {
-          this._showEmbedScalePopper = display === 'show';
-        }
-      );
-      this._disposables.add(this._embedScalePopper);
-    }
-
-    super.updated(changedProperties);
-  }
-
   override render() {
     const model = this.model;
     if ('url' in this.model) {
@@ -608,185 +575,196 @@ export class EdgelessChangeEmbedCardButton extends WithDisposable(LitElement) {
       );
     }
 
-    return html`
-      <div class="change-embed-card-container">
-        ${this._canShowUrlOptions && 'url' in model
-          ? html`
-              <div class="change-embed-card-button url" @click=${this._copyUrl}>
-                <span>${model.url}</span>
-              </div>
+    const buttons = [
+      this._canShowUrlOptions && 'url' in model
+        ? html`
+            <div class="change-embed-card-button url" @click=${this._copyUrl}>
+              <span>${model.url}</span>
+            </div>
 
-              <edgeless-tool-icon-button
-                .tooltip=${'Click to copy link'}
-                .iconContainerPadding=${2}
-                class="change-embed-card-button copy"
-                ?disabled=${this._doc.readonly}
-                @click=${this._copyUrl}
-              >
-                ${CopyIcon}
-              </edgeless-tool-icon-button>
+            <edgeless-tool-icon-button
+              arai-label="Click to copy link"
+              .tooltip=${'Click to copy link'}
+              class="change-embed-card-button copy"
+              ?disabled=${this._doc.readonly}
+              @click=${this._copyUrl}
+            >
+              ${CopyIcon}
+            </edgeless-tool-icon-button>
 
-              <edgeless-tool-icon-button
-                .tooltip=${'Edit'}
-                .iconContainerPadding=${2}
-                class="change-embed-card-button edit"
-                ?disabled=${this._doc.readonly}
-                @click=${() =>
-                  toggleEmbedCardEditModal(this.std.host as EditorHost, model)}
-              >
-                ${EditIcon}
-              </edgeless-tool-icon-button>
+            <edgeless-tool-icon-button
+              arai-label="Edit"
+              .tooltip=${'Edit'}
+              class="change-embed-card-button edit"
+              ?disabled=${this._doc.readonly}
+              @click=${() =>
+                toggleEmbedCardEditModal(this.std.host as EditorHost, model)}
+            >
+              ${EditIcon}
+            </edgeless-tool-icon-button>
+          `
+        : nothing,
 
-              <component-toolbar-menu-divider
-                .vertical=${true}
-              ></component-toolbar-menu-divider>
-            `
-          : nothing}
-        ${isEmbedLinkedDocBlock(model) || isEmbedSyncedDocBlock(model)
-          ? html`
-              ${isEmbedSyncedDocBlock(model)
-                ? html`<div
-                    class="change-embed-card-button doc-info"
-                    @click=${this._open}
-                  >
-                    ${this._pageIcon}
-                    <span>${this._docTitle}</span>
-                  </div>`
-                : nothing}
-              <edgeless-tool-icon-button
-                .tooltip=${'Open'}
-                .iconContainerPadding=${2}
-                class="change-embed-card-button open"
-                @click=${this._open}
-              >
-                ${OpenIcon}
-              </edgeless-tool-icon-button>
+      isEmbedSyncedDocBlock(model)
+        ? html`
+            <div class="change-embed-card-button doc-info" @click=${this._open}>
+              ${this._pageIcon}
+              <span>${this._docTitle}</span>
+            </div>
+          `
+        : nothing,
 
-              <component-toolbar-menu-divider
-                .vertical=${true}
-              ></component-toolbar-menu-divider>
-            `
-          : nothing}
-        ${this._canShowFullScreenButton
-          ? html`
-              <edgeless-tool-icon-button
-                .tooltip=${'Full screen'}
-                .iconContainerPadding=${2}
-                class="change-embed-card-button expand"
-                @click=${this._open}
-              >
-                ${ExpandFullIcon}
-              </edgeless-tool-icon-button>
+      isEmbedSyncedDocBlock(model) || isEmbedLinkedDocBlock(model)
+        ? html`
+            <edgeless-tool-icon-button
+              arai-label="Open"
+              .tooltip=${'Open this doc'}
+              class="change-embed-card-button open"
+              @click=${this._open}
+              .disabled=${this._openButtonDisabled}
+            >
+              ${OpenIcon}
+            </edgeless-tool-icon-button>
+          `
+        : nothing,
 
-              <component-toolbar-menu-divider
-                .vertical=${true}
-              ></component-toolbar-menu-divider>
-            `
-          : nothing}
-        ${this._canConvertToEmbedView || this._isEmbedView
-          ? html`
-              <div class="change-embed-card-view-style">
-                <div class="change-embed-card-button-view-selector">
-                  <edgeless-tool-icon-button
-                    class=${classMap({
-                      'change-embed-card-button': true,
-                      card: true,
-                      'current-view': this._isCardView,
-                    })}
-                    .tooltip=${'Card view'}
-                    ?disabled=${this._doc.readonly}
-                    .iconContainerPadding=${2}
-                    .hover=${false}
-                    @click=${this._convertToCardView}
-                  >
-                    ${BookmarkIcon}
-                  </edgeless-tool-icon-button>
+      this._blockElement && isPeekable(this._blockElement)
+        ? html`
+            <edgeless-tool-icon-button
+              arai-label="Center peek"
+              .tooltip=${'Open in center peek'}
+              class="change-embed-card-button center-peek"
+              @click=${this._peek}
+            >
+              ${CenterPeekIcon}
+            </edgeless-tool-icon-button>
+          `
+        : nothing,
 
-                  <edgeless-tool-icon-button
-                    class=${classMap({
-                      'change-embed-card-button': true,
-                      embed: true,
-                      'current-view': this._isEmbedView,
-                    })}
-                    .tooltip=${'Embed view'}
-                    ?disabled=${this._doc.readonly}
-                    .iconContainerPadding=${2}
-                    .hover=${false}
-                    @click=${this._convertToEmbedView}
-                  >
-                    ${EmbedWebIcon}
-                  </edgeless-tool-icon-button>
-                </div>
-              </div>
-            `
-          : nothing}
-        ${'style' in model && this._canShowCardStylePanel
-          ? html`
-              <div class="change-embed-card-button card-style">
+      this._canShowFullScreenButton
+        ? html`
+            <edgeless-tool-icon-button
+              arai-label="Full screen"
+              .tooltip=${'Full screen'}
+              class="change-embed-card-button expand"
+              @click=${this._open}
+            >
+              ${ExpandFullIcon}
+            </edgeless-tool-icon-button>
+          `
+        : nothing,
+
+      this._canConvertToEmbedView || this._isEmbedView
+        ? html`
+            <div class="change-embed-card-view-style">
+              <div class="change-embed-card-button-view-selector">
                 <edgeless-tool-icon-button
-                  .tooltip=${this._showCardStylePopper ? nothing : 'Card style'}
-                  .iconContainerPadding=${2}
+                  class=${classMap({
+                    'change-embed-card-button': true,
+                    card: true,
+                    'current-view': this._isCardView,
+                  })}
+                  arai-label="Card view"
+                  .tooltip=${'Card view'}
                   ?disabled=${this._doc.readonly}
-                  @click=${() => this._cardStylePopper?.toggle()}
+                  .hover=${false}
+                  @click=${this._convertToCardView}
+                >
+                  ${BookmarkIcon}
+                </edgeless-tool-icon-button>
+
+                <edgeless-tool-icon-button
+                  class=${classMap({
+                    'change-embed-card-button': true,
+                    embed: true,
+                    'current-view': this._isEmbedView,
+                  })}
+                  arai-label="Embed view"
+                  .tooltip=${'Embed view'}
+                  .disabled=${this._embedViewButtonDisabled}
+                  .hover=${false}
+                  @click=${this._convertToEmbedView}
+                >
+                  ${EmbedWebIcon}
+                </edgeless-tool-icon-button>
+              </div>
+            </div>
+          `
+        : nothing,
+
+      'style' in model && this._canShowCardStylePanel
+        ? html`
+            <edgeless-menu-button
+              .contentPadding=${'8px'}
+              .button=${html`
+                <edgeless-tool-icon-button
+                  aria-label="Card style"
+                  .tooltip=${'Card style'}
                 >
                   ${PaletteIcon}
                 </edgeless-tool-icon-button>
+              `}
+            >
+              <card-style-panel
+                slot
+                .value=${model.style}
+                .options=${this._getCardStyleOptions}
+                .onSelect=${(value: EmbedCardStyle) =>
+                  this._setCardStyle(value)}
+              >
+              </card-style-panel>
+            </edgeless-menu-button>
+          `
+        : nothing,
 
-                <card-style-panel
-                  .value=${model.style}
-                  .options=${this._getCardStyleOptions}
-                  .onSelect=${(value: EmbedCardStyle) =>
-                    this._setCardStyle(value)}
-                >
-                </card-style-panel>
-              </div>
-            `
-          : nothing}
-
-        <component-toolbar-menu-divider
-          .vertical=${true}
-        ></component-toolbar-menu-divider>
-
+      html`
         <edgeless-tool-icon-button
-          .tooltip=${'Add Caption'}
-          .iconContainerPadding=${2}
+          arai-label="Add caption"
+          .tooltip=${'Add caption'}
           class="change-embed-card-button caption"
           ?disabled=${this._doc.readonly}
           @click=${this._showCaption}
         >
           ${CaptionIcon}
         </edgeless-tool-icon-button>
+      `,
 
-        ${!isEmbedHtmlBlock(model)
-          ? html`<component-toolbar-menu-divider
-                .vertical=${true}
-              ></component-toolbar-menu-divider>
+      this.quickConnectButton,
 
-              <edgeless-tool-icon-button
-                .tooltip=${this._showEmbedScalePopper ? nothing : 'Scale'}
-                .iconContainerPadding=${0}
-                @click=${() => this._embedScalePopper?.toggle()}
-              >
-                <div class="embed-scale-button">
-                  <span class="embed-scale-label"
-                    >${Math.round(this._embedScale * 100) + '%'}</span
-                  >
+      isEmbedHtmlBlock(model)
+        ? nothing
+        : html`
+            <edgeless-menu-button
+              .contentPadding=${'8px'}
+              .button=${html`
+                <edgeless-tool-icon-button
+                  aria-label="Scale"
+                  .tooltip=${'Scale'}
+                  .justify=${'space-between'}
+                  .iconContainerWidth=${'65px'}
+                  .labelHeight=${'20px'}
+                >
+                  <span class="label ellipsis">
+                    ${Math.round(this._embedScale * 100) + '%'}
+                  </span>
                   ${SmallArrowDownIcon}
-                </div>
-              </edgeless-tool-icon-button>
+                </edgeless-tool-icon-button>
+              `}
+            >
               <edgeless-scale-panel
+                slot
                 class="embed-scale-popper"
                 .scale=${Math.round(this._embedScale * 100)}
-                .scales=${[50, 100, 200]}
-                .minSize=${0}
-                .onSelect=${(scale: number) => {
-                  this._setEmbedScale(scale);
-                }}
-                .onPopperCose=${() => this._embedScalePopper?.hide()}
-              ></edgeless-scale-panel>`
-          : nothing}
-      </div>
-    `;
+                .onSelect=${(scale: number) => this._setEmbedScale(scale)}
+              ></edgeless-scale-panel>
+            </edgeless-menu-button>
+          `,
+    ];
+
+    return join(
+      buttons.filter(button => button !== nothing),
+      renderMenuDivider
+    );
   }
 }
 
@@ -798,12 +776,16 @@ declare global {
 
 export function renderEmbedButton(
   edgeless: EdgelessRootBlockComponent,
-  models?: EdgelessChangeEmbedCardButton['model'][]
+  models?: EdgelessChangeEmbedCardButton['model'][],
+  quickConnectButton?: TemplateResult<1>[]
 ) {
   if (models?.length !== 1) return nothing;
 
-  return html`<edgeless-change-embed-card-button
-    .model=${models[0]}
-    .edgeless=${edgeless}
-  ></edgeless-change-embed-card-button>`;
+  return html`
+    <edgeless-change-embed-card-button
+      .model=${models[0]}
+      .edgeless=${edgeless}
+      .quickConnectButton=${quickConnectButton?.pop() ?? nothing}
+    ></edgeless-change-embed-card-button>
+  `;
 }

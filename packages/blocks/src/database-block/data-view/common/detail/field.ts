@@ -5,11 +5,11 @@ import { classMap } from 'lit/directives/class-map.js';
 import { createRef } from 'lit/directives/ref.js';
 import { html } from 'lit/static-html.js';
 
+import { popMenu } from '../../../../_common/components/index.js';
 import type {
   CellRenderProps,
   DataViewCellLifeCycle,
 } from '../../column/index.js';
-import { popMenu } from '../../utils/menu/index.js';
 import { renderUniLit } from '../../utils/uni-component/uni-component.js';
 import type {
   DataViewColumnManager,
@@ -25,27 +25,30 @@ import {
 
 @customElement('affine-data-view-record-field')
 export class RecordField extends WithDisposable(ShadowlessElement) {
+  private get readonly() {
+    return this.view.readonly;
+  }
+
+  get cell(): DataViewCellLifeCycle | undefined {
+    return this._cell.value;
+  }
+
   static override styles = css`
     affine-data-view-record-field {
       display: flex;
       gap: 12px;
     }
 
-    .affine-database-number {
-      text-align: left;
-      justify-content: start;
-    }
-
     .field-left {
-      padding: 4px 6px 4px 4px;
+      padding: 6px;
       display: flex;
       height: max-content;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       font-size: var(--data-view-cell-text-size);
       line-height: var(--data-view-cell-text-line-height);
       color: var(--affine-text-secondary-color);
-      width: 116px;
+      width: 160px;
       border-radius: 4px;
       cursor: pointer;
       user-select: none;
@@ -75,13 +78,18 @@ export class RecordField extends WithDisposable(ShadowlessElement) {
     }
 
     .field-content {
-      padding: 4px 6px;
+      padding: 6px 8px;
       border-radius: 4px;
       flex: 1;
       cursor: pointer;
       display: flex;
       align-items: center;
       border: 1px solid transparent;
+    }
+
+    .field-content .affine-database-number {
+      text-align: left;
+      justify-content: start;
     }
 
     .field-content:hover {
@@ -95,29 +103,32 @@ export class RecordField extends WithDisposable(ShadowlessElement) {
     .field-content.is-focus {
       border: 1px solid var(--affine-primary-color);
     }
+    .field-content.empty::before {
+      content: 'Empty';
+      color: var(--affine-text-disable-color);
+      font-size: 14px;
+      line-height: 22px;
+    }
   `;
 
-  @property({ attribute: false })
-  view!: DataViewManager;
-  @property({ attribute: false })
-  column!: DataViewColumnManager;
-  @property({ attribute: false })
-  rowId!: string;
-  @state()
-  isFocus = false;
-  @state()
-  editing = false;
   private _cell = createRef<DataViewCellLifeCycle>();
 
-  private get readonly() {
-    return this.view.readonly;
-  }
+  @property({ attribute: false })
+  accessor view!: DataViewManager;
 
-  public get cell(): DataViewCellLifeCycle | undefined {
-    return this._cell.value;
-  }
+  @property({ attribute: false })
+  accessor column!: DataViewColumnManager;
 
-  public changeEditing = (editing: boolean) => {
+  @property({ attribute: false })
+  accessor rowId!: string;
+
+  @state()
+  accessor isFocus = false;
+
+  @state()
+  accessor editing = false;
+
+  changeEditing = (editing: boolean) => {
     const selection = this.closest('affine-data-view-record-detail')?.selection;
     if (selection) {
       selection.selection = {
@@ -127,13 +138,14 @@ export class RecordField extends WithDisposable(ShadowlessElement) {
     }
   };
 
-  public _click = (e: MouseEvent) => {
+  _click = (e: MouseEvent) => {
     e.stopPropagation();
     if (this.readonly) return;
 
     this.changeEditing(true);
   };
-  public _clickLeft = (e: MouseEvent) => {
+
+  _clickLeft = (e: MouseEvent) => {
     if (this.readonly) return;
     const ele = e.currentTarget as HTMLElement;
     const columns = this.view.detailColumns;
@@ -258,15 +270,18 @@ export class RecordField extends WithDisposable(ShadowlessElement) {
     const { view, edit } = this.column.renderer;
     const contentClass = classMap({
       'field-content': true,
+      empty: !this.editing && this.column.isEmpty(this.rowId),
       'is-editing': this.editing,
       'is-focus': this.isFocus,
     });
     return html`
-      <div class="field-left" @click="${this._clickLeft}">
-        <div class="icon">
-          <uni-lit .uni="${this.column.icon}"></uni-lit>
+      <div>
+        <div class="field-left" @click="${this._clickLeft}">
+          <div class="icon">
+            <uni-lit .uni="${this.column.icon}"></uni-lit>
+          </div>
+          <div class="filed-name">${column.name}</div>
         </div>
-        <div class="filed-name">${column.name}</div>
       </div>
       <div @click="${this._click}" class="${contentClass}">
         ${renderUniLit(this.editing && edit ? edit : view, props, {

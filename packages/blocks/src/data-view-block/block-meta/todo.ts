@@ -24,10 +24,10 @@ todoMeta.addProperty({
     //
   },
   updated: (block, callback) => {
-    block.text.yText.observe(callback);
+    block.text?.yText.observe(callback);
     return {
       dispose: () => {
-        block.text.yText.unobserve(callback);
+        block.text?.yText.unobserve(callback);
       },
     };
   },

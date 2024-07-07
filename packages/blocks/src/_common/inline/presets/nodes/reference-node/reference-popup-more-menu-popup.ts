@@ -2,12 +2,17 @@ import type { BlockElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import type { InlineRange } from '@blocksuite/inline/types';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { RootBlockComponent } from '../../../../../root-block/types.js';
+import { isPeekable, peek } from '../../../../components/peekable.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
-import { DeleteIcon, OpenIcon } from '../../../../icons/index.js';
+import {
+  CenterPeekIcon,
+  DeleteIcon,
+  OpenIcon,
+} from '../../../../icons/index.js';
 import type { AffineInlineEditor } from '../../affine-inline-specs.js';
 
 @customElement('reference-popup-more-menu')
@@ -29,6 +34,8 @@ export class ReferencePopupMoreMenu extends WithDisposable(LitElement) {
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      padding: 0px 8px;
+      gap: 8px;
       width: 100%;
     }
 
@@ -44,12 +51,7 @@ export class ReferencePopupMoreMenu extends WithDisposable(LitElement) {
       color: var(--affine-error-color);
     }
 
-    .reference-popup-more-menu-container > .menu-item svg {
-      margin: 0 8px;
-    }
-
     .reference-popup-more-menu-container > .divider {
-      width: 148px;
       height: 1px;
       margin: 8px;
       background-color: var(--affine-border-color);
@@ -57,13 +59,16 @@ export class ReferencePopupMoreMenu extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  inlineEditor!: AffineInlineEditor;
+  accessor target!: LitElement;
 
   @property({ attribute: false })
-  targetInlineRange!: InlineRange;
+  accessor inlineEditor!: AffineInlineEditor;
 
   @property({ attribute: false })
-  abortController!: AbortController;
+  accessor targetInlineRange!: InlineRange;
+
+  @property({ attribute: false })
+  accessor abortController!: AbortController;
 
   get referenceDocId() {
     const docId = this.inlineEditor.getFormat(this.targetInlineRange).reference
@@ -84,6 +89,10 @@ export class ReferencePopupMoreMenu extends WithDisposable(LitElement) {
     const std = this.blockElement.std;
     assertExists(std);
     return std;
+  }
+
+  get _openButtonDisabled() {
+    return this.referenceDocId === this.blockElement.doc.id;
   }
 
   private _openDoc() {
@@ -114,11 +123,24 @@ export class ReferencePopupMoreMenu extends WithDisposable(LitElement) {
             width="126px"
             height="32px"
             class="menu-item open"
-            text="Open"
+            text="Open this doc"
             @click=${() => this._openDoc()}
+            ?disabled=${this._openButtonDisabled}
           >
             ${OpenIcon}
           </icon-button>
+
+          ${isPeekable(this.target)
+            ? html`<icon-button
+                width="126px"
+                height="32px"
+                class="menu-item center-peek"
+                text="Open in center peek"
+                @click=${() => peek(this.target)}
+              >
+                ${CenterPeekIcon}
+              </icon-button>`
+            : nothing}
 
           <div class="divider"></div>
 

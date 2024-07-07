@@ -4,7 +4,12 @@ import {
   ShadowlessElement,
   WithDisposable,
 } from '@blocksuite/block-std';
-import type { Block, BlockModel, Doc } from '@blocksuite/store';
+import type { Block } from '@blocksuite/store';
+import {
+  type BlockModel,
+  type BlockSelector,
+  BlockViewType,
+} from '@blocksuite/store';
 import { css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -14,9 +19,9 @@ import {
   EDGELESS_BLOCK_CHILD_BORDER_WIDTH,
   EDGELESS_BLOCK_CHILD_PADDING,
 } from '../../_common/consts.js';
-import { DEFAULT_NOTE_COLOR } from '../../_common/edgeless/note/consts.js';
+import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../_common/edgeless/note/consts.js';
 import { NoteDisplayMode } from '../../_common/types.js';
-import { type NoteBlockModel } from '../../note-block/index.js';
+import type { NoteBlockModel } from '../../note-block/index.js';
 import { SpecProvider } from '../../specs/utils/spec-provider.js';
 import { deserializeXYWH } from '../../surface-block/index.js';
 
@@ -29,38 +34,41 @@ export class SurfaceRefNotePortal extends WithDisposable(ShadowlessElement) {
   `;
 
   @property({ attribute: false })
-  index!: number;
+  accessor index!: number;
 
   @property({ attribute: false })
-  model!: NoteBlockModel;
+  accessor model!: NoteBlockModel;
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
-  ancestors: Set<string> = new Set();
+  ancestors = new Set<string>();
 
-  selector = (block: Block, doc: Doc) => {
-    let parent: BlockModel | Block | null = block;
+  selector: BlockSelector = (block, doc) => {
+    let currentBlock: Block | BlockModel | null = block;
 
     if (this.ancestors.has(block.id)) {
-      return true;
+      return BlockViewType.Display;
     }
 
-    while (parent) {
-      if (parent.id === this.model.id) {
-        return true;
+    while (currentBlock) {
+      if (currentBlock.id === this.model.id) {
+        return BlockViewType.Display;
       }
 
-      parent = doc.getParent(parent.id);
+      currentBlock = doc.getParent(currentBlock.id);
     }
 
-    return false;
+    return BlockViewType.Hidden;
   };
 
-  renderPreview(model: BlockModel) {
-    const doc = model.doc.blockCollection.getDoc(this.selector);
-    const previewSpec = SpecProvider.getInstance().getSpec('preview');
-    return this.host.renderSpecPortal(doc, previewSpec.value);
+  renderPreview() {
+    const doc = this.model.doc.blockCollection.getDoc({
+      selector: this.selector,
+      readonly: true,
+    });
+    const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
+    return this.host.renderSpecPortal(doc, previewSpec.value.slice());
   }
 
   override connectedCallback() {
@@ -71,27 +79,29 @@ export class SurfaceRefNotePortal extends WithDisposable(ShadowlessElement) {
       this.ancestors.add(parent.id);
       parent = this.model.doc.getParent(parent.id);
     }
+
+    const doc = this.model.doc;
+    this._disposables.add(() => {
+      doc.blockCollection.clearSelector(this.selector, true);
+    });
   }
 
   override firstUpdated() {
     this.disposables.add(
       this.model.propsUpdated.on(() => this.requestUpdate())
     );
-    this._disposables.add(() => {
-      this.model.doc.blockCollection.clearSelector(this.selector);
-    });
   }
 
   override updated() {
     setTimeout(() => {
-      const editiableElements = Array.from<HTMLDivElement>(
+      const editableElements = Array.from<HTMLDivElement>(
         this.querySelectorAll('[contenteditable]')
       );
       const blockElements = Array.from(
         this.querySelectorAll(`[data-block-id]`)
       );
 
-      editiableElements.forEach(element => {
+      editableElements.forEach(element => {
         if (element.contentEditable === 'true')
           element.contentEditable = 'false';
       });
@@ -119,11 +129,11 @@ export class SurfaceRefNotePortal extends WithDisposable(ShadowlessElement) {
           : undefined,
       transform: `translate(${modelX}px, ${modelY}px)`,
       padding: `${EDGELESS_BLOCK_CHILD_PADDING}px`,
-      border: `${EDGELESS_BLOCK_CHILD_BORDER_WIDTH}px ${'solid'} var(--affine-black-10)`,
-      background: `var(${background ?? DEFAULT_NOTE_COLOR})`,
-      boxShadow: 'var(--affine-shadow-3)',
+      border: `${EDGELESS_BLOCK_CHILD_BORDER_WIDTH}px none var(--affine-black-10)`,
+      background: `var(${background ?? DEFAULT_NOTE_BACKGROUND_COLOR})`,
+      boxShadow: 'var(--affine-note-shadow-sticker)',
       position: 'absolute',
-      borderRadius: '8px',
+      borderRadius: '0px',
       boxSizing: 'border-box',
       pointerEvents: 'none',
       overflow: 'hidden',
@@ -138,7 +148,7 @@ export class SurfaceRefNotePortal extends WithDisposable(ShadowlessElement) {
         data-model-height="${modelH}"
         data-portal-reference-block-id="${model.id}"
       >
-        ${this.renderPreview(model)}
+        ${this.renderPreview()}
       </div>
     `;
   }

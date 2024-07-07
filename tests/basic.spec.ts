@@ -103,7 +103,6 @@ test(scoped`basic multi user state`, async ({ context, page: pageA }) => {
   await enterPlaygroundRoom(pageB, {
     flags: {},
     room,
-    blobStorage: undefined,
     noInit: true,
   });
   await waitDefaultPageLoaded(pageB);
@@ -127,7 +126,6 @@ test(
     await enterPlaygroundRoom(pageB, {
       flags: {},
       room,
-      blobStorage: undefined,
       noInit: true,
     });
 
@@ -151,11 +149,10 @@ test(scoped`A first open, B first edit`, async ({ context, page: pageA }) => {
 
   const pageB = await context.newPage();
   await enterPlaygroundRoom(pageB, {
-    flags: {},
     room,
-    blobStorage: undefined,
     noInit: true,
   });
+  await pageB.waitForTimeout(500);
   await focusRichText(pageB);
 
   await waitNextFrame(pageA);
@@ -476,15 +473,15 @@ test(scoped`automatic identify url text`, async ({ page }) => {
     /*xml*/ `
 <affine:page>
   <affine:note
-    prop:background="--affine-background-secondary-color"
+    prop:background="--affine-note-background-blue"
     prop:displayMode="both"
     prop:edgeless={
       Object {
         "style": Object {
-          "borderRadius": 8,
+          "borderRadius": 0,
           "borderSize": 4,
-          "borderStyle": "solid",
-          "shadowType": "--affine-note-shadow-box",
+          "borderStyle": "none",
+          "shadowType": "--affine-note-shadow-sticker",
         },
       }
     }

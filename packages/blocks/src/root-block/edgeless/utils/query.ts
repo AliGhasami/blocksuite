@@ -1,13 +1,10 @@
 import type { BlockModel } from '@blocksuite/store';
 
 import type { EmbedBlockModel } from '../../../_common/embed-block-helper/embed-block-model.js';
-import {
-  type Connectable,
-  type EdgelessTool,
-  type Selectable,
-} from '../../../_common/utils/index.js';
+import type { Connectable } from '../../../_common/utils/index.js';
 import type { AttachmentBlockModel } from '../../../attachment-block/index.js';
 import type { BookmarkBlockModel } from '../../../bookmark-block/bookmark-model.js';
+import type { EdgelessTextBlockModel } from '../../../edgeless-text/edgeless-text-model.js';
 import type { EmbedFigmaModel } from '../../../embed-figma-block/embed-figma-model.js';
 import type { EmbedGithubModel } from '../../../embed-github-block/index.js';
 import type { EmbedHtmlModel } from '../../../embed-html-block/index.js';
@@ -18,36 +15,55 @@ import type { EmbedYoutubeModel } from '../../../embed-youtube-block/embed-youtu
 import type { FrameBlockModel } from '../../../frame-block/index.js';
 import type { ImageBlockModel } from '../../../image-block/index.js';
 import type { NoteBlockModel } from '../../../note-block/index.js';
+import type { PointLocation } from '../../../surface-block/index.js';
 import {
   Bound,
-  type CanvasElement,
   type CanvasElementWithText,
   clamp,
+  ConnectorElementModel,
   deserializeXYWH,
   getQuadBoundsWithRotation,
   GRID_GAP_MAX,
   GRID_GAP_MIN,
+  MindmapElementModel,
   ShapeElementModel,
   TextElementModel,
 } from '../../../surface-block/index.js';
-import type { EdgelessBlockModel, EdgelessModel } from '../type.js';
+import type { EdgelessBlockModel } from '../edgeless-block-model.js';
+import type { EdgelessTool } from '../types.js';
 import { getElementsWithoutGroup } from './group.js';
 import type { Viewport } from './viewport.js';
 
+export function isMindmapNode(
+  element: EdgelessBlockModel | BlockSuite.EdgelessModelType | null
+) {
+  return element?.group instanceof MindmapElementModel;
+}
+
 export function isTopLevelBlock(
-  selectable: BlockModel | Selectable | BlockModel | null
+  selectable: BlockModel | BlockSuite.EdgelessModelType | BlockModel | null
 ): selectable is EdgelessBlockModel {
   return !!selectable && 'flavour' in selectable;
 }
 
 export function isNoteBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is NoteBlockModel {
   return !!element && 'flavour' in element && element.flavour === 'affine:note';
 }
 
+export function isEdgelessTextBlock(
+  element: BlockModel | BlockSuite.EdgelessModelType | null
+): element is EdgelessTextBlockModel {
+  return (
+    !!element &&
+    'flavour' in element &&
+    element.flavour === 'affine:edgeless-text'
+  );
+}
+
 export function isFrameBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is FrameBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:frame'
@@ -55,7 +71,7 @@ export function isFrameBlock(
 }
 
 export function isImageBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is ImageBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:image'
@@ -63,7 +79,7 @@ export function isImageBlock(
 }
 
 export function isAttachmentBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is AttachmentBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:attachment'
@@ -71,7 +87,7 @@ export function isAttachmentBlock(
 }
 
 export function isBookmarkBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is BookmarkBlockModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:bookmark'
@@ -79,7 +95,7 @@ export function isBookmarkBlock(
 }
 
 export function isEmbeddedBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedBlockModel {
   return (
     !!element && 'flavour' in element && /affine:embed-*/.test(element.flavour)
@@ -87,7 +103,7 @@ export function isEmbeddedBlock(
 }
 
 export function isEmbeddedLinkBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ) {
   return (
     isEmbeddedBlock(element) &&
@@ -97,7 +113,7 @@ export function isEmbeddedLinkBlock(
 }
 
 export function isEmbedGithubBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedGithubModel {
   return (
     !!element &&
@@ -107,7 +123,7 @@ export function isEmbedGithubBlock(
 }
 
 export function isEmbedYoutubeBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedYoutubeModel {
   return (
     !!element &&
@@ -117,7 +133,7 @@ export function isEmbedYoutubeBlock(
 }
 
 export function isEmbedLoomBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedLoomModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:embed-loom'
@@ -125,7 +141,7 @@ export function isEmbedLoomBlock(
 }
 
 export function isEmbedFigmaBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedFigmaModel {
   return (
     !!element &&
@@ -135,7 +151,7 @@ export function isEmbedFigmaBlock(
 }
 
 export function isEmbedLinkedDocBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedLinkedDocModel {
   return (
     !!element &&
@@ -145,7 +161,7 @@ export function isEmbedLinkedDocBlock(
 }
 
 export function isEmbedSyncedDocBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedSyncedDocModel {
   return (
     !!element &&
@@ -155,7 +171,7 @@ export function isEmbedSyncedDocBlock(
 }
 
 export function isEmbedHtmlBlock(
-  element: BlockModel | EdgelessModel | null
+  element: BlockModel | BlockSuite.EdgelessModelType | null
 ): element is EmbedHtmlModel {
   return (
     !!element && 'flavour' in element && element.flavour === 'affine:embed-html'
@@ -163,13 +179,13 @@ export function isEmbedHtmlBlock(
 }
 
 export function isCanvasElement(
-  selectable: Selectable | null
-): selectable is CanvasElement {
+  selectable: BlockSuite.EdgelessModelType | null
+): selectable is BlockSuite.SurfaceModelType {
   return !isTopLevelBlock(selectable);
 }
 
 export function isCanvasElementWithText(
-  element: Selectable
+  element: BlockSuite.EdgelessModelType
 ): element is CanvasElementWithText {
   return (
     element instanceof TextElementModel || element instanceof ShapeElementModel
@@ -177,7 +193,7 @@ export function isCanvasElementWithText(
 }
 
 export function isConnectable(
-  element: EdgelessModel | null
+  element: BlockSuite.EdgelessModelType | null
 ): element is Connectable {
   return !!element && element.connectable;
 }
@@ -221,7 +237,9 @@ export function getBackgroundGrid(zoom: number, showGrid: boolean) {
   };
 }
 
-export function getSelectedRect(selected: Selectable[]): DOMRect {
+export function getSelectedRect(
+  selected: BlockSuite.EdgelessModelType[]
+): DOMRect {
   if (selected.length === 0) {
     return new DOMRect();
   }
@@ -261,27 +279,28 @@ export function getSelectedRect(selected: Selectable[]): DOMRect {
   );
 }
 
-export function getSelectableBounds(selected: Selectable[]): Map<
-  string,
-  {
-    bound: Bound;
-    rotate: number;
-  }
-> {
-  const bounds = new Map<
-    string,
-    {
-      bound: Bound;
-      rotate: number;
-    }
-  >();
+export type SelectableProps = {
+  bound: Bound;
+  rotate: number;
+  path?: PointLocation[];
+};
+
+export function getSelectableBounds(
+  selected: BlockSuite.EdgelessModelType[]
+): Map<string, SelectableProps> {
+  const bounds = new Map();
   getElementsWithoutGroup(selected).forEach(ele => {
     const bound = Bound.deserialize(ele.xywh);
-
-    bounds.set(ele.id, {
+    const props: SelectableProps = {
       bound,
       rotate: ele.rotate,
-    });
+    };
+
+    if (isCanvasElement(ele) && ele instanceof ConnectorElementModel) {
+      props.path = ele.absolutePath.map(p => p.clone());
+    }
+
+    bounds.set(ele.id, props);
   });
 
   return bounds;

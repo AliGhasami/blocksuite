@@ -10,12 +10,13 @@ import {
 import { assertExists } from '@blocksuite/global/utils';
 import { type DocCollection, Text } from '@blocksuite/store';
 
-import { type InitFn } from './utils.js';
+import type { InitFn } from './utils.js';
 
 export const database: InitFn = (collection: DocCollection, id: string) => {
   const doc = collection.createDoc({ id });
   doc.awarenessStore.setFlag('enable_expand_database_block', true);
   doc.awarenessStore.setFlag('enable_database_statistics', true);
+  doc.awarenessStore.setFlag('enable_database_attachment_note', true);
   doc.awarenessStore.setFlag('enable_block_query', true);
 
   doc.load(() => {

@@ -1,14 +1,18 @@
 import { expect, type Page } from '@playwright/test';
+import { waitNextFrame } from 'utils/actions/misc.js';
 
 import { dblclickView } from '../utils/actions/click.js';
 import {
+  addNote,
   autoFit,
   createShapeElement,
   dragBetweenViewCoords,
   edgelessCommonSetup,
   setEdgelessTool,
   Shape,
+  toViewCoord,
   triggerComponentToolbarAction,
+  zoomOutByKeyboard,
 } from '../utils/actions/edgeless.js';
 import {
   pressEnter,
@@ -17,6 +21,7 @@ import {
 } from '../utils/actions/keyboard.js';
 import {
   assertEdgelessCanvasText,
+  assertRichTexts,
   assertSelectedBound,
 } from '../utils/asserts.js';
 import { test } from '../utils/playwright.js';
@@ -57,7 +62,7 @@ test.describe('frame', () => {
       await setEdgelessTool(page, 'frame');
       const frameMenu = page.locator('edgeless-frame-menu');
       await expect(frameMenu).toBeVisible();
-      const button = page.locator('.frame-add-button:nth-of-type(2)');
+      const button = page.locator('.frame-add-button[data-name="1:1"]');
       await button.click();
       await assertSelectedBound(page, [-500, -550, 1200, 1200]);
     });
@@ -66,10 +71,10 @@ test.describe('frame', () => {
   test('drag frame to move', async ({ page }) => {
     await addFrame(page);
     await autoFit(page);
-    await dragBetweenViewCoords(page, [100, 50], [105, 50]);
+    await dragBetweenViewCoords(page, [100, 50], [120, 70]);
     await selectAllByKeyboard(page);
-    await assertSelectedBound(page, [5, 0, 100, 100], 0);
-    await assertSelectedBound(page, [105, 0, 100, 100], 1);
+    await assertSelectedBound(page, [20, 20, 100, 100], 0);
+    await assertSelectedBound(page, [120, 20, 100, 100], 1);
   });
 
   test('edit frame title', async ({ page }) => {
@@ -77,6 +82,45 @@ test.describe('frame', () => {
     await autoFit(page);
     expect(await page.locator('edgeless-frame-title-editor').count()).toBe(0);
     await dblclickView(page, [-300 + 5, -270 - 20]);
+    await page.locator('edgeless-frame-title-editor').waitFor({
+      state: 'attached',
+    });
+    await type(page, 'ABC');
+    await assertEdgelessCanvasText(page, 'ABC');
+  });
+
+  test('edit frame after zoom', async ({ page }) => {
+    await addFrame(page);
+    await autoFit(page);
+    await zoomOutByKeyboard(page);
+    expect(await page.locator('edgeless-frame-title-editor').count()).toBe(0);
+    await dblclickView(page, [-300 + 5, -270 - 20]);
+    await page.locator('edgeless-frame-title-editor').waitFor({
+      state: 'attached',
+    });
+    await type(page, 'ABC');
+    await assertEdgelessCanvasText(page, 'ABC');
+  });
+
+  test('edit frame title after drag', async ({ page }) => {
+    await addFrame(page);
+    await autoFit(page);
+    await dragBetweenViewCoords(page, [100, 50], [120, 70]);
+    await selectAllByKeyboard(page);
+    await dblclickView(page, [-300 + 5 + 20, -270 - 20 + 20]);
+    await page.locator('edgeless-frame-title-editor').waitFor({
+      state: 'attached',
+    });
+    await type(page, 'ABC');
+    await assertEdgelessCanvasText(page, 'ABC');
+  });
+
+  test('edit title of the frame that created by tool ', async ({ page }) => {
+    await edgelessCommonSetup(page);
+    await setEdgelessTool(page, 'frame');
+
+    await dragBetweenViewCoords(page, [0, 0], [200, 100]);
+    await dblclickView(page, [65, -20]);
     await page.locator('edgeless-frame-title-editor').waitFor({
       state: 'attached',
     });
@@ -104,5 +148,20 @@ test.describe('frame', () => {
     });
     await pressEnter(page);
     expect(await page.locator('edgeless-frame-title-editor').count()).toBe(0);
+  });
+
+  test('dom inside frame can be selected and edited', async ({ page }) => {
+    await init(page);
+    const noteCoord = await toViewCoord(page, [0, 200]);
+    await addNote(page, '', noteCoord[0], noteCoord[1]);
+    await page.mouse.click(noteCoord[0] - 80, noteCoord[1]);
+    await selectAllByKeyboard(page);
+    await waitNextFrame(page);
+    await triggerComponentToolbarAction(page, 'addFrame');
+    await autoFit(page);
+
+    await dblclickView(page, [50, 250]);
+    await type(page, 'hello');
+    await assertRichTexts(page, ['hello']);
   });
 });

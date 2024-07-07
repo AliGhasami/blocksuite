@@ -11,7 +11,7 @@ import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-bl
 @customElement('edgeless-release-from-group-button')
 export class EdgelessReleaseFromGroupButton extends WithDisposable(LitElement) {
   @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
+  accessor edgeless!: EdgelessRootBlockComponent;
 
   private _releaseFromGroup() {
     const service = this.edgeless.service;
@@ -21,7 +21,8 @@ export class EdgelessReleaseFromGroupButton extends WithDisposable(LitElement) {
 
     const group = element.group;
 
-    group.removeDescendant(element.id);
+    // eslint-disable-next-line unicorn/prefer-dom-node-remove
+    group.removeChild(element);
 
     element.index = service.layer.generateIndex(
       'flavour' in element ? element.flavour : element.type
@@ -34,13 +35,16 @@ export class EdgelessReleaseFromGroupButton extends WithDisposable(LitElement) {
   }
 
   protected override render() {
-    return html`<edgeless-tool-icon-button
-      .iconContainerPadding=${2}
-      @click=${() => this._releaseFromGroup()}
-      .tooltip=${'Release From Group'}
-    >
-      ${ReleaseFromGroupButtonIcon}
-    </edgeless-tool-icon-button> `;
+    return html`
+      <edgeless-tool-icon-button
+        aria-label="Release from group"
+        .tooltip=${'Release from group'}
+        .iconSize=${'20px'}
+        @click=${() => this._releaseFromGroup()}
+      >
+        ${ReleaseFromGroupButtonIcon}
+      </edgeless-tool-icon-button>
+    `;
   }
 }
 
@@ -53,7 +57,9 @@ declare global {
 export function renderReleaseFromGroupButton(
   edgeless: EdgelessRootBlockComponent
 ) {
-  return html`<edgeless-release-from-group-button
-    .edgeless=${edgeless}
-  ></edgeless-release-from-group-button>`;
+  return html`
+    <edgeless-release-from-group-button
+      .edgeless=${edgeless}
+    ></edgeless-release-from-group-button>
+  `;
 }

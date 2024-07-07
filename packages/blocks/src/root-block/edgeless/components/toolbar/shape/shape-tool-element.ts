@@ -9,7 +9,6 @@ import {
 } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
-import type { CssVariableName } from '../../../../../_common/theme/css-variables.js';
 import type { ShapeType } from '../../../../../surface-block/elements/shape/consts.js';
 import type { ShapeStyle } from '../../../../../surface-block/index.js';
 import {
@@ -31,14 +30,15 @@ interface Coord {
   y: number;
 }
 
-interface TransformMap {
-  [key: string]: {
+type TransformMap = Record<
+  string,
+  {
     x: number;
     y: number;
     scale: number;
     origin: string;
-  };
-}
+  }
+>;
 
 @customElement('edgeless-shape-tool-element')
 export class EdgelessShapeToolElement extends WithDisposable(LitElement) {
@@ -70,41 +70,11 @@ export class EdgelessShapeToolElement extends WithDisposable(LitElement) {
     }
   `;
 
-  @property({ attribute: false })
-  shape!: Shape;
-
-  @property({ attribute: false })
-  order!: number;
-
-  @property({ attribute: false })
-  getContainerRect!: () => DOMRect;
-
-  @property({ attribute: false })
-  handleClick!: () => void;
-
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
-
   @query('#shape-tool-element')
-  private _shapeElement!: HTMLElement;
+  private accessor _shapeElement!: HTMLElement;
 
   @query('#backup-shape-element')
-  private _backupShapeElement!: HTMLElement;
-
-  @property({ attribute: false })
-  shapeType!: ShapeName;
-
-  @property({ attribute: false })
-  fillColor!: CssVariableName;
-
-  @property({ attribute: false })
-  shapeStyle!: ShapeStyle;
-
-  @property({ attribute: false })
-  strokeColor!: CssVariableName;
-
-  @property({ attribute: false })
-  radius!: number;
+  private accessor _backupShapeElement!: HTMLElement;
 
   private _transformMap: TransformMap = {
     z1: { x: 0, y: 5, scale: 1.1, origin: '50% 100%' },
@@ -114,13 +84,37 @@ export class EdgelessShapeToolElement extends WithDisposable(LitElement) {
   };
 
   @state()
-  private _startCoord: Coord = { x: -1, y: -1 };
+  private accessor _startCoord: Coord = { x: -1, y: -1 };
 
   @state()
-  private _dragging: boolean = false;
+  private accessor _dragging: boolean = false;
 
   @state()
-  private _isOutside: boolean = false;
+  private accessor _isOutside: boolean = false;
+
+  @property({ attribute: false })
+  accessor shape!: Shape;
+
+  @property({ attribute: false })
+  accessor order!: number;
+
+  @property({ attribute: false })
+  accessor getContainerRect!: () => DOMRect;
+
+  @property({ attribute: false })
+  accessor handleClick!: () => void;
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
+
+  @property({ attribute: false })
+  accessor shapeType!: ShapeName;
+
+  @property({ attribute: false })
+  accessor shapeStyle!: ShapeStyle;
+
+  @property({ attribute: false })
+  accessor radius!: number;
 
   private _onDragStart = (coord: Coord) => {
     this._startCoord = { x: coord.x, y: coord.y };
@@ -292,12 +286,6 @@ export class EdgelessShapeToolElement extends WithDisposable(LitElement) {
       this._backupShapeElement.style.setProperty('--scale', '0.9');
       this._backupShapeElement.style.zIndex = '999';
     }
-
-    this.edgeless.slots.edgelessToolUpdated.on(newTool => {
-      if (newTool.type !== 'shape') {
-        return;
-      }
-    });
   }
 
   override render() {

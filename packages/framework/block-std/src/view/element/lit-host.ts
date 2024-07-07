@@ -1,10 +1,10 @@
 /* eslint-disable lit/binding-positions, lit/no-invalid-html */
 
 import { handleError } from '@blocksuite/global/exceptions';
-import { assertExists } from '@blocksuite/global/utils';
-import type { BlockModel, Doc } from '@blocksuite/store';
-import { css } from 'lit';
+import { assertExists, Slot } from '@blocksuite/global/utils';
+import { type BlockModel, BlockViewType, type Doc } from '@blocksuite/store';
 import {
+  css,
   LitElement,
   nothing,
   type PropertyValues,
@@ -27,28 +27,6 @@ import { ShadowlessElement } from './shadowless-element.js';
 
 @customElement('editor-host')
 export class EditorHost extends WithDisposable(ShadowlessElement) {
-  static override styles = css`
-    editor-host {
-      outline: none;
-    }
-  `;
-
-  @property({ attribute: false })
-  specs!: BlockSpec[];
-
-  @property({ attribute: false })
-  doc!: Doc;
-
-  @property({ attribute: false })
-  blockIdAttr = 'data-block-id';
-
-  @property({ attribute: false })
-  widgetIdAttr = 'data-widget-id';
-
-  std!: BlockSuite.Std;
-
-  rangeManager: RangeManager | null = null;
-
   get command(): CommandManager {
     return this.std.command;
   }
@@ -68,6 +46,72 @@ export class EditorHost extends WithDisposable(ShadowlessElement) {
   get spec(): SpecStore {
     return this.std.spec;
   }
+
+  static override styles = css`
+    editor-host {
+      outline: none;
+      isolation: isolate;
+    }
+  `;
+
+  @property({ attribute: false })
+  accessor specs!: BlockSpec[];
+
+  @property({ attribute: false })
+  accessor doc!: Doc;
+
+  @property({ attribute: false })
+  accessor blockIdAttr = 'data-block-id';
+
+  @property({ attribute: false })
+  accessor widgetIdAttr = 'data-widget-id';
+
+  std!: BlockSuite.Std;
+
+  rangeManager: RangeManager | null = null;
+
+  readonly slots = {
+    unmounted: new Slot(),
+  };
+
+  private _renderModel = (model: BlockModel): TemplateResult => {
+    const { flavour } = model;
+    const block = this.doc.getBlock(model.id);
+    if (block?.blockViewType === BlockViewType.Hidden) {
+      return html``;
+    }
+    const schema = this.doc.schema.flavourSchemaMap.get(flavour);
+    const view = this.std.spec.getView(flavour);
+    if (!schema || !block || !view) {
+      console.warn(`Cannot find render flavour ${flavour}.`);
+      return html`${nothing}`;
+    }
+
+    const tag = view.component;
+    const widgets: Record<string, TemplateResult> = view.widgets
+      ? Object.entries(view.widgets).reduce((mapping, [key, tag]) => {
+          const template = html`<${tag}
+            ${unsafeStatic(this.widgetIdAttr)}=${key}
+            .host=${this}
+            .model=${model}
+            .doc=${this.doc}></${tag}>`;
+
+          return {
+            ...mapping,
+            [key]: template,
+          };
+        }, {})
+      : {};
+
+    return html`<${tag}
+      ${unsafeStatic(this.blockIdAttr)}=${model.id}
+      .host=${this}
+      .doc=${this.doc}
+      .model=${model}
+      .widgets=${widgets}
+      .viewType=${block.blockViewType}
+    ></${tag}>`;
+  };
 
   override willUpdate(changedProperties: PropertyValues) {
     if (changedProperties.has('specs')) {
@@ -129,6 +173,7 @@ export class EditorHost extends WithDisposable(ShadowlessElement) {
     super.disconnectedCallback();
     this.std.unmount();
     this.rangeManager = null;
+    this.slots.unmounted.emit();
   }
 
   override render() {
@@ -137,45 +182,6 @@ export class EditorHost extends WithDisposable(ShadowlessElement) {
 
     return this._renderModel(root);
   }
-
-  private _renderModel = (model: BlockModel): TemplateResult => {
-    const { flavour } = model;
-    const schema = this.doc.schema.flavourSchemaMap.get(flavour);
-    if (!schema) {
-      console.warn(`Cannot find schema for ${flavour}.`);
-      return html`${nothing}`;
-    }
-
-    const view = this.std.spec.getView(flavour);
-    if (!view) {
-      console.warn(`Cannot find view for ${flavour}.`);
-      return html`${nothing}`;
-    }
-
-    const tag = view.component;
-    const widgets: Record<string, TemplateResult> = view.widgets
-      ? Object.entries(view.widgets).reduce((mapping, [key, tag]) => {
-          const template = html`<${tag}
-            ${unsafeStatic(this.widgetIdAttr)}=${key}
-            .host=${this}
-            .model=${model}
-            .doc=${this.doc}></${tag}>`;
-
-          return {
-            ...mapping,
-            [key]: template,
-          };
-        }, {})
-      : {};
-
-    return html`<${tag}
-      ${unsafeStatic(this.blockIdAttr)}=${model.id}
-      .host=${this}
-      .doc=${this.doc}
-      .model=${model}
-      .widgets=${widgets}
-    ></${tag}>`;
-  };
 
   /**
    * @deprecated

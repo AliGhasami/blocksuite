@@ -1,5 +1,5 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import { type FrameBlockModel } from '@blocksuite/blocks';
+import type { FrameBlockModel } from '@blocksuite/blocks';
 import { DisposableGroup } from '@blocksuite/global/utils';
 import type { Y } from '@blocksuite/store';
 import { css, html, type PropertyValues } from 'lit';
@@ -57,22 +57,22 @@ const styles = css`
 export class FrameCardTitle extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
-  @property({ attribute: false })
-  frame!: FrameBlockModel;
+  private _titleDisposables: DisposableGroup | null = null;
 
   @property({ attribute: false })
-  cardIndex!: number;
+  accessor frame!: FrameBlockModel;
+
+  @property({ attribute: false })
+  accessor cardIndex!: number;
 
   @query('.frame-card-title-container')
-  titleContainer!: HTMLElement;
+  accessor titleContainer!: HTMLElement;
 
   @query('.frame-card-title-container .card-index')
-  titleIndexElement!: HTMLElement;
+  accessor titleIndexElement!: HTMLElement;
 
   @query('.frame-card-title-container .card-title')
-  titleContentElement!: HTMLElement;
-
-  private _titleDisposables: DisposableGroup | null = null;
+  accessor titleContentElement!: HTMLElement;
 
   private _updateElement = () => {
     this.requestUpdate();

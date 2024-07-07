@@ -20,6 +20,17 @@ import { getSurfaceElementFromEditor } from './utils/selection-utils.js';
 
 @customElement('copilot-panel')
 export class CopilotPanel extends WithDisposable(ShadowlessElement) {
+  get host() {
+    return this.editor.host;
+  }
+
+  get logic() {
+    if (!this.aiLogic) {
+      this.aiLogic = new AILogic(() => this.host);
+    }
+    return this.aiLogic;
+  }
+
   static override styles = css`
     copilot-panel {
       width: 100%;
@@ -112,29 +123,11 @@ export class CopilotPanel extends WithDisposable(ShadowlessElement) {
   `;
 
   @property({ attribute: false })
-  editor!: AffineEditorContainer;
+  accessor editor!: AffineEditorContainer;
+
   editorWithAI?: AIEdgelessLogic;
+
   aiLogic?: AILogic;
-
-  get host() {
-    return this.editor.host;
-  }
-
-  get logic() {
-    if (!this.aiLogic) {
-      this.aiLogic = new AILogic(() => this.host);
-    }
-    return this.aiLogic;
-  }
-
-  public override connectedCallback() {
-    super.connectedCallback();
-    this.disposables.add(
-      getSurfaceElementFromEditor(this.host).model.childrenUpdated.on(() => {
-        this.requestUpdate();
-      })
-    );
-  }
 
   config = () => {
     const createNew = (type: string) => () => {
@@ -185,6 +178,7 @@ export class CopilotPanel extends WithDisposable(ShadowlessElement) {
     `;
   };
 
+  // eslint-disable-next-line @typescript-eslint/member-ordering
   panels: Record<
     string,
     {
@@ -209,16 +203,23 @@ export class CopilotPanel extends WithDisposable(ShadowlessElement) {
       render: this.config,
     },
   };
+
   @state()
-  currentPanel: keyof typeof this.panels = 'Chat';
+  accessor currentPanel: keyof typeof this.panels = 'Chat';
+
+  override connectedCallback() {
+    super.connectedCallback();
+    this.disposables.add(
+      getSurfaceElementFromEditor(this.host).model.childrenUpdated.on(() => {
+        this.requestUpdate();
+      })
+    );
+  }
 
   override render() {
     const panel = this.panels[this.currentPanel];
     return html`
-      <div
-        style="display:flex;flex-direction: column;height: 100%"
-        class="blocksuite-overlay"
-      >
+      <div style="display:flex;flex-direction: column;height: 100%">
         <div
           style="display:flex;align-items:center;justify-content:center; padding-top: 17px;"
         >

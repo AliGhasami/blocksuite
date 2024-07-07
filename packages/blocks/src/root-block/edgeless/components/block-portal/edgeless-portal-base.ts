@@ -5,27 +5,31 @@ import { property } from 'lit/decorators.js';
 import { requestConnectedFrame } from '../../../../_common/utils/event.js';
 import type { SurfaceBlockComponent } from '../../../../surface-block/surface-block.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
+import type { EdgelessBlockPortalContainer } from './edgeless-block-portal.js';
 
 export class EdgelessPortalBase<T extends BlockModel> extends WithDisposable(
   ShadowlessElement
 ) {
   @property({ attribute: false })
-  index!: number;
+  accessor index!: number;
 
   @property({ attribute: false })
-  model!: T;
+  accessor model!: T;
 
   @property({ attribute: false })
-  surface!: SurfaceBlockComponent;
+  accessor surface!: SurfaceBlockComponent;
 
   @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
+  accessor edgeless!: EdgelessRootBlockComponent;
 
   @property({ attribute: false })
-  updatingSet!: Set<string>;
+  accessor updatingSet!: Set<string>;
 
   @property({ attribute: false })
-  concurrentUpdatingCount!: number;
+  accessor concurrentUpdatingCount!: number;
+
+  @property({ attribute: false })
+  accessor portalContainer!: EdgelessBlockPortalContainer;
 
   protected renderModel(model: T) {
     return this.surface.host.renderModel(model);
@@ -58,7 +62,7 @@ export class EdgelessPortalBase<T extends BlockModel> extends WithDisposable(
 
     this._disposables.add(
       this.model.propsUpdated.on(() => {
-        this.requestUpdate();
+        if (this.hasUpdated) this.requestUpdate();
       })
     );
   }

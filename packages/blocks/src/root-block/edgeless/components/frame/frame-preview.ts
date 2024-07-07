@@ -6,14 +6,15 @@ import {
   WithDisposable,
 } from '@blocksuite/block-std';
 import { debounce, DisposableGroup } from '@blocksuite/global/utils';
-import { type Doc, nanoid } from '@blocksuite/store';
+import type { BlockModel } from '@blocksuite/store';
+import { type Block, BlockViewType, type Doc, nanoid } from '@blocksuite/store';
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { EdgelessModel } from '../../../../_common/types.js';
 import type { FrameBlockModel } from '../../../../frame-block/frame-model.js';
 import type { NoteBlockModel } from '../../../../note-block/note-model.js';
+import { SpecProvider } from '../../../../specs/index.js';
 import type {
   ElementUpdatedData,
   SurfaceBlockModel,
@@ -25,7 +26,7 @@ import type { SurfaceRefRenderer } from '../../../../surface-ref-block/surface-r
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 import { isTopLevelBlock } from '../../utils/query.js';
 
-type RefElement = Exclude<EdgelessModel, NoteBlockModel>;
+type RefElement = Exclude<BlockSuite.EdgelessModelType, NoteBlockModel>;
 
 const DEFAULT_PREVIEW_CONTAINER_WIDTH = 280;
 const DEFAULT_PREVIEW_CONTAINER_HEIGHT = 166;
@@ -67,48 +68,78 @@ const styles = css`
 
 @customElement('frame-preview')
 export class FramePreview extends WithDisposable(ShadowlessElement) {
-  static override styles = styles;
-
-  @property({ attribute: false })
-  edgeless: EdgelessRootBlockComponent | null = null;
-
-  @property({ attribute: false })
-  frame!: FrameBlockModel;
-
-  @property({ attribute: false })
-  doc!: Doc;
-
-  @property({ attribute: false })
-  host!: EditorHost;
-
-  @property({ attribute: false })
-  surfaceWidth: number = DEFAULT_PREVIEW_CONTAINER_WIDTH;
-
-  @property({ attribute: false })
-  surfaceHeight: number = DEFAULT_PREVIEW_CONTAINER_HEIGHT;
-
-  @state()
-  fillScreen = false;
-
-  @state()
-  private _surfaceModel: SurfaceBlockModel | null = null;
-
-  private _surfaceRefRendererId: string = nanoid();
-  private _surfaceRefRenderer!: SurfaceRefRenderer;
-
-  private _edgelessDisposables: DisposableGroup | null = null;
-  private _docDisposables: DisposableGroup | null = null;
-  private _frameDisposables: DisposableGroup | null = null;
-
-  @query('.frame-preview-surface-canvas-container')
-  container!: HTMLDivElement;
-
-  @query('.frame-preview-surface-container surface-ref-portal')
-  blocksPortal!: SurfaceRefPortal;
-
   get surfaceRenderer() {
     return this._surfaceRefRenderer.surfaceRenderer;
   }
+
+  private get _surfaceService() {
+    return this.host?.std.spec.getService('affine:surface');
+  }
+
+  private get _surfaceRefService() {
+    return this.host.spec.getService('affine:surface-ref');
+  }
+
+  static override styles = styles;
+
+  @state()
+  private accessor _surfaceModel: SurfaceBlockModel | null = null;
+
+  private _surfaceRefRendererId: string = nanoid();
+
+  private _surfaceRefRenderer!: SurfaceRefRenderer;
+
+  private _edgelessDisposables: DisposableGroup | null = null;
+
+  private _docDisposables: DisposableGroup | null = null;
+
+  private _frameDisposables: DisposableGroup | null = null;
+
+  private _debounceHandleElementUpdated = debounce(
+    (data: ElementUpdatedData) => {
+      const { id, oldValues, props } = data;
+      if (!props.xywh) return;
+      // if element is moved in frame, refresh viewport
+      if (this._overlapWithFrame(id)) {
+        this._refreshViewport();
+      } else if (oldValues.xywh) {
+        // if element is moved out of frame, refresh viewport
+        const oldBound = Bound.deserialize(oldValues.xywh as string);
+        const frameBound = Bound.deserialize(this.frame.xywh);
+        if (oldBound.isOverlapWithBound(frameBound)) {
+          this._refreshViewport();
+        }
+      }
+    },
+    1000 / 30
+  );
+
+  @property({ attribute: false })
+  accessor edgeless: EdgelessRootBlockComponent | null = null;
+
+  @property({ attribute: false })
+  accessor frame!: FrameBlockModel;
+
+  @property({ attribute: false })
+  accessor doc!: Doc;
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
+
+  @property({ attribute: false })
+  accessor surfaceWidth: number = DEFAULT_PREVIEW_CONTAINER_WIDTH;
+
+  @property({ attribute: false })
+  accessor surfaceHeight: number = DEFAULT_PREVIEW_CONTAINER_HEIGHT;
+
+  @state()
+  accessor fillScreen = false;
+
+  @query('.frame-preview-surface-canvas-container')
+  accessor container!: HTMLDivElement;
+
+  @query('.frame-preview-surface-container surface-ref-portal')
+  accessor blocksPortal!: SurfaceRefPortal;
 
   private _attachRenderer() {
     if (
@@ -132,14 +163,6 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
         this._surfaceRefRenderer.surfaceRenderer.stackingCanvas
       );
     }
-  }
-
-  private get _surfaceService() {
-    return this.host?.std.spec.getService('affine:surface');
-  }
-
-  private get _surfaceRefService() {
-    return this.host.spec.getService('affine:surface-ref');
   }
 
   private _setupSurfaceRefRenderer() {
@@ -207,7 +230,7 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
     if (!this.edgeless) return;
 
     this.fillScreen =
-      this.edgeless.service.editPropsStore.getItem('presentFillScreen') ??
+      this.edgeless.service.editPropsStore.getStorage('presentFillScreen') ??
       false;
   }
 
@@ -235,27 +258,6 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
     const eleBound = Bound.deserialize(ele.xywh);
     return frameBound.isOverlapWithBound(eleBound);
   };
-
-  private _handleElementUpdated = (data: ElementUpdatedData) => {
-    const { id, oldValues, props } = data;
-    if (!props.xywh) return;
-    // if element is moved in frame, refresh viewport
-    if (this._overlapWithFrame(id)) {
-      this._refreshViewport();
-    } else if (oldValues.xywh) {
-      // if element is moved out of frame, refresh viewport
-      const oldBound = Bound.deserialize(oldValues.xywh as string);
-      const frameBound = Bound.deserialize(this.frame.xywh);
-      if (oldBound.isOverlapWithBound(frameBound)) {
-        this._refreshViewport();
-      }
-    }
-  };
-
-  private _debounceHandleElementUpdated = debounce(
-    this._handleElementUpdated,
-    1000 / 30
-  );
 
   private _clearEdgelessDisposables = () => {
     this._edgelessDisposables?.dispose();
@@ -334,6 +336,32 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
     );
   }
 
+  private _getSelector = (model: BlockModel) => {
+    return (block: Block, doc: Doc) => {
+      let parent: BlockModel | Block | null = block;
+
+      while (parent) {
+        if (parent.id === model.id) {
+          return BlockViewType.Display;
+        }
+
+        parent = doc.getParent(parent.id);
+      }
+
+      return BlockViewType.Hidden;
+    };
+  };
+
+  private _renderModel(model: BlockModel) {
+    const selector = this._getSelector(model);
+    this._disposables.add(() => {
+      doc.blockCollection.clearSelector(selector);
+    });
+    const doc = model.doc.blockCollection.getDoc({ selector });
+    const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
+    return this.host.renderSpecPortal(doc, previewSpec.value);
+  }
+
   private _renderSurfaceContent(referencedModel: FrameBlockModel) {
     const { width, height } = this._getViewportWH(referencedModel);
     return html`<div
@@ -363,7 +391,7 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
             .doc=${this.doc}
             .host=${this.host}
             .refModel=${referencedModel}
-            .renderModel=${this.host.renderModel}
+            .renderModel=${this._renderModel}
           ></surface-ref-portal>
           <div class="frame-preview-surface-canvas-container">
             <!-- attach canvas here -->

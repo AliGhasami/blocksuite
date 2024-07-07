@@ -2,7 +2,12 @@ import { expect, test, vi } from 'vitest';
 import * as Y from 'yjs';
 
 import { Schema } from '../schema/index.js';
-import { DocCollection, Generator } from '../store/index.js';
+import {
+  type BlockSelector,
+  BlockViewType,
+  DocCollection,
+  Generator,
+} from '../store/index.js';
 import {
   DividerBlockSchema,
   ListBlockSchema,
@@ -30,6 +35,7 @@ function createTestOptions() {
 test('trigger props updated', () => {
   const options = createTestOptions();
   const collection = new DocCollection(options);
+  collection.meta.initialize();
 
   const doc = collection.createDoc({ id: 'home' });
   doc.load();
@@ -89,6 +95,7 @@ test('trigger props updated', () => {
 test('stash and pop', () => {
   const options = createTestOptions();
   const collection = new DocCollection(options);
+  collection.meta.initialize();
 
   const doc = collection.createDoc({ id: 'home' });
   doc.load();
@@ -158,6 +165,7 @@ test('stash and pop', () => {
 test('always get latest value in onChange', () => {
   const options = createTestOptions();
   const collection = new DocCollection(options);
+  collection.meta.initialize();
 
   const doc = collection.createDoc({ id: 'home' });
   doc.load();
@@ -204,31 +212,58 @@ test('always get latest value in onChange', () => {
 test('selector', () => {
   const options = createTestOptions();
   const collection = new DocCollection(options);
+  collection.meta.initialize();
   const doc1 = collection.createDoc({ id: 'home' });
   doc1.load();
   const doc2 = collection.getDoc('home');
-  const doc3 = collection.getDoc(
-    'home',
-    block => block.flavour !== 'affine:list'
-  );
+
+  const selector: BlockSelector = block =>
+    block.flavour !== 'affine:list'
+      ? BlockViewType.Display
+      : BlockViewType.Hidden;
+  const doc3 = collection.getDoc('home', {
+    selector,
+  });
   expect(doc1).toBe(doc2);
   expect(doc1).not.toBe(doc3);
 
   const page = doc1.addBlock('affine:page');
   const note = doc1.addBlock('affine:note', {}, page);
-  doc1.addBlock('affine:paragraph', {}, note);
-  doc1.addBlock('affine:list' as never, {}, note);
+  const paragraph1 = doc1.addBlock('affine:paragraph', {}, note);
+  const list1 = doc1.addBlock('affine:list' as never, {}, note);
 
-  expect(doc2?.getBlocks()).toHaveLength(4);
-  expect(doc3?.getBlocks()).toHaveLength(3);
+  expect(doc2?.getBlock(paragraph1)?.blockViewType).toBe(BlockViewType.Display);
+  expect(doc2?.getBlock(list1)?.blockViewType).toBe(BlockViewType.Display);
+  expect(doc3?.getBlock(list1)?.blockViewType).toBe(BlockViewType.Hidden);
 
-  expect(doc1?.getBlocksByFlavour('affine:list')).toHaveLength(1);
-  expect(doc2?.getBlocksByFlavour('affine:list')).toHaveLength(1);
-  expect(doc3?.getBlocksByFlavour('affine:list')).toHaveLength(0);
+  const list2 = doc1.addBlock('affine:list' as never, {}, note);
 
-  doc1.addBlock('affine:list' as never, {}, note);
+  expect(doc2?.getBlock(list2)?.blockViewType).toBe(BlockViewType.Display);
+  expect(doc3?.getBlock(list2)?.blockViewType).toBe(BlockViewType.Hidden);
+});
 
-  expect(doc1?.getBlocksByFlavour('affine:list')).toHaveLength(2);
-  expect(doc2?.getBlocksByFlavour('affine:list')).toHaveLength(2);
-  expect(doc3?.getBlocksByFlavour('affine:list')).toHaveLength(0);
+test('local readonly', () => {
+  const options = createTestOptions();
+  const collection = new DocCollection(options);
+  collection.meta.initialize();
+  const doc1 = collection.createDoc({ id: 'home' });
+  doc1.load();
+  const doc2 = collection.getDoc('home', { readonly: true });
+  const doc3 = collection.getDoc('home', { readonly: false });
+
+  expect(doc1.readonly).toBeFalsy();
+  expect(doc2?.readonly).toBeTruthy();
+  expect(doc3?.readonly).toBeFalsy();
+
+  collection.awarenessStore.setReadonly(doc1.blockCollection, true);
+
+  expect(doc1.readonly).toBeTruthy();
+  expect(doc2?.readonly).toBeTruthy();
+  expect(doc3?.readonly).toBeTruthy();
+
+  collection.awarenessStore.setReadonly(doc1.blockCollection, false);
+
+  expect(doc1.readonly).toBeFalsy();
+  expect(doc2?.readonly).toBeTruthy();
+  expect(doc3?.readonly).toBeFalsy();
 });

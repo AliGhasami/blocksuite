@@ -1,17 +1,37 @@
-import type { HitTestOptions } from '../../root-block/edgeless/type.js';
-import { DEFAULT_ROUGHNESS } from '../consts.js';
+import { DocCollection, type Y } from '@blocksuite/store';
+
+import {
+  DEFAULT_ROUGHNESS,
+  FontFamily,
+  FontStyle,
+  FontWeight,
+  StrokeStyle,
+  TextAlign,
+  type TextStyleProps,
+} from '../consts.js';
 import { Bound } from '../utils/bound.js';
-import { getBezierNearestPoint } from '../utils/curve.js';
-import { getBezierParameters } from '../utils/curve.js';
+import {
+  getBezierNearestPoint,
+  getBezierNearestTime,
+  getBezierParameters,
+  getBezierPoint,
+  intersects,
+} from '../utils/curve.js';
 import {
   linePolylineIntersects,
   polyLineNearestPoint,
 } from '../utils/math-utils.js';
 import { PointLocation } from '../utils/point-location.js';
+import { Polyline } from '../utils/polyline.js';
 import { type IVec2, Vec } from '../utils/vec.js';
-import { type SerializedXYWH } from '../utils/xywh.js';
-import { type BaseProps, ElementModel, LocalModel } from './base.js';
-import type { StrokeStyle } from './common.js';
+import type { SerializedXYWH, XYWH } from '../utils/xywh.js';
+import {
+  type IBaseProps,
+  type IHitTestOptions,
+  type SerializedElement,
+  SurfaceElementModel,
+  SurfaceLocalModel,
+} from './base.js';
 import { derive, local, yfield } from './decorators.js';
 
 export enum ConnectorEndpoint {
@@ -23,6 +43,12 @@ export type PointStyle = 'None' | 'Arrow' | 'Triangle' | 'Circle' | 'Diamond';
 
 export const DEFAULT_FRONT_END_POINT_STYLE = 'None' as const;
 export const DEFAULT_REAR_END_POINT_STYLE = 'Arrow' as const;
+export const CONNECTOR_LABEL_MAX_WIDTH = 280;
+
+export type SerializedConnection = {
+  id?: string;
+  position?: `[${number},${number}]` | PointLocation;
+};
 
 // at least one of id and position is not null
 // both exists means the position is relative to the element
@@ -36,8 +62,49 @@ export enum ConnectorMode {
   Orthogonal,
   Curve,
 }
+export const getConnectorModeName = (mode: ConnectorMode) => {
+  return {
+    [ConnectorMode.Straight]: 'Straight',
+    [ConnectorMode.Orthogonal]: 'Orthogonal',
+    [ConnectorMode.Curve]: 'Curve',
+  }[mode];
+};
 
-type ConnectorElementProps = BaseProps & {
+export enum ConnectorLabelOffsetAnchor {
+  Top = 'top',
+  Center = 'center',
+  Bottom = 'bottom',
+}
+
+export type ConnectorLabelOffsetProps = {
+  // [0, 1], `0.5` by default
+  distance: number;
+  // `center` by default
+  anchor?: ConnectorLabelOffsetAnchor;
+};
+
+export type ConnectorLabelConstraintsProps = {
+  hasMaxWidth: boolean;
+  maxWidth: number;
+};
+
+export type ConnectorLabelProps = {
+  // Label's content
+  text?: Y.Text;
+  labelEditing?: boolean;
+  labelDisplay?: boolean;
+  labelXYWH?: XYWH;
+  labelOffset?: ConnectorLabelOffsetProps;
+  labelStyle?: TextStyleProps;
+  labelConstraints?: ConnectorLabelConstraintsProps;
+};
+
+export type SerializedConnectorElement = SerializedElement & {
+  source: SerializedConnection;
+  target: SerializedConnection;
+};
+
+export type ConnectorElementProps = IBaseProps & {
   mode: ConnectorMode;
   stroke: string;
   strokeWidth: number;
@@ -49,11 +116,9 @@ type ConnectorElementProps = BaseProps & {
 
   frontEndpointStyle?: PointStyle;
   rearEndpointStyle?: PointStyle;
-};
+} & ConnectorLabelProps;
 
-export class ConnectorElementModel extends ElementModel<ConnectorElementProps> {
-  updatingPath = false;
-
+export class ConnectorElementModel extends SurfaceElementModel<ConnectorElementProps> {
   get type() {
     return 'connector';
   }
@@ -63,58 +128,190 @@ export class ConnectorElementModel extends ElementModel<ConnectorElementProps> {
     return false as const;
   }
 
+  get connected() {
+    return !!(this.source.id || this.target.id);
+  }
+
+  override get elementBound() {
+    let bounds = super.elementBound;
+    if (this.hasLabel()) {
+      bounds = bounds.unite(Bound.fromXYWH(this.labelXYWH!));
+    }
+    return bounds;
+  }
+
+  updatingPath = false;
+
   @derive((path: PointLocation[], instance: ConnectorElementModel) => {
     const { x, y } = instance;
 
     return {
-      absolutePath: path.map(p => p.clone().setVec([p[0] + x, p[1] + y])),
+      absolutePath: path.map(p => p.clone().setVec(Vec.add(p, [x, y]))),
     };
   })
   @local()
-  path: PointLocation[] = [];
+  accessor path: PointLocation[] = [];
 
   @local()
-  absolutePath: PointLocation[] = [];
+  accessor absolutePath: PointLocation[] = [];
 
   @local()
-  xywh: SerializedXYWH = '[0,0,0,0]';
+  accessor xywh: SerializedXYWH = '[0,0,0,0]';
 
   @local()
-  rotate: number = 0;
+  accessor rotate: number = 0;
 
   @yfield()
-  mode: ConnectorMode = ConnectorMode.Orthogonal;
+  accessor mode: ConnectorMode = ConnectorMode.Orthogonal;
 
   @yfield()
-  strokeWidth: number = 4;
+  accessor strokeWidth: number = 4;
 
   @yfield()
-  stroke: string = '#000000';
+  accessor stroke: string = '#000000';
 
   @yfield()
-  strokeStyle: StrokeStyle = 'solid';
+  accessor strokeStyle: StrokeStyle = StrokeStyle.Solid;
 
   @yfield()
-  roughness: number = DEFAULT_ROUGHNESS;
+  accessor roughness: number = DEFAULT_ROUGHNESS;
 
   @yfield()
-  rough?: boolean;
+  accessor rough: boolean | undefined = undefined;
 
   @yfield()
-  source: Connection = {
+  accessor source: Connection = {
     position: [0, 0],
   };
 
   @yfield()
-  target: Connection = {
+  accessor target: Connection = {
     position: [0, 0],
   };
 
-  @yfield('None')
-  frontEndpointStyle!: PointStyle;
+  @yfield('None' as PointStyle)
+  accessor frontEndpointStyle!: PointStyle;
 
-  @yfield('Arrow')
-  rearEndpointStyle!: PointStyle;
+  @yfield('Arrow' as PointStyle)
+  accessor rearEndpointStyle!: PointStyle;
+
+  /**
+   * The content of the label.
+   */
+  @yfield()
+  accessor text: Y.Text | undefined = undefined;
+
+  /**
+   * Local control display and hide, mainly used in editing scenarios.
+   */
+  @local()
+  accessor lableEditing: boolean = false;
+
+  /**
+   * Control display and hide.
+   */
+  @yfield(true)
+  accessor labelDisplay!: boolean;
+
+  /**
+   * Returns a `XYWH` array providing information about the size of a label
+   * and its position relative to the viewport.
+   */
+  @yfield()
+  accessor labelXYWH: XYWH | undefined = undefined;
+
+  /**
+   * The offset property specifies the label along the connector path.
+   */
+  @yfield({
+    distance: 0.5,
+    anchor: ConnectorLabelOffsetAnchor.Center,
+  } as ConnectorLabelOffsetProps)
+  accessor labelOffset!: ConnectorLabelOffsetProps;
+
+  /**
+   * Defines the style of the label.
+   */
+  @yfield({
+    color: '#000000',
+    fontFamily: FontFamily.Inter,
+    fontSize: 16,
+    fontStyle: FontStyle.Normal,
+    fontWeight: FontWeight.Regular,
+    textAlign: TextAlign.Center,
+  } as TextStyleProps)
+  accessor labelStyle!: TextStyleProps;
+
+  /**
+   * Defines the size constraints of the label.
+   */
+  @yfield({
+    hasMaxWidth: true,
+    maxWidth: CONNECTOR_LABEL_MAX_WIDTH,
+  } as ConnectorLabelConstraintsProps)
+  accessor labelConstraints!: ConnectorLabelConstraintsProps;
+
+  resizePath(originalPath: PointLocation[], matrix: DOMMatrix) {
+    if (this.mode === ConnectorMode.Curve) {
+      return originalPath.map(point => {
+        const [p, t, absIn, absOut] = [
+          point,
+          point.tangent,
+          point.absIn,
+          point.absOut,
+        ]
+          .map(p => new DOMPoint(...p).matrixTransform(matrix))
+          .map(p => [p.x, p.y]);
+        const ip = Vec.sub(absIn, p);
+        const op = Vec.sub(absOut, p);
+        return new PointLocation(p, t, ip, op);
+      });
+    }
+
+    return originalPath.map(point => {
+      const { x, y } = new DOMPoint(...point).matrixTransform(matrix);
+      const p = [x, y];
+      return PointLocation.fromVec(p);
+    });
+  }
+
+  resize(bounds: Bound, originalPath: PointLocation[], matrix: DOMMatrix) {
+    this.updatingPath = false;
+
+    const path = this.resizePath(originalPath, matrix);
+
+    // the property assignment order matters
+    this.xywh = bounds.serialize();
+    this.path = path.map(p => p.clone().setVec(Vec.sub(p, bounds.tl)));
+
+    const props: {
+      labelXYWH?: XYWH;
+      source?: Connection;
+      target?: Connection;
+    } = {};
+
+    // Updates Connector's Label position.
+    if (this.hasLabel()) {
+      const [cx, cy] = this.getPointByOffsetDistance(this.labelOffset.distance);
+      const [, , w, h] = this.labelXYWH!;
+      props.labelXYWH = [cx - w / 2, cy - h / 2, w, h];
+    }
+
+    if (!this.source.id) {
+      props.source = {
+        ...this.source,
+        position: path[0].toVec() as [number, number],
+      };
+    }
+    if (!this.target.id) {
+      props.target = {
+        ...this.target,
+        position: path[path.length - 1].toVec() as [number, number],
+      };
+    }
+
+    return props;
+  }
 
   moveTo(bound: Bound) {
     const oldBound = Bound.deserialize(this.xywh);
@@ -132,33 +329,78 @@ export class ConnectorElementModel extends ElementModel<ConnectorElementProps> {
         position: Vec.add(target.position, offset) as [number, number],
       };
     }
+
+    // Updates Connector's Label position.
+    if (this.hasLabel()) {
+      const [x, y, w, h] = this.labelXYWH!;
+      this.labelXYWH = [x + offset[0], y + offset[1], w, h];
+    }
+  }
+
+  hasLabel() {
+    return Boolean(!this.lableEditing && this.labelDisplay && this.labelXYWH);
+  }
+
+  labelHitTest(point: IVec2) {
+    return (
+      this.hasLabel() && Bound.fromXYWH(this.labelXYWH!).isPointInBound(point)
+    );
   }
 
   override hitTest(
     x: number,
     y: number,
-    options?: HitTestOptions | undefined
+    options?: IHitTestOptions | undefined
   ): boolean {
+    const currentPoint = [x, y];
+
+    if (this.labelHitTest(currentPoint as IVec2)) {
+      return true;
+    }
+
+    const { mode, strokeWidth, absolutePath: path } = this;
+
     const point =
-      this.mode === ConnectorMode.Curve
-        ? getBezierNearestPoint(getBezierParameters(this.absolutePath), [x, y])
-        : polyLineNearestPoint(this.absolutePath, [x, y]);
+      mode === ConnectorMode.Curve
+        ? getBezierNearestPoint(getBezierParameters(path), currentPoint)
+        : polyLineNearestPoint(path, currentPoint);
 
     return (
-      Vec.dist(point, [x, y]) < (options?.expand ? this.strokeWidth / 2 : 0) + 8
+      Vec.dist(point, currentPoint) <
+      (options?.expand ? strokeWidth / 2 : 0) + 8
     );
   }
 
   override containedByBounds(bounds: Bound) {
-    return this.absolutePath.some(point => bounds.containsPoint(point));
-  }
-
-  override getNearestPoint(point: IVec2): IVec2 {
-    return polyLineNearestPoint(this.absolutePath, point) as IVec2;
+    return (
+      this.absolutePath.some(point => bounds.containsPoint(point)) ||
+      (this.hasLabel() &&
+        Bound.fromXYWH(this.labelXYWH!).points.some(p =>
+          bounds.containsPoint(p)
+        ))
+    );
   }
 
   override intersectWithLine(start: IVec2, end: IVec2) {
-    return linePolylineIntersects(start, end, this.absolutePath);
+    const { mode, absolutePath: path } = this;
+
+    let intersected = null;
+
+    if (mode === ConnectorMode.Curve && path.length > 1) {
+      intersected = intersects(path, [start, end]);
+    } else {
+      intersected = linePolylineIntersects(start, end, path);
+    }
+
+    if (!intersected && this.hasLabel()) {
+      intersected = linePolylineIntersects(
+        start,
+        end,
+        Bound.fromXYWH(this.labelXYWH!).points
+      );
+    }
+
+    return intersected;
   }
 
   override getRelativePointLocation(point: IVec2): PointLocation {
@@ -170,11 +412,119 @@ export class ConnectorElementModel extends ElementModel<ConnectorElementProps> {
   override serialize() {
     const result = super.serialize();
     result.xywh = this.xywh;
-    return result;
+    return result as SerializedConnectorElement;
+  }
+
+  /**
+   * Calculate the closest point on the curve via a point.
+   */
+  override getNearestPoint(point: IVec2) {
+    const { mode, absolutePath: path } = this;
+
+    if (mode === ConnectorMode.Straight) {
+      const first = path[0];
+      const last = path[path.length - 1];
+      return Vec.nearestPointOnLineSegment(first, last, point, true);
+    }
+
+    if (mode === ConnectorMode.Orthogonal) {
+      const points = path.map<IVec2>(p => [p[0], p[1]]);
+      return Polyline.nearestPoint(points, point);
+    }
+
+    const b = getBezierParameters(path);
+    const t = getBezierNearestTime(b, point);
+    const p = getBezierPoint(b, t);
+    if (p) return p;
+
+    const { x, y } = this;
+    return [x, y];
+  }
+
+  /**
+   * Calculating the computed point along a path via a offset distance.
+   *
+   * Returns a point relative to the viewport.
+   */
+  getPointByOffsetDistance(offsetDistance = 0.5, bounds?: Bound) {
+    const { mode, absolutePath: path } = this;
+
+    if (mode === ConnectorMode.Straight) {
+      const first = path[0];
+      const last = path[path.length - 1];
+      return Vec.lrp(first, last, offsetDistance);
+    }
+
+    let { x, y, w, h } = this;
+    if (bounds) {
+      x = bounds.x;
+      y = bounds.y;
+      w = bounds.w;
+      h = bounds.h;
+    }
+
+    if (mode === ConnectorMode.Orthogonal) {
+      const points = path.map<IVec2>(p => [p[0], p[1]]);
+      const point = Polyline.pointAt(points, offsetDistance);
+      if (point) return point;
+      return [x + w / 2, y + h / 2];
+    }
+
+    const b = getBezierParameters(path);
+    const point = getBezierPoint(b, offsetDistance);
+    if (point) return point;
+    return [x + w / 2, y + h / 2];
+  }
+
+  /**
+   * Calculating the computed distance along a path via a point.
+   *
+   * The point is relative to the viewport.
+   */
+  getOffsetDistanceByPoint(point: IVec2, bounds?: Bound) {
+    const { mode, absolutePath: path } = this;
+
+    let { x, y, w, h } = this;
+    if (bounds) {
+      x = bounds.x;
+      y = bounds.y;
+      w = bounds.w;
+      h = bounds.h;
+    }
+
+    point[0] = Vec.clamp(point[0], x, x + w);
+    point[1] = Vec.clamp(point[1], y, y + h);
+
+    if (mode === ConnectorMode.Straight) {
+      const s = path[0];
+      const e = path[path.length - 1];
+      const pl = Vec.dist(s, point);
+      const fl = Vec.dist(s, e);
+      return pl / fl;
+    }
+
+    if (mode === ConnectorMode.Orthogonal) {
+      const points = path.map<IVec2>(p => [p[0], p[1]]);
+      const p = Polyline.nearestPoint(points, point);
+      const pl = Polyline.lenAtPoint(points, p);
+      const fl = Polyline.len(points);
+      return pl / fl;
+    }
+
+    const b = getBezierParameters(path);
+    return getBezierNearestTime(b, point);
+  }
+
+  static override propsToY(props: ConnectorElementProps) {
+    if (props.text && !(props.text instanceof DocCollection.Y.Text)) {
+      props.text = new DocCollection.Y.Text(props.text);
+    }
+
+    return props;
   }
 }
 
-export class LocalConnectorElementModel extends LocalModel {
+export class LocalConnectorElementModel extends SurfaceLocalModel {
   get type() {
     return 'connector';
   }
@@ -210,7 +560,7 @@ export class LocalConnectorElementModel extends LocalModel {
 
   stroke: string = '#000000';
 
-  strokeStyle: StrokeStyle = 'solid';
+  strokeStyle: StrokeStyle = StrokeStyle.Solid;
 
   roughness: number = DEFAULT_ROUGHNESS;
 
@@ -227,4 +577,24 @@ export class LocalConnectorElementModel extends LocalModel {
   frontEndpointStyle!: PointStyle;
 
   rearEndpointStyle!: PointStyle;
+}
+
+export function isConnectorWithLabel(
+  model: BlockSuite.EdgelessModelType | BlockSuite.SurfaceLocalModelType
+) {
+  return model instanceof ConnectorElementModel && model.hasLabel();
+}
+
+declare global {
+  namespace BlockSuite {
+    interface SurfaceElementModelMap {
+      connector: ConnectorElementModel;
+    }
+    interface SurfaceLocalModelMap {
+      connector: LocalConnectorElementModel;
+    }
+    interface EdgelessTextModelMap {
+      connector: ConnectorElementModel;
+    }
+  }
 }

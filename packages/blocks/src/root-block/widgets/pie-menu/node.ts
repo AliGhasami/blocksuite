@@ -2,7 +2,7 @@ import { WithDisposable } from '@blocksuite/block-std';
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { type IVec } from '../../../surface-block/index.js';
+import type { IVec } from '../../../surface-block/index.js';
 import type { PieNodeModel } from './base.js';
 import type { PieMenu } from './menu.js';
 import { pieNodeStyles } from './styles.js';
@@ -17,57 +17,6 @@ import {
 
 @customElement('affine-pie-node')
 export class PieNode extends WithDisposable(LitElement) {
-  static override styles = pieNodeStyles;
-  @property({ attribute: false })
-  model!: PieNodeModel;
-
-  @property({ attribute: false })
-  angle!: number;
-
-  @property({ attribute: false })
-  index!: number; // for selecting with keyboard
-
-  @property({ attribute: false })
-  startAngle!: number;
-
-  @property({ attribute: false })
-  endAngle!: number;
-
-  @property({ attribute: false })
-  position!: IVec;
-
-  @property({ attribute: false })
-  containerNode: PieNode | null = null;
-
-  @property({ attribute: false })
-  menu!: PieMenu;
-
-  @state()
-  private _isHovering = false;
-
-  private _rotatorAngle: number | null = null;
-
-  select() {
-    const schema = this.model;
-
-    if (isRootNode(schema)) return;
-
-    const ctx = {
-      rootElement: this.menu.rootElement,
-      menu: this.menu,
-      widgetElement: this.menu.widgetElement,
-      node: this,
-    };
-
-    if (isNodeWithAction(schema)) {
-      schema.action(ctx);
-    } else if (isColorNode(schema)) {
-      schema.onChange(schema.color, ctx);
-    }
-
-    this.requestUpdate();
-  }
-
   get icon() {
     const icon = this.model.icon;
     if (typeof icon === 'function') {
@@ -78,26 +27,36 @@ export class PieNode extends WithDisposable(LitElement) {
     return icon;
   }
 
-  isCenterNode() {
-    return (
-      isNodeWithChildren(this.model) && this.menu.selectionChain.includes(this)
-    );
-  }
+  static override styles = pieNodeStyles;
 
-  isActive() {
-    return this.menu.isActiveNode(this);
-  }
+  @state()
+  private accessor _isHovering = false;
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-    this._setupEvents();
-  }
+  private _rotatorAngle: number | null = null;
 
-  protected override render() {
-    return this.isCenterNode()
-      ? this._renderCenterNode()
-      : this._renderChildNode();
-  }
+  @property({ attribute: false })
+  accessor model!: PieNodeModel;
+
+  @property({ attribute: false })
+  accessor angle!: number;
+
+  @property({ attribute: false })
+  accessor index!: number; // for selecting with keyboard
+
+  @property({ attribute: false })
+  accessor startAngle!: number;
+
+  @property({ attribute: false })
+  accessor endAngle!: number;
+
+  @property({ attribute: false })
+  accessor position!: IVec;
+
+  @property({ attribute: false })
+  accessor containerNode: PieNode | null = null;
+
+  @property({ attribute: false })
+  accessor menu!: PieMenu;
 
   private _setupEvents() {
     this._disposables.add(
@@ -168,6 +127,48 @@ export class PieNode extends WithDisposable(LitElement) {
       this._isHovering = false;
     }
   };
+
+  protected override render() {
+    return this.isCenterNode()
+      ? this._renderCenterNode()
+      : this._renderChildNode();
+  }
+
+  select() {
+    const schema = this.model;
+
+    if (isRootNode(schema)) return;
+
+    const ctx = {
+      rootElement: this.menu.rootElement,
+      menu: this.menu,
+      widgetElement: this.menu.widgetElement,
+      node: this,
+    };
+
+    if (isNodeWithAction(schema)) {
+      schema.action(ctx);
+    } else if (isColorNode(schema)) {
+      schema.onChange(schema.color, ctx);
+    }
+
+    this.requestUpdate();
+  }
+
+  isCenterNode() {
+    return (
+      isNodeWithChildren(this.model) && this.menu.selectionChain.includes(this)
+    );
+  }
+
+  isActive() {
+    return this.menu.isActiveNode(this);
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._setupEvents();
+  }
 }
 
 declare global {

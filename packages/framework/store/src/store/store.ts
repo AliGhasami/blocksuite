@@ -2,14 +2,16 @@ import { type Logger, NoopLogger } from '@blocksuite/global/utils';
 import {
   AwarenessEngine,
   type AwarenessSource,
+  BlobEngine,
+  type BlobSource,
   DocEngine,
   type DocSource,
+  MemoryBlobSource,
   NoopDocSource,
 } from '@blocksuite/sync';
 import { merge } from 'merge';
 import { Awareness } from 'y-protocols/awareness.js';
 
-import type { BlobStorage } from '../persistence/blob/types.js';
 import type { IdGenerator } from '../utils/id-generator.js';
 import {
   createAutoIncrementIdGenerator,
@@ -21,11 +23,7 @@ import { AwarenessStore, type RawAwarenessState } from '../yjs/awareness.js';
 import { BlockSuiteDoc } from '../yjs/index.js';
 import type { Space } from './space.js';
 
-export interface SerializedStore {
-  [key: string]: {
-    [key: string]: unknown;
-  };
-}
+export type SerializedStore = Record<string, Record<string, unknown>>;
 
 export enum Generator {
   /**
@@ -54,36 +52,50 @@ export interface StoreOptions<
   id?: string;
   idGenerator?: Generator | IdGenerator;
   defaultFlags?: Partial<Flags>;
-  blobStorages?: ((id: string) => BlobStorage)[];
   logger?: Logger;
   docSources?: {
     main: DocSource;
-    shadow?: DocSource[];
+    shadows?: DocSource[];
+  };
+  blobSources?: {
+    main: BlobSource;
+    shadows?: BlobSource[];
   };
   awarenessSources?: AwarenessSource[];
+  disableSearchIndex?: boolean;
+  disableBacklinkIndex?: boolean;
 }
 
 const FLAGS_PRESET = {
   enable_synced_doc_block: false,
   enable_pie_menu: false,
   enable_database_statistics: false,
+  enable_database_attachment_note: false,
   enable_legacy_validation: true,
   enable_expand_database_block: false,
   enable_block_query: false,
   enable_lasso_tool: false,
-  enable_mindmap_entry: false,
+  enable_edgeless_text: true,
+  enable_ai_onboarding: false,
   readonly: {},
 } satisfies BlockSuiteFlags;
 
 export class Store {
   readonly id: string;
+
   readonly doc: BlockSuiteDoc;
+
   readonly spaces = new Map<string, Space>();
+
   readonly awarenessStore: AwarenessStore;
+
   readonly idGenerator: IdGenerator;
 
   readonly docSync: DocEngine;
+
   readonly awarenessSync: AwarenessEngine;
+
+  readonly blobSync: BlobEngine;
 
   constructor(
     {
@@ -93,6 +105,9 @@ export class Store {
       awarenessSources = [],
       docSources = {
         main: new NoopDocSource(),
+      },
+      blobSources = {
+        main: new MemoryBlobSource(),
       },
       logger = new NoopLogger(),
     }: StoreOptions = {
@@ -114,7 +129,12 @@ export class Store {
     this.docSync = new DocEngine(
       this.doc,
       docSources.main,
-      docSources.shadow ?? [],
+      docSources.shadows ?? [],
+      logger
+    );
+    this.blobSync = new BlobEngine(
+      blobSources.main,
+      blobSources.shadows ?? [],
       logger
     );
 

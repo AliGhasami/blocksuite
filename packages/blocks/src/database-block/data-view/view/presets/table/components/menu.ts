@@ -1,6 +1,9 @@
-import type { ReferenceElement } from '@floating-ui/dom';
 import { html } from 'lit';
 
+import {
+  type Menu,
+  popFilterableSimpleMenu,
+} from '../../../../../../_common/components/index.js';
 import {
   ExpandFullIcon,
   MoveLeftIcon,
@@ -9,7 +12,6 @@ import {
 import type { RootBlockComponent } from '../../../../../../root-block/index.js';
 import { DeleteIcon } from '../../../../common/icons/index.js';
 import type { DataViewRenderer } from '../../../../data-view.js';
-import { type Menu, popFilterableSimpleMenu } from '../../../../utils/index.js';
 import type { DataViewColumnManager } from '../../../data-view-manager.js';
 import type { TableSelectionController } from '../controller/selection.js';
 import {
@@ -38,7 +40,7 @@ export const openDetail = (
 
 export const popRowMenu = (
   dataViewEle: DataViewRenderer,
-  ele: ReferenceElement,
+  ele: HTMLElement,
   rowId: string,
   selection: TableSelectionController
 ) => {
@@ -131,7 +133,7 @@ export const popRowMenu = (
 
 export const popColStatOperationMenu = (
   _rootElement: RootBlockComponent | null,
-  elem: ReferenceElement,
+  elem: HTMLElement,
   _column: DataViewColumnManager,
   calcType: ColumnDataType,
   onSelect: (formula: StatCalcOp) => void

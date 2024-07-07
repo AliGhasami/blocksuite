@@ -24,6 +24,7 @@ export class AffineEdgelessZoomToolbarWidget extends WidgetElement<
       z-index: var(--affine-z-index-popover);
       display: flex;
       justify-content: center;
+      -webkit-user-select: none;
       user-select: none;
     }
 
@@ -41,7 +42,7 @@ export class AffineEdgelessZoomToolbarWidget extends WidgetElement<
   `;
 
   @state()
-  private _hide = false;
+  private accessor _hide = false;
 
   get edgeless() {
     return this.blockElement;

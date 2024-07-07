@@ -2,7 +2,7 @@ import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import type { InlineRange } from '@blocksuite/inline';
 import type { Text } from '@blocksuite/store';
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
@@ -12,6 +12,21 @@ import type { DatabaseBlockComponent } from '../../database-block.js';
 
 @customElement('affine-database-title')
 export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
+  get inlineEditor() {
+    assertExists(this.richText.inlineEditor);
+    return this.richText.inlineEditor;
+  }
+
+  get inlineEditorContainer() {
+    return this.inlineEditor.rootElement;
+  }
+
+  get topContenteditableElement() {
+    const databaseBlock =
+      this.closest<DatabaseBlockComponent>('affine-database');
+    return databaseBlock?.topContenteditableElement;
+  }
+
   static override styles = css`
     .affine-database-title {
       position: relative;
@@ -52,32 +67,33 @@ export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
     }
   `;
 
-  @property({ attribute: false })
-  titleText!: Text;
-
-  @property({ attribute: false })
-  readonly!: boolean;
-
-  @property({ attribute: false })
-  onPressEnterKey?: () => void;
+  @query('rich-text')
+  private accessor richText!: RichText;
 
   @state()
-  isComposing = false;
+  private accessor isActive = false;
 
-  @query('rich-text')
-  private richText!: RichText;
-  get inlineEditor() {
-    assertExists(this.richText.inlineEditor);
-    return this.richText.inlineEditor;
-  }
-  get inlineEditorContainer() {
-    return this.inlineEditor.rootElement;
-  }
-  get topContenteditableElement() {
-    const databaseBlock =
-      this.closest<DatabaseBlockComponent>('affine-database');
-    return databaseBlock?.topContenteditableElement;
-  }
+  @property({ attribute: false })
+  accessor titleText!: Text;
+
+  @property({ attribute: false })
+  accessor readonly!: boolean;
+
+  @property({ attribute: false })
+  accessor onPressEnterKey: (() => void) | undefined = undefined;
+
+  @state()
+  accessor isComposing = false;
+
+  private _onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.isComposing) {
+      // prevent insert v-line
+      event.preventDefault();
+      // insert new row
+      this.onPressEnterKey?.();
+      return;
+    }
+  };
 
   override firstUpdated() {
     // for title placeholder
@@ -122,19 +138,6 @@ export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
     return result;
   }
 
-  private _onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.isComposing) {
-      // prevent insert v-line
-      event.preventDefault();
-      // insert new row
-      this.onPressEnterKey?.();
-      return;
-    }
-  };
-
-  @state()
-  private isActive = false;
-
   override render() {
     const isEmpty =
       (!this.titleText || !this.titleText.length) && !this.isComposing;
@@ -151,9 +154,10 @@ export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
         .undoManager=${this.topContenteditableElement?.doc.history}
         .enableFormat=${false}
         .readonly=${this.readonly}
-        .verticalScrollContainer=${this.topContenteditableElement?.host
-          ? getViewportElement(this.topContenteditableElement.host)
-          : nothing}
+        .verticalScrollContainerGetter=${() =>
+          this.topContenteditableElement?.host
+            ? getViewportElement(this.topContenteditableElement.host)
+            : null}
         class="${classList}"
         data-title-empty="${isEmpty}"
         data-title-focus="${this.isActive}"

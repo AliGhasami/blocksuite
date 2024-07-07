@@ -15,15 +15,19 @@ export abstract class BaseCellRenderer<
   implements DataViewCellLifeCycle, CellRenderProps<Data, Value>
 {
   @property({ attribute: false })
-  view!: DataViewManager;
+  accessor view!: DataViewManager;
+
   @property({ attribute: false })
-  column!: DataViewColumnManager<Value, Data>;
+  accessor column!: DataViewColumnManager<Value, Data>;
+
   @property()
-  rowId!: string;
+  accessor rowId!: string;
+
   @property({ attribute: false })
-  isEditing!: boolean;
+  accessor isEditing!: boolean;
+
   @property({ attribute: false })
-  selectCurrentCell!: (editing: boolean) => void;
+  accessor selectCurrentCell!: (editing: boolean) => void;
 
   get readonly(): boolean {
     return this.column.readonly;
@@ -37,23 +41,23 @@ export abstract class BaseCellRenderer<
     this.column.setValue(this.rowId, value);
   }
 
-  public beforeEnterEditMode(): boolean {
+  beforeEnterEditMode(): boolean {
     return true;
   }
 
-  public onEnterEditMode(): void {
+  onEnterEditMode(): void {
     // do nothing
   }
 
-  public onExitEditMode() {
+  onExitEditMode() {
     // do nothing
   }
 
-  public focusCell() {
+  focusCell() {
     return true;
   }
 
-  public blurCell() {
+  blurCell() {
     return true;
   }
 

@@ -1,4 +1,4 @@
-import type { ElementModel } from '../base.js';
+import type { SurfaceElementModel } from '../base.js';
 import { getDecoratorState } from './common.js';
 import { convertProps } from './convert.js';
 import { getDeriveProperties, updateDerivedProp } from './derive.js';
@@ -6,49 +6,67 @@ import { startObserve } from './observer.js';
 
 const yPropsSetSymbol = Symbol('yProps');
 
-export function getYFieldPropsSet(prototype: unknown): Set<string | symbol> {
+export function getYFieldPropsSet(target: unknown): Set<string | symbol> {
+  const proto = Object.getPrototypeOf(target);
   // @ts-ignore
-  if (!Object.hasOwn(prototype, yPropsSetSymbol)) {
+  if (!Object.hasOwn(proto, yPropsSetSymbol)) {
     // @ts-ignore
-    prototype[yPropsSetSymbol] = new Set();
+    proto[yPropsSetSymbol] = new Set();
   }
 
   // @ts-ignore
-  return prototype[yPropsSetSymbol] as Set<string | symbol>;
+  return proto[yPropsSetSymbol] as Set<string | symbol>;
 }
 
-export function yfield(fallback?: unknown): PropertyDecorator {
-  return function yDecorator(prototype: unknown, prop: string | symbol) {
-    const yProps = getYFieldPropsSet(prototype);
+export function yfield<V, T extends SurfaceElementModel>(fallback?: V) {
+  // return function yDecorator(prototype: unknown, prop: string | symbol) {
+  return function yDecorator(
+    target: ClassAccessorDecoratorTarget<T, V>,
+    context: ClassAccessorDecoratorContext
+  ) {
+    const prop = context.name;
 
-    yProps.add(prop);
+    return {
+      init(this: SurfaceElementModel, v: V) {
+        const yProps = getYFieldPropsSet(this);
 
-    Object.defineProperty(prototype, prop, {
-      get(this: ElementModel) {
+        yProps.add(prop);
+
+        if (getDecoratorState()?.skipYfield) {
+          return;
+        }
+
+        if (this.yMap) {
+          if (this.yMap.doc) {
+            this.surface.doc.transact(() => {
+              this.yMap.set(prop as string, v);
+            });
+          } else {
+            this.yMap.set(prop as string, v);
+            this._preserved.set(prop as string, v);
+          }
+        }
+        return v;
+      },
+      get(this: SurfaceElementModel) {
         return (
           this.yMap.get(prop as string) ??
           this._preserved.get(prop as string) ??
           fallback
         );
       },
-      set(this: ElementModel, originalVal) {
+      set(this: T, originalVal: V) {
         const isCreating = getDecoratorState()?.creating;
 
         if (getDecoratorState()?.skipYfield) {
           return;
         }
 
-        const derivedProps = getDeriveProperties(
-          prototype,
-          prop,
-          originalVal,
-          this
-        );
+        const derivedProps = getDeriveProperties(prop, originalVal, this);
         const val = isCreating
           ? originalVal
-          : convertProps(prototype, prop, originalVal, this);
-        // @ts-ignore
-        const oldValue = this[prop];
+          : convertProps(prop, originalVal, this);
+        const oldValue = target.get.call(this);
 
         if (this.yMap.doc) {
           this.surface.doc.transact(() => {
@@ -59,7 +77,7 @@ export function yfield(fallback?: unknown): PropertyDecorator {
           this._preserved.set(prop as string, val);
         }
 
-        startObserve(prototype, prop as string, this);
+        startObserve(prop as string, this);
 
         if (!isCreating) {
           updateDerivedProp(derivedProps, this);
@@ -75,6 +93,6 @@ export function yfield(fallback?: unknown): PropertyDecorator {
           });
         }
       },
-    });
+    } as ClassAccessorDecoratorResult<T, V>;
   };
 }

@@ -5,7 +5,7 @@ import { Boxed, type UnRecord, y2Native } from '../../reactive/index.js';
 import { createYProxy, native2Y } from '../../reactive/index.js';
 import { BlockModel, internalPrimitives } from '../../schema/base.js';
 import type { Schema } from '../../schema/index.js';
-import type { Doc } from './doc.js';
+import { BlockViewType, type Doc } from './doc.js';
 
 export type YBlock = Y.Map<unknown> & {
   get(prop: 'sys:id'): string;
@@ -14,79 +14,26 @@ export type YBlock = Y.Map<unknown> & {
   get<T = unknown>(prop: string): T;
 };
 
-export type BlockOptions = Partial<{
-  onChange: (block: Block, key: string, value: unknown) => void;
-}>;
+export type BlockOptions = {
+  onChange?: (block: Block, key: string, value: unknown) => void;
+};
 
 export class Block {
-  readonly model: BlockModel;
-  readonly id: string;
-  readonly flavour: string;
-  readonly version: number;
-  readonly yChildren: Y.Array<string[]>;
   private _byPassProxy: boolean = false;
-  private readonly _stashed: Set<string | number> = new Set();
 
-  private _stashProp(prop: string) {
-    (this.model as BlockModel<Record<string, unknown>>)[prop] = y2Native(
-      this.yBlock.get(`prop:${prop}`),
-      {
-        transform: (value, origin) => {
-          if (Boxed.is(origin)) {
-            return value;
-          }
-          if (origin instanceof Y.Map) {
-            return new Proxy(value as UnRecord, {
-              get: (target, p, receiver) => {
-                return Reflect.get(target, p, receiver);
-              },
-              set: (target, p, value, receiver) => {
-                const result = Reflect.set(target, p, value, receiver);
-                this.options.onChange?.(this, prop, value);
-                return result;
-              },
-              deleteProperty: (target, p) => {
-                const result = Reflect.deleteProperty(target, p);
-                this.options.onChange?.(this, prop, undefined);
-                return result;
-              },
-            });
-          }
-          if (origin instanceof Y.Array) {
-            return new Proxy(value as unknown[], {
-              get: (target, p, receiver) => {
-                return Reflect.get(target, p, receiver);
-              },
-              set: (target, p, value, receiver) => {
-                const index = Number(p);
-                if (Number.isNaN(index)) {
-                  return Reflect.set(target, p, value, receiver);
-                }
-                const result = Reflect.set(target, p, value, receiver);
-                this.options.onChange?.(this, prop, value);
-                return result;
-              },
-              deleteProperty: (target, p) => {
-                const result = Reflect.deleteProperty(target, p);
-                this.options.onChange?.(this, p as string, undefined);
-                return result;
-              },
-            });
-          }
+  private readonly _stashed = new Set<string | number>();
 
-          return value;
-        },
-      }
-    );
-  }
+  blockViewType: BlockViewType = BlockViewType.Display;
 
-  private _popProp(prop: string) {
-    const model = this.model as BlockModel<Record<string, unknown>>;
+  readonly model: BlockModel;
 
-    const value = model[prop];
-    this._stashed.delete(prop);
-    model[prop] = value;
-  }
+  readonly id: string;
+
+  readonly flavour: string;
+
+  readonly version: number;
+
+  readonly yChildren: Y.Array<string[]>;
 
   constructor(
     readonly schema: Schema,
@@ -150,17 +97,66 @@ export class Block {
     }
   }
 
-  stash = (prop: string) => {
-    if (this._stashed.has(prop)) return;
+  private _stashProp(prop: string) {
+    (this.model as BlockModel<Record<string, unknown>>)[prop] = y2Native(
+      this.yBlock.get(`prop:${prop}`),
+      {
+        transform: (value, origin) => {
+          if (Boxed.is(origin)) {
+            return value;
+          }
+          if (origin instanceof Y.Map) {
+            return new Proxy(value as UnRecord, {
+              get: (target, p, receiver) => {
+                return Reflect.get(target, p, receiver);
+              },
+              set: (target, p, value, receiver) => {
+                const result = Reflect.set(target, p, value, receiver);
+                this.options.onChange?.(this, prop, value);
+                return result;
+              },
+              deleteProperty: (target, p) => {
+                const result = Reflect.deleteProperty(target, p);
+                this.options.onChange?.(this, prop, undefined);
+                return result;
+              },
+            });
+          }
+          if (origin instanceof Y.Array) {
+            return new Proxy(value as unknown[], {
+              get: (target, p, receiver) => {
+                return Reflect.get(target, p, receiver);
+              },
+              set: (target, p, value, receiver) => {
+                const index = Number(p);
+                if (Number.isNaN(index)) {
+                  return Reflect.set(target, p, value, receiver);
+                }
+                const result = Reflect.set(target, p, value, receiver);
+                this.options.onChange?.(this, prop, value);
+                return result;
+              },
+              deleteProperty: (target, p) => {
+                const result = Reflect.deleteProperty(target, p);
+                this.options.onChange?.(this, p as string, undefined);
+                return result;
+              },
+            });
+          }
 
-    this._stashed.add(prop);
-    this._stashProp(prop);
-  };
+          return value;
+        },
+      }
+    );
+  }
 
-  pop = (prop: string) => {
-    if (!this._stashed.has(prop)) return;
-    this._popProp(prop);
-  };
+  private _popProp(prop: string) {
+    const model = this.model as BlockModel<Record<string, unknown>>;
+
+    const value = model[prop];
+    this._stashed.delete(prop);
+    model[prop] = value;
+  }
 
   private _byPassUpdate = (fn: () => void) => {
     this._byPassProxy = true;
@@ -223,7 +219,7 @@ export class Block {
     // Set default props if not exists
     if (defaultProps) {
       Object.entries(defaultProps).forEach(([key, value]) => {
-        if (props[key] !== undefined) return;
+        if (key in props) return;
 
         const yValue = native2Y(value);
         this.yBlock.set(`prop:${key}`, yValue);
@@ -296,4 +292,16 @@ export class Block {
       },
     });
   }
+
+  stash = (prop: string) => {
+    if (this._stashed.has(prop)) return;
+
+    this._stashed.add(prop);
+    this._stashProp(prop);
+  };
+
+  pop = (prop: string) => {
+    if (!this._stashed.has(prop)) return;
+    this._popProp(prop);
+  };
 }

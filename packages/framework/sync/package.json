@@ -1,6 +1,6 @@
 {
   "name": "@blocksuite/sync",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "BlockSuite data synchronization engine abstraction and implementation.",
   "type": "module",
   "repository": "toeverything/blocksuite",
@@ -14,10 +14,10 @@
   "license": "MPL-2.0",
   "dependencies": {
     "@blocksuite/global": "workspace:*",
-    "y-protocols": "^1.0.6",
-    "idb": "^8.0.0"
+    "idb": "^8.0.0",
+    "idb-keyval": "^6.2.1",
+    "y-protocols": "^1.0.6"
   },
-  "devDependencies": {},
   "peerDependencies": {
     "yjs": "^13.6.15"
   },

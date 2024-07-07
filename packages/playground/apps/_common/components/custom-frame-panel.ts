@@ -20,17 +20,18 @@ export class CustomFramePanel extends WithDisposable(ShadowlessElement) {
       z-index: 1;
     }
   `;
+
   @state()
-  private _show = false;
+  private accessor _show = false;
 
   @property({ attribute: false })
-  editor!: AffineEditorContainer;
+  accessor editor!: AffineEditorContainer;
 
   private _renderPanel() {
     return html`<frame-panel .editor=${this.editor}></frame-panel>`;
   }
 
-  public toggleDisplay() {
+  toggleDisplay() {
     this._show = !this._show;
   }
 
@@ -55,9 +56,7 @@ export class CustomFramePanel extends WithDisposable(ShadowlessElement) {
   override render() {
     return html`
       ${this._show
-        ? html`<div class="custom-frame-container blocksuite-overlay">
-            ${this._renderPanel()}
-          </div>`
+        ? html`<div class="custom-frame-container">${this._renderPanel()}</div>`
         : nothing}
     `;
   }

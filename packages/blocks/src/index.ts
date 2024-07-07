@@ -19,16 +19,24 @@ import { deserializeXYWH } from './surface-block/index.js';
 
 export * from './_common/adapters/index.js';
 export * from './_common/components/ai-item/index.js';
-export type { SelectTag } from './_common/components/index.js';
-export { toast, Tooltip } from './_common/components/index.js';
+export * from './_common/components/doc-mode-service.js';
+export type {
+  DocModeService,
+  NotificationService,
+  PeekViewService,
+} from './_common/components/index.js';
 export {
-  popTagSelect,
+  createLitPortal,
+  HoverController,
+  PeekableController,
   RichText,
   scrollbarStyle,
+  toast,
+  Tooltip,
 } from './_common/components/index.js';
 export { type NavigatorMode } from './_common/edgeless/frame/consts.js';
 export {
-  createEmbedBlock,
+  createEmbedBlockSchema,
   defineEmbedModel,
   EmbedBlockElement,
 } from './_common/embed-block-helper/index.js';
@@ -63,7 +71,11 @@ export {
   ThemeObserver,
 } from './_common/theme/theme-observer.js';
 export * from './_common/transformers/index.js';
-export { type AbstractEditor, NoteDisplayMode } from './_common/types.js';
+export {
+  type AbstractEditor,
+  type DocMode,
+  NoteDisplayMode,
+} from './_common/types.js';
 export {
   createButtonPopper,
   matchFlavours,
@@ -81,8 +93,13 @@ export * from './attachment-block/index.js';
 export * from './bookmark-block/index.js';
 export * from './code-block/index.js';
 export * from './data-view-block/index.js';
+export {
+  popTagSelect,
+  type SelectTag,
+} from './database-block/data-view/utils/tags/multi-tag-select.js';
 export * from './database-block/index.js';
 export * from './divider-block/index.js';
+export * from './edgeless-text/index.js';
 export * from './embed-figma-block/index.js';
 export * from './embed-github-block/index.js';
 export * from './embed-html-block/index.js';
@@ -103,7 +120,6 @@ export type {
   TemplateManager,
 } from './root-block/edgeless/components/toolbar/template/template-type.js';
 export { CopilotSelectionController } from './root-block/edgeless/controllers/tools/copilot-tool.js';
-export type { EdgelessModel } from './root-block/edgeless/type.js';
 export * from './root-block/index.js';
 export * from './schemas.js';
 export * from './specs/index.js';
@@ -115,11 +131,11 @@ export {
   CommunityCanvasTextFonts,
   ConnectorElementModel,
   ConnectorMode,
-  ElementModel,
   fitContent,
   generateKeyBetween,
   getElementsBound,
   GroupElementModel,
+  LayoutType,
   markdownToMindmap,
   MindmapElementModel,
   MindmapRootBlock,

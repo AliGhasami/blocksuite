@@ -93,6 +93,7 @@ export const defaultStore: SerializedStore = {
       'affine:bookmark': 1,
       'affine:attachment': 1,
       'affine:surface-ref': 1,
+      'affine:edgeless-text': 1,
     },
     workspaceVersion: COLLECTION_VERSION,
     pageVersion: PAGE_VERSION,
@@ -113,16 +114,16 @@ export const defaultStore: SerializedStore = {
           'sys:children': ['2'],
           'sys:version': 1,
           'prop:xywh': `[0,0,${NOTE_WIDTH},95]`,
-          'prop:background': '--affine-background-secondary-color',
+          'prop:background': '--affine-note-background-blue',
           'prop:index': 'a0',
           'prop:hidden': false,
           'prop:displayMode': 'both',
           'prop:edgeless': {
             style: {
-              borderRadius: 8,
+              borderRadius: 0,
               borderSize: 4,
-              borderStyle: 'solid',
-              shadowType: '--affine-note-shadow-box',
+              borderStyle: 'none',
+              shadowType: '--affine-note-shadow-sticker',
             },
           },
         },
@@ -213,7 +214,13 @@ export async function assertRichTexts(page: Page, texts: string[]) {
 export async function assertEdgelessCanvasText(page: Page, text: string) {
   const actualTexts = await page.evaluate(() => {
     const editor = document.querySelector(
-      'edgeless-text-editor,edgeless-shape-text-editor,edgeless-frame-title-editor,edgeless-group-title-editor'
+      [
+        'edgeless-text-editor',
+        'edgeless-shape-text-editor',
+        'edgeless-frame-title-editor',
+        'edgeless-group-title-editor',
+        'edgeless-connector-label-editor',
+      ].join(',')
     );
     if (!editor) {
       throw new Error('editor not found');
@@ -227,18 +234,15 @@ export async function assertEdgelessCanvasText(page: Page, text: string) {
 
 export async function assertRichImage(page: Page, count: number) {
   const editor = getEditorLocator(page);
-  const actual = await editor.locator('.resizable-img').count();
-  expect(actual).toEqual(count);
+  await expect(editor.locator('.resizable-img')).toHaveCount(count);
 }
 
 export async function assertDivider(page: Page, count: number) {
-  const actual = await page.locator('affine-divider').count();
-  expect(actual).toEqual(count);
+  await expect(page.locator('affine-divider')).toHaveCount(count);
 }
 
 export async function assertRichDragButton(page: Page) {
-  const actual = await page.locator('.resize').count();
-  expect(actual).toEqual(4);
+  await expect(page.locator('.resize')).toHaveCount(4);
 }
 
 export async function assertImageSize(
@@ -255,7 +259,7 @@ export async function assertImageSize(
 export async function assertImageOption(page: Page) {
   // const actual = await page.locator('.embed-editing-state').count();
   // expect(actual).toEqual(1);
-  const locator = page.locator('.embed-editing-state');
+  const locator = page.locator('.affine-image-toolbar-container');
   await expect(locator).toBeVisible();
 }
 
@@ -288,12 +292,10 @@ export async function assertBlockCount(
   flavour: string,
   count: number
 ) {
-  const actual = await page.locator(`affine-${flavour}`).count();
-  expect(actual).toBe(count);
+  await expect(page.locator(`affine-${flavour}`)).toHaveCount(count);
 }
 export async function assertRowCount(page: Page, count: number) {
-  const actual = await page.locator('.affine-database-block-row').count();
-  expect(actual).toBe(count);
+  await expect(page.locator('.affine-database-block-row')).toHaveCount(count);
 }
 
 export async function assertRichTextInlineRange(
@@ -480,15 +482,67 @@ export async function assertBlockType(
 ) {
   const actual = await page.evaluate(
     ({ id }) => {
-      const element = document.querySelector(`[data-block-id="${id}"]`);
-      // @ts-ignore
-      const model = element.model as BlockModel;
+      const element = document.querySelector<BlockElement>(
+        `[data-block-id="${id}"]`
+      );
+
+      if (!element) {
+        throw new Error(`Element with id ${id} not found`);
+      }
+
+      const model = element.model;
       // @ts-ignore
       return model.type;
     },
     { id }
   );
   expect(actual).toBe(type);
+}
+
+export async function assertBlockFlavour(
+  page: Page,
+  id: string | number,
+  flavour: BlockSuite.Flavour
+) {
+  const actual = await page.evaluate(
+    ({ id }) => {
+      const element = document.querySelector<BlockElement>(
+        `[data-block-id="${id}"]`
+      );
+
+      if (!element) {
+        throw new Error(`Element with id ${id} not found`);
+      }
+
+      const model = element.model;
+      return model.flavour;
+    },
+    { id }
+  );
+  expect(actual).toBe(flavour);
+}
+
+export async function assertBlockTextContent(
+  page: Page,
+  id: string | number,
+  str: string
+) {
+  const actual = await page.evaluate(
+    ({ id }) => {
+      const element = document.querySelector<BlockElement>(
+        `[data-block-id="${id}"]`
+      );
+
+      if (!element) {
+        throw new Error(`Element with id ${id} not found`);
+      }
+
+      const model = element.model;
+      return model.text?.toString() ?? '';
+    },
+    { id }
+  );
+  expect(actual).toBe(str);
 }
 
 export async function assertBlockProps(
@@ -810,6 +864,8 @@ export async function assertEdgelessSelectedRect(page: Page, xywh: number[]) {
   const selectedRect = editor
     .locator('edgeless-selected-rect')
     .locator('.affine-edgeless-selected-rect');
+  // FIXME: remove this timeout
+  await page.waitForTimeout(50);
   const box = await selectedRect.boundingBox();
   if (!box) throw new Error('Missing edgeless selected rect');
 

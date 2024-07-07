@@ -1,13 +1,14 @@
 import {
   AssetsManager,
   type BlockSnapshot,
-  MemoryBlobManager,
+  MemoryBlobCRUD,
 } from '@blocksuite/store';
 import { describe, expect, test } from 'vitest';
 
 import { NotionHtmlAdapter } from '../../_common/adapters/notion-html.js';
 import { nanoidReplacement } from '../../_common/test-utils/test-utils.js';
 import { NoteDisplayMode } from '../../_common/types.js';
+import { createJob } from '../utils/create-job.js';
 
 describe('notion html to snapshot', () => {
   test('code', async () => {
@@ -52,7 +53,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -175,7 +176,7 @@ describe('notion html to snapshot', () => {
         },
       ],
     };
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -255,7 +256,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -774,7 +775,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -877,7 +878,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -925,7 +926,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -995,7 +996,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -1043,7 +1044,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -1081,10 +1082,10 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
-      assets: new AssetsManager({ blob: new MemoryBlobManager() }),
+      assets: new AssetsManager({ blob: new MemoryBlobCRUD() }),
     });
     expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
   });
@@ -1133,7 +1134,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -1175,10 +1176,10 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
-    const blobManager = new MemoryBlobManager();
-    const key = await blobManager.set(new File([], 'README.pdf'));
-    const assestsManager = new AssetsManager({ blob: blobManager });
+    const adapter = new NotionHtmlAdapter(createJob());
+    const blobCRUD = new MemoryBlobCRUD();
+    const key = await blobCRUD.set(new File([], 'README.pdf'));
+    const assestsManager = new AssetsManager({ blob: blobCRUD });
     await assestsManager.readFromBlob(key);
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
@@ -1388,7 +1389,14 @@ describe('notion html to snapshot', () => {
                 },
                 'matchesReplaceMap[58]': {
                   columnId: 'matchesReplaceMap[58]',
-                  value: ' Not started ',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [
+                      {
+                        insert: ' Not started ',
+                      },
+                    ],
+                  },
                 },
                 'matchesReplaceMap[60]': {
                   columnId: 'matchesReplaceMap[60]',
@@ -1410,7 +1418,14 @@ describe('notion html to snapshot', () => {
                 },
                 'matchesReplaceMap[58]': {
                   columnId: 'matchesReplaceMap[58]',
-                  value: ' Not started ',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [
+                      {
+                        insert: ' Not started ',
+                      },
+                    ],
+                  },
                 },
                 'matchesReplaceMap[60]': {
                   columnId: 'matchesReplaceMap[60]',
@@ -1432,7 +1447,14 @@ describe('notion html to snapshot', () => {
                 },
                 'matchesReplaceMap[58]': {
                   columnId: 'matchesReplaceMap[58]',
-                  value: ' Not started ',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [
+                      {
+                        insert: ' Not started ',
+                      },
+                    ],
+                  },
                 },
                 'matchesReplaceMap[60]': {
                   columnId: 'matchesReplaceMap[60]',
@@ -1507,7 +1529,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });
@@ -1575,31 +1597,57 @@ describe('notion html to snapshot', () => {
               'matchesReplaceMap[20]': {
                 'matchesReplaceMap[17]': {
                   columnId: 'matchesReplaceMap[17]',
-                  value: 'aa',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [
+                      {
+                        insert: 'aa',
+                      },
+                    ],
+                  },
                 },
                 'matchesReplaceMap[19]': {
                   columnId: 'matchesReplaceMap[19]',
-                  value: '',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [],
+                  },
                 },
               },
               'matchesReplaceMap[21]': {
                 'matchesReplaceMap[17]': {
                   columnId: 'matchesReplaceMap[17]',
-                  value: '1',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [
+                      {
+                        insert: '1',
+                      },
+                    ],
+                  },
                 },
                 'matchesReplaceMap[19]': {
                   columnId: 'matchesReplaceMap[19]',
-                  value: '',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [],
+                  },
                 },
               },
               'matchesReplaceMap[22]': {
                 'matchesReplaceMap[17]': {
                   columnId: 'matchesReplaceMap[17]',
-                  value: '',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [],
+                  },
                 },
                 'matchesReplaceMap[19]': {
                   columnId: 'matchesReplaceMap[19]',
-                  value: '',
+                  value: {
+                    '$blocksuite:internal:text$': true,
+                    delta: [],
+                  },
                 },
               },
             },
@@ -1670,7 +1718,7 @@ describe('notion html to snapshot', () => {
       ],
     };
 
-    const adapter = new NotionHtmlAdapter();
+    const adapter = new NotionHtmlAdapter(createJob());
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
     });

@@ -7,10 +7,6 @@ export const SYNCED_MIN_WIDTH = 370;
 export const SYNCED_MIN_HEIGHT = 64;
 
 export const blockStyles = css`
-  edgeless-block-portal-embed:has(.affine-embed-synced-doc-block.editing) {
-    z-index: 1000 !important;
-  }
-
   .edgeless-block-portal-embed
     > affine-embed-synced-doc-block[data-nested-editor] {
     position: relative;
@@ -37,11 +33,13 @@ export const blockStyles = css`
     border: 1px solid var(--affine-border-color);
   }
 
-  affine-embed-synced-doc-block[data-nested-editor] {
-    position: relative;
-    display: block;
-    left: -24px;
-    width: calc(100% + 48px);
+  affine-embed-synced-doc-block[data-nested-editor]
+    .affine-embed-synced-doc-container.page {
+    padding: 0 24px;
+  }
+
+  .affine-embed-synced-doc-editor {
+    pointer-events: none;
   }
 
   .affine-embed-synced-doc-container {
@@ -54,33 +52,49 @@ export const blockStyles = css`
   }
   .affine-embed-synced-doc-container.edgeless {
     display: block;
-    padding: 18px 24px;
     width: 100%;
     height: calc(${EMBED_CARD_HEIGHT.syncedDoc}px + 36px);
   }
-  .affine-embed-synced-doc-container:hover.light,
-  .affine-embed-synced-doc-container.selected.light,
-  affine-embed-synced-doc-block.with-drag-handle
-    > .affine-embed-synced-doc-container.light {
+  .affine-embed-synced-doc-container:hover.light {
     box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.08);
   }
-  .affine-embed-synced-doc-container:hover.dark,
-  .affine-embed-synced-doc-container.selected.dark,
-  affine-embed-synced-doc-block.with-drag-handle
-    > .affine-embed-synced-doc-container.dark {
+  .affine-embed-synced-doc-container:hover.dark {
     box-shadow: 0px 0px 0px 2px rgba(255, 255, 255, 0.14);
   }
-  .affine-embed-synced-doc-container.editing.light {
-    box-shadow:
-      0px 0px 0px 2px rgba(0, 0, 0, 0.08),
-      0px 0px 0px 1px var(--affine-brand-color);
+  .affine-embed-synced-doc-header-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 34px;
+    width: 100%;
+    background-color: var(--affine-white);
+    opacity: 0;
   }
-  .affine-embed-synced-doc-container.editing.dark {
-    box-shadow:
-      0px 0px 0px 2px rgba(255, 255, 255, 0.14),
-      0px 0px 0px 1px var(--affine-brand-color);
+  .affine-embed-synced-doc-header-wrapper.selected {
+    opacity: 1;
+    transition: all 0.23s ease;
   }
-
+  .affine-embed-synced-doc-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 24px;
+    background-color: var(--affine-hover-color);
+  }
+  .affine-embed-synced-doc-header svg {
+    flex-shrink: 0;
+  }
+  .affine-embed-synced-doc-title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 22px;
+    margin-left: 8px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .affine-embed-synced-doc-editor-overlay {
     position: absolute;
     top: 0;
@@ -95,14 +109,11 @@ export const blockStyles = css`
   }
 
   .affine-embed-synced-doc-editor-empty {
-    position: absolute;
-    top: 0;
-    left: 24px;
     display: flex;
     align-items: center;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    min-height: 44px;
   }
 
   .affine-embed-synced-doc-container.surface
@@ -133,8 +144,12 @@ export const blockStyles = css`
     background: transparent;
   }
 
+  .affine-embed-synced-doc-container > .affine-embed-synced-doc-editor {
+    width: 100%;
+    height: 100%;
+  }
+
   .affine-embed-synced-doc-editor .affine-page-root-block-container {
-    padding: 0 24px;
     width: 100%;
     max-width: 100%;
   }

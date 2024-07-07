@@ -1,23 +1,21 @@
-import { type PointerEventState } from '@blocksuite/block-std';
+import type { PointerEventState } from '@blocksuite/block-std';
 import { BlockElement } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { BlockModel } from '@blocksuite/store';
-import { type Text } from '@blocksuite/store';
+import type { BlockModel, Text } from '@blocksuite/store';
 import { css, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import {
+  asyncFocusRichText,
   buildPath,
   focusTitle,
-  type Viewport,
-} from '../../_common/utils/index.js';
-import {
-  asyncFocusRichText,
   getDocTitleInlineEditor,
   matchFlavours,
   NoteDisplayMode,
+  type Viewport,
 } from '../../_common/utils/index.js';
+import { getScrollContainer } from '../../_common/utils/scroll-container.js';
 import type { NoteBlockModel } from '../../note-block/index.js';
 import { PageClipboard } from '../clipboard/index.js';
 import type { PageRootBlockWidgetName } from '../index.js';
@@ -26,6 +24,7 @@ import type { RootBlockModel } from '../root-model.js';
 import type { PageRootService } from './page-root-service.js';
 
 const DOC_BLOCK_CHILD_PADDING = 24;
+const DOC_BOTTOM_PADDING = 32;
 
 function testClickOnBlankArea(
   state: PointerEventState,
@@ -53,82 +52,26 @@ export class PageRootBlockComponent extends BlockElement<
   PageRootService,
   PageRootBlockWidgetName
 > {
-  static override styles = css`
-    editor-host:has(> affine-page-root, * > affine-page-root) {
-      display: block;
-      height: 100%;
-    }
-
-    affine-page-root {
-      display: block;
-      height: 100%;
-    }
-
-    .affine-page-root-block-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-      font-family: var(--affine-font-family);
-      font-size: var(--affine-font-base);
-      line-height: var(--affine-line-height);
-      color: var(--affine-text-primary-color);
-      font-weight: 400;
-      //max-width: var(--affine-editor-width);
-      //margin: 0 auto;
-      /* cursor: crosshair; */
-      cursor: default;
-      /* Leave a place for drag-handle */
-      /* Do not use prettier format this style, or it will be broken */
-      /* prettier-ignore */
-      //padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
-      /* prettier-ignore */
-      //padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
-      padding-inline-start: 50px;
-    }
-
-    /* Extra small devices (phones, 640px and down) */
-    @container viewport (width <= 640px) {
-      .affine-page-root-block-container {
-        padding-left: ${DOC_BLOCK_CHILD_PADDING}px;
-        padding-right: ${DOC_BLOCK_CHILD_PADDING}px;
-      }
-    }
-
-    .affine-block-element {
-      display: block;
-    }
-
-    @media print {
-      .selected {
-        background-color: transparent !important;
-      }
-    }
-  `;
-
-  keyboardManager: PageKeyboardManager | null = null;
-
-  clipboardController = new PageClipboard(this);
-
-  @query('.affine-page-root-block-container')
-  rootElementContainer!: HTMLDivElement;
-
-  private _viewportElement: HTMLDivElement | null = null;
-
   get slots() {
     return this.service.slots;
   }
 
-  get viewportElement(): HTMLDivElement {
+  get rootScrollContainer() {
+    return getScrollContainer(this);
+  }
+
+  get viewportElement(): HTMLDivElement | null {
     if (this._viewportElement) return this._viewportElement;
     this._viewportElement = this.host.closest(
       '.affine-page-viewport'
     ) as HTMLDivElement | null;
-    assertExists(this._viewportElement);
     return this._viewportElement;
   }
 
-  get viewport(): Viewport {
+  get viewport(): Viewport | null {
+    if (!this.viewportElement) {
+      return null;
+    }
     const {
       scrollLeft,
       scrollTop,
@@ -150,6 +93,70 @@ export class PageRootBlockComponent extends BlockElement<
     };
   }
 
+  static override styles = css`
+    editor-host:has(> affine-page-root, * > affine-page-root) {
+      display: block;
+      height: 100%;
+    }
+
+    affine-page-root {
+      display: block;
+      height: 100%;
+    }
+
+    .affine-page-root-block-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      font-family: var(--affine-font-family);
+      font-size: var(--affine-font-base);
+      line-height: var(--affine-line-height);
+      color: var(--affine-text-primary-color);
+      font-weight: 400;
+      max-width: var(--affine-editor-width);
+      margin: 0 auto;
+      /* cursor: crosshair; */
+      cursor: default;
+
+      /* Leave a place for drag-handle */
+      /* Do not use prettier format this style, or it will be broken */
+      /* prettier-ignore */
+      padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
+      /* prettier-ignore */
+      padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
+      /* prettier-ignore */
+      padding-bottom: var(--affine-editor-bottom-padding, ${DOC_BOTTOM_PADDING}px);
+    }
+
+    /* Extra small devices (phones, 640px and down) */
+    @container viewport (width <= 640px) {
+      .affine-page-root-block-container {
+        padding-left: ${DOC_BLOCK_CHILD_PADDING}px;
+        padding-right: ${DOC_BLOCK_CHILD_PADDING}px;
+      }
+    }
+
+    .affine-block-element {
+      display: block;
+    }
+
+    @media print {
+      .selected {
+        background-color: transparent !important;
+      }
+    }
+  `;
+
+  private _viewportElement: HTMLDivElement | null = null;
+
+  keyboardManager: PageKeyboardManager | null = null;
+
+  clipboardController = new PageClipboard(this);
+
+  @query('.affine-page-root-block-container')
+  accessor rootElementContainer!: HTMLDivElement;
+
   private _createDefaultNoteBlock() {
     const { doc } = this;
 
@@ -165,20 +172,25 @@ export class PageRootBlockComponent extends BlockElement<
   }
 
   private _initViewportResizeEffect() {
+    const viewport = this.viewport;
+    const viewportElement = this.viewportElement;
+    if (!viewport || !viewportElement) {
+      return;
+    }
     // when observe viewportElement resize, emit viewport update event
     const resizeObserver = new ResizeObserver(
       (entries: ResizeObserverEntry[]) => {
         for (const { target } of entries) {
-          if (target === this.viewportElement) {
-            this.slots.viewportUpdated.emit(this.viewport);
+          if (target === viewportElement) {
+            this.slots.viewportUpdated.emit(viewport);
             break;
           }
         }
       }
     );
-    resizeObserver.observe(this.viewportElement);
+    resizeObserver.observe(viewportElement);
     this.disposables.add(() => {
-      resizeObserver.unobserve(this.viewportElement);
+      resizeObserver.unobserve(viewportElement);
       resizeObserver.disconnect();
     });
   }
@@ -257,7 +269,6 @@ export class PageRootBlockComponent extends BlockElement<
         return true;
       },
       ArrowUp: () => {
-        //console.log("this is ArrowUp");
         const selection = this.host.selection;
         const sel = selection.value.find(
           sel => sel.is('text') || sel.is('block')
@@ -278,7 +289,6 @@ export class PageRootBlockComponent extends BlockElement<
           const isFirstText = sel.is('text') && sel.start.index === 0;
           const isBlock = sel.is('block');
           if (isBlock || isFirstText) {
-            //todo ali ghasami for comment
             focusTitle(this.host);
           }
           return;
@@ -322,6 +332,7 @@ export class PageRootBlockComponent extends BlockElement<
       const { paddingLeft, paddingRight } = window.getComputedStyle(
         this.rootElementContainer
       );
+      assertExists(this.viewport, 'viewport should exist');
       const isClickOnBlankArea = testClickOnBlankArea(
         event,
         this.viewport.left,
@@ -356,7 +367,6 @@ export class PageRootBlockComponent extends BlockElement<
         newTextSelectionId = paragraphId;
       } else {
         const last = lastNote.children.at(-1);
-
         if (
           !last ||
           !last.text ||

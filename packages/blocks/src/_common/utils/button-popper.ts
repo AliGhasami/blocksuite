@@ -1,4 +1,4 @@
-import { type Disposable } from '@blocksuite/global/utils';
+import type { Disposable } from '@blocksuite/global/utils';
 import {
   autoPlacement,
   computePosition,
@@ -84,18 +84,19 @@ export function createButtonPopper(
         }),
       ],
     })
-      .then(({ x, y }) => {
+      .then(({ x, y, middlewareData: data }) => {
         Object.assign(popperElement.style, {
           position: 'absolute',
           zIndex: 1,
-          left: `${x}px`,
-          top: `${y}px`,
+          left: `${x + (data.shift?.x ?? 0)}px`,
+          top: `${y + (data.shift?.y ?? 0)}px`,
         });
       })
       .catch(console.error);
   }
 
   const show = () => {
+    if (display === 'show') return;
     popperElement.setAttribute(ATTR_SHOW, '');
     display = 'show';
     stateUpdated({ display });
@@ -103,6 +104,7 @@ export function createButtonPopper(
   };
 
   const hide = () => {
+    if (display === 'hidden') return;
     popperElement.removeAttribute(ATTR_SHOW);
     display = 'hidden';
     stateUpdated({ display });

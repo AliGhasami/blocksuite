@@ -21,6 +21,17 @@ export class RangeBinding {
     return this.manager.host;
   }
 
+  private _prevTextSelection: {
+    selection: TextSelection;
+    path: string[];
+  } | null = null;
+
+  private _compositionStartCallback:
+    | ((event: CompositionEvent) => Promise<void>)
+    | null = null;
+
+  isComposing = false;
+
   constructor(public manager: RangeManager) {
     this.host.disposables.add(
       this.selectionManager.slots.changed.on(this._onStdSelectionChanged)
@@ -52,20 +63,19 @@ export class RangeBinding {
     );
   }
 
-  isComposing = false;
-  private _prevTextSelection: {
-    selection: TextSelection;
-    path: string[];
-  } | null = null;
   private _onStdSelectionChanged = (selections: BaseSelection[]) => {
+    const text =
+      selections.find((selection): selection is TextSelection =>
+        selection.is('text')
+      ) ?? null;
+
+    if (text === this._prevTextSelection) {
+      return;
+    }
+
     // wait for lit updated
     this.host.updateComplete
       .then(() => {
-        const text =
-          selections.find((selection): selection is TextSelection =>
-            selection.is('text')
-          ) ?? null;
-
         const model = text && this.host.doc.getBlockById(text.blockId);
         const path = model && this.host.view.calculatePath(model);
 
@@ -73,7 +83,8 @@ export class RangeBinding {
           text && this._prevTextSelection && path
             ? text.equals(this._prevTextSelection.selection) &&
               path.join('') === this._prevTextSelection.path.join('')
-            : text === this._prevTextSelection;
+            : false;
+
         if (eq) {
           return;
         }
@@ -116,6 +127,22 @@ export class RangeBinding {
     if (!range) {
       this._prevTextSelection = null;
       this.selectionManager.clear(['text']);
+      return;
+    }
+
+    // range is in a non-editable element
+    // ex. placeholder
+    const isRangeOutNotEditable =
+      (range.startContainer instanceof HTMLElement &&
+        range.startContainer.contentEditable === 'false') ||
+      (range.endContainer instanceof HTMLElement &&
+        range.endContainer.contentEditable === 'false');
+    if (isRangeOutNotEditable) {
+      this._prevTextSelection = null;
+      this.selectionManager.clear(['text']);
+
+      // force clear native selection to break inline editor input
+      selection.removeRange(range);
       return;
     }
 
@@ -208,12 +235,8 @@ export class RangeBinding {
       },
       to: null,
     });
-    this.selectionManager.set([newSelection]);
+    this.selectionManager.setGroup('note', [newSelection]);
   };
-
-  private _compositionStartCallback:
-    | ((event: CompositionEvent) => Promise<void>)
-    | null = null;
 
   private _onCompositionStart = () => {
     const selection = this.selectionManager.find('text');
@@ -291,7 +314,7 @@ export class RangeBinding {
         },
         to: null,
       });
-      this.host.selection.set([selection]);
+      this.host.selection.setGroup('note', [selection]);
       this.rangeManager.syncTextSelectionToRange(selection);
     };
   };

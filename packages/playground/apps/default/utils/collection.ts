@@ -1,8 +1,6 @@
 import { AffineSchemas } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
 import {
-  type BlobStorage,
-  createIndexeddbStorage,
   DocCollection,
   type DocCollectionOptions,
   Generator,
@@ -14,6 +12,7 @@ import {
 import {
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
+  IndexedDBBlobSource,
   IndexedDBDocSource,
 } from '@blocksuite/sync';
 import PartySocket from 'partysocket';
@@ -27,9 +26,6 @@ import { WebSocketDocSource } from '../../_common/sync/websocket/doc';
 //console.log('1111', import.meta.env, import.meta.env.PLAYGROUND_WS);
 
 export async function createDefaultDocCollection() {
-  const blobStorages: ((id: string) => BlobStorage)[] = [
-    createIndexeddbStorage,
-  ];
   const idGenerator: Generator = Generator.NanoID;
   const schema = new Schema();
   schema.register(AffineSchemas);
@@ -55,14 +51,14 @@ export async function createDefaultDocCollection() {
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadow: [new WebSocketDocSource(ws as WebSocket)],
+          shadows: [new WebSocketDocSource(ws)],
         };
         awarenessSources = [new WebSocketAwarenessSource(ws as WebSocket)];
       })
       .catch(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadow: [new BroadcastChannelDocSource()],
+          shadows: [new BroadcastChannelDocSource()],
         };
         awarenessSources = [
           new BroadcastChannelAwarenessSource('quickEdgeless'),
@@ -70,22 +66,29 @@ export async function createDefaultDocCollection() {
       });
   }
 
+  const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
+    [...params.entries()]
+      .filter(([key]) => key.startsWith('enable_'))
+      .map(([k, v]) => [k, v === 'true'])
+  );
+
   const options: DocCollectionOptions = {
     id: 'quickEdgeless',
     schema,
     idGenerator,
-    blobStorages,
+    blobSources: {
+      main: new IndexedDBBlobSource('quickEdgeless'),
+    },
     docSources,
     awarenessSources,
     defaultFlags: {
       enable_synced_doc_block: true,
       enable_pie_menu: true,
       enable_lasso_tool: true,
-      enable_mindmap_entry: true,
+      ...flags,
     },
   };
   const collection = new DocCollection(options);
-
   collection.start();
 
   // debug info
@@ -104,6 +107,7 @@ export async function initDefaultDocCollection(collection: DocCollection) {
 
   const shouldInit = collection.docs.size === 0 && !params.get('room');
   if (shouldInit) {
+    collection.meta.initialize();
     const doc = collection.createDoc({ id: 'doc:home' });
     doc.load();
     const rootId = doc.addBlock('affine:page', {

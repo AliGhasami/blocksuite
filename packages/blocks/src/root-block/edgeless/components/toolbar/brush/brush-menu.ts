@@ -2,16 +2,16 @@ import '../../panel/one-row-color-panel.js';
 import '../../buttons/tool-icon-button.js';
 import '../common/slide-menu.js';
 
-import { WithDisposable } from '@blocksuite/block-std';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import type { EdgelessRootBlockComponent } from '../../../edgeless-root-block.js';
+import type { EdgelessTool } from '../../../types.js';
 import type { ColorEvent } from '../../panel/color-panel.js';
 import type { LineWidthEvent } from '../../panel/line-width-panel.js';
+import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 
 @customElement('edgeless-brush-menu')
-export class EdgelessBrushMenu extends WithDisposable(LitElement) {
+export class EdgelessBrushMenu extends EdgelessToolbarToolMixin(LitElement) {
   static override styles = css`
     :host {
       display: flex;
@@ -30,21 +30,18 @@ export class EdgelessBrushMenu extends WithDisposable(LitElement) {
     }
   `;
 
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
+  type: EdgelessTool['type'] = 'brush';
 
   @property({ attribute: false })
-  color!: string;
+  accessor color!: string;
 
   @property({ attribute: false })
-  lineWidth!: number;
+  accessor lineWidth!: number;
 
   @property({ attribute: false })
-  onChange!: (props: Record<string, unknown>) => void;
+  accessor onChange!: (props: Record<string, unknown>) => void;
 
   override render() {
-    if (this.edgeless.edgelessTool.type !== 'brush') return nothing;
-
     const { color, lineWidth } = this;
     return html`
       <edgeless-slide-menu>

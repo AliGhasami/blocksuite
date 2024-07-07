@@ -28,6 +28,18 @@ export class SurfaceBlockComponent extends BlockElement<
   SurfaceBlockModel,
   SurfaceBlockService
 > {
+  get renderer() {
+    return this._renderer;
+  }
+
+  get edgeless() {
+    return this.parentBlockElement as EdgelessRootBlockComponent;
+  }
+
+  private get _isEdgeless() {
+    return isInsideEdgelessEditor(this.host);
+  }
+
   static override styles = css`
     .affine-edgeless-surface-block-container {
       position: absolute;
@@ -87,9 +99,16 @@ export class SurfaceBlockComponent extends BlockElement<
     }
   `;
 
+  static isShape = isShape;
+
   private _renderer!: Renderer;
+
   private _lastTime = 0;
+
   private _cachedViewport = new Bound();
+
+  @query('.affine-edgeless-surface-block-container')
+  private accessor _surfaceContainer!: HTMLElement;
 
   readonly themeObserver = new ThemeObserver();
 
@@ -99,34 +118,7 @@ export class SurfaceBlockComponent extends BlockElement<
   };
 
   @query('edgeless-block-portal-container')
-  portal!: EdgelessBlockPortalContainer;
-
-  get renderer() {
-    return this._renderer;
-  }
-
-  get edgeless() {
-    return this.parentBlockElement as EdgelessRootBlockComponent;
-  }
-
-  private get _isEdgeless() {
-    return isInsideEdgelessEditor(this.host);
-  }
-
-  @query('.affine-edgeless-surface-block-container')
-  private _surfaceContainer!: HTMLElement;
-
-  override connectedCallback() {
-    super.connectedCallback();
-
-    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
-
-    if (!this._isEdgeless) return;
-
-    this._initThemeObserver();
-    this._initRenderer();
-    this._initOverlay();
-  }
+  accessor portal!: EdgelessBlockPortalContainer;
 
   private _initOverlay() {
     this.overlays = {
@@ -186,13 +178,6 @@ export class SurfaceBlockComponent extends BlockElement<
       })
     );
     this._disposables.add(
-      this.std.event.slots.parentScaleChanged.on(() => {
-        this._renderer.setCumulativeParentScale(
-          this.std.event.cumulativeParentScale
-        );
-      })
-    );
-    this._disposables.add(
       this.std.event.slots.editorHostPanned.on(() => {
         this._renderer.onResize();
       })
@@ -205,16 +190,6 @@ export class SurfaceBlockComponent extends BlockElement<
     this.disposables.add(() => this.themeObserver.dispose());
   };
 
-  override firstUpdated() {
-    if (!this._isEdgeless) return;
-
-    this._renderer.attach(this._surfaceContainer);
-    this._renderer.setCumulativeParentScale(
-      this.std.event.cumulativeParentScale
-    );
-    this._initResizeEffect();
-  }
-
   private _emitStackingCanvasUpdate() {
     const evt = new CustomEvent('indexedcanvasupdate', {
       detail: {
@@ -225,15 +200,22 @@ export class SurfaceBlockComponent extends BlockElement<
     this.dispatchEvent(evt);
   }
 
-  private _initResizeEffect() {
-    const observer = new ResizeObserver(() => {
-      this._renderer.onResize();
-    });
+  override connectedCallback() {
+    super.connectedCallback();
 
-    observer.observe(this._surfaceContainer);
-    this._disposables.add(() => {
-      observer.disconnect();
-    });
+    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
+
+    if (!this._isEdgeless) return;
+
+    this._initThemeObserver();
+    this._initRenderer();
+    this._initOverlay();
+  }
+
+  override firstUpdated() {
+    if (!this._isEdgeless) return;
+
+    this._renderer.attach(this._surfaceContainer);
   }
 
   refresh() {
@@ -281,7 +263,7 @@ export class SurfaceBlockComponent extends BlockElement<
       </div>
     `;
   }
-  static isShape = isShape;
+
   static isConnector = (element: unknown): element is ConnectorElementModel => {
     return element instanceof ConnectorElementModel;
   };

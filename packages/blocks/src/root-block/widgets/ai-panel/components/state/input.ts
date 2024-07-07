@@ -86,17 +86,20 @@ export class AIPanelInput extends WithDisposable(LitElement) {
     }
   `;
 
-  @property({ attribute: false })
-  onFinish?: (input: string) => void;
-
   @query('.arrow')
-  private _arrow!: HTMLDivElement;
+  private accessor _arrow!: HTMLDivElement;
 
   @query('textarea')
-  private _textarea!: HTMLTextAreaElement;
+  private accessor _textarea!: HTMLTextAreaElement;
 
   @state()
-  private _hasContent = false;
+  private accessor _hasContent = false;
+
+  @property({ attribute: false })
+  accessor onFinish: ((input: string) => void) | undefined = undefined;
+
+  @property({ attribute: false })
+  accessor onInput: ((input: string) => void) | undefined = undefined;
 
   private _sendToAI = () => {
     const value = this._textarea.value.trim();
@@ -117,6 +120,7 @@ export class AIPanelInput extends WithDisposable(LitElement) {
     this._textarea.style.height = 'auto';
     this._textarea.style.height = this._textarea.scrollHeight + 'px';
 
+    this.onInput?.(this._textarea.value);
     const value = this._textarea.value.trim();
     if (value.length > 0) {
       this._arrow.dataset.active = '';

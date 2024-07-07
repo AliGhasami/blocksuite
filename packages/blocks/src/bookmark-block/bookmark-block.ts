@@ -1,38 +1,21 @@
 import './components/bookmark-card.js';
-import '../_common/components/block-selection.js';
-import '../_common/components/embed-card/embed-card-caption.js';
 
-import { BlockElement } from '@blocksuite/block-std';
-import { html, nothing } from 'lit';
+import { html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { EmbedCardCaption } from '../_common/components/embed-card/embed-card-caption.js';
+import { BlockComponent } from '../_common/components/block-component.js';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
 import { Bound } from '../surface-block/utils/bound.js';
-import { type BookmarkBlockModel } from './bookmark-model.js';
+import type { BookmarkBlockModel } from './bookmark-model.js';
 import type { BookmarkBlockService } from './bookmark-service.js';
 import { refreshBookmarkUrlData } from './utils.js';
 
 @customElement('affine-bookmark')
-export class BookmarkBlockComponent extends BlockElement<
+export class BookmarkBlockComponent extends BlockComponent<
   BookmarkBlockModel,
   BookmarkBlockService
 > {
-  @property({ attribute: false })
-  loading = false;
-
-  @property({ attribute: false })
-  error = false;
-
-  @query('bookmark-card')
-  bookmarkCard!: HTMLElement;
-
-  @query('embed-card-caption')
-  captionElement!: EmbedCardCaption;
-
-  private _isInSurface = false;
-
   get isInSurface() {
     return this._isInSurface;
   }
@@ -44,6 +27,21 @@ export class BookmarkBlockComponent extends BlockElement<
     return this.host.querySelector('affine-edgeless-root');
   }
 
+  private _isInSurface = false;
+
+  private _fetchAbortController?: AbortController;
+
+  override accessor useCaptionEditor = true;
+
+  @property({ attribute: false })
+  accessor loading = false;
+
+  @property({ attribute: false })
+  accessor error = false;
+
+  @query('bookmark-card')
+  accessor bookmarkCard!: HTMLElement;
+
   open = () => {
     let link = this.model.url;
     if (!link.match(/^[a-zA-Z]+:\/\//)) {
@@ -53,16 +51,24 @@ export class BookmarkBlockComponent extends BlockElement<
   };
 
   refreshData = () => {
-    refreshBookmarkUrlData(this).catch(console.error);
+    refreshBookmarkUrlData(this, this._fetchAbortController?.signal).catch(
+      console.error
+    );
   };
 
   override connectedCallback() {
     super.connectedCallback();
 
+    this._fetchAbortController = new AbortController();
+
     this.contentEditable = 'false';
 
     const parent = this.host.doc.getParent(this.model);
     this._isInSurface = parent?.flavour === 'affine:surface';
+
+    this.blockContainerStyles = this._isInSurface
+      ? undefined
+      : { margin: '18px 0' };
 
     if (!this.model.description && !this.model.title) {
       this.refreshData();
@@ -77,14 +83,20 @@ export class BookmarkBlockComponent extends BlockElement<
     );
   }
 
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._fetchAbortController?.abort();
+  }
+
   override renderBlock() {
     const { style } = this.model;
 
     let containerStyleMap = styleMap({
       position: 'relative',
       width: '100%',
-      margin: '18px 0px',
+      minWidth: '450px',
     });
+
     if (this.isInSurface) {
       const width = EMBED_CARD_WIDTH[style];
       const height = EMBED_CARD_HEIGHT[style];
@@ -109,13 +121,7 @@ export class BookmarkBlockComponent extends BlockElement<
           .loading=${this.loading}
           .error=${this.error}
         ></bookmark-card>
-
-        <embed-card-caption .block=${this}></embed-card-caption>
-
-        <affine-block-selection .block=${this}></affine-block-selection>
       </div>
-
-      ${this.isInSurface ? nothing : Object.values(this.widgets)}
     `;
   }
 }

@@ -8,10 +8,10 @@ import { css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { html } from 'lit/static-html.js';
 
+import { popMenu } from '../../../../../_common/components/index.js';
 import { AddCursorIcon } from '../../../../../_common/icons/index.js';
 import type { GroupHelper } from '../../../common/group-by/helper.js';
 import type { InsertToPosition } from '../../../types.js';
-import { popMenu } from '../../../utils/index.js';
 import { insertPositionToIndex } from '../../../utils/insert.js';
 import { renderUniLit } from '../../../utils/uni-component/index.js';
 import { DataViewBase } from '../../data-view-base.js';
@@ -132,33 +132,19 @@ export class DataViewTable extends DataViewBase<
   DataViewTableManager,
   TableViewSelection
 > {
-  static override styles = styles;
-
-  dragController = new TableDragController(this);
-  selectionController = new TableSelectionController(this);
-  hotkeysController = new TableHotkeysController(this);
-  clipboardController = new TableClipboardController(this);
   private get readonly() {
     return this.view.readonly;
   }
 
-  override connectedCallback() {
-    super.connectedCallback();
-    this._disposables.add(
-      this.view.slots.update.on(() => {
-        this.requestUpdate();
-        this.querySelectorAll('affine-data-view-table-group').forEach(v => {
-          v.requestUpdate();
-        });
-      })
-    );
+  static override styles = styles;
 
-    if (this.readonly) return;
-  }
+  dragController = new TableDragController(this);
 
-  public override addRow(position: InsertToPosition) {
-    this._addRow(this.view, position);
-  }
+  selectionController = new TableSelectionController(this);
+
+  hotkeysController = new TableHotkeysController(this);
+
+  clipboardController = new TableClipboardController(this);
 
   private _addRow = (
     tableViewManager: DataViewTableManager,
@@ -184,6 +170,50 @@ export class DataViewTable extends DataViewBase<
       };
     });
   };
+
+  private renderTable() {
+    const groupHelper = this.view.groupHelper;
+    if (groupHelper) {
+      return html`
+        <div style="display:flex;flex-direction: column;gap: 16px;">
+          ${groupHelper.groups.map(group => {
+            return html`<affine-data-view-table-group
+              data-group-key="${group.key}"
+              .dataViewEle="${this.dataViewEle}"
+              .view="${this.view}"
+              .viewEle="${this}"
+              .group="${group}"
+            ></affine-data-view-table-group>`;
+          })}
+          ${this.renderAddGroup(groupHelper)}
+        </div>
+      `;
+    }
+    return html`<affine-data-view-table-group
+      .dataViewEle="${this.dataViewEle}"
+      .view="${this.view}"
+      .viewEle="${this}"
+    ></affine-data-view-table-group>`;
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+    this._disposables.add(
+      this.view.slots.update.on(() => {
+        this.requestUpdate();
+        this.querySelectorAll('affine-data-view-table-group').forEach(v => {
+          v.requestUpdate();
+        });
+      })
+    );
+
+    if (this.readonly) return;
+  }
+
+  override addRow(position: InsertToPosition) {
+    this._addRow(this.view, position);
+  }
+
   renderAddGroup = (groupHelper: GroupHelper) => {
     const addGroup = groupHelper.addGroup;
     if (!addGroup) {
@@ -216,30 +246,7 @@ export class DataViewTable extends DataViewBase<
       </div>
     </div>`;
   };
-  private renderTable() {
-    const groupHelper = this.view.groupHelper;
-    if (groupHelper) {
-      return html`
-        <div style="display:flex;flex-direction: column;gap: 16px;">
-          ${groupHelper.groups.map(group => {
-            return html`<affine-data-view-table-group
-              data-group-key="${group.key}"
-              .dataViewEle="${this.dataViewEle}"
-              .view="${this.view}"
-              .viewEle="${this}"
-              .group="${group}"
-            ></affine-data-view-table-group>`;
-          })}
-          ${this.renderAddGroup(groupHelper)}
-        </div>
-      `;
-    }
-    return html`<affine-data-view-table-group
-      .dataViewEle="${this.dataViewEle}"
-      .view="${this.view}"
-      .viewEle="${this}"
-    ></affine-data-view-table-group>`;
-  }
+
   onWheel = (event: WheelEvent) => {
     if (event.metaKey || event.ctrlKey) {
       return;
@@ -253,18 +260,18 @@ export class DataViewTable extends DataViewBase<
     }
   };
 
-  public hideIndicator(): void {
+  hideIndicator(): void {
     this.dragController.dropPreview.remove();
   }
 
-  public moveTo(id: string, evt: MouseEvent): void {
+  moveTo(id: string, evt: MouseEvent): void {
     const result = this.dragController.getInsertPosition(evt);
     if (result) {
       this.view.rowMove(id, result.position, undefined, result.groupKey);
     }
   }
 
-  public showIndicator(evt: MouseEvent): boolean {
+  showIndicator(evt: MouseEvent): boolean {
     return this.dragController.showIndicator(evt) != null;
   }
 

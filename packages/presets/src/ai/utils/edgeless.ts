@@ -1,5 +1,11 @@
+import type { BlockElement, EditorHost } from '@blocksuite/block-std';
+import type {
+  EdgelessCopilotWidget,
+  EdgelessRootService,
+} from '@blocksuite/blocks';
 import {
-  type EdgelessModel,
+  AFFINE_EDGELESS_COPILOT_WIDGET,
+  matchFlavours,
   MindmapElementModel,
   type ShapeElementModel,
 } from '@blocksuite/blocks';
@@ -25,12 +31,46 @@ export function mindMapToMarkdown(mindmap: MindmapElementModel) {
   return markdownStr;
 }
 
-export function isMindMapRoot(ele: EdgelessModel) {
+export function isMindMapRoot(ele: BlockSuite.EdgelessModelType) {
   const group = ele?.group;
 
   return group instanceof MindmapElementModel && group.tree.element === ele;
 }
 
-export function isMindmapChild(ele: EdgelessModel) {
+export function isMindmapChild(ele: BlockSuite.EdgelessModelType) {
   return ele?.group instanceof MindmapElementModel && !isMindMapRoot(ele);
+}
+
+export function getService(host: EditorHost) {
+  const edgelessService = host.spec.getService(
+    'affine:page'
+  ) as EdgelessRootService;
+
+  return edgelessService;
+}
+
+export function getEdgelessCopilotWidget(
+  host: EditorHost
+): EdgelessCopilotWidget {
+  const rootBlockId = host.doc.root?.id as string;
+  const copilotWidget = host.view.getWidget(
+    AFFINE_EDGELESS_COPILOT_WIDGET,
+    rootBlockId
+  ) as EdgelessCopilotWidget;
+
+  return copilotWidget;
+}
+
+export function findNoteBlockModel(blockElement: BlockElement) {
+  let curBlock = blockElement;
+  while (curBlock) {
+    if (matchFlavours(curBlock.model, ['affine:note'])) {
+      return curBlock.model;
+    }
+    if (matchFlavours(curBlock.model, ['affine:page', 'affine:surface'])) {
+      return null;
+    }
+    curBlock = curBlock.parentBlockElement;
+  }
+  return null;
 }

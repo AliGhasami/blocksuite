@@ -8,7 +8,7 @@ import {
   dragBetweenIndices,
   enterPlaygroundRoom,
   focusRichText,
-  getCenterPosition,
+  focusRichTextEnd,
   getInlineSelectionIndex,
   getInlineSelectionText,
   initEmptyCodeBlockState,
@@ -19,6 +19,7 @@ import {
   pressBackspace,
   pressEnter,
   pressEnterWithShortkey,
+  pressEscape,
   pressShiftTab,
   pressTab,
   redoByKeyboard,
@@ -28,6 +29,7 @@ import {
   type,
   undoByKeyboard,
   updateBlockType,
+  waitNextFrame,
 } from './utils/actions/index.js';
 import {
   assertBlockCount,
@@ -48,28 +50,58 @@ import { test } from './utils/playwright.js';
  */
 function getCodeBlock(page: Page) {
   const codeBlock = page.locator('affine-code');
-  const languageButton = codeBlock.getByTestId('lang-button');
+  const languageButton = page.getByTestId('lang-button');
+
   const clickLanguageButton = async () => {
     await codeBlock.hover();
     await languageButton.click({ delay: 50 });
   };
 
-  const langList = page.locator('lang-list');
-  const codeOption = page.locator('.affine-codeblock-option');
-  const copyButton = codeOption.getByTestId('copy-button');
-  const wrapButton = codeOption.getByTestId('wrap-button');
-  const deleteButton = codeOption.getByTestId('delete-button');
+  const langList = page.locator('affine-filterable-list');
   const langFilterInput = langList.locator('#filter-input');
+
+  const codeToolbar = page.locator('affine-code-toolbar');
+
+  const copyButton = codeToolbar.getByTestId('copy-code');
+  const moreButton = codeToolbar.getByTestId('more-button');
+  const captionButton = codeToolbar.getByTestId('caption');
+
+  const moreMenu = page.locator('more-popup-menu');
+
+  const openMore = async () => {
+    await moreButton.click();
+    const menu = page.locator('more-popup-menu');
+
+    const wrapButton = page.locator('.menu-item.wrap');
+
+    const cancelWrapButton = page.locator('.menu-item.cancel-wrap');
+
+    const duplicateButton = page.locator('.menu-item.duplicate');
+
+    const deleteButton = page.locator('.menu-item.delete');
+
+    return {
+      menu,
+      wrapButton,
+      cancelWrapButton,
+      duplicateButton,
+      deleteButton,
+    };
+  };
+
   return {
     codeBlock,
+    codeToolbar,
+    captionButton,
     languageButton,
-    clickLanguageButton,
     langList,
-    codeOption,
     copyButton,
-    wrapButton,
-    deleteButton,
+    moreButton,
     langFilterInput,
+    moreMenu,
+
+    openMore,
+    clickLanguageButton,
   };
 }
 
@@ -101,15 +133,15 @@ test('use markdown syntax can create code block', async ({ page }) => {
     page,
     `
 <affine:note
-  prop:background="--affine-background-secondary-color"
+  prop:background="--affine-note-background-blue"
   prop:displayMode="both"
   prop:edgeless={
     Object {
       "style": Object {
-        "borderRadius": 8,
+        "borderRadius": 0,
         "borderSize": 4,
-        "borderStyle": "solid",
-        "shadowType": "--affine-note-shadow-box",
+        "borderStyle": "none",
+        "shadowType": "--affine-note-shadow-sticker",
       },
     }
   }
@@ -145,15 +177,15 @@ test('use markdown syntax can create code block', async ({ page }) => {
     page,
     `
 <affine:note
-  prop:background="--affine-background-secondary-color"
+  prop:background="--affine-note-background-blue"
   prop:displayMode="both"
   prop:edgeless={
     Object {
       "style": Object {
-        "borderRadius": 8,
+        "borderRadius": 0,
         "borderSize": 4,
-        "borderStyle": "solid",
-        "shadowType": "--affine-note-shadow-box",
+        "borderStyle": "none",
+        "shadowType": "--affine-note-shadow-sticker",
       },
     }
   }
@@ -161,6 +193,7 @@ test('use markdown syntax can create code block', async ({ page }) => {
   prop:index="a0"
 >
   <affine:code
+    prop:caption=""
     prop:language="Plain Text"
     prop:wrap={false}
   />
@@ -225,8 +258,7 @@ test('support ```[lang] to add code block with language', async ({ page }) => {
 
   const languageButton = codeBlockController.languageButton;
   await expect(languageButton).toBeVisible();
-  const languageText = await languageButton.innerText();
-  expect(languageText).toEqual('TypeScript');
+  await expect(languageButton).toHaveText('TypeScript');
 });
 
 test('use more than three backticks can not create code block', async ({
@@ -263,20 +295,25 @@ test('change code language can work', async ({ page }) => {
   await focusRichText(page);
 
   const codeBlockController = getCodeBlock(page);
+  await codeBlockController.codeBlock.hover();
   await codeBlockController.clickLanguageButton();
   const locator = codeBlockController.langList;
   await expect(locator).toBeVisible();
 
   await type(page, 'rust');
-  await page.click('.lang-list-button-container > icon-button:nth-child(1)');
+  await page.click(
+    '.affine-filterable-list > .items-container > icon-button:nth-child(1)'
+  );
   await expect(locator).toBeHidden();
 
+  await codeBlockController.codeBlock.hover();
   await expect(codeBlockController.languageButton).toHaveText('Rust');
 
   await assertStoreMatchJSX(
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="rust"
   prop:wrap={false}
 />`,
@@ -287,6 +324,7 @@ test('change code language can work', async ({ page }) => {
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={false}
 />`,
@@ -301,9 +339,7 @@ test('change code language can work', async ({ page }) => {
   await expect(codeBlockController.languageButton).toHaveText('TypeScript');
 });
 
-test('language select list can disappear when click other place', async ({
-  page,
-}) => {
+test('click outside should close language list', async ({ page }) => {
   await enterPlaygroundRoom(page);
   await initEmptyCodeBlockState(page);
   await focusRichText(page);
@@ -313,9 +349,9 @@ test('language select list can disappear when click other place', async ({
   const locator = codeBlock.langList;
   await expect(locator).toBeVisible();
 
-  const rect = await page.locator('.lang-list-button-container').boundingBox();
+  const rect = await page.locator('affine-filterable-list').boundingBox();
   if (!rect) throw new Error('Failed to get bounding box of code block.');
-  await page.mouse.click(rect.x + 10, rect.y + 10);
+  await page.mouse.click(rect.x - 10, rect.y - 10);
 
   await expect(locator).toBeHidden();
 });
@@ -403,15 +439,15 @@ test.skip('use keyboard copy inside code block copy', async ({ page }) => {
     /*xml*/ `
 <affine:page>
   <affine:note
-    prop:background="--affine-background-secondary-color"
+    prop:background="--affine-note-background-blue"
     prop:displayMode="both"
     prop:edgeless={
       Object {
         "style": Object {
-          "borderRadius": 8,
+          "borderRadius": 0,
           "borderSize": 4,
-          "borderStyle": "solid",
-          "shadowType": "--affine-note-shadow-box",
+          "borderStyle": "none",
+          "shadowType": "--affine-note-shadow-sticker",
         },
       }
     }
@@ -419,11 +455,13 @@ test.skip('use keyboard copy inside code block copy', async ({ page }) => {
     prop:index="a0"
   >
     <affine:code
+      prop:caption=""
       prop:language="Plain Text"
       prop:text="use"
       prop:wrap={false}
     />
     <affine:code
+      prop:caption=""
       prop:language="Plain Text"
       prop:text="use"
       prop:wrap={false}
@@ -444,6 +482,7 @@ test('code block has content, click code block copy menu, copy whole code block'
 
   const codeBlockController = getCodeBlock(page);
   await codeBlockController.codeBlock.hover();
+
   await expect(codeBlockController.copyButton).toBeVisible();
   await codeBlockController.copyButton.click();
 
@@ -454,15 +493,15 @@ test('code block has content, click code block copy menu, copy whole code block'
     /*xml*/ `
 <affine:page>
   <affine:note
-    prop:background="--affine-background-secondary-color"
+    prop:background="--affine-note-background-blue"
     prop:displayMode="both"
     prop:edgeless={
       Object {
         "style": Object {
-          "borderRadius": 8,
+          "borderRadius": 0,
           "borderSize": 4,
-          "borderStyle": "solid",
-          "shadowType": "--affine-note-shadow-box",
+          "borderStyle": "none",
+          "shadowType": "--affine-note-shadow-sticker",
         },
       }
     }
@@ -470,11 +509,13 @@ test('code block has content, click code block copy menu, copy whole code block'
     prop:index="a0"
   >
     <affine:code
+      prop:caption=""
       prop:language="javascript"
       prop:text="use"
       prop:wrap={false}
     />
     <affine:code
+      prop:caption=""
       prop:language="javascript"
       prop:text="use"
       prop:wrap={false}
@@ -505,15 +546,15 @@ test('code block is empty, click code block copy menu, copy the empty code block
     /*xml*/ `
 <affine:page>
   <affine:note
-    prop:background="--affine-background-secondary-color"
+    prop:background="--affine-note-background-blue"
     prop:displayMode="both"
     prop:edgeless={
       Object {
         "style": Object {
-          "borderRadius": 8,
+          "borderRadius": 0,
           "borderSize": 4,
-          "borderStyle": "solid",
-          "shadowType": "--affine-note-shadow-box",
+          "borderStyle": "none",
+          "shadowType": "--affine-note-shadow-sticker",
         },
       }
     }
@@ -521,10 +562,12 @@ test('code block is empty, click code block copy menu, copy the empty code block
     prop:index="a0"
   >
     <affine:code
+      prop:caption=""
       prop:language="javascript"
       prop:wrap={false}
     />
     <affine:code
+      prop:caption=""
       prop:language="javascript"
       prop:wrap={false}
     />
@@ -533,23 +576,142 @@ test('code block is empty, click code block copy menu, copy the empty code block
   );
 });
 
-test('code block copy button can work', async ({ page }) => {
+test('language selection list should not close when hovering out of code block', async ({
+  page,
+}) => {
   await enterPlaygroundRoom(page);
-  await initEmptyCodeBlockState(page);
-  await focusRichText(page);
+  await initEmptyCodeBlockState(page, { language: 'javascript' });
 
-  await type(page, 'use');
   const codeBlockController = getCodeBlock(page);
   await codeBlockController.codeBlock.hover();
 
-  const position = await getCenterPosition(
-    page,
-    '.affine-codeblock-option > icon-button:nth-child(1)'
+  await codeBlockController.clickLanguageButton();
+  const langLocator = codeBlockController.langList;
+  await expect(langLocator).toBeVisible();
+
+  const bBox = await codeBlockController.codeBlock.boundingBox();
+  if (!bBox) throw new Error('Expected bounding box');
+
+  const { x, y, width, height } = bBox;
+
+  // hovering inside the code block should keep the list open
+  await page.mouse.move(x + width / 2, y + height / 2);
+  await expect(langLocator).toBeVisible();
+
+  // hovering out should not close the list
+  await page.mouse.move(x - 10, y - 10);
+  await waitNextFrame(page);
+  await expect(langLocator).toBeVisible();
+});
+
+test('duplicate code block', async ({ page }) => {
+  await enterPlaygroundRoom(page);
+  await initEmptyCodeBlockState(page, { language: 'javascript' });
+
+  const codeBlockController = getCodeBlock(page);
+  await codeBlockController.codeBlock.hover();
+
+  // change language
+  await codeBlockController.clickLanguageButton();
+  const langLocator = codeBlockController.langList;
+  await expect(langLocator).toBeVisible();
+  await type(page, 'rust');
+  await page.click(
+    '.affine-filterable-list > .items-container > icon-button:nth-child(1)'
   );
-  await page.mouse.click(position.x, position.y);
-  await focusRichText(page);
-  await pasteByKeyboard(page);
-  await assertRichTexts(page, ['useuse']);
+
+  // add text
+  await focusRichTextEnd(page);
+  await type(page, 'let a: u8 = 7');
+  await pressEscape(page);
+  await waitNextFrame(page, 100);
+
+  // add a caption
+  await codeBlockController.codeBlock.hover();
+  await codeBlockController.captionButton.click();
+  await type(page, 'BlockSuite');
+  await pressEnter(page);
+  await pressBackspace(page); // remove paragraph
+  await waitNextFrame(page, 100);
+
+  // turn on wrap
+  await codeBlockController.codeBlock.hover();
+  await (await codeBlockController.openMore()).wrapButton.click();
+
+  // duplicate
+  await codeBlockController.codeBlock.hover();
+  await (await codeBlockController.openMore()).duplicateButton.click();
+
+  await assertStoreMatchJSX(
+    page,
+    /*xml*/ `
+<affine:page>
+  <affine:note
+    prop:background="--affine-note-background-blue"
+    prop:displayMode="both"
+    prop:edgeless={
+      Object {
+        "style": Object {
+          "borderRadius": 0,
+          "borderSize": 4,
+          "borderStyle": "none",
+          "shadowType": "--affine-note-shadow-sticker",
+        },
+      }
+    }
+    prop:hidden={false}
+    prop:index="a0"
+  >
+    <affine:code
+      prop:caption="BlockSuite"
+      prop:language="rust"
+      prop:text="let a: u8 = 7"
+      prop:wrap={true}
+    />
+    <affine:code
+      prop:caption="BlockSuite"
+      prop:language="rust"
+      prop:text="let a: u8 = 7"
+      prop:wrap={true}
+    />
+  </affine:note>
+</affine:page>`
+  );
+});
+
+test('delete code block in more menu', async ({ page }) => {
+  await enterPlaygroundRoom(page);
+  await initEmptyCodeBlockState(page, { language: 'javascript' });
+
+  const codeBlockController = getCodeBlock(page);
+  await codeBlockController.codeBlock.hover();
+  const moreMenu = await codeBlockController.openMore();
+
+  await expect(moreMenu.menu).toBeVisible();
+  await moreMenu.deleteButton.click();
+
+  await assertStoreMatchJSX(
+    page,
+    /*xml*/ `
+<affine:page>
+  <affine:note
+    prop:background="--affine-note-background-blue"
+    prop:displayMode="both"
+    prop:edgeless={
+      Object {
+        "style": Object {
+          "borderRadius": 0,
+          "borderSize": 4,
+          "borderStyle": "none",
+          "shadowType": "--affine-note-shadow-sticker",
+        },
+      }
+    }
+    prop:hidden={false}
+    prop:index="a0"
+  />
+</affine:page>`
+  );
 });
 
 test('split code by enter', async ({ page }) => {
@@ -717,7 +879,7 @@ test('undo and redo works in code block', async ({ page }) => {
   await assertRichTexts(page, ['const a = 10;']);
 });
 
-test('code block option can appear and disappear during mousemove', async ({
+test('code block toolbar widget can appear and disappear during mousemove', async ({
   page,
 }) => {
   await enterPlaygroundRoom(page);
@@ -728,15 +890,12 @@ test('code block option can appear and disappear during mousemove', async ({
   if (!position) throw new Error('Failed to get affine code position');
   await page.mouse.move(position.x, position.y);
 
-  const locator = page.locator('.affine-codeblock-option');
-  const optionPosition = await locator.boundingBox();
-  if (!optionPosition) throw new Error('Failed to get option position');
-  await page.mouse.move(optionPosition.x, optionPosition.y);
+  const locator = page.locator('.code-toolbar-container');
+  const toolbarPosition = await locator.boundingBox();
+  if (!toolbarPosition) throw new Error('Failed to get option position');
+  await page.mouse.move(toolbarPosition.x, toolbarPosition.y);
   await expect(locator).toBeVisible();
-  await page.mouse.move(
-    optionPosition.x + optionPosition.width + 10,
-    optionPosition.y
-  );
+  await page.mouse.move(position.x - 10, position.y - 10);
   await expect(locator).toBeHidden();
 });
 
@@ -760,16 +919,39 @@ test('should tab works in code block', async ({ page }) => {
   await assertRichTexts(page, ['const a = 10;\n  \nconst b = "NothingToSay"']);
 });
 
+test('add caption works', async ({ page }) => {
+  await enterPlaygroundRoom(page);
+  const { codeBlockId } = await initEmptyCodeBlockState(page);
+
+  const codeBlockController = getCodeBlock(page);
+  await codeBlockController.codeBlock.hover();
+  await codeBlockController.captionButton.click();
+  await type(page, 'BlockSuite');
+  await pressEnter(page);
+  await waitNextFrame(page, 100);
+
+  await assertStoreMatchJSX(
+    page,
+    /*xml*/ `
+<affine:code
+  prop:caption="BlockSuite"
+  prop:language="Plain Text"
+  prop:wrap={false}
+/>`,
+    codeBlockId
+  );
+});
+
 test('toggle code block wrap can work', async ({ page }) => {
   await enterPlaygroundRoom(page);
   const { codeBlockId } = await initEmptyCodeBlockState(page);
-  await focusRichText(page);
 
   const codeBlockController = getCodeBlock(page);
   await assertStoreMatchJSX(
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={false}
 />`,
@@ -777,23 +959,27 @@ test('toggle code block wrap can work', async ({ page }) => {
   );
 
   await codeBlockController.codeBlock.hover();
-  await expect(codeBlockController.wrapButton).toBeVisible();
-  await codeBlockController.wrapButton.click();
+  await (await codeBlockController.openMore()).wrapButton.click();
+
   await assertStoreMatchJSX(
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={true}
 />`,
     codeBlockId
   );
 
-  await codeBlockController.wrapButton.click();
+  await codeBlockController.codeBlock.hover();
+  await (await codeBlockController.openMore()).cancelWrapButton.click();
+
   await assertStoreMatchJSX(
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={false}
 />`,
@@ -811,6 +997,7 @@ test('undo code block wrap can work', async ({ page }) => {
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={false}
 />`,
@@ -818,12 +1005,12 @@ test('undo code block wrap can work', async ({ page }) => {
   );
 
   await codeBlockController.codeBlock.hover();
-  await expect(codeBlockController.wrapButton).toBeVisible();
-  await codeBlockController.wrapButton.click();
+  await (await codeBlockController.openMore()).wrapButton.click();
   await assertStoreMatchJSX(
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={true}
 />`,
@@ -836,6 +1023,7 @@ test('undo code block wrap can work', async ({ page }) => {
     page,
     /*xml*/ `
 <affine:code
+  prop:caption=""
   prop:language="Plain Text"
   prop:wrap={false}
 />`,
@@ -843,46 +1031,41 @@ test('undo code block wrap can work', async ({ page }) => {
   );
 });
 
-test('should code block wrap active after click', async ({ page }) => {
+test('should open more menu and close on selecting', async ({ page }) => {
   await enterPlaygroundRoom(page);
   await initEmptyCodeBlockState(page);
   await focusRichText(page);
 
   const codeBlockController = getCodeBlock(page);
   await codeBlockController.codeBlock.hover();
-  await expect(codeBlockController.wrapButton).toBeVisible();
-  await expect(codeBlockController.wrapButton).not.toHaveAttribute(
-    'active',
-    ''
-  );
-  await codeBlockController.wrapButton.click();
-  await expect(codeBlockController.wrapButton).toBeVisible();
-  await expect(codeBlockController.wrapButton).toHaveAttribute('active', '');
-  await codeBlockController.wrapButton.click();
-  await expect(codeBlockController.wrapButton).toBeVisible();
-  await expect(codeBlockController.wrapButton).not.toHaveAttribute(
-    'active',
-    ''
-  );
+  await expect(codeBlockController.codeToolbar).toBeVisible();
+  const moreMenu = await codeBlockController.openMore();
+
+  await expect(moreMenu.menu).toBeVisible();
+  await moreMenu.wrapButton.click();
+  await expect(moreMenu.menu).toBeHidden();
 });
 
 test('should code block works in read only mode', async ({ page }) => {
   await enterPlaygroundRoom(page);
   await initEmptyCodeBlockState(page);
-  await focusRichText(page);
+  await focusRichTextEnd(page);
 
-  await page.mouse.move(0, 0);
   await page.waitForTimeout(300);
   await switchReadonly(page);
+
   const codeBlockController = getCodeBlock(page);
   const codeBlock = codeBlockController.codeBlock;
   await codeBlock.hover();
   await codeBlockController.clickLanguageButton();
   await expect(codeBlockController.langList).toBeHidden();
-  await expect(codeBlockController.codeOption).toBeVisible();
+
+  await codeBlock.hover();
+  await expect(codeBlockController.codeToolbar).toBeVisible();
+  await codeBlockController.moreButton.click({ delay: 50 });
+
   await expect(codeBlockController.copyButton).toBeVisible();
-  await expect(codeBlockController.wrapButton).toBeHidden();
-  await expect(codeBlockController.deleteButton).toBeHidden();
+  await expect(codeBlockController.moreMenu).toBeHidden();
 });
 
 test('should code block lang input supports alias', async ({ page }) => {

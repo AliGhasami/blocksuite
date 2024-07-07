@@ -13,18 +13,15 @@ import type { EmbedCardStyle } from '../../../../_common/types.js';
 export class CardStylePanel extends WithDisposable(LitElement) {
   static override styles = css`
     :host {
-      border-radius: 8px;
-      padding: 8px;
-      gap: 8px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: var(--affine-background-overlay-panel-color);
-      box-shadow: var(--affine-shadow-2);
+      justify-content: conter;
+      gap: 8px;
     }
 
     icon-button {
       padding: var(--1, 0px);
+      justify-content: center;
     }
 
     icon-button.selected {
@@ -33,37 +30,41 @@ export class CardStylePanel extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  value!: string;
+  accessor value!: EmbedCardStyle;
 
   @property({ attribute: false })
-  options!: {
+  accessor options!: {
     style: EmbedCardStyle;
     Icon: TemplateResult<1>;
     tooltip: string;
   }[];
 
   @property({ attribute: false })
-  onSelect!: (value: EmbedCardStyle) => void;
+  accessor onSelect!: (value: EmbedCardStyle) => void;
 
   override render() {
     const options = this.options;
-    if (!options || !options.length) return nothing;
+    if (!options?.length) return nothing;
 
     return repeat(
       options,
       options => options.style,
-      ({ style, Icon, tooltip }) =>
-        html`<icon-button
+      ({ style, Icon, tooltip }) => html`
+        <icon-button
           width="76px"
           height="76px"
           class=${classMap({
             selected: this.value === style,
           })}
-          @click=${() => this.onSelect(style)}
+          @click=${() => {
+            this.onSelect(style);
+            this.value = style;
+          }}
         >
           ${Icon}
           <affine-tooltip .offset=${4}>${tooltip}</affine-tooltip>
-        </icon-button>`
+        </icon-button>
+      `
     );
   }
 }

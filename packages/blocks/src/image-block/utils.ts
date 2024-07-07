@@ -2,7 +2,6 @@ import type { EditorHost } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { uploadFile } from '../_common/upload.js';
 import { downloadBlob, withTempBlobData } from '../_common/utils/filesys.js';
 import { humanFileSize } from '../_common/utils/math.js';
 import type { AttachmentBlockProps } from '../attachment-block/attachment-model.js';
@@ -34,30 +33,13 @@ export async function uploadBlobForImage(
   if (isImageUploading(blockId)) {
     throw new Error('The image is already uploading!');
   }
-  //setImageUploading(blockId);
+  setImageUploading(blockId);
   const doc = editorHost.doc;
-  //let sourceId: string | undefined;
-  const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
-  assertExists(imageModel);
+  let sourceId: string | undefined;
+
   try {
-    //setImageUploaded(blockId);
-    //console.log('this is blob', blob);
-    /*doc.updateBlock(imageModel, {
-      src: URL.createObjectURL(blob),
-      //sourceId,
-      // blobUrl: '1111',
-    } satisfies Partial<ImageBlockProps>);*/
-    const { data } = await uploadFile(blob);
-    doc.withoutTransact(() => {
-      doc.updateBlock(imageModel, {
-        src: `${data.data.storage}`,
-        // blobUrl: '1111',
-      } satisfies Partial<ImageBlockProps>);
-    });
-    //console.log('rrrr', res);
-    //sourceId = await doc.blob.set(blob);
-    //console.log('222', doc.blob.list);
-    //console.log('3333');
+    setImageUploaded(blockId);
+    sourceId = await doc.blobSync.set(blob);
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -67,18 +49,16 @@ export async function uploadBlobForImage(
       );
     }
   } finally {
-    //setImageUploaded(blockId);
-    /* doc.updateBlock(imageModel, {
-      src: URL.createObjectURL(blob),
-      //sourceId,
-      // blobUrl: '1111',
-    } satisfies Partial<ImageBlockProps>);*/
-    /*doc.withoutTransact(() => {
+    setImageUploaded(blockId);
+
+    const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
+    assertExists(imageModel);
+
+    doc.withoutTransact(() => {
       doc.updateBlock(imageModel, {
-        //sourceId,
-        // blobUrl: '1111',
+        sourceId,
       } satisfies Partial<ImageBlockProps>);
-    });*/
+    });
   }
 }
 
@@ -89,7 +69,7 @@ async function getImageBlob(model: ImageBlockModel) {
   }
 
   const doc = model.doc;
-  const blob = await doc.blob.get(sourceId);
+  const blob = await doc.blobSync.get(sourceId);
 
   if (!blob) {
     return null;
@@ -143,7 +123,7 @@ export async function fetchImageBlob(block: ImageBlockComponent) {
       throw new Error('Image sourceId is missing!');
     }
 
-    const blob = await doc.blob.get(sourceId);
+    const blob = await doc.blobSync.get(sourceId);
     if (!blob) {
       throw new Error('Image blob is missing!');
     }
@@ -290,49 +270,6 @@ export function shouldResizeImage(node: Node, target: EventTarget | null) {
   );
 }
 
-/*export function addSiblingImageBlockUploadFile(
-  editorHost: EditorHost,
-  files: File[],
-  maxFileSize: number,
-  targetModel: BlockModel,
-  place: 'after' | 'before' = 'after'
-) {
-  //console.log('1111', files);
-  const imageFiles = files.filter(file => file.type.startsWith('image/'));
-  if (!imageFiles.length) {
-    return;
-  }
-
-  const isSizeExceeded = imageFiles.some(file => file.size > maxFileSize);
-  if (isSizeExceeded) {
-    toast(
-      editorHost,
-      `You can only upload files less than ${humanFileSize(
-        maxFileSize,
-        true,
-        0
-      )}`
-    );
-    return;
-  }
-
-  const imageBlockProps: Partial<ImageBlockProps> &
-    {
-      flavour: 'affine:image';
-    }[] = imageFiles.map(file => ({
-    flavour: 'affine:image',
-    size: file.size,
-  }));
-
-  const doc = editorHost.doc;
-  const blockIds = doc.addSiblingBlocks(targetModel, imageBlockProps, place);
-  blockIds.map(
-    (blockId, index) =>
-      void uploadBlobForImage(editorHost, blockId, imageFiles[index])
-  );
-  return blockIds;
-}*/
-
 export function addSiblingImageBlock(
   editorHost: EditorHost,
   files: File[],
@@ -340,11 +277,11 @@ export function addSiblingImageBlock(
   targetModel: BlockModel,
   place: 'after' | 'before' = 'after'
 ) {
-  //console.log('1111', files);
   const imageFiles = files.filter(file => file.type.startsWith('image/'));
   if (!imageFiles.length) {
     return;
   }
+
   const isSizeExceeded = imageFiles.some(file => file.size > maxFileSize);
   if (isSizeExceeded) {
     toast(
@@ -364,7 +301,6 @@ export function addSiblingImageBlock(
     }[] = imageFiles.map(file => ({
     flavour: 'affine:image',
     size: file.size,
-    src: URL.createObjectURL(file),
   }));
 
   const doc = editorHost.doc;

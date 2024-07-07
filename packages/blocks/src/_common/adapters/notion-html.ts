@@ -1,4 +1,4 @@
-import { isEqual } from '@blocksuite/global/utils';
+import { isEqual, sha } from '@blocksuite/global/utils';
 import type { DeltaInsert } from '@blocksuite/inline';
 import type {
   FromBlockSnapshotPayload,
@@ -16,7 +16,6 @@ import {
   type DocSnapshot,
   getAssetName,
   nanoid,
-  sha,
   type SliceSnapshot,
 } from '@blocksuite/store';
 import rehypeParse from 'rehype-parse';
@@ -32,7 +31,7 @@ import {
   hastQuerySelector,
   type HtmlAST,
 } from './hast.js';
-import { fetchable, fetchImage } from './utils.js';
+import { createText, fetchable, fetchImage, isText } from './utils.js';
 
 export type NotionHtml = string;
 
@@ -77,149 +76,15 @@ type BlocksuiteTableColumn = {
   id: string;
 };
 
-type BlocksuiteTableRow = {
-  [key: string]: {
+type BlocksuiteTableRow = Record<
+  string,
+  {
     columnId: string;
     value: unknown;
-  };
-};
+  }
+>;
 
 export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
-  override fromDocSnapshot(
-    _payload: FromDocSnapshotPayload
-  ): Promise<FromDocSnapshotResult<NotionHtml>> {
-    throw new Error('Method not implemented.');
-  }
-  override fromBlockSnapshot(
-    _payload: FromBlockSnapshotPayload
-  ): Promise<FromBlockSnapshotResult<NotionHtml>> {
-    throw new Error('Method not implemented.');
-  }
-  override fromSliceSnapshot(
-    _payload: FromSliceSnapshotPayload
-  ): Promise<FromSliceSnapshotResult<NotionHtml>> {
-    throw new Error('Method not implemented.');
-  }
-  override async toDocSnapshot(
-    payload: NotionHtmlToDocSnapshotPayload
-  ): Promise<DocSnapshot> {
-    const notionHtmlAst = this._htmlToAst(payload.file);
-    const titleAst = hastQuerySelector(notionHtmlAst, 'title');
-    const blockSnapshotRoot = {
-      type: 'block',
-      id: nanoid(),
-      flavour: 'affine:note',
-      props: {
-        xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
-        index: 'a0',
-        hidden: false,
-        displayMode: NoteDisplayMode.DocAndEdgeless,
-      },
-      children: [],
-    };
-    return {
-      type: 'page',
-      meta: {
-        id: payload.pageId ?? nanoid(),
-        title: hastGetTextContent(titleAst, 'Untitled'),
-        createDate: Date.now(),
-        tags: [],
-      },
-      blocks: {
-        type: 'block',
-        id: nanoid(),
-        flavour: 'affine:page',
-        props: {
-          title: {
-            '$blocksuite:internal:text$': true,
-            delta: this._hastToDelta(
-              titleAst ?? {
-                type: 'text',
-                value: 'Untitled',
-              }
-            ),
-          },
-        },
-        children: [
-          {
-            type: 'block',
-            id: nanoid(),
-            flavour: 'affine:surface',
-            props: {
-              elements: {},
-            },
-            children: [],
-          },
-          await this._traverseNotionHtml(
-            notionHtmlAst,
-            blockSnapshotRoot as BlockSnapshot,
-            payload.assets,
-            payload.pageMap
-          ),
-        ],
-      },
-    };
-  }
-  override toBlockSnapshot(
-    payload: NotionHtmlToBlockSnapshotPayload
-  ): Promise<BlockSnapshot> {
-    const notionHtmlAst = this._htmlToAst(payload.file);
-    const blockSnapshotRoot = {
-      type: 'block',
-      id: nanoid(),
-      flavour: 'affine:note',
-      props: {
-        xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
-        index: 'a0',
-        hidden: false,
-        displayMode: NoteDisplayMode.DocAndEdgeless,
-      },
-      children: [],
-    };
-    return this._traverseNotionHtml(
-      notionHtmlAst,
-      blockSnapshotRoot as BlockSnapshot,
-      payload.assets,
-      payload.pageMap
-    );
-  }
-  override async toSliceSnapshot(
-    payload: NotionHtmlToSliceSnapshotPayload
-  ): Promise<SliceSnapshot | null> {
-    const notionHtmlAst = this._htmlToAst(payload.file);
-    const blockSnapshotRoot = {
-      type: 'block',
-      id: nanoid(),
-      flavour: 'affine:note',
-      props: {
-        xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
-        index: 'a0',
-        hidden: false,
-        displayMode: NoteDisplayMode.DocAndEdgeless,
-      },
-      children: [],
-    };
-    const contentSlice = (await this._traverseNotionHtml(
-      notionHtmlAst,
-      blockSnapshotRoot as BlockSnapshot,
-      payload.assets
-    )) as BlockSnapshot;
-    if (contentSlice.children.length === 0) {
-      return null;
-    }
-    return {
-      type: 'slice',
-      content: [contentSlice],
-      pageVersion: payload.pageVersion,
-      workspaceVersion: payload.workspaceVersion,
-      workspaceId: payload.workspaceId,
-      pageId: payload.pageId,
-    };
-  }
-
   private _htmlToAst(notionHtml: NotionHtml) {
     return unified().use(rehypeParse).parse(notionHtml);
   }
@@ -841,14 +706,35 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                     : false,
                 };
               } else if (columns[index].type === 'number') {
-                row[columns[index].id] = {
-                  columnId: columns[index].id,
-                  value: Number(hastGetTextContent(child)),
-                };
+                const text = hastGetTextContent(child);
+                const number = Number(text);
+                if (Number.isNaN(number)) {
+                  if (columns[index].type !== 'rich-text') {
+                    columns[index].type = 'rich-text';
+                  }
+                  row[columns[index].id] = {
+                    columnId: columns[index].id,
+                    value: createText(text),
+                  };
+                } else {
+                  row[columns[index].id] = {
+                    columnId: columns[index].id,
+                    value: number,
+                  };
+                }
               } else {
                 row[columns[index].id] = {
                   columnId: columns[index].id,
                   value: hastGetTextContent(child),
+                };
+              }
+              if (
+                columns[index].type === 'rich-text' &&
+                !isText(row[columns[index].id].value)
+              ) {
+                row[columns[index].id] = {
+                  columnId: columns[index].id,
+                  value: createText(row[columns[index].id].value),
                 };
               }
             });
@@ -1121,4 +1007,149 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
       return [...acc, cur];
     }, [] as DeltaInsert<object>[]);
   };
+
+  override fromDocSnapshot(
+    _payload: FromDocSnapshotPayload
+  ): Promise<FromDocSnapshotResult<NotionHtml>> {
+    throw new Error('Method not implemented.');
+  }
+
+  override fromBlockSnapshot(
+    _payload: FromBlockSnapshotPayload
+  ): Promise<FromBlockSnapshotResult<NotionHtml>> {
+    throw new Error('Method not implemented.');
+  }
+
+  override fromSliceSnapshot(
+    _payload: FromSliceSnapshotPayload
+  ): Promise<FromSliceSnapshotResult<NotionHtml>> {
+    throw new Error('Method not implemented.');
+  }
+
+  override async toDocSnapshot(
+    payload: NotionHtmlToDocSnapshotPayload
+  ): Promise<DocSnapshot> {
+    const notionHtmlAst = this._htmlToAst(payload.file);
+    const titleAst = hastQuerySelector(notionHtmlAst, 'title');
+    const blockSnapshotRoot = {
+      type: 'block',
+      id: nanoid(),
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: '--affine-background-secondary-color',
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [],
+    };
+    return {
+      type: 'page',
+      meta: {
+        id: payload.pageId ?? nanoid(),
+        title: hastGetTextContent(titleAst, 'Untitled'),
+        createDate: Date.now(),
+        tags: [],
+      },
+      blocks: {
+        type: 'block',
+        id: nanoid(),
+        flavour: 'affine:page',
+        props: {
+          title: {
+            '$blocksuite:internal:text$': true,
+            delta: this._hastToDelta(
+              titleAst ?? {
+                type: 'text',
+                value: 'Untitled',
+              }
+            ),
+          },
+        },
+        children: [
+          {
+            type: 'block',
+            id: nanoid(),
+            flavour: 'affine:surface',
+            props: {
+              elements: {},
+            },
+            children: [],
+          },
+          await this._traverseNotionHtml(
+            notionHtmlAst,
+            blockSnapshotRoot as BlockSnapshot,
+            payload.assets,
+            payload.pageMap
+          ),
+        ],
+      },
+    };
+  }
+
+  override async toDoc(payload: NotionHtmlToDocSnapshotPayload) {
+    const snapshot = await this.toDocSnapshot(payload);
+    return this.job.snapshotToDoc(snapshot);
+  }
+
+  override toBlockSnapshot(
+    payload: NotionHtmlToBlockSnapshotPayload
+  ): Promise<BlockSnapshot> {
+    const notionHtmlAst = this._htmlToAst(payload.file);
+    const blockSnapshotRoot = {
+      type: 'block',
+      id: nanoid(),
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: '--affine-background-secondary-color',
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [],
+    };
+    return this._traverseNotionHtml(
+      notionHtmlAst,
+      blockSnapshotRoot as BlockSnapshot,
+      payload.assets,
+      payload.pageMap
+    );
+  }
+
+  override async toSliceSnapshot(
+    payload: NotionHtmlToSliceSnapshotPayload
+  ): Promise<SliceSnapshot | null> {
+    const notionHtmlAst = this._htmlToAst(payload.file);
+    const blockSnapshotRoot = {
+      type: 'block',
+      id: nanoid(),
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: '--affine-background-secondary-color',
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [],
+    };
+    const contentSlice = (await this._traverseNotionHtml(
+      notionHtmlAst,
+      blockSnapshotRoot as BlockSnapshot,
+      payload.assets
+    )) as BlockSnapshot;
+    if (contentSlice.children.length === 0) {
+      return null;
+    }
+    return {
+      type: 'slice',
+      content: [contentSlice],
+      pageVersion: payload.pageVersion,
+      workspaceVersion: payload.workspaceVersion,
+      workspaceId: payload.workspaceId,
+      pageId: payload.pageId,
+    };
+  }
 }

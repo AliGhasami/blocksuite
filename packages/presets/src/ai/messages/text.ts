@@ -8,7 +8,7 @@ import {
   ListBlockComponent,
   ParagraphBlockComponent,
 } from '@blocksuite/blocks';
-import { type BlockSelector, type Doc } from '@blocksuite/store';
+import { type BlockSelector, BlockViewType, type Doc } from '@blocksuite/store';
 import { css, html, LitElement, type PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -96,11 +96,11 @@ export class AIAnswerText extends WithDisposable(LitElement) {
         > .affine-block-children-container {
           > :first-child,
           > :first-child * {
-            margin-top: 0;
+            margin-top: 0 !important;
           }
           > :last-child,
           > :last-child * {
-            margin-bottom: 0;
+            margin-bottom: 0 !important;
           }
         }
       }
@@ -131,26 +131,38 @@ export class AIAnswerText extends WithDisposable(LitElement) {
       rich-text .nowrap-lines v-element span {
         white-space: pre;
       }
+      editor-host:focus-visible {
+        outline: none;
+      }
+      editor-host * {
+        box-sizing: border-box;
+      }
     }
 
     ${textBlockStyles}
     ${customHeadingStyles}
   `;
 
-  @property({ attribute: false })
-  host!: EditorHost;
-
-  @property({ attribute: false })
-  answer!: string;
-
-  @property({ attribute: false })
-  options!: TextRendererOptions;
-
-  @property({ attribute: false })
-  state?: AffineAIPanelState;
-
   @query('.ai-answer-text-container')
-  private _container!: HTMLDivElement;
+  private accessor _container!: HTMLDivElement;
+
+  private _doc!: Doc;
+
+  private _answers: string[] = [];
+
+  private _timer?: ReturnType<typeof setInterval> | null = null;
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
+
+  @property({ attribute: false })
+  accessor answer!: string;
+
+  @property({ attribute: false })
+  accessor options!: TextRendererOptions;
+
+  @property({ attribute: false })
+  accessor state: AffineAIPanelState | undefined = undefined;
 
   private _onWheel(e: MouseEvent) {
     e.stopPropagation();
@@ -158,10 +170,6 @@ export class AIAnswerText extends WithDisposable(LitElement) {
       e.preventDefault();
     }
   }
-
-  private _doc!: Doc;
-  private _answers: string[] = [];
-  private _timer?: ReturnType<typeof setInterval> | null = null;
 
   private _clearTimer = () => {
     if (this._timer) {
@@ -179,7 +187,9 @@ export class AIAnswerText extends WithDisposable(LitElement) {
       'affine:code',
       'affine:list',
       'affine:divider',
-    ]);
+    ])
+      ? BlockViewType.Display
+      : BlockViewType.Hidden;
 
   private _updateDoc = () => {
     if (this._answers.length > 0) {
@@ -188,7 +198,9 @@ export class AIAnswerText extends WithDisposable(LitElement) {
       if (latestAnswer) {
         markDownToDoc(this.host, latestAnswer)
           .then(doc => {
-            this._doc = doc.blockCollection.getDoc(this._selector);
+            this._doc = doc.blockCollection.getDoc({
+              selector: this._selector,
+            });
             this.disposables.add(() => {
               doc.blockCollection.clearSelector(this._selector);
             });

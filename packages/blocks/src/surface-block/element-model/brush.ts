@@ -1,4 +1,3 @@
-import type { HitTestOptions } from '../../root-block/edgeless/type.js';
 import { getSolidStrokePoints } from '../canvas-renderer/element-renderer/brush/utils.js';
 import {
   Bound,
@@ -17,11 +16,15 @@ import {
 import { PointLocation } from '../utils/point-location.js';
 import type { IVec2 } from '../utils/vec.js';
 import { Vec } from '../utils/vec.js';
-import { type SerializedXYWH } from '../utils/xywh.js';
-import { type BaseProps, ElementModel } from './base.js';
+import type { SerializedXYWH } from '../utils/xywh.js';
+import {
+  type IBaseProps,
+  type IHitTestOptions,
+  SurfaceElementModel,
+} from './base.js';
 import { convert, derive, watch, yfield } from './decorators.js';
 
-export type BrushProps = BaseProps & {
+export type BrushProps = IBaseProps & {
   /**
    * [[x0,y0,pressure0?],[x1,y1,pressure1?]...]
    * pressure is optional and exsits when pressure sensitivity is supported, otherwise not.
@@ -31,9 +34,27 @@ export type BrushProps = BaseProps & {
   lineWidth: number;
 };
 
-export class BrushElementModel extends ElementModel<BrushProps> {
-  static override propsToY(props: BrushProps) {
-    return props;
+export class BrushElementModel extends SurfaceElementModel<BrushProps> {
+  /**
+   * The SVG path commands for the brush.
+   */
+  get commands() {
+    if (!this._local.has('commands')) {
+      const stroke = getSolidStrokePoints(this.points, this.lineWidth);
+      const commands = getSvgPathFromStroke(stroke);
+
+      this._local.set('commands', commands);
+    }
+
+    return this._local.get('commands') as string;
+  }
+
+  override get connectable() {
+    return false;
+  }
+
+  override get type() {
+    return 'brush';
   }
 
   @watch((_, instance: BrushElementModel) => {
@@ -61,7 +82,7 @@ export class BrushElementModel extends ElementModel<BrushProps> {
     return relativePoints;
   })
   @yfield()
-  points: number[][] = [];
+  accessor points: number[][] = [];
 
   @derive((xywh: SerializedXYWH, instance: BrushElementModel) => {
     const bound = Bound.deserialize(xywh);
@@ -86,27 +107,13 @@ export class BrushElementModel extends ElementModel<BrushProps> {
     };
   })
   @yfield()
-  xywh: SerializedXYWH = '[0,0,0,0]';
+  accessor xywh: SerializedXYWH = '[0,0,0,0]';
 
   @yfield(0)
-  rotate: number = 0;
+  accessor rotate: number = 0;
 
   @yfield()
-  color: string = '#000000';
-
-  /**
-   * The SVG path commands for the brush.
-   */
-  get commands() {
-    if (!this._local.has('commands')) {
-      const stroke = getSolidStrokePoints(this.points, this.lineWidth);
-      const commands = getSvgPathFromStroke(stroke);
-
-      this._local.set('commands', commands);
-    }
-
-    return this._local.get('commands') as string;
-  }
+  accessor color: string = '#000000';
 
   @watch((_, instance: BrushElementModel) => {
     instance['_local'].delete('commands');
@@ -134,17 +141,9 @@ export class BrushElementModel extends ElementModel<BrushProps> {
     };
   })
   @yfield()
-  lineWidth: number = 4;
+  accessor lineWidth: number = 4;
 
-  override get connectable() {
-    return false;
-  }
-
-  override get type() {
-    return 'brush';
-  }
-
-  override hitTest(px: number, py: number, options?: HitTestOptions): boolean {
+  override hitTest(px: number, py: number, options?: IHitTestOptions): boolean {
     const hit = isPointOnlines(
       Bound.deserialize(this.xywh),
       this.points as [number, number][],
@@ -201,5 +200,17 @@ export class BrushElementModel extends ElementModel<BrushProps> {
   override getRelativePointLocation(position: IVec2): PointLocation {
     const point = Bound.deserialize(this.xywh).getRelativePoint(position);
     return new PointLocation(point);
+  }
+
+  static override propsToY(props: BrushProps) {
+    return props;
+  }
+}
+
+declare global {
+  namespace BlockSuite {
+    interface SurfaceElementModelMap {
+      brush: BrushElementModel;
+    }
   }
 }

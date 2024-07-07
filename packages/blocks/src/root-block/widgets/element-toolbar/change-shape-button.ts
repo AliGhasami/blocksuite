@@ -1,26 +1,29 @@
 import '../../edgeless/components/buttons/tool-icon-button.js';
+import '../../edgeless/components/buttons/menu-button.js';
+import '../../edgeless/components/panel/stroke-style-panel.js';
 import '../../edgeless/components/panel/color-panel.js';
 import '../../edgeless/components/panel/shape-style-panel.js';
 import '../../edgeless/components/panel/shape-panel.js';
 import './change-text-menu.js';
-import './component-toolbar-menu-divider.js';
 
 import { WithDisposable } from '@blocksuite/block-std';
-import { css, html, LitElement, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { html, LitElement, nothing, type TemplateResult } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
+import { cache } from 'lit/directives/cache.js';
+import { choose } from 'lit/directives/choose.js';
+import { join } from 'lit/directives/join.js';
 
 import {
+  AddTextIcon,
   ChangeShapeIcon,
   GeneralStyleIcon,
-  LineStyleIcon,
   ScribbledStyleIcon,
-  ShapeArrowDownSmallIcon,
+  SmallArrowDownIcon,
 } from '../../../_common/icons/index.js';
 import type { CssVariableName } from '../../../_common/theme/css-variables.js';
-import { LineWidth, type ShapeTool } from '../../../_common/types.js';
-import { createButtonPopper } from '../../../_common/utils/button-popper.js';
+import { LineWidth } from '../../../_common/types.js';
 import { countBy, maxBy } from '../../../_common/utils/iterable.js';
-import { CanvasTextFontFamily } from '../../../surface-block/consts.js';
+import { FontFamily } from '../../../surface-block/consts.js';
 import {
   FILL_COLORS,
   ShapeType,
@@ -32,29 +35,22 @@ import {
   StrokeStyle,
 } from '../../../surface-block/index.js';
 import { lineSizeButtonStyles } from '../../edgeless/components/buttons/line-size-button.js';
-import type { LineStyleButtonProps } from '../../edgeless/components/buttons/line-style-button.js';
-import type { EdgelessToolIconButton } from '../../edgeless/components/buttons/tool-icon-button.js';
+import { renderMenuDivider } from '../../edgeless/components/buttons/menu-button.js';
 import type { ColorEvent } from '../../edgeless/components/panel/color-panel.js';
-import { ColorUnit } from '../../edgeless/components/panel/color-panel.js';
 import {
   GET_DEFAULT_LINE_COLOR,
   isTransparent,
 } from '../../edgeless/components/panel/color-panel.js';
-import {
-  LineStylesPanel,
-  type LineStylesPanelClickedButton,
-  lineStylesPanelStyles,
-} from '../../edgeless/components/panel/line-styles-panel.js';
+import type { LineStyleEvent } from '../../edgeless/components/panel/line-styles-panel.js';
 import type { EdgelessShapePanel } from '../../edgeless/components/panel/shape-panel.js';
-import type { EdgelessShapeStylePanel } from '../../edgeless/components/panel/shape-style-panel.js';
+import type { ShapeTool } from '../../edgeless/controllers/tools/shape-tool.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 import {
   SHAPE_FILL_COLOR_BLACK,
   SHAPE_TEXT_COLOR_PURE_BLACK,
   SHAPE_TEXT_COLOR_PURE_WHITE,
 } from '../../edgeless/utils/consts.js';
-
-const ICON_BUTTON_PADDING_TWO = 2;
+import { mountShapeTextEditor } from '../../edgeless/utils/text.js';
 
 function getMostCommonShape(
   elements: ShapeElementModel[]
@@ -96,26 +92,10 @@ function getMostCommonLineSize(elements: ShapeElementModel[]): LineWidth {
 
 function getMostCommonLineStyle(
   elements: ShapeElementModel[]
-): LineStyleButtonProps['mode'] | null {
-  const sizes = countBy(elements, (ele: ShapeElementModel) => {
-    switch (ele.strokeStyle) {
-      case 'solid': {
-        return 'solid';
-      }
-      case 'dash': {
-        return 'dash';
-      }
-      case 'none': {
-        return 'none';
-      }
-    }
-  });
+): StrokeStyle | null {
+  const sizes = countBy(elements, (ele: ShapeElementModel) => ele.strokeStyle);
   const max = maxBy(Object.entries(sizes), ([_k, count]) => count);
-  return max ? (max[0] as LineStyleButtonProps['mode']) : null;
-}
-
-function doesAllShapesContainText(elements: ShapeElementModel[]): boolean {
-  return elements.every(ele => ele.text);
+  return max ? (max[0] as StrokeStyle) : null;
 }
 
 function getMostCommonShapeStyle(elements: ShapeElementModel[]): ShapeStyle {
@@ -128,164 +108,20 @@ function getMostCommonShapeStyle(elements: ShapeElementModel[]): ShapeStyle {
 
 @customElement('edgeless-change-shape-button')
 export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
-  static override styles = [
-    lineSizeButtonStyles,
-    lineStylesPanelStyles,
-    css`
-      .change-shape-toolbar-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--affine-text-primary-color);
-        stroke: none;
-        fill: currentColor;
-      }
-
-      edgeless-shape-panel {
-        display: none;
-      }
-
-      edgeless-shape-panel[data-show] {
-        display: flex;
-      }
-
-      .change-shape-button,
-      .shape-style-button,
-      .line-styles-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .change-shape-button svg,
-      .shape-style-button svg,
-      .line-styles-button svg {
-        fill: var(--affine-icon-color);
-      }
-
-      .border-styles-button {
-        margin-left: 12px;
-      }
-
-      .fill-color-container,
-      .stroke-color-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 20px;
-        height: 20px;
-      }
-
-      .color-panel-container,
-      .shape-style-panel-container {
-        display: none;
-        justify-content: center;
-        align-items: center;
-        background: var(--affine-background-overlay-panel-color);
-        box-shadow: var(--affine-shadow-2);
-        border-radius: 8px;
-      }
-
-      .shape-style-panel-container {
-        padding: 8px;
-      }
-
-      .color-panel-container[data-show],
-      .shape-style-panel-container[data-show] {
-        display: flex;
-      }
-
-      .shape-color-button-indicator {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 24px;
-        height: 24px;
-        box-sizing: border-box;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      .shape-color-button-indicator div {
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-      }
-
-      .line-style-panel {
-        display: none;
-        padding: 6px;
-      }
-
-      .line-style-panel component-toolbar-menu-divider {
-        margin: 0 8px;
-      }
-
-      .line-style-panel[data-show] {
-        display: flex;
-      }
-
-      component-toolbar-menu-divider {
-        margin: 0 12px;
-        height: 24px;
-      }
-    `,
-  ];
-
-  @property({ attribute: false })
-  elements: ShapeElementModel[] = [];
-
-  @property({ attribute: false })
-  edgeless!: EdgelessRootBlockComponent;
-
-  @state()
-  private _showTypePanelPopper = false;
-  @query('.change-shape-button')
-  private _changeShapeButton!: EdgelessToolIconButton;
-  @query('edgeless-shape-panel')
-  private _shapePanel!: EdgelessShapePanel;
-  private _shapePanelPopper: ReturnType<typeof createButtonPopper> | null =
-    null;
-
-  @state()
-  private _showStylelPanelPopper = false;
-  @query('.shape-style-button')
-  private _shapeStyleButton!: EdgelessToolIconButton;
-  @query('.shape-style-panel-container')
-  private _shapeStyleMenu!: HTMLDivElement;
-  private _shapeStyleMenuPopper: ReturnType<typeof createButtonPopper> | null =
-    null;
-
-  @state()
-  private _showFillColorPanelPopper = false;
-  @query('.fill-color-button')
-  private _fillColorButton!: EdgelessToolIconButton;
-  @query('.color-panel-container.fill-color')
-  private _fillColorMenu!: HTMLDivElement;
-  private _fillColorMenuPopper: ReturnType<typeof createButtonPopper> | null =
-    null;
-
-  @state()
-  private _showStrokeColorPanelPopper = false;
-  @query('.stroke-color-button')
-  private _strokeColorButton!: EdgelessToolIconButton;
-  @query('.color-panel-container.stroke-color')
-  private _strokeColorMenu!: HTMLDivElement;
-  private _strokeColorMenuPopper: ReturnType<typeof createButtonPopper> | null =
-    null;
-
-  @state()
-  private _showLineStylePanelPopper = false;
-  @query('.line-styles-button')
-  private _lineStylesButton!: EdgelessToolIconButton;
-  @query('.line-style-panel')
-  private _lineStylesPanel!: HTMLDivElement;
-  private _lineStylesPanelPopper: ReturnType<typeof createButtonPopper> | null =
-    null;
-
   get service() {
     return this.edgeless.service;
   }
+
+  static override styles = [lineSizeButtonStyles];
+
+  @query('edgeless-shape-panel')
+  private accessor _shapePanel!: EdgelessShapePanel;
+
+  @property({ attribute: false })
+  accessor elements: ShapeElementModel[] = [];
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
 
   private _getTextColor(fillColor: CssVariableName) {
     // When the shape is filled with black color, the text color should be white.
@@ -300,87 +136,68 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     return textColor;
   }
 
-  private _setShapeFillColor(color: CssVariableName) {
-    const textColor = this._getTextColor(color);
-    const filled = !isTransparent(color);
-    this.elements.forEach(ele => {
-      this.service.updateElement(ele.id, {
-        filled,
-        fillColor: color,
-        color: textColor,
-      });
-    });
+  private _setShapeFillColor(fillColor: CssVariableName) {
+    const filled = !isTransparent(fillColor);
+    const color = this._getTextColor(fillColor);
+    this.elements.forEach(ele =>
+      this.service.updateElement(ele.id, { filled, fillColor, color })
+    );
   }
 
-  private _setShapeStrokeColor(color: CssVariableName) {
-    this.elements.forEach(ele => {
-      this.service.updateElement(ele.id, {
-        strokeColor: color,
-      });
-    });
+  private _setShapeStrokeColor(strokeColor: CssVariableName) {
+    this.elements.forEach(ele =>
+      this.service.updateElement(ele.id, { strokeColor })
+    );
   }
 
   private _setShapeStrokeWidth(strokeWidth: number) {
-    this.elements.forEach(ele => {
-      this.service.updateElement(ele.id, {
-        strokeWidth,
-      });
-    });
+    this.elements.forEach(ele =>
+      this.service.updateElement(ele.id, { strokeWidth })
+    );
   }
 
   private _setShapeStrokeStyle(strokeStyle: StrokeStyle) {
-    this.elements.forEach(ele => {
-      this.service.updateElement(ele.id, {
-        strokeStyle,
-      });
-    });
+    this.elements.forEach(ele =>
+      this.service.updateElement(ele.id, { strokeStyle })
+    );
   }
 
-  private _setShapeStyles({ type, value }: LineStylesPanelClickedButton) {
+  private _setShapeStyles({ type, value }: LineStyleEvent) {
     if (type === 'size') {
-      const strokeWidth = value;
-      this._setShapeStrokeWidth(strokeWidth);
-    } else if (type === 'lineStyle') {
-      switch (value) {
-        case 'solid': {
-          this._setShapeStrokeStyle(StrokeStyle.Solid);
-          break;
-        }
-        case 'dash': {
-          this._setShapeStrokeStyle(StrokeStyle.Dashed);
-          break;
-        }
-        case 'none': {
-          this._setShapeStrokeStyle(StrokeStyle.None);
-          break;
-        }
-      }
+      this._setShapeStrokeWidth(value);
+      return;
+    }
+    if (type === 'lineStyle') {
+      this._setShapeStrokeStyle(value);
     }
   }
 
   private _setShapeStyle(shapeStyle: ShapeStyle) {
+    const fontFamily =
+      shapeStyle === ShapeStyle.General ? FontFamily.Inter : FontFamily.Kalam;
+
     this.elements.forEach(ele => {
-      this.service.updateElement(ele.id, {
-        shapeStyle: shapeStyle,
-        fontFamily:
-          shapeStyle === ShapeStyle.General
-            ? CanvasTextFontFamily.Inter
-            : CanvasTextFontFamily.Kalam,
-      });
+      this.service.updateElement(ele.id, { shapeStyle, fontFamily });
     });
+  }
+
+  private _addText() {
+    mountShapeTextEditor(this.elements[0], this.edgeless);
+  }
+
+  private _showAddButtonOrTextMenu() {
+    if (this.elements.length === 1 && !this.elements[0].text) {
+      return 'button';
+    }
+    if (!this.elements.some(e => !e.text)) {
+      return 'menu';
+    }
+    return 'nothing';
   }
 
   override firstUpdated(changedProperties: Map<string, unknown>) {
     const _disposables = this._disposables;
 
-    this._shapePanelPopper = createButtonPopper(
-      this._changeShapeButton,
-      this._shapePanel,
-      ({ display }) => {
-        this._showTypePanelPopper = display === 'show';
-      }
-    );
-    _disposables.add(this._shapePanelPopper);
     _disposables.add(
       this._shapePanel.slots.select.on(shapeType => {
         const updatedProps =
@@ -395,176 +212,152 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
       })
     );
 
-    this._fillColorMenuPopper = createButtonPopper(
-      this._fillColorButton,
-      this._fillColorMenu,
-      ({ display }) => {
-        this._showFillColorPanelPopper = display === 'show';
-      }
-    );
-    _disposables.add(this._fillColorMenuPopper);
-
-    this._strokeColorMenuPopper = createButtonPopper(
-      this._strokeColorButton,
-      this._strokeColorMenu,
-      ({ display }) => {
-        this._showStrokeColorPanelPopper = display === 'show';
-      }
-    );
-    _disposables.add(this._strokeColorMenuPopper);
-
-    this._lineStylesPanelPopper = createButtonPopper(
-      this._lineStylesButton,
-      this._lineStylesPanel,
-      ({ display }) => {
-        this._showLineStylePanelPopper = display === 'show';
-      }
-    );
-    _disposables.add(this._lineStylesPanelPopper);
-
-    this._shapeStyleMenuPopper = createButtonPopper(
-      this._shapeStyleButton,
-      this._shapeStyleMenu,
-      ({ display }) => {
-        this._showStylelPanelPopper = display === 'show';
-      }
-    );
-    _disposables.add(this._shapeStyleMenuPopper);
-
     super.firstUpdated(changedProperties);
   }
 
   override render() {
-    const selectedShape = getMostCommonShape(this.elements);
-
+    const elements = this.elements;
+    const selectedShape = getMostCommonShape(elements);
     const selectedFillColor =
-      getMostCommonFillColor(this.elements) ?? FILL_COLORS[0];
+      getMostCommonFillColor(elements) ?? FILL_COLORS[0];
     const selectedStrokeColor =
-      getMostCommonStrokeColor(this.elements) ?? STROKE_COLORS[0];
-    const selectedLineSize =
-      getMostCommonLineSize(this.elements) ?? LineWidth.Four;
-    const selectedLineStyle = getMostCommonLineStyle(this.elements) ?? 'solid';
+      getMostCommonStrokeColor(elements) ?? STROKE_COLORS[0];
+    const selectedLineSize = getMostCommonLineSize(elements) ?? LineWidth.Four;
+    const selectedLineStyle =
+      getMostCommonLineStyle(elements) ?? StrokeStyle.Solid;
     const selectedShapeStyle =
-      getMostCommonShapeStyle(this.elements) ?? ShapeStyle.Scribbled;
+      getMostCommonShapeStyle(elements) ?? ShapeStyle.Scribbled;
 
-    return html`
-      <div class="change-shape-toolbar-container">
-        <edgeless-tool-icon-button
-          .tooltip=${this._showTypePanelPopper ? nothing : 'Switch Type'}
-          .active=${false}
-          .iconContainerPadding=${ICON_BUTTON_PADDING_TWO}
-          @click=${() => this._shapePanelPopper?.toggle()}
-        >
-          <div class="change-shape-button">
-            ${ChangeShapeIcon} ${ShapeArrowDownSmallIcon}
-          </div>
-        </edgeless-tool-icon-button>
-        <edgeless-shape-panel
-          .selectedShape=${selectedShape}
-          .shapeStyle=${selectedShapeStyle}
-        >
-        </edgeless-shape-panel>
-
-        <component-toolbar-menu-divider></component-toolbar-menu-divider>
-
-        <edgeless-tool-icon-button
-          .tooltip=${this._showStylelPanelPopper ? nothing : 'Style'}
-          .active=${false}
-          .iconContainerPadding=${ICON_BUTTON_PADDING_TWO}
-          @click=${() => this._shapeStyleMenuPopper?.toggle()}
-        >
-          <div class="shape-style-button">
-            ${selectedShapeStyle === ShapeStyle.General
-              ? GeneralStyleIcon
-              : ScribbledStyleIcon}
-            ${ShapeArrowDownSmallIcon}
-          </div>
-        </edgeless-tool-icon-button>
-        <div class="shape-style-panel-container">
-          <edgeless-shape-style-panel
-            .value=${selectedShapeStyle}
-            .onSelect=${(value: EdgelessShapeStylePanel['value']) => {
-              this._setShapeStyle(value);
-            }}
+    return join(
+      [
+        html`
+          <edgeless-menu-button
+            .button=${html`
+              <edgeless-tool-icon-button
+                aria-label="Switch type"
+                .tooltip=${'Switch type'}
+              >
+                ${ChangeShapeIcon}${SmallArrowDownIcon}
+              </edgeless-tool-icon-button>
+            `}
           >
-          </edgeless-shape-style-panel>
-        </div>
+            <edgeless-shape-panel
+              slot
+              .selectedShape=${selectedShape}
+              .shapeStyle=${selectedShapeStyle}
+            >
+            </edgeless-shape-panel>
+          </edgeless-menu-button>
+        `,
 
-        <component-toolbar-menu-divider></component-toolbar-menu-divider>
-
-        <edgeless-tool-icon-button
-          class="fill-color-button"
-          .tooltip=${this._showFillColorPanelPopper ? nothing : 'Fill color'}
-          .active=${false}
-          .iconContainerPadding=${ICON_BUTTON_PADDING_TWO}
-          @click=${() => this._fillColorMenuPopper?.toggle()}
-        >
-          <div class="fill-color-container">
-            ${ColorUnit(selectedFillColor)}
-          </div>
-        </edgeless-tool-icon-button>
-        <div class="color-panel-container fill-color">
-          <edgeless-color-panel
-            .value=${selectedFillColor}
-            .options=${FILL_COLORS}
-            @select=${(e: ColorEvent) => this._setShapeFillColor(e.detail)}
+        html`
+          <edgeless-menu-button
+            .button=${html`
+              <edgeless-tool-icon-button aria-label="Style" .tooltip=${'Style'}>
+                ${cache(
+                  selectedShapeStyle === ShapeStyle.General
+                    ? GeneralStyleIcon
+                    : ScribbledStyleIcon
+                )}
+                ${SmallArrowDownIcon}
+              </edgeless-tool-icon-button>
+            `}
           >
-          </edgeless-color-panel>
-        </div>
+            <edgeless-shape-style-panel
+              slot
+              .value=${selectedShapeStyle}
+              .onSelect=${(value: ShapeStyle) => this._setShapeStyle(value)}
+            >
+            </edgeless-shape-style-panel>
+          </edgeless-menu-button>
+        `,
 
-        <component-toolbar-menu-divider></component-toolbar-menu-divider>
-
-        <edgeless-tool-icon-button
-          class="stroke-color-button"
-          .tooltip=${this._showStrokeColorPanelPopper
-            ? nothing
-            : 'Border color'}
-          .active=${false}
-          .iconContainerPadding=${ICON_BUTTON_PADDING_TWO}
-          @click=${() => this._strokeColorMenuPopper?.toggle()}
-        >
-          <div class="stroke-color-container">
-            ${ColorUnit(selectedStrokeColor, { hollowCircle: true })}
-          </div>
-        </edgeless-tool-icon-button>
-        <div class="color-panel-container stroke-color">
-          <edgeless-color-panel
-            .value=${selectedStrokeColor}
-            .options=${STROKE_COLORS}
-            .hollowCircle=${true}
-            @select=${(e: ColorEvent) => this._setShapeStrokeColor(e.detail)}
+        html`
+          <edgeless-menu-button
+            .contentPadding=${'8px'}
+            .button=${html`
+              <edgeless-tool-icon-button
+                aria-label="Fill color"
+                .tooltip=${'Fill color'}
+              >
+                <edgeless-color-button
+                  .color=${selectedFillColor}
+                ></edgeless-color-button>
+              </edgeless-tool-icon-button>
+            `}
           >
-          </edgeless-color-panel>
-        </div>
+            <edgeless-color-panel
+              slot
+              role="listbox"
+              aria-label="Fill colors"
+              .value=${selectedFillColor}
+              .options=${FILL_COLORS}
+              @select=${(e: ColorEvent) => this._setShapeFillColor(e.detail)}
+            >
+            </edgeless-color-panel>
+          </edgeless-menu-button>
+        `,
 
-        <edgeless-tool-icon-button
-          class="border-styles-button"
-          .tooltip=${this._showLineStylePanelPopper ? nothing : 'Border style'}
-          .active=${false}
-          .iconContainerPadding=${ICON_BUTTON_PADDING_TWO}
-          @click=${() => this._lineStylesPanelPopper?.toggle()}
-        >
-          <div class="line-styles-button">
-            ${LineStyleIcon} ${ShapeArrowDownSmallIcon}
-          </div>
-        </edgeless-tool-icon-button>
-        ${LineStylesPanel({
-          selectedLineSize,
-          selectedLineStyle,
-          onClick: event => {
-            this._setShapeStyles(event);
-          },
-        })}
-        ${doesAllShapesContainText(this.elements)
-          ? html`<component-toolbar-menu-divider></component-toolbar-menu-divider>
-              <edgeless-change-text-menu
-                .elements=${this.elements}
-                .elementType=${'shape'}
-                .edgeless=${this.edgeless}
-              ></edgeless-change-text-menu>`
-          : nothing}
-      </div>
-    `;
+        html`
+          <edgeless-menu-button
+            .contentPadding=${'8px'}
+            .button=${html`
+              <edgeless-tool-icon-button
+                aria-label="Border style"
+                .tooltip=${'Border style'}
+              >
+                <edgeless-color-button
+                  .color=${selectedStrokeColor}
+                  .hollowCircle=${true}
+                ></edgeless-color-button>
+              </edgeless-tool-icon-button>
+            `}
+          >
+            <stroke-style-panel
+              slot
+              .hollowCircle=${true}
+              .strokeWidth=${selectedLineSize}
+              .strokeStyle=${selectedLineStyle}
+              .strokeColor=${selectedStrokeColor}
+              .setStrokeStyle=${(e: LineStyleEvent) => this._setShapeStyles(e)}
+              .setStrokeColor=${(e: ColorEvent) =>
+                this._setShapeStrokeColor(e.detail)}
+            >
+            </stroke-style-panel>
+          </edgeless-menu-button>
+        `,
+
+        choose<string, TemplateResult<1> | typeof nothing>(
+          this._showAddButtonOrTextMenu(),
+          [
+            [
+              'button',
+              () => html`
+                <edgeless-tool-icon-button
+                  aria-label="Add text"
+                  .tooltip=${'Add text'}
+                  @click=${this._addText}
+                >
+                  ${AddTextIcon}
+                </edgeless-tool-icon-button>
+              `,
+            ],
+            [
+              'menu',
+              () => html`
+                <edgeless-change-text-menu
+                  .elementType=${'shape'}
+                  .elements=${elements}
+                  .edgeless=${this.edgeless}
+                ></edgeless-change-text-menu>
+              `,
+            ],
+            ['nothing', () => nothing],
+          ]
+        ),
+      ].filter(button => button !== nothing),
+      renderMenuDivider
+    );
   }
 }
 
@@ -582,9 +375,8 @@ export function renderChangeShapeButton(
   if (elements.some(e => edgeless.service.surface.isInMindmap(e.id)))
     return nothing;
 
-  return html`<edgeless-change-shape-button
-    .elements=${elements}
-    .edgeless=${edgeless}
-  >
-  </edgeless-change-shape-button>`;
+  return html`
+    <edgeless-change-shape-button .elements=${elements} .edgeless=${edgeless}>
+    </edgeless-change-shape-button>
+  `;
 }

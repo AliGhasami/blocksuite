@@ -3,14 +3,14 @@ import '../declare-test-window.js';
 
 import type { EditorHost } from '@block-std/view/element/lit-host.js';
 import type { CssVariableName } from '@blocks/_common/theme/css-variables.js';
-import {
-  type DatabaseBlockModel,
-  type ListType,
-  type RichText,
-  type ThemeObserver,
+import type {
+  DatabaseBlockModel,
+  ListType,
+  RichText,
+  ThemeObserver,
 } from '@blocks/index.js';
 import { assertExists } from '@global/utils.js';
-import { type InlineRange, type InlineRootElement } from '@inline/index.js';
+import type { InlineRange, InlineRootElement } from '@inline/index.js';
 import type { CustomFramePanel } from '@playground/apps/_common/components/custom-frame-panel.js';
 import type { CustomOutlinePanel } from '@playground/apps/_common/components/custom-outline-panel.js';
 import type { DebugMenu } from '@playground/apps/_common/components/debug-menu.js';
@@ -259,23 +259,24 @@ export function expectConsoleMessage(
   });
 }
 
+export type PlaygroundRoomOptions = {
+  flags?: Partial<BlockSuiteFlags>;
+  room?: string;
+  blobSource?: ('idb' | 'mock')[];
+  noInit?: boolean;
+};
 export async function enterPlaygroundRoom(
   page: Page,
-  ops?: {
-    flags?: Partial<BlockSuiteFlags>;
-    room?: string;
-    blobStorage?: ('memory' | 'idb' | 'mock')[];
-    noInit?: boolean;
-  }
+  ops?: PlaygroundRoomOptions
 ) {
   const url = new URL(DEFAULT_PLAYGROUND);
   let room = ops?.room;
-  const blobStorage = ops?.blobStorage;
+  const blobSource = ops?.blobSource;
   if (!room) {
     room = generateRandomRoomId();
   }
   url.searchParams.set('room', room);
-  url.searchParams.set('blobStorage', blobStorage?.join(',') || 'idb');
+  url.searchParams.set('blobSource', blobSource?.join(',') || 'idb');
   await page.goto(url.toString());
   // const readyPromise = waitForPageReady(page);
 
@@ -1299,7 +1300,7 @@ export async function initImageState(page: Page) {
     const imageBlob = await fetch(`${location.origin}/test-card-1.png`).then(
       response => response.blob()
     );
-    const storage = pageRoot.doc.blob;
+    const storage = pageRoot.doc.blobSync;
     const sourceId = await storage.set(imageBlob);
     const imageId = doc.addBlock(
       'affine:image',
@@ -1408,4 +1409,33 @@ export async function scrollToBottom(page: Page) {
       ) < 10
     );
   });
+}
+
+export async function mockQuickSearch(
+  page: Page,
+  mapping: Record<string, string> // query -> docId
+) {
+  // mock quick search service
+  await page.evaluate(mapping => {
+    window.host.std.spec.getService('affine:page').quickSearchService = {
+      searchDoc(options) {
+        return new Promise(resolve => {
+          if (!options.userInput) {
+            return resolve(null);
+          }
+
+          const docId = mapping[options.userInput];
+          if (!docId) {
+            return resolve({
+              userInput: options.userInput,
+            });
+          } else {
+            return resolve({
+              docId,
+            });
+          }
+        });
+      },
+    };
+  }, mapping);
 }

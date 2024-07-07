@@ -1,4 +1,4 @@
-import { FontFamily, FontWeight } from '../../../element-model/common.js';
+import { FontFamily, FontWeight } from '../../../consts.js';
 import type { GroupElementModel } from '../../../element-model/group.js';
 import { Bound } from '../../../utils/bound.js';
 import {
@@ -16,7 +16,11 @@ export function titleRenderParams(group: GroupElementModel, zoom: number) {
   let text = group.title.toJSON();
   const font = getGroupTitleFont(zoom);
   const lineWidth = getLineWidth(text, font);
-  const lineHeight = getLineHeight(TITLE_FONT, TITLE_FONT_SIZE / zoom);
+  const lineHeight = getLineHeight(
+    TITLE_FONT,
+    TITLE_FONT_SIZE / zoom,
+    'normal'
+  );
   const bound = group.elementBound;
   const padding = [
     Math.min(TITLE_PADDING[0] / zoom, TITLE_PADDING[0]),

@@ -1,10 +1,6 @@
 import { assertEquals, assertExists } from '@blocksuite/global/utils';
 
-import type {
-  Connectable,
-  EdgelessModel,
-  Selectable,
-} from '../../_common/types.js';
+import type { Connectable } from '../../_common/types.js';
 import type { EdgelessRootService } from '../../root-block/edgeless/edgeless-root-service.js';
 import { Overlay } from '../canvas-renderer/renderer.js';
 import type { IBound } from '../consts.js';
@@ -13,7 +9,11 @@ import type {
   ConnectorElementModel,
   LocalConnectorElementModel,
 } from '../element-model/connector.js';
-import { ConnectorMode } from '../element-model/connector.js';
+import {
+  ConnectorMode,
+  isConnectorWithLabel,
+} from '../element-model/connector.js';
+import { GroupElementModel } from '../element-model/group.js';
 import { AStarRunner } from '../utils/a-star.js';
 import { Bound, getBoundFromPoints } from '../utils/bound.js';
 import {
@@ -43,14 +43,61 @@ export type OrthogonalConnectorInput = {
   endPoint: PointLocation;
 };
 
-function rBound(ele: EdgelessModel, anti = false): IBound {
+export const ConnectorEndpointLocations: IVec2[] = [
+  // At top
+  [0.5, 0],
+  // At right
+  [1, 0.5],
+  // At bottom
+  [0.5, 1],
+  // At left
+  [0, 0.5],
+];
+
+export const ConnectorEndpointLocationsOnTriangle: IVec2[] = [
+  // At top
+  [0.5, 0],
+  // At right
+  [0.75, 0.5],
+  // At bottom
+  [0.5, 1],
+  // At left
+  [0.25, 0.5],
+];
+
+export function calculateNearestLocation(
+  point: IVec,
+  bounds: IBound,
+  locations = ConnectorEndpointLocations,
+  shortestDistance = Number.POSITIVE_INFINITY
+) {
+  const { x, y, w, h } = bounds;
+  return locations
+    .map(offset => [x + offset[0] * w, y + offset[1] * h])
+    .map(point => getPointFromBoundsWithRotation(bounds, point))
+    .reduce(
+      (prev, curr, index) => {
+        const d = Vec.dist(point, curr);
+        if (d < shortestDistance) {
+          const location = locations[index];
+          shortestDistance = d;
+          prev[0] = location[0];
+          prev[1] = location[1];
+        }
+        return prev;
+      },
+      [...locations[0]]
+    ) as IVec2;
+}
+
+function rBound(ele: BlockSuite.EdgelessModelType, anti = false): IBound {
   const bound = Bound.deserialize(ele.xywh);
   return { ...bound, rotate: anti ? -ele.rotate : ele.rotate };
 }
 
 export function isConnectorAndBindingsAllSelected(
   connector: ConnectorElementModel | LocalConnectorElementModel,
-  selected: Selectable[]
+  selected: BlockSuite.EdgelessModelType[]
 ) {
   const connectorSelected = selected.find(s => s.id === connector.id);
   if (!connectorSelected) {
@@ -74,7 +121,7 @@ export function isConnectorAndBindingsAllSelected(
   return false;
 }
 
-export function getAnchors(ele: EdgelessModel) {
+export function getAnchors(ele: BlockSuite.EdgelessModelType) {
   const bound = Bound.deserialize(ele.xywh);
   const offset = 10;
   const anchors: { point: PointLocation; coord: IVec }[] = [];
@@ -88,7 +135,7 @@ export function getAnchors(ele: EdgelessModel) {
   ]
     .map(vec => getPointFromBoundsWithRotation({ ...bound, rotate }, vec))
     .forEach(vec => {
-      const rst = ele.intersectWithLine(bound.center, vec);
+      const rst = ele.intersectWithLine(bound.center as IVec2, vec as IVec2);
       assertExists(rst);
       const originPoint = getPointFromBoundsWithRotation(
         { ...bound, rotate: -rotate },
@@ -100,10 +147,10 @@ export function getAnchors(ele: EdgelessModel) {
 }
 
 function getConnectableRelativePosition(
-  connectable: EdgelessModel,
+  connectable: BlockSuite.EdgelessModelType,
   position: IVec
 ) {
-  const location = connectable.getRelativePointLocation(position);
+  const location = connectable.getRelativePointLocation(position as IVec2);
   if (isVecZero(Vec.sub(position, [0, 0.5])))
     location.tangent = Vec.rot([0, -1], toRadian(connectable.rotate));
   else if (isVecZero(Vec.sub(position, [1, 0.5])))
@@ -725,10 +772,31 @@ function adjustStartEndPoint(
   }
 }
 
+function renderRect(
+  ctx: CanvasRenderingContext2D,
+  bounds: IBound,
+  color: string,
+  lineWidth: number
+) {
+  const { x, y, w, h } = bounds;
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.setLineDash([lineWidth * 2, lineWidth * 2]);
+  ctx.strokeRect(x, y, w, h);
+  ctx.closePath();
+  ctx.restore();
+}
+
 export class ConnectionOverlay extends Overlay {
   points: IVec[] = [];
+
   highlightPoint: IVec | null = null;
-  bound: Bound | null = null;
+
+  sourceBounds: IBound | null = null;
+
+  targetBounds: IBound | null = null;
 
   constructor(private _service: EdgelessRootService) {
     super();
@@ -747,29 +815,37 @@ export class ConnectionOverlay extends Overlay {
       '--affine-text-emphasis-color'
     );
 
+    ctx.globalAlpha = 0.6;
+    let lineWidth = 1 / zoom;
+    if (this.sourceBounds) {
+      renderRect(ctx, this.sourceBounds, color, lineWidth);
+    }
+    if (this.targetBounds) {
+      renderRect(ctx, this.targetBounds, color, lineWidth);
+    }
+
+    lineWidth = 2 / zoom;
     this.points.forEach(p => {
       ctx.beginPath();
       ctx.arc(p[0], p[1], radius, 0, PI2);
       ctx.fillStyle = 'white';
       ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = lineWidth;
       ctx.fill();
       ctx.stroke();
+      ctx.closePath();
     });
+
+    ctx.globalAlpha = 1;
     if (this.highlightPoint) {
       ctx.beginPath();
       ctx.arc(this.highlightPoint[0], this.highlightPoint[1], radius, 0, PI2);
       ctx.fillStyle = color;
       ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = lineWidth;
       ctx.fill();
       ctx.stroke();
-    }
-    if (this.bound) {
-      ctx.beginPath();
-      ctx.rect(this.bound.x, this.bound.y, this.bound.w, this.bound.h);
-      ctx.fillStyle = 'rgba(211, 211, 211, 0.3)';
-      ctx.fill();
+      ctx.closePath();
     }
   }
 
@@ -785,8 +861,10 @@ export class ConnectionOverlay extends Overlay {
   renderConnector(point: IVec, excludedIds: string[] = []) {
     const connectables = this._findConnectablesInViews();
     const service = this._service;
+    let target;
 
-    this.clear();
+    this._clearRect();
+
     let result: Connection | null = null;
     for (let i = 0; i < connectables.length; i++) {
       const connectable = connectables[i];
@@ -798,24 +876,29 @@ export class ConnectionOverlay extends Overlay {
       const rotateBound = Bound.from(
         getBoundsWithRotation(rBound(connectable))
       );
+      // FIXME: the real path needs to be expanded: diamod, ellipse, trangle.
       if (!rotateBound.expand(10).isPointInBound(point)) continue;
 
       // then check if closes to anchors
       const anchors = getAnchors(connectable);
+      const len = anchors.length;
+      const pointerViewCoord = service.viewport.toViewCoord(point[0], point[1]);
+
+      let shortestDistance = Number.POSITIVE_INFINITY;
+      let j = 0;
 
       this.points = anchors.map(a => a.point);
 
-      for (let j = 0; j < anchors.length; j++) {
+      for (; j < len; j++) {
         const anchor = anchors[j];
         const anchorViewCoord = service.viewport.toViewCoord(
           anchor.point[0],
           anchor.point[1]
         );
-        const pointerViewCoord = service.viewport.toViewCoord(
-          point[0],
-          point[1]
-        );
-        if (Vec.dist(anchorViewCoord, pointerViewCoord) < 20) {
+        const d = Vec.dist(anchorViewCoord, pointerViewCoord);
+        if (d < shortestDistance) {
+          shortestDistance = d;
+          target = connectable;
           this.highlightPoint = anchor.point;
           result = {
             id: connectable.id,
@@ -823,10 +906,11 @@ export class ConnectionOverlay extends Overlay {
           };
         }
       }
-      if (result) break;
+
+      if (shortestDistance < 8 && result) break;
 
       // if not, check if closes to bound
-      const nearestPoint = connectable.getNearestPoint(point);
+      const nearestPoint = connectable.getNearestPoint(point as IVec2);
 
       if (Vec.dist(nearestPoint, point) < 8) {
         this.highlightPoint = nearestPoint;
@@ -835,6 +919,7 @@ export class ConnectionOverlay extends Overlay {
           nearestPoint
         );
         this._renderer.refresh();
+        target = connectable;
         result = {
           id: connectable.id,
           position: bound
@@ -844,8 +929,8 @@ export class ConnectionOverlay extends Overlay {
       }
 
       if (result) break;
-      // if not, check if in inside of the element
 
+      // if not, check if in inside of the element
       if (
         connectable.hitTest(
           point[0],
@@ -856,28 +941,41 @@ export class ConnectionOverlay extends Overlay {
           this._service.host
         )
       ) {
+        target = connectable;
         result = {
           id: connectable.id,
         };
       }
     }
 
+    if (target instanceof GroupElementModel) {
+      this.targetBounds = Bound.deserialize(target.xywh);
+    } else {
+      this.targetBounds = null;
+    }
+
     // at last, if not, just return the point
-    if (!result)
+    if (!result) {
       result = {
         position: point as IVec2,
       };
+    }
 
     this._renderer.refresh();
 
     return result;
   }
 
-  clear() {
+  _clearRect() {
     this.points = [];
     this.highlightPoint = null;
-    this.bound = null;
     this._renderer.refresh();
+  }
+
+  clear() {
+    this.sourceBounds = null;
+    this.targetBounds = null;
+    this._clearRect();
   }
 }
 
@@ -886,7 +984,7 @@ export class ConnectorPathGenerator {
 
   constructor(
     private options: {
-      getElementById: (id: string) => EdgelessModel | Connectable | null;
+      getElementById: (id: string) => BlockSuite.EdgelessModelType | null;
     }
   ) {}
 
@@ -1149,6 +1247,17 @@ export class ConnectorPathGenerator {
     // the property assignment order matters
     connector.xywh = bound.serialize();
     connector.path = relativePoints;
+
+    // Updates Connector's Label position.
+    if (isConnectorWithLabel(connector)) {
+      const model = connector as ConnectorElementModel;
+      const [cx, cy] = model.getPointByOffsetDistance(
+        model.labelOffset.distance
+      );
+      const [, , w, h] = model.labelXYWH!;
+      model.labelXYWH = [cx - w / 2, cy - h / 2, w, h];
+    }
+
     connector.updatingPath = false;
   }
 

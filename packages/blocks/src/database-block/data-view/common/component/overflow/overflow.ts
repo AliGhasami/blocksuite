@@ -28,21 +28,30 @@ export class Overflow extends WithDisposable(ShadowlessElement) {
       position: absolute;
     }
   `;
-  @property({ attribute: false })
-  renderItem!: Array<() => TemplateResult>;
 
   @property({ attribute: false })
-  renderMore!: (count: number) => TemplateResult;
+  accessor renderItem!: Array<() => TemplateResult>;
+
+  @property({ attribute: false })
+  accessor renderMore!: (count: number) => TemplateResult;
 
   @state()
-  renderCount = 0;
+  accessor renderCount = 0;
 
   @queryAll(':scope > .component-overflow-item')
-  items!: HTMLDivElement[];
-  @query(':scope > .component-overflow-more')
-  more!: HTMLDivElement;
+  accessor items!: HTMLDivElement[] & NodeList;
 
-  public override connectedCallback() {
+  @query(':scope > .component-overflow-more')
+  accessor more!: HTMLDivElement;
+
+  protected override updated(_changedProperties: PropertyValues) {
+    super.updated(_changedProperties);
+    requestAnimationFrame(() => {
+      this.adjustStyle();
+    });
+  }
+
+  override connectedCallback() {
     super.connectedCallback();
     const resize = new ResizeObserver(() => {
       this.adjustStyle();
@@ -50,13 +59,6 @@ export class Overflow extends WithDisposable(ShadowlessElement) {
     resize.observe(this);
     this.disposables.add(() => {
       resize.unobserve(this);
-    });
-  }
-
-  protected override updated(_changedProperties: PropertyValues) {
-    super.updated(_changedProperties);
-    requestAnimationFrame(() => {
-      this.adjustStyle();
     });
   }
 

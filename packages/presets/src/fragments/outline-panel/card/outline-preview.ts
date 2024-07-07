@@ -142,22 +142,22 @@ const styles = css`
 export class OutlineBlockPreview extends WithDisposable(LitElement) {
   static override styles = styles;
 
-  @property({ attribute: false })
-  block!: ValuesOf<BlockSuite.BlockModels>;
-
-  @property({ attribute: false })
-  showPreviewIcon!: boolean;
-
-  @property({ attribute: false })
-  enableNotesSorting!: boolean;
-
-  @property({ attribute: false })
-  disabledIcon = false;
-
-  @property({ attribute: false })
-  cardNumber!: number;
-
   private _textDisposables: DisposableGroup | null = null;
+
+  @property({ attribute: false })
+  accessor block!: ValuesOf<BlockSuite.BlockModels>;
+
+  @property({ attribute: false })
+  accessor showPreviewIcon!: boolean;
+
+  @property({ attribute: false })
+  accessor enableNotesSorting!: boolean;
+
+  @property({ attribute: false })
+  accessor disabledIcon = false;
+
+  @property({ attribute: false })
+  accessor cardNumber!: number;
 
   private _clearTextDisposables = () => {
     this._textDisposables?.dispose();

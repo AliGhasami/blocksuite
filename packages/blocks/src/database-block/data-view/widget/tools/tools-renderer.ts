@@ -10,7 +10,7 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import type { ViewSource } from '../../common/index.js';
 import { renderUniLit } from '../../utils/uni-component/index.js';
-import { type DataViewExpose } from '../../view/data-view.js';
+import type { DataViewExpose } from '../../view/data-view.js';
 import type { DataViewManager } from '../../view/data-view-manager.js';
 import type { DataViewWidget, DataViewWidgetProps } from '../types.js';
 import { WidgetBase } from '../widget-base.js';
@@ -45,10 +45,12 @@ const styles = css`
 @customElement('data-view-header-tools')
 export class DataViewHeaderTools extends WidgetBase {
   static override styles = styles;
+
   @property({ attribute: false })
-  toolsMap!: Record<string, DataViewWidget[]>;
+  accessor toolsMap!: Record<string, DataViewWidget[]>;
+
   @state()
-  public showToolBar = false;
+  accessor showToolBar = false;
 
   override render() {
     if (this.view.isDeleted) {

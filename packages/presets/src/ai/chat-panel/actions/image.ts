@@ -6,16 +6,16 @@ import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import type { ChatAction } from '../chat-context.js';
 import { renderImages } from '../components/images.js';
-import type { ChatAction } from '../index.js';
 
 @customElement('action-image')
 export class ActionImage extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
-  item!: ChatAction;
+  accessor item!: ChatAction;
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   protected override render() {
     const answer = this.item.messages[0].attachments;

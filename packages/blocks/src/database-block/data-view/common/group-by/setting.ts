@@ -1,18 +1,17 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import type { ReferenceElement } from '@floating-ui/dom';
 import type { PropertyValues } from 'lit';
 import { css, html, unsafeCSS } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import Sortable from 'sortablejs';
 
-import { ArrowRightSmallIcon } from '../../../../_common/icons/index.js';
 import {
   type Menu,
   type MenuOptions,
   popMenu,
-} from '../../utils/menu/index.js';
-import { menuTitleItem } from '../../utils/menu/title.js';
+} from '../../../../_common/components/index.js';
+import { ArrowRightSmallIcon } from '../../../../_common/icons/index.js';
+import { menuTitleItem } from '../../utils/menu-title.js';
 import { renderUniLit } from '../../utils/uni-component/uni-component.js';
 import { DataViewKanbanManager } from '../../view/presets/kanban/kanban-view-manager.js';
 import { DataViewTableManager } from '../../view/presets/table/table-view-manager.js';
@@ -53,22 +52,12 @@ export class GroupSetting extends WithDisposable(ShadowlessElement) {
       background-color: #c0bfc1;
     }
   `;
-  @property({ attribute: false })
-  view!: DataViewTableManager | DataViewKanbanManager;
-  @query('.group-sort-setting')
-  groupContainer!: HTMLElement;
 
-  override connectedCallback() {
-    super.connectedCallback();
-    this._disposables.add(
-      this.view.slots.update.on(() => {
-        this.requestUpdate();
-      })
-    );
-    this._disposables.addFromEvent(this, 'pointerdown', e => {
-      e.stopPropagation();
-    });
-  }
+  @property({ attribute: false })
+  accessor view!: DataViewTableManager | DataViewKanbanManager;
+
+  @query('.group-sort-setting')
+  accessor groupContainer!: HTMLElement;
 
   protected override firstUpdated(_changedProperties: PropertyValues) {
     super.firstUpdated(_changedProperties);
@@ -143,6 +132,18 @@ export class GroupSetting extends WithDisposable(ShadowlessElement) {
       </div>
     `;
   }
+
+  override connectedCallback() {
+    super.connectedCallback();
+    this._disposables.add(
+      this.view.slots.update.on(() => {
+        this.requestUpdate();
+      })
+    );
+    this._disposables.addFromEvent(this, 'pointerdown', e => {
+      e.stopPropagation();
+    });
+  }
 }
 export const selectGroupByProperty = (
   view: DataViewTableManager | DataViewKanbanManager,
@@ -197,7 +198,7 @@ export const selectGroupByProperty = (
   };
 };
 export const popSelectGroupByProperty = (
-  target: ReferenceElement,
+  target: HTMLElement,
   view: DataViewTableManager | DataViewKanbanManager,
   onClose?: () => void
 ) => {
@@ -206,7 +207,7 @@ export const popSelectGroupByProperty = (
   });
 };
 export const popGroupSetting = (
-  target: ReferenceElement,
+  target: HTMLElement,
   view: DataViewTableManager | DataViewKanbanManager,
   onBack: () => void
 ) => {

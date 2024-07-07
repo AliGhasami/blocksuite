@@ -1,6 +1,6 @@
 import { type EditorHost, WithDisposable } from '@blocksuite/block-std';
 import { noop } from '@blocksuite/global/utils';
-import type { Doc } from '@blocksuite/store';
+import { type Doc, Job } from '@blocksuite/store';
 import {
   DocCollection,
   type DocCollectionOptions,
@@ -89,31 +89,33 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   @property({ attribute: false })
-  answer!: string;
+  accessor answer!: string;
 
   @property({ attribute: false })
-  templateShow = true;
+  accessor templateShow = true;
 
   @property({ attribute: false })
-  height = 400;
+  accessor height = 400;
 
   @property({ attribute: false })
-  ctx!: {
+  accessor ctx!: {
     get(): Record<string, unknown>;
     set(data: Record<string, unknown>): void;
   };
 
   @property({ attribute: false })
-  mindmapStyle?: MindmapStyle;
+  accessor mindmapStyle: MindmapStyle | undefined = undefined;
 
   @query('editor-host')
-  portalHost!: EditorHost;
+  accessor portalHost!: EditorHost;
 
   doc!: Doc;
+
   surface!: SurfaceBlockModel;
+
   mindmapId!: string;
 
   get _mindmap() {
@@ -127,12 +129,11 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
       id: 'MINI_MINDMAP_TEMPORARY',
       schema,
       idGenerator: Generator.NanoID,
-      blobStorages: [],
       awarenessSources: [],
     };
 
     const collection = new DocCollection(options);
-
+    collection.meta.initialize();
     collection.start();
 
     const doc = collection.createDoc({ id: 'doc:home' }).load();
@@ -147,8 +148,8 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
     };
   }
 
-  private _toMindmapNode(answer: string) {
-    return markdownToMindmap(answer);
+  private _toMindmapNode(answer: string, doc: Doc) {
+    return markdownToMindmap(answer, doc);
   }
 
   private _switchStyle(style: MindmapStyle) {
@@ -171,7 +172,7 @@ export class MiniMindmapPreview extends WithDisposable(LitElement) {
     super.connectedCallback();
 
     const tempDoc = this._createTemporaryDoc();
-    const mindmapNode = this._toMindmapNode(this.answer);
+    const mindmapNode = this._toMindmapNode(this.answer, tempDoc.doc);
 
     if (!mindmapNode) {
       return;
@@ -234,9 +235,10 @@ type Node = {
   children: Node[];
 };
 
-export const markdownToMindmap = (answer: string) => {
+export const markdownToMindmap = (answer: string, doc: Doc) => {
   let result: Node | null = null;
-  const markdown = new MarkdownAdapter();
+  const job = new Job({ collection: doc.collection });
+  const markdown = new MarkdownAdapter(job);
   const ast = markdown['_markdownToAst'](answer);
   const traverse = (
     markdownNode: Unpacked<(typeof ast)['children']>,

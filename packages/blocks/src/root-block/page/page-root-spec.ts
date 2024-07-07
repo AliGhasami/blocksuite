@@ -5,6 +5,7 @@ import { RootBlockSchema } from '../root-model.js';
 import { AFFINE_DATE_WIDGET } from '../widgets/date/index.js';
 import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/drag-handle.js';
+import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
 import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
 import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
@@ -23,6 +24,7 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_LINKED_DOC_WIDGET
   | typeof AFFINE_PAGE_DRAGGING_AREA_WIDGET
   | typeof AFFINE_DRAG_HANDLE_WIDGET
+  | typeof AFFINE_EMBED_CARD_TOOLBAR_WIDGET
   | typeof AFFINE_FORMAT_BAR_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
@@ -48,6 +50,9 @@ export const PageRootBlockSpec: BlockSpec<PageRootBlockWidgetName> = {
       )}`,
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
+      )}`,
+      [AFFINE_EMBED_CARD_TOOLBAR_WIDGET]: literal`${unsafeStatic(
+        AFFINE_EMBED_CARD_TOOLBAR_WIDGET
       )}`,
       [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
         AFFINE_FORMAT_BAR_WIDGET

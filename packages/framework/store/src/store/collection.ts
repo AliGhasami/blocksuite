@@ -3,11 +3,8 @@ import * as Y from 'yjs';
 
 import type { Schema } from '../schema/index.js';
 import type { AwarenessStore } from '../yjs/index.js';
-import { blob, DocCollectionAddonType, indexer, test } from './addon/index.js';
-import {
-  BlockCollection,
-  defaultBlockSelector,
-} from './doc/block-collection.js';
+import { DocCollectionAddonType, indexer, test } from './addon/index.js';
+import { BlockCollection, type GetDocOptions } from './doc/block-collection.js';
 import type { BlockSelector, Doc } from './doc/index.js';
 import { DocCollectionMeta, type DocMeta } from './meta.js';
 import { Store, type StoreOptions } from './store.js';
@@ -16,33 +13,9 @@ export type DocCollectionOptions = StoreOptions & {
   schema: Schema;
 };
 
-@blob
 @indexer
 @test
 export class DocCollection extends DocCollectionAddonType {
-  static Y = Y;
-  protected _store: Store;
-
-  protected readonly _schema: Schema;
-
-  meta: DocCollectionMeta;
-
-  slots = {
-    docAdded: new Slot<string>(),
-    docUpdated: new Slot(),
-    docRemoved: new Slot<string>(),
-  };
-
-  constructor(options: DocCollectionOptions) {
-    super();
-    this._schema = options.schema;
-
-    this._store = new Store(options);
-
-    this.meta = new DocCollectionMeta(this.doc);
-    this._bindDocMetaEvents();
-  }
-
   get id() {
     return this._store.id;
   }
@@ -93,21 +66,36 @@ export class DocCollection extends DocCollectionAddonType {
     return this.store.awarenessSync;
   }
 
+  get blobSync() {
+    return this.store.blobSync;
+  }
+
+  static Y = Y;
+
+  protected _store: Store;
+
+  protected readonly _schema: Schema;
+
+  meta: DocCollectionMeta;
+
+  slots = {
+    docAdded: new Slot<string>(),
+    docUpdated: new Slot(),
+    docRemoved: new Slot<string>(),
+  };
+
+  constructor(options: DocCollectionOptions) {
+    super();
+    this._schema = options.schema;
+
+    this._store = new Store(options);
+
+    this.meta = new DocCollectionMeta(this.doc);
+    this._bindDocMetaEvents();
+  }
+
   private _hasDoc(docId: string) {
     return this.docs.has(docId);
-  }
-
-  getDoc(
-    docId: string,
-    selector: BlockSelector = defaultBlockSelector
-  ): Doc | null {
-    const collection = this.getBlockCollection(docId);
-    return collection?.getDoc(selector) ?? null;
-  }
-
-  getBlockCollection(docId: string): BlockCollection | null {
-    const space = this.docs.get(docId) as BlockCollection | undefined;
-    return space ?? null;
   }
 
   private _bindDocMetaEvents() {
@@ -134,14 +122,22 @@ export class DocCollection extends DocCollectionAddonType {
     });
   }
 
+  getDoc(docId: string, options?: GetDocOptions): Doc | null {
+    const collection = this.getBlockCollection(docId);
+    return collection?.getDoc(options) ?? null;
+  }
+
+  getBlockCollection(docId: string): BlockCollection | null {
+    const space = this.docs.get(docId) as BlockCollection | undefined;
+    return space ?? null;
+  }
+
   /**
    * By default, only an empty doc will be created.
    * If the `init` parameter is passed, a `surface`, `note`, and `paragraph` block
    * will be created in the doc simultaneously.
    */
   createDoc(options: { id?: string; selector?: BlockSelector } = {}) {
-    // End of migration guide. Remove this in the next major version
-
     const { id: docId = this.idGenerator(), selector } = options;
     if (this._hasDoc(docId)) {
       throw new Error('doc already exists');
@@ -153,7 +149,7 @@ export class DocCollection extends DocCollectionAddonType {
       createDate: Date.now(),
       tags: [],
     });
-    return this.getDoc(docId, selector) as Doc;
+    return this.getDoc(docId, { selector }) as Doc;
   }
 
   /** Update doc meta state. Note that this intentionally does not mutate doc state. */
@@ -182,6 +178,7 @@ export class DocCollection extends DocCollectionAddonType {
    */
   start() {
     this.docSync.start();
+    this.blobSync.start();
     this.awarenessSync.connect();
   }
 
@@ -206,6 +203,7 @@ export class DocCollection extends DocCollectionAddonType {
    */
   forceStop() {
     this.docSync.forceStop();
+    this.blobSync.stop();
     this.awarenessSync.disconnect();
   }
 

@@ -1,29 +1,11 @@
-import { type Slot } from '@blocksuite/global/utils';
-import { type BlockModel, type Doc } from '@blocksuite/store';
+import type { Slot } from '@blocksuite/global/utils';
+import type { BlockModel, Doc } from '@blocksuite/store';
 
-import type { BookmarkBlockModel } from '../bookmark-block/bookmark-model.js';
-import type { EmbedFigmaModel } from '../embed-figma-block/embed-figma-model.js';
-import type { EmbedGithubModel } from '../embed-github-block/embed-github-model.js';
-import type { EmbedHtmlModel } from '../embed-html-block/embed-html-model.js';
-import type { EmbedLinkedDocModel } from '../embed-linked-doc-block/embed-linked-doc-model.js';
-import type { EmbedLoomModel } from '../embed-loom-block/embed-loom-model.js';
-import type { EmbedSyncedDocModel } from '../embed-synced-doc-block/embed-synced-doc-model.js';
-import type { EmbedYoutubeModel } from '../embed-youtube-block/embed-youtube-model.js';
-import type { FrameBlockModel } from '../frame-block/frame-model.js';
-import type { ImageBlockModel } from '../image-block/image-model.js';
-import type { NoteBlockModel } from '../note-block/note-model.js';
-import type { EdgelessModel } from '../root-block/edgeless/type.js';
-import type {
-  ConnectorElementModel,
-  ConnectorMode,
-} from '../surface-block/element-model/connector.js';
-import { type CanvasElement } from '../surface-block/element-model/index.js';
+import type { ConnectorElementModel } from '../surface-block/element-model/connector.js';
 import type {
   BrushElementModel,
   GroupElementModel,
-  ShapeType,
 } from '../surface-block/index.js';
-import type { NavigatorMode } from './edgeless/frame/consts.js';
 import type { RefNodeSlots } from './inline/presets/nodes/reference-node/reference-node.js';
 import type { BlockComponent } from './utils/query.js';
 import type { Point } from './utils/rect.js';
@@ -45,58 +27,26 @@ export interface EditingState {
 
 export type CommonSlots = RefNodeSlots;
 
-export type EditorMode = 'page' | 'edgeless';
+export type DocMode = 'page' | 'edgeless';
+
 type EditorSlots = {
-  editorModeSwitched: Slot<EditorMode>;
+  editorModeSwitched: Slot<DocMode>;
   docUpdated: Slot<{ newDocId: string }>;
 };
 
 export type AbstractEditor = {
   doc: Doc;
-  mode: EditorMode;
+  mode: DocMode;
   readonly slots: CommonSlots & EditorSlots;
 } & HTMLElement;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExtendedModel = BlockModel & Record<string, any>;
 
-// blocks that would only appear under the edgeless container root
-export type TopLevelBlockModel =
-  | NoteBlockModel
-  | FrameBlockModel
-  | ImageBlockModel
-  | BookmarkBlockModel
-  | EmbedGithubModel
-  | EmbedYoutubeModel
-  | EmbedFigmaModel
-  | EmbedLinkedDocModel
-  | EmbedSyncedDocModel
-  | EmbedHtmlModel
-  | EmbedLoomModel;
-
-export type { EdgelessModel as EdgelessModel };
-
-export type Alignable = EdgelessModel;
-
-export type Selectable = EdgelessModel;
-
-export type Erasable = EdgelessModel;
-
-export type Connectable =
-  | TopLevelBlockModel
-  | Exclude<
-      CanvasElement,
-      ConnectorElementModel | BrushElementModel | GroupElementModel
-    >;
-
-export type DefaultTool = {
-  type: 'default';
-};
-
-export type ShapeTool = {
-  type: 'shape';
-  shapeType: ShapeType | 'roundedRect';
-};
+export type Connectable = Exclude<
+  BlockSuite.EdgelessModelType,
+  ConnectorElementModel | BrushElementModel | GroupElementModel
+>;
 
 export enum LineWidth {
   Two = 2,
@@ -114,41 +64,6 @@ export enum LassoMode {
   Polygonal,
 }
 
-export type TextTool = {
-  type: 'text';
-};
-
-export type BrushTool = {
-  type: 'brush';
-};
-
-export type EraserTool = {
-  type: 'eraser';
-};
-
-export type FrameTool = {
-  type: 'frame';
-};
-
-export type FrameNavigatorTool = {
-  type: 'frameNavigator';
-  mode?: NavigatorMode;
-};
-
-export type PanTool = {
-  type: 'pan';
-  panning: boolean;
-};
-
-export type CopilotSelectionTool = {
-  type: 'copilot';
-};
-
-export type LassoTool = {
-  type: 'lasso';
-  mode: LassoMode;
-};
-
 export type NoteChildrenFlavour =
   | 'affine:paragraph'
   | 'affine:list'
@@ -161,41 +76,11 @@ export type NoteChildrenFlavour =
   | 'affine:attachment'
   | 'affine:surface-ref';
 
-export type NoteTool = {
-  type: 'affine:note';
-  childFlavour: NoteChildrenFlavour;
-  childType: string | null;
-  tip: string;
-};
-
 export enum NoteDisplayMode {
   DocAndEdgeless = 'both',
   EdgelessOnly = 'edgeless',
   DocOnly = 'doc',
 }
-
-export type ConnectorTool = {
-  type: 'connector';
-  mode: ConnectorMode;
-};
-
-export type EdgelessTool =
-  | DefaultTool
-  | TextTool
-  | ShapeTool
-  | BrushTool
-  | PanTool
-  | NoteTool
-  | ConnectorTool
-  | EraserTool
-  | FrameTool
-  | FrameNavigatorTool
-  | CopilotSelectionTool
-  | LassoTool;
-
-export type EmbedBlockDoubleClickData = {
-  blockId: string;
-};
 
 export interface Viewport {
   left: number;

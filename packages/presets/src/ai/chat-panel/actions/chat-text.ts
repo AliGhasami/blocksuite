@@ -10,20 +10,20 @@ import { renderImages } from '../components/images.js';
 @customElement('chat-text')
 export class ChatText extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   @property({ attribute: false })
-  attachments?: string[];
+  accessor attachments: string[] | undefined = undefined;
 
   @property({ attribute: false })
-  text!: string;
+  accessor text!: string;
 
   @property({ attribute: false })
-  state: 'finished' | 'generating' = 'finished';
+  accessor state: 'finished' | 'generating' = 'finished';
 
   protected override render() {
     const { attachments, text, host } = this;
-    return html`${attachments
+    return html`${attachments && attachments.length > 0
       ? renderImages(attachments)
       : nothing}${createTextRenderer(host, { customHeading: true })(
       text,

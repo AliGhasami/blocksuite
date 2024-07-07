@@ -81,7 +81,7 @@ export class BacklinkButton extends WithDisposable(LitElement) {
   `;
 
   @state()
-  private _showPopover = false;
+  private accessor _showPopover = false;
 
   private _backlinks: BacklinkData[];
 
@@ -91,12 +91,6 @@ export class BacklinkButton extends WithDisposable(LitElement) {
     this._backlinks = backlinks;
   }
 
-  override connectedCallback() {
-    super.connectedCallback();
-
-    this.tabIndex = 0;
-  }
-
   // Handle click outside
   private _onClickAway = (e: Event) => {
     if (e.target === this) return;
@@ -104,6 +98,12 @@ export class BacklinkButton extends WithDisposable(LitElement) {
     this._showPopover = false;
     document.removeEventListener('mousedown', this._onClickAway);
   };
+
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.tabIndex = 0;
+  }
 
   onClick() {
     this._showPopover = !this._showPopover;

@@ -1,13 +1,12 @@
 import type {
   BlockSelection,
+  EditorHost,
   UIEventHandler,
   UIEventStateContext,
 } from '@blocksuite/block-std';
-import type { EditorHost } from '@blocksuite/block-std';
-import { type BlockElement } from '@blocksuite/block-std';
+import type { BlockElement } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { ReactiveController } from 'lit';
-import type { ReactiveControllerHost } from 'lit';
+import type { ReactiveController, ReactiveControllerHost } from 'lit';
 
 import { moveBlockConfigs } from '../_common/configs/move-block.js';
 import { quickActionConfig } from '../_common/configs/quick-action/config.js';
@@ -17,25 +16,18 @@ import { onModelElementUpdated } from '../root-block/utils/callback.js';
 import { ensureBlockInContainer } from './utils.js';
 
 export class KeymapController implements ReactiveController {
-  private _anchorSel: BlockSelection | null = null;
-  private _focusBlock: BlockElement | null = null;
-
-  host: ReactiveControllerHost & BlockElement;
-
   private get _std() {
     return this.host.std;
   }
 
+  private _anchorSel: BlockSelection | null = null;
+
+  private _focusBlock: BlockElement | null = null;
+
+  host: ReactiveControllerHost & BlockElement;
+
   constructor(host: ReactiveControllerHost & BlockElement) {
     (this.host = host).addController(this);
-  }
-
-  hostConnected() {
-    this._reset();
-  }
-
-  hostDisconnected() {
-    this._reset();
   }
 
   private _reset = () => {
@@ -43,33 +35,7 @@ export class KeymapController implements ReactiveController {
     this._focusBlock = null;
   };
 
-  bind = () => {
-    this.host.handleEvent('keyDown', ctx => {
-     // console.log('keymap-controller-keyDown');
-      const state = ctx.get('keyboardState');
-      if (state.raw.key === 'Shift') {
-        return;
-      }
-      this._reset();
-    });
-
-    this.host.bindHotKey({
-      ArrowDown: this._onArrowDown,
-      ArrowUp: this._onArrowUp,
-      'Shift-ArrowDown': this._onShiftArrowDown,
-      'Shift-ArrowUp': this._onShiftArrowUp,
-      Escape: this._onEsc,
-      Enter: this._onEnter,
-      'Mod-a': this._onSelectAll,
-    });
-
-    this._bindQuickActionHotKey();
-    this._bindTextConversionHotKey();
-    this._bindMoveBlockHotKey();
-  };
-
   private _onArrowDown = (ctx: UIEventStateContext) => {
-    //console.log('keymap - controller - _onArrowDown');
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -164,7 +130,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onArrowUp = (ctx: UIEventStateContext) => {
-    //console.log('keymap - controller - _onArrowUp');
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -258,7 +223,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onShiftArrowDown = () => {
-  //  console.log('keymap - controller - _onShiftArrowDown');
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -271,7 +235,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onBlockShiftDown = (cmd: BlockSuite.CommandChain) => {
-    //console.log('keymap - controller - _onBlockShiftDown');
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {
@@ -309,7 +272,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onShiftArrowUp = () => {
-    //console.log('keymap - controller - _onShiftArrowUp');
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -322,7 +284,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onBlockShiftUp = (cmd: BlockSuite.CommandChain) => {
-   // console.log('keymap - controller - _onBlockShiftUp');
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {
@@ -359,7 +320,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onEsc = () => {
-   // console.log('keymap - controller - _onEsc');
     const [result] = this._std.command
       .chain()
       .getBlockSelections()
@@ -381,7 +341,6 @@ export class KeymapController implements ReactiveController {
   };
 
   private _onEnter = (ctx: UIEventStateContext) => {
-    //console.log('keymap - controller - _onEnter');
     const event = ctx.get('defaultState').event;
     const [result] = this._std.command
       .chain()
@@ -546,5 +505,37 @@ export class KeymapController implements ReactiveController {
         });
       });
     });
+  };
+
+  hostConnected() {
+    this._reset();
+  }
+
+  hostDisconnected() {
+    this._reset();
+  }
+
+  bind = () => {
+    this.host.handleEvent('keyDown', ctx => {
+      const state = ctx.get('keyboardState');
+      if (state.raw.key === 'Shift') {
+        return;
+      }
+      this._reset();
+    });
+
+    this.host.bindHotKey({
+      ArrowDown: this._onArrowDown,
+      ArrowUp: this._onArrowUp,
+      'Shift-ArrowDown': this._onShiftArrowDown,
+      'Shift-ArrowUp': this._onShiftArrowUp,
+      Escape: this._onEsc,
+      Enter: this._onEnter,
+      'Mod-a': this._onSelectAll,
+    });
+
+    this._bindQuickActionHotKey();
+    this._bindTextConversionHotKey();
+    this._bindMoveBlockHotKey();
   };
 }

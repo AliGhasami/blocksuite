@@ -1,6 +1,6 @@
 {
   "name": "@blocksuite/store",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "BlockSuite data store built for general purpose state management.",
   "type": "module",
   "repository": "toeverything/blocksuite",
@@ -20,8 +20,7 @@
     "@blocksuite/sync": "workspace:*",
     "@types/flexsearch": "^0.7.6",
     "flexsearch": "0.7.43",
-    "idb-keyval": "^6.2.1",
-    "lib0": "^0.2.93",
+    "lib0": "^0.2.94",
     "merge": "^2.1.1",
     "minimatch": "^9.0.4",
     "nanoid": "^5.0.7",

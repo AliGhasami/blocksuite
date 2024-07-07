@@ -1,11 +1,13 @@
 import '../finish-tip.js';
 
+import type { EditorHost } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { baseTheme } from '@toeverything/theme';
 import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { AIPanelAnswerConfig, CopyConfig } from '../../type.js';
+import { filterAIItemGroup } from '../../utils.js';
 
 @customElement('ai-panel-answer')
 export class AIPanelAnswer extends WithDisposable(LitElement) {
@@ -40,6 +42,7 @@ export class AIPanelAnswer extends WithDisposable(LitElement) {
       font-style: normal;
       font-weight: 500;
       line-height: 20px; /* 166.667% */
+      height: 20px;
     }
 
     .answer-body {
@@ -80,16 +83,21 @@ export class AIPanelAnswer extends WithDisposable(LitElement) {
       --item-icon-hover-color: var(--affine-icon-color);
     }
   `;
-  @property({ attribute: false })
-  config!: AIPanelAnswerConfig;
 
   @property({ attribute: false })
-  finish = true;
+  accessor config!: AIPanelAnswerConfig;
 
   @property({ attribute: false })
-  copy?: CopyConfig;
+  accessor finish = true;
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
+
+  @property({ attribute: false })
+  accessor copy: CopyConfig | undefined = undefined;
 
   override render() {
+    const responseGroup = filterAIItemGroup(this.host, this.config.responses);
     return html`
       <div class="answer">
         <div class="answer-head">Answer</div>
@@ -100,10 +108,10 @@ export class AIPanelAnswer extends WithDisposable(LitElement) {
       ${this.finish
         ? html`
             <ai-finish-tip .copy=${this.copy}></ai-finish-tip>
-            ${this.config.responses.length > 0
+            ${responseGroup.length > 0
               ? html`
                   <ai-panel-divider></ai-panel-divider>
-                  ${this.config.responses.map(
+                  ${responseGroup.map(
                     (group, index) => html`
                       ${index !== 0
                         ? html`<ai-panel-divider></ai-panel-divider>`
@@ -115,7 +123,7 @@ export class AIPanelAnswer extends WithDisposable(LitElement) {
                   )}
                 `
               : nothing}
-            ${this.config.responses.length > 0 && this.config.actions.length > 0
+            ${responseGroup.length > 0 && this.config.actions.length > 0
               ? html`<ai-panel-divider></ai-panel-divider>`
               : nothing}
             ${this.config.actions.length > 0

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import * as Y from 'yjs';
 
-import { MemoryBlobManager } from '../adapter/index.js';
+import { MemoryBlobCRUD } from '../adapter/index.js';
 import { Text } from '../reactive/index.js';
 import {
   type BlockModel,
@@ -51,12 +51,13 @@ function createTestOptions() {
 }
 
 const transformer = new BaseBlockTransformer();
-const blobManager = new MemoryBlobManager();
-const assets = new AssetsManager({ blob: blobManager });
+const blobCRUD = new MemoryBlobCRUD();
+const assets = new AssetsManager({ blob: blobCRUD });
 
 test('model to snapshot', () => {
   const options = createTestOptions();
   const collection = new DocCollection(options);
+  collection.meta.initialize();
   const doc = collection.createDoc({ id: 'home' });
   doc.load();
   doc.addBlock('page');
@@ -73,6 +74,7 @@ test('model to snapshot', () => {
 test('snapshot to model', async () => {
   const options = createTestOptions();
   const collection = new DocCollection(options);
+  collection.meta.initialize();
   const doc = collection.createDoc({ id: 'home' });
   doc.load();
   doc.addBlock('page');

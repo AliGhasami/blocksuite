@@ -13,7 +13,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { CopyIcon, MoreIcon, RetryIcon } from '../../_common/icons.js';
 import { AIProvider } from '../../provider.js';
 import { copyText } from '../../utils/editor-actions.js';
-import type { ChatItem, ChatMessage, ChatStatus } from '../index.js';
+import type { ChatContextValue, ChatMessage } from '../chat-context.js';
 import { PageEditorActions } from './actions-handle.js';
 
 noop(Tooltip);
@@ -37,6 +37,10 @@ export class ChatCopyMore extends WithDisposable(LitElement) {
 
       div:hover {
         background-color: var(--affine-hover-color);
+      }
+
+      svg {
+        color: var(--affine-icon-color);
       }
     }
 
@@ -70,50 +74,82 @@ export class ChatCopyMore extends WithDisposable(LitElement) {
     }
   `;
 
-  @property({ attribute: false })
-  host!: EditorHost;
-
-  @property({ attribute: false })
-  content!: string;
-
-  @property({ attribute: false })
-  isLast!: boolean;
-
-  @property({ attribute: false })
-  curTextSelection?: TextSelection;
-
-  @property({ attribute: false })
-  curBlockSelections?: BlockSelection[];
-
-  @property({ attribute: false })
-  items!: ChatItem[];
-
-  @property({ attribute: false })
-  updateItems!: (items: ChatItem[]) => void;
-
-  @property({ attribute: false })
-  updateStatus!: (status: ChatStatus) => void;
-
-  @property({ attribute: false })
-  updateError!: (error: AIError | null) => void;
-
-  @property({ attribute: false })
-  abortController!: AbortController | null;
-
-  @property({ attribute: false })
-  updateAbortController!: (abortController: AbortController | null) => void;
-
   @state()
-  private _showMoreMenu = false;
+  private accessor _showMoreMenu = false;
 
   @query('.more-button')
-  private _moreButton!: HTMLDivElement;
+  private accessor _moreButton!: HTMLDivElement;
+
   @query('.more-menu')
-  private _moreMenu!: HTMLDivElement;
+  private accessor _moreMenu!: HTMLDivElement;
+
   private _morePopper: ReturnType<typeof createButtonPopper> | null = null;
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
+
+  @property({ attribute: false })
+  accessor content!: string;
+
+  @property({ attribute: false })
+  accessor isLast!: boolean;
+
+  @property({ attribute: false })
+  accessor curTextSelection: TextSelection | undefined = undefined;
+
+  @property({ attribute: false })
+  accessor curBlockSelections: BlockSelection[] | undefined = undefined;
+
+  @property({ attribute: false })
+  accessor chatContextValue!: ChatContextValue;
+
+  @property({ attribute: false })
+  accessor updateContext!: (context: Partial<ChatContextValue>) => void;
 
   private _toggle() {
     this._morePopper?.toggle();
+  }
+
+  private async _retry() {
+    const { doc } = this.host;
+    try {
+      const abortController = new AbortController();
+
+      const items = [...this.chatContextValue.items];
+      const last = items[items.length - 1];
+      if ('content' in last) {
+        last.content = '';
+        last.createdAt = new Date().toISOString();
+      }
+      this.updateContext({ items, status: 'loading', error: null });
+
+      const stream = AIProvider.actions.chat?.({
+        retry: true,
+        docId: doc.id,
+        workspaceId: doc.collection.id,
+        host: this.host,
+        stream: true,
+        signal: abortController.signal,
+        where: 'chat-panel',
+        control: 'chat-send',
+      });
+
+      if (stream) {
+        this.updateContext({ abortController });
+        for await (const text of stream) {
+          const items = [...this.chatContextValue.items];
+          const last = items[items.length - 1] as ChatMessage;
+          last.content += text;
+          this.updateContext({ items, status: 'transmitting' });
+        }
+
+        this.updateContext({ status: 'success' });
+      }
+    } catch (error) {
+      this.updateContext({ status: 'error', error: error as AIError });
+    } finally {
+      this.updateContext({ abortController: null });
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -131,52 +167,6 @@ export class ChatCopyMore extends WithDisposable(LitElement) {
     }
   }
 
-  private async _retry() {
-    const { doc } = this.host;
-    try {
-      const abortController = new AbortController();
-      const items = [...this.items];
-      const last = items[items.length - 1];
-      if ('content' in last) {
-        last.content = '';
-        last.createdAt = new Date().toISOString();
-      }
-
-      this.updateItems(items);
-      this.updateStatus('loading');
-      this.updateError(null);
-
-      const stream = AIProvider.actions.chat?.({
-        retry: true,
-        docId: doc.id,
-        workspaceId: doc.collection.id,
-        host: this.host,
-        stream: true,
-        signal: abortController.signal,
-        where: 'chat-panel',
-        control: 'chat-send',
-      });
-
-      if (stream) {
-        this.updateAbortController(abortController);
-        for await (const text of stream) {
-          this.updateStatus('transmitting');
-          const items = [...this.items];
-          const last = items[items.length - 1] as ChatMessage;
-          last.content += text;
-          this.updateItems(items);
-        }
-
-        this.updateStatus('success');
-      }
-    } catch (error) {
-      this.updateStatus('error');
-      this.updateError(error as AIError);
-    } finally {
-      this.updateAbortController(null);
-    }
-  }
-
   override render() {
     const { host, content, isLast } = this;
     return html`<style>
@@ -185,10 +175,12 @@ export class ChatCopyMore extends WithDisposable(LitElement) {
         }
       </style>
       <div class="copy-more">
-        <div @click=${() => copyText(host, content)}>
-          ${CopyIcon}
-          <affine-tooltip>Copy</affine-tooltip>
-        </div>
+        ${content
+          ? html`<div @click=${() => copyText(host, content)}>
+              ${CopyIcon}
+              <affine-tooltip>Copy</affine-tooltip>
+            </div>`
+          : nothing}
         ${isLast
           ? html`<div @click=${() => this._retry()}>
               ${RetryIcon}

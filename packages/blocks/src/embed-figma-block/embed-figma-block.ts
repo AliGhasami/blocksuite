@@ -1,17 +1,13 @@
-import '../_common/components/block-selection.js';
-import '../_common/components/embed-card/embed-card-caption.js';
-
 import { assertExists } from '@blocksuite/global/utils';
-import { html, nothing } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
-import type { EmbedCardCaption } from '../_common/components/embed-card/embed-card-caption.js';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
 import { EmbedBlockElement } from '../_common/embed-block-helper/embed-block-element.js';
 import { OpenIcon } from '../_common/icons/text.js';
 import type { EmbedFigmaStyles } from './embed-figma-model.js';
-import { type EmbedFigmaModel } from './embed-figma-model.js';
+import type { EmbedFigmaModel } from './embed-figma-model.js';
 import type { EmbedFigmaBlockService } from './embed-figma-service.js';
 import { FigmaIcon, styles } from './styles.js';
 
@@ -22,20 +18,17 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
 > {
   static override styles = styles;
 
-  override _cardStyle: (typeof EmbedFigmaStyles)[number] = 'figma';
+  @state()
+  private accessor _isSelected = false;
 
   @state()
-  private _isSelected = false;
-
-  @state()
-  private _showOverlay = true;
-
-  @query('embed-card-caption')
-  captionElement!: EmbedCardCaption;
+  private accessor _showOverlay = true;
 
   private _isDragging = false;
 
   private _isResizing = false;
+
+  override _cardStyle: (typeof EmbedFigmaStyles)[number] = 'figma';
 
   private _selectBlock() {
     const selectionManager = this.host.selection;
@@ -186,13 +179,7 @@ export class EmbedFigmaBlockComponent extends EmbedBlockElement<
               </div>
             </div>
           </div>
-
-          <embed-card-caption .block=${this}></embed-card-caption>
-
-          <affine-block-selection .block=${this}></affine-block-selection>
         </div>
-
-        ${this.isInSurface ? nothing : Object.values(this.widgets)}
       `
     );
   }

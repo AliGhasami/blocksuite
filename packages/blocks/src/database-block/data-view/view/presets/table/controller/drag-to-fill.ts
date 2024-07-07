@@ -34,7 +34,7 @@ export class DragToFillElement extends ShadowlessElement {
   `;
 
   @state()
-  dragging = false;
+  accessor dragging = false;
 
   dragToFillRef = createRef<HTMLDivElement>();
 
@@ -42,7 +42,6 @@ export class DragToFillElement extends ShadowlessElement {
     // TODO add tooltip
     return html`<div
       ${ref(this.dragToFillRef)}
-      draggable="true"
       data-drag-to-fill="true"
       class="drag-to-fill ${this.dragging ? 'dragging' : ''}"
     ></div>`;

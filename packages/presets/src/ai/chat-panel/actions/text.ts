@@ -7,7 +7,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import { createTextRenderer } from '../../messages/text.js';
-import type { ChatAction } from '../index.js';
+import type { ChatAction } from '../chat-context.js';
 
 @customElement('action-text')
 export class ActionText extends WithDisposable(LitElement) {
@@ -21,13 +21,13 @@ export class ActionText extends WithDisposable(LitElement) {
   `;
 
   @property({ attribute: false })
-  item!: ChatAction;
+  accessor item!: ChatAction;
 
   @property({ attribute: false })
-  host!: EditorHost;
+  accessor host!: EditorHost;
 
   @property({ attribute: false })
-  isCode = false;
+  accessor isCode = false;
 
   protected override render() {
     const originalText = this.item.messages[1].content;
@@ -41,7 +41,10 @@ export class ActionText extends WithDisposable(LitElement) {
         })}
         class="original-text"
       >
-        ${createTextRenderer(this.host, { customHeading: true })(originalText)}
+        ${createTextRenderer(this.host, {
+          customHeading: true,
+          maxHeight: 160,
+        })(originalText)}
       </div>
     </action-wrapper>`;
   }

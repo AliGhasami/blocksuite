@@ -1,10 +1,6 @@
 import type { Y } from '@blocksuite/store';
 
-import type {
-  FontFamily,
-  FontStyle,
-  FontWeight,
-} from '../../../element-model/common.js';
+import type { FontFamily, FontStyle, FontWeight } from '../../../consts.js';
 import type { TextElementModel } from '../../../element-model/text.js';
 import type { Bound } from '../../../utils/bound.js';
 import {
@@ -18,9 +14,7 @@ import {
 
 export type TextDelta = {
   insert: string;
-  attributes?: {
-    [k: string]: unknown;
-  };
+  attributes?: Record<string, unknown>;
 };
 
 const getMeasureCtx = (function initMeasureContext() {
@@ -37,6 +31,71 @@ const getMeasureCtx = (function initMeasureContext() {
   };
 })();
 
+const textMeasureCache = new Map<
+  string,
+  {
+    lineHeight: number;
+    lineGap: number;
+    fontSize: number;
+  }
+>();
+
+export function measureTextInDOM(
+  fontFamily: string,
+  fontSize: number,
+  fontWeight: string
+) {
+  const cacheKey = `${wrapFontFamily(fontFamily)}-${fontWeight}`;
+
+  if (textMeasureCache.has(cacheKey)) {
+    const {
+      fontSize: cacheFontSize,
+      lineGap,
+      lineHeight,
+    } = textMeasureCache.get(cacheKey)!;
+
+    return {
+      lineHeight: lineHeight * (fontSize / cacheFontSize),
+      lineGap: lineGap * (fontSize / cacheFontSize),
+    };
+  }
+
+  const div = document.createElement('div');
+  const span = document.createElement('span');
+
+  div.append(span);
+
+  span.innerText = 'x';
+
+  div.style.position = 'absolute';
+  div.style.top = '0px';
+  div.style.left = '0px';
+  div.style.visibility = 'hidden';
+  div.style.fontFamily = wrapFontFamily(fontFamily);
+  div.style.fontWeight = fontWeight;
+  div.style.fontSize = `${fontSize}px`;
+
+  div.style.pointerEvents = 'none';
+
+  document.body.append(div);
+
+  const lineHeight = span.getBoundingClientRect().height;
+  const height = div.getBoundingClientRect().height;
+  const result = {
+    lineHeight,
+    lineGap: height - lineHeight,
+  };
+
+  div.remove();
+
+  textMeasureCache.set(cacheKey, {
+    ...result,
+    fontSize,
+  });
+
+  return result;
+}
+
 export function getFontString({
   fontStyle,
   fontWeight,
@@ -48,40 +107,63 @@ export function getFontString({
   fontSize: number;
   fontFamily: string;
 }): string {
-  const lineHeight = getLineHeight(fontFamily, fontSize);
+  const lineHeight = getLineHeight(fontFamily, fontSize, fontWeight);
   return `${fontStyle} ${fontWeight} ${fontSize}px/${lineHeight}px ${wrapFontFamily(
     fontFamily
   )}, sans-serif`.trim();
 }
 
-const cachedFontFamily = new Map<
+export function getLineHeight(
+  fontFamily: string,
+  fontSize: number,
+  fontWeight: string
+): number {
+  const { lineHeight } = measureTextInDOM(fontFamily, fontSize, fontWeight);
+  return lineHeight;
+}
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+
+type TextMetricsLike = Writeable<TextMetrics>;
+
+const metricsCache = new Map<
   string,
   {
     fontSize: number;
-    lineHeight: number;
+    metrics: TextMetrics;
   }
 >();
-export function getLineHeight(fontFamily: string, fontSize: number) {
+export function getFontMetrics(
+  fontFamily: string,
+  fontSize: number,
+  fontWeight: string
+) {
   const ctx = getMeasureCtx();
-  const wrappedFontFamily = wrapFontFamily(fontFamily);
+  const cacheKey = `${wrapFontFamily(fontFamily)}-${fontWeight}`;
 
-  if (cachedFontFamily.has(wrappedFontFamily)) {
-    const cache = cachedFontFamily.get(wrappedFontFamily)!;
-    return (fontSize / cache.fontSize) * cache.lineHeight;
+  if (metricsCache.has(cacheKey)) {
+    const { fontSize: cacheFontSize, metrics } = metricsCache.get(cacheKey)!;
+
+    return Object.keys(Object.getPrototypeOf(metrics)).reduce((acc, key) => {
+      acc[key as keyof TextMetrics] =
+        metrics[key as keyof TextMetrics] * (fontSize / cacheFontSize);
+      return acc;
+    }, {} as TextMetricsLike);
   }
 
-  const font = `${fontSize}px ${wrapFontFamily(fontFamily)}`;
-  ctx.font = `${fontSize}px ${wrapFontFamily(fontFamily)}`;
-  const textMetrcs = ctx.measureText('M');
-  const lineHeight =
-    textMetrcs.fontBoundingBoxAscent + textMetrcs.fontBoundingBoxDescent;
+  const font = `${fontWeight} ${fontSize}px ${wrapFontFamily(fontFamily)}`;
+  ctx.font = font;
+  const metrics = ctx.measureText('x');
 
-  // cached when font property does not fallback
-  if (font === ctx.font) {
-    cachedFontFamily.set(wrappedFontFamily, { fontSize, lineHeight });
+  // check if font does not fallback
+  if (ctx.font === font) {
+    metricsCache.set(cacheKey, {
+      fontSize,
+      metrics,
+    });
   }
 
-  return lineHeight;
+  return metrics;
 }
 
 function transformDelta(delta: TextDelta): (TextDelta | '\n')[] {
@@ -195,7 +277,7 @@ export function wrapTextDeltas(text: Y.Text, font: string, w: number) {
 }
 
 export const charWidth = (() => {
-  const cachedCharWidth: { [key: string]: Array<number> } = {};
+  const cachedCharWidth: Record<string, Array<number>> = {};
 
   const calculate = (char: string, font: string) => {
     const ascii = char.charCodeAt(0);
@@ -400,7 +482,7 @@ export function getTextCursorPosition(
   return [
     Math.floor(
       (mousePos[1] - leftTop[1]) /
-        getLineHeight(model.fontFamily, model.fontSize)
+        getLineHeight(model.fontFamily, model.fontSize, model.fontWeight)
     ),
     mousePos[0] - leftTop[0],
   ];
@@ -434,15 +516,29 @@ export function getCursorByCoord(
 }
 
 export function normalizeTextBound(
-  text: TextElementModel,
+  {
+    yText,
+    fontStyle,
+    fontWeight,
+    fontSize,
+    fontFamily,
+    hasMaxWidth,
+    maxWidth,
+  }: {
+    yText: Y.Text;
+    fontStyle: FontStyle;
+    fontWeight: FontWeight;
+    fontSize: number;
+    fontFamily: FontFamily;
+    hasMaxWidth?: boolean;
+    maxWidth?: number;
+  },
   bound: Bound,
   dragging: boolean = false
 ): Bound {
-  if (!text.text) return bound;
+  if (!yText) return bound;
 
-  const yText = text.text;
-  const { fontStyle, fontWeight, fontSize, fontFamily } = text;
-  const lineHeightPx = getLineHeight(fontFamily, fontSize);
+  const lineHeightPx = getLineHeight(fontFamily, fontSize, fontWeight);
   const font = getFontString({
     fontStyle,
     fontWeight,
@@ -452,8 +548,9 @@ export function normalizeTextBound(
 
   let lines: TextDelta[][] = [];
   const deltas: TextDelta[] = yText.toDelta() as TextDelta[];
+  const text = yText.toString();
   const widestCharWidth =
-    [...yText.toString()]
+    [...text]
       .map(char => getTextWidth(char, font))
       .sort((a, b) => a - b)
       .pop() ?? getTextWidth('W', font);
@@ -468,15 +565,15 @@ export function normalizeTextBound(
     attributes: delta.attributes,
   })) as TextDelta[];
   lines = deltaInsertsToChunks(insertDeltas);
-  if (!dragging && !text.hasMaxWidth) {
+  if (!dragging) {
     lines = deltaInsertsToChunks(deltas);
     const widestLineWidth = Math.max(
-      ...yText
-        .toString()
-        .split('\n')
-        .map(text => getTextWidth(text, font))
+      ...text.split('\n').map(line => getTextWidth(line, font))
     );
     bound.w = widestLineWidth;
+    if (hasMaxWidth && maxWidth && maxWidth > 0) {
+      bound.w = Math.min(bound.w, maxWidth);
+    }
   }
   bound.h = lineHeightPx * lines.length;
 

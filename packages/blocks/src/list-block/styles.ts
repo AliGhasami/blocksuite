@@ -65,7 +65,6 @@ export const toggleStyles = css`
 export const listBlockStyles = css`
   affine-list {
     display: block;
-    margin: 10px 0;
     font-size: var(--affine-font-base);
   }
 
@@ -80,7 +79,6 @@ export const listBlockStyles = css`
   .affine-list-rich-text-wrapper {
     position: relative;
     display: flex;
-    position: relative;
   }
   .affine-list-rich-text-wrapper rich-text {
     flex: 1;

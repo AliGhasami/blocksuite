@@ -1,39 +1,43 @@
-import type { EdgelessModel } from '../../../_common/utils/index.js';
 import { groupBy } from '../../../_common/utils/iterable.js';
+import type { EdgelessTextBlockModel } from '../../../edgeless-text/edgeless-text-model.js';
+import type { EmbedSyncedDocModel } from '../../../embed-synced-doc-block/index.js';
 import type { FrameBlockModel } from '../../../frame-block/index.js';
 import type { ImageBlockModel } from '../../../image-block/index.js';
 import type { NoteBlockModel } from '../../../note-block/index.js';
-import { type CanvasElement } from '../../../surface-block/index.js';
-import {
-  getCopyElements,
-  prepareClipboardData,
-} from '../controllers/clipboard.js';
 import type { EdgelessRootBlockComponent } from '../edgeless-root-block.js';
 import { edgelessElementsBound } from './bound-utils.js';
+import { getCloneElements, prepareCloneData } from './clone-utils.js';
 import { getElementsWithoutGroup } from './group.js';
-import { isFrameBlock, isImageBlock, isNoteBlock } from './query.js';
+import {
+  isEdgelessTextBlock,
+  isEmbedSyncedDocBlock,
+  isFrameBlock,
+  isImageBlock,
+  isNoteBlock,
+} from './query.js';
 
 const offset = 10;
 export async function duplicate(
   edgeless: EdgelessRootBlockComponent,
-  elements: EdgelessModel[],
+  elements: BlockSuite.EdgelessModelType[],
   select = true
 ) {
   const { clipboardController } = edgeless;
-  const copyElements = getCopyElements(edgeless.surface, elements);
+  const copyElements = getCloneElements(
+    elements,
+    edgeless.surface.edgeless.service.frame
+  );
   const totalBound = edgelessElementsBound(copyElements);
   totalBound.x += totalBound.w + offset;
 
-  const data = JSON.parse(
-    JSON.stringify(await prepareClipboardData(copyElements, edgeless.std))
-  );
-  const [canvasElements, blocks] =
-    clipboardController.createElementsFromClipboardData(
-      data as Record<string, unknown>[],
+  const snapshot = await prepareCloneData(copyElements, edgeless.std);
+  const { canvasElements, blockModels } =
+    await clipboardController.createElementsFromClipboardData(
+      snapshot,
       totalBound.center
     );
 
-  const newElements = [...canvasElements, ...blocks];
+  const newElements = [...canvasElements, ...blockModels];
 
   edgeless.surface.fitToViewport(totalBound);
 
@@ -44,30 +48,36 @@ export async function duplicate(
     });
   }
 }
-export const splitElements = (elements: EdgelessModel[]) => {
-  const { notes, frames, shapes, images } = groupBy(
-    getElementsWithoutGroup(elements),
-    element => {
+export const splitElements = (elements: BlockSuite.EdgelessModelType[]) => {
+  const { notes, frames, shapes, images, edgelessTexts, embedSyncedDocs } =
+    groupBy(getElementsWithoutGroup(elements), element => {
       if (isNoteBlock(element)) {
         return 'notes';
       } else if (isFrameBlock(element)) {
         return 'frames';
       } else if (isImageBlock(element)) {
         return 'images';
+      } else if (isEdgelessTextBlock(element)) {
+        return 'edgelessTexts';
+      } else if (isEmbedSyncedDocBlock(element)) {
+        return 'embedSyncedDocs';
       }
       return 'shapes';
-    }
-  ) as {
-    notes: NoteBlockModel[];
-    shapes: CanvasElement[];
-    frames: FrameBlockModel[];
-    images: ImageBlockModel[];
-  };
+    }) as {
+      notes: NoteBlockModel[];
+      shapes: BlockSuite.SurfaceModelType[];
+      frames: FrameBlockModel[];
+      images: ImageBlockModel[];
+      edgelessTexts: EdgelessTextBlockModel[];
+      embedSyncedDocs: EmbedSyncedDocModel[];
+    };
 
   return {
     notes: notes ?? [],
     shapes: shapes ?? [],
     frames: frames ?? [],
     images: images ?? [],
+    edgelessTexts: edgelessTexts ?? [],
+    embedSyncedDocs: embedSyncedDocs ?? [],
   };
 };

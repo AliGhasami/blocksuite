@@ -52,22 +52,13 @@ export class OverlayScrollbar extends LitElement {
   `;
 
   @query('.overlay-handle')
-  private _handle!: HTMLDivElement;
+  private accessor _handle!: HTMLDivElement;
 
   private _disposable = new DisposableGroup();
 
   private _scrollable: HTMLElement | null = null;
 
   private _handleVisible = false;
-
-  override firstUpdated(): void {
-    this._initWheelHandler();
-  }
-
-  override connectedCallback(): void {
-    super.connectedCallback();
-    this._disposable.dispose();
-  }
 
   private _toggleScrollbarVisible(visible: boolean) {
     const vis = visible || this._handleVisible ? '1' : '0';
@@ -165,6 +156,15 @@ export class OverlayScrollbar extends LitElement {
 
       dispose();
     });
+  }
+
+  override firstUpdated(): void {
+    this._initWheelHandler();
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._disposable.dispose();
   }
 
   override render() {

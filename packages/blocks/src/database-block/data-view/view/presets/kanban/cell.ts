@@ -56,29 +56,38 @@ const styles = css`
 
 @customElement('affine-data-view-kanban-cell')
 export class KanbanCell extends WithDisposable(ShadowlessElement) {
+  get cell(): DataViewCellLifeCycle | undefined {
+    return this._cell.value;
+  }
+
+  get selection() {
+    return this.closest('affine-data-view-kanban')?.selectionController;
+  }
+
   static override styles = styles;
-
-  @property({ attribute: false })
-  contentOnly = false;
-  @property({ attribute: false })
-  view!: DataViewKanbanManager;
-  @property({ attribute: false })
-  groupKey!: string;
-  @property({ attribute: false })
-  cardId!: string;
-  @property({ attribute: false })
-  column!: DataViewKanbanColumnManager;
-  @state()
-  isFocus = false;
-
-  @state()
-  editing = false;
 
   private _cell = createRef<DataViewCellLifeCycle>();
 
-  public get cell(): DataViewCellLifeCycle | undefined {
-    return this._cell.value;
-  }
+  @property({ attribute: false })
+  accessor contentOnly = false;
+
+  @property({ attribute: false })
+  accessor view!: DataViewKanbanManager;
+
+  @property({ attribute: false })
+  accessor groupKey!: string;
+
+  @property({ attribute: false })
+  accessor cardId!: string;
+
+  @property({ attribute: false })
+  accessor column!: DataViewKanbanColumnManager;
+
+  @state()
+  accessor isFocus = false;
+
+  @state()
+  accessor editing = false;
 
   override connectedCallback() {
     super.connectedCallback();
@@ -113,10 +122,6 @@ export class KanbanCell extends WithDisposable(ShadowlessElement) {
       isEditing: editing,
     };
   };
-
-  get selection() {
-    return this.closest('affine-data-view-kanban')?.selectionController;
-  }
 
   renderIcon() {
     if (this.contentOnly) {

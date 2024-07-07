@@ -9,9 +9,9 @@ import { repeat } from 'lit/directives/repeat.js';
 import { html } from 'lit/static-html.js';
 import Sortable from 'sortablejs';
 
+import { popMenu } from '../../../../../_common/components/index.js';
 import { AddCursorIcon } from '../../../../../_common/icons/index.js';
 import type { GroupHelper } from '../../../common/group-by/helper.js';
-import { popMenu } from '../../../utils/menu/index.js';
 import { renderUniLit } from '../../../utils/uni-component/uni-component.js';
 import { DataViewBase } from '../../data-view-base.js';
 import { KanbanClipboardController } from './controller/clipboard.js';
@@ -100,11 +100,16 @@ export class DataViewKanban extends DataViewBase<
   static override styles = styles;
 
   private dragController = new KanbanDragController(this);
+
   selectionController = new KanbanSelectionController(this);
+
   hotkeysController = new KanbanHotkeysController(this);
+
   clipboardController = new KanbanClipboardController(this);
+
   @query('.affine-data-view-kanban-groups')
-  groups!: HTMLElement;
+  accessor groups!: HTMLElement;
+
   groupHelper?: GroupHelper;
 
   override connectedCallback() {
@@ -182,6 +187,7 @@ export class DataViewKanban extends DataViewBase<
       <div class="add-group-icon">${AddCursorIcon}</div>
     </div>`;
   };
+
   onWheel = (event: WheelEvent) => {
     if (event.metaKey || event.ctrlKey) {
       return;
@@ -194,6 +200,7 @@ export class DataViewKanban extends DataViewBase<
       event.stopPropagation();
     }
   };
+
   override render() {
     this.groupHelper = this.view.groupHelper;
     const groups = this.groupHelper?.groups;
@@ -234,11 +241,11 @@ export class DataViewKanban extends DataViewBase<
     return this.selectionController.selection;
   }
 
-  public hideIndicator(): void {
+  hideIndicator(): void {
     this.dragController.dropPreview.remove();
   }
 
-  public moveTo(id: string, evt: MouseEvent): void {
+  moveTo(id: string, evt: MouseEvent): void {
     const position = this.dragController.getInsertPosition(evt);
     if (position) {
       position.group.group.helper.moveCardTo(
@@ -250,7 +257,7 @@ export class DataViewKanban extends DataViewBase<
     }
   }
 
-  public showIndicator(evt: MouseEvent): boolean {
+  showIndicator(evt: MouseEvent): boolean {
     return this.dragController.shooIndicator(evt, undefined) != null;
   }
 }

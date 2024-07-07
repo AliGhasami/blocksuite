@@ -1,6 +1,6 @@
-import type { ReferenceElement } from '@floating-ui/dom';
 import { html } from 'lit';
 
+import { popFilterableSimpleMenu } from '../../../../../_common/components/index.js';
 import {
   ArrowRightBigIcon,
   ExpandFullIcon,
@@ -9,7 +9,6 @@ import {
 } from '../../../../../_common/icons/index.js';
 import { DeleteIcon } from '../../../common/icons/index.js';
 import type { DataViewRenderer } from '../../../data-view.js';
-import { popFilterableSimpleMenu } from '../../../utils/menu/index.js';
 import type { KanbanSelectionController } from './controller/selection.js';
 
 export const openDetail = (
@@ -30,7 +29,7 @@ export const openDetail = (
 
 export const popCardMenu = (
   dataViewEle: DataViewRenderer,
-  ele: ReferenceElement,
+  ele: HTMLElement,
   rowId: string,
   selection: KanbanSelectionController
 ) => {

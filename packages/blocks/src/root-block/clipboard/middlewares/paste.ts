@@ -5,6 +5,7 @@ import type {
   TextSelection,
 } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
+import type { Text } from '@blocksuite/store';
 import {
   type BlockModel,
   type BlockSnapshot,
@@ -13,7 +14,6 @@ import {
   fromJSON,
   type JobMiddleware,
   type SliceSnapshot,
-  type Text,
 } from '@blocksuite/store';
 
 import { matchFlavours } from '../../../_common/utils/index.js';
@@ -29,8 +29,11 @@ const findLast = (snapshot: BlockSnapshot): BlockSnapshot => {
 
 class PointState {
   readonly block: BlockElement;
+
   readonly text: Text;
+
   readonly model: BlockModel;
+
   constructor(
     readonly std: EditorHost['std'],
     readonly point: TextRangePoint
@@ -51,16 +54,23 @@ class PointState {
 
 class PasteTr {
   private readonly lastIndex: number;
+
   private readonly fromPointState: PointState;
+
   private readonly endPointState: PointState;
+
   private readonly to: TextRangePoint | null;
+
   private readonly firstSnapshot: BlockSnapshot;
+
   private lastSnapshot: BlockSnapshot;
+
   private readonly firstSnapshotIsPlainText: boolean;
+
   constructor(
-    public readonly std: EditorHost['std'],
-    public readonly text: TextSelection,
-    public readonly snapshot: SliceSnapshot
+    readonly std: EditorHost['std'],
+    readonly text: TextSelection,
+    readonly snapshot: SliceSnapshot
   ) {
     const { from, to } = text;
     const end = to ?? from;
@@ -88,18 +98,6 @@ class PasteTr {
       this.firstSnapshot.flavour === 'affine:paragraph' &&
       this.firstSnapshot.props.type === 'text';
   }
-
-  canMerge = () => {
-    const firstTextSnapshot = this._textFromSnapshot(this.firstSnapshot);
-    const lastTextSnapshot = this._textFromSnapshot(this.lastSnapshot);
-    return (
-      firstTextSnapshot &&
-      lastTextSnapshot &&
-      ((this.fromPointState.text.length > 0 &&
-        this.endPointState.text.length > 0) ||
-        this.firstSnapshotIsPlainText)
-    );
-  };
 
   private _textFromSnapshot = (snapshot: BlockSnapshot) => {
     return snapshot.props.text as Record<'delta', DeltaOperation[]>;
@@ -203,6 +201,18 @@ class PasteTr {
     lastTextSnapshot.delta = [...lastDelta, ...toDelta];
   };
 
+  canMerge = () => {
+    const firstTextSnapshot = this._textFromSnapshot(this.firstSnapshot);
+    const lastTextSnapshot = this._textFromSnapshot(this.lastSnapshot);
+    return (
+      firstTextSnapshot &&
+      lastTextSnapshot &&
+      ((this.fromPointState.text.length > 0 &&
+        this.endPointState.text.length > 0) ||
+        this.firstSnapshotIsPlainText)
+    );
+  };
+
   pasted = () => {
     const needCleanup = this.canMerge() || this.endPointState.text.length === 0;
     if (!needCleanup) {
@@ -296,6 +306,80 @@ class PasteTr {
 
     this._mergeMultiple();
   }
+
+  convertToLinkedDoc = async (std: EditorHost['std']) => {
+    const quickSearchService =
+      std.spec.getService('affine:page').quickSearchService;
+
+    if (!quickSearchService) {
+      return;
+    }
+
+    const linkToDocId = new Map<string, string | null>();
+
+    for (const blockSnapshot of this.snapshot.content) {
+      if (blockSnapshot.props.text) {
+        const text = this._textFromSnapshot(blockSnapshot);
+        const needToConvert = new Map<DeltaOperation, string>();
+        for (const op of text.delta) {
+          if (op.attributes?.link) {
+            let docId = linkToDocId.get(op.attributes.link);
+            if (docId === undefined) {
+              const searchResult = await quickSearchService.searchDoc({
+                userInput: op.attributes.link,
+                skipSelection: true,
+                action: 'insert',
+              });
+              if (searchResult && 'docId' in searchResult) {
+                const doc = std.collection.getDoc(searchResult.docId);
+                if (doc) {
+                  docId = doc.id;
+                  linkToDocId.set(op.attributes.link, doc.id);
+                }
+              }
+            }
+            if (docId) {
+              needToConvert.set(op, docId);
+            }
+          }
+        }
+        const delta = text.delta.map(op => {
+          if (needToConvert.has(op)) {
+            return {
+              ...op,
+              attributes: {
+                reference: {
+                  pageId: needToConvert.get(op),
+                  type: 'LinkedPage',
+                },
+              },
+              insert: ' ',
+            };
+          }
+          return {
+            ...op,
+          };
+        });
+        const model = std.doc.getBlockById(blockSnapshot.id);
+        if (model) {
+          std.spec
+            .getService('affine:page')
+            .telemetryService?.track('LinkedDocCreated', {
+              page: 'doc editor',
+              category: 'pasted link',
+              type: 'doc',
+              other: 'existing doc',
+            });
+          std.doc.captureSync();
+          std.doc.transact(() => {
+            const text = model.text as Text;
+            text.clear();
+            text.applyDelta(delta);
+          });
+        }
+      }
+    }
+  };
 }
 
 function flatNote(snapshot: SliceSnapshot) {
@@ -326,6 +410,7 @@ export const pasteMiddleware = (std: EditorHost['std']): JobMiddleware => {
       if (tr && payload.type === 'slice') {
         tr.pasted();
         tr.focusPasted();
+        tr.convertToLinkedDoc(std).catch(console.error);
       }
     });
   };

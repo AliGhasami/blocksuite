@@ -1,24 +1,25 @@
 import { WidgetElement } from '@blocksuite/block-std';
 import { offset, shift } from '@floating-ui/dom';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import { HoverController } from '../../../_common/components/hover/controller.js';
+import { isPeekable, peek } from '../../../_common/components/peekable.js';
 import { toast } from '../../../_common/components/toast.js';
 import { PAGE_HEADER_HEIGHT } from '../../../_common/consts.js';
 import { EdgelessModeIcon } from '../../../_common/icons/edgeless.js';
 import {
   CaptionIcon,
+  CenterPeekIcon,
   CopyIcon,
   DeleteIcon,
   DownloadIcon,
 } from '../../../_common/icons/text.js';
-import type { EdgelessModel } from '../../../_common/types.js';
 import { downloadBlob } from '../../../_common/utils/filesys.js';
-import {
-  type SurfaceRefBlockComponent,
-  type SurfaceRefBlockModel,
+import type {
+  SurfaceRefBlockComponent,
+  SurfaceRefBlockModel,
 } from '../../../surface-ref-block/index.js';
 import { edgelessToBlob, writeImageBlobToClipboard } from './utils.js';
 
@@ -206,6 +207,21 @@ function SurfaceRefToolbarOptions(options: {
         <affine-tooltip tip-position="top">Download</affine-tooltip>
       </icon-button>
 
+      ${isPeekable(blockElement)
+        ? html`<icon-button
+            size="32px"
+            ?hidden=${!hasValidReference}
+            @click=${() => {
+              peek(blockElement);
+            }}
+          >
+            ${CenterPeekIcon}
+            <affine-tooltip tip-position="top"
+              >Open in center peek</affine-tooltip
+            >
+          </icon-button>`
+        : nothing}
+
       <icon-button
         size="32px"
         ?hidden=${!hasValidReference}
@@ -213,7 +229,8 @@ function SurfaceRefToolbarOptions(options: {
           edgelessToBlob(blockElement.host, {
             surfaceRefBlock: blockElement,
             surfaceRenderer: blockElement.surfaceRenderer,
-            edgelessElement: blockElement.referenceModel as EdgelessModel,
+            edgelessElement:
+              blockElement.referenceModel as BlockSuite.EdgelessModelType,
             blockContainer: blockElement.portal,
           })
             .then(blob => {

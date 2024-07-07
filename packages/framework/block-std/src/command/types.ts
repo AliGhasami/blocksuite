@@ -6,7 +6,7 @@
 // type TestC = MakeOptionalIfEmpty<C>;  // { prop: string }
 import type { cmdSymbol } from './consts.js';
 
-type IfAllKeysOptional<T, Yes, No> =
+export type IfAllKeysOptional<T, Yes, No> =
   Partial<T> extends T ? (T extends Partial<T> ? Yes : No) : No;
 type MakeOptionalIfEmpty<T> = IfAllKeysOptional<T, void | T, T>;
 
@@ -30,7 +30,7 @@ export type Command<
 type Omit1<A, B> = [keyof Omit<A, keyof B>] extends [never]
   ? void
   : Omit<A, keyof B>;
-type InDataOfCommand<C> =
+export type InDataOfCommand<C> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   C extends Command<infer K, any, infer R> ? CommandKeyToData<K> & R : never;
 type OutDataOfCommand<C> =
@@ -39,11 +39,6 @@ type OutDataOfCommand<C> =
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type CommonMethods<In extends object = {}> = {
-  run(): [
-    result: boolean,
-    ctx: CommandKeyToData<Extract<keyof In, BlockSuite.CommandDataName>>,
-  ];
-  with<T extends Partial<BlockSuite.CommandContext>>(value: T): Chain<In & T>;
   inline: <InlineOut extends BlockSuite.CommandDataName = never>(
     command: Command<Extract<keyof In, BlockSuite.CommandDataName>, InlineOut>
   ) => Chain<In & CommandKeyToData<InlineOut>>;
@@ -53,6 +48,11 @@ type CommonMethods<In extends object = {}> = {
   tryAll: <InlineOut extends BlockSuite.CommandDataName = never>(
     fn: (chain: Chain<In>) => Chain<In & CommandKeyToData<InlineOut>>[]
   ) => Chain<In & CommandKeyToData<InlineOut>>;
+  run(): [
+    result: boolean,
+    ctx: CommandKeyToData<Extract<keyof In, BlockSuite.CommandDataName>>,
+  ];
+  with<T extends Partial<BlockSuite.CommandContext>>(value: T): Chain<In & T>;
 };
 
 type Cmds = {
@@ -67,6 +67,9 @@ export type Chain<In extends object = {}> = CommonMethods<In> & {
     >
   ) => Chain<In & OutDataOfCommand<BlockSuite.Commands[K]>>;
 } & Cmds;
+
+export type ExecCommandResult<K extends keyof BlockSuite.Commands> =
+  OutDataOfCommand<BlockSuite.Commands[K]>;
 
 declare global {
   namespace BlockSuite {

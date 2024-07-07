@@ -5,12 +5,12 @@ import { SharedPriorityTarget } from '../utils/async-queue.js';
 import { MANUALLY_STOP, throwIfAborted } from '../utils/throw-if-aborted.js';
 import { DocEngineStep, DocPeerStep } from './consts.js';
 import { type DocPeerStatus, SyncPeer } from './peer.js';
-import { type DocSource } from './source.js';
+import type { DocSource } from './source.js';
 
 export interface DocEngineStatus {
   step: DocEngineStep;
   main: DocPeerStatus | null;
-  shadow: (DocPeerStatus | null)[];
+  shadows: (DocPeerStatus | null)[];
   retrying: boolean;
 }
 
@@ -41,41 +41,44 @@ export interface DocEngineStatus {
  * 1. start main sync
  * 2. wait for main sync complete
  * 3. start shadow sync
- * 4. continuously sync main and shadow
+ * 4. continuously sync main and shadows
  */
 export class DocEngine {
   get rootDocId() {
     return this.rootDoc.guid;
   }
 
-  readonly onStatusChange = new Slot<DocEngineStatus>();
-  readonly priorityTarget = new SharedPriorityTarget();
-
-  private _status: DocEngineStatus;
-  private setStatus(s: DocEngineStatus) {
-    this.logger.debug(`syne-engine:${this.rootDocId} status change`, s);
-    this._status = s;
-    this.onStatusChange.emit(s);
-  }
   get status() {
     return this._status;
   }
 
+  private _status: DocEngineStatus;
+
   private _abort = new AbortController();
+
+  readonly onStatusChange = new Slot<DocEngineStatus>();
+
+  readonly priorityTarget = new SharedPriorityTarget();
 
   constructor(
     readonly rootDoc: Doc,
     readonly main: DocSource,
-    readonly shadow: DocSource[],
+    readonly shadows: DocSource[],
     readonly logger: Logger
   ) {
     this._status = {
       step: DocEngineStep.Stopped,
       main: null,
-      shadow: shadow.map(() => null),
+      shadows: shadows.map(() => null),
       retrying: false,
     };
     this.logger.debug(`syne-engine:${this.rootDocId} status init`, this.status);
+  }
+
+  private setStatus(s: DocEngineStatus) {
+    this.logger.debug(`syne-engine:${this.rootDocId} status change`, s);
+    this._status = s;
+    this.onStatusChange.emit(s);
   }
 
   start() {
@@ -121,7 +124,7 @@ export class DocEngine {
     this.setStatus({
       step: DocEngineStep.Stopped,
       main: null,
-      shadow: this.shadow.map(() => null),
+      shadows: this.shadows.map(() => null),
       retrying: false,
     });
   }
@@ -133,7 +136,7 @@ export class DocEngine {
       shadowPeers: (SyncPeer | null)[];
     } = {
       mainPeer: null,
-      shadowPeers: this.shadow.map(() => null),
+      shadowPeers: this.shadows.map(() => null),
     };
 
     const cleanUp: (() => void)[] = [];
@@ -159,7 +162,7 @@ export class DocEngine {
       await state.mainPeer.waitForLoaded(signal);
 
       // Step 3: start shadow sync peer
-      state.shadowPeers = this.shadow.map(shadow => {
+      state.shadowPeers = this.shadows.map(shadow => {
         const peer = new SyncPeer(
           this.rootDoc,
           shadow,
@@ -205,9 +208,9 @@ export class DocEngine {
     }
   }
 
-  updateSyncingState(local: SyncPeer | null, shadow: (SyncPeer | null)[]) {
+  updateSyncingState(local: SyncPeer | null, shadows: (SyncPeer | null)[]) {
     let step = DocEngineStep.Synced;
-    const allPeer = [local, ...shadow];
+    const allPeer = [local, ...shadows];
     for (const peer of allPeer) {
       if (!peer || peer.status.step !== DocPeerStep.Synced) {
         step = DocEngineStep.Syncing;
@@ -217,7 +220,7 @@ export class DocEngine {
     this.setStatus({
       step,
       main: local?.status ?? null,
-      shadow: shadow.map(peer => peer?.status ?? null),
+      shadows: shadows.map(peer => peer?.status ?? null),
       retrying: allPeer.some(
         peer => peer?.status.step === DocPeerStep.Retrying
       ),
@@ -250,7 +253,7 @@ export class DocEngine {
 
   async waitForLoadedRootDoc(abort?: AbortSignal) {
     function isLoadedRootDoc(status: DocEngineStatus) {
-      return ![status.main, ...status.shadow].some(
+      return ![status.main, ...status.shadows].some(
         peer => !peer || peer.step <= DocPeerStep.LoadingRootDoc
       );
     }
