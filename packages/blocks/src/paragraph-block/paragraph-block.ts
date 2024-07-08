@@ -1,7 +1,8 @@
 import '../_common/components/rich-text/rich-text.js';
 import '../_common/components/block-selection.js';
 
-import { BlockElement, getInlineRangeProvider, TextSelection } from "@blocksuite/block-std";
+import type { TextSelection } from '@blocksuite/block-std';
+import { BlockElement, getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import { type InlineRangeProvider } from '@blocksuite/inline';
 import { html, nothing, type TemplateResult } from 'lit';
@@ -52,7 +53,7 @@ export class ParagraphBlockComponent extends BlockElement<
   ParagraphBlockService
 > {
   static override styles = paragraphBlockStyles;
-  
+
   get inlineManager() {
     const inlineManager = this.service?.inlineManager;
     assertExists(inlineManager);
@@ -191,7 +192,7 @@ export class ParagraphBlockComponent extends BlockElement<
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
       (!this.selected && !isEmpty) ||
-      !isCollapsed ||
+      //!isCollapsed ||
       this._isInDatabase()
     ) {
       this._placeholderContainer.classList.remove('visible');
