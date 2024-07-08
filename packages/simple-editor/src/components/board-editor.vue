@@ -240,6 +240,16 @@ defineExpose({
 </script>
 
 <style lang="less">
+
+
+ /*.affine-block-children-container:not(:has(.with-drag-handle))
+    > affine-paragraph:last-child
+    .affine-paragraph-placeholder {
+    display: block;
+  }*/
+
+
+
 /* TODO ali ghasami for fix token */
 @prefix:~'vue-block-board-editor';
 .@{prefix}{

@@ -207,12 +207,12 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: date,
         action: ({ rootElement, model }) => {
           //old method
-          /*const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));*/
-          const triggerKey = '';
+          const date = new Date();
+          insertContent(rootElement.host, model, formatDate(date));
+          //todo fix ali ghasami
+          /*const triggerKey = '';
           insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
-          //todo fix ali ghasami
           //@ts-ignore
           const widgetEle = rootElement.widgetElements['affine-date-widget'];
           assertExists(widgetEle);
@@ -227,7 +227,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             assertExists(inlineEditor);
             mentionWidget.showMention(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
-          });
+          });*/
         },
       },
       {

@@ -85,36 +85,20 @@ export class ParagraphBlockComponent extends BlockComponent<
       !this.inlineEditor
     )
       return;
-    //console.log('this is ', this.host);
-    //const { selection: test, doc } = this.host;
-    //console.log('this is selection', test);
-    //console.log('22222222', test.value);
-    //const isEmpty = false;
-    //const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
-    //console.log('this is note', note.length);
-    /*const paragraphList = note.length ? note[0].children : [];
+    let isEmpty = false;
+    const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].yChildren : [];
     if (paragraphList.length == 1) {
       isEmpty = true;
-    }*/
-    const selection = this._currentTextSelection;
-    const isCollapsed = selection?.isCollapsed() ?? false;
-    //this.doc.readonly ||
-    //this.inlineEditor.yTextLength > 0 ||
-    //this.inlineEditor.isComposing ||
-    //(!this.selected && !isEmpty) ||
-    //!isCollapsed ||
-    //this._isInDatabase()
-    //this.doc.readonly ||
-    //this.inlineEditor.yTextLength > 0 ||
-    //this.inlineEditor.isComposing ||
-    ///(!this.selected && !isEmpty) || !isCollapsed || this._isInDatabase();
+    }
+    //const selection = this._currentTextSelection;
+    //const isCollapsed = selection?.isCollapsed() ?? false;
     if (
       this.doc.readonly ||
       this.inlineEditor.yTextLength > 0 ||
       this.inlineEditor.isComposing ||
-      !this.selected ||
-      //(!this.selected && !isEmpty) ||
-      !isCollapsed ||
+      (!this.selected && !isEmpty) || //!this.selected
+      //!isCollapsed ||
       this._isInDatabase()
     ) {
       this._placeholderContainer.classList.remove('visible');

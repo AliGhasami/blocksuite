@@ -19,6 +19,7 @@ import { EmbedLoomBlockSchema } from './embed-loom-block/embed-loom-schema.js';
 import { EmbedSyncedDocBlockSchema } from './embed-synced-doc-block/embed-synced-doc-schema.js';
 import { EmbedYoutubeBlockSchema } from './embed-youtube-block/embed-youtube-schema.js';
 import { FrameBlockSchema } from './frame-block/frame-model.js';
+import { HintBlockSchema } from './hint-block/hint-model.js';
 import { ImageBlockSchema } from './image-block/image-model.js';
 import { ListBlockSchema } from './list-block/list-model.js';
 import { NoteBlockSchema } from './note-block/note-model.js';
@@ -51,4 +52,5 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   EmbedSyncedDocBlockSchema,
   EmbedLoomBlockSchema,
   EdgelessTextBlockSchema,
+  HintBlockSchema,
 ];

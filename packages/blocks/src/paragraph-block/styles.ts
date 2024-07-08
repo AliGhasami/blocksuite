@@ -81,7 +81,7 @@ export const paragraphBlockStyles = css`
     font-size: calc(var(--affine-font-base) - 2px);
   }
 
-  .quote {
+  .claytap-quote {
     line-height: 26px;
     padding-left: 17px;
     margin-top: var(--affine-paragraph-space);
@@ -89,7 +89,7 @@ export const paragraphBlockStyles = css`
     padding-bottom: 10px;
     position: relative;
   }
-  .quote::after {
+  .claytap-quote::after {
     content: '';
     width: 2px;
     height: calc(100% - 20px);
@@ -124,10 +124,15 @@ export const paragraphBlockStyles = css`
     display: block;
   }
 
-  /*.affine-block-children-container:not(:has(.selected))
+  /* .affine-block-children-container:not(:has(.selected))
     > affine-paragraph:last-child
     .affine-paragraph-placeholder {
     display: block;
+  }*/
+
+  /* .affine-block-children-container > affine-paragraph:last-child {
+    //background: red;
+    display: none;
   }*/
 
   @media print {

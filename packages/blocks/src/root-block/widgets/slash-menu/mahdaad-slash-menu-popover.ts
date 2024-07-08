@@ -12,7 +12,10 @@ import {
   cleanSpecifiedTail,
   createKeydownObserver,
 } from '../../../_common/components/utils.js';
-import { getRichTextByModel } from '../../../_common/utils/index.js';
+import {
+  getInlineEditorByModel,
+  getRichTextByModel,
+} from '../../../_common/utils/index.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { RootBlockComponent } from '../../../root-block/types.js';
 import type {
@@ -95,6 +98,13 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     // Need to remove the search string
     // We must to do clean the slash string before we do the action
     // Otherwise, the action may change the model and cause the slash string to be changed
+
+    /*cleanSpecifiedTail(
+      this.host,
+      this.context.model,
+      this.triggerKey + this._query
+    );*/
+    //console.log('1111', this.triggerKey + this._searchString);
     cleanSpecifiedTail(
       this.host,
       this.context.model,
@@ -191,16 +201,22 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     });
     this._filterItems = this._updateItem('');
 
-    const richText = getRichTextByModel(this.host, this.model);
+    const inlineEditor = getInlineEditorByModel(
+      this.context.rootElement.host,
+      this.context.model
+    );
+    assertExists(inlineEditor, 'RichText InlineEditor not found');
+
+    /*const richText = getRichTextByModel(this.host, this.model);
     if (!richText) {
       console.warn(
         'Slash Menu may not work properly! No rich text found for model',
         this.model
       );
       return;
-    }
-    const inlineEditor = richText.inlineEditor;
-    assertExists(inlineEditor, 'RichText InlineEditor not found');
+    }*/
+    //const inlineEditor = richText.inlineEditor;
+    //assertExists(inlineEditor, 'RichText InlineEditor not found');
 
     /**
      * Handle arrow key
@@ -216,19 +232,20 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       target: inlineEditor.eventSource,
       inlineEditor,
       abortController: this.abortController,
-      interceptor: (e, next) => {
-        if (e.key === '/') {
+      interceptor: (event, next) => {
+        const { key } = event;
+        if (key === '/') {
           // Can not stopPropagation here,
           // otherwise the rich text will not be able to trigger a new the slash menu
           return;
         }
-        if (this._hide && e.key !== 'Backspace') {
+        if (this._hide && key !== 'Backspace') {
           // if the following key is not the backspace key,
           // the slash menu will be closed
           this.abortController.abort();
           return;
         }
-        if (e.key === ' ') {
+        if (key === ' ') {
           this._hide = true;
           next();
           return;
@@ -263,7 +280,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
         }
       },
       onMove: step => {
-        //console.log('this is move');
         const configLen = this._filterItems.length;
         /*if (this._leftPanelActivated) {
           const groupNames = collectGroupNames(this._filterItems);
@@ -330,7 +346,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       this._leftPanelActivated = false;
     }*/
     const searchStr = this._searchString.toLowerCase();
-    //console.log('this is options', this.options);
     /*let allMenus = this.options.menus
       .map(group =>
         typeof group.items === 'function'
@@ -340,7 +355,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
           : group.items.map(item => ({ ...item, groupName: group.name }))
       )
       .flat();*/
-    //console.log('this is all menu', allMenus);
     /*allMenus = allMenus.filter(({ showWhen = () => true }) =>
       showWhen(this.model, this.rootElement)
     );*/
@@ -392,8 +406,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       : styleMap({
           visibility: 'hidden',
         });
-
-    //console.log('1111', this._filterItems);
 
     /* const btnItems = this._filterItems.map(
       ({ name, icon, suffix, disabled = false, groupName }, index) => {

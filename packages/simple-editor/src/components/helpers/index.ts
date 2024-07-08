@@ -8,7 +8,7 @@ export function createEmptyDoc(isBoard:boolean=false) {
   const collection = new DocCollection({ schema });
   collection.meta.initialize();
   //collection.
-  const doc = collection.createDoc({ id: 'page1' });
+  const doc = collection.createDoc();//{ id: 'page1' }
   //console.log( await collection.importDocSnapshot(data,'11111125'))
   /*collection.importDocSnapshot(data,'11111125').then(()=>{
     console.log("1111")
