@@ -62,7 +62,7 @@ export const PageRootBlockSpec: BlockSpec<PageRootBlockWidgetName> = {
         AFFINE_VIEWPORT_OVERLAY_WIDGET
       )}`,
       [AFFINE_MENTION_WIDGET]: literal`${unsafeStatic(AFFINE_MENTION_WIDGET)}`,
-      [AFFINE_DATE_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_WIDGET)}`,
+      //[AFFINE_DATE_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_WIDGET)}`,
     },
   },
 };
