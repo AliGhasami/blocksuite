@@ -109,14 +109,14 @@ export const getQuickTools = ({
   //     `,
   //   });
   // }
-
+  // TODO: hidden feature
   // Link
-  quickTools.push({
-    content: html`<edgeless-link-tool-button
-      .edgeless=${edgeless}
-    ></edgeless-link-tool-button>`,
-    menu: buildLinkDenseMenu(edgeless),
-  });
+  // quickTools.push({
+  //   content: html`<edgeless-link-tool-button
+  //     .edgeless=${edgeless}
+  //   ></edgeless-link-tool-button>`,
+  //   menu: buildLinkDenseMenu(edgeless),
+  // });
   return quickTools;
 };
 
@@ -181,13 +181,13 @@ export const getSeniorTools = ({
   //     .edgeless=${edgeless}
   //   ></edgeless-image-tool-button>`,
   // });
-
+  // TODO: hidden feature
   // Template
-  tools.push({
-    name: 'Template',
-    content: html`<edgeless-template-button .edgeless=${edgeless}>
-    </edgeless-template-button>`,
-  });
+  // tools.push({
+  //   name: 'Template',
+  //   content: html`<edgeless-template-button .edgeless=${edgeless}>
+  //   </edgeless-template-button>`,
+  // });
 
   return tools;
 };

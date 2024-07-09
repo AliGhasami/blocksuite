@@ -475,7 +475,8 @@ export class EdgelessAutoConnectWidget extends WidgetElement<
 
   private _EdgelessOnlyLabels() {
     const { _edgelessOnlyNotesSet } = this;
-
+    // TODO: hidden feature
+    return nothing;
     if (!_edgelessOnlyNotesSet.size) return nothing;
 
     return html`${repeat(

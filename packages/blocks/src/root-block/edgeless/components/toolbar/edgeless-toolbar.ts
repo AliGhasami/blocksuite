@@ -638,8 +638,8 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
         >
           <smooth-corner
             class="edgeless-toolbar-smooth-corner"
-            .borderRadius=${16}
-            .smooth=${0.7}
+            .borderRadius=${8}
+            .smooth=${0.3}
             .borderWidth=${1}
             .bgColor=${'var(--affine-background-overlay-panel-color)'}
             .borderColor=${'var(--affine-border-color)'}

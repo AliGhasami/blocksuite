@@ -3,11 +3,8 @@ import './note-menu.js';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import {
-  Heading1Icon,
-  LinkIcon,
-  TextIcon,
-} from '../../../../../_common/icons/text.js';
+import { FileIcon } from '../../../../../_common/icons/index.js';
+import { Heading1Icon, TextIcon } from '../../../../../_common/icons/text.js';
 import type { NoteTool } from '../../../controllers/tools/note-tool.js';
 import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../auto-complete/utils.js';
 import { getTooltipWithShortcut } from '../../utils.js';
@@ -154,7 +151,6 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
       tip,
     });
     const menu = this.createPopper('edgeless-note-menu', this);
-
     Object.assign(menu.element, {
       edgeless,
       childFlavour,
@@ -214,7 +210,7 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
         style="--paper-bg: var(${_noteBg})"
       >
         <div class="paper">${toShapeNotToAdapt}</div>
-        <div class="edgeless-toolbar-note-icon link">${LinkIcon}</div>
+        <div class="edgeless-toolbar-note-icon link">${FileIcon}</div>
         <div class="edgeless-toolbar-note-icon heading">${Heading1Icon}</div>
         <div class="edgeless-toolbar-note-icon text">${TextIcon}</div>
       </div>

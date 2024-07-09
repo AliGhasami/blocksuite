@@ -292,7 +292,8 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       REORDER_ACTIONS,
       this.getOpenActions(),
       [...COPY_ACTIONS, this.getRefreshAction()],
-      [this.getLinkedDocAction()],
+      // TODO: hidden feature
+      // [this.getLinkedDocAction()],
       [DELETE_ACTION],
     ];
   }
@@ -301,7 +302,8 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     return [
       [FRAME_ACTION],
       COPY_ACTIONS,
-      [this.getLinkedDocAction()],
+      // TODO: hidden feature
+      // [this.getLinkedDocAction()],
       [DELETE_ACTION],
     ];
   }
@@ -445,19 +447,20 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       segment: 'toolbar',
       type: 'embed-linked-doc',
     });
-    this.edgeless.service.telemetryService?.track('DocCreated', {
-      control: 'create linked doc',
-      page: 'whiteboard editor',
-      module: 'format toolbar',
-      type: 'embed-linked-doc',
-    });
-    this.edgeless.service.telemetryService?.track('LinkedDocCreated', {
-      control: 'create linked doc',
-      page: 'whiteboard editor',
-      module: 'format toolbar',
-      type: 'embed-linked-doc',
-      other: 'new doc',
-    });
+    // TODO: hidden feature
+    // this.edgeless.service.telemetryService?.track('DocCreated', {
+    //   control: 'create linked doc',
+    //   page: 'whiteboard editor',
+    //   module: 'format toolbar',
+    //   type: 'embed-linked-doc',
+    // });
+    // this.edgeless.service.telemetryService?.track('LinkedDocCreated', {
+    //   control: 'create linked doc',
+    //   page: 'whiteboard editor',
+    //   module: 'format toolbar',
+    //   type: 'embed-linked-doc',
+    //   other: 'new doc',
+    // });
     // delete selected elements
     this.doc.transact(() => {
       deleteElements(this.surface, elements);

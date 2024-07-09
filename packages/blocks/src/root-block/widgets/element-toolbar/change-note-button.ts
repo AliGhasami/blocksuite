@@ -235,7 +235,9 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     const isDocOnly = displayMode === NoteDisplayMode.DocOnly;
 
     const buttons = [
-      onlyOne
+      // TODO: hidden feature
+      // onlyOne
+      false
         ? html`
             <span class="display-mode-button-label">Show in</span>
             <edgeless-menu-button

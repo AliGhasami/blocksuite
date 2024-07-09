@@ -354,7 +354,7 @@ defineExpose({
   /* paragraph Style */
   .claytap-text{
     //background-color: red;
-   @apply text-neutral-8 mt-body;
+   @apply text-neutral-8 ;//mt-body
     line-height: unset;
   }
 

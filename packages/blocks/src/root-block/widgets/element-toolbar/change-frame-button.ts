@@ -103,7 +103,9 @@ export class EdgelessChangeFrameButton extends WithDisposable(LitElement) {
 
     return join(
       [
-        onlyOne
+        // TODO: hidden feature
+        // onlyOne
+        false
           ? html`
               <edgeless-tool-icon-button
                 arai-label=${'Insert into Page'}

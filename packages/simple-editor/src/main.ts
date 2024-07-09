@@ -5,7 +5,8 @@ import 'virtual:uno.css'
 import App from './App.vue'
 import router from './router'
 import {defineCssVars} from "@mahdaad/tokens";
-import '@mahdaad/tokens/dist/index.css'
+// TODO: hidden feature
+//import '@mahdaad/tokens/dist/index.css'
 
 const app = createApp(App)
 //app.config.compilerOptions.isCustomElement = (tag) => tag.includes('-')

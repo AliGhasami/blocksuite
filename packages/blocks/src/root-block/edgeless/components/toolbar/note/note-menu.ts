@@ -129,6 +129,16 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
 
   override render() {
     const { childType } = this;
+    // TODO: hidden feature
+    // <edgeless-tool-icon-button
+    //   .activeMode=${'background'}
+    //   .tooltip=${getTooltipWithShortcut('Link', '@')}
+    //   @click=${() => {
+    //     this._onHandleLinkButtonClick();
+    //   }}
+    // >
+    //   ${LinkIcon}
+    // </edgeless-tool-icon-button>
 
     return html`
       <edgeless-slide-menu>
@@ -142,16 +152,6 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               .disabled=${this._imageLoading}
             >
               ${ImageIcon}
-            </edgeless-tool-icon-button>
-
-            <edgeless-tool-icon-button
-              .activeMode=${'background'}
-              .tooltip=${getTooltipWithShortcut('Link', '@')}
-              @click=${() => {
-                this._onHandleLinkButtonClick();
-              }}
-            >
-              ${LinkIcon}
             </edgeless-tool-icon-button>
 
             <edgeless-tool-icon-button

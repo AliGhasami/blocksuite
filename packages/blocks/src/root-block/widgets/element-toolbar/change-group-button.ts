@@ -81,7 +81,9 @@ export class EdgelessChangeGroupButton extends WithDisposable(LitElement) {
 
     return join(
       [
-        onlyOne
+        // TODO: hidden feature
+        // onlyOne
+        false
           ? html`
               <edgeless-tool-icon-button
                 aria-label="Insert into Page"
