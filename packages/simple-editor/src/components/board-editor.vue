@@ -7,8 +7,15 @@
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css';
 import { PageEditor ,EdgelessEditor} from '@blocksuite/presets';
-import {createEmptyDoc} from './helpers'
-import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
+import { createEmptyDoc, initDefaultDocCollection } from "./helpers";
+import {
+  type BlockCollection,
+  type BlockModel,
+  Doc,
+  DocCollection,
+  type DocCollectionOptions,
+  Job
+} from "@blocksuite/store";
 import { defineCustomElement, onMounted, ref, watch } from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css';
@@ -17,6 +24,9 @@ let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
 import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
 import DatePickerComponent from '@/components/web-component/DatePicker.ce.vue'
+import { createDefaultDocCollection, initCollaborate } from "@/utils/websocket";
+import { IndexedDBBlobSource } from "@blocksuite/sync";
+import { assertExists } from "@blocksuite/global/utils";
 
 //TODO ali ghasami for add function add and check web component
 const SelectHintType = defineCustomElement(SelectHintTypeComponent)
@@ -176,8 +186,30 @@ watch(()=>props.mentionUserList,()=>{
   updateMentionList()
 },{deep:true})
 
-function init(){
-  const {doc,collection} = createEmptyDoc(props.isBoardView).init();
+
+
+async function init(){
+  const collection = await createDefaultDocCollection();
+  await initDefaultDocCollection(collection);
+  const blockCollection = collection.docs.values().next()
+    .value as BlockCollection;
+  assertExists(blockCollection, 'Need to create a doc first');
+  const doc = blockCollection.getDoc();
+  // const [docSources, awarenessSources] = await initCollaborate()
+  // const {doc,collection} = createEmptyDoc(props.isBoardView,{
+  //   id: 'quickEdgeless',
+  //   blobSources: {
+  //     main: new IndexedDBBlobSource('quickEdgeless'),
+  //   },
+  //   defaultFlags: {
+  //     enable_synced_doc_block: true,
+  //     enable_pie_menu: true,
+  //     enable_lasso_tool: true,
+  //   },
+  //   docSources,
+  //   awarenessSources
+  // } ).init();
+  // await initDefaultDocCollection(collection)
   myCollection= collection
   currentDocument=doc
   //myNoteId=noteId
@@ -192,6 +224,7 @@ function init(){
   /*if(refEditor.value){
     refEditor.value.appendChild(editor);
   }*/
+
   bindEvent(doc)
   updateMentionList()
 }

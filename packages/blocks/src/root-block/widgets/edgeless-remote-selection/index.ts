@@ -173,7 +173,6 @@ export class EdgelessRemoteSelectionWidget extends WidgetElement<
     const remoteCursors: EdgelessRemoteSelectionWidget['_remoteCursors'] =
       new Map();
     const status = this.doc.awarenessStore.getStates();
-
     this.selection.remoteCursorSelectionMap.forEach(
       (cursorSelection, clientId) => {
         remoteCursors.set(clientId, {
@@ -252,7 +251,6 @@ export class EdgelessRemoteSelectionWidget extends WidgetElement<
           })}
         ></div>`
     );
-
     const cursors = repeat(
       _remoteCursors.entries(),
       value => value[0],

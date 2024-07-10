@@ -4,6 +4,7 @@ import { initCollection } from './utils';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error';
 
+
 export class Provider {
   metaWs: WebsocketProvider;
   docWs: WebsocketProvider | null = null;

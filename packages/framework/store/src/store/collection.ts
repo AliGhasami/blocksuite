@@ -89,7 +89,6 @@ export class DocCollection extends DocCollectionAddonType {
     this._schema = options.schema;
 
     this._store = new Store(options);
-
     this.meta = new DocCollectionMeta(this.doc);
     this._bindDocMetaEvents();
   }
