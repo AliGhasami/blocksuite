@@ -159,6 +159,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               return next();
             })
             .run();
+
+          //rootElement.doc.addBlock('affine:paragraph', {}, parent);
         },
       },
       {
@@ -277,8 +279,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: image,
         action: async ({ rootElement, model }) => {
+          //old method
           const parent = rootElement.doc.getParent(model);
-          console.log('1111', parent);
           if (!parent) {
             return;
           }
@@ -294,6 +296,25 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           );
           tryRemoveEmptyLine(model);
           rootElement.doc.addBlock('affine:paragraph', {}, parent);
+
+          /*const parent = rootElement.doc.getParent(model);
+          if (!parent) {
+            return;
+          }
+
+          const imageFiles = await getImageFilesFromLocal();
+          if (!imageFiles.length) return;
+
+          const imageService = rootElement.host.spec.getService('affine:image');
+          const maxFileSize = imageService.maxFileSize;
+
+          addSiblingImageBlock(
+            rootElement.host,
+            imageFiles,
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);*/
         },
       },
       /* {

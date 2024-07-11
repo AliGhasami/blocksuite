@@ -8,6 +8,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 import { BlockComponent } from '../_common/components/block-component.js';
 import { Peekable } from '../_common/components/index.js';
+import { getStorageURL } from '../_common/upload.js';
 import { Bound } from '../surface-block/utils/bound.js';
 import type { ImageBlockEdgelessComponent } from './components/edgeless-image-block.js';
 import type { AffineImageCard } from './components/image-card.js';
@@ -88,6 +89,13 @@ export class ImageBlockComponent extends BlockComponent<
   @state()
   accessor lastSourceId!: string;
 
+  get src() {
+    if (!this.model.src?.startsWith('blob')) {
+      return `${getStorageURL()}${this.model.src}`;
+    }
+    return this.model.src;
+  }
+
   private _selectBlock() {
     const selectionManager = this.host.selection;
     const blockSelection = selectionManager.create('block', {
@@ -135,7 +143,7 @@ export class ImageBlockComponent extends BlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    this.refreshData();
+    //this.refreshData();
 
     this.contentEditable = 'false';
 
@@ -148,7 +156,7 @@ export class ImageBlockComponent extends BlockComponent<
 
     this.model.propsUpdated.on(({ key }) => {
       if (key === 'sourceId') {
-        this.refreshData();
+        //this.refreshData();
       }
     });
   }
@@ -182,7 +190,7 @@ export class ImageBlockComponent extends BlockComponent<
         transformOrigin: 'center',
       });
     }
-
+    console.log('this is src', this.src);
     return html`
       <div
         class="affine-image-container"
@@ -195,7 +203,7 @@ export class ImageBlockComponent extends BlockComponent<
             ></affine-image-block-card>`
           : this.isInSurface
             ? html`<affine-edgeless-image
-                .url=${this.blobUrl}
+                .url=${this.src}
                 @error=${(_: CustomEvent<Error>) => {
                   this.error = true;
                 }}

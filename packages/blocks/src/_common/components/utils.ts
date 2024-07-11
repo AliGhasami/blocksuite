@@ -216,7 +216,7 @@ export function cleanSpecifiedTail(
   inlineEditorOrModel: AffineInlineEditor | BlockModel,
   str: string
 ) {
-  console.log('333333', str);
+  //console.log('333333', str);
   if (!str) {
     console.warn('Failed to clean text! Unexpected empty string');
     return;

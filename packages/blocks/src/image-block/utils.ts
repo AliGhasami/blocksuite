@@ -2,6 +2,7 @@ import type { EditorHost } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
+import { uploadFile } from '../_common/upload.js';
 import { downloadBlob, withTempBlobData } from '../_common/utils/filesys.js';
 import { humanFileSize } from '../_common/utils/math.js';
 import type { AttachmentBlockProps } from '../attachment-block/attachment-model.js';
@@ -33,13 +34,24 @@ export async function uploadBlobForImage(
   if (isImageUploading(blockId)) {
     throw new Error('The image is already uploading!');
   }
-  setImageUploading(blockId);
+  //setImageUploading(blockId);
   const doc = editorHost.doc;
-  let sourceId: string | undefined;
-
+  //let sourceId: string | undefined;
+  const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
+  console.log('aaaa', imageModel);
+  assertExists(imageModel);
   try {
-    setImageUploaded(blockId);
-    sourceId = await doc.blobSync.set(blob);
+    //setImageUploaded(blockId);
+    //sourceId = await doc.blobSync.set(blob);
+
+    const { data } = await uploadFile(blob);
+    console.log('111111', data.data.storage);
+    doc.withoutTransact(() => {
+      doc.updateBlock(imageModel, {
+        src: `${data.data.storage}`,
+        // blobUrl: '1111',
+      } satisfies Partial<ImageBlockProps>);
+    });
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -49,7 +61,7 @@ export async function uploadBlobForImage(
       );
     }
   } finally {
-    setImageUploaded(blockId);
+    /*setImageUploaded(blockId);
 
     const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
     assertExists(imageModel);
@@ -58,7 +70,7 @@ export async function uploadBlobForImage(
       doc.updateBlock(imageModel, {
         sourceId,
       } satisfies Partial<ImageBlockProps>);
-    });
+    });*/
   }
 }
 
@@ -301,6 +313,7 @@ export function addSiblingImageBlock(
     }[] = imageFiles.map(file => ({
     flavour: 'affine:image',
     size: file.size,
+    src: URL.createObjectURL(file),
   }));
 
   const doc = editorHost.doc;

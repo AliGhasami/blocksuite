@@ -159,7 +159,7 @@ export class AttachmentBlockComponent extends BlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    this.refreshData();
+    //this.refreshData();
 
     this.contentEditable = 'false';
 
@@ -181,7 +181,7 @@ export class AttachmentBlockComponent extends BlockComponent<
           URL.revokeObjectURL(this.blobUrl);
           this.blobUrl = undefined;
         }
-        this.refreshData();
+        //this.refreshData();
       }
     });
 
