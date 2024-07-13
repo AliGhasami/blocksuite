@@ -253,6 +253,28 @@ defineExpose({
 /* TODO ali ghasami for fix token */
 @prefix:~'vue-block-board-editor';
 .@{prefix}{
+
+  *{
+    font-family: unset;
+  }
+
+  edgeless-block-portal-edgeless-text *{
+    //font-family:inherit
+    //color:red;
+
+    .claytap-h1{
+      /*color:green;*/
+      font-family: unset;
+    }
+
+    .claytap-text{
+      font-family: unset;
+      //color:green
+    }
+
+  }
+
+
   .place-holder{
   @apply text-neutral-4 mt-body;
     line-height: unset;

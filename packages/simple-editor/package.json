@@ -1,7 +1,10 @@
 {
-  "name": "alighasami_vue-block-editor",
-  "version": "0.1.0",
+  "name": "@mahdaad/block-editor",
+  "version": "0.1.1",
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "files": [
     "dist",
