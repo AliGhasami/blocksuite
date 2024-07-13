@@ -4,7 +4,9 @@ import { createPinia } from 'pinia'
 import 'virtual:uno.css'
 import App from './App.vue'
 import router from './router'
+import '@mahdaad/tokens/dist/index.css';
 import {defineCssVars} from "@mahdaad/tokens";
+
 // TODO: hidden feature
 //import '@mahdaad/tokens/dist/index.css'
 

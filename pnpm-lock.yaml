@@ -581,8 +581,8 @@ importers:
   packages/simple-editor:
     dependencies:
       '@mahdaad/tokens':
-        specifier: ^0.0.30
-        version: 0.0.30
+        specifier: ^0.0.36
+        version: 0.0.36
       '@unhead/vue':
         specifier: ^1.9.5
         version: 1.9.15(vue@3.4.31(typescript@5.4.5))
@@ -1602,8 +1602,8 @@ packages:
   '@lit/reactive-element@2.0.4':
     resolution: {integrity: sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ==}
 
-  '@mahdaad/tokens@0.0.30':
-    resolution: {integrity: sha512-s7/ChwMuXCDg4tROH40/poxlvXbDVKIrXXjbVrvkJgqNTSzmhYGniFrnOK1o42g4Bi/HUiY3e7LlUyE3F9LoOw==}
+  '@mahdaad/tokens@0.0.36':
+    resolution: {integrity: sha512-OMO8Y+dC8/ZpxRVLyA3RnS7lGrCaHrLrsHjKRHv/gTfMbNXj1ROby8TTItspQtjivdm+8/V+DHebnP0gJPG+Ig==}
 
   '@microsoft/api-extractor-model@7.28.13':
     resolution: {integrity: sha512-39v/JyldX4MS9uzHcdfmjjfS6cYGAoXV+io8B5a338pkHiSt+gy2eXQ0Q7cGFJ7quSa1VqqlMdlPrB6sLR/cAw==}
@@ -7315,7 +7315,7 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.2.0
 
-  '@mahdaad/tokens@0.0.30':
+  '@mahdaad/tokens@0.0.36':
     dependencies:
       mitt: 3.0.1
       tinycolor2: 1.6.0

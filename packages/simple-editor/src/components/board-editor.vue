@@ -242,6 +242,7 @@ defineExpose({
 <style lang="less">
 
 
+
  /*.affine-block-children-container:not(:has(.with-drag-handle))
     > affine-paragraph:last-child
     .affine-paragraph-placeholder {
@@ -250,26 +251,63 @@ defineExpose({
 
 
 
+ /*rich-text *{
+   color:red;
+   //font-family: var(--base-font-family), tahoma, serif;
+   font-family: "blocksuite:surface:Poppins";
+ }*/
+
+
+
+
+
 /* TODO ali ghasami for fix token */
 @prefix:~'vue-block-board-editor';
 .@{prefix}{
 
-  *{
-    font-family: unset;
+  /**{
+    font-family: "blocksuite:surface:Poppins";
+  }*/
+
+ /* edgeless-shape-text-editor *{
+    font-family: unset !important;
   }
+*/
+
+
+
+  rich-text *{
+    font-family: unset;
+   //color:red;
+   //font-family: var(--base-font-family), tahoma, serif;
+    //font-size: 20px;
+   //font-family: "blocksuite:surface:Poppins";
+ }
+
+
+  /**{
+    font-family: unset;
+  }*/
+
+  /**{
+    font-family:"blocksuite:surface:Poppins"  !important;
+  }*/
+
+
+
+  /**{
+    font-family:"blocksuite:surface:Poppins"  !important;
+  }*/
+
 
   edgeless-block-portal-edgeless-text *{
-    //font-family:inherit
-    //color:red;
 
     .claytap-h1{
-      /*color:green;*/
       font-family: unset;
     }
 
     .claytap-text{
       font-family: unset;
-      //color:green
     }
 
   }

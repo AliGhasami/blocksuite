@@ -60,6 +60,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
     | undefined = undefined;
 
   private _updateElementWH() {
+    //debugger;
     const bcr = this.richText.getBoundingClientRect();
     const containerHeight = this.richText.offsetHeight;
     const containerWidth = this.richText.offsetWidth;
@@ -106,6 +107,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
   }
 
   private _unmount() {
+    //debugger;
     this._resizeObserver?.disconnect();
     this._resizeObserver = null;
 
