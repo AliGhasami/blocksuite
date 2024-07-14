@@ -221,6 +221,7 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
         });
       },
       showWhen: chain => {
+        return false;
         const [_, ctx] = chain
           .getSelectedModels({
             types: ['block', 'text'],

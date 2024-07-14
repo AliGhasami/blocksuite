@@ -54,11 +54,9 @@ export class ParagraphBlockService<
       return html`<div class="affine-paragraph-placeholder-content">
         <div>
           <span class="place-holder">
-            Press
-            <span class="short-code">@</span>
-            for AI &
+            Start typing or Press
             <span class="short-code">/</span>
-            for Commands ...
+            for block types ...
           </span>
         </div>
         <!-- TODO ali ghasami  -->

@@ -265,6 +265,10 @@ defineExpose({
 @prefix:~'vue-block-board-editor';
 .@{prefix}{
 
+  .affine-menu-action-text{
+    @apply text-gray-8;
+  }
+
   /**{
     font-family: "blocksuite:surface:Poppins";
   }*/
@@ -276,14 +280,14 @@ defineExpose({
 
 
 
-  rich-text *{
+ /* rich-text *{
     font-family: unset;
    //color:red;
    //font-family: var(--base-font-family), tahoma, serif;
     //font-size: 20px;
    //font-family: "blocksuite:surface:Poppins";
  }
-
+*/
 
   /**{
     font-family: unset;
@@ -314,12 +318,22 @@ defineExpose({
 
 
   .place-holder{
-  @apply text-neutral-4 mt-body;
+  @apply flex items-center gap-1 text-neutral-4 mt-body;
     line-height: unset;
     transition: all 0.3s ease-in-out;
     .short-code{
+      font-size: 10px;
+     /* border-radius: 4px;
+      @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;*/
       border-radius: 4px;
-      @apply bg-neutral-1 p-1 w-6 h-6 inline-flex items-center justify-center;
+      border: 1px solid @neutral-3;
+      background: @gray-0; // var(----mt-kbd-bg, #FFF);
+      border-bottom: 3px solid @neutral-4;
+      width: @size-5;
+      height: @size-5;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 
