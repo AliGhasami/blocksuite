@@ -103,7 +103,7 @@ const options = [
 </script>
 
 <style lang="less">
-
+@import '../css/override';
 /* TODO Ali Ghasami for fix variable and convert to token   **/
 .SelectTrigger{
   cursor: pointer;

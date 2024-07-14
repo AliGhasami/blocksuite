@@ -15,7 +15,7 @@ import 'tippy.js/dist/tippy.css';
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
-import SelectHintTypeComponent from '@/components/web-component/SelectHintType.ce.vue'
+import SelectHintTypeComponent from '@/components/web-component/SelectHintType/SelectHintType.ce.vue'
 import DatePickerComponent from '@/components/web-component/DatePicker.ce.vue'
 
 //TODO ali ghasami for add function add and check web component
@@ -264,6 +264,9 @@ defineExpose({
 /* TODO ali ghasami for fix token */
 @prefix:~'vue-block-board-editor';
 .@{prefix}{
+
+
+
 
   .affine-menu-action-text{
     @apply text-gray-8;
@@ -556,15 +559,41 @@ defineExpose({
 }
 
 
+ .fill-gray-0{
+   fill:@gray-0;
+ }
 
-/* TOdo ali ghasami for fix style **/
-.tippy-box{
-  @apply bg-white shadow-floated text-black;
-  //color:red;
+ .fill-ocean-1{
+   fill:@ocean-1;
+ }
+
+ .fill-ocean-8{
+   fill:@ocean-8;
+ }
+ .fill-ocean-5{
+   fill:@ocean-5;
+ }
+
+
+ .stroke-gray-0{
+   stroke:@gray-0;
+ }
+
+ .stroke-ocean-1{
+   stroke:@ocean-1;
+ }
+
+ .stroke-ocean-5{
+   stroke:@ocean-5;
+ }
+
+
+
+.tippy-box[data-theme="block-editor"]{
+  @apply bg-gray-0 shadow-floated  text-gray-8;
   border-radius: @roundness-3;
   position: relative;
 }
-
 
 /*//.slash-menu,
 !*.popover-menu{
