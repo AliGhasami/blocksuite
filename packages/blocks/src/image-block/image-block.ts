@@ -190,7 +190,6 @@ export class ImageBlockComponent extends BlockComponent<
         transformOrigin: 'center',
       });
     }
-    console.log('this is src', this.src);
     return html`
       <div
         class="affine-image-container"

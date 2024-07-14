@@ -38,14 +38,12 @@ export async function uploadBlobForImage(
   const doc = editorHost.doc;
   //let sourceId: string | undefined;
   const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
-  console.log('aaaa', imageModel);
   assertExists(imageModel);
   try {
     //setImageUploaded(blockId);
     //sourceId = await doc.blobSync.set(blob);
 
     const { data } = await uploadFile(blob);
-    console.log('111111', data.data.storage);
     doc.withoutTransact(() => {
       doc.updateBlock(imageModel, {
         src: `${data.data.storage}`,

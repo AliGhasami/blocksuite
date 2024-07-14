@@ -138,8 +138,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Hint',
         description: 'Description',
         icon: hint,
-        action: ({ rootElement }) => {
+        action: ({ rootElement, model }) => {
           //console.log('rootElement', rootElement);
+          console.log('rootElement', rootElement);
+          console.log('model', model);
           rootElement.host.std.command
             .chain()
             .updateBlockType({
@@ -159,7 +161,27 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               return next();
             })
             .run();
-
+          /*rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:hint',
+              props: {
+                title: new Text('Title'),
+                description: new Text('Description'),
+                type: 'success',
+              },
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();*/
+          //insertContent(rootElement.host, model, '11111');
+          //runCommand(rootElement, 'affine:paragraph', 'text');
           //rootElement.doc.addBlock('affine:paragraph', {}, parent);
         },
       },

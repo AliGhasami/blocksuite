@@ -221,7 +221,6 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
         });
       },
       showWhen: chain => {
-        return false;
         const [_, ctx] = chain
           .getSelectedModels({
             types: ['block', 'text'],
@@ -229,7 +228,7 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
           })
           .run();
         const { selectedModels } = ctx;
-        return !!selectedModels && selectedModels.length > 0;
+        return !!selectedModels && selectedModels.length > 0 && false;
       },
     })
     .addBlockTypeSwitch({

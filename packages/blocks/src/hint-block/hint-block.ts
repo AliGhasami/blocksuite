@@ -224,6 +224,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         );*/
         //@ts-ignore
         tippy(this, {
+          theme: 'block-editor',
           content: this.optionPopover,
           allowHTML: true,
           placement: 'top',
