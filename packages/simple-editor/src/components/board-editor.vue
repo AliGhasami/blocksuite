@@ -250,14 +250,11 @@ defineExpose({
   }*/
 
 
-
  /*rich-text *{
    color:red;
    //font-family: var(--base-font-family), tahoma, serif;
    font-family: "blocksuite:surface:Poppins";
  }*/
-
-
 
 
 

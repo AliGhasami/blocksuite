@@ -3,7 +3,7 @@
     <div v-html="temp">
     </div>
     <StyleProvider :cache="cache">
-      <Select :open="true"  v-model:value="val" :bordered="false" style="width: 120px" :getPopupContainer="()=>{
+      <Select  v-model:value="val" :bordered="false" style="width: 120px" :getPopupContainer="()=>{
         return container
       }">
         <SelectOption v-for="item in options" :value="item.value">
