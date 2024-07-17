@@ -1,20 +1,18 @@
 import { WithDisposable } from '@blocksuite/block-std';
 import { baseTheme } from '@toeverything/theme';
 import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 import {
-  MinusIcon,
-  PlusIcon,
-  ViewBarIcon,
+  BackTablerIcon,
+  RedoTablerIcon,
 } from '../../../_common/icons/edgeless.js';
 import { stopPropagation } from '../../../_common/utils/event.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 import type { EdgelessTool } from '../../edgeless/types.js';
-import { ZOOM_STEP } from '../../edgeless/utils/viewport.js';
 
-@customElement('edgeless-zoom-toolbar')
-export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
+@customElement('edgeless-ur-toolbar')
+export class EdgelessURToolbar extends WithDisposable(LitElement) {
   get edgelessTool() {
     return this.edgeless.edgelessTool;
   }
@@ -22,6 +20,12 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
   get edgelessService() {
     return this.edgeless.service;
   }
+
+  @state()
+  private accessor _canUndo = false;
+
+  @state()
+  private accessor _canRedo = false;
 
   get zoom() {
     return this.viewport.zoom;
@@ -141,6 +145,11 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
         this.requestUpdate();
       })
     );
+
+    this.edgeless.doc.slots.historyUpdated.on(() => {
+      this._canUndo = this.edgeless.doc.canUndo;
+      this._canRedo = this.edgeless.doc.canRedo;
+    });
   }
 
   override render() {
@@ -151,7 +160,6 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
     const formattedZoom = `${Math.round(this.zoom * 100)}%`;
     const classes = `edgeless-zoom-toolbar-container ${this.layout}`;
     const locked = this.locked;
-
     return html`
       <div
         class=${classes}
@@ -161,41 +169,24 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
         @pointerdown=${stopPropagation}
       >
         <edgeless-tool-icon-button
-          .tooltip=${'Fit to screen'}
-          .tipPosition=${this._isVerticalBar() ? 'right' : 'top-end'}
+          .tooltip=${'Undo'}
+          .tipPosition="top"
           .arrow=${!this._isVerticalBar()}
-          @click=${() => this.edgelessService.zoomToFit()}
+          @click=${() => this.edgelessService.doc.undo()}
           .iconContainerPadding=${4}
-          .disabled=${locked}
+          .disabled=${!this._canUndo}
         >
-          ${ViewBarIcon}
+          ${BackTablerIcon}
         </edgeless-tool-icon-button>
         <edgeless-tool-icon-button
-          .tooltip=${'Zoom out'}
-          .tipPosition=${this._isVerticalBar() ? 'right' : 'top'}
+          .tooltip=${'Redo'}
+          .tipPosition="top"
           .arrow=${!this._isVerticalBar()}
-          @click=${() => this.edgelessService.setZoomByStep(-ZOOM_STEP)}
+          @click=${() => this.edgelessService.doc.redo()}
           .iconContainerPadding=${4}
-          .disabled=${locked}
+          .disabled=${!this._canRedo}
         >
-          ${MinusIcon}
-        </edgeless-tool-icon-button>
-        <button
-          class="zoom-percent"
-          @click=${() => this.viewport.smoothZoom(1)}
-          .disabled=${locked}
-        >
-          ${formattedZoom}
-        </button>
-        <edgeless-tool-icon-button
-          .tooltip=${'Zoom in'}
-          .tipPosition=${this._isVerticalBar() ? 'right' : 'top'}
-          .arrow=${!this._isVerticalBar()}
-          @click=${() => this.edgelessService.setZoomByStep(ZOOM_STEP)}
-          .iconContainerPadding=${4}
-          .disabled=${locked}
-        >
-          ${PlusIcon}
+          ${RedoTablerIcon}
         </edgeless-tool-icon-button>
       </div>
     `;
@@ -204,6 +195,6 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'edgeless-zoom-toolbar': EdgelessZoomToolbar;
+    'edgeless-ur-toolbar': EdgelessURToolbar;
   }
 }

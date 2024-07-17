@@ -154,28 +154,9 @@ export class SmoothCorner extends LitElement {
   }
 
   override render() {
-    return html`${this._getSvg(
-        'smooth-corner-bg',
-        svg`<path 
-          d="${this._path}" 
-          fill="${this.bgColor}" 
-          fill-opacity="${this.bgOpacity}"
-          transform="translate(${this.borderWidth / 2} ${this.borderWidth / 2})"
-        >`
-      )}
-      ${this._getSvg(
-        'smooth-corner-border',
-        svg`<path 
-          fill="none"
-          d="${this._path}" 
-          stroke="${this.borderColor}" 
-          stroke-width="${this.borderWidth}"
-          transform="translate(${this.borderWidth / 2} ${this.borderWidth / 2})"
-        >`
-      )}
-      <div class="smooth-corner-content">
-        <slot></slot>
-      </div>`;
+    return html` <div class="smooth-corner-content">
+      <slot></slot>
+    </div>`;
   }
 }
 

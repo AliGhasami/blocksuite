@@ -54,7 +54,7 @@ export class PresentationToolbar extends EdgelessToolbarToolMixin(LitElement) {
     }
     .full-divider {
       width: 8px;
-      height: 100%;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;

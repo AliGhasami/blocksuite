@@ -44,9 +44,11 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
   accessor tip = 'Text';
 
   private _toggleNoteMenu() {
+    this.tryDisposePopper();
     if (this._noteMenu) {
       this._disposeMenu();
       this.requestUpdate();
+      this.tryDisposePopper();
     } else {
       this.edgeless.tools.setEdgelessTool({
         type: 'affine:note',
@@ -54,8 +56,13 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
         childType: this.childType,
         tip: this.tip,
       });
+      this.setEdgelessTool({
+        type: 'affine:note',
+        childFlavour: this.childFlavour,
+        childType: this.childType,
+        tip: this.tip,
+      });
       this._noteMenu = createPopper('edgeless-note-menu', this);
-
       this._noteMenu.element.edgeless = this.edgeless;
       this._noteMenu.element.childFlavour = this.childFlavour;
       this._noteMenu.element.childType = this.childType;

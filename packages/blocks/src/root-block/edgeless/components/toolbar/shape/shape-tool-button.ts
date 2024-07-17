@@ -8,7 +8,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import {
-  EraserTablerIcon,
+  ArrowUpIcon,
   ShapeTablerIcon,
 } from '../../../../../_common/icons/index.js';
 import { isTransparent } from '../../../../../_common/theme/css-variables.js';
@@ -46,6 +46,12 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     .shapes {
       //width: 100%;
       //height: 64px;
+    }
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
   `;
 
@@ -141,6 +147,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     const shapeStroke = isTransparent(strokeColor!)
       ? cssVar('black10')
       : `var(${strokeColor})`;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
       <edgeless-tool-icon-button
@@ -153,6 +160,9 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         @click=${this._toggleMenu}
       >
         ${ShapeTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
       </edgeless-tool-icon-button>
     `;
 

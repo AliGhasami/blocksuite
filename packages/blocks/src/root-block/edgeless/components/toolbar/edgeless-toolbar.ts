@@ -37,12 +37,12 @@ import {
 } from './context.js';
 import { getQuickTools, getSeniorTools } from './tools.js';
 
-const TOOLBAR_PADDING_X = 12;
+const TOOLBAR_PADDING_X = 8;
 const TOOLBAR_HEIGHT = 64;
 const QUICK_TOOLS_GAP = 10;
 const QUICK_TOOL_SIZE = 36;
 const QUICK_TOOL_MORE_SIZE = 20;
-const SENIOR_TOOLS_GAP = 0;
+const SENIOR_TOOLS_GAP = 10;
 const SENIOR_TOOL_WIDTH = 96;
 const SENIOR_TOOL_NAV_SIZE = 20;
 const DIVIDER_WIDTH = 8;
@@ -243,8 +243,12 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
       position: relative;
       display: flex;
       align-items: center;
-      padding: 0 ${unsafeCSS(TOOLBAR_PADDING_X)}px;
-      height: ${unsafeCSS(TOOLBAR_HEIGHT)}px;
+      padding: ${unsafeCSS(TOOLBAR_PADDING_X)}px;
+      background-color: var(--affine-background-overlay-panel-color);
+      border-radius: 8px;
+      border: 1px solid var(--affine-border-color);
+
+      // height: ${unsafeCSS(TOOLBAR_HEIGHT)}px;
     }
     :host([disabled]) .edgeless-toolbar-container {
       pointer-events: none;
@@ -320,7 +324,7 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
     }
 
     .senior-tool-item {
-      width: ${unsafeCSS(SENIOR_TOOL_WIDTH)}px;
+      // width: ${unsafeCSS(SENIOR_TOOL_WIDTH)}px;
       height: 100%;
       display: flex;
       justify-content: center;

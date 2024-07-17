@@ -1,7 +1,7 @@
-import type { SurfaceSelection } from '@blocksuite/block-std';
 import type {
   EventName,
   PointerEventState,
+  SurfaceSelection,
   UIEventHandler,
   UIEventState,
 } from '@blocksuite/block-std';
@@ -452,7 +452,7 @@ export class EdgelessToolsManager {
         state = this.selection.lastSurfaceSelections; // for getting the selection back after going to another tools
       }
     }
-
+    console.log('state====>', state, edgelessTool);
     this.selection.set(state);
     this.edgelessTool = edgelessTool;
     this.container.slots.edgelessToolUpdated.emit(edgelessTool);

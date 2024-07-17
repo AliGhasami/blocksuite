@@ -1,19 +1,17 @@
 import './mindmap-menu.js';
 
 import { assertExists } from '@blocksuite/global/utils';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
-import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import {
+  ArrowUpIcon,
   MapTablerIcon,
-  ShapeTablerIcon,
 } from '../../../../../_common/icons/index.js';
 import { MindmapStyle } from '../../../../../surface-block/index.js';
 import type { EdgelessTool } from '../../../types.js';
-import { getTooltipWithShortcut } from '../../utils.js';
+import type { MenuPopper } from '../common/create-popper.js';
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { getMindMaps } from './assets.js';
@@ -23,9 +21,9 @@ import {
   mindmapConfig,
   textConfig,
   textRender,
-  toolConfig2StyleObj,
 } from './basket-elements.js';
 import { basketIconDark, basketIconLight, textIcon } from './icons.js';
+import type { EdgelessMindmapMenu } from './mindmap-menu.js';
 
 @customElement('edgeless-mindmap-tool-button')
 export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
@@ -62,6 +60,12 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
     .partial-clip {
       flex-shrink: 0;
@@ -146,9 +150,9 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
     }
   `;
 
-  override type: EdgelessTool['type'][] = ['mindmap', 'text'];
+  override type: EdgelessTool['type'][] = ['mindmap'];
 
-  override enableActiveBackground = true;
+  override enableActiveBackground = false;
 
   draggableController!: EdgelessDraggableElementController<DraggableTool>;
 
@@ -164,11 +168,20 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
   @query('.basket-tool-item.mindmap')
   accessor mindmapElement!: HTMLElement;
 
-  private _toggleMenu() {
-    if (this.tryDisposePopper()) return;
-    this.setEdgelessTool({ type: 'default' });
+  private _noteMenu: MenuPopper<EdgelessMindmapMenu> | null = null;
 
+  private _showMenu: boolean;
+
+  private _toggleMenu() {
+    if (this.tryDisposePopper()) {
+      return;
+    }
+    this.setEdgelessTool({
+      type: this.type[0],
+    });
+    this._showMenu = true;
     const menu = this.createPopper('edgeless-mindmap-menu', this);
+    this._noteMenu = menu;
     Object.assign(menu.element, {
       edgeless: this.edgeless,
       activeStyle: this.activeStyle,
@@ -293,11 +306,12 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
       this.draggableController?.states || {};
 
     const active = popper || draggingElement;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
       <edgeless-tool-icon-button
         class="edgeless-mindmap-button"
-        .tooltip=${popper ? '' : 'Others'}
+        .tooltip=${popper ? '' : 'Mindmap'}
         .tooltipOffset=${4}
         .iconContainerPadding=${6}
         .active=${active}
@@ -305,6 +319,9 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
         @click=${this._toggleMenu}
       >
         ${MapTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
       </edgeless-tool-icon-button>
     `;
 

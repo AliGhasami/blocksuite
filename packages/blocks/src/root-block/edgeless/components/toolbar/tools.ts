@@ -1,4 +1,5 @@
 import './default/default-tool-button.js';
+import './default/pan-tool-button.js';
 // import './lasso/lasso-tool-button.js';
 import './connector/connector-tool-button.js';
 import './frame/frame-tool-button.js';
@@ -7,7 +8,7 @@ import './note/note-tool-button.js';
 import './brush/brush-tool-button.js';
 import './eraser/eraser-tool-button.js';
 import './shape/shape-tool-button.js';
-// import './text/text-tool-button.js';
+import './text/text-tool-button.js';
 import './template/template-tool-button.js';
 // import './image/image-tool-button.js';
 import './note/note-senior-button.js';
@@ -21,7 +22,6 @@ import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 import type { EdgelessTool } from '../../types.js';
 import { buildConnectorDenseMenu } from './connector/connector-dense-menu.js';
 import { buildFrameDenseMenu } from './frame/frame-dense-menu.js';
-import { buildLinkDenseMenu } from './link/link-dense-menu.js';
 
 export interface QuickTool {
   type?: EdgelessTool['type'];
@@ -56,6 +56,15 @@ export const getQuickTools = ({
     content: html`<edgeless-default-tool-button
       .edgeless=${edgeless}
     ></edgeless-default-tool-button>`,
+    // menu: will never show because the first tool will never hide
+  });
+
+  // 🔧 Hands / Pointer
+  quickTools.push({
+    type: 'pan',
+    content: html`<edgeless-pan-tool-button
+      .edgeless=${edgeless}
+    ></edgeless-pan-tool-button>`,
     // menu: will never show because the first tool will never hide
   });
 
@@ -175,11 +184,12 @@ export const getSeniorTools = ({
     ></edgeless-mindmap-tool-button>`,
   });
 
-  // // Text
-  // tools.push({
-  //   content: html`<edgeless-text-tool-button .edgeless=${edgeless}>
-  //   </edgeless-text-tool-button>`,
-  // });
+  // Text
+  tools.push({
+    name: 'Text',
+    content: html`<edgeless-text-tool-button .edgeless=${edgeless}>
+    </edgeless-text-tool-button>`,
+  });
 
   // // Image
   // tools.push({

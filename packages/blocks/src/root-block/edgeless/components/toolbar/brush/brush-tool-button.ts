@@ -6,8 +6,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import {
-  EdgelessPenDarkIcon,
-  EdgelessPenLightIcon,
+  ArrowUpIcon,
   PenTablerIcon,
 } from '../../../../../_common/icons/edgeless.js';
 import { LineWidth } from '../../../../../_common/utils/index.js';
@@ -30,6 +29,13 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
       //height: 100%;
       overflow-y: hidden;
     }
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
+    }
+
     //.edgeless-brush-button {
     //  height: 100%;
     //}
@@ -111,6 +117,7 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
   override render() {
     const { active, theme } = this;
     // const icon = theme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
       <edgeless-tool-icon-button
@@ -118,13 +125,15 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
         .tooltip=${this.popper ? '' : getTooltipWithShortcut('Pen', 'P')}
         .tooltipOffset=${4}
         .active=${active}
-        .withHover=${true}
         .iconContainerPadding=${6}
         @click=${() => {
           this._toggleBrushMenu();
         }}
       >
         ${PenTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
       </edgeless-tool-icon-button>
     `;
   }

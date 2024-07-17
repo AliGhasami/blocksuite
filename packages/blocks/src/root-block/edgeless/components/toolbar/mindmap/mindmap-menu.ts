@@ -3,7 +3,6 @@ import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type { MindmapStyle } from '../../../../../surface-block/index.js';
-import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { getMindMaps, type ToolbarMindmapItem } from './assets.js';
@@ -28,6 +27,7 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(LitElement) {
       display: flex;
       z-index: -1;
       justify-content: flex-end;
+      margin-left: 0 !important;
     }
     .text-and-mindmap {
       display: flex;
@@ -131,35 +131,6 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(LitElement) {
     const showNextText = dragOut && !cancelled;
     return html`<edgeless-slide-menu .height=${'64px'}>
       <div class="text-and-mindmap">
-        <div class="text-item">
-          ${isDraggingText
-            ? html`<button
-                class="next"
-                style="transform: translateY(${showNextText ? 0 : 64}px)"
-              >
-                ${textItem.icon}
-              </button>`
-            : nothing}
-          <button
-            style="opacity: ${isDraggingText ? 0 : 1}"
-            @mousedown=${(e: MouseEvent) =>
-              this.draggableController.onMouseDown(e, {
-                preview: textItem.icon,
-                data: textItem,
-              })}
-            @touchstart=${(e: TouchEvent) =>
-              this.draggableController.onTouchStart(e, {
-                preview: textItem.icon,
-                data: textItem,
-              })}
-          >
-            ${textItem.icon}
-          </button>
-          <affine-tooltip tip-position="top" .offset=${12}>
-            ${getTooltipWithShortcut('Edgeless Text', 'T')}
-          </affine-tooltip>
-        </div>
-        <div class="thin-divider"></div>
         <!-- mind map -->
         ${repeat(this.mindMaps, mindMap => {
           const isDraggingMindMap = draggingElement?.data?.type !== 'text';
@@ -197,9 +168,6 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(LitElement) {
               >
                 ${mindMap.icon}
               </button>
-              <affine-tooltip tip-position="top" .offset=${12}>
-                ${getTooltipWithShortcut('Mind Map', 'M')}
-              </affine-tooltip>
             </div>
           `;
         })}
