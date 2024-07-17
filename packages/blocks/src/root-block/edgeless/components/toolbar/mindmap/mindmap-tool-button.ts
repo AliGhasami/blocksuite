@@ -7,8 +7,13 @@ import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import {
+  MapTablerIcon,
+  ShapeTablerIcon,
+} from '../../../../../_common/icons/index.js';
 import { MindmapStyle } from '../../../../../surface-block/index.js';
 import type { EdgelessTool } from '../../../types.js';
+import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { getMindMaps } from './assets.js';
@@ -289,101 +294,115 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
 
     const active = popper || draggingElement;
 
-    return html`<edgeless-toolbar-button
-      class="edgeless-mindmap-button"
-      ?withHover=${true}
-      .tooltip=${popper ? '' : 'Others'}
-      .tooltipOffset=${4}
-      @click=${this._toggleMenu}
-      style="width: 100%; height: 100%; display: inline-block"
-    >
-      <div class="partial-clip">
-        <div class="basket-wrapper ${active ? 'active' : ''}">
-          ${repeat(
-            this.draggableTools,
-            t => t.name,
-            tool => {
-              const isBeingDragged = draggingElement?.data.name === tool.name;
-              const variables = toolConfig2StyleObj(tool.config);
+    return html`
+      <edgeless-tool-icon-button
+        class="edgeless-mindmap-button"
+        .tooltip=${popper ? '' : 'Others'}
+        .tooltipOffset=${4}
+        .iconContainerPadding=${6}
+        .active=${active}
+        .onShapeClick=${this._toggleMenu}
+        @click=${this._toggleMenu}
+      >
+        ${MapTablerIcon}
+      </edgeless-tool-icon-button>
+    `;
 
-              const nextStyle = styleMap({
-                ...variables,
-              });
-              const currentStyle = styleMap({
-                ...variables,
-                opacity: isBeingDragged ? 0 : 1,
-                pointerEvents: draggingElement ? 'none' : 'auto',
-              });
-
-              return html`${isBeingDragged
-                  ? html`<div
-                      class=${classMap({
-                        'basket-tool-item': true,
-                        next: true,
-                        coming: !!dragOut && !cancelled,
-                      })}
-                      style=${nextStyle}
-                    >
-                      ${tool.icon}
-                    </div>`
-                  : nothing}
-
-                <div
-                  style=${currentStyle}
-                  @mousedown=${(e: MouseEvent) =>
-                    this.draggableController.onMouseDown(e, {
-                      data: tool,
-                      preview: tool.icon,
-                      standardWidth: tool.standardWidth,
-                    })}
-                  @touchstart=${(e: TouchEvent) =>
-                    this.draggableController.onTouchStart(e, {
-                      data: tool,
-                      preview: tool.icon,
-                      standardWidth: tool.standardWidth,
-                    })}
-                  class="basket-tool-item current ${tool.name}"
-                >
-                  ${tool.icon}
-                </div>`;
-            }
-          )}
-
-          <div class="basket">
-            <div
-              class="glass ${this.enableBlur ? 'enabled' : ''}"
-              style="background: ${glassBg}"
-            ></div>
-            ${basketIcon}
-          </div>
-        </div>
-      </div>
-
-      <svg width="0" height="0" style="opacity: 0; pointer-events: none">
-        <defs>
-          <mask id="mindmap-basket-body-mask">
-            <rect
-              x="2"
-              width="71.8"
-              y="2"
-              height="15"
-              rx="1.5"
-              ry="1.5"
-              fill="white"
-            />
-            <rect
-              width="32"
-              height="6"
-              x="22"
-              y="5.9"
-              fill="black"
-              rx="3"
-              ry="3"
-            />
-          </mask>
-        </defs>
-      </svg>
-    </edgeless-toolbar-button>`;
+    // return html`<!--<edgeless-toolbar-button-->
+    //   <!--      class="edgeless-mindmap-button"-->
+    //   <!--      ?withHover=${true}-->
+    //   <!--      .tooltip=${popper ? '' : 'Others'}-->
+    //   <!--      .tooltipOffset=${4}-->
+    //   <!--      @click=${this._toggleMenu}-->
+    //   <!--      style="width: 100%; height: 100%; display: inline-block"-->
+    //   <!--    >-->
+    //   <!--      <div class="partial-clip">-->
+    //   <!--        <div class="basket-wrapper ${active ? 'active' : ''}">-->
+    //   <!--          ${repeat(
+    //     this.draggableTools,
+    //     t => t.name,
+    //     tool => {
+    //       const isBeingDragged = draggingElement?.data.name === tool.name;
+    //       const variables = toolConfig2StyleObj(tool.config);
+    //
+    //       const nextStyle = styleMap({
+    //         ...variables,
+    //       });
+    //       const currentStyle = styleMap({
+    //         ...variables,
+    //         opacity: isBeingDragged ? 0 : 1,
+    //         pointerEvents: draggingElement ? 'none' : 'auto',
+    //       });
+    //
+    //       return html`${isBeingDragged
+    //           ? html`<div
+    //               class=${classMap({
+    //                 'basket-tool-item': true,
+    //                 next: true,
+    //                 coming: !!dragOut && !cancelled,
+    //               })}
+    //               style=${nextStyle}
+    //             >
+    //               ${tool.icon}
+    //             </div>`
+    //           : nothing}
+    //
+    //         <div
+    //           style=${currentStyle}
+    //           @mousedown=${(e: MouseEvent) =>
+    //             this.draggableController.onMouseDown(e, {
+    //               data: tool,
+    //               preview: tool.icon,
+    //               standardWidth: tool.standardWidth,
+    //             })}
+    //           @touchstart=${(e: TouchEvent) =>
+    //             this.draggableController.onTouchStart(e, {
+    //               data: tool,
+    //               preview: tool.icon,
+    //               standardWidth: tool.standardWidth,
+    //             })}
+    //           class="basket-tool-item current ${tool.name}"
+    //         >
+    //           ${tool.icon}
+    //         </div>`;
+    //     }
+    //   )}-->
+    //
+    //   <!--          <div class="basket">-->
+    //   <!--            <div-->
+    //   <!--              class="glass ${this.enableBlur ? 'enabled' : ''}"-->
+    //   <!--              style="background: ${glassBg}"-->
+    //   <!--            ></div>-->
+    //   <!--            ${basketIcon}-->
+    //   <!--          </div>-->
+    //   <!--        </div>-->
+    //   <!--      </div>-->
+    //
+    //   <!--      <svg width="0" height="0" style="opacity: 0; pointer-events: none">-->
+    //   <!--        <defs>-->
+    //   <!--          <mask id="mindmap-basket-body-mask">-->
+    //   <!--            <rect-->
+    //   <!--              x="2"-->
+    //   <!--              width="71.8"-->
+    //   <!--              y="2"-->
+    //   <!--              height="15"-->
+    //   <!--              rx="1.5"-->
+    //   <!--              ry="1.5"-->
+    //   <!--              fill="white"-->
+    //   <!--            />-->
+    //   <!--            <rect-->
+    //   <!--              width="32"-->
+    //   <!--              height="6"-->
+    //   <!--              x="22"-->
+    //   <!--              y="5.9"-->
+    //   <!--              fill="black"-->
+    //   <!--              rx="3"-->
+    //   <!--              ry="3"-->
+    //   <!--            />-->
+    //   <!--          </mask>-->
+    //   <!--        </defs>-->
+    //   <!--      </svg>-->
+    //   <!--    </edgeless-toolbar-button>-->`;
   }
 }
 

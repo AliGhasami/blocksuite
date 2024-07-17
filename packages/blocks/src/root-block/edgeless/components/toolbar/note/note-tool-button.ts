@@ -103,6 +103,28 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
     super.disconnectedCallback();
   }
 
+  // override render() {
+  //   const { active } = this;
+  //   const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
+  //   return html`
+  //     <edgeless-tool-icon-button
+  //       class="edgeless-note-button"
+  //       .tooltip=${this._noteMenu ? '' : getTooltipWithShortcut('Note', 'N')}
+  //       .tooltipOffset=${17}
+  //       .active=${active}
+  //       .iconContainerPadding=${6}
+  //       @click=${() => {
+  //         this._toggleNoteMenu();
+  //       }}
+  //     >
+  //       ${NoteIcon}
+  //       <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+  //         ${ArrowUpIcon}
+  //       </span>
+  //     </edgeless-tool-icon-button>
+  //   `;
+  // }
+
   override render() {
     const { active } = this;
     const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';

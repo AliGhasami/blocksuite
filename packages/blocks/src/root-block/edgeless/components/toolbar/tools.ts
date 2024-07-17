@@ -131,25 +131,31 @@ export const getSeniorTools = ({
   const tools: SeniorTool[] = [];
 
   if (!doc.readonly) {
+    // tools.push({
+    //   name: 'Note',
+    //   content: html`<edgeless-note-senior-button .edgeless=${edgeless}>
+    //   </edgeless-note-senior-button>`,
+    // });
     tools.push({
       name: 'Note',
-      content: html`<edgeless-note-senior-button .edgeless=${edgeless}>
-      </edgeless-note-senior-button>`,
+      content: html`<edgeless-note-tool-button .edgeless=${edgeless}>
+      </edgeless-note-tool-button>`,
     });
   }
 
   // Brush / Eraser
   tools.push({
     name: 'Pen',
-    content: html`<div class="brush-and-eraser">
-      <edgeless-brush-tool-button
-        .edgeless=${edgeless}
-      ></edgeless-brush-tool-button>
+    content: html`<edgeless-brush-tool-button
+      .edgeless=${edgeless}
+    ></edgeless-brush-tool-button>`,
+  });
 
-      <edgeless-eraser-tool-button
-        .edgeless=${edgeless}
-      ></edgeless-eraser-tool-button>
-    </div> `,
+  tools.push({
+    name: 'Eraser',
+    content: html` <edgeless-eraser-tool-button
+      .edgeless=${edgeless}
+    ></edgeless-eraser-tool-button>`,
   });
 
   // Shape
