@@ -9,6 +9,7 @@ export function createEmptyDoc(isBoard:boolean=false) {
   collection.meta.initialize();
   //collection.
   const doc = collection.createDoc();//{ id: 'page1' }
+  //doc.readonly=true
   //console.log( await collection.importDocSnapshot(data,'11111125'))
   /*collection.importDocSnapshot(data,'11111125').then(()=>{
     console.log("1111")
@@ -19,6 +20,8 @@ export function createEmptyDoc(isBoard:boolean=false) {
     doc,
     init() {
       doc.load(()=>{
+        //doc.awarenessStore.setFlag('readonly', true);
+        /*doc.updateBlock()*/
         const rootId = doc.addBlock('affine:page', {
           //userList:['1','2','3','4','5']
         });

@@ -1,7 +1,7 @@
 <template>
-  <div class="vue-block-board-editor">
-    <div ref="refEditor" :class="[props.isBoardView ? 'board':'editor']"></div>
-  </div>
+    <div class="vue-block-board-editor">
+      <div ref="refEditor" :class="[props.isBoardView ? 'board':'editor']"></div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -9,25 +9,14 @@ import '@blocksuite/presets/themes/affine.css';
 import { PageEditor ,EdgelessEditor} from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
-import { defineCustomElement, onMounted, ref, watch } from "vue";
+import {  onMounted, ref, watch } from "vue";
 import {replaceIdMiddleware} from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css';
+import './web-component/index'
+
 const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
-import SelectHintTypeComponent from '@/components/web-component/SelectHintType/SelectHintType.ce.vue'
-import DatePickerComponent from '@/components/web-component/DatePicker.ce.vue'
-
-//TODO ali ghasami for add function add and check web component
-const SelectHintType = defineCustomElement(SelectHintTypeComponent)
-if(!customElements.get('select-hint-type')){
-  customElements.define('select-hint-type', SelectHintType,{})
-}
-
-const DatePicker = defineCustomElement(DatePickerComponent)
-if(!customElements.get('mahdaad-date-picker')){
-  customElements.define('mahdaad-date-picker', DatePicker,{})
-}
 
 
 interface Props{
