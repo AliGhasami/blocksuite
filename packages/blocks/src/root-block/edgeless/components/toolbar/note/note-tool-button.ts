@@ -44,9 +44,11 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
   accessor tip = 'Text';
 
   private _toggleNoteMenu() {
+    this.tryDisposePopper();
     if (this._noteMenu) {
       this._disposeMenu();
       this.requestUpdate();
+      this.tryDisposePopper();
     } else {
       this.edgeless.tools.setEdgelessTool({
         type: 'affine:note',
@@ -54,8 +56,13 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
         childType: this.childType,
         tip: this.tip,
       });
+      this.setEdgelessTool({
+        type: 'affine:note',
+        childFlavour: this.childFlavour,
+        childType: this.childType,
+        tip: this.tip,
+      });
       this._noteMenu = createPopper('edgeless-note-menu', this);
-
       this._noteMenu.element.edgeless = this.edgeless;
       this._noteMenu.element.childFlavour = this.childFlavour;
       this._noteMenu.element.childType = this.childType;
@@ -102,6 +109,28 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
     this._disposeMenu();
     super.disconnectedCallback();
   }
+
+  // override render() {
+  //   const { active } = this;
+  //   const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
+  //   return html`
+  //     <edgeless-tool-icon-button
+  //       class="edgeless-note-button"
+  //       .tooltip=${this._noteMenu ? '' : getTooltipWithShortcut('Note', 'N')}
+  //       .tooltipOffset=${17}
+  //       .active=${active}
+  //       .iconContainerPadding=${6}
+  //       @click=${() => {
+  //         this._toggleNoteMenu();
+  //       }}
+  //     >
+  //       ${NoteIcon}
+  //       <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+  //         ${ArrowUpIcon}
+  //       </span>
+  //     </edgeless-tool-icon-button>
+  //   `;
+  // }
 
   override render() {
     const { active } = this;

@@ -6,8 +6,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import {
-  EdgelessPenDarkIcon,
-  EdgelessPenLightIcon,
+  ArrowUpIcon,
+  PenTablerIcon,
 } from '../../../../../_common/icons/edgeless.js';
 import { LineWidth } from '../../../../../_common/utils/index.js';
 import type { LastProps } from '../../../../../surface-block/managers/edit-session.js';
@@ -26,27 +26,34 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
   static override styles = css`
     :host {
       display: flex;
-      height: 100%;
+      //height: 100%;
       overflow-y: hidden;
     }
-    .edgeless-brush-button {
-      height: 100%;
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
-    .pen-wrapper {
-      width: 35px;
-      height: 64px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    #edgeless-pen-icon {
-      transition: transform 0.3s ease-in-out;
-      transform: translateY(8px);
-    }
-    .edgeless-brush-button:hover #edgeless-pen-icon,
-    .pen-wrapper.active #edgeless-pen-icon {
-      transform: translateY(0);
-    }
+
+    //.edgeless-brush-button {
+    //  height: 100%;
+    //}
+    //.pen-wrapper {
+    //  width: 35px;
+    //  //height: 64px;
+    //  display: flex;
+    //  align-items: flex-end;
+    //  justify-content: center;
+    //}
+    //#edgeless-pen-icon {
+    //  transition: transform 0.3s ease-in-out;
+    //  transform: translateY(8px);
+    //}
+    //.edgeless-brush-button:hover #edgeless-pen-icon,
+    //.pen-wrapper.active #edgeless-pen-icon {
+    //  transform: translateY(0);
+    //}
   `;
 
   override type = 'brush' as const;
@@ -109,26 +116,25 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
 
   override render() {
     const { active, theme } = this;
-    const icon = theme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
+    // const icon = theme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
-      <edgeless-toolbar-button
-        class="edgeless-brush-button"
+      <edgeless-tool-icon-button
+        class="edgeless-brush--button"
         .tooltip=${this.popper ? '' : getTooltipWithShortcut('Pen', 'P')}
         .tooltipOffset=${4}
         .active=${active}
-        .withHover=${true}
+        .iconContainerPadding=${6}
         @click=${() => {
           this._toggleBrushMenu();
         }}
       >
-        <div
-          style=${styleMap({ color: `var(${this.states.color})` })}
-          class="pen-wrapper"
-        >
-          ${icon}
-        </div>
-      </edgeless-toolbar-button>
+        ${PenTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
+      </edgeless-tool-icon-button>
     `;
   }
 }

@@ -7,6 +7,10 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import {
+  ArrowUpIcon,
+  ShapeTablerIcon,
+} from '../../../../../_common/icons/index.js';
 import { isTransparent } from '../../../../../_common/theme/css-variables.js';
 import {
   DEFAULT_SHAPE_FILL_COLOR,
@@ -35,13 +39,19 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
   static override styles = css`
     :host {
       display: block;
-      width: 100%;
-      height: 100%;
+      //width: 100%;
+      //height: 100%;
     }
     edgeless-toolbar-button,
     .shapes {
-      width: 100%;
-      height: 64px;
+      //width: 100%;
+      //height: 64px;
+    }
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
   `;
 
@@ -137,30 +147,48 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     const shapeStroke = isTransparent(strokeColor!)
       ? cssVar('black10')
       : `var(${strokeColor})`;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
-      <edgeless-toolbar-button
-        class="edgeless-shape-button"
-        .tooltip=${this.popper ? '' : getTooltipWithShortcut('Shape', 'S')}
-        .tooltipOffset=${5}
+      <edgeless-tool-icon-button
+        class="edgeless-eraser-button"
+        .tooltip=${getTooltipWithShortcut('Eraser', 'E')}
+        .tooltipOffset=${4}
+        .iconContainerPadding=${6}
         .active=${active}
+        .onShapeClick=${this._handleShapeClick.bind(this)}
+        @click=${this._toggleMenu}
       >
-        <edgeless-toolbar-shape-draggable
-          .edgeless=${this.edgeless}
-          .toolbarContainer=${this.toolbarContainer}
-          class="shapes"
-          style=${styleMap({
-            color: shapeColor,
-            stroke: shapeStroke,
-          })}
-          .color=${shapeColor}
-          .stroke=${shapeStroke}
-          @click=${this._toggleMenu}
-          .onShapeClick=${this._handleShapeClick.bind(this)}
-        >
-        </edgeless-toolbar-shape-draggable>
-      </edgeless-toolbar-button>
+        ${ShapeTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
+      </edgeless-tool-icon-button>
     `;
+
+    // return html`
+    //   <edgeless-toolbar-button
+    //     class="edgeless-shape-button"
+    //     .tooltip=${this.popper ? '' : getTooltipWithShortcut('Shape', 'S')}
+    //     .tooltipOffset=${5}
+    //     .active=${active}
+    //   >
+    //     <edgeless-toolbar-shape-draggable
+    //       .edgeless=${this.edgeless}
+    //       .toolbarContainer=${this.toolbarContainer}
+    //       class="shapes"
+    //       style=${styleMap({
+    //         color: shapeColor,
+    //         stroke: shapeStroke,
+    //       })}
+    //       .color=${shapeColor}
+    //       .stroke=${shapeStroke}
+    //       @click=${this._toggleMenu}
+    //       .onShapeClick=${this._handleShapeClick.bind(this)}
+    //     >
+    //     </edgeless-toolbar-shape-draggable>
+    //   </edgeless-toolbar-button>
+    // `;
   }
 }
 

@@ -4,6 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import {
   EdgelessEraserDarkIcon,
   EdgelessEraserLightIcon,
+  EraserTablerIcon,
 } from '../../../../../_common/icons/index.js';
 import type { EdgelessTool } from '../../../types.js';
 import { getTooltipWithShortcut } from '../../utils.js';
@@ -15,7 +16,8 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
 ) {
   static override styles = css`
     :host {
-      height: 100%;
+      //height: 100%;
+      display: flex;
       overflow-y: hidden;
     }
     .eraser-button {
@@ -57,21 +59,22 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
 
   override render() {
     const type = this.edgelessTool?.type;
-    const { theme } = this;
-
-    const icon =
-      theme === 'dark' ? EdgelessEraserDarkIcon : EdgelessEraserLightIcon;
+    // const { theme } = this;
+    //
+    // const icon =
+    //   theme === 'dark' ? EdgelessEraserDarkIcon : EdgelessEraserLightIcon;
 
     return html`
-      <edgeless-toolbar-button
+      <edgeless-tool-icon-button
         class="edgeless-eraser-button"
         .tooltip=${getTooltipWithShortcut('Eraser', 'E')}
         .tooltipOffset=${4}
         .active=${type === 'eraser'}
+        .iconContainerPadding=${6}
         @click=${() => this.setEdgelessTool({ type: 'eraser' })}
       >
-        <div class="eraser-button">${icon}</div>
-      </edgeless-toolbar-button>
+        ${EraserTablerIcon}
+      </edgeless-tool-icon-button>
     `;
   }
 }
