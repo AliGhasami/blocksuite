@@ -5,7 +5,7 @@ import SelectHintType from './SelectHintType/SelectHintType.vue'
 import DatePicker from "@/components/web-component/DatePicker.vue";
 const components={
   'select-hint-type':SelectHintType,
-  'date-picker':DatePicker
+  'mahdaad-date-picker':DatePicker
 }
 
 Object.keys(components).forEach((item)=>{

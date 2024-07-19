@@ -1,7 +1,12 @@
 <template>
+  <div>
+    <div style="width: 450px">
+      <mahdaad-date-picker :onChange="handleChange" :time="null" date=""></mahdaad-date-picker>
+    </div>
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board':'editor']"></div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,6 +23,11 @@ const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
 
+
+
+function handleChange(date:string,time:string|null){
+  console.log("this is change in web component",date,time);
+}
 
 interface Props{
   isBoardView?:boolean,

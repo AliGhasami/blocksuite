@@ -16,96 +16,15 @@ import {
 } from '../../../_common/components/utils.js';
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
-//import { isFuzzyMatch } from '../../../_common/utils/string.js';
+import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { MentionOptions } from './index.js';
 import { styles } from './styles.js';
 import type { UserMention } from './types.js';
 
 //ShadowlessElement
-@customElement('affine-date-popover')
-export class DatePopover extends WithDisposable(ShadowlessElement) {
+@customElement('affine-date-time-popover')
+export class DateTimePopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
-
-  private _menu() {
-    let index = 0;
-    return html`<div class="${Prefix}-mention-menu-container">
-      ${this._filterItems.map(item => {
-        return html`<div
-          class="mention-item ${index == this._activatedItemIndex
-            ? 'hover'
-            : ''}"
-          data-index="${index++}"
-          @click=${() => {
-            return this._handleClickItem(item);
-          }}
-        >
-          ${item.name}
-        </div>`;
-      })}
-    </div>`;
-  }
-
-  private _handleClickItem(user: UserMention) {
-    // return
-    // assertExists(inlineEditor, 'Editor not found');
-    cleanSpecifiedTail(
-      this.editorHost,
-      this.inlineEditor,
-      this.triggerKey + this._query
-    );
-
-    const inlineRange = this.inlineEditor.getInlineRange();
-    assertExists(inlineRange);
-    this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
-      mention: { ...user, user_id: user.id, id: uuidv4() },
-      //mention: { name: user., id: '1' },
-      //mention: { type: 'LinkedPage', pageId: '11' },
-    });
-    this.inlineEditor.setInlineRange({
-      index: inlineRange.index + 1,
-      length: 0,
-    });
-
-    /*if (
-      //this._leftPanelActivated ||
-      index < 0 ||
-      index >= this._filterItems.length
-    ) {
-      return;
-    }*/
-    // Need to remove the search string
-    // We must to do clean the slash string before we do the action
-    // Otherwise, the action may change the model and cause the slash string to be changed
-    /*    cleanSpecifiedTail(
-      this.host,
-      this.model,
-      this.triggerKey + this._searchString
-    );*/
-    this.abortController.abort();
-    //console.log('this is item', item);
-    //const { action } = this._filterItems[index];
-    /*action({ rootElement: this.rootElement, model: this.model })?.catch(
-      console.error
-    );*/
-
-    /*this.rootElement.host.std.command
-      .chain()
-      .updateBlockType({
-        flavour: 'affine:mention',
-        props: {
-          text: new Text(item),
-        }, //type
-      })
-      .inline((ctx, next) => {
-        //console.log('this is inline in menu ', ctx);
-        const newModels = ctx.updatedBlocks;
-        if (!newModels || newModels.length == 0) {
-          return false;
-        }
-        return next();
-      })
-      .run();*/
-  }
 
   @property({ attribute: false })
   accessor options!: MentionOptions;
@@ -126,13 +45,13 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
   @state()
   private accessor _query = '';
 
-  //private accessor _searchString = '';
+  private _searchString = '';
 
   @state()
   private accessor _filterItems: UserMention[] = [];
 
   @state()
-  accessor userList: UserMention[] = [];
+  public accessor userList: UserMention[] = [];
 
   @state()
   private accessor _activatedItemIndex = 0;
@@ -147,9 +66,9 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
       .flat();
   }*/
 
-  private _updateItem(query: string) {
-    //this._searchString = query;
-    //this._activatedItemIndex = 0;
+  private _updateItem(query: string): UserMention[] {
+    this._searchString = query;
+    this._activatedItemIndex = 0;
     //const _menu: ClayTapSlashMenu[] = [];
     /*clayTapGroupMenu.map(group => {
       _menu.push(
@@ -160,7 +79,7 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     /*if (this._leftPanelActivated) {
       this._leftPanelActivated = false;
     }*/
-    //const searchStr = this._searchString.toLowerCase();
+    const searchStr = this._searchString.toLowerCase();
     //console.log('this is options', this.options);
     /*let allMenus = this.options.menus
       .map(group =>
@@ -175,10 +94,11 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     /*allMenus = allMenus.filter(({ showWhen = () => true }) =>
       showWhen(this.model, this.rootElement)
     );*/
-    /* if (!searchStr) {
+    if (!searchStr) {
       return this.userList;
-    }*/
-    //return this.userList.filter(item => isFuzzyMatch(item.name, searchStr));
+    }
+
+    return this.userList.filter(item => isFuzzyMatch(item.name, searchStr));
   }
 
   /* private _updateActionList() {
@@ -190,19 +110,19 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     });
   }*/
 
-  @query(`.${Prefix}-date-picker-popover`)
-  accessor DatePickerPopOverElement: Element | null = null;
+  @query(`.${Prefix}-date-time-popover`)
+  accessor DateTimePopOverElement: Element | null = null;
 
   /* private get _doc() {
     return this.editorHost.doc;
   }*/
 
-  /*private _scrollToItem(index: number, force = true) {
+  private _scrollToItem(index: number, force = true) {
     //console.log('index,this', index, this);
-    /!* const shadowRoot = this.rootElement;
+    /* const shadowRoot = this.rootElement;
     if (!shadowRoot) {
       return;
-    }*!/
+    }*/
     const ele = this.querySelector(`[data-index='${index}']`);
     if (!ele) {
       return;
@@ -215,7 +135,7 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     ele.scrollIntoView({
       block: 'nearest',
     });
-  }*/
+  }
 
   constructor(
     private editorHost: EditorHost,
@@ -249,10 +169,10 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
         this._updateActionList();
       })
     );*/
-    /* this._disposables.addFromEvent(this, 'mousedown', e => {
+    this._disposables.addFromEvent(this, 'mousedown', e => {
       // Prevent input from losing focus
-      // e.preventDefault();
-    });*/
+      e.preventDefault();
+    });
 
     /**
      * Handle arrow key
@@ -264,7 +184,6 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
      * - When the search item is empty, the slash menu will be hidden temporarily,
      *   and if the following key is not the backspace key, the slash menu will be closed
      */
-    //todo remove ali ghasami
     createKeydownObserver({
       target: inlineEditor.eventSource,
       inlineEditor,
@@ -347,7 +266,7 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
           ejectedCnt--
         );*/
         //console.log('1111', this._activatedItemIndex);
-        //this._scrollToItem(this._activatedItemIndex, false);
+        this._scrollToItem(this._activatedItemIndex, false);
       },
       onConfirm: () => {
         //console.log('11111', this._activatedItemIndex);
@@ -413,12 +332,97 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     this._position = position;
   }
 
+  private _handleClickItem(user: UserMention) {
+    // assertExists(inlineEditor, 'Editor not found');
+    cleanSpecifiedTail(
+      this.editorHost,
+      this.inlineEditor,
+      this.triggerKey + this._query
+    );
+
+    const inlineRange = this.inlineEditor.getInlineRange();
+    assertExists(inlineRange);
+    this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
+      mention: { ...user, user_id: user.id, id: uuidv4() },
+      //mention: { name: user., id: '1' },
+      //mention: { type: 'LinkedPage', pageId: '11' },
+    });
+    this.inlineEditor.setInlineRange({
+      index: inlineRange.index + 1,
+      length: 0,
+    });
+
+    /*if (
+      //this._leftPanelActivated ||
+      index < 0 ||
+      index >= this._filterItems.length
+    ) {
+      return;
+    }*/
+    // Need to remove the search string
+    // We must to do clean the slash string before we do the action
+    // Otherwise, the action may change the model and cause the slash string to be changed
+    /*    cleanSpecifiedTail(
+      this.host,
+      this.model,
+      this.triggerKey + this._searchString
+    );*/
+    this.abortController.abort();
+    //console.log('this is item', item);
+    //const { action } = this._filterItems[index];
+    /*action({ rootElement: this.rootElement, model: this.model })?.catch(
+      console.error
+    );*/
+
+    /*this.rootElement.host.std.command
+      .chain()
+      .updateBlockType({
+        flavour: 'affine:mention',
+        props: {
+          text: new Text(item),
+        }, //type
+      })
+      .inline((ctx, next) => {
+        //console.log('this is inline in menu ', ctx);
+        const newModels = ctx.updatedBlocks;
+        if (!newModels || newModels.length == 0) {
+          return false;
+        }
+        return next();
+      })
+      .run();*/
+  }
+
+  private _menu() {
+    let index = 0;
+    if (this._filterItems.length < 1) {
+      return html`<div style="color: var(--bu-neutral-3);text-align: center">
+        No user found
+      </div>`;
+    }
+    return html`<div class="${Prefix}-mention-menu-container">
+      ${this._filterItems.map(item => {
+        return html`<div
+          class="mention-item ${index == this._activatedItemIndex
+            ? 'hover'
+            : ''}"
+          data-index="${index++}"
+          @click=${() => {
+            return this._handleClickItem(item);
+          }}
+        >
+          ${item.name}
+        </div>`;
+      })}
+    </div>`;
+  }
+
   override render() {
     //const MAX_HEIGHT = 200;
     const style = this._position
       ? styleMap({
           transform: `translate(${this._position.x}, ${this._position.y})`,
-          maxHeight: `${Math.min(this._position.height, MAX_HEIGHT)}px`,
+          //maxHeight: `${Math.min(this._position.height, MAX_HEIGHT)}px`,
         })
       : styleMap({
           visibility: 'hidden',
@@ -433,12 +437,10 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
         @click="${() => this.abortController.abort()}"
       ></div> -->
       <div
-        class="${Prefix}-popover  ${Prefix}-date-picker-popover"
+        class="${Prefix}-popover  ${Prefix}-date-time-popover"
         style="${style}"
       >
-        <!-- ${this._menu()} -->
         <div class="${Prefix}-popover-container">
-          <!-- <date-picker></date-picker>-->
           <mahdaad-date-picker></mahdaad-date-picker>
         </div>
       </div>

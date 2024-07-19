@@ -13,6 +13,7 @@ import { viewPresets } from '../../../database-block/index.js';
 import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
+import type { AffineDateWidget } from '../date/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMentionWidget } from '../mention/index.js';
@@ -231,17 +232,18 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: date,
         action: ({ rootElement, model }) => {
           //old method
-          const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));
+          /*const date = new Date();
+          insertContent(rootElement.host, model, formatDate(date));*/
           //todo fix ali ghasami
-          /*const triggerKey = '';
+          const triggerKey = '';
           insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
           //@ts-ignore
-          const widgetEle = rootElement.widgetElements['affine-date-widget'];
+          const widgetEle =
+            rootElement.widgetElements['affine-date-time-widget'];
           assertExists(widgetEle);
           // We have checked the existence of showLinkedDoc method in the showWhen
-          const mentionWidget = widgetEle as AffineMentionWidget;
+          const dateWidget = widgetEle as AffineDateWidget;
           // Wait for range to be updated
           setTimeout(() => {
             const inlineEditor = getInlineEditorByModel(
@@ -249,9 +251,9 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               model
             );
             assertExists(inlineEditor);
-            mentionWidget.showMention(inlineEditor, triggerKey);
+            dateWidget.showMention(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
-          });*/
+          });
         },
       },
       {

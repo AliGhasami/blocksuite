@@ -17,8 +17,8 @@ import {
 } from '../../../_common/utils/query.js';
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
-import { DatePopover } from './date-popover.js';
-//import type { UserMention } from './types.js';
+import { DateTimePopover } from './date-time-popover.js';
+import type { UserMention } from './types.js';
 
 export type MentionOptions = {
   triggerKeys: string[];
@@ -32,7 +32,7 @@ export type MentionOptions = {
   }) => LinkedDocGroup[];*/
 };
 
-export function showDatePickerPopover({
+export function showMentionPopover({
   editorHost,
   inlineEditor,
   range,
@@ -40,7 +40,7 @@ export function showDatePickerPopover({
   abortController = new AbortController(),
   options,
   triggerKey,
-  //userList = [],
+  userList = [],
 }: {
   editorHost: EditorHost;
   inlineEditor: AffineInlineEditor;
@@ -49,31 +49,35 @@ export function showDatePickerPopover({
   abortController?: AbortController;
   options: MentionOptions;
   triggerKey: string;
-  // userList: UserMention[];
+  userList: UserMention[];
 }) {
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
 
   //console.log(55555, inlineEditor.getInlineRange());
-  const datePicker = new DatePopover(editorHost, inlineEditor, abortController);
-  datePicker.options = options;
+  const mention = new DateTimePopover(
+    editorHost,
+    inlineEditor,
+    abortController
+  );
+  mention.options = options;
   //linkedDoc.options = options;
-  datePicker.triggerKey = triggerKey;
+  mention.triggerKey = triggerKey;
   //console.log('this is user List', userList);
-  //mention.userList = userList;
+  mention.userList = userList;
   // Mount
-  container.append(datePicker);
-  disposables.add(() => datePicker.remove());
+  container.append(mention);
+  disposables.add(() => mention.remove());
 
   // Handle position
   const updatePosition = throttle(() => {
-    const datePickerPopOverElement = datePicker.DatePickerPopOverElement;
+    const mentionPopOverElement = mention.DateTimePopOverElement;
     assertExists(
-      datePickerPopOverElement,
+      mentionPopOverElement,
       'You should render the mention PopOver Element node even if no position'
     );
-    const position = getPopperPosition(datePickerPopOverElement, range);
-    datePicker.updatePosition(position);
+    const position = getPopperPosition(mentionPopOverElement, range);
+    mention.updatePosition(position);
   }, 10);
   disposables.addFromEvent(window, 'resize', updatePosition);
   const scrollContainer = getViewportElement(editorHost);
@@ -87,9 +91,8 @@ export function showDatePickerPopover({
   // Wait for node to be mounted
   setTimeout(updatePosition);
 
-  //todo ali ghasami for implement
+  //todo ali ghasami
   disposables.addFromEvent(window, 'mousedown', (e: Event) => {
-    return;
     const elm: HTMLElement = e.target as HTMLElement;
     if (elm && elm.className.includes('mention-item')) return;
     //console.log('e.target', e.target, mention, container, elm.className);
@@ -99,25 +102,24 @@ export function showDatePickerPopover({
     //if(e.target)
     //return;
     //if (e.target === mention) return;
-    abortController.abort();
+    //abortController.abort();
   });
 
-  return datePicker;
+  return mention;
 }
 
-export const AFFINE_DATE_WIDGET = 'affine-date-widget';
+export const AFFINE_DATE_TIME_WIDGET = 'affine-date-time-widget';
 
-@customElement(AFFINE_DATE_WIDGET)
-export class AffineDateWidget extends WidgetElement {
+@customElement(AFFINE_DATE_TIME_WIDGET)
+export class AffineDateTimeWidget extends WidgetElement {
   static DEFAULT_OPTIONS: MentionOptions = {
     /**
      * The first item of the trigger keys will be the primary key
      */
     triggerKeys: [
       //comment for support mention
-      //'@',
+      '@',
     ],
-    //TODO ali ghasami for complete ignore list
     ignoreBlockTypes: ['affine:code'],
     /**
      * Convert trigger key to primary key (the first item of the trigger keys)
@@ -126,7 +128,28 @@ export class AffineDateWidget extends WidgetElement {
     //getMenus,
   };
 
-  options = AffineDateWidget.DEFAULT_OPTIONS;
+  options = AffineDateTimeWidget.DEFAULT_OPTIONS;
+
+  override connectedCallback() {
+    super.connectedCallback();
+    //console.log('this is block', this.blockElement.model);
+    this.handleEvent('keyDown', this._onKeyDown);
+  }
+
+  showMention = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
+    const curRange = getCurrentNativeRange();
+    if (!curRange) return;
+    showMentionPopover({
+      editorHost: this.host,
+      inlineEditor,
+      range: curRange,
+      options: this.options,
+      triggerKey,
+      //TODO ali ghasami - important
+      //@ts-ignore
+      userList: this.blockElement.model.mentionUserList,
+    });
+  };
 
   private getInlineEditor = (evt: KeyboardEvent) => {
     if (evt.target instanceof HTMLElement) {
@@ -151,27 +174,6 @@ export class AffineDateWidget extends WidgetElement {
     }
     if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
     return getInlineEditorByModel(this.host, model);
-  };
-
-  override connectedCallback() {
-    super.connectedCallback();
-    //console.log('this is block', this.blockElement.model);
-    this.handleEvent('keyDown', this._onKeyDown);
-  }
-
-  showMention = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
-    const curRange = getCurrentNativeRange();
-    if (!curRange) return;
-    showDatePickerPopover({
-      editorHost: this.host,
-      inlineEditor,
-      range: curRange,
-      options: this.options,
-      triggerKey,
-      //TODO ali ghasami - important
-      //@ts-ignore
-      //userList: this.blockElement.model.mentionUserList,
-    });
   };
 
   private _onKeyDown = (ctx: UIEventStateContext) => {
@@ -233,6 +235,6 @@ export class AffineDateWidget extends WidgetElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    [AFFINE_DATE_WIDGET]: AffineDateWidget;
+    [AFFINE_DATE_TIME_WIDGET]: AffineDateTimeWidget;
   }
 }
