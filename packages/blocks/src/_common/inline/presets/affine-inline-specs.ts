@@ -17,6 +17,11 @@ export interface AffineTextAttributes {
   strike?: true | null;
   code?: true | null;
   link?: string | null;
+  date?: {
+    id: string;
+    time: string;
+    date: string;
+  };
   reference?: {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
@@ -146,6 +151,29 @@ export function getAffineInlineSpecsWithReference(
       },
     },
     {
+      name: 'date',
+      schema: z
+        .object({
+          time: z.string(),
+          date: z.string(),
+          id: z.string(),
+        })
+        .optional()
+        .nullable()
+        .catch(undefined),
+      //z.string().optional().nullable().catch(undefined)
+      match: delta => {
+        return !!delta.attributes?.date;
+      },
+      renderer: delta => {
+        //return html`this is date`;
+        //console.log('11111');
+        //return '11111';
+        console.log('11111', delta);
+        return html`<affine-date-time .delta=${delta}></affine-date-time>`;
+      },
+    },
+    {
       name: 'mention',
       schema: z
         .object({
@@ -160,6 +188,8 @@ export function getAffineInlineSpecsWithReference(
         return !!delta.attributes?.mention;
       },
       renderer: (delta, selected) => {
+        //console.log('11111');
+        //return html`1111111`;
         return html`<affine-mention
           .delta=${delta}
           .selected=${selected}

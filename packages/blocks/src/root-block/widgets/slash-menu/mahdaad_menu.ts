@@ -1,8 +1,10 @@
 import { assertExists } from '@blocksuite/global/utils';
-import type { BlockModel } from '@blocksuite/store';
+import { type BlockModel, uuidv4 } from '@blocksuite/store';
 import { Text } from '@blocksuite/store';
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
+import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
   getImageFilesFromLocal,
@@ -232,6 +234,14 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
+          insertContent(rootElement.host, model, REFERENCE_NODE, {
+            date: {
+              date: '2024-05-06',
+              time: '10:35:06',
+              id: uuidv4(),
+            },
+          });
+          return;
           /*const temp=dayjs*/
           //old method
           /*const date = new Date();
