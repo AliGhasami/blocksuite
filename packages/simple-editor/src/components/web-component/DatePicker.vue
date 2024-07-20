@@ -1,7 +1,6 @@
 <template>
-  <div class="mahdaad-date-picker">
+  <div ref="thisRef" class="mahdaad-date-picker">
     <div class="flex">
-      {{ currentTime }}
       <div class="calendar ">
           <div  class="month-year-container">
             <Select
@@ -10,6 +9,7 @@
               :dropdown-match-select-width="false"
               :value="String(currentDate.month())"
               @change="handleChangeMonth"
+              :getPopupContainer="()=> monthContainerRef"
             >
               <SelectOption
                 v-for="(val, index) in getMonths(currentDate)"
@@ -26,6 +26,7 @@
               class="my-year-select"
               :value="String(currentDate.year())"
               @change="handleChangeYear"
+              :getPopupContainer="()=> yearContainerRef"
             >
               <SelectOption
                 v-for="val in getYears(currentDate)"
@@ -46,22 +47,25 @@
         <div ref="container" class="time-body"></div>
         <span class="time-footer">
             <Button @click="handleNow" type="link">Now</Button>
+          <Button @click="handleOKTime" type="primary" size="small">ok</Button>
         </span>
       </div>
     </div>
-    <TimePicker value-format="HH:mm:ss" v-model:value="currentTime" ref="temp" :blur="handleChangeTime"  :getPopupContainer="()=> container" :bordered="false" :open="true" style="display: none"/>
+    <TimePicker v-model:value="currentTime" :getPopupContainer="()=> container" :bordered="false" :open="true" style="display: none"/>
+    <div ref="yearContainerRef"></div>
+    <div ref="monthContainerRef"></div>
   </div>
 </template>
 <script setup lang="ts">
 import {Calendar,TimePicker,Select,SelectOption,Button} from 'ant-design-vue'
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import dayjs, { Dayjs } from 'dayjs';
 
 interface Props{
   date?:string
   time?:string | null
 }
-const temp=ref()
+//const temp=ref()
 
 /*
 onMounted(()=>{
@@ -70,23 +74,16 @@ onMounted(()=>{
   },5000)
 })
 */
-
 const container=ref()
+const thisRef=ref()
+const yearContainerRef=ref()
+const monthContainerRef=ref()
 const currentDate = ref<Dayjs>(dayjs());
-const currentTime = ref<Dayjs | null>(dayjs());
+const currentTime = ref<Dayjs | null>(null);
 const emit=defineEmits<{
   (e:'change',date:string,time:string | null) : void
 }>()
 const props=withDefaults(defineProps<Props>(),{})
-
-/*watch(()=>props.time,()=>{
-  if(props.time==null){
-    currentTime.value=null
-  }
-  if(props.time!=undefined){
-    currentTime.value=dayjs(currentDate.value.format('YYYY-MM-DD')+'T'+props.time,)
-  }
-},{immediate:true})*/
 
 watch(()=>props.date,()=>{
   if(!props.date){
@@ -113,12 +110,18 @@ const getYears = (value: Dayjs) => {
   return years;
 };
 
-function handleNow(){
-  currentTime.value=dayjs()
+function handleOKTime(){
+  if(thisRef.value){
+    const okBtn : HTMLElement | null=(thisRef.value as HTMLElement).querySelector('.ant-picker-ok button');
+    if(okBtn){
+      okBtn.click()
+    }
+  }
 }
 
-function handleChangeTime(time){
-  console.log("this is now",time);
+
+function handleNow(){
+  currentTime.value=dayjs()
 }
 
 function handleToday(){
@@ -137,7 +140,6 @@ watch([currentTime,currentDate],handleChange)
 
 
 function handleChange(){
-  console.log("this is change");
   const time=currentTime.value ? currentTime.value.format('HH:mm:ss') : null
   emit('change',currentDate.value.format('YYYY-MM-DD'),time)
 }
@@ -166,10 +168,16 @@ function handleChange(){
       border-bottom: 1px solid @gray-2;
     }
 
+
     .calendar-footer,.time-footer{
       @apply h-10 flex items-center justify-center text-primary-5;
       border-top: 1px solid @gray-2;
     }
+
+    .time-footer{
+      @apply gap-6;
+    }
+
     .ant-picker-calendar-header{
       display: none;
     }

@@ -1,6 +1,7 @@
 import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 import { Text } from '@blocksuite/store';
+import dayjs from 'dayjs';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
@@ -231,11 +232,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
+          /*const temp=dayjs*/
           //old method
           /*const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));*/
           //todo fix ali ghasami
-          const triggerKey = '';
+          const triggerKey = dayjs().format('DD MMMM,YYYY'); //this is date'//'YYYY-MM-DD'
+          //const date = '1111';
           insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
           //@ts-ignore

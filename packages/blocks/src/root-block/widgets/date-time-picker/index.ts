@@ -49,35 +49,39 @@ export function showMentionPopover({
   abortController?: AbortController;
   options: MentionOptions;
   triggerKey: string;
-  userList: UserMention[];
+  //userList: UserMention[];
 }) {
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
 
   //console.log(55555, inlineEditor.getInlineRange());
-  const mention = new DateTimePopover(
+  const dateTime = new DateTimePopover(
     editorHost,
     inlineEditor,
     abortController
   );
-  mention.options = options;
+  dateTime.options = options;
   //linkedDoc.options = options;
-  mention.triggerKey = triggerKey;
+  dateTime.triggerKey = triggerKey;
   //console.log('this is user List', userList);
-  mention.userList = userList;
+  //dateTime.userList = userList;
   // Mount
-  container.append(mention);
-  disposables.add(() => mention.remove());
+  container.append(dateTime);
+  disposables.add(() => dateTime.remove());
 
   // Handle position
   const updatePosition = throttle(() => {
-    const mentionPopOverElement = mention.DateTimePopOverElement;
+    const mentionPopOverElement = dateTime.DateTimePopOverElement;
     assertExists(
       mentionPopOverElement,
       'You should render the mention PopOver Element node even if no position'
     );
     const position = getPopperPosition(mentionPopOverElement, range);
-    mention.updatePosition(position);
+    //const x = parseInt(position.x.slice(0, position.x.length - 2));
+    //position.x = `${x - 90}px`;
+    //console.log('1111', position);
+    //position.x = position.x-3;
+    dateTime.updatePosition(position);
   }, 10);
   disposables.addFromEvent(window, 'resize', updatePosition);
   const scrollContainer = getViewportElement(editorHost);
@@ -93,8 +97,9 @@ export function showMentionPopover({
 
   //todo ali ghasami
   disposables.addFromEvent(window, 'mousedown', (e: Event) => {
-    const elm: HTMLElement = e.target as HTMLElement;
-    if (elm && elm.className.includes('mention-item')) return;
+    //const elm: HTMLElement = e.target as HTMLElement;
+    //console.log('this is elm', elm);
+    //if (elm && elm.className.includes('mention-item')) return;
     //console.log('e.target', e.target, mention, container, elm.className);
     //if()
     //return;
@@ -102,10 +107,26 @@ export function showMentionPopover({
     //if(e.target)
     //return;
     //if (e.target === mention) return;
-    //abortController.abort();
+    abortController.abort();
   });
 
-  return mention;
+  disposables.addFromEvent(window, 'keypress', (e: Event) => {
+    abortController.abort();
+    //console.log('this is keydown');
+    /*const elm: HTMLElement = e.target as HTMLElement;
+    console.log('this is elm', elm);
+    if (elm && elm.className.includes('mention-item')) return;*/
+    //console.log('e.target', e.target, mention, container, elm.className);
+    //if()
+    //return;
+    //console.log('77777', inlineEditor.getInlineRange());
+    //if(e.target)
+    //return;
+    //if (e.target === mention) return;
+    //
+  });
+
+  return dateTime;
 }
 
 export const AFFINE_DATE_TIME_WIDGET = 'affine-date-time-widget';

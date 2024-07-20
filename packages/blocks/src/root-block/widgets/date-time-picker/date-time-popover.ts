@@ -170,6 +170,8 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
       })
     );*/
     this._disposables.addFromEvent(this, 'mousedown', e => {
+      e.stopPropagation();
+      //debugger;
       // Prevent input from losing focus
       e.preventDefault();
     });
