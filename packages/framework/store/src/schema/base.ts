@@ -1,14 +1,16 @@
-import { type Disposable, Slot } from '@blocksuite/global/utils';
 import type { Signal } from '@preact/signals-core';
-import { computed, signal } from '@preact/signals-core';
 import type * as Y from 'yjs';
+
+import { type Disposable, Slot } from '@blocksuite/global/utils';
+import { computed, signal } from '@preact/signals-core';
 import { z } from 'zod';
 
-import { Boxed } from '../reactive/boxed.js';
-import { Text } from '../reactive/text.js';
 import type { YBlock } from '../store/doc/block/index.js';
 import type { Doc } from '../store/index.js';
 import type { BaseBlockTransformer } from '../transformer/base.js';
+
+import { Boxed } from '../reactive/boxed.js';
+import { Text } from '../reactive/text.js';
 
 const FlavourSchema = z.string();
 const ParentSchema = z.array(z.string()).optional();

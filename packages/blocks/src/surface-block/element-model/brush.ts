@@ -1,3 +1,6 @@
+import type { IVec, IVec3 } from '../utils/vec.js';
+import type { SerializedXYWH } from '../utils/xywh.js';
+
 import { getSolidStrokePoints } from '../canvas-renderer/element-renderer/brush/utils.js';
 import {
   Bound,
@@ -14,9 +17,7 @@ import {
   polyLineNearestPoint,
 } from '../utils/math-utils.js';
 import { PointLocation } from '../utils/point-location.js';
-import type { IVec, IVec3 } from '../utils/vec.js';
 import { Vec } from '../utils/vec.js';
-import type { SerializedXYWH } from '../utils/xywh.js';
 import {
   type IBaseProps,
   type IHitTestOptions,

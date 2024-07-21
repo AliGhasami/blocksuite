@@ -1,6 +1,7 @@
 import type { SerializedXYWH } from '../../../index.js';
-import { Bound } from '../../../utils/bound.js';
 import type { MindmapElementModel } from '../../mindmap.js';
+
+import { Bound } from '../../../utils/bound.js';
 
 export const NODE_VERTICAL_SPACING = 45;
 export const NODE_HORIZONTAL_SPACING = 110;

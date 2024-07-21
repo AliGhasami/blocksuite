@@ -1,4 +1,5 @@
 import type { BlockService } from '@blocksuite/block-std';
+
 import { DisposableGroup, Slot } from '@blocksuite/global/utils';
 import { isPlainObject, recursive } from 'merge';
 import { z } from 'zod';

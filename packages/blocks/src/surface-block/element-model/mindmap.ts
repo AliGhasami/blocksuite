@@ -3,14 +3,24 @@ import { DocCollection, type Y } from '@blocksuite/store';
 import { generateKeyBetween } from 'fractional-indexing';
 import { z } from 'zod';
 
+import type { SurfaceBlockModel } from '../surface-model.js';
+import type {
+  MindmapNode,
+  MindmapRoot,
+  NodeDetail,
+} from './utils/mindmap/layout.js';
+import type {
+  ConnectorStyle,
+  MindmapStyleGetter,
+} from './utils/mindmap/style.js';
+
 import { keys, last, pick } from '../../_common/utils/iterable.js';
 import { TextResizing } from '../consts.js';
 import { ConnectorPathGenerator } from '../managers/connector-manager.js';
-import type { SurfaceBlockModel } from '../surface-model.js';
 import {
-  deserializeXYWH,
   type SerializedXYWH,
   type XYWH,
+  deserializeXYWH,
 } from '../utils/xywh.js';
 import {
   type IBaseProps,
@@ -19,19 +29,10 @@ import {
 } from './base.js';
 import { LocalConnectorElementModel } from './connector.js';
 import { convert, observe, watch, yfield } from './decorators.js';
-import type {
-  MindmapNode,
-  MindmapRoot,
-  NodeDetail,
-} from './utils/mindmap/layout.js';
-import { layout, LayoutType } from './utils/mindmap/layout.js';
-import type {
-  ConnectorStyle,
-  MindmapStyleGetter,
-} from './utils/mindmap/style.js';
+import { LayoutType, layout } from './utils/mindmap/layout.js';
 import {
-  applyNodeStyle,
   MindmapStyle,
+  applyNodeStyle,
   mindmapStyleGetters,
 } from './utils/mindmap/style.js';
 

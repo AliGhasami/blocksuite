@@ -1,5 +1,6 @@
 import { BlockService } from '@blocksuite/block-std';
-import { html, type TemplateResult } from 'lit';
+
+import type { ParagraphBlockModel } from './paragraph-model.js';
 
 import { InlineManager } from '../_common/inline/inline-manager.js';
 import {
@@ -8,32 +9,14 @@ import {
 } from '../_common/inline/presets/affine-inline-specs.js';
 import { affineInlineMarkdownMatches } from '../_common/inline/presets/markdown.js';
 import { ReferenceNodeConfig } from '../_common/inline/presets/nodes/reference-node/reference-config.js';
-import type { ParagraphBlockModel } from './paragraph-model.js';
 
 export class ParagraphBlockService<
   TextAttributes extends AffineTextAttributes = AffineTextAttributes,
 > extends BlockService<ParagraphBlockModel> {
   readonly inlineManager = new InlineManager<TextAttributes>();
 
-  readonly referenceNodeConfig = new ReferenceNodeConfig();
-
-  override mounted(): void {
-    super.mounted();
-
-    this.referenceNodeConfig.setDoc(this.doc);
-
-    const inlineSpecs = getAffineInlineSpecsWithReference(
-      this.referenceNodeConfig
-    );
-    this.inlineManager.registerSpecs(inlineSpecs);
-    this.inlineManager.registerMarkdownMatches(affineInlineMarkdownMatches);
-  }
-
-  placeholderGenerator: (
-    model: ParagraphBlockModel
-  ) => TemplateResult<1> | string = model => {
-    return this.getPlaceholder(model);
-    /*if (model.type === 'text') {
+  placeholderGenerator: (model: ParagraphBlockModel) => string = model => {
+    if (model.type === 'text') {
       return "Type '/' for commands";
     }
 
@@ -76,4 +59,18 @@ export class ParagraphBlockService<
     };
     return placeholders[model.type];
   };
+
+  readonly referenceNodeConfig = new ReferenceNodeConfig();
+
+  override mounted(): void {
+    super.mounted();
+
+    this.referenceNodeConfig.setDoc(this.doc);
+
+    const inlineSpecs = getAffineInlineSpecsWithReference(
+      this.referenceNodeConfig
+    );
+    this.inlineManager.registerSpecs(inlineSpecs);
+    this.inlineManager.registerMarkdownMatches(affineInlineMarkdownMatches);
+  }
 }

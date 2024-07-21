@@ -9,6 +9,7 @@ import type {
   DocSnapshot,
   SliceSnapshot,
 } from '../transformer/type.js';
+
 import { ASTWalkerContext } from './context.js';
 
 export type FromDocSnapshotPayload = {

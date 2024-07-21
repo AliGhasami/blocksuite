@@ -1,8 +1,10 @@
 import type { Doc as YDoc, YEvent } from 'yjs';
-import { Array as YArray, Map as YMap, Text as YText, UndoManager } from 'yjs';
+
+import { UndoManager, Array as YArray, Map as YMap, Text as YText } from 'yjs';
+
+import type { ProxyOptions } from './proxy.js';
 
 import { Boxed } from './boxed.js';
-import type { ProxyOptions } from './proxy.js';
 import { Text } from './text.js';
 
 export type Native2Y<T> =

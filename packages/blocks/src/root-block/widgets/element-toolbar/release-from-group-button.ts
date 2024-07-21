@@ -1,18 +1,15 @@
-import '../../edgeless/components/buttons/tool-icon-button.js';
-
 import { WithDisposable } from '@blocksuite/block-std';
-import { html, LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+
+import '../../../_common/components/toolbar/icon-button.js';
 import { ReleaseFromGroupButtonIcon } from '../../../_common/icons/index.js';
 import { GroupElementModel } from '../../../surface-block/element-model/group.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 
 @customElement('edgeless-release-from-group-button')
 export class EdgelessReleaseFromGroupButton extends WithDisposable(LitElement) {
-  @property({ attribute: false })
-  accessor edgeless!: EdgelessRootBlockComponent;
-
   private _releaseFromGroup() {
     const service = this.edgeless.service;
     const element = service.selection.firstElement;
@@ -36,16 +33,19 @@ export class EdgelessReleaseFromGroupButton extends WithDisposable(LitElement) {
 
   protected override render() {
     return html`
-      <edgeless-tool-icon-button
+      <editor-icon-button
         aria-label="Release from group"
         .tooltip=${'Release from group'}
         .iconSize=${'20px'}
         @click=${() => this._releaseFromGroup()}
       >
         ${ReleaseFromGroupButtonIcon}
-      </edgeless-tool-icon-button>
+      </editor-icon-button>
     `;
   }
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
 }
 
 declare global {

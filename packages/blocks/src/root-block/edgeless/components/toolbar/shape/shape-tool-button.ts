@@ -1,11 +1,11 @@
-import '../../buttons/toolbar-button.js';
-import './shape-menu.js';
-import './shape-draggable.js';
-
 import { cssVar } from '@toeverything/theme';
-import { css, html, LitElement } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+
+import type { LastProps } from '../../../../../surface-block/managers/edit-session.js';
+import type { ShapeName } from './shape-tool-element.js';
+import type { DraggableShape } from './utils.js';
 
 import {
   ArrowUpIcon,
@@ -18,17 +18,17 @@ import {
   ShapeType,
 } from '../../../../../surface-block/elements/shape/consts.js';
 import { ShapeStyle } from '../../../../../surface-block/index.js';
-import type { LastProps } from '../../../../../surface-block/managers/edit-session.js';
 import { ShapeToolController } from '../../../controllers/tools/shape-tool.js';
+import '../../buttons/toolbar-button.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import {
   applyLastProps,
   observeLastProps,
 } from '../common/observe-last-props.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
+import './shape-draggable.js';
+import './shape-menu.js';
 import { ShapeComponentConfig } from './shape-menu-config.js';
-import type { ShapeName } from './shape-tool-element.js';
-import type { DraggableShape } from './utils.js';
 
 const { Rect } = ShapeType;
 
@@ -57,18 +57,19 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
 
   override type = 'shape' as const;
 
-  @state()
-  accessor states: Partial<LastProps['shape']> = {
-    shapeStyle: ShapeStyle.Scribbled,
-    shapeType: Rect,
-    fillColor: DEFAULT_SHAPE_FILL_COLOR,
-    strokeColor: DEFAULT_SHAPE_STROKE_COLOR,
-    radius: 0,
-  };
-
-  get stateKeys() {
-    return Object.keys(this.states) as Array<keyof typeof this.states>;
-  }
+  /*private _handleShapeClick(shape: DraggableShape) {
+    const name = shape.name;
+    if (name !== this.states.shapeType) {
+      const shapeConfig = ShapeComponentConfig.find(s => s.name === name);
+      if (!shapeConfig) return;
+      this.edgeless.service.editPropsStore.recordLastProps(
+        'shape',
+        shapeConfig?.value
+      );
+      this.updateMenu();
+    }
+    if (!this.popper) this._toggleMenu();
+  }*/
 
   private _toggleMenu() {
     if (this.tryDisposePopper()) return;
@@ -190,6 +191,24 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     //   </edgeless-toolbar-button>
     // `;
   }
+
+  /*updateMenu() {
+    if (!this.popper) return;
+    Object.assign(this.popper.element, this.states);
+  }*/
+
+  get stateKeys() {
+    return Object.keys(this.states) as Array<keyof typeof this.states>;
+  }
+
+  @state()
+  accessor states: Partial<LastProps['shape']> = {
+    shapeStyle: ShapeStyle.Scribbled,
+    shapeType: Rect,
+    fillColor: DEFAULT_SHAPE_FILL_COLOR,
+    strokeColor: DEFAULT_SHAPE_STROKE_COLOR,
+    radius: 0,
+  };
 }
 
 declare global {

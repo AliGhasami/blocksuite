@@ -1,11 +1,12 @@
 import { DisposableGroup, Slot } from '@blocksuite/global/utils';
 
-import { requestConnectedFrame } from '../../_common/utils/event.js';
-import { last } from '../../_common/utils/iterable.js';
 import type { Viewport } from '../../root-block/edgeless/utils/viewport.js';
 import type { IBound } from '../consts.js';
 import type { SurfaceElementModel } from '../element-model/base.js';
 import type { LayerManager } from '../managers/layer-manager.js';
+
+import { requestConnectedFrame } from '../../_common/utils/event.js';
+import { last } from '../../_common/utils/iterable.js';
 import { RoughCanvas } from '../rough/canvas.js';
 import { intersects } from '../utils/math-utils.js';
 import { getBoundsWithRotation } from '../utils/math-utils.js';
@@ -140,6 +141,7 @@ export class Renderer {
           : document.createElement('canvas');
 
         if (!created) {
+          this._stackingCanvas.push(canvas);
           onCreated?.(canvas);
         }
 

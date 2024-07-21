@@ -1,5 +1,7 @@
 import { DocCollection, type Y } from '@blocksuite/store';
 
+import type { SerializedXYWH, XYWH } from '../utils/xywh.js';
+
 import {
   DEFAULT_ROUGHNESS,
   FontFamily,
@@ -24,7 +26,6 @@ import {
 import { PointLocation } from '../utils/point-location.js';
 import { Polyline } from '../utils/polyline.js';
 import { type IVec, Vec } from '../utils/vec.js';
-import type { SerializedXYWH, XYWH } from '../utils/xywh.js';
 import {
   type IBaseProps,
   type IHitTestOptions,

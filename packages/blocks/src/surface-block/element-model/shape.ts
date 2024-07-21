@@ -1,5 +1,10 @@
 import { DocCollection, type Y } from '@blocksuite/store';
 
+import type { IBound, SerializedXYWH } from '../index.js';
+import type { Bound } from '../utils/bound.js';
+import type { PointLocation } from '../utils/point-location.js';
+import type { IVec } from '../utils/vec.js';
+
 import {
   DEFAULT_ROUGHNESS,
   FontFamily,
@@ -11,10 +16,6 @@ import {
   type TextStyleProps,
   TextVerticalAlign,
 } from '../consts.js';
-import type { IBound, SerializedXYWH } from '../index.js';
-import type { Bound } from '../utils/bound.js';
-import type { PointLocation } from '../utils/point-location.js';
-import type { IVec } from '../utils/vec.js';
 import {
   type IBaseProps,
   type IHitTestOptions,

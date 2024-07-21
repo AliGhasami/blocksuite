@@ -1,22 +1,23 @@
-import '../declare-test-window.js';
-
 import type { CssVariableName } from '@blocks/_common/theme/css-variables.js';
 import type { IPoint, NoteDisplayMode } from '@blocks/_common/types.js';
 import type { NoteBlockModel } from '@blocks/note-block/index.js';
 import type { IVec } from '@blocks/surface-block/index.js';
-import { assertExists, sleep } from '@global/utils/index.js';
 import type { Locator, Page } from '@playwright/test';
+
+import { assertExists, sleep } from '@global/utils/index.js';
 import { expect } from '@playwright/test';
 
 import type { Bound } from '../asserts.js';
+
+import '../declare-test-window.js';
 import { clickView } from './click.js';
 import { dragBetweenCoords } from './drag.js';
 import {
+  SHIFT_KEY,
+  SHORT_KEY,
   pressBackspace,
   pressEnter,
   selectAllByKeyboard,
-  SHIFT_KEY,
-  SHORT_KEY,
   type,
 } from './keyboard.js';
 import {
@@ -45,11 +46,11 @@ const AWAIT_TIMEOUT = 500;
 export const ZOOM_BAR_RESPONSIVE_SCREEN_WIDTH = 1200;
 export type Point = { x: number; y: number };
 export enum Shape {
-  Square = 'Square',
-  Ellipse = 'Ellipse',
   Diamond = 'Diamond',
-  Triangle = 'Triangle',
+  Ellipse = 'Ellipse',
   'Rounded rectangle' = 'Rounded rectangle',
+  Square = 'Square',
+  Triangle = 'Triangle',
 }
 
 export enum LassoMode {
@@ -255,7 +256,7 @@ export function locatorEdgelessComponentToolButton(
     more: 'More',
   }[type];
   const button = page
-    .locator('edgeless-element-toolbar-widget edgeless-tool-icon-button')
+    .locator('edgeless-element-toolbar-widget editor-icon-button')
     .filter({
       hasText: text,
     });
@@ -395,7 +396,7 @@ export async function assertEdgelessLassoToolMode(page: Page, mode: LassoMode) {
 }
 
 export async function getEdgelessBlockChild(page: Page) {
-  const block = page.locator('.edgeless-block-portal-note');
+  const block = page.locator('affine-edgeless-note');
   const blockBox = await block.boundingBox();
   if (blockBox === null) throw new Error('Missing edgeless block child rect');
   return blockBox;
@@ -632,7 +633,9 @@ export async function pickColorAtPoints(page: Page, points: number[][]) {
 
 export async function getNoteBoundBoxInEdgeless(page: Page, noteId: string) {
   const editor = getEditorLocator(page);
-  const note = editor.locator(`affine-note[data-block-id="${noteId}"]`);
+  const note = editor.locator(
+    `affine-edgeless-note[data-block-id="${noteId}"]`
+  );
   const bound = await note.boundingBox();
   if (!bound) {
     throw new Error(`Missing note: ${noteId}`);
@@ -667,7 +670,7 @@ export async function activeNoteInEdgeless(page: Page, noteId: string) {
 
 export async function selectNoteInEdgeless(page: Page, noteId: string) {
   const bound = await getNoteBoundBoxInEdgeless(page, noteId);
-  await page.mouse.click(bound.x, bound.y);
+  await page.mouse.click(bound.x + bound.width / 2, bound.y + bound.height / 2);
 }
 
 export function locatorNoteDisplayModeButton(
@@ -710,7 +713,7 @@ export async function updateExistedBrushElementSize(
 
 export async function openComponentToolbarMoreMenu(page: Page) {
   const btn = page.locator(
-    'edgeless-element-toolbar-widget edgeless-more-button edgeless-menu-button'
+    'edgeless-element-toolbar-widget edgeless-more-button editor-menu-button'
   );
 
   await btn.click();
@@ -725,7 +728,7 @@ export async function clickComponentToolbarMoreMenuButton(
   }[button];
 
   const btn = locatorComponentToolbarMoreButton(page)
-    .locator('.action-item')
+    .locator('editor-menu-action')
     .filter({ hasText: text });
 
   await btn.click();
@@ -869,7 +872,6 @@ type Action =
   | 'quickConnect'
   | 'turnIntoLinkedDoc'
   | 'createLinkedDoc'
-  | 'linkedDocInfo'
   | 'openLinkedDoc'
   | 'toCardView'
   | 'toEmbedView';
@@ -884,7 +886,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Bring to Front',
         });
@@ -896,7 +898,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Bring Forward',
         });
@@ -908,7 +910,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Send Backward',
         });
@@ -920,7 +922,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Send to Back',
         });
@@ -932,7 +934,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Copy as PNG',
         });
@@ -944,7 +946,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Frame Section',
         });
@@ -956,7 +958,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Duplicate',
         });
@@ -1038,7 +1040,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Group Section',
         });
@@ -1113,7 +1115,7 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Turn into linked doc',
         });
@@ -1125,22 +1127,22 @@ export async function triggerComponentToolbarAction(
       await moreButton.click();
 
       const actionButton = moreButton
-        .locator('.more-actions-container .action-item')
+        .locator('.more-actions-container editor-menu-action')
         .filter({
           hasText: 'Create linked doc',
         });
       await actionButton.click();
       break;
     }
-    case 'linkedDocInfo': {
-      const button = locatorComponentToolbar(page).locator('.doc-info');
-      await button.click();
-      break;
-    }
     case 'openLinkedDoc': {
-      const button = locatorComponentToolbar(page).locator(
-        'edgeless-change-embed-card-button .open'
-      );
+      const openButton = locatorComponentToolbar(page).getByRole('button', {
+        name: 'Open',
+      });
+      await openButton.click();
+
+      const button = locatorComponentToolbar(page).getByRole('button', {
+        name: 'Open this doc',
+      });
       await button.click();
       break;
     }

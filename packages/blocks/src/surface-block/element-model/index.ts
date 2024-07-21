@@ -1,10 +1,11 @@
 import { DocCollection, type Y } from '@blocksuite/store';
 
 import type { SurfaceBlockModel } from '../surface-model.js';
+
 import { SurfaceElementModel } from './base.js';
 import { BrushElementModel } from './brush.js';
 import { ConnectorElementModel } from './connector.js';
-import { initializedObservers, initializeWatchers } from './decorators.js';
+import { initializeWatchers, initializedObservers } from './decorators.js';
 import { getDecoratorState } from './decorators/common.js';
 import { GroupElementModel } from './group.js';
 import { MindmapElementModel } from './mindmap.js';

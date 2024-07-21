@@ -5,15 +5,17 @@ import {
 } from '@blocksuite/global/utils';
 
 import type { Connectable } from '../../_common/types.js';
-import { last } from '../../_common/utils/iterable.js';
 import type { EdgelessRootService } from '../../root-block/edgeless/edgeless-root-service.js';
-import { Overlay } from '../canvas-renderer/renderer.js';
 import type { IBound } from '../consts.js';
 import type {
   Connection,
   ConnectorElementModel,
   LocalConnectorElementModel,
 } from '../element-model/connector.js';
+import type { IVec, IVec3 } from '../utils/vec.js';
+
+import { last } from '../../_common/utils/iterable.js';
+import { Overlay } from '../canvas-renderer/renderer.js';
 import {
   ConnectorMode,
   isConnectorWithLabel,
@@ -26,6 +28,7 @@ import {
   getBezierParameters,
 } from '../utils/curve.js';
 import {
+  PI2,
   almostEqual,
   clamp,
   getBoundsWithRotation,
@@ -33,12 +36,10 @@ import {
   isOverlap,
   isVecZero,
   lineIntersects,
-  PI2,
   sign,
   toRadian,
 } from '../utils/math-utils.js';
 import { PointLocation } from '../utils/point-location.js';
-import type { IVec, IVec3 } from '../utils/vec.js';
 import { Vec } from '../utils/vec.js';
 
 export type OrthogonalConnectorInput = {

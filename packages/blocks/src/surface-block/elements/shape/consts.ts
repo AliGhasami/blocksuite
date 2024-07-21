@@ -1,5 +1,6 @@
-import { createZodUnion } from '../../../_common/utils/index.js';
 import type { StrokeStyle } from '../../consts.js';
+
+import { createZodUnion } from '../../../_common/utils/index.js';
 
 export enum ShapeType {
   Diamond = 'diamond',

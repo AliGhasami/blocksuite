@@ -2,14 +2,16 @@ import { html } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import type { LineWidth } from '../../../../_common/types.js';
+import type { LineWidthEvent } from './line-width-panel.js';
+
+import '../../../../_common/components/toolbar/separator.js';
 import {
   BanIcon,
   DashLineIcon,
   StraightLineIcon,
 } from '../../../../_common/icons/edgeless.js';
-import type { LineWidth } from '../../../../_common/types.js';
 import { StrokeStyle } from '../../../../surface-block/consts.js';
-import type { LineWidthEvent } from './line-width-panel.js';
 
 export type LineStyleEvent =
   | {
@@ -96,7 +98,7 @@ export function LineStylesPanel({
 
   return html`
     ${lineSizePanel}
-    <edgeless-menu-divider></edgeless-menu-divider>
+    <editor-toolbar-separator></editor-toolbar-separator>
     ${lineStyleButtons}
   `;
 }

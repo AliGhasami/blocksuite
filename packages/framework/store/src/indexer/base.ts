@@ -1,5 +1,6 @@
-import { assertExists, DisposableGroup, Slot } from '@blocksuite/global/utils';
 import type * as Y from 'yjs';
+
+import { DisposableGroup, Slot, assertExists } from '@blocksuite/global/utils';
 import { YArrayEvent, YMapEvent, YTextEvent } from 'yjs';
 
 import type { YBlock } from '../store/doc/block/index.js';

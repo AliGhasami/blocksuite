@@ -4,9 +4,10 @@ import type {
   TextSelection,
 } from '@blocksuite/block-std';
 import type { EditorHost } from '@blocksuite/block-std';
+import type { RoleType } from '@blocksuite/store';
+
 import { BlockElement } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { RoleType } from '@blocksuite/store';
 
 import type { ImageSelection } from '../../../image-block/image-selection.js';
 
@@ -35,17 +36,19 @@ export const getSelectedBlocksCommand: Command<
   if (types.includes('text') && textSelection) {
     const rangeManager = (ctx.std.host as EditorHost).rangeManager;
     assertExists(rangeManager);
-    const range = rangeManager.textSelectionToRange(textSelection);
-    if (!range) return;
+    try {
+      const range = rangeManager.textSelectionToRange(textSelection);
+      if (!range) return;
 
-    const selectedBlockElements = rangeManager.getSelectedBlockElementsByRange(
-      range,
-      {
-        match: (el: BlockElement) => roles.includes(el.model.role),
-        mode,
-      }
-    );
-    dirtyResult.push(...selectedBlockElements);
+      const selectedBlockElements =
+        rangeManager.getSelectedBlockElementsByRange(range, {
+          match: (el: BlockElement) => roles.includes(el.model.role),
+          mode,
+        });
+      dirtyResult.push(...selectedBlockElements);
+    } catch {
+      return;
+    }
   }
 
   const blockSelections = ctx.blockSelections ?? ctx.currentBlockSelections;
@@ -80,7 +83,7 @@ export const getSelectedBlocksCommand: Command<
           blockElements.push(parent);
         }
       }
-      if (['flat', 'all'].includes(mode)) {
+      if (['all', 'flat'].includes(mode)) {
         viewStore.walkThrough(node => {
           const view = node;
           if (!(view instanceof BlockElement)) {

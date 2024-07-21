@@ -1,9 +1,11 @@
-import { assertExists } from '@blocksuite/global/utils';
 import type { YArrayEvent, YMapEvent } from 'yjs';
+
+import { assertExists } from '@blocksuite/global/utils';
 import { Array as YArray, Map as YMap } from 'yjs';
 
-import { Boxed } from './boxed.js';
 import type { UnRecord } from './utils.js';
+
+import { Boxed } from './boxed.js';
 import { BaseReactiveYData, native2Y, y2Native } from './utils.js';
 
 export type ProxyOptions<T> = {

@@ -1,5 +1,8 @@
 import { DocCollection, type Y } from '@blocksuite/store';
 
+import type { SerializedXYWH } from '../index.js';
+import type { IVec } from '../utils/vec.js';
+
 import {
   FontFamily,
   FontStyle,
@@ -7,7 +10,6 @@ import {
   TextAlign,
   type TextStyleProps,
 } from '../consts.js';
-import type { SerializedXYWH } from '../index.js';
 import { Bound } from '../utils/bound.js';
 import {
   getPointsFromBoundsWithRotation,
@@ -15,7 +17,6 @@ import {
   pointInPolygon,
   polygonNearestPoint,
 } from '../utils/math-utils.js';
-import type { IVec } from '../utils/vec.js';
 import { type IBaseProps, SurfaceElementModel } from './base.js';
 import { yfield } from './decorators.js';
 

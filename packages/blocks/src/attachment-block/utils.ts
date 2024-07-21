@@ -1,15 +1,17 @@
 import type { EditorHost } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { toast } from '../_common/components/toast.js';
-import { uploadFile } from '../_common/upload.js';
-import { humanFileSize } from '../_common/utils/math.js';
 import type { AttachmentBlockComponent } from './attachment-block.js';
+import { assertExists } from '@blocksuite/global/utils';
+import { uploadFile } from '../_common/upload.js';
+
 import type {
   AttachmentBlockModel,
   AttachmentBlockProps,
 } from './attachment-model.js';
+
+import { toast } from '../_common/components/toast.js';
+import { humanFileSize } from '../_common/utils/math.js';
 import { defaultAttachmentProps } from './attachment-model.js';
 import { allowEmbed } from './embed.js';
 
@@ -194,7 +196,7 @@ export async function getFileType(file: File) {
   }
   // If the file type is not available, try to get it from the buffer.
   const buffer = await file.arrayBuffer();
-  const FileType = await import('@sgtpooki/file-type');
+  const FileType = await import('file-type');
   const fileType = await FileType.fileTypeFromBuffer(buffer);
   return fileType ? fileType.mime : '';
 }

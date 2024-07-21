@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
+  Shape,
   activeNoteInEdgeless,
   createConnectorElement,
   createNote,
@@ -11,7 +12,6 @@ import {
   getConnectorPath,
   locatorComponentToolbarMoreButton,
   selectNoteInEdgeless,
-  Shape,
   triggerComponentToolbarAction,
 } from '../utils/actions/edgeless.js';
 import {
@@ -43,9 +43,9 @@ test.describe('note to linked doc', () => {
     const embedSyncedBlock = page.locator('affine-embed-synced-doc-block');
     assertExists(embedSyncedBlock);
 
-    await triggerComponentToolbarAction(page, 'linkedDocInfo');
+    await triggerComponentToolbarAction(page, 'openLinkedDoc');
     await waitNextFrame(page, 200);
-    const noteBlock = page.locator('affine-note');
+    const noteBlock = page.locator('affine-edgeless-note');
     assertExists(noteBlock);
     const noteContent = await noteBlock.innerText();
     expect(noteContent).toBe('Hello\nWorld');

@@ -1,5 +1,7 @@
 import type { BlockElement } from '@blocksuite/block-std';
-import { css, LitElement, type PropertyValues } from 'lit';
+
+import { SignalWatcher } from '@lit-labs/preact-signals';
+import { LitElement, type PropertyValues, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 /**
@@ -20,7 +22,7 @@ import { customElement, property } from 'lit/decorators.js';
  * ```
  */
 @customElement('affine-block-selection')
-export class BlockSelection extends LitElement {
+export class BlockSelection extends SignalWatcher(LitElement) {
   static override styles = css`
     :host {
       position: absolute;
@@ -36,20 +38,6 @@ export class BlockSelection extends LitElement {
     }
   `;
 
-  @property({ attribute: false })
-  accessor block!: BlockElement;
-
-  @property({ attribute: false })
-  accessor borderRadius: number = 5;
-
-  @property({ attribute: false })
-  accessor borderWidth: number = 0;
-
-  protected override updated(_changedProperties: PropertyValues): void {
-    super.updated(_changedProperties);
-    this.style.display = this.block.selected?.is('block') ? 'block' : 'none';
-  }
-
   override connectedCallback(): void {
     super.connectedCallback();
 
@@ -59,9 +47,21 @@ export class BlockSelection extends LitElement {
       this.style.transform = `translate(-${this.borderWidth}px, -${this.borderWidth}px)`;
     }
     this.style.borderWidth = `${this.borderWidth}px`;
-
-    this.block.host.selection.slots.changed.on(() => this.requestUpdate());
   }
+
+  protected override updated(_changedProperties: PropertyValues): void {
+    super.updated(_changedProperties);
+    this.style.display = this.block.selected?.is('block') ? 'block' : 'none';
+  }
+
+  @property({ attribute: false })
+  accessor block!: BlockElement;
+
+  @property({ attribute: false })
+  accessor borderRadius: number = 5;
+
+  @property({ attribute: false })
+  accessor borderWidth: number = 0;
 }
 
 declare global {

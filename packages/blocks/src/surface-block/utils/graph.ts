@@ -1,7 +1,8 @@
 import type { Bound } from './bound.js';
+import type { IVec, IVec3 } from './vec.js';
+
 import { almostEqual, linePolygonIntersects } from './math-utils.js';
 import { isOverlap as _isOverlap } from './math-utils.js';
-import type { IVec, IVec3 } from './vec.js';
 
 function isOverlap(line: IVec[], line2: IVec[]) {
   if (

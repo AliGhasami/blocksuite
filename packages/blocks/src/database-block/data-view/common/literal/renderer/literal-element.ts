@@ -10,13 +10,13 @@ export abstract class LiteralElement<T = unknown, Type extends TType = TType>
   implements LiteralViewProps<T, Type>
 {
   @property({ attribute: false })
+  accessor onChange!: (value?: T) => void;
+
+  @property({ attribute: false })
   accessor type!: Type;
 
   @property({ attribute: false })
   accessor value: T | undefined = undefined;
-
-  @property({ attribute: false })
-  accessor onChange!: (value?: T) => void;
 }
 
 @customElement('data-view-literal-boolean-view')
@@ -40,7 +40,7 @@ export class NumberLiteral extends LiteralElement<number> {
 
   override render() {
     return (
-      this.value?.toString() ?? html`<span class="dv-color-2">Empty</span>`
+      this.value?.toString() ?? html`<span class="dv-color-2">Value</span>`
     );
   }
 }
@@ -59,7 +59,7 @@ export class StringLiteral extends LiteralElement<string> {
 
   override render() {
     return (
-      this.value?.toString() ?? html`<span class="dv-color-2">Empty</span>`
+      this.value?.toString() ?? html`<span class="dv-color-2">Value</span>`
     );
   }
 }

@@ -1,16 +1,15 @@
-import '../../buttons/toolbar-button.js';
-import './brush-menu.js';
-
-import { css, html, LitElement } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+
+import type { LastProps } from '../../../../../surface-block/managers/edit-session.js';
 
 import {
   ArrowUpIcon,
   PenTablerIcon,
 } from '../../../../../_common/icons/edgeless.js';
 import { LineWidth } from '../../../../../_common/utils/index.js';
-import type { LastProps } from '../../../../../surface-block/managers/edit-session.js';
+import '../../buttons/toolbar-button.js';
 import { DEFAULT_BRUSH_COLOR } from '../../panel/color-panel.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import {
@@ -18,6 +17,7 @@ import {
   observeLastProps,
 } from '../common/observe-last-props.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
+import './brush-menu.js';
 
 @customElement('edgeless-brush-tool-button')
 export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
@@ -56,19 +56,9 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
     //}
   `;
 
-  override type = 'brush' as const;
-
   override enableActiveBackground = true;
 
-  @state()
-  accessor states: LastProps['brush'] = {
-    color: DEFAULT_BRUSH_COLOR,
-    lineWidth: LineWidth.Four,
-  };
-
-  get statesKeys() {
-    return Object.keys(this.states) as (keyof LastProps['brush'])[];
-  }
+  override type = 'brush' as const;
 
   private _toggleBrushMenu() {
     if (this.tryDisposePopper()) return;
@@ -82,12 +72,6 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
       },
     });
     this.updateMenu();
-  }
-
-  updateMenu() {
-    const { popper } = this;
-    if (!popper) return;
-    Object.assign(popper.element, this.states);
   }
 
   override connectedCallback() {
@@ -106,12 +90,6 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
         }
       )
     );
-  }
-
-  override updated(changedProperties: Map<string, unknown>) {
-    if (changedProperties.has('states') && this.popper) {
-      this.updateMenu();
-    }
   }
 
   override render() {
@@ -137,6 +115,28 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
       </edgeless-tool-icon-button>
     `;
   }
+
+  updateMenu() {
+    const { popper } = this;
+    if (!popper) return;
+    Object.assign(popper.element, this.states);
+  }
+
+  override updated(changedProperties: Map<string, unknown>) {
+    if (changedProperties.has('states') && this.popper) {
+      this.updateMenu();
+    }
+  }
+
+  get statesKeys() {
+    return Object.keys(this.states) as (keyof LastProps['brush'])[];
+  }
+
+  @state()
+  accessor states: LastProps['brush'] = {
+    color: DEFAULT_BRUSH_COLOR,
+    lineWidth: LineWidth.Four,
+  };
 }
 
 declare global {

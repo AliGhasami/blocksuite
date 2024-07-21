@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 
 import { waitNextFrame } from './actions/misc.js';
 import { assertAlmostEqual } from './asserts.js';
@@ -11,7 +11,6 @@ export function getFormatBar(page: Page) {
   const strikeBtn = formatBar.getByTestId('strike');
   const codeBtn = formatBar.getByTestId('code');
   const linkBtn = formatBar.getByTestId('link');
-  const copyBtn = formatBar.getByTestId('copy');
   // highlight
   const highlightBtn = formatBar.locator('.highlight-icon');
   const redForegroundBtn = formatBar.getByTestId(
@@ -36,6 +35,15 @@ export function getFormatBar(page: Page) {
   const bulletedBtn = formatBar.getByTestId('affine:list/bulleted');
   const codeBlockBtn = formatBar.getByTestId('affine:code/');
 
+  const moreBtn = formatBar.getByRole('button', { name: 'More' });
+  const copyBtn = formatBar.getByRole('button', { name: 'Copy' });
+  const duplicateBtn = formatBar.getByRole('button', { name: 'Duplicate' });
+  const deleteBtn = formatBar.getByRole('button', { name: 'Delete' });
+  const openMoreMenu = async () => {
+    await expect(formatBar).toBeVisible();
+    await moreBtn.click();
+  };
+
   const assertBoundingBox = async (x: number, y: number) => {
     const boundingBox = await formatBar.boundingBox();
     if (!boundingBox) {
@@ -53,7 +61,6 @@ export function getFormatBar(page: Page) {
     strikeBtn,
     codeBtn,
     linkBtn,
-    copyBtn,
     highlight,
     createLinkedDocBtn,
 
@@ -63,29 +70,33 @@ export function getFormatBar(page: Page) {
     bulletedBtn,
     codeBlockBtn,
 
+    moreBtn,
+    openMoreMenu,
+    copyBtn,
+    duplicateBtn,
+    deleteBtn,
+
     assertBoundingBox,
   };
 }
 
 export function getEmbedCardToolbar(page: Page) {
   const embedCardToolbar = page.locator('.embed-card-toolbar');
-  function createButtonLocator(className: string) {
-    return embedCardToolbar.locator(`.embed-card-toolbar-button.${className}`);
+  function createButtonLocator(name: string) {
+    return embedCardToolbar.getByRole('button', { name });
   }
-  const urlButton = createButtonLocator('url');
   const copyButton = createButtonLocator('copy');
   const editButton = createButtonLocator('edit');
-  const docInfo = createButtonLocator('doc-info');
-  const inlineButton = createButtonLocator('link');
-  const cardButton = createButtonLocator('card');
-  const embedButton = createButtonLocator('embed');
-  const cardStyleButton = createButtonLocator('card-style');
+  const cardStyleButton = createButtonLocator('card style');
   const captionButton = createButtonLocator('caption');
-  const moreButton = createButtonLocator('more-button');
-  const cardStyleHorizontalButton = page.locator(
-    '.card-style-button-horizontal'
-  );
-  const cardStyleListButton = page.locator('.card-style-button-list');
+  const moreButton = createButtonLocator('more');
+
+  const cardStyleHorizontalButton = embedCardToolbar.getByRole('button', {
+    name: 'Large horizontal style',
+  });
+  const cardStyleListButton = embedCardToolbar.getByRole('button', {
+    name: 'Small horizontal style',
+  });
 
   const openCardStyleMenu = async () => {
     await expect(embedCardToolbar).toBeVisible();
@@ -101,13 +112,8 @@ export function getEmbedCardToolbar(page: Page) {
 
   return {
     embedCardToolbar,
-    urlButton,
     copyButton,
     editButton,
-    docInfo,
-    inlineButton,
-    cardButton,
-    embedButton,
     cardStyleButton,
     captionButton,
     moreButton,

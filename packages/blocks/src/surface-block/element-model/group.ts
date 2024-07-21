@@ -1,12 +1,14 @@
 import type { Y } from '@blocksuite/store';
+
 import { DocCollection } from '@blocksuite/store';
+
+import type { PointLocation } from '../utils/point-location.js';
+import type { IVec } from '../utils/vec.js';
+import type { IBaseProps, SerializedElement } from './base.js';
 
 import { keys } from '../../_common/utils/iterable.js';
 import { Bound } from '../utils/bound.js';
 import { linePolygonIntersects } from '../utils/math-utils.js';
-import type { PointLocation } from '../utils/point-location.js';
-import type { IVec } from '../utils/vec.js';
-import type { IBaseProps, SerializedElement } from './base.js';
 import { SurfaceGroupLikeModel } from './base.js';
 import { local, observe, yfield } from './decorators.js';
 

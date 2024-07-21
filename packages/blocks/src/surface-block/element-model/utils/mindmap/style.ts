@@ -1,9 +1,10 @@
+import type { ShapeElementModel } from '../../shape.js';
+import type { MindmapNode } from './layout.js';
+
 import { last } from '../../../../_common/utils/iterable.js';
 import { fitContent } from '../../../canvas-renderer/element-renderer/shape/utils.js';
 import { FontFamily, FontWeight, StrokeStyle } from '../../../consts.js';
 import { ConnectorMode } from '../../connector.js';
-import type { ShapeElementModel } from '../../shape.js';
-import type { MindmapNode } from './layout.js';
 
 export type NodeStyle = {
   radius: number;

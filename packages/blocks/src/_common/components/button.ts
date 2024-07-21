@@ -1,5 +1,5 @@
 import { baseTheme } from '@toeverything/theme';
-import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
+import { LitElement, css, html, nothing, unsafeCSS } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 /**
@@ -58,7 +58,7 @@ export class IconButton extends LitElement {
     }
 
     /* You can add a 'hover' attribute to the button to show the hover style */
-    :host([hover]) {
+    :host([hover='true']) {
       background: var(--affine-hover-color);
     }
     :host([hover='false']) {
@@ -78,11 +78,12 @@ export class IconButton extends LitElement {
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
     }
 
     :host .text {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       font-size: var(--affine-font-sm);
       line-height: var(--affine-line-height);
     }
@@ -100,6 +101,7 @@ export class IconButton extends LitElement {
     }
 
     ::slotted(svg) {
+      flex-shrink: 0;
       color: var(--svg-icon-color);
     }
 
@@ -107,31 +109,6 @@ export class IconButton extends LitElement {
       margin-left: auto;
     }
   `;
-
-  @property()
-  accessor size: string | number | null = null;
-
-  @property()
-  accessor width: string | number | null = null;
-
-  @property()
-  accessor height: string | number | null = null;
-
-  @property()
-  accessor text: string | null = null;
-
-  @property()
-  accessor subText: string | null = null;
-
-  @property({ attribute: true, type: Boolean })
-  accessor active: boolean = false;
-
-  @property({ attribute: true, type: Boolean })
-  accessor hover: boolean | undefined = undefined;
-
-  // Do not add `{ attribute: false }` option here, otherwise the `disabled` styles will not work
-  @property({ attribute: true, type: Boolean })
-  accessor disabled: boolean | undefined = undefined;
 
   constructor() {
     super();
@@ -161,6 +138,7 @@ export class IconButton extends LitElement {
   override connectedCallback() {
     super.connectedCallback();
     this.tabIndex = 0;
+    this.role = 'button';
 
     const DEFAULT_SIZE = '28px';
     if (this.size && (this.width || this.height)) {
@@ -218,6 +196,31 @@ export class IconButton extends LitElement {
       ${textContainer}
       <slot name="suffix"></slot>`;
   }
+
+  @property({ attribute: true, type: Boolean })
+  accessor active: boolean = false;
+
+  // Do not add `{ attribute: false }` option here, otherwise the `disabled` styles will not work
+  @property({ attribute: true, type: Boolean })
+  accessor disabled: boolean | undefined = undefined;
+
+  @property()
+  accessor height: string | number | null = null;
+
+  @property({ attribute: true, type: String })
+  accessor hover: 'true' | 'false' | undefined = undefined;
+
+  @property()
+  accessor size: string | number | null = null;
+
+  @property()
+  accessor subText: string | null = null;
+
+  @property()
+  accessor text: string | null = null;
+
+  @property()
+  accessor width: string | number | null = null;
 }
 
 declare global {

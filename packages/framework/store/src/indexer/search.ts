@@ -1,11 +1,12 @@
+import type { DocumentSearchOptions } from 'flexsearch';
+import type { Doc } from 'yjs';
+
 import {
   IS_NODE,
   IS_WEB,
   REQUEST_IDLE_CALLBACK_ENABLED,
 } from '@blocksuite/global/env';
-import type { DocumentSearchOptions } from 'flexsearch';
 import FlexSearch from 'flexsearch';
-import type { Doc } from 'yjs';
 import { Text as YText } from 'yjs';
 
 import type { YBlock } from '../store/doc/block/index.js';

@@ -1,4 +1,5 @@
 import type { EditorHost } from '@blocksuite/block-std';
+
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
@@ -12,28 +13,9 @@ export class BlockRenderer
   extends WithDisposable(ShadowlessElement)
   implements DetailSlotProps
 {
-  get model() {
-    return this.host?.doc.getBlock(this.rowId)?.model;
-  }
-
-  get service() {
-    return this.host.std.spec.getService('affine:database');
-  }
-
-  get inlineManager() {
-    return this.service.inlineManager;
-  }
-
-  get attributesSchema() {
-    return this.inlineManager.getSchema();
-  }
-
-  get attributeRenderer() {
-    return this.inlineManager.getRenderer();
-  }
-
   static override styles = css`
     database-datasource-block-renderer {
+      padding-top: 36px;
       padding-bottom: 16px;
       display: flex;
       flex-direction: column;
@@ -46,6 +28,21 @@ export class BlockRenderer
 
     database-datasource-block-renderer .tips-placeholder {
       display: none;
+    }
+
+    database-datasource-block-renderer rich-text {
+      font-size: 15px;
+      line-height: 24px;
+    }
+
+    database-datasource-block-renderer.empty rich-text::before {
+      content: 'Untitled';
+      position: absolute;
+      color: var(--affine-text-disable-color);
+      font-size: 15px;
+      line-height: 24px;
+      user-select: none;
+      pointer-events: none;
     }
 
     .database-block-detail-header-icon {
@@ -62,35 +59,23 @@ export class BlockRenderer
     }
   `;
 
-  @property({ attribute: false })
-  accessor view!: DataViewTableManager | DataViewKanbanManager;
-
-  @property({ attribute: false })
-  accessor rowId!: string;
-
-  @property({ attribute: false })
-  accessor host!: EditorHost;
-
-  protected override render(): unknown {
-    const model = this.model;
-    if (!model) {
-      return;
-    }
-    return html`
-      ${this.renderIcon()}
-      <rich-text
-        .yText=${model.text}
-        .attributesSchema=${this.attributesSchema}
-        .attributeRenderer=${this.attributeRenderer}
-        .embedChecker=${this.inlineManager.embedChecker}
-        .markdownShortcutHandler=${this.inlineManager.markdownShortcutHandler}
-        class="inline-editor"
-      ></rich-text>
-    `;
-  }
-
   override connectedCallback() {
     super.connectedCallback();
+    if (this.model && this.model.text) {
+      const cb = () => {
+        if (this.model?.text?.length == 0) {
+          // eslint-disable-next-line wc/no-self-class
+          this.classList.add('empty');
+        } else {
+          // eslint-disable-next-line wc/no-self-class
+          this.classList.remove('empty');
+        }
+      };
+      this.model.text.yText.observe(cb);
+      this.disposables.add(() => {
+        this.model?.text?.yText.unobserve(cb);
+      });
+    }
     this._disposables.addFromEvent(
       this,
       'keydown',
@@ -115,6 +100,24 @@ export class BlockRenderer
     );
   }
 
+  protected override render(): unknown {
+    const model = this.model;
+    if (!model) {
+      return;
+    }
+    return html`
+      ${this.renderIcon()}
+      <rich-text
+        .yText=${model.text}
+        .attributesSchema=${this.attributesSchema}
+        .attributeRenderer=${this.attributeRenderer}
+        .embedChecker=${this.inlineManager.embedChecker}
+        .markdownShortcutHandler=${this.inlineManager.markdownShortcutHandler}
+        class="inline-editor"
+      ></rich-text>
+    `;
+  }
+
   renderIcon() {
     const iconColumn = this.view.header.iconColumn;
     if (!iconColumn) {
@@ -124,4 +127,33 @@ export class BlockRenderer
       ${this.view.cellGetValue(this.rowId, iconColumn)}
     </div>`;
   }
+
+  get attributeRenderer() {
+    return this.inlineManager.getRenderer();
+  }
+
+  get attributesSchema() {
+    return this.inlineManager.getSchema();
+  }
+
+  get inlineManager() {
+    return this.service.inlineManager;
+  }
+
+  get model() {
+    return this.host?.doc.getBlock(this.rowId)?.model;
+  }
+
+  get service() {
+    return this.host.std.spec.getService('affine:database');
+  }
+
+  @property({ attribute: false })
+  accessor host!: EditorHost;
+
+  @property({ attribute: false })
+  accessor rowId!: string;
+
+  @property({ attribute: false })
+  accessor view!: DataViewTableManager | DataViewKanbanManager;
 }

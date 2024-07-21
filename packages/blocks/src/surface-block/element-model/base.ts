@@ -3,12 +3,16 @@ import type {
   IEdgelessElement,
   IHitTestOptions,
 } from '@blocksuite/block-std';
-import { DisposableGroup } from '@blocksuite/global/utils';
 import type { Y } from '@blocksuite/store';
 
+import { DisposableGroup } from '@blocksuite/global/utils';
+
 import type { EdgelessBlockModel } from '../../root-block/edgeless/edgeless-block-model.js';
-import { randomSeed } from '../rough/math.js';
 import type { SurfaceBlockModel } from '../surface-model.js';
+import type { IVec } from '../utils/vec.js';
+import type { OmitFunctionsAndKeysAndReadOnly } from './utility-type.js';
+
+import { randomSeed } from '../rough/math.js';
 import { Bound } from '../utils/bound.js';
 import {
   getBoundsWithRotation,
@@ -19,11 +23,10 @@ import {
   rotatePoints,
 } from '../utils/math-utils.js';
 import { PointLocation } from '../utils/point-location.js';
-import type { IVec } from '../utils/vec.js';
 import {
-  deserializeXYWH,
   type SerializedXYWH,
   type XYWH,
+  deserializeXYWH,
 } from '../utils/xywh.js';
 import {
   convertProps,
@@ -34,7 +37,6 @@ import {
   watch,
   yfield,
 } from './decorators.js';
-import type { OmitFunctionsAndKeysAndReadOnly } from './utility-type.js';
 
 export type { IHitTestOptions } from '@blocksuite/block-std';
 
@@ -476,9 +478,18 @@ export abstract class SurfaceLocalModel {
     return this.deserializedXYWH[1];
   }
 
+  get w() {
+    return this.deserializedXYWH[2];
+  }
+
+  get h() {
+    return this.deserializedXYWH[3];
+  }
+
   abstract rotate: number;
 
   abstract xywh: SerializedXYWH;
+
 }
 
 declare global {

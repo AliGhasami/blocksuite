@@ -1,8 +1,8 @@
 import type { DatabaseBlockModel } from '@blocks/database-block/index.js';
+
 import { assertExists } from '@global/utils.js';
-import { expect, type Page } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import { switchEditorMode, zoomOutByKeyboard } from 'utils/actions/edgeless.js';
-import { pressEnter, type } from 'utils/actions/keyboard.js';
 import { getLinkedDocPopover } from 'utils/actions/linked-doc.js';
 import {
   enterPlaygroundRoom,
@@ -33,9 +33,10 @@ test.describe('Embed synced doc', () => {
     const referencePopup = page.locator('.affine-reference-popover-container');
     await expect(referencePopup).toBeVisible();
 
-    const embedSyncedDocBtn = page.locator(
-      '.affine-reference-popover-view-selector-button.embed-view'
-    );
+    const switchButton = page.getByRole('button', { name: 'Switch view' });
+    await switchButton.click();
+
+    const embedSyncedDocBtn = page.getByRole('button', { name: 'Embed view' });
     await expect(embedSyncedDocBtn).toBeVisible();
 
     await embedSyncedDocBtn.click();
@@ -43,13 +44,6 @@ test.describe('Embed synced doc', () => {
 
     const embedSyncedBlock = page.locator('affine-embed-synced-doc-block');
     expect(await embedSyncedBlock.count()).toBe(1);
-  }
-
-  async function typeParagraphs(page: Page, count: number) {
-    for (let i = 0; i < count; i++) {
-      await type(page, 'Hello');
-      await pressEnter(page);
-    }
   }
 
   test('can change linked doc to embed synced doc', async ({ page }) => {
@@ -77,11 +71,13 @@ test.describe('Embed synced doc', () => {
     const toolbar = page.locator('.embed-card-toolbar');
     await expect(toolbar).toBeVisible();
 
-    const cardBtn = page.locator(
-      '.embed-card-toolbar .embed-card-toolbar-button.card'
-    );
-    await expect(cardBtn).toBeVisible();
+    const switchBtn = toolbar.getByRole('button', { name: 'Switch view' });
+    await expect(switchBtn).toBeVisible();
 
+    await switchBtn.click();
+    await waitNextFrame(page, 200);
+
+    const cardBtn = toolbar.getByRole('button', { name: 'Card view' });
     await cardBtn.click();
     await waitNextFrame(page, 200);
 
@@ -106,10 +102,6 @@ test.describe('Embed synced doc', () => {
       embedSyncedBox.y + embedSyncedBox.height / 2
     );
 
-    // Type some text to make the embed synced doc has some height
-    await typeParagraphs(page, 12);
-    await waitNextFrame(page, 200);
-
     // Switch to edgeless mode
     await switchEditorMode(page);
     await waitNextFrame(page, 200);
@@ -117,10 +109,10 @@ test.describe('Embed synced doc', () => {
     await zoomOutByKeyboard(page);
 
     // Double click on note to enter edit status
-    const notePortal = page.locator('.edgeless-block-portal-note');
-    const notePortalBox = await notePortal.boundingBox();
-    assertExists(notePortalBox);
-    await page.mouse.dblclick(notePortalBox.x + 10, notePortalBox.y + 10);
+    const noteBlock = page.locator('affine-edgeless-note');
+    const noteBlockBox = await noteBlock.boundingBox();
+    assertExists(noteBlockBox);
+    await page.mouse.dblclick(noteBlockBox.x + 10, noteBlockBox.y + 10);
     await waitNextFrame(page, 200);
 
     // Drag the embed synced doc to whiteboard
@@ -135,11 +127,11 @@ test.describe('Embed synced doc', () => {
     await page.mouse.up();
 
     // Check the height of the embed synced doc portal, it should be the same as the embed synced doc in note
-    const EmbedSyncedDocPortal = page.locator('.edgeless-block-portal-embed');
-    const EmbedSyncedDocPortalBox = await EmbedSyncedDocPortal.boundingBox();
-    const border = 2;
-    assertExists(EmbedSyncedDocPortalBox);
-    expect(EmbedSyncedDocPortalBox.height).toBeCloseTo(height + border, 1);
+    const EmbedSyncedDocBlock = page.locator('affine-embed-synced-doc-block');
+    const EmbedSyncedDocBlockBox = await EmbedSyncedDocBlock.boundingBox();
+    const border = 1;
+    assertExists(EmbedSyncedDocBlockBox);
+    expect(EmbedSyncedDocBlockBox.height).toBeCloseTo(height + 2 * border, 1);
   });
 
   test('nested embed synced doc should be rendered as card when depth >=1', async ({
@@ -212,8 +204,14 @@ test.describe('Embed synced doc', () => {
       await createAndConvertToEmbedSyncedDoc(page);
       const locator = page.locator('affine-embed-synced-doc-block');
       await locator.click();
-      const button = page.locator('.embed-card-toolbar-button.doc-info');
+
+      const toolbar = page.locator('editor-toolbar');
+      const openMenu = toolbar.getByRole('button', { name: 'Open' });
+      await openMenu.click();
+
+      const button = toolbar.getByRole('button', { name: 'Open this doc' });
       await button.click();
+
       await page.evaluate(async () => {
         const { collection } = window;
         const getDocCollection = () => {

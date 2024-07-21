@@ -1,14 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import '@blocksuite/presets/themes/affine.css';
-
 import { AffineSchemas } from '@blocksuite/blocks';
 import { AffineEditorContainer } from '@blocksuite/presets';
+import '@blocksuite/presets/themes/affine.css';
 import { Schema } from '@blocksuite/store';
 import { DocCollection, Text } from '@blocksuite/store';
 import { IndexeddbPersistence } from 'y-indexeddb';
 
 const schema = new Schema().register(AffineSchemas);
 const collection = new DocCollection({ schema });
+collection.meta.initialize();
 const doc = collection.createDoc();
 const editor = new AffineEditorContainer();
 editor.doc = doc;
