@@ -2,14 +2,16 @@
 // checkout https://vitest.dev/guide/debugging.html for debugging tests
 
 import type { Slot } from '@blocksuite/global/utils';
+
 import { assert, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyUpdate, encodeStateAsUpdate } from 'yjs';
 
-import { COLLECTION_VERSION, PAGE_VERSION } from '../consts.js';
 import type { BlockModel, BlockSchemaType, Doc } from '../index.js';
-import { DocCollection, Generator, Schema } from '../index.js';
 import type { DocMeta } from '../store/index.js';
 import type { BlockSuiteDoc } from '../yjs/index.js';
+
+import { COLLECTION_VERSION, PAGE_VERSION } from '../consts.js';
+import { DocCollection, IdGeneratorType, Schema } from '../index.js';
 import {
   NoteBlockSchema,
   ParagraphBlockSchema,
@@ -24,7 +26,7 @@ export const BlockSchemas = [
 ] as BlockSchemaType[];
 
 function createTestOptions() {
-  const idGenerator = Generator.AutoIncrement;
+  const idGenerator = IdGeneratorType.AutoIncrement;
   const schema = new Schema();
   schema.register(BlockSchemas);
   return { id: 'test-collection', idGenerator, schema };
@@ -376,7 +378,7 @@ describe('addBlock', () => {
     doc.addBlock('affine:paragraph', {}, noteId!);
     assert.equal(root.children[0].flavour, 'affine:note');
     assert.equal(root.children[0].children[0].flavour, 'affine:paragraph');
-    assert.equal(root.childMap.get('1'), 0);
+    assert.equal(root.childMap.value.get('1'), 0);
 
     const serializedChildren = serializCollection(doc.rootDoc).spaces[spaceId]
       .blocks['0']['sys:children'];
@@ -957,6 +959,22 @@ describe('collection search', () => {
       }
     `);
     });
+  });
+});
+
+describe('flags', () => {
+  it('update flags', () => {
+    const options = createTestOptions();
+    const collection = new DocCollection(options);
+    collection.meta.initialize();
+
+    const awareness = collection.awarenessStore;
+
+    awareness.setFlag('enable_lasso_tool', false);
+    expect(awareness.getFlag('enable_lasso_tool')).toBe(false);
+
+    awareness.setFlag('enable_lasso_tool', true);
+    expect(awareness.getFlag('enable_lasso_tool')).toBe(true);
   });
 });
 

@@ -1,44 +1,16 @@
 import { type IVec, Vec } from './vec.js';
 
 export class PointLocation extends Array<number> implements IVec {
-  get tangent() {
-    return this._tangent;
-  }
+  _in: IVec = [0, 0];
 
-  set tangent(value: IVec) {
-    this._tangent = value;
-  }
-
-  get in() {
-    return this._in;
-  }
-
-  get absIn() {
-    return Vec.add(this, this._in);
-  }
-
-  set in(value: IVec) {
-    this._in = value;
-  }
-
-  get out() {
-    return this._out;
-  }
-
-  get absOut() {
-    return Vec.add(this, this._out);
-  }
-
-  set out(value: IVec) {
-    this._out = value;
-  }
+  _out: IVec = [0, 0];
 
   // the tangent belongs to the point on the element outline
   _tangent: IVec = [0, 0];
 
-  _in: IVec = [0, 0];
+  [0]: number;
 
-  _out: IVec = [0, 0];
+  [1]: number;
 
   constructor(
     point: IVec = [0, 0],
@@ -54,8 +26,20 @@ export class PointLocation extends Array<number> implements IVec {
     this._out = outVec;
   }
 
-  toVec(): IVec {
-    return [this[0], this[1]];
+  static fromVec(vec: IVec) {
+    const point = new PointLocation();
+    point[0] = vec[0];
+    point[1] = vec[1];
+    return point;
+  }
+
+  clone() {
+    return new PointLocation(
+      this as unknown as IVec,
+      this._tangent,
+      this._in,
+      this._out
+    );
   }
 
   setVec(vec: IVec) {
@@ -64,14 +48,43 @@ export class PointLocation extends Array<number> implements IVec {
     return this;
   }
 
-  clone() {
-    return new PointLocation(this, this._tangent, this._in, this._out);
+  toVec(): IVec {
+    return [this[0], this[1]];
   }
 
-  static fromVec(vec: IVec) {
-    const point = new PointLocation();
-    point[0] = vec[0];
-    point[1] = vec[1];
-    return point;
+  get absIn() {
+    return Vec.add(this, this._in);
+  }
+
+  get absOut() {
+    return Vec.add(this, this._out);
+  }
+
+  get in() {
+    return this._in;
+  }
+
+  set in(value: IVec) {
+    this._in = value;
+  }
+
+  override get length() {
+    return super.length as 2;
+  }
+
+  get out() {
+    return this._out;
+  }
+
+  set out(value: IVec) {
+    this._out = value;
+  }
+
+  get tangent() {
+    return this._tangent;
+  }
+
+  set tangent(value: IVec) {
+    this._tangent = value;
   }
 }

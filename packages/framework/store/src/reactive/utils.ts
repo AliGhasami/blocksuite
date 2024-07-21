@@ -97,24 +97,6 @@ export function y2Native(
 export type UnRecord = Record<string, unknown>;
 
 export abstract class BaseReactiveYData<T, Y> {
-  get proxy() {
-    return this._proxy;
-  }
-
-  protected abstract readonly _proxy: T;
-
-  protected abstract readonly _source: T;
-
-  protected abstract readonly _ySource: Y;
-
-  protected abstract readonly _options: ProxyOptions<T>;
-
-  protected _skipNext = false;
-
-  protected readonly _stashed = new Set<string | number>();
-
-  protected abstract _getProxy(): T;
-
   protected _getOrigin = (
     doc: YDoc
   ): {
@@ -130,16 +112,6 @@ export abstract class BaseReactiveYData<T, Y> {
     };
   };
 
-  protected _updateWithSkip = (fn: () => void) => {
-    this._skipNext = true;
-    fn();
-    this._skipNext = false;
-  };
-
-  protected _transact = (doc: YDoc, fn: () => void) => {
-    doc.transact(fn, this._getOrigin(doc));
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected _onObserve = (event: YEvent<any>, handler: () => void) => {
     if (
@@ -153,6 +125,34 @@ export abstract class BaseReactiveYData<T, Y> {
     this._options.onChange?.(this._proxy);
   };
 
-  abstract stash(prop: string | number): void;
+  protected _skipNext = false;
+
+  protected readonly _stashed = new Set<string | number>();
+
+  protected _transact = (doc: YDoc, fn: () => void) => {
+    doc.transact(fn, this._getOrigin(doc));
+  };
+
+  protected _updateWithSkip = (fn: () => void) => {
+    this._skipNext = true;
+    fn();
+    this._skipNext = false;
+  };
+
+  get proxy() {
+    return this._proxy;
+  }
+
+  protected abstract _getProxy(): T;
+
+  protected abstract readonly _options: ProxyOptions<T>;
+
+  protected abstract readonly _proxy: T;
+
+  protected abstract readonly _source: T;
+
+  protected abstract readonly _ySource: Y;
+
   abstract pop(prop: string | number): void;
+  abstract stash(prop: string | number): void;
 }

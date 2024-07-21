@@ -40,9 +40,9 @@ export type MindmapRoot = MindmapNode & {
 };
 
 export enum LayoutType {
-  RIGHT = 0,
-  LEFT = 1,
   BALANCE = 2,
+  LEFT = 1,
+  RIGHT = 0,
 }
 
 type TreeSize = {

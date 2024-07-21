@@ -202,12 +202,12 @@ export {
 };
 
 export enum CanvasElementType {
-  SHAPE = 'shape',
   BRUSH = 'brush',
   CONNECTOR = 'connector',
-  TEXT = 'text',
   GROUP = 'group',
   MINDMAP = 'mindmap',
+  SHAPE = 'shape',
+  TEXT = 'text',
 }
 
 export type ElementModelMap = {

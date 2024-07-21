@@ -2,16 +2,16 @@ import { createZodUnion } from '../../../_common/utils/index.js';
 import type { StrokeStyle } from '../../consts.js';
 
 export enum ShapeType {
+  Diamond = 'diamond',
+  Ellipse = 'ellipse',
   Rect = 'rect',
   Triangle = 'triangle',
-  Ellipse = 'ellipse',
-  Diamond = 'diamond',
 }
 
 export enum SHAPE_TEXT_FONT_SIZE {
-  SMALL = 12,
-  MEDIUM = 20,
   LARGE = 28,
+  MEDIUM = 20,
+  SMALL = 12,
   XLARGE = 36,
 }
 

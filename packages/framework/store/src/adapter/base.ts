@@ -49,39 +49,19 @@ export type ToSliceSnapshotPayload<Target> = {
 };
 
 export abstract class BaseAdapter<AdapterTarget = unknown> {
-  protected configs = new Map<string, unknown>();
-
   job: Job;
 
   constructor(job: Job) {
     this.job = job;
-    this.applyConfigs(job.adapterConfigs);
   }
 
-  abstract fromDocSnapshot(
-    payload: FromDocSnapshotPayload
-  ):
-    | Promise<FromDocSnapshotResult<AdapterTarget>>
-    | FromDocSnapshotResult<AdapterTarget>;
-  abstract fromBlockSnapshot(
-    payload: FromBlockSnapshotPayload
-  ):
-    | Promise<FromBlockSnapshotResult<AdapterTarget>>
-    | FromBlockSnapshotResult<AdapterTarget>;
-  abstract fromSliceSnapshot(
-    payload: FromSliceSnapshotPayload
-  ):
-    | Promise<FromSliceSnapshotResult<AdapterTarget>>
-    | FromSliceSnapshotResult<AdapterTarget>;
-  abstract toDocSnapshot(
-    payload: ToDocSnapshotPayload<AdapterTarget>
-  ): Promise<DocSnapshot> | DocSnapshot;
-  abstract toBlockSnapshot(
-    payload: ToBlockSnapshotPayload<AdapterTarget>
-  ): Promise<BlockSnapshot> | BlockSnapshot;
-  abstract toSliceSnapshot(
-    payload: ToSliceSnapshotPayload<AdapterTarget>
-  ): Promise<SliceSnapshot | null> | SliceSnapshot | null;
+  async fromBlock(mode: DraftModel) {
+    const blockSnapshot = await this.job.blockToSnapshot(mode);
+    return this.fromBlockSnapshot({
+      snapshot: blockSnapshot,
+      assets: this.job.assetsManager,
+    });
+  }
 
   async fromDoc(doc: Doc) {
     const docSnapshot = await this.job.docToSnapshot(doc);
@@ -91,15 +71,10 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     });
   }
 
-  async toDoc(payload: ToDocSnapshotPayload<AdapterTarget>) {
-    const snapshot = await this.toDocSnapshot(payload);
-    return this.job.snapshotToDoc(snapshot);
-  }
-
-  async fromBlock(mode: DraftModel) {
-    const blockSnapshot = await this.job.blockToSnapshot(mode);
-    return this.fromBlockSnapshot({
-      snapshot: blockSnapshot,
+  async fromSlice(slice: Slice) {
+    const sliceSnapshot = await this.job.sliceToSnapshot(slice);
+    return this.fromSliceSnapshot({
+      snapshot: sliceSnapshot,
       assets: this.job.assetsManager,
     });
   }
@@ -114,12 +89,9 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     return this.job.snapshotToBlock(snapshot, doc, parent, index);
   }
 
-  async fromSlice(slice: Slice) {
-    const sliceSnapshot = await this.job.sliceToSnapshot(slice);
-    return this.fromSliceSnapshot({
-      snapshot: sliceSnapshot,
-      assets: this.job.assetsManager,
-    });
+  async toDoc(payload: ToDocSnapshotPayload<AdapterTarget>) {
+    const snapshot = await this.toDocSnapshot(payload);
+    return this.job.snapshotToDoc(snapshot);
   }
 
   async toSlice(
@@ -133,9 +105,39 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     return this.job.snapshotToSlice(snapshot, doc, parent, index);
   }
 
-  applyConfigs(configs: Map<string, unknown>) {
-    this.configs = new Map(configs);
+  get configs() {
+    return this.job.adapterConfigs;
   }
+
+  abstract fromBlockSnapshot(
+    payload: FromBlockSnapshotPayload
+  ):
+    | Promise<FromBlockSnapshotResult<AdapterTarget>>
+    | FromBlockSnapshotResult<AdapterTarget>;
+
+  abstract fromDocSnapshot(
+    payload: FromDocSnapshotPayload
+  ):
+    | Promise<FromDocSnapshotResult<AdapterTarget>>
+    | FromDocSnapshotResult<AdapterTarget>;
+
+  abstract fromSliceSnapshot(
+    payload: FromSliceSnapshotPayload
+  ):
+    | Promise<FromSliceSnapshotResult<AdapterTarget>>
+    | FromSliceSnapshotResult<AdapterTarget>;
+
+  abstract toBlockSnapshot(
+    payload: ToBlockSnapshotPayload<AdapterTarget>
+  ): Promise<BlockSnapshot> | BlockSnapshot;
+
+  abstract toDocSnapshot(
+    payload: ToDocSnapshotPayload<AdapterTarget>
+  ): Promise<DocSnapshot> | DocSnapshot;
+
+  abstract toSliceSnapshot(
+    payload: ToSliceSnapshotPayload<AdapterTarget>
+  ): Promise<SliceSnapshot | null> | SliceSnapshot | null;
 }
 
 type Keyof<T> = T extends unknown ? keyof T : never;
@@ -157,15 +159,9 @@ type NodeProps<Node extends object> = {
 export class ASTWalker<ONode extends object, TNode extends object | never> {
   private _enter: WalkerFn<ONode, TNode> | undefined;
 
-  private _leave: WalkerFn<ONode, TNode> | undefined;
-
   private _isONode!: (node: unknown) => node is ONode;
 
-  private context: ASTWalkerContext<TNode>;
-
-  constructor() {
-    this.context = new ASTWalkerContext<TNode>();
-  }
+  private _leave: WalkerFn<ONode, TNode> | undefined;
 
   private _visit = async (o: NodeProps<ONode>) => {
     if (!o.node) return;
@@ -226,6 +222,8 @@ export class ASTWalker<ONode extends object, TNode extends object | never> {
     }
   };
 
+  private context: ASTWalkerContext<TNode>;
+
   setEnter = (fn: WalkerFn<ONode, TNode>) => {
     this._enter = fn;
   };
@@ -248,4 +246,8 @@ export class ASTWalker<ONode extends object, TNode extends object | never> {
   walkONode = async (oNode: ONode) => {
     await this._visit({ node: oNode, parent: null, prop: null, index: null });
   };
+
+  constructor() {
+    this.context = new ASTWalkerContext<TNode>();
+  }
 }

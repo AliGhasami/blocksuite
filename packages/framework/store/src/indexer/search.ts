@@ -8,7 +8,7 @@ import FlexSearch from 'flexsearch';
 import type { Doc } from 'yjs';
 import { Text as YText } from 'yjs';
 
-import type { YBlock } from '../store/doc/block.js';
+import type { YBlock } from '../store/doc/block/index.js';
 import type { YBlocks } from '../store/doc/block-collection.js';
 import type { BlockSuiteDoc } from '../yjs/index.js';
 
@@ -68,6 +68,27 @@ export class SearchIndexer {
 
   private readonly _indexer: FlexSearch.Document<IndexMeta, string[]>;
 
+  private _reindex = () => {
+    if (!this._reindexMap) return;
+
+    for (const id of this._reindexMap.keys()) {
+      const meta = this._reindexMap.get(id);
+      if (meta) {
+        this._reindexMap.delete(id);
+        this._indexer.add(id, meta);
+      }
+    }
+
+    setTimeout(() => {
+      if (!this._reindexMap) return;
+      if (REQUEST_IDLE_CALLBACK_ENABLED) {
+        requestIdleCallback(this._reindex, { timeout: 1000 });
+      } else {
+        setTimeout(this._reindex, 1000);
+      }
+    }, REINDEX_TIMEOUT);
+  };
+
   private _reindexMap: Map<string, IndexMeta> | null = null;
 
   constructor(
@@ -112,37 +133,11 @@ export class SearchIndexer {
     }
   }
 
-  private _reindex = () => {
-    if (!this._reindexMap) return;
-
-    for (const id of this._reindexMap.keys()) {
-      const meta = this._reindexMap.get(id);
-      if (meta) {
-        this._reindexMap.delete(id);
-        this._indexer.add(id, meta);
-      }
-    }
-
-    setTimeout(() => {
-      if (!this._reindexMap) return;
-      if (REQUEST_IDLE_CALLBACK_ENABLED) {
-        requestIdleCallback(this._reindex, { timeout: 1000 });
-      } else {
-        setTimeout(this._reindex, 1000);
-      }
-    }, REINDEX_TIMEOUT);
-  };
-
-  private _search(query: QueryContent): SearchResults[] {
-    if (typeof query === 'object') {
-      return this._indexer.search({
-        ...query,
-        enrich: true,
-      }) as unknown as SearchResults[];
-    } else {
-      return this._indexer.search(query, {
-        enrich: true,
-      }) as unknown as SearchResults[];
+  private _getDoc(key: string): Doc | undefined {
+    try {
+      return this._doc.spaces.get(key);
+    } catch (_) {
+      return undefined;
     }
   }
 
@@ -202,6 +197,19 @@ export class SearchIndexer {
     }
   }
 
+  private _search(query: QueryContent): SearchResults[] {
+    if (typeof query === 'object') {
+      return this._indexer.search({
+        ...query,
+        enrich: true,
+      }) as unknown as SearchResults[];
+    } else {
+      return this._indexer.search(query, {
+        enrich: true,
+      }) as unknown as SearchResults[];
+    }
+  }
+
   private _toContent(obj: unknown) {
     if (obj) {
       if (typeof obj === 'string') {
@@ -213,12 +221,11 @@ export class SearchIndexer {
     return undefined;
   }
 
-  private _getDoc(key: string): Doc | undefined {
-    try {
-      return this._doc.spaces.get(key);
-    } catch (_) {
-      return undefined;
-    }
+  refreshDocIndex(docId: string, doc: Doc) {
+    const yBlocks = doc.getMap('blocks') as YBlocks;
+    yBlocks.forEach((_, key) => {
+      this._refreshIndex(docId, key, 'add', yBlocks.get(key));
+    });
   }
 
   search(query: QueryContent) {
@@ -227,12 +234,5 @@ export class SearchIndexer {
         result.map(r => [r.id, { space: r.doc.space, content: r.doc.content }])
       )
     );
-  }
-
-  refreshDocIndex(docId: string, doc: Doc) {
-    const yBlocks = doc.getMap('blocks') as YBlocks;
-    yBlocks.forEach((_, key) => {
-      this._refreshIndex(docId, key, 'add', yBlocks.get(key));
-    });
   }
 }
