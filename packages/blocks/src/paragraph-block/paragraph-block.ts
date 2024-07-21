@@ -51,6 +51,13 @@ export class ParagraphBlockComponent extends BlockComponent<
     this._displayPlaceholder = computed(() => {
       //const textSelection = this.host.selection.find('text');
       //const isCollapsed = textSelection?.isCollapsed() ?? false;
+      const isEmpty = false;
+      //todo ali ghasami for fix bug
+      /*const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
+      const paragraphList = note.length ? note[0].yChildren : [];
+      if (paragraphList.length == 1) {
+        isEmpty = true;
+      }*/
 
       if (
         this.doc.readonly ||
@@ -64,7 +71,6 @@ export class ParagraphBlockComponent extends BlockComponent<
       }
       return true;
     });
-
   }
 
   override async getUpdateComplete() {
@@ -84,8 +90,7 @@ export class ParagraphBlockComponent extends BlockComponent<
 
     return html`
       <div class="affine-paragraph-block-container">
-        <div class="affine-paragraph-rich-text-wrapper ${type$.value}">
-        <div class="affine-paragraph-rich-text-wrapper claytap-${type}">
+        <div class="affine-paragraph-rich-text-wrapper claytap-${type$.value}">
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}

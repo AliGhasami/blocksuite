@@ -1,4 +1,5 @@
 import { BlockService } from '@blocksuite/block-std';
+import { type TemplateResult, html } from 'lit';
 
 import type { ParagraphBlockModel } from './paragraph-model.js';
 
@@ -13,25 +14,6 @@ import { ReferenceNodeConfig } from '../_common/inline/presets/nodes/reference-n
 export class ParagraphBlockService<
   TextAttributes extends AffineTextAttributes = AffineTextAttributes,
 > extends BlockService<ParagraphBlockModel> {
-  readonly inlineManager = new InlineManager<TextAttributes>();
-
-  placeholderGenerator: (model: ParagraphBlockModel) => string = model => {
-    if (model.type === 'text') {
-      return "Type '/' for commands";
-    }
-
-    const placeholders = {
-      h1: 'Heading 1',
-      h2: 'Heading 2',
-      h3: 'Heading 3',
-      h4: 'Heading 4',
-      h5: 'Heading 5',
-      h6: 'Heading 6',
-      quote: '',
-    };
-    return placeholders[model.type];*/
-  };
-
   getPlaceholder = (model: ParagraphBlockModel): TemplateResult<1> | string => {
     if (model.type === 'text') {
       return html`<div class="affine-paragraph-placeholder-content">
@@ -46,6 +28,25 @@ export class ParagraphBlockService<
         <div>&nbsp;</div>
       </div>`;
       // return "Type '/' for commands";
+    }
+
+    const placeholders = {
+      h1: 'Heading 1',
+      h2: 'Heading 2',
+      h3: 'Heading 3',
+      h4: 'Heading 4',
+      h5: 'Heading 5',
+      h6: 'Heading 6',
+      quote: '',
+    };
+    return placeholders[model.type];
+  };
+
+  readonly inlineManager = new InlineManager<TextAttributes>();
+
+  placeholderGenerator: (model: ParagraphBlockModel) => string = model => {
+    if (model.type === 'text') {
+      return "Type '/' for commands";
     }
 
     const placeholders = {

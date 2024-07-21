@@ -1,15 +1,16 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { LitElement, css, html, nothing } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 //import { classMap } from 'lit/directives/class-map.js';
 //import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
+
+import type { EdgelessTool } from '../../../types.js';
+
 import {
   ArrowUpIcon,
   MapTablerIcon,
 } from '../../../../../_common/icons/index.js';
-import type { EdgelessTool } from '../../../types.js';
-
 import { MindmapStyle } from '../../../../../surface-block/index.js';
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
@@ -241,16 +242,6 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
     this.disposables.add(dispose);
   }
 
-  override updated(_changedProperties: Map<PropertyKey, unknown>) {
-    const controllerRequiredProps = ['edgeless', 'toolbarContainer'] as const;
-    if (
-      controllerRequiredProps.some(p => _changedProperties.has(p)) &&
-      !this.draggableController
-    ) {
-      this.initDragController();
-    }
-  }
-
   override render() {
     const { popper, theme } = this;
     const basketIcon = theme === 'light' ? basketIconLight : basketIconDark;
@@ -280,7 +271,6 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
         </span>
       </edgeless-tool-icon-button>
     `;
-
 
     /*return html`<edgeless-toolbar-button
       class="edgeless-mindmap-button"
