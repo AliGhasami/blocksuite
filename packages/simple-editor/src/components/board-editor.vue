@@ -6,7 +6,6 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css';
-import { PageEditor ,EdgelessEditor} from '@blocksuite/presets';
 import {createEmptyDoc} from './helpers'
 import {type BlockModel, Doc, DocCollection, Job} from '@blocksuite/store';
 import {  onMounted, ref, watch } from "vue";
@@ -82,17 +81,19 @@ async function getData(){
   }
   return null
 }
-
+const createEditor = async () => {
+  if(props.isBoardView){
+    const {EdgelessEditor} = await import('@blocksuite/presets')
+    return new EdgelessEditor();
+  }else{
+    const {PageEditor} = await import('@blocksuite/presets')
+    return new PageEditor();
+  }
+}
 //TODO(@ali ghasami) for fix after and check performance
 async function setData(data:any){
   if(myCollection){
-    //const editor = new PageEditor();
-    let editor = null
-    if(props.isBoardView){
-      editor = new EdgelessEditor();
-    }else{
-      editor = new PageEditor();
-    }
+    const editor = await createEditor()
     const job = new Job({ collection: myCollection, middlewares: [
         replaceIdMiddleware
       ]})
