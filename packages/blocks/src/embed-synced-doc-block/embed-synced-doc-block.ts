@@ -1,5 +1,6 @@
 import type { EditorHost } from '@blocksuite/block-std';
 
+import { Bound } from '@blocksuite/global/utils';
 import { assertExists } from '@blocksuite/global/utils';
 import {
   type BlockSelector,
@@ -23,7 +24,7 @@ import type { EmbedSyncedDocBlockService } from './embed-synced-doc-service.js';
 
 import { Peekable } from '../_common/components/peekable.js';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
-import { EmbedBlockElement } from '../_common/embed-block-helper/embed-block-element.js';
+import { EmbedBlockComponent } from '../_common/embed-block-helper/embed-block-element.js';
 import { EmbedEdgelessIcon, EmbedPageIcon } from '../_common/icons/text.js';
 import { REFERENCE_NODE } from '../_common/inline/presets/nodes/consts.js';
 import { type DocMode, NoteDisplayMode } from '../_common/types.js';
@@ -31,7 +32,6 @@ import { matchFlavours } from '../_common/utils/model.js';
 import { getThemeMode } from '../_common/utils/query.js';
 import { isEmptyDoc } from '../_common/utils/render-linked-doc.js';
 import { SpecProvider } from '../specs/utils/spec-provider.js';
-import { Bound } from '../surface-block/utils/bound.js';
 import './components/embed-synced-doc-card.js';
 import { blockStyles } from './styles.js';
 
@@ -39,7 +39,7 @@ import { blockStyles } from './styles.js';
 @Peekable({
   enableOn: ({ doc }: EmbedSyncedDocBlockComponent) => !doc.readonly,
 })
-export class EmbedSyncedDocBlockComponent extends EmbedBlockElement<
+export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<
   EmbedSyncedDocModel,
   EmbedSyncedDocBlockService
 > {
@@ -89,9 +89,9 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockElement<
     };
 
     const observer = new ResizeObserver(fitToContent);
-    const blockElement = this.embedBlock;
+    const block = this.embedBlock;
 
-    observer.observe(blockElement);
+    observer.observe(block);
 
     this._disposables.add(() => {
       observer.disconnect();

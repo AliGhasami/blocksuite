@@ -1,4 +1,5 @@
 import { WidgetElement } from '@blocksuite/block-std';
+import { Bound } from '@blocksuite/global/utils';
 import { type TemplateResult, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -23,7 +24,6 @@ import {
   stopPropagation,
 } from '../../../_common/utils/event.js';
 import { matchFlavours } from '../../../_common/utils/model.js';
-import { Bound } from '../../../surface-block/index.js';
 import { isNoteBlock } from '../../edgeless/utils/query.js';
 
 const PAGE_VISIBLE_INDEX_LABEL_WIDTH = 44;
@@ -356,7 +356,7 @@ export class EdgelessAutoConnectWidget extends WidgetElement<
   }
 
   private _initLabels() {
-    const { service } = this.blockElement;
+    const { service } = this.block;
     const surfaceRefs = service.doc
       .getBlocksByFlavour('affine:surface-ref')
       .map(block => block.model) as SurfaceRefBlockModel[];
@@ -415,7 +415,7 @@ export class EdgelessAutoConnectWidget extends WidgetElement<
 
       this._edgelessOnlyNotesSet = edgelessOnlyNotesSet;
       this._pageVisibleElementsMap = pageVisibleBlocks;
-    }, this.blockElement);
+    }, this.block);
 
     this._disposables.add(
       service.selection.slots.updated.on(() => {

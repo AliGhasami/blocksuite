@@ -1,6 +1,8 @@
 import type { PointerEventState } from '@blocksuite/block-std';
+import type { IVec } from '@blocksuite/global/utils';
 
-import { assertExists, noop } from '@blocksuite/global/utils';
+import { Bound } from '@blocksuite/global/utils';
+import { noop } from '@blocksuite/global/utils';
 
 import type {
   ShapeElementModel,
@@ -10,11 +12,7 @@ import type { SelectionArea } from '../../services/tools-manager.js';
 import type { EdgelessTool } from '../../types.js';
 
 import { hasClassNameInList } from '../../../../_common/utils/index.js';
-import {
-  Bound,
-  CanvasElementType,
-  type IVec,
-} from '../../../../surface-block/index.js';
+import { CanvasElementType } from '../../../../surface-block/index.js';
 import {
   EXCLUDING_MOUSE_OUT_CLASS_LIST,
   SHAPE_OVERLAY_HEIGHT,
@@ -100,8 +98,8 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
       _moveWithSpaceStartPos,
       _moveWithSpaceShapePosTemp,
     } = this;
-    assertExists(_draggingArea);
-    assertExists(_moveWithSpaceShapePosTemp);
+    if (!_draggingArea) return;
+    if (!_moveWithSpaceShapePosTemp) return;
 
     const { x: moveCurX, y: moveCurY } = _draggingArea.end;
 
@@ -117,8 +115,8 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
 
   private _resize(shift = false) {
     const { _draggingElementId: id, _draggingArea } = this;
-    assertExists(id);
-    assertExists(_draggingArea);
+    if (!id) return;
+    if (!_draggingArea) return;
 
     const { viewport } = this._service;
     const { zoom } = viewport;
@@ -216,7 +214,7 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
     const id = this._addNewShape(e, SHAPE_OVERLAY_WIDTH, SHAPE_OVERLAY_HEIGHT);
 
     const element = this._service.getElementById(id);
-    assertExists(element);
+    if (!element) return;
 
     this._edgeless.tools.switchToDefaultMode({
       elements: [element.id],
@@ -241,7 +239,7 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
     }
 
     const id = this._draggingElementId;
-    assertExists(id);
+    if (!id) return;
 
     if (this._draggingArea) {
       const width = Math.abs(
@@ -263,7 +261,7 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
     this._doc.captureSync();
 
     const element = this._service.getElementById(id);
-    assertExists(element);
+    if (!element) return;
 
     this._edgeless.tools.switchToDefaultMode({
       elements: [element.id],
@@ -273,8 +271,8 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
 
   onContainerDragMove(e: PointerEventState) {
     if (this._disableOverlay) return;
-    assertExists(this._draggingElementId);
-    assertExists(this._draggingArea);
+    if (!this._draggingElementId) return;
+    if (!this._draggingArea) return;
 
     this._draggingArea.end = new DOMPoint(e.x, e.y);
 
@@ -341,25 +339,23 @@ export class ShapeToolController extends EdgelessToolController<ShapeTool> {
 
   onPressSpaceBar(pressed: boolean): void {
     const { tools } = this._edgeless;
-    if (tools.dragging) {
-      if (pressed) {
-        assertExists(this._draggingArea);
+    if (tools.dragging && pressed) {
+      if (!this._draggingArea) return;
 
-        const x = this._draggingArea.end.x;
-        const y = this._draggingArea.end.y;
-        this._moveWithSpaceStartPos = [x, y];
+      const x = this._draggingArea.end.x;
+      const y = this._draggingArea.end.y;
+      this._moveWithSpaceStartPos = [x, y];
 
-        // Keep a temp version of the _draggingArea
-        const {
-          start: { x: startX, y: startY },
-          end: { x: endX, y: endY },
-        } = this._draggingArea;
+      // Keep a temp version of the _draggingArea
+      const {
+        start: { x: startX, y: startY },
+        end: { x: endX, y: endY },
+      } = this._draggingArea;
 
-        this._moveWithSpaceShapePosTemp = {
-          start: new DOMPoint(startX, startY),
-          end: new DOMPoint(endX, endY),
-        };
-      }
+      this._moveWithSpaceShapePosTemp = {
+        start: new DOMPoint(startX, startY),
+        end: new DOMPoint(endX, endY),
+      };
     }
   }
 

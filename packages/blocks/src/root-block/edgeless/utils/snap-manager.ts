@@ -1,3 +1,7 @@
+import { deserializeXYWH } from '@blocksuite/global/utils';
+import { Point } from '@blocksuite/global/utils';
+import { Bound } from '@blocksuite/global/utils';
+
 import type { SurfaceBlockComponent } from '../../../index.js';
 import type {
   ConnectorElementModel,
@@ -5,11 +9,8 @@ import type {
 } from '../../../surface-block/index.js';
 import type { EdgelessRootService } from '../edgeless-root-service.js';
 
-import { Point } from '../../../_common/utils/rect.js';
 import {
-  Bound,
   Overlay,
-  deserializeXYWH,
   getBoundsWithRotation,
 } from '../../../surface-block/index.js';
 import { isConnectable, isTopLevelBlock } from '../utils/query.js';
@@ -45,6 +46,14 @@ export class EdgelessSnapManager extends Overlay {
    * and alignment within the individual graphic elements.
    */
   private _intraGraphicAlignLines: [Point, Point][] = [];
+
+  cleanupAlignables = () => {
+    this._alignableBounds = [];
+    this._intraGraphicAlignLines = [];
+    this._distributedAlignLines = [];
+    // FIXME: not sure why renderer can be undefined sometimes
+    this._surface.renderer?.removeOverlay(this);
+  };
 
   constructor(private _rootService: EdgelessRootService) {
     super();
@@ -360,13 +369,6 @@ export class EdgelessSnapManager extends Overlay {
     }
     this._draw();
     return rst;
-  }
-
-  cleanupAlignables() {
-    this._alignableBounds = [];
-    this._intraGraphicAlignLines = [];
-    this._distributedAlignLines = [];
-    this._surface.renderer.removeOverlay(this);
   }
 
   override render(ctx: CanvasRenderingContext2D) {

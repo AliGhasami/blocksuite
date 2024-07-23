@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
+import type { SerializedXYWH } from '@blocksuite/global/utils';
 import type { DeltaInsert } from '@blocksuite/inline/types';
 import type { AffineEditorContainer, CommentPanel } from '@blocksuite/presets';
 import type { SlDropdown } from '@shoelace-style/shoelace';
@@ -12,7 +13,6 @@ import {
   HtmlTransformer,
   MarkdownTransformer,
   NotionHtmlAdapter,
-  type SerializedXYWH,
   SizeVariables,
   StyleVariables,
   type SurfaceBlockComponent,
@@ -254,25 +254,27 @@ export class DebugMenu extends ShadowlessElement {
       try {
         const docs = await ZipTransformer.importDocs(this.collection, file);
         for (const doc of docs) {
-          const noteBlock = window.doc.getBlockByFlavour('affine:note');
-          window.doc.addBlock(
-            'affine:paragraph',
-            {
-              type: 'text',
-              text: new Text([
-                {
-                  insert: ' ',
-                  attributes: {
-                    reference: {
-                      type: 'LinkedPage',
-                      pageId: doc.id,
+          if (doc) {
+            const noteBlock = window.doc.getBlockByFlavour('affine:note');
+            window.doc.addBlock(
+              'affine:paragraph',
+              {
+                type: 'text',
+                text: new Text([
+                  {
+                    insert: ' ',
+                    attributes: {
+                      reference: {
+                        type: 'LinkedPage',
+                        pageId: doc.id,
+                      },
                     },
-                  },
-                } as DeltaInsert<AffineTextAttributes>,
-              ]),
-            },
-            noteBlock[0].id
-          );
+                  } as DeltaInsert<AffineTextAttributes>,
+                ]),
+              },
+              noteBlock[0].id
+            );
+          }
         }
         this.requestUpdate();
       } catch (e) {

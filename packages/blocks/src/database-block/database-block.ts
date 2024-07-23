@@ -10,10 +10,12 @@ import type { DatabaseBlockModel } from './database-model.js';
 import type { DatabaseBlockService } from './database-service.js';
 
 import {
-  BlockComponent,
+  CaptionedBlockComponent,
   DragIndicator,
   popMenu,
+  toast,
 } from '../_common/components/index.js';
+import { NOTE_SELECTOR } from '../_common/edgeless/note/consts.js';
 import {
   CopyIcon,
   DeleteIcon,
@@ -49,7 +51,7 @@ import { DatabaseBlockSchema } from './database-model.js';
 import { DatabaseBlockViewSource } from './view-source.js';
 
 @customElement('affine-database')
-export class DatabaseBlockComponent extends BlockComponent<
+export class DatabaseBlockComponent extends CaptionedBlockComponent<
   DatabaseBlockModel,
   DatabaseBlockService
 > {
@@ -78,7 +80,12 @@ export class DatabaseBlockComponent extends BlockComponent<
             name: 'Copy',
             select: () => {
               const slice = Slice.fromModels(this.doc, [this.model]);
-              this.std.clipboard.copySlice(slice).catch(console.error);
+              this.std.clipboard
+                .copySlice(slice)
+                .then(() => {
+                  toast(this.host, 'Copied to clipboard');
+                })
+                .catch(console.error);
             },
           },
           // {
@@ -208,8 +215,8 @@ export class DatabaseBlockComponent extends BlockComponent<
       );
       return () => {
         this.indicator.remove();
-        const model = this.doc.getBlockById(id);
-        const target = this.doc.getBlockById(result.dropBlockId);
+        const model = this.doc.getBlock(id).model;
+        const target = this.doc.getBlock(result.dropBlockId).model;
         let parent = this.doc.getParent(result.dropBlockId);
         const shouldInsertIn = result.dropType === 'in';
         if (shouldInsertIn) {
@@ -400,7 +407,7 @@ export class DatabaseBlockComponent extends BlockComponent<
 
   override get topContenteditableElement() {
     if (this.rootElement instanceof EdgelessRootBlockComponent) {
-      const note = this.closest<NoteBlockComponent>('affine-note');
+      const note = this.closest<NoteBlockComponent>(NOTE_SELECTOR);
       return note;
     }
     return this.rootElement;

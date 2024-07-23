@@ -26,6 +26,7 @@ import { currentEditorIndex, multiEditor } from '../multiple-editor.js';
 import {
   SHORT_KEY,
   pressEnter,
+  pressEscape,
   pressSpace,
   pressTab,
   type,
@@ -190,10 +191,6 @@ export const getEditorLocator = (page: Page) => {
 
 export const getEditorHostLocator = (page: Page) => {
   return page.locator('editor-host').nth(currentEditorIndex);
-};
-
-export const getBlockHub = (page: Page) => {
-  return page.locator('affine-block-hub').nth(currentEditorIndex);
 };
 
 type TaggedConsoleMessage = ConsoleMessage & { __ignore?: boolean };
@@ -643,11 +640,14 @@ export async function initDatabaseDynamicRowWithData(
   const editorHost = getEditorHostLocator(page);
   if (addRow) {
     await initDatabaseRow(page);
+    await pressEscape(page);
   }
-  await focusDatabaseTitle(page);
+  // await focusDatabaseTitle(page);
   const lastRow = editorHost.locator('.affine-database-block-row').last();
   const cell = lastRow.locator('.database-cell').nth(index + 1);
   await cell.click();
+  await waitNextFrame(page);
+  await pressEnter(page);
   await waitNextFrame(page);
   await type(page, data);
   await pressEnter(page);
@@ -1017,6 +1017,9 @@ export async function getPageSnapshot(page: Page, toJSON?: boolean) {
   const json = await page.evaluate(async () => {
     const { job, doc } = window;
     const snapshot = await job.docToSnapshot(doc);
+    if (!snapshot) {
+      throw new Error('Failed to get snapshot');
+    }
     return snapshot.blocks;
   });
   if (toJSON) {
@@ -1109,25 +1112,6 @@ export async function readClipboardText(
   );
   return text;
 }
-
-export const getCenterPosition: (
-  page: Page,
-  // TODO use `locator` directly
-  selector: string
-) => Promise<{ x: number; y: number }> = async (
-  page: Page,
-  selector: string
-) => {
-  const locator = page.locator(selector);
-  const box = await locator.boundingBox();
-  if (!box) {
-    throw new Error("Failed to getCenterPosition! Can't get bounding box");
-  }
-  return {
-    x: box.x + box.width / 2,
-    y: box.y + box.height / 2,
-  };
-};
 
 export const getCenterPositionByLocator: (
   page: Page,

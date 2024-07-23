@@ -1,4 +1,5 @@
-import { BlockElement, RangeManager } from '@blocksuite/block-std';
+import { BlockComponent, RangeManager } from '@blocksuite/block-std';
+import { Bound } from '@blocksuite/global/utils';
 import { css, html, nothing } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
@@ -14,11 +15,9 @@ import { FrameOverlay } from '../root-block/edgeless/frame-manager.js';
 import { Renderer } from './canvas-renderer/renderer.js';
 import { ConnectorElementModel } from './element-model/index.js';
 import { ConnectionOverlay } from './managers/connector-manager.js';
-import { Bound } from './utils/bound.js';
-import { normalizeWheelDeltaY } from './utils/index.js';
 
 @customElement('affine-surface')
-export class SurfaceBlockComponent extends BlockElement<
+export class SurfaceBlockComponent extends BlockComponent<
   SurfaceBlockModel,
   SurfaceBlockService
 > {
@@ -119,9 +118,26 @@ export class SurfaceBlockComponent extends BlockElement<
     }
   `;
 
+  fitToViewport = (bound: Bound) => {
+    const { viewport } = this.edgeless.service;
+    bound = bound.expand(30);
+    if (Date.now() - this._lastTime > 200)
+      this._cachedViewport = viewport.viewportBounds;
+    this._lastTime = Date.now();
+
+    if (this._cachedViewport.contains(bound)) return;
+
+    this._cachedViewport = this._cachedViewport.unite(bound);
+    viewport.setViewportByBound(this._cachedViewport, [0, 0, 0, 0], true);
+  };
+
   overlays!: {
     connector: ConnectionOverlay;
     frame: FrameOverlay;
+  };
+
+  refresh = () => {
+    this._renderer.refresh();
   };
 
   readonly themeObserver = new ThemeObserver();
@@ -219,44 +235,6 @@ export class SurfaceBlockComponent extends BlockElement<
     this._initCanvasTransform();
   }
 
-  fitToViewport(bound: Bound) {
-    const { viewport } = this.edgeless.service;
-    bound = bound.expand(30);
-    if (Date.now() - this._lastTime > 200)
-      this._cachedViewport = viewport.viewportBounds;
-    this._lastTime = Date.now();
-
-    if (this._cachedViewport.contains(bound)) return;
-
-    this._cachedViewport = this._cachedViewport.unite(bound);
-    viewport.setViewportByBound(this._cachedViewport, [0, 0, 0, 0], true);
-  }
-
-  /** @internal Only for testing */
-  initDefaultGestureHandler() {
-    const { _renderer, edgeless } = this;
-    const { viewport } = edgeless.service;
-
-    _renderer.canvas.addEventListener('wheel', e => {
-      e.preventDefault();
-      // pan
-      if (!e.ctrlKey) {
-        const dx = e.deltaX / viewport.zoom;
-        const dy = e.deltaY / viewport.zoom;
-        viewport.setCenter(viewport.centerX + dx, viewport.centerY + dy);
-      }
-      // zoom
-      else {
-        const zoom = normalizeWheelDeltaY(e.deltaY);
-        viewport.setZoom(zoom);
-      }
-    });
-  }
-
-  refresh() {
-    this._renderer.refresh();
-  }
-
   override render() {
     if (!this._isEdgeless) return nothing;
 
@@ -268,7 +246,7 @@ export class SurfaceBlockComponent extends BlockElement<
   }
 
   get edgeless() {
-    return this.parentBlockElement as EdgelessRootBlockComponent;
+    return this.parentBlock as EdgelessRootBlockComponent;
   }
 
   get renderer() {

@@ -5,6 +5,8 @@ import {
   ShadowlessElement,
   WithDisposable,
 } from '@blocksuite/block-std';
+import { deserializeXYWH } from '@blocksuite/global/utils';
+import { Bound } from '@blocksuite/global/utils';
 import { DisposableGroup, debounce } from '@blocksuite/global/utils';
 import { type Block, BlockViewType, type Doc, nanoid } from '@blocksuite/store';
 import { type PropertyValues, css, html, nothing } from 'lit';
@@ -22,8 +24,6 @@ import type { SurfaceRefRenderer } from '../../../../surface-ref-block/surface-r
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 
 import { SpecProvider } from '../../../../specs/index.js';
-import { Bound } from '../../../../surface-block/utils/bound.js';
-import { deserializeXYWH } from '../../../../surface-block/utils/xywh.js';
 import '../../../../surface-ref-block/surface-ref-portal.js';
 import { isTopLevelBlock } from '../../utils/query.js';
 
@@ -150,6 +150,16 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
     return frameBound.isOverlapWithBound(eleBound);
   };
 
+  private _renderModel = (model: BlockModel) => {
+    const selector = this._getSelector(model);
+    this._disposables.add(() => {
+      doc.blockCollection.clearSelector(selector);
+    });
+    const doc = model.doc.blockCollection.getDoc({ selector });
+    const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
+    return this.host.renderSpecPortal(doc, previewSpec.value);
+  };
+
   private _surfaceRefRenderer!: SurfaceRefRenderer;
 
   private _surfaceRefRendererId: string = nanoid();
@@ -206,16 +216,6 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
         this.blocksPortal?.setViewport(this.surfaceRenderer.viewport);
       })
       .catch(console.error);
-  }
-
-  private _renderModel(model: BlockModel) {
-    const selector = this._getSelector(model);
-    this._disposables.add(() => {
-      doc.blockCollection.clearSelector(selector);
-    });
-    const doc = model.doc.blockCollection.getDoc({ selector });
-    const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
-    return this.host.renderSpecPortal(doc, previewSpec.value);
   }
 
   private _renderSurfaceContent(referencedModel: FrameBlockModel) {

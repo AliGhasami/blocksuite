@@ -6,8 +6,13 @@ import type {
 import type { BlockModel, Doc } from '@blocksuite/store';
 
 import { WithDisposable } from '@blocksuite/block-std';
-import { BlocksUtils, Bound, NoteDisplayMode } from '@blocksuite/blocks';
-import { DisposableGroup, assertExists, noop } from '@blocksuite/global/utils';
+import { BlocksUtils, NoteDisplayMode } from '@blocksuite/blocks';
+import {
+  Bound,
+  DisposableGroup,
+  assertExists,
+  noop,
+} from '@blocksuite/global/utils';
 import { LitElement, type PropertyValues, css, html, nothing } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -394,17 +399,17 @@ export class OutlinePanelBody extends WithDisposable(LitElement) {
 
     const { blockPath } = e.detail;
     const path = [rootElement.model.id, ...blockPath];
-    const blockElement = this.editorHost.view.viewFromPath('block', path);
-    if (!blockElement) return;
+    const block = this.editorHost.view.viewFromPath('block', path);
+    if (!block) return;
 
-    blockElement.scrollIntoView({
+    block.scrollIntoView({
       behavior: 'instant',
       block: 'center',
       inline: 'center',
     });
 
     requestAnimationFrame(() => {
-      const blockRect = blockElement.getBoundingClientRect();
+      const blockRect = block.getBoundingClientRect();
       const { top, left, width, height } = blockRect;
       assertExists(rootElement.viewport, 'viewport should exist');
       const {

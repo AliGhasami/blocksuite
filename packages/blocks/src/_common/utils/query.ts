@@ -1,8 +1,9 @@
 import type {
-  BlockElement,
+  BlockComponent,
   EditorHost,
   ViewStore,
 } from '@blocksuite/block-std';
+import type { Point } from '@blocksuite/global/utils';
 import type { InlineEditor } from '@blocksuite/inline';
 import type { BlockModel } from '@blocksuite/store';
 
@@ -14,7 +15,7 @@ import type { RootBlockComponent } from '../../index.js';
 import type { EdgelessRootBlockComponent } from '../../root-block/edgeless/edgeless-root-block.js';
 import type { PageRootBlockComponent } from '../../root-block/page/page-root-block.js';
 import type { AbstractEditor } from '../types.js';
-import type { Point, Rect } from './rect.js';
+import type { Rect } from './rect.js';
 
 import {
   BLOCK_ID_ATTR as ATTR,
@@ -29,10 +30,6 @@ const ATTR_SELECTOR = `[${ATTR}]`;
 // h1.margin-top = 8px + 24px = 32px;
 const MAX_SPACE = 32;
 const STEPS = MAX_SPACE / 2 / 2;
-
-// Fix use unknown type
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type BlockComponent = BlockElement<any>;
 
 interface ContainerBlock {
   model?: BlockModel;
@@ -59,7 +56,8 @@ export function getNextBlock(
   map: Record<string, true> = {}
 ): BlockModel | null {
   if (model.id in map) {
-    throw new Error("Can't get next block! There's a loop in the block tree!");
+    console.error("Can't get next block! There's a loop in the block tree!");
+    return null;
   }
   map[model.id] = true;
 
@@ -136,9 +134,10 @@ export function getPreviousBlock(
     model: BlockModel
   ) => {
     if (model.id in map) {
-      throw new Error(
+      console.error(
         "Can't get previous block! There's a loop in the block tree!"
       );
+      return null;
     }
     map[model.id] = true;
 
@@ -172,7 +171,7 @@ export function buildPath(model: BlockModel | null): string[] {
   return path;
 }
 
-export function blockElementGetter(model: BlockModel, view: ViewStore) {
+export function blockComponentGetter(model: BlockModel, view: ViewStore) {
   if (matchFlavours(model, ['affine:image', 'affine:frame'])) {
     let current: BlockModel | null = model;
     const path: string[] = [];
@@ -262,11 +261,15 @@ export function isInsideEdgelessEditor(host: EditorHost) {
 export function getViewportElement(editorHost: EditorHost) {
   if (!isInsidePageEditor(editorHost)) return null;
   const doc = editorHost.doc;
-  assertExists(doc.root);
+  if (!doc.root) {
+    console.error('Failed to get root doc');
+    return null;
+  }
   const rootElement = editorHost.view.viewFromPath('block', [doc.root.id]);
 
   if (!rootElement || rootElement.closest('affine-page-root') !== rootElement) {
-    throw new Error('Failed to get viewport element!');
+    console.error('Failed to get viewport element!');
+    return null;
   }
   return (rootElement as PageRootBlockComponent).viewportElement;
 }
@@ -361,7 +364,8 @@ export async function asyncGetInlineEditorByModel(
 ) {
   if (matchFlavours(model, ['affine:database'])) {
     // Not support database model since it's may be have multiple inline editor instances.
-    throw new Error('Cannot get inline editor by database model!');
+    console.error('Cannot get inline editor by database model!');
+    return null;
   }
   const richText = await asyncGetRichTextByModel(editorHost, model);
   if (!richText) return null;
@@ -486,7 +490,7 @@ function isEdgelessChildImage({ classList }: Element) {
  * ############### block
  * ```
  */
-export function getClosestBlockElementByPoint(
+export function getClosestBlockComponentByPoint(
   point: Point,
   state: {
     rect?: Rect;
@@ -534,7 +538,7 @@ export function getClosestBlockElementByPoint(
   }
 
   // find block element
-  element = findBlockElement(
+  element = findBlockComponent(
     document.elementsFromPoint(point.x, point.y),
     container
   );
@@ -559,7 +563,7 @@ export function getClosestBlockElementByPoint(
       }
     } else {
       // Indented paragraphs or list
-      bounds = getRectByBlockElement(element);
+      bounds = getRectByBlockComponent(element);
       childBounds = element
         .querySelector('.affine-block-children-container')
         ?.firstElementChild?.getBoundingClientRect();
@@ -586,13 +590,13 @@ export function getClosestBlockElementByPoint(
     n *= -1;
 
     // find block element
-    element = findBlockElement(
+    element = findBlockComponent(
       document.elementsFromPoint(point.x, point.y),
       container
     );
 
     if (element) {
-      bounds = getRectByBlockElement(element);
+      bounds = getRectByBlockComponent(element);
       diff = bounds.bottom - point.y;
       if (diff >= 0 && diff <= STEPS * 2) {
         return element;
@@ -614,7 +618,7 @@ export function getClosestBlockElementByPoint(
  * @param container container which the blocks can be found inside
  * @param point position
  */
-export function findClosestBlockElement(
+export function findClosestBlockComponent(
   container: BlockComponent,
   point: Point,
   selector: string
@@ -652,7 +656,7 @@ export function findClosestBlockElement(
 /**
  * Returns the closest block element by element that does not contain the page element and note element.
  */
-export function getClosestBlockElementByElement(
+export function getClosestBlockComponentByElement(
   element: Element | null
 ): BlockComponent | null {
   if (!element) return null;
@@ -690,7 +694,7 @@ export function getModelByBlockComponent(component: Element) {
  * https://github.com/toeverything/blocksuite/issues/902
  * https://github.com/toeverything/blocksuite/pull/1121
  */
-export function getRectByBlockElement(element: Element | BlockComponent) {
+export function getRectByBlockComponent(element: Element | BlockComponent) {
   if (isDatabase(element)) return element.getBoundingClientRect();
   return (element.firstElementChild ?? element).getBoundingClientRect();
 }
@@ -699,7 +703,7 @@ export function getRectByBlockElement(element: Element | BlockComponent) {
  * Returns block elements excluding their subtrees.
  * Only keep block elements of same level.
  */
-export function getBlockElementsExcludeSubtrees(
+export function getBlockComponentsExcludeSubtrees(
   elements: Element[] | BlockComponent[]
 ) {
   if (elements.length <= 1) return elements;
@@ -719,7 +723,7 @@ export function getBlockElementsExcludeSubtrees(
  * Find block element from an `Element[]`.
  * In Chrome/Safari, `document.elementsFromPoint` does not include `affine-image`.
  */
-function findBlockElement(elements: Element[], parent?: Element) {
+function findBlockComponent(elements: Element[], parent?: Element) {
   const len = elements.length;
   let element = null;
   let i = 0;
@@ -734,7 +738,7 @@ function findBlockElement(elements: Element[], parent?: Element) {
       if (i < len && hasBlockId(element) && isBlock(element)) {
         return elements[i];
       }
-      return getClosestBlockElementByElement(element);
+      return getClosestBlockComponentByElement(element);
     }
   }
   return null;
@@ -814,7 +818,7 @@ export function getDropRectByPoint(
   flag: DropFlags;
 } {
   const result = {
-    rect: getRectByBlockElement(element),
+    rect: getRectByBlockComponent(element),
     flag: DropFlags.Normal,
   };
 
@@ -822,7 +826,9 @@ export function getDropRectByPoint(
 
   if (isDatabase) {
     const table = getDatabaseBlockTableElement(element);
-    assertExists(table);
+    if (!table) {
+      return result;
+    }
     let bounds = table.getBoundingClientRect();
     if (model.isEmpty.value) {
       result.flag = DropFlags.EmptyDatabase;

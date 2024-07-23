@@ -65,8 +65,9 @@ export class AffineDocRemoteSelectionWidget extends WidgetElement {
   }
 
   private _getCursorRect(selections: BaseSelection[]): SelectionRect | null {
-    if (!isRootElement(this.blockElement)) {
-      throw new Error('remote selection widget must be used in page component');
+    if (!isRootElement(this.block)) {
+      console.error('remote selection widget must be used in page component');
+      return null;
     }
 
     const textSelection = selections.find(
@@ -119,9 +120,9 @@ export class AffineDocRemoteSelectionWidget extends WidgetElement {
     } else if (blockSelections.length > 0) {
       const lastBlockSelection = blockSelections[blockSelections.length - 1];
 
-      const blockElement = this.host.view.getBlock(lastBlockSelection.blockId);
-      if (blockElement) {
-        const rect = blockElement.getBoundingClientRect();
+      const block = this.host.view.getBlock(lastBlockSelection.blockId);
+      if (block) {
+        const rect = block.getBoundingClientRect();
         return {
           width: 2,
           height: rect.height,
@@ -140,8 +141,9 @@ export class AffineDocRemoteSelectionWidget extends WidgetElement {
   }
 
   private _getSelectionRect(selections: BaseSelection[]): SelectionRect[] {
-    if (!isRootElement(this.blockElement)) {
-      throw new Error('remote selection widget must be used in page component');
+    if (!isRootElement(this.block)) {
+      console.error('remote selection widget must be used in page component');
+      return [];
     }
 
     const textSelection = selections.find(
@@ -179,9 +181,9 @@ export class AffineDocRemoteSelectionWidget extends WidgetElement {
       }
     } else if (blockSelections.length > 0) {
       return blockSelections.flatMap(blockSelection => {
-        const blockElement = this.host.view.getBlock(blockSelection.blockId);
-        if (blockElement) {
-          const rect = blockElement.getBoundingClientRect();
+        const block = this.host.view.getBlock(blockSelection.blockId);
+        if (block) {
+          const rect = block.getBoundingClientRect();
           return {
             width: rect.width,
             height: rect.height,

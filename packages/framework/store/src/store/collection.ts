@@ -1,9 +1,5 @@
-import {
-  type Logger,
-  NoopLogger,
-  Slot,
-  assertExists,
-} from '@blocksuite/global/utils';
+import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
+import { type Logger, NoopLogger, Slot } from '@blocksuite/global/utils';
 import {
   AwarenessEngine,
   type AwarenessSource,
@@ -193,7 +189,10 @@ export class DocCollection extends DocCollectionAddonType {
   createDoc(options: { id?: string; selector?: BlockSelector } = {}) {
     const { id: docId = this.idGenerator(), selector } = options;
     if (this._hasDoc(docId)) {
-      throw new Error('doc already exists');
+      throw new BlockSuiteError(
+        ErrorCode.DocCollectionError,
+        'doc already exists'
+      );
     }
 
     this.meta.addDocMeta({
@@ -227,7 +226,12 @@ export class DocCollection extends DocCollectionAddonType {
 
   removeDoc(docId: string) {
     const docMeta = this.meta.getDocMeta(docId);
-    assertExists(docMeta);
+    if (!docMeta) {
+      throw new BlockSuiteError(
+        ErrorCode.DocCollectionError,
+        `doc meta not found: ${docId}`
+      );
+    }
 
     const blockCollection = this.getBlockCollection(docId);
     if (!blockCollection) return;

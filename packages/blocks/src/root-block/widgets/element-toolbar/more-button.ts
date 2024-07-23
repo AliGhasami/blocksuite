@@ -2,6 +2,7 @@ import type { SurfaceSelection } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
 import { WithDisposable } from '@blocksuite/block-std';
+import { Bound } from '@blocksuite/global/utils';
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
@@ -48,7 +49,6 @@ import {
   notifyDocCreated,
   promptDocTitle,
 } from '../../../_common/utils/render-linked-doc.js';
-import { Bound } from '../../../surface-block/index.js';
 import '../../edgeless/components/toolbar/shape/shape-menu.js';
 import { removeContainedFrames } from '../../edgeless/frame-manager.js';
 import { edgelessElementsBound } from '../../edgeless/utils/bound-utils.js';
@@ -211,9 +211,9 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
 
   private _reload = (selections: SurfaceSelection[]) => {
     selections.forEach(sel => {
-      const blockElement = this.view.getBlock(sel.blockId);
-      if (!!blockElement && this._refreshable(blockElement.model)) {
-        (blockElement as RefreshableBlockComponent).refreshData();
+      const block = this.view.getBlock(sel.blockId);
+      if (!!block && this._refreshable(block.model)) {
+        (block as RefreshableBlockComponent).refreshData();
       }
     });
   };
@@ -289,16 +289,16 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
         break;
       case 'open':
         if (
-          this._blockElement &&
-          'open' in this._blockElement &&
-          typeof this._blockElement.open === 'function'
+          this._block &&
+          'open' in this._block &&
+          typeof this._block.open === 'function'
         ) {
-          this._blockElement.open();
+          this._block.open();
         }
         break;
       case 'center-peek':
-        if (this._blockElement && isPeekable(this._blockElement)) {
-          peek(this._blockElement);
+        if (this._block && isPeekable(this._block)) {
+          peek(this._block);
         }
         break;
     }
@@ -379,7 +379,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     ];
   }
 
-  private get _blockElement() {
+  private get _block() {
     const blockSelection = this.edgeless.service.selection.surfaceSelections;
     if (
       blockSelection.length !== 1 ||
@@ -388,12 +388,10 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       return;
     }
 
-    const blockElement = this.view.getBlock(blockSelection[0].blockId);
-    if (!blockElement) {
-      return;
-    }
+    const block = this.view.getBlock(blockSelection[0].blockId);
+    if (!block) return;
 
-    return blockElement;
+    return block;
   }
 
   private _refreshable(ele: BlockModel) {
@@ -440,11 +438,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       });
     }
 
-    if (
-      isSingleSelect &&
-      this._blockElement &&
-      isPeekable(this._blockElement)
-    ) {
+    if (isSingleSelect && this._block && isPeekable(this._block)) {
       result.push(CENTER_PEEK_ACTION);
     }
 

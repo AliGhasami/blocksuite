@@ -1,4 +1,5 @@
-import { type Disposable, Slot, assertExists } from '@blocksuite/global/utils';
+import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
+import { type Disposable, Slot } from '@blocksuite/global/utils';
 import { signal } from '@preact/signals-core';
 
 import type { BlockModel, Schema } from '../../schema/index.js';
@@ -242,7 +243,10 @@ export class Doc {
     parentIndex?: number
   ): string {
     if (this.readonly) {
-      throw new Error('cannot modify data in readonly mode');
+      throw new BlockSuiteError(
+        ErrorCode.ModelCRUDError,
+        'cannot modify data in readonly mode'
+      );
     }
 
     const id = blockProps.id ?? this._blockCollection.generateBlockId();
@@ -290,14 +294,14 @@ export class Doc {
   ): string[] {
     if (!props.length) return [];
     const parent = this.getParent(targetModel);
-    assertExists(parent);
+    if (!parent) return [];
 
     const targetIndex =
       parent.children.findIndex(({ id }) => id === targetModel.id) ?? 0;
     const insertIndex = place === 'before' ? targetIndex : targetIndex + 1;
 
     if (props.length <= 1) {
-      assertExists(props[0].flavour);
+      if (!props[0]?.flavour) return [];
       const { flavour, ...blockProps } = props[0];
       const id = this.addBlock(
         flavour as never,
@@ -314,7 +318,7 @@ export class Doc {
     }> = [];
     props.forEach(prop => {
       const { flavour, ...blockProps } = prop;
-      assertExists(flavour);
+      if (!flavour) return;
       blocks.push({ flavour, blockProps });
     });
     return this.addBlocks(blocks, parent.id, insertIndex);
@@ -507,7 +511,12 @@ export class Doc {
     }
 
     const yBlock = this._yBlocks.get(model.id);
-    assertExists(yBlock);
+    if (!yBlock) {
+      throw new BlockSuiteError(
+        ErrorCode.ModelCRUDError,
+        `updating block: ${model.id} not found`
+      );
+    }
 
     this.transact(() => {
       if (isCallback) {
@@ -523,7 +532,12 @@ export class Doc {
       }
 
       const schema = this.schema.flavourSchemaMap.get(model.flavour);
-      assertExists(schema);
+      if (!schema) {
+        throw new BlockSuiteError(
+          ErrorCode.ModelCRUDError,
+          `schema for flavour: ${model.flavour} not found`
+        );
+      }
       syncBlockProps(schema, model, yBlock, callBackOrProps);
       return;
     });

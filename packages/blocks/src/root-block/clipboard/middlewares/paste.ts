@@ -1,5 +1,5 @@
 import type {
-  BlockElement,
+  BlockComponent,
   EditorHost,
   TextRangePoint,
   TextSelection,
@@ -55,7 +55,7 @@ class PointState {
     return block;
   };
 
-  readonly block: BlockElement;
+  readonly block: BlockComponent;
 
   readonly model: BlockModel;
 
@@ -291,10 +291,12 @@ class PasteTr {
 
     host.updateComplete
       .then(() => {
-        const target = this.std.host.querySelector<BlockElement>(
+        const target = this.std.host.querySelector<BlockComponent>(
           `[${host.blockIdAttr}="${cursorModel.id}"]`
         );
-        assertExists(target);
+        if (!target) {
+          return;
+        }
         if (!cursorModel.text) {
           if (matchFlavours(cursorModel, ['affine:image'])) {
             const selection = this.std.selection.create('image', {

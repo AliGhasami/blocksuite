@@ -2,6 +2,7 @@ import type { Doc } from '@blocksuite/store';
 
 import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, BlockViewType } from '@blocksuite/store';
+import { consume, createContext, provide } from '@lit/context';
 import { SignalWatcher, computed } from '@lit-labs/preact-signals';
 import { type PropertyValues, type TemplateResult, nothing, render } from 'lit';
 import { property, state } from 'lit/decorators.js';
@@ -10,14 +11,18 @@ import { when } from 'lit/directives/when.js';
 import { html } from 'lit/static-html.js';
 
 import type { EventName, UIEventHandler } from '../../event/index.js';
+import type { BlockStdScope } from '../../scope/index.js';
 import type { BlockService } from '../../service/index.js';
-import type { EditorHost } from './lit-host.js';
 import type { WidgetElement } from './widget-element.js';
 
 import { WithDisposable } from '../utils/with-disposable.js';
+import { docContext, stdContext } from './lit-host.js';
 import { ShadowlessElement } from './shadowless-element.js';
 
-export class BlockElement<
+export const modelContext = createContext<BlockModel>('model');
+export const serviceContext = createContext<BlockService>('service');
+
+export class BlockComponent<
   Model extends BlockModel = BlockModel,
   Service extends BlockService = BlockService,
   WidgetName extends string = string,
@@ -56,8 +61,6 @@ export class BlockElement<
   renderChildren = (model: BlockModel): TemplateResult => {
     return this.host.renderChildren(model);
   };
-
-  service!: Service;
 
   private _renderMismatchBlock(content: unknown) {
     return when(
@@ -110,17 +113,16 @@ export class BlockElement<
     super.connectedCallback();
 
     this.std.view.setBlock(this);
+
     const disposable = this.std.doc.slots.blockUpdated.on(({ type, id }) => {
       if (id === this.model.id && type === 'delete') {
         this.std.view.deleteBlock(this);
         disposable.dispose();
       }
     });
-
-    this.service = this.host.std.spec.getService(this.model.flavour);
-    this.path = this.host.view.calculatePath(this.model);
-
     this._disposables.add(disposable);
+
+    this.path = this.host.view.calculatePath(this.model);
 
     this._disposables.add(
       this.model.propsUpdated.on(() => {
@@ -137,7 +139,7 @@ export class BlockElement<
   override disconnectedCallback() {
     super.disconnectedCallback();
 
-    this.service.specSlots.viewDisconnected.emit({
+    this.service?.specSlots.viewDisconnected.emit({
       service: this.service,
       component: this,
     });
@@ -145,7 +147,7 @@ export class BlockElement<
 
   protected override async getUpdateComplete(): Promise<boolean> {
     const result = await super.getUpdateComplete();
-    await Promise.all(this.childBlockElements.map(el => el.updateComplete));
+    await Promise.all(this.childBlocks.map(el => el.updateComplete));
     return result;
   }
 
@@ -214,17 +216,21 @@ export class BlockElement<
     return this.dataset.blockId as string;
   }
 
-  get childBlockElements() {
+  get childBlocks() {
     const childModels = this.model.children;
     return childModels
       .map(child => {
         return this.std.view.getBlock(child.id);
       })
-      .filter((x): x is BlockElement => !!x);
+      .filter((x): x is BlockComponent => !!x);
   }
 
   get flavour(): string {
     return this.model.flavour;
+  }
+
+  get host() {
+    return this.std.host;
   }
 
   get isVersionMismatch() {
@@ -245,13 +251,23 @@ export class BlockElement<
     return false;
   }
 
-  get parentBlockElement(): BlockElement {
-    const el = this.parentElement;
-    // TODO(mirone/#6534): find a better way to get block element from a node
-    return el?.closest('[data-block-id]') as BlockElement;
+  get model() {
+    if (this._model) {
+      return this._model;
+    }
+    const model = this.doc.getBlockById<Model>(this.blockId);
+    assertExists(model, `Cannot find block model for id ${this.blockId}`);
+    this._model = model;
+    return model;
   }
 
-  get rootElement(): BlockElement | null {
+  get parentBlock(): BlockComponent {
+    const el = this.parentElement;
+    // TODO(mirone/#6534): find a better way to get block element from a node
+    return el?.closest('[data-block-id]') as BlockComponent;
+  }
+
+  get rootElement(): BlockComponent | null {
     const rootId = this.doc.root?.id;
     if (!rootId) {
       return null;
@@ -268,22 +284,36 @@ export class BlockElement<
     return this.host.selection;
   }
 
-  get std() {
-    return this.host.std;
+  get service(): Service {
+    if (this._service) {
+      return this._service;
+    }
+    const service = this.std.spec.getService(this.model.flavour) as Service;
+    assertExists(
+      service,
+      `Cannot find service for flavour ${this.model.flavour}`
+    );
+    this._service = service;
+    return service;
   }
 
-  get topContenteditableElement(): BlockElement | null {
+  get topContenteditableElement(): BlockComponent | null {
     return this.rootElement;
   }
 
   get widgetElements(): Partial<Record<WidgetName, WidgetElement>> {
-    return Object.keys(this.widgets).reduce((mapping, key) => {
-      return {
+    return Object.keys(this.widgets).reduce(
+      (mapping, key) => ({
         ...mapping,
-        [key]: this.host.view.viewFromPath('widget', [...this.path, key]),
-      };
-    }, {});
+        [key]: this.host.view.getWidget(key, this.blockId),
+      }),
+      {}
+    );
   }
+
+  @provide({ context: modelContext as never })
+  @state()
+  private accessor _model: Model | null = null;
 
   @state()
   protected accessor _renderers: Array<(content: unknown) => unknown> = [
@@ -292,20 +322,18 @@ export class BlockElement<
     this._renderViewType,
   ];
 
-  @property({ attribute: false })
-  accessor content: TemplateResult | null = null;
+  @provide({ context: serviceContext as never })
+  @state()
+  private accessor _service: Service | null = null;
 
   @property({ attribute: false })
   accessor dirty = false;
 
-  @property({ attribute: false })
+  @consume({ context: docContext })
   accessor doc!: Doc;
 
-  @property({ attribute: false })
-  accessor host!: EditorHost;
-
-  @property({ attribute: false })
-  accessor model!: Model;
+  @consume({ context: stdContext })
+  accessor std!: BlockStdScope;
 
   @property({ attribute: false })
   accessor viewType: BlockViewType = BlockViewType.Display;

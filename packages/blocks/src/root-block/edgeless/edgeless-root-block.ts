@@ -1,9 +1,12 @@
 import type { SurfaceSelection } from '@blocksuite/block-std';
+import type { IBound, IPoint, IVec } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { BlockElement } from '@blocksuite/block-std';
+import { BlockComponent } from '@blocksuite/block-std';
 import { IS_WINDOWS } from '@blocksuite/global/env';
-import { assertExists, throttle } from '@blocksuite/global/utils';
+import { serializeXYWH } from '@blocksuite/global/utils';
+import { Point } from '@blocksuite/global/utils';
+import { Bound, Vec, assertExists, throttle } from '@blocksuite/global/utils';
 import { css, html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -31,9 +34,7 @@ import {
 } from '../../_common/consts.js';
 import { ThemeObserver } from '../../_common/theme/theme-observer.js';
 import {
-  type IPoint,
   NoteDisplayMode,
-  Point,
   type Viewport,
   asyncFocusRichText,
   handleNativeRangeAtPoint,
@@ -46,14 +47,7 @@ import {
   setAttachmentUploaded,
   setAttachmentUploading,
 } from '../../attachment-block/utils.js';
-import {
-  Bound,
-  type IBound,
-  type IVec,
-  Vec,
-  normalizeWheelDeltaY,
-  serializeXYWH,
-} from '../../surface-block/index.js';
+import { normalizeWheelDeltaY } from '../../surface-block/index.js';
 import '../../surface-block/surface-block.js';
 import './components/note-slicer/index.js';
 import './components/presentation/edgeless-navigator-black-background.js';
@@ -100,7 +94,7 @@ export interface EdgelessViewport {
 }
 
 @customElement('affine-edgeless-root')
-export class EdgelessRootBlockComponent extends BlockElement<
+export class EdgelessRootBlockComponent extends BlockComponent<
   RootBlockModel,
   EdgelessRootService,
   EdgelessRootBlockWidgetName
@@ -129,6 +123,8 @@ export class EdgelessRootBlockComponent extends BlockElement<
     affine-edgeless-root {
       -webkit-user-select: none;
       user-select: none;
+      display: block;
+      height: 100%;
     }
 
     .widgets-container {
@@ -245,6 +241,7 @@ export class EdgelessRootBlockComponent extends BlockElement<
     const setRemoteCursor = (pos: { x: number; y: number }) => {
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestConnectedFrame(() => {
+        if (!this.service?.viewport) return;
         const cursorPosition = this.service.viewport.toModelCoord(pos.x, pos.y);
         this.service.selection.setCursor({
           x: cursorPosition[0],
@@ -262,6 +259,11 @@ export class EdgelessRootBlockComponent extends BlockElement<
 
   private _initResizeEffect() {
     const resizeObserver = new ResizeObserver((_: ResizeObserverEntry[]) => {
+      // FIXME: find a better way to get rid of empty check
+      if (!this.service || !this.service.selection || !this.service.viewport) {
+        console.error('Service not ready');
+        return;
+      }
       this.service.selection.set(this.service.selection.surfaceSelections);
       this.service.viewport.onResize();
     });

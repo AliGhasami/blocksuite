@@ -193,6 +193,10 @@ export class EdgelessZoomToolbar extends WithDisposable(LitElement) {
   }
 
   get zoom() {
+    if (!this.viewport) {
+      console.error('Something went wrong, viewport is not available');
+      return 1;
+    }
     return this.viewport.zoom;
   }
 

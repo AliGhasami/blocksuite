@@ -1,4 +1,4 @@
-import type { BlockElement } from '@blocksuite/block-std';
+import type { BlockComponent } from '@blocksuite/block-std';
 import type { InlineRange } from '@blocksuite/inline/types';
 
 import { WithDisposable } from '@blocksuite/block-std';
@@ -142,6 +142,10 @@ export class LinkPopup extends WithDisposable(LitElement) {
   };
 
   private _viewTemplate = () => {
+    if (!this._rootService) {
+      return nothing;
+    }
+
     this._embedOptions = this._rootService.getEmbedBlockOptions(
       this.currentLink
     );
@@ -234,23 +238,24 @@ export class LinkPopup extends WithDisposable(LitElement) {
       targetFlavour = this._embedOptions.flavour;
     }
 
-    const blockElement = this.blockElement;
+    const block = this.block;
+    if (!block) return;
     const url = this.currentLink;
     const title = this.currentText;
     const props = {
       url,
       title: title === url ? '' : title,
     };
-    const doc = blockElement.doc;
-    const parent = doc.getParent(blockElement.model);
+    const doc = block.doc;
+    const parent = doc.getParent(block.model);
     assertExists(parent);
-    const index = parent.children.indexOf(blockElement.model);
+    const index = parent.children.indexOf(block.model);
     doc.addBlock(targetFlavour as never, props, parent, index + 1);
 
     const totalTextLength = this.inlineEditor.yTextLength;
     const inlineTextLength = this.targetInlineRange.length;
     if (totalTextLength === inlineTextLength) {
-      doc.deleteBlock(blockElement.model);
+      doc.deleteBlock(block.model);
     } else {
       this.inlineEditor.formatText(this.targetInlineRange, { link: null });
     }
@@ -266,18 +271,19 @@ export class LinkPopup extends WithDisposable(LitElement) {
     const { flavour } = this._embedOptions;
     const url = this.currentLink;
 
-    const blockElement = this.blockElement;
-    const doc = blockElement.doc;
-    const parent = doc.getParent(blockElement.model);
+    const block = this.block;
+    if (!block) return;
+    const doc = block.doc;
+    const parent = doc.getParent(block.model);
     assertExists(parent);
-    const index = parent.children.indexOf(blockElement.model);
+    const index = parent.children.indexOf(block.model);
 
     doc.addBlock(flavour as never, { url }, parent, index + 1);
 
     const totalTextLength = this.inlineEditor.yTextLength;
     const inlineTextLength = this.targetInlineRange.length;
     if (totalTextLength === inlineTextLength) {
-      doc.deleteBlock(blockElement.model);
+      doc.deleteBlock(block.model);
     } else {
       this.inlineEditor.formatText(this.targetInlineRange, { link: null });
     }
@@ -287,19 +293,21 @@ export class LinkPopup extends WithDisposable(LitElement) {
 
   private _copyUrl() {
     navigator.clipboard.writeText(this.currentLink).catch(console.error);
+    if (!this.host) return;
     toast(this.host, 'Copied link to clipboard');
     this.abortController.abort();
   }
 
   private get _isBookmarkAllowed() {
-    const blockElement = this.blockElement;
-    const schema = blockElement.doc.schema;
-    const parent = blockElement.doc.getParent(blockElement.model);
-    assertExists(parent);
+    const block = this.block;
+    if (!block) return false;
+    const schema = block.doc.schema;
+    const parent = block.doc.getParent(block.model);
+    if (!parent) return false;
     const bookmarkSchema = schema.flavourSchemaMap.get('affine:bookmark');
-    assertExists(bookmarkSchema);
+    if (!bookmarkSchema) return false;
     const parentSchema = schema.flavourSchemaMap.get(parent.flavour);
-    assertExists(parentSchema);
+    if (!parentSchema) return false;
 
     try {
       schema.validateSchema(bookmarkSchema, parentSchema);
@@ -358,9 +366,9 @@ export class LinkPopup extends WithDisposable(LitElement) {
         reference: null,
       });
       this.inlineEditor.setInlineRange(this.targetInlineRange);
-      const textSelection = this.host.selection.find('text');
+      const textSelection = this.host?.selection.find('text');
       assertExists(textSelection);
-      this.host.rangeManager?.syncTextSelectionToRange(textSelection);
+      this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
     } else if (this.type === 'edit') {
       const text = this.textInput?.value ?? link;
       this.inlineEditor.insertText(this.targetInlineRange, text, {
@@ -371,9 +379,9 @@ export class LinkPopup extends WithDisposable(LitElement) {
         index: this.targetInlineRange.index,
         length: text.length,
       });
-      const textSelection = this.host.selection.find('text');
+      const textSelection = this.host?.selection.find('text');
       assertExists(textSelection);
-      this.host.rangeManager?.syncTextSelectionToRange(textSelection);
+      this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
     }
 
     this.abortController.abort();
@@ -388,7 +396,7 @@ export class LinkPopup extends WithDisposable(LitElement) {
   }
 
   private get _rootService() {
-    return this.std.spec.getService('affine:page');
+    return this.std?.spec.getService('affine:page');
   }
 
   private _updateConfirmBtn() {
@@ -460,7 +468,7 @@ export class LinkPopup extends WithDisposable(LitElement) {
     super.connectedCallback();
 
     if (this.targetInlineRange.length === 0) {
-      throw new Error('Cannot toggle link popup on empty range');
+      return;
     }
 
     if (this.type === 'edit' || this.type === 'create') {
@@ -499,7 +507,7 @@ export class LinkPopup extends WithDisposable(LitElement) {
                 class="affine-link-popover-overlay-mask"
                 @click=${() => {
                   this.abortController.abort();
-                  this.host.selection.clear();
+                  this.host?.selection.clear();
                 }}
               ></div>
             `}
@@ -558,12 +566,12 @@ export class LinkPopup extends WithDisposable(LitElement) {
       .catch(console.error);
   }
 
-  get blockElement() {
-    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
+  get block() {
+    const block = this.inlineEditor.rootElement.closest<BlockComponent>(
       `[${BLOCK_ID_ATTR}]`
     );
-    assertExists(blockElement);
-    return blockElement;
+    if (!block) return null;
+    return block;
   }
 
   get currentLink() {
@@ -580,11 +588,11 @@ export class LinkPopup extends WithDisposable(LitElement) {
   }
 
   get host() {
-    return this.blockElement.host;
+    return this.block?.host;
   }
 
   get std() {
-    return this.blockElement.std;
+    return this.block?.std;
   }
 
   @property({ attribute: false })

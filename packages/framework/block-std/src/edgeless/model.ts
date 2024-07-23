@@ -1,21 +1,23 @@
-import type { Constructor } from '@blocksuite/global/utils';
+import type {
+  Constructor,
+  IVec,
+  SerializedXYWH,
+} from '@blocksuite/global/utils';
 
-import { BlockModel } from '@blocksuite/store';
-
-import type { EditorHost } from '../view/index.js';
-import type { SerializedXYWH } from './types.js';
-import type { IVec } from './vec.js';
-
+import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import {
+  Bound,
+  PointLocation,
   getBoundsWithRotation,
   getPointsFromBoundsWithRotation,
   linePolygonIntersects,
   polygonGetPointTangent,
   polygonNearestPoint,
   rotatePoints,
-} from '../utils/math.js';
-import { Bound } from './bound.js';
-import { PointLocation } from './point-location.js';
+} from '@blocksuite/global/utils';
+import { BlockModel } from '@blocksuite/store';
+
+import type { EditorHost } from '../view/index.js';
 
 export interface IHitTestOptions {
   expand?: number;
@@ -201,7 +203,10 @@ export function selectable<
     }
 
     if (Object.getPrototypeOf(currentClass.prototype) === null) {
-      throw new Error('The SuperClass is not a subclass of BlockModel');
+      throw new BlockSuiteError(
+        ErrorCode.EdgelessBlockError,
+        'The SuperClass is not a subclass of BlockModel'
+      );
     }
 
     Object.setPrototypeOf(currentClass.prototype, EdgelessBlockModel.prototype);

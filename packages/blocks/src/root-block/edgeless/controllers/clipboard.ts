@@ -4,7 +4,11 @@ import type {
   UIEventStateContext,
 } from '@blocksuite/block-std';
 import type { EditorHost } from '@blocksuite/block-std';
+import type { IVec } from '@blocksuite/global/utils';
+import type { IBound } from '@blocksuite/global/utils';
 
+import { Vec } from '@blocksuite/global/utils';
+import { Bound } from '@blocksuite/global/utils';
 import {
   DisposableGroup,
   assertExists,
@@ -22,7 +26,6 @@ import DOMPurify from 'dompurify';
 
 import type { EdgelessSelectableProps } from '../../../_common/edgeless/mixin/edgeless-selectable.js';
 import type { NoteBlockModel } from '../../../note-block/note-model.js';
-import type { IBound } from '../../../surface-block/consts.js';
 import type { EdgelessRootBlockComponent } from '../edgeless-root-block.js';
 
 import {
@@ -33,7 +36,7 @@ import {
 import { matchFlavours } from '../../../_common/utils/index.js';
 import { groupBy } from '../../../_common/utils/iterable.js';
 import {
-  blockElementGetter,
+  blockComponentGetter,
   getRootByEditorHost,
   isInsidePageEditor,
 } from '../../../_common/utils/query.js';
@@ -52,8 +55,7 @@ import {
 } from '../../../surface-block/index.js';
 import { ConnectorElementModel } from '../../../surface-block/index.js';
 import { compare } from '../../../surface-block/managers/layer-utils.js';
-import { Bound, getCommonBound } from '../../../surface-block/utils/bound.js';
-import { type IVec, Vec } from '../../../surface-block/utils/vec.js';
+import { getCommonBound } from '../../../surface-block/utils/bound.js';
 import { ClipboardAdapter } from '../../clipboard/adapter.js';
 import { PageClipboard } from '../../clipboard/index.js';
 import {
@@ -892,7 +894,7 @@ export class EdgelessClipboardController extends PageClipboard {
       block: BlockSuite.EdgelessBlockModelType,
       isInFrame = false
     ) => {
-      let blockElement = blockElementGetter(
+      let blockComponent = blockComponentGetter(
         block,
         this.std.view
       )?.parentElement;
@@ -900,14 +902,14 @@ export class EdgelessClipboardController extends PageClipboard {
         'affine:',
         '.edgeless-block-portal-'
       );
-      blockElement = blockElement?.closest(blockPortalSelector);
-      if (!blockElement) {
+      blockComponent = blockComponent?.closest(blockPortalSelector);
+      if (!blockComponent) {
         throw new Error('Could not find edgeless block portal.');
       }
 
       const blockBound = Bound.deserialize(block.xywh);
       const canvasData = await html2canvas(
-        blockElement as HTMLElement,
+        blockComponent as HTMLElement,
         html2canvasOption
       );
       ctx.drawImage(
@@ -1416,6 +1418,9 @@ export async function prepareClipboardData(
   const selected = await Promise.all(
     selectedAll.map(async selected => {
       const data = await serializeElement(selected, selectedAll, job);
+      if (!data) {
+        return;
+      }
       if (isAttachmentBlock(selected) || isImageBlock(selected)) {
         await job.assetsManager.readFromBlob(data.props.sourceId as string);
       }

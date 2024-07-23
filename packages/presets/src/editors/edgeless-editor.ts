@@ -7,7 +7,7 @@ import {
 } from '@blocksuite/block-std';
 import { EdgelessEditorBlockSpecs } from '@blocksuite/blocks';
 import { noop } from '@blocksuite/global/utils';
-import { css, html, nothing } from 'lit';
+import { type TemplateResult, css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { type Ref, createRef, ref } from 'lit/directives/ref.js';
 
@@ -76,6 +76,9 @@ export class EdgelessEditor extends WithDisposable(ShadowlessElement) {
 
   @property({ attribute: false })
   accessor doc!: Doc;
+
+  @property({ attribute: false })
+  accessor editor!: TemplateResult;
 
   @property({ attribute: false })
   accessor specs = EdgelessEditorBlockSpecs;

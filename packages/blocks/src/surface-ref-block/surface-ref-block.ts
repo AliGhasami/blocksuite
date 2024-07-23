@@ -1,5 +1,7 @@
 import { PathFinder } from '@blocksuite/block-std';
-import { BlockElement } from '@blocksuite/block-std';
+import { BlockComponent } from '@blocksuite/block-std';
+import { deserializeXYWH } from '@blocksuite/global/utils';
+import { Bound } from '@blocksuite/global/utils';
 import { type Disposable, assertExists, noop } from '@blocksuite/global/utils';
 import {
   type PropertyDeclaration,
@@ -28,8 +30,6 @@ import {
 } from '../_common/icons/index.js';
 import { requestConnectedFrame } from '../_common/utils/event.js';
 import { getBackgroundGrid } from '../root-block/edgeless/utils/query.js';
-import { Bound } from '../surface-block/utils/bound.js';
-import { deserializeXYWH } from '../surface-block/utils/xywh.js';
 import './surface-ref-portal.js';
 import { SurfaceRefPortal } from './surface-ref-portal.js';
 import { noContentPlaceholder } from './utils.js';
@@ -56,7 +56,7 @@ type RefElementModel = BlockSuite.SurfaceElementModelType | FrameBlockModel;
 
 @customElement('affine-surface-ref')
 @Peekable()
-export class SurfaceRefBlockComponent extends BlockElement<
+export class SurfaceRefBlockComponent extends BlockComponent<
   SurfaceRefBlockModel,
   SurfaceRefBlockService
 > {
@@ -481,7 +481,7 @@ export class SurfaceRefBlockComponent extends BlockElement<
     return (
       this.isConnected &&
       this.parentElement &&
-      !this.parentBlockElement.closest('affine-surface-ref')
+      !this.parentBlock.closest('affine-surface-ref')
     );
   }
 

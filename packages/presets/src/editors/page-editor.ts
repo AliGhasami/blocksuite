@@ -7,7 +7,7 @@ import {
 } from '@blocksuite/block-std';
 import { PageEditorBlockSpecs } from '@blocksuite/blocks';
 import { noop } from '@blocksuite/global/utils';
-import { css, html, nothing } from 'lit';
+import { type TemplateResult, css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { type Ref, createRef, ref } from 'lit/directives/ref.js';
 
@@ -85,6 +85,9 @@ export class PageEditor extends WithDisposable(ShadowlessElement) {
 
   @property({ attribute: false })
   accessor doc!: Doc;
+
+  @property({ attribute: false })
+  accessor editor!: TemplateResult;
 
   @property({ type: Boolean })
   accessor hasViewport = true;

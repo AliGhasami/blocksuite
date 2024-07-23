@@ -1,8 +1,7 @@
-import type { BlockElement } from '@blocksuite/block-std';
+import type { BlockComponent } from '@blocksuite/block-std';
 import type { BundledLanguage, Highlighter } from 'shiki';
 
 import { getInlineRangeProvider } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
 import {
   INLINE_ROOT_ATTR,
   type InlineRangeProvider,
@@ -19,13 +18,14 @@ import { z } from 'zod';
 import type { RichText } from '../_common/components/rich-text/rich-text.js';
 import type { CodeBlockModel, HighlightOptionsGetter } from './code-model.js';
 
+import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/index.js';
 import '../_common/components/rich-text/rich-text.js';
 import { toast } from '../_common/components/toast.js';
+import { NOTE_SELECTOR } from '../_common/edgeless/note/consts.js';
 import { ThemeObserver } from '../_common/theme/theme-observer.js';
 import { getViewportElement } from '../_common/utils/query.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
-import { BlockComponent } from './../_common/components/block-component.js';
 import { CodeClipboardController } from './clipboard/index.js';
 import { codeBlockStyles } from './styles.js';
 import { getStandardLanguage, isPlaintext } from './utils/code-languages.js';
@@ -40,7 +40,7 @@ import {
 import { getHighLighter } from './utils/high-lighter.js';
 
 @customElement('affine-code')
-export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
+export class CodeBlockComponent extends CaptionedBlockComponent<CodeBlockModel> {
   private _highlighter: Highlighter | null = null;
 
   private _inlineRangeProvider: InlineRangeProvider | null = null;
@@ -117,7 +117,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
   private _updateLineNumbers() {
     const lineNumbersContainer =
       this.querySelector<HTMLElement>('#line-numbers');
-    assertExists(lineNumbersContainer);
+    if (!lineNumbersContainer) return;
 
     const next = this.model.wrap
       ? generateLineNumberRender()
@@ -204,6 +204,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
         const state = ctx.get('keyboardState');
         const event = state.raw;
         const inlineEditor = this.inlineEditor;
+        if (!inlineEditor) return;
         const inlineRange = inlineEditor.getInlineRange();
         if (inlineRange) {
           event.stopPropagation();
@@ -228,6 +229,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
             indexArr.push(0);
           }
           indexArr.forEach(i => {
+            if (!this.inlineEditor) return;
             this.inlineEditor.insertText(
               {
                 index: i,
@@ -251,6 +253,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
         const state = ctx.get('keyboardState');
         const event = state.raw;
         const inlineEditor = this.inlineEditor;
+        if (!inlineEditor) return;
         const inlineRange = inlineEditor.getInlineRange();
         if (inlineRange) {
           event.stopPropagation();
@@ -278,6 +281,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
             i => text.slice(i, i + 2) === INDENT_SYMBOL
           );
           indexArr.forEach(i => {
+            if (!this.inlineEditor) return;
             this.inlineEditor.deleteText({
               index: i,
               length: 2,
@@ -395,7 +399,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
       }
     }
 
-    assertExists(this._richTextElement);
+    if (!this._richTextElement) return;
     this._richTextResizeObserver.disconnect();
     this._richTextResizeObserver.observe(this._richTextElement);
   }
@@ -404,10 +408,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
     const inlineRoot = this.querySelector<InlineRootElement>(
       `[${INLINE_ROOT_ATTR}]`
     );
-    if (!inlineRoot) {
-      throw new Error('Inline editor root not found');
-    }
-    return inlineRoot.inlineEditor;
+    return inlineRoot?.inlineEditor;
   }
 
   get readonly() {
@@ -416,9 +417,7 @@ export class CodeBlockComponent extends BlockComponent<CodeBlockModel> {
 
   override get topContenteditableElement() {
     if (this.rootElement instanceof EdgelessRootBlockComponent) {
-      const el = this.closest<BlockElement>(
-        'affine-note, affine-edgeless-note, affine-edgeless-text'
-      );
+      const el = this.closest<BlockComponent>(NOTE_SELECTOR);
       return el;
     }
     return this.rootElement;

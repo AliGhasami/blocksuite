@@ -1,12 +1,11 @@
 import type { Doc } from '@blocksuite/store';
 
 import {
-  Bound,
-  EdgelessBlockElement,
-  type SerializedXYWH,
+  EdgelessBlockComponent,
   ShadowlessElement,
   WithDisposable,
 } from '@blocksuite/block-std';
+import { Bound, type SerializedXYWH } from '@blocksuite/global/utils';
 import { css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -242,7 +241,7 @@ export class EdgelessFrameTitle extends WithDisposable(ShadowlessElement) {
 }
 
 @customElement('affine-frame')
-export class FrameBlockComponent extends EdgelessBlockElement<
+export class FrameBlockComponent extends EdgelessBlockComponent<
   EdgelessRootService,
   FrameBlockModel
 > {

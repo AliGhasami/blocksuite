@@ -1,16 +1,12 @@
 import type { PointerEventState } from '@blocksuite/block-std';
+import type { IBound, IVec } from '@blocksuite/global/utils';
 
-import { assertExists, noop } from '@blocksuite/global/utils';
+import { Bound, noop } from '@blocksuite/global/utils';
 
-import type {
-  ConnectorMode,
-  IBound,
-  IVec,
-} from '../../../../surface-block/index.js';
+import type { ConnectorMode } from '../../../../surface-block/index.js';
 import type { EdgelessTool } from '../../types.js';
 
 import {
-  Bound,
   CanvasElementType,
   type Connection,
   type ConnectorElementModel,
@@ -58,8 +54,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
   } as ConnectorTool;
 
   private _createConnector() {
-    assertExists(this._source);
-    assertExists(this._startPoint);
+    if (!this._source || !this._startPoint) return;
 
     this._doc.captureSync();
     const id = this._edgeless.service.addElement(CanvasElementType.CONNECTOR, {
@@ -102,7 +97,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
   }
 
   findTargetByPoint(point: IVec) {
-    assertExists(this._connector);
+    if (!this._connector) return;
     const {
       _connector,
       _edgeless,
@@ -149,7 +144,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
 
   onContainerDragEnd() {
     if (this._mode === ConnectorToolMode.Quick) return;
-    assertExists(this._connector);
+    if (!this._connector) return;
 
     this._doc.captureSync();
     this._edgeless.tools.switchToDefaultMode({
@@ -170,12 +165,10 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
 
   onContainerMouseMove(e: PointerEventState) {
     if (this._mode === ConnectorToolMode.Dragging) return;
-
-    assertExists(this._sourceBounds);
-    assertExists(this._connector);
-
+    if (!this._sourceBounds) return;
+    if (!this._connector) return;
     const sourceId = this._connector.source.id;
-    assertExists(sourceId);
+    if (!sourceId) return;
 
     const point = this._service.viewport.toModelCoord(e.x, e.y);
     const target = this._surface.overlays.connector.renderConnector(point, [

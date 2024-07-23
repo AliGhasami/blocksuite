@@ -167,7 +167,10 @@ export class SlashMenu extends WithDisposable(LitElement) {
     });
 
     const inlineEditor = this.inlineEditor;
-    assertExists(inlineEditor, 'RichText InlineEditor not found');
+    if (!inlineEditor || !inlineEditor.eventSource) {
+      console.error('inlineEditor or eventSource is not found');
+      return;
+    }
 
     /**
      * Handle arrow key
@@ -371,7 +374,11 @@ export class InnerSlashMenu extends WithDisposable(LitElement) {
     if (isGroupDivider(item)) return this._renderGroupItem(item);
     else if (isActionItem(item)) return this._renderActionItem(item);
     else if (isSubMenuItem(item)) return this._renderSubMenuItem(item);
-    else throw new Error('Unreachable');
+    else {
+      console.error('Unknown item type for slash menu');
+      console.error(item);
+      return nothing;
+    }
   };
 
   private _renderSubMenuItem = (item: SlashSubMenu) => {
@@ -443,7 +450,11 @@ export class InnerSlashMenu extends WithDisposable(LitElement) {
       this.context.rootElement.host,
       this.context.model
     );
-    assertExists(inlineEditor, 'RichText InlineEditor not found');
+
+    if (!inlineEditor || !inlineEditor.eventSource) {
+      console.error('inlineEditor or eventSource is not found');
+      return;
+    }
 
     inlineEditor.eventSource.addEventListener(
       'keydown',

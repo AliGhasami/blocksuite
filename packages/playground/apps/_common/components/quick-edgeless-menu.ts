@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
-import type {
-  AffineTextAttributes,
-  DocMode,
-  SerializedXYWH,
-} from '@blocksuite/blocks';
+import type { AffineTextAttributes, DocMode } from '@blocksuite/blocks';
+import type { SerializedXYWH } from '@blocksuite/global/utils';
 import type { DeltaInsert } from '@blocksuite/inline';
 import type { AffineEditorContainer } from '@blocksuite/presets';
 
@@ -170,6 +167,10 @@ export class QuickEdgelessMenu extends ShadowlessElement {
               },
               this.doc.root?.id
             );
+          }
+
+          if (!doc) {
+            break;
           }
 
           window.doc.addBlock(

@@ -1,5 +1,6 @@
 import type { BaseTextAttributes, DeltaInsert } from '@blocksuite/inline';
 
+import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import * as Y from 'yjs';
 
 export interface OptionalAttributes {
@@ -12,10 +13,18 @@ export type DeltaOperation = {
   retain?: number;
 } & OptionalAttributes;
 
+export type OnTextChange = (data: Y.Text) => void;
+
 export class Text {
+  private _onChange?: OnTextChange;
+
   private readonly _yText: Y.Text;
 
-  constructor(input?: Y.Text | string | DeltaInsert[]) {
+  constructor(
+    input?: Y.Text | string | DeltaInsert[],
+    onChange?: OnTextChange
+  ) {
+    this._onChange = onChange;
     if (typeof input === 'string') {
       const text = input.replaceAll('\r\n', '\n');
       this._yText = new Y.Text(text);
@@ -33,18 +42,26 @@ export class Text {
     } else {
       this._yText = new Y.Text();
     }
+    this._yText.observe(() => {
+      this._onChange?.(this._yText);
+    });
   }
 
-  static fromDelta(delta: DeltaOperation[]) {
+  /**
+   * @deprecated
+   * This method will lose the change observer unless you pass the onChange callback.
+   */
+  static fromDelta(delta: DeltaOperation[], onChange?: OnTextChange) {
     const result = new Y.Text();
     result.applyDelta(delta);
-    return new Text(result);
+    return new Text(result, onChange);
   }
 
   private _transact(callback: () => void) {
     const doc = this._yText.doc;
     if (!doc) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'Failed to transact text! yText is not attached to a doc'
       );
     }
@@ -59,6 +76,10 @@ export class Text {
     });
   }
 
+  bind(onChange?: OnTextChange) {
+    this._onChange = onChange;
+  }
+
   clear() {
     if (!this._yText.length) {
       return;
@@ -69,7 +90,7 @@ export class Text {
   }
 
   clone() {
-    return new Text(this._yText.clone());
+    return new Text(this._yText.clone(), this._onChange);
   }
 
   delete(index: number, length: number) {
@@ -77,7 +98,8 @@ export class Text {
       return;
     }
     if (index < 0 || length < 0 || index + length > this._yText.length) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'Failed to delete text! Index or length out of range, index: ' +
           index +
           ', length: ' +
@@ -97,7 +119,8 @@ export class Text {
       return;
     }
     if (index < 0 || length < 0 || index + length > this._yText.length) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'Failed to format text! Index or length out of range, index: ' +
           index +
           ', length: ' +
@@ -116,7 +139,8 @@ export class Text {
       return;
     }
     if (index < 0 || index > this._yText.length) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'Failed to insert text! Index or length out of range, index: ' +
           index +
           ', length: ' +
@@ -149,7 +173,8 @@ export class Text {
     attributes?: BaseTextAttributes
   ) {
     if (index < 0 || length < 0 || index + length > this._yText.length) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'Failed to replace text! The length of the text is' +
           this._yText.length +
           ', but you are trying to replace from' +
@@ -236,7 +261,8 @@ export class Text {
    */
   split(index: number, length = 0): Text {
     if (index < 0 || length < 0 || index + length > this._yText.length) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'Failed to split text! Index or length out of range, index: ' +
           index +
           ', length: ' +
@@ -247,7 +273,8 @@ export class Text {
     }
     const deltas = this._yText.toDelta();
     if (!(deltas instanceof Array)) {
-      throw new Error(
+      throw new BlockSuiteError(
+        ErrorCode.ReactiveProxyError,
         'This text cannot be split because we failed to get the deltas of it.'
       );
     }
@@ -267,7 +294,8 @@ export class Text {
         }
         tmpIndex += insert.length;
       } else {
-        throw new Error(
+        throw new BlockSuiteError(
+          ErrorCode.ReactiveProxyError,
           'This text cannot be split because it contains non-string insert.'
         );
       }
@@ -276,7 +304,7 @@ export class Text {
     this.delete(index, this.length - index);
     const rightYText = new Y.Text();
     rightYText.applyDelta(rightDeltas);
-    const rightText = new Text(rightYText);
+    const rightText = new Text(rightYText, this._onChange);
 
     return rightText;
   }

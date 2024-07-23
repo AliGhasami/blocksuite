@@ -1,11 +1,11 @@
 import type { UIEventStateContext } from '@blocksuite/block-std';
+import type { IVec } from '@blocksuite/global/utils';
 
 import { WidgetElement } from '@blocksuite/block-std';
 import { noop } from '@blocksuite/global/utils';
 import { nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import type { IVec } from '../../../surface-block/index.js';
 import type { PieMenuSchema } from './base.js';
 
 import { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
@@ -148,7 +148,7 @@ export class AffinePieMenuWidget extends WidgetElement {
   }
 
   get rootElement(): EdgelessRootBlockComponent {
-    const rootElement = this.blockElement;
+    const rootElement = this.block;
     if (rootElement instanceof EdgelessRootBlockComponent) {
       return rootElement;
     }

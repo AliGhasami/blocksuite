@@ -1,5 +1,6 @@
+import type { Bound } from '@blocksuite/global/utils';
+
 import type { SurfaceBlockModel, SurfaceMiddleware } from '../surface-model.js';
-import type { Bound } from '../utils/bound.js';
 
 import { SurfaceGroupLikeModel } from '../element-model/base.js';
 
@@ -14,10 +15,17 @@ export const groupSizeMiddleware: SurfaceMiddleware = (
   const calculateGroupSize = (group: SurfaceGroupLikeModel) => {
     let bound: Bound | undefined;
     group.childIds.forEach(childId => {
-      const elementBound = getElementById(childId)?.elementBound;
+      try {
+        const elementBound = getElementById(childId)?.elementBound;
 
-      if (elementBound) {
-        bound = bound ? bound.unite(elementBound) : elementBound;
+        if (elementBound) {
+          bound = bound ? bound.unite(elementBound) : elementBound;
+        }
+      } catch (e) {
+        console.error(
+          `Error calculating group size for group child id: ${childId}`
+        );
+        console.error(e);
       }
     });
 

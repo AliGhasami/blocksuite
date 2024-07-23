@@ -1,11 +1,12 @@
-import { BlockElement } from '@blocksuite/block-std';
+import type { Bound } from '@blocksuite/global/utils';
+
+import { BlockComponent } from '@blocksuite/block-std';
 import { html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import type { Viewport } from '../../root-block/edgeless/utils/viewport.js';
 import type { ShapeElementModel } from '../element-model/shape.js';
 import type { SurfaceBlockModel } from '../surface-model.js';
-import type { Bound } from '../utils/bound.js';
 import type { MindmapService } from './service.js';
 
 import { ThemeObserver } from '../../_common/theme/theme-observer.js';
@@ -14,7 +15,7 @@ import { Renderer } from '../canvas-renderer/renderer.js';
 import { LayerManager } from '../managers/layer-manager.js';
 
 @customElement('mini-mindmap-surface-block')
-export class MindmapSurfaceBlock extends BlockElement<SurfaceBlockModel> {
+export class MindmapSurfaceBlock extends BlockComponent<SurfaceBlockModel> {
   private _layer!: LayerManager;
 
   private _renderer!: Renderer;

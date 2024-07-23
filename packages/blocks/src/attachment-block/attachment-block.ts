@@ -1,3 +1,4 @@
+import { Bound } from '@blocksuite/global/utils';
 import { Slice } from '@blocksuite/store';
 import { flip, offset } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
@@ -10,7 +11,7 @@ import type { EdgelessRootService } from '../root-block/index.js';
 import type { AttachmentBlockService } from './attachment-service.js';
 
 import {
-  BlockComponent,
+  CaptionedBlockComponent,
   HoverController,
   toast,
 } from '../_common/components/index.js';
@@ -23,7 +24,6 @@ import {
 import { ThemeObserver } from '../_common/theme/theme-observer.js';
 import { humanFileSize } from '../_common/utils/math.js';
 import { getEmbedCardIcons } from '../_common/utils/url.js';
-import { Bound } from '../surface-block/utils/bound.js';
 import {
   type AttachmentBlockModel,
   AttachmentBlockStyles,
@@ -34,7 +34,7 @@ import { styles } from './styles.js';
 import { checkAttachmentBlob, downloadAttachmentBlob } from './utils.js';
 
 @customElement('affine-attachment')
-export class AttachmentBlockComponent extends BlockComponent<
+export class AttachmentBlockComponent extends CaptionedBlockComponent<
   AttachmentBlockModel,
   AttachmentBlockService
 > {
@@ -71,7 +71,7 @@ export class AttachmentBlockComponent extends BlockComponent<
       template: AttachmentOptionsTemplate({
         anchor: this,
         model: this.model,
-        showCaption: () => this.captionEditor.show(),
+        showCaption: () => this.captionEditor?.show(),
         copy: this.copy,
         download: this.download,
         refresh: this.refreshData,
