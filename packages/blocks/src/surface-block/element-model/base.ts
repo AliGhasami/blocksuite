@@ -462,6 +462,14 @@ export abstract class SurfaceLocalModel {
     return this.deserializedXYWH[3];
   }
 
+  get h() {
+    return this.deserializedXYWH[3];
+  }
+
+  get w() {
+    return this.deserializedXYWH[2];
+  }
+
   get w() {
     return this.deserializedXYWH[2];
   }
@@ -474,18 +482,9 @@ export abstract class SurfaceLocalModel {
     return this.deserializedXYWH[1];
   }
 
-  get w() {
-    return this.deserializedXYWH[2];
-  }
-
-  get h() {
-    return this.deserializedXYWH[3];
-  }
-
   abstract rotate: number;
 
   abstract xywh: SerializedXYWH;
-
 }
 
 declare global {
