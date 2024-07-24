@@ -19,7 +19,7 @@ export interface AffineTextAttributes {
   link?: string | null;
   date?: {
     id: string;
-    time: string;
+    time: string | null;
     date: string;
   };
   reference?: {
@@ -154,7 +154,7 @@ export function getAffineInlineSpecsWithReference(
       name: 'date',
       schema: z
         .object({
-          time: z.string(),
+          time: z.string().nullable(),
           date: z.string(),
           id: z.string(),
         })
@@ -169,7 +169,7 @@ export function getAffineInlineSpecsWithReference(
         //return html`this is date`;
         //console.log('11111');
         //return '11111';
-        console.log('11111', delta);
+        //console.log('11111', delta);
         return html`<affine-date-time .delta=${delta}></affine-date-time>`;
       },
     },
@@ -188,8 +188,6 @@ export function getAffineInlineSpecsWithReference(
         return !!delta.attributes?.mention;
       },
       renderer: (delta, selected) => {
-        //console.log('11111');
-        //return html`1111111`;
         return html`<affine-mention
           .delta=${delta}
           .selected=${selected}

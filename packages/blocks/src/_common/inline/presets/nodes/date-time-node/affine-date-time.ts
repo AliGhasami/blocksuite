@@ -8,27 +8,29 @@ import {
   type InlineRootElement,
   ZERO_WIDTH_NON_JOINER,
   ZERO_WIDTH_SPACE,
+  //ZERO_WIDTH_NON_JOINER,
+  //ZERO_WIDTH_SPACE,
 } from '@blocksuite/inline';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ref } from 'lit/directives/ref.js';
-import { styleMap } from 'lit/directives/style-map.js';
 
+//import { ref } from 'lit/directives/ref.js';
+//import { styleMap } from 'lit/directives/style-map.js';
 import { HoverController } from '../../../../components/hover/index.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
-import { affineTextStyles } from '../affine-text.js';
+//import { affineTextStyles } from '../affine-text.js';
 import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
 
 @customElement('affine-date-time')
 export class AffineDateTime extends ShadowlessElement {
-  get link() {
+  /*get link() {
     const link = this.delta.attributes?.link;
     if (!link) {
       return '';
     }
     return link;
-  }
+  }*/
 
   get inlineEditor() {
     const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
@@ -120,6 +122,15 @@ export class AffineDateTime extends ShadowlessElement {
     }, 0);
   }
 
+  get dateTime() {
+    const dateTime = this.delta.attributes?.date?.date;
+    if (!dateTime) {
+      return '';
+    }
+    //console.log('111', dateTime);
+    return dateTime;
+  }
+
   override render() {
     /*const style = this.delta.attributes
       ? affineTextStyles(this.delta.attributes, {
@@ -146,9 +157,12 @@ export class AffineDateTime extends ShadowlessElement {
     target="_blank"
     style=${style}
       @mouseup=${this._onMouseUp}*/
-    return html`<span class="${Prefix}-date-time"
-      ><v-text .str=${this.delta.insert}></v-text
-    ></span>`;
+    //console.log('1111', this.delta);
+    return html`<span>
+      <span class="${Prefix}-date-time">${this.dateTime}</span>
+      <v-text .str=${this.delta.insert}></v-text>
+      <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
+    </span>`;
   }
 }
 

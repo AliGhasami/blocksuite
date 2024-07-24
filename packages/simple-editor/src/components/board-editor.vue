@@ -458,6 +458,13 @@ defineExpose({
   }
 
 
+  /* */
+  &-date-time{
+    //@apply mt-overline;
+    color:@blue-5;
+    text-decoration: underline;
+  }
+
 }
 
 /* popover Style */
@@ -509,7 +516,7 @@ defineExpose({
   }
 
   .title{
-  @apply mt-overline;
+    @apply mt-overline;
   }
 
   .item-title{

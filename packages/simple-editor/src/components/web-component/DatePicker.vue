@@ -37,7 +37,7 @@
               </SelectOption>
             </Select>
           </div>
-        <Calendar class="calendar-body"  v-model:value="currentDate" :fullscreen="false"  />
+        <Calendar class="calendar-body"  v-model:value="currentDate" :fullscreen="false" @select="onSelect"  />
         <span class="calendar-footer">
           <Button @click="handleToday" type="link">Today</Button>
         </span>
@@ -82,6 +82,7 @@ const currentDate = ref<Dayjs>(dayjs());
 const currentTime = ref<Dayjs | null>(null);
 const emit=defineEmits<{
   (e:'change',date:string,time:string | null) : void
+  (e:'close') : void
 }>()
 const props=withDefaults(defineProps<Props>(),{})
 
@@ -113,11 +114,25 @@ const getYears = (value: Dayjs) => {
 function handleOKTime(){
   if(thisRef.value){
     const okBtn : HTMLElement | null=(thisRef.value as HTMLElement).querySelector('.ant-picker-ok button');
+    //console.log("this is ok button",okBtn);
     if(okBtn){
       okBtn.click()
+      handleChange()
+      emit('close')
     }
   }
 }
+
+const onSelect = (date, { source }) => {
+  //console.log("this is close in web component");
+  handleChange()
+  emit('close')
+  //console.log("this is select");
+  /*if (source === 'date') {
+    console.log('Panel Select:', source);
+  }*/
+};
+
 
 
 function handleNow(){
@@ -141,6 +156,7 @@ watch([currentTime,currentDate],handleChange)
 
 function handleChange(){
   const time=currentTime.value ? currentTime.value.format('HH:mm:ss') : null
+  //console.log("this is change in web component");
   emit('change',currentDate.value.format('YYYY-MM-DD'),time)
 }
 

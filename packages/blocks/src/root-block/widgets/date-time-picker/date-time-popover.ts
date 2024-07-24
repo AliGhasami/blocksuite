@@ -137,10 +137,13 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
     });
   }
 
+  private temp = null;
+
   constructor(
     private editorHost: EditorHost,
     private inlineEditor: AffineInlineEditor,
-    private abortController = new AbortController()
+    private abortController = new AbortController(),
+    private index?: null | number
   ) {
     //debugger;
     //console.log('ppppp', inlineEditor.getInlineRange());
@@ -161,6 +164,7 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
     });*/
     const inlineEditor = this.inlineEditor;
     assertExists(inlineEditor, 'RichText InlineEditor not found');
+    this.temp = inlineEditor.getInlineRange();
     this._filterItems = this._updateItem('');
     // init
     //this._updateActionList();
@@ -443,7 +447,109 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
         style="${style}"
       >
         <div class="${Prefix}-popover-container">
-          <mahdaad-date-picker></mahdaad-date-picker>
+          <mahdaad-date-picker
+            @change=${event => {
+              /* this.inlineEditor.setInlineRange({
+                index: this.index + 1,
+                length: 0,
+              });*/
+              //console.log('99999', this.triggerKey, event.detail);
+              //const inlineRange = this.inlineEditor.getInlineRange();
+              //console.log('8888', inlineRange);
+              //assertExists(inlineRange);
+              if (!this.index) return;
+              this.inlineEditor.deleteText({
+                index: this.index - 1,
+                //index: inlineRange.index - 1,
+                length: 1,
+              });
+              //return;
+              /*cleanSpecifiedTail(
+                this.editorHost,
+                this.inlineEditor,
+                this.triggerKey
+              );*/
+              //return;
+
+              this.inlineEditor.insertText(
+                {
+                  index: this.index - 1,
+                  //index: inlineRange.index - 1,
+                  length: 0,
+                },
+                REFERENCE_NODE,
+                {
+                  date: {
+                    date: event.detail[0],
+                    time: event.detail[1], //'11:00:00'
+                    id: uuidv4(),
+                  },
+                  //mention: { ...user, user_id: user.id, id: uuidv4() },
+                  //mention: { name: user., id: '1' },
+                  //mention: { type: 'LinkedPage', pageId: '11' },
+                }
+              );
+              /* this.inlineEditor.setInlineRange({
+                index: this.index + 1,
+                length: 0,
+              });*/
+              //console.log('inlineEditor', this.inlineEditor);
+              //console.log('this is test', event.detail);
+              //const inlineRange = this.inlineEditor.getInlineRange();
+              //assertExists(inlineRange);
+              /* this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
+                date: {
+                  date: '2025-01-01',
+                  time: '11:00:00',
+                  id: uuidv4(),
+                },
+              });*/
+              //assertExists(this.range);
+              /* this.inlineEditor.formatText(this.range, {
+                date: {
+                  date: '1403-05-06',
+                  time: '12:00:00',
+                  id: uuidv4(),
+                },
+              });*/
+
+              /* this.inlineEditor.setInlineRange({
+                index: inlineRange.index + 1,
+                length: 0,
+              });*/
+              /*const inlineRange = this.inlineEditor.getInlineRange();
+              assertExists(inlineRange);
+              this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
+                date: {
+                  date: '2025-01-01',
+                  time: '11:00:00',
+                  id: uuidv4(),
+                },
+              });
+              this.inlineEditor.setInlineRange({
+                index: inlineRange.index + 1,
+                length: 0,
+              });*/
+
+              /*cleanSpecifiedTail(
+                this.editorHost,
+                this.inlineEditor,
+                this.triggerKey + this._query
+              );
+              action()?.catch(console.error);*/
+            }}
+            @close="${() => {
+              this.abortController.abort();
+              //console.log('this is editor,', this.inlineEditor);
+              if (this.index) return;
+              this.inlineEditor.focusIndex(this.index as number);
+              /*this.inlineEditor.setInlineRange({
+                index: 0,
+                length: 0,
+              });*/
+              //console.log('this is close');
+            }}"
+          ></mahdaad-date-picker>
         </div>
       </div>
     </div>`;

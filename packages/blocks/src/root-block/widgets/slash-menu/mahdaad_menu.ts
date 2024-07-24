@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+import { defaultDateFormat } from '../../../_common/inline/presets/nodes/date-time-node/config.js';
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
   getImageFilesFromLocal,
@@ -16,7 +17,7 @@ import { viewPresets } from '../../../database-block/index.js';
 import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
-import type { AffineDateWidget } from '../date/index.js';
+import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMentionWidget } from '../mention/index.js';
@@ -234,29 +235,39 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
+          const triggerKey = dayjs().format('YYYY-MM-DD'); //defaultDateFormat
+          //const inlineEditor = getInlineEditorByModel(rootElement.host, model);
+          //assertExists(inlineEditor);
+          //const inlineRange = inlineEditor.getInlineRange();
+          //const index = inlineRange ? inlineRange.index : 0;
           insertContent(rootElement.host, model, REFERENCE_NODE, {
             date: {
-              date: '2024-05-06',
-              time: '10:35:06',
+              date: triggerKey,
+              time: null,
               id: uuidv4(),
             },
           });
-          return;
+          //inlineEditor.deleteText({ index: 1, length: 30 });
+          //console.log('this is index', index);
+          //model.text.insert(text, index, attributes as Record<string, unknown>);
+          //console.log('this is inline editgor', inlineEditor);
+          //console.log('this is model', model);
+          //console.log('this is host', rootElement.host);
+          //return;
           /*const temp=dayjs*/
           //old method
           /*const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));*/
-          //todo fix ali ghasami
-          const triggerKey = dayjs().format('DD MMMM,YYYY'); //this is date'//'YYYY-MM-DD'
+
           //const date = '1111';
-          insertContent(rootElement.host, model, triggerKey);
+          //insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
           //@ts-ignore
           const widgetEle =
             rootElement.widgetElements['affine-date-time-widget'];
           assertExists(widgetEle);
           // We have checked the existence of showLinkedDoc method in the showWhen
-          const dateWidget = widgetEle as AffineDateWidget;
+          const dateWidget = widgetEle as AffineDateTimeWidget;
           // Wait for range to be updated
           setTimeout(() => {
             const inlineEditor = getInlineEditorByModel(
@@ -264,7 +275,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               model
             );
             assertExists(inlineEditor);
-            dateWidget.showMention(inlineEditor, triggerKey);
+            dateWidget.showDateTime(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
@@ -385,7 +396,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             rootElement.host.spec.getService('affine:attachment');
           assertExists(attachmentService);
           const maxFileSize = attachmentService.maxFileSize;
-
           await addSiblingAttachmentBlocks(
             rootElement.host,
             [file],

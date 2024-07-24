@@ -231,6 +231,8 @@ export function cleanSpecifiedTail(
   assertExists(inlineRange);
   const idx = inlineRange.index - str.length;
   const textStr = inlineEditor.yText.toString().slice(idx, idx + str.length);
+  //console.log('this is text str', textStr);
+  //console.log('this is str', str);
   if (textStr !== str) {
     console.warn(
       `Failed to clean text! Text mismatch expected: ${str} but actual: ${textStr}`

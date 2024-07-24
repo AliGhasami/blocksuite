@@ -18,7 +18,7 @@ import {
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { DateTimePopover } from './date-time-popover.js';
-import type { UserMention } from './types.js';
+//import type { UserMention } from './types.js';
 
 export type MentionOptions = {
   triggerKeys: string[];
@@ -32,7 +32,7 @@ export type MentionOptions = {
   }) => LinkedDocGroup[];*/
 };
 
-export function showMentionPopover({
+export function showDateTimePopover({
   editorHost,
   inlineEditor,
   range,
@@ -40,7 +40,7 @@ export function showMentionPopover({
   abortController = new AbortController(),
   options,
   triggerKey,
-  userList = [],
+  //userList = [],
 }: {
   editorHost: EditorHost;
   inlineEditor: AffineInlineEditor;
@@ -51,14 +51,16 @@ export function showMentionPopover({
   triggerKey: string;
   //userList: UserMention[];
 }) {
+  //console.log('this is range', range);
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
-
   //console.log(55555, inlineEditor.getInlineRange());
   const dateTime = new DateTimePopover(
     editorHost,
     inlineEditor,
-    abortController
+    abortController,
+    //range,
+    inlineEditor.getInlineRange()?.index
   );
   dateTime.options = options;
   //linkedDoc.options = options;
@@ -77,8 +79,8 @@ export function showMentionPopover({
       'You should render the mention PopOver Element node even if no position'
     );
     const position = getPopperPosition(mentionPopOverElement, range);
-    //const x = parseInt(position.x.slice(0, position.x.length - 2));
-    //position.x = `${x - 90}px`;
+    const x = parseInt(position.x.slice(0, position.x.length - 2));
+    position.x = `${x - 90}px`;
     //console.log('1111', position);
     //position.x = position.x-3;
     dateTime.updatePosition(position);
@@ -154,13 +156,14 @@ export class AffineDateTimeWidget extends WidgetElement {
   override connectedCallback() {
     super.connectedCallback();
     //console.log('this is block', this.blockElement.model);
-    this.handleEvent('keyDown', this._onKeyDown);
+    //this.handleEvent('keyDown', this._onKeyDown);
   }
 
-  showMention = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
+  showDateTime = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
     const curRange = getCurrentNativeRange();
     if (!curRange) return;
-    showMentionPopover({
+    console.log('this is cu range', curRange);
+    showDateTimePopover({
       editorHost: this.host,
       inlineEditor,
       range: curRange,
@@ -168,11 +171,11 @@ export class AffineDateTimeWidget extends WidgetElement {
       triggerKey,
       //TODO ali ghasami - important
       //@ts-ignore
-      userList: this.blockElement.model.mentionUserList,
+      //userList: this.blockElement.model.mentionUserList,
     });
   };
 
-  private getInlineEditor = (evt: KeyboardEvent) => {
+  /*private getInlineEditor = (evt: KeyboardEvent) => {
     if (evt.target instanceof HTMLElement) {
       const editor = (
         evt.target.closest('.inline-editor') as {
@@ -195,9 +198,9 @@ export class AffineDateTimeWidget extends WidgetElement {
     }
     if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
     return getInlineEditorByModel(this.host, model);
-  };
+  };*/
 
-  private _onKeyDown = (ctx: UIEventStateContext) => {
+  /*  private _onKeyDown = (ctx: UIEventStateContext) => {
     const eventState = ctx.get('keyboardState');
     const event = eventState.raw;
     if (isControlledKeyboardEvent(event) || event.key.length !== 1) return;
@@ -245,13 +248,13 @@ export class AffineDateTimeWidget extends WidgetElement {
           length: 0,
         });
         inlineEditor.slots.inlineRangeApply.once(() => {
-          this.showMention(inlineEditor, primaryTriggerKey);
+          this.showDateTime(inlineEditor, primaryTriggerKey);
         });
         return;
       }
-      this.showMention(inlineEditor, matchedKey);
+      this.showDateTime(inlineEditor, matchedKey);
     });
-  };
+  };*/
 }
 
 declare global {

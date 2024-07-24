@@ -126,5 +126,8 @@
   },
   "stackblitz": {
     "startCommand": "pnpm run dev"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.12"
   }
 }
