@@ -136,9 +136,9 @@ function bindEvent(doc:Doc){
     console.log("this iis yBlockUpdated",data);
   })*/
 
-  doc.slots.dateTimeEvent.on((data)=>{
+  /*doc.slots.dateTimeEvent.on((data)=>{
     console.log("this is data",data);
-  })
+  })*/
 
 
   doc.slots.blockUpdated.on((data)=>{

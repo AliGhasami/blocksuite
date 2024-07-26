@@ -521,7 +521,6 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
-import { ArrowDownIcon } from '../../../_common/icons/index.js';
 import {
   getInlineEditorByModel,
   isControlledKeyboardEvent,
@@ -742,7 +741,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
         };
     return html`${this._queryState !== 'no_result'
         ? html` <div
-            id="${this.slasheMenuID}"
             class="overlay-mask"
             @click="${() => this.abortController.abort()}"
           ></div>`
@@ -883,7 +881,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
   private _renderItem = (item: SlashMenuStaticItem) => {
     if (isGroupDivider(item)) return this._renderGroupItem(item);
     else if (isActionItem(item)) return this._renderActionItem(item);
-    else if (isSubMenuItem(item)) return this._renderSubMenuItem(item);
+    //else if (isSubMenuItem(item)) return this._renderSubMenuItem(item);
     else {
       console.error('Unknown item type for slash menu');
       console.error(item);
@@ -891,7 +889,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
     }
   };
 
-  private _renderSubMenuItem = (item: SlashSubMenu) => {
+  /*private _renderSubMenuItem = (item: SlashSubMenu) => {
     const { name, icon, description } = item;
 
     const hover = item === this._activeItem;
@@ -920,7 +918,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
         ${ArrowDownIcon}
       </div>
     </icon-button>`;
-  };
+  };*/
 
   private _subMenuAbortController: AbortController | null = null;
 
@@ -942,7 +940,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
             ${menu
               .filter(item => item.group == itemGroup)
               .map(item => {
-                const currentIndex = index;
+                //const currentIndex = index;
                 return html`<div
                   class="claytap-slash-menu-item ${this._activeItem == item
                     ? 'hover'

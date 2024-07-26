@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "0.1.7",
+  "version": "0.2.1",
   "private": false,
   "publishConfig": {
     "access": "public"

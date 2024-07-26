@@ -1,19 +1,26 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { Text } from '@blocksuite/store';
+import { uuidv4 } from '@blocksuite/store';
 
 import type { RootBlockComponent } from '../../types.js';
+import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
-import { openFileOrFiles } from '../../../_common/utils/index.js';
+import {
+  getInlineEditorByModel,
+  openFileOrFiles,
+} from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import { viewPresets } from '../../../database-block/index.js';
 import { onModelTextUpdated } from '../../utils/index.js';
-import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+//import link_to_page from './icons/link_to_page.svg?raw';
+import dayjs from 'dayjs';
+
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
+import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 /*import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
@@ -29,8 +36,6 @@ import file from './icons/file.svg?raw';
 import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
-import hint from './icons/hint.svg?raw';
-//import link_to_page from './icons/link_to_page.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
@@ -38,7 +43,7 @@ import quote from './icons/quote.svg?raw';
 import table_view from './icons/table_view.svg?raw';
 import text from './icons/text.svg?raw';
 //import video from './icons/video.svg?raw';
-import { formatDate, insertContent, tryRemoveEmptyLine } from './utils.js';
+import { insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
   groupName: string;
   children: ClayTapSlashMenu[];
@@ -121,7 +126,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
       },
-      {
+      /* {
         title: 'Hint',
         description: 'Description',
         icon: hint,
@@ -148,30 +153,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               return next();
             })
             .run();
-          /*rootElement.host.std.command
-            .chain()
-            .updateBlockType({
-              flavour: 'affine:hint',
-              props: {
-                title: new Text('Title'),
-                description: new Text('Description'),
-                type: 'success',
-              },
-            })
-            .inline((ctx, next) => {
-              //console.log('this is inline in menu ', ctx);
-              const newModels = ctx.updatedBlocks;
-              if (!newModels || newModels.length == 0) {
-                return false;
-              }
-              return next();
-            })
-            .run();*/
-          //insertContent(rootElement.host, model, '11111');
-          //runCommand(rootElement, 'affine:paragraph', 'text');
-          //rootElement.doc.addBlock('affine:paragraph', {}, parent);
+
         },
-      },
+      }*/
+      ,
     ],
   },
   {
@@ -242,10 +227,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             time: null,
             id: uuidv4(),
           };
-          insertContent(rootElement.host, model, REFERENCE_NODE, {
+          insertContent(rootComponent.host, model, REFERENCE_NODE, {
             date: temp,
           });
-          model.doc.slots.dateTimeEvent.emit({ type: 'add', meta: temp });
+          //model.doc.slots.dateTimeEvent.emit({ type: 'add', meta: temp });
           //model.doc.slots.inlineUpdate.emit({type:});
           //inlineEditor.deleteText({ index: 1, length: 30 });
           //console.log('this is index', index);
@@ -266,21 +251,20 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
 
           //@ts-ignore
           const widgetEle =
-            rootElement.widgetElements['affine-date-time-widget'];
+            rootComponent.widgetComponents['affine-date-time-widget'];
           assertExists(widgetEle);
           // We have checked the existence of showLinkedDoc method in the showWhen
           const dateWidget = widgetEle as AffineDateTimeWidget;
           // Wait for range to be updated
           setTimeout(() => {
             const inlineEditor = getInlineEditorByModel(
-              rootElement.host,
+              rootComponent.host,
               model
             );
             assertExists(inlineEditor);
             dateWidget.showDateTime(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
-
         },
       },
       /*{

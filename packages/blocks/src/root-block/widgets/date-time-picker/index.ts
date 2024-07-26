@@ -1,8 +1,6 @@
-import type { EditorHost, UIEventStateContext } from '@blocksuite/block-std';
+import type { EditorHost } from '@blocksuite/block-std';
 
 import { WidgetComponent } from '@blocksuite/block-std';
-import type { EditorHost } from '@blocksuite/block-std';
-import { WidgetElement } from '@blocksuite/block-std';
 import {
   DisposableGroup,
   assertExists,
@@ -13,8 +11,6 @@ import { customElement } from 'lit/decorators.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 
-import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
-import { matchFlavours } from '../../../_common/utils/index.js';
 //import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
@@ -140,7 +136,7 @@ export function showDateTimePopover({
 export const AFFINE_DATE_TIME_WIDGET = 'affine-date-time-widget';
 
 @customElement(AFFINE_DATE_TIME_WIDGET)
-export class AffineDateTimeWidget extends WidgetElement {
+export class AffineDateTimeWidget extends WidgetComponent {
   static DEFAULT_OPTIONS: MentionOptions = {
     /**
      * The first item of the trigger keys will be the primary key
@@ -159,12 +155,6 @@ export class AffineDateTimeWidget extends WidgetElement {
 
   options = AffineDateTimeWidget.DEFAULT_OPTIONS;
 
-  override connectedCallback() {
-    super.connectedCallback();
-    //console.log('this is block', this.blockElement.model);
-    //this.handleEvent('keyDown', this._onKeyDown);
-  }
-
   showDateTime = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
     const curRange = getCurrentNativeRange();
     if (!curRange) return;
@@ -180,6 +170,12 @@ export class AffineDateTimeWidget extends WidgetElement {
       //userList: this.blockElement.model.mentionUserList,
     });
   };
+
+  override connectedCallback() {
+    super.connectedCallback();
+    //console.log('this is block', this.blockElement.model);
+    //this.handleEvent('keyDown', this._onKeyDown);
+  }
 
   /*private getInlineEditor = (evt: KeyboardEvent) => {
     if (evt.target instanceof HTMLElement) {

@@ -153,4 +153,7 @@ export const styles = css`
   .affine-attachment-iframe-overlay.hide {
     display: none;
   }
+  .affine-attachment-container {
+    padding-inline-end: 10px;
+  }
 `;
