@@ -26,7 +26,6 @@ export class NoteBlockComponent extends BlockComponent<
 
   override connectedCallback() {
     super.connectedCallback();
-
     this.keymapController.bind();
   }
 

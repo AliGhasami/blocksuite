@@ -5,7 +5,7 @@ import { literal, unsafeStatic } from 'lit/static-html.js';
 import type { RootBlockConfig } from '../index.js';
 
 import { RootBlockSchema } from '../root-model.js';
-import { AFFINE_DATE_WIDGET } from '../widgets/date/index.js';
+import { AFFINE_DATE_TIME_WIDGET } from '../widgets/date-time-picker/index.js';
 import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/drag-handle.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
@@ -32,7 +32,7 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
   | typeof AFFINE_MENTION_WIDGET
-  | typeof AFFINE_DATE_WIDGET;
+  | typeof AFFINE_DATE_TIME_WIDGET;
 
 export type PageRootBlockSpecType = BlockSpec<
   PageRootBlockWidgetName,
@@ -76,7 +76,7 @@ export const PageRootBlockSpec: PageRootBlockSpecType = {
         AFFINE_VIEWPORT_OVERLAY_WIDGET
       )}`,
       [AFFINE_MENTION_WIDGET]: literal`${unsafeStatic(AFFINE_MENTION_WIDGET)}`,
-      [AFFINE_DATE_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_WIDGET)}`,
+      [AFFINE_DATE_TIME_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_TIME_WIDGET)}`,
     },
   },
 };

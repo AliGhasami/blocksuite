@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "0.1.9",
+  "version": "0.1.7",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -40,7 +40,8 @@
     "@mahdaad/tokens": "^0.0.36",
     "@unhead/vue": "^1.9.5",
     "@vueuse/core": "^10.9.0",
-    "ant-design-vue": "4.x",
+    "ant-design-vue": "^4.2.3",
+    "dayjs": "^1.11.12",
     "less": "^4.2.0",
     "pinia": "^2.1.7",
     "radix-vue": "^1.7.3",

@@ -8,6 +8,7 @@ import { openFileOrFiles } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import { viewPresets } from '../../../database-block/index.js';
 import { onModelTextUpdated } from '../../utils/index.js';
+import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import link from './icons/link.svg?raw';
@@ -209,8 +210,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: date,
         action: ({ rootComponent, model }) => {
           //old method
-          const date = new Date();
-          insertContent(rootComponent.host, model, formatDate(date));
+          //const date = new Date();
+          //insertContent(rootComponent.host, model, formatDate(date));
           //todo fix ali ghasami
           /*const triggerKey = '';
           insertContent(rootElement.host, model, triggerKey);
@@ -230,6 +231,56 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             mentionWidget.showMention(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });*/
+
+          const triggerKey = dayjs().format('YYYY-MM-DD');
+          //const inlineEditor = getInlineEditorByModel(rootElement.host, model);
+          //assertExists(inlineEditor);
+          //const inlineRange = inlineEditor.getInlineRange();
+          //const index = inlineRange ? inlineRange.index : 0;
+          const temp = {
+            date: triggerKey,
+            time: null,
+            id: uuidv4(),
+          };
+          insertContent(rootElement.host, model, REFERENCE_NODE, {
+            date: temp,
+          });
+          model.doc.slots.dateTimeEvent.emit({ type: 'add', meta: temp });
+          //model.doc.slots.inlineUpdate.emit({type:});
+          //inlineEditor.deleteText({ index: 1, length: 30 });
+          //console.log('this is index', index);
+          //model.text.insert(text, index, attributes as Record<string, unknown>);
+          //console.log('this is inline editgor', inlineEditor);
+          //console.log('this is model', model);
+          //console.log('this is host', rootElement.host);
+          //return;
+          /*const temp=dayjs*/
+          //old method
+          /*const date = new Date();
+          insertContent(rootElement.host, model, formatDate(date));*/
+          //const date = '1111';
+          //insertContent(rootElement.host, model, triggerKey);
+          assertExists(model.doc.root);
+
+          //model.doc.slots.yBlockUpdated.emit({ id: '55555', type: '111' });
+
+          //@ts-ignore
+          const widgetEle =
+            rootElement.widgetElements['affine-date-time-widget'];
+          assertExists(widgetEle);
+          // We have checked the existence of showLinkedDoc method in the showWhen
+          const dateWidget = widgetEle as AffineDateTimeWidget;
+          // Wait for range to be updated
+          setTimeout(() => {
+            const inlineEditor = getInlineEditorByModel(
+              rootElement.host,
+              model
+            );
+            assertExists(inlineEditor);
+            dateWidget.showDateTime(inlineEditor, triggerKey);
+            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+          });
+
         },
       },
       /*{

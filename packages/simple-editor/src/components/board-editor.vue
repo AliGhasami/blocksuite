@@ -1,7 +1,12 @@
 <template>
+  <div>
+<!--    <div style="width: 450px">
+      <mahdaad-date-picker :onChange="handleChange" :time="null" date=""></mahdaad-date-picker>
+    </div>-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board':'editor']"></div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,6 +23,9 @@ const refEditor = ref<HTMLElement | null>(null)
 let  currentDocument : Doc | null=null
 let myCollection: DocCollection | null = null
 
+/*function handleChange(date:string,time:string|null){
+  console.log("this is change in web component",date,time);
+}*/
 
 interface Props{
   isBoardView?:boolean,
@@ -118,7 +126,23 @@ function reset(){
 
 
 function bindEvent(doc:Doc){
+  /*console.log("11111",doc);
+
+  doc.slots.yBlockUpdated.on((data)=>{
+    console.log("this iis yBlockUpdated",data);
+  })
+
   doc.slots.blockUpdated.on((data)=>{
+    console.log("this iis yBlockUpdated",data);
+  })*/
+
+  doc.slots.dateTimeEvent.on((data)=>{
+    console.log("this is data",data);
+  })
+
+
+  doc.slots.blockUpdated.on((data)=>{
+    //console.log("this is event",data);
     emit('change',data)
     if(data.type=='add')
       emit('addBlock',data)
@@ -450,6 +474,13 @@ defineExpose({
   }
 
 
+  /* */
+  &-date-time{
+    //@apply mt-overline;
+    color:@blue-5;
+    text-decoration: underline;
+  }
+
 }
 
 /* popover Style */
@@ -501,7 +532,7 @@ defineExpose({
   }
 
   .title{
-  @apply mt-overline;
+    @apply mt-overline;
   }
 
   .item-title{

@@ -157,9 +157,11 @@ export class TestRichText extends ShadowlessElement {
     this.addEventListener('keydown', keydownHandler);
 
     this.inlineEditor.slots.textChange.on(() => {
+      //debugger;
       const el = this.querySelector('.y-text');
       if (el) {
         const text = this.inlineEditor.yText.toDelta();
+        console.log('this is text in textChange', text);
         const span = document.createElement('span');
         span.innerHTML = JSON.stringify(text);
         el.replaceChildren(span);
@@ -169,6 +171,7 @@ export class TestRichText extends ShadowlessElement {
       const el = this.querySelector('.v-range');
       if (el) {
         const inlineRange = this.inlineEditor.getInlineRange();
+        console.log('this isinlineRange', inlineRange);
         if (inlineRange) {
           const span = document.createElement('span');
           span.innerHTML = JSON.stringify(inlineRange);
@@ -236,6 +239,7 @@ const yDocA = new Y.Doc();
 const yDocB = new Y.Doc();
 
 yDocA.on('update', update => {
+  //console.log('this is update ', update);
   Y.applyUpdate(yDocB, update);
 });
 

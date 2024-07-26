@@ -11,6 +11,12 @@ import './nodes/index.js';
 export type AffineInlineEditor = InlineEditor<AffineTextAttributes>;
 export type AffineInlineRootElement = InlineRootElement<AffineTextAttributes>;
 
+export interface DateTimeEvent {
+  id?: string;
+  time: string | null;
+  date: string;
+}
+
 export interface AffineTextAttributes {
   bold?: true | null;
   italic?: true | null;
@@ -18,6 +24,7 @@ export interface AffineTextAttributes {
   strike?: true | null;
   code?: true | null;
   link?: string | null;
+  date?: DateTimeEvent;
   reference?: {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
@@ -144,6 +151,25 @@ export function getAffineInlineSpecsWithReference(
       },
       renderer: delta => {
         return html`<affine-link .delta=${delta}></affine-link>`;
+      },
+    },
+    {
+      name: 'date',
+      schema: z
+        .object({
+          time: z.string().nullable(),
+          date: z.string(),
+          id: z.string().optional(),
+        })
+        .optional()
+        .nullable()
+        .catch(undefined),
+      //z.string().optional().nullable().catch(undefined)
+      match: delta => {
+        return !!delta.attributes?.date;
+      },
+      renderer: delta => {
+        return html`<affine-date-time .delta=${delta}></affine-date-time>`;
       },
     },
     {
