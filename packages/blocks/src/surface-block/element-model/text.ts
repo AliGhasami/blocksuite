@@ -1,8 +1,10 @@
-import type { IVec } from '@blocksuite/global/utils';
-import type { SerializedXYWH } from '@blocksuite/global/utils';
+import type { IVec, SerializedXYWH } from '@blocksuite/global/utils';
 
+import { yfield } from '@blocksuite/block-std/gfx';
 import { Bound } from '@blocksuite/global/utils';
 import { DocCollection, type Y } from '@blocksuite/store';
+
+import type { CustomColor } from '../consts.js';
 
 import {
   FontFamily,
@@ -17,10 +19,9 @@ import {
   pointInPolygon,
   polygonNearestPoint,
 } from '../utils/math-utils.js';
-import { type IBaseProps, SurfaceElementModel } from './base.js';
-import { yfield } from './decorators.js';
+import { type BaseElementProps, SurfaceElementModel } from './base.js';
 
-export type TextElementProps = IBaseProps & {
+export type TextElementProps = BaseElementProps & {
   text: Y.Text;
   hasMaxWidth?: boolean;
 } & Omit<TextStyleProps, 'fontWeight' | 'fontStyle'> &
@@ -62,7 +63,7 @@ export class TextElementModel extends SurfaceElementModel<TextElementProps> {
   }
 
   @yfield()
-  accessor color: string = '#000000';
+  accessor color: string | CustomColor = '#000000';
 
   @yfield()
   accessor fontFamily: FontFamily = FontFamily.Inter;

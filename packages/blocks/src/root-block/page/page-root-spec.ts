@@ -1,6 +1,8 @@
-import type { BlockSpec } from '@blocksuite/block-std';
+import type { BlockService, BlockSpec } from '@blocksuite/block-std';
 
 import { literal, unsafeStatic } from 'lit/static-html.js';
+
+import type { RootBlockConfig } from '../index.js';
 
 import { RootBlockSchema } from '../root-model.js';
 import { AFFINE_DATE_WIDGET } from '../widgets/date/index.js';
@@ -32,7 +34,13 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_MENTION_WIDGET
   | typeof AFFINE_DATE_WIDGET;
 
-export const PageRootBlockSpec: BlockSpec<PageRootBlockWidgetName> = {
+export type PageRootBlockSpecType = BlockSpec<
+  PageRootBlockWidgetName,
+  BlockService,
+  RootBlockConfig
+>;
+
+export const PageRootBlockSpec: PageRootBlockSpecType = {
   schema: RootBlockSchema,
   service: PageRootService,
   view: {

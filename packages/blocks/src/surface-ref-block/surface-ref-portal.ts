@@ -12,6 +12,7 @@ import { literal, html as staticHtml, unsafeStatic } from 'lit/static-html.js';
 
 import type { FrameBlockModel } from '../frame-block/index.js';
 import type { EdgelessBlockModel } from '../root-block/edgeless/edgeless-block-model.js';
+import type { Renderer } from '../surface-block/canvas-renderer/renderer.js';
 import type { GroupElementModel } from '../surface-block/element-model/group.js';
 import type { BlockLayer } from '../surface-block/managers/layer-manager.js';
 
@@ -20,10 +21,10 @@ import './portal/note.js';
 
 const portalMap = {
   'affine:note': 'surface-ref-note-portal',
-} as Record<BlockSuite.EdgelessModelKeyType, string>;
+} as Record<BlockSuite.EdgelessModelKeys, string>;
 
 const getPortalTag = (model: BlockModel) => {
-  const tag = portalMap[model.flavour as BlockSuite.EdgelessModelKeyType];
+  const tag = portalMap[model.flavour as BlockSuite.EdgelessModelKeys];
   return tag ?? 'surface-ref-generic-block-portal';
 };
 
@@ -39,7 +40,7 @@ export class SurfaceRefPortal extends WithDisposable(ShadowlessElement) {
     return candidates;
   };
 
-  private _renderEdgelessBlocks = () => {
+  private _renderGfxBlocks = () => {
     const refModel = this.refModel;
     const blocks =
       'flavour' in refModel
@@ -73,6 +74,7 @@ export class SurfaceRefPortal extends WithDisposable(ShadowlessElement) {
           .model=${model}
           .doc=${this.doc}
           .host=${this.host}
+          .renderer=${this.renderer}
           .renderModel=${this.renderModel}
           style=${styleMap({
             'z-index': zIndex,
@@ -137,7 +139,7 @@ export class SurfaceRefPortal extends WithDisposable(ShadowlessElement) {
   override render() {
     return html`<div class="surface-blocks-portal">
       <div class="stacking-canvas"></div>
-      ${this._renderEdgelessBlocks()}
+      ${this._renderGfxBlocks()}
     </div>`;
   }
 
@@ -168,6 +170,9 @@ export class SurfaceRefPortal extends WithDisposable(ShadowlessElement) {
 
   @property({ attribute: false })
   accessor renderModel!: (model: BlockModel) => TemplateResult;
+
+  @property({ attribute: false })
+  accessor renderer!: Renderer;
 }
 
 declare global {

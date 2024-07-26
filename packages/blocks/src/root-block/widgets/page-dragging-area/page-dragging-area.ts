@@ -1,6 +1,6 @@
 import type { PointerEventState } from '@blocksuite/block-std';
 
-import { BlockComponent, WidgetElement } from '@blocksuite/block-std';
+import { BlockComponent, WidgetComponent } from '@blocksuite/block-std';
 import { assertInstanceOf } from '@blocksuite/global/utils';
 import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -29,7 +29,7 @@ export const AFFINE_PAGE_DRAGGING_AREA_WIDGET =
   'affine-page-dragging-area-widget';
 
 @customElement(AFFINE_PAGE_DRAGGING_AREA_WIDGET)
-export class AffinePageDraggingAreaWidget extends WidgetElement<
+export class AffinePageDraggingAreaWidget extends WidgetComponent<
   RootBlockModel,
   PageRootBlockComponent
 > {
@@ -184,9 +184,9 @@ export class AffinePageDraggingAreaWidget extends WidgetElement<
   }
 
   private get _viewport() {
-    const rootElement = this.block;
-    if (!rootElement) return;
-    return rootElement.viewport;
+    const rootComponent = this.block;
+    if (!rootComponent) return;
+    return rootComponent.viewport;
   }
 
   private get scrollContainer() {
@@ -229,8 +229,13 @@ export class AffinePageDraggingAreaWidget extends WidgetElement<
         if (!this._dragging) {
           return;
         }
-        ctx.get('defaultState').event.preventDefault();
+
         const state = ctx.get('pointerState');
+        // TODO(@L-Sun) support drag area for touch device
+        if (state.raw.pointerType === 'touch') return;
+
+        ctx.get('defaultState').event.preventDefault();
+
         this._rafID = requestAnimationFrame(() => {
           this._updateDraggingArea(state, true);
         });

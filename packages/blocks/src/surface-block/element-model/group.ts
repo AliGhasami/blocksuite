@@ -1,18 +1,23 @@
-import type { PointLocation } from '@blocksuite/global/utils';
-import type { IVec } from '@blocksuite/global/utils';
+import type {
+  BaseElementProps,
+  SerializedElement,
+} from '@blocksuite/block-std/gfx';
+import type { IVec, PointLocation } from '@blocksuite/global/utils';
 import type { Y } from '@blocksuite/store';
 
+import {
+  GfxGroupLikeElementModel,
+  local,
+  observe,
+  yfield,
+} from '@blocksuite/block-std/gfx';
 import { Bound } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
 
-import type { IBaseProps, SerializedElement } from './base.js';
-
 import { keys } from '../../_common/utils/iterable.js';
 import { linePolygonIntersects } from '../utils/math-utils.js';
-import { SurfaceGroupLikeModel } from './base.js';
-import { local, observe, yfield } from './decorators.js';
 
-type GroupElementProps = IBaseProps & {
+type GroupElementProps = BaseElementProps & {
   children: Y.Map<boolean>;
   title: Y.Text;
 };
@@ -22,7 +27,7 @@ export type SerializedGroupElement = SerializedElement & {
   children: Record<string, boolean>;
 };
 
-export class GroupElementModel extends SurfaceGroupLikeModel<GroupElementProps> {
+export class GroupElementModel extends GfxGroupLikeElementModel<GroupElementProps> {
   static override propsToY(props: Record<string, unknown>) {
     if (props.title && !(props.title instanceof DocCollection.Y.Text)) {
       props.title = new DocCollection.Y.Text(props.title as string);
@@ -41,7 +46,7 @@ export class GroupElementModel extends SurfaceGroupLikeModel<GroupElementProps> 
     return props as GroupElementProps;
   }
 
-  addChild(element: BlockSuite.EdgelessModelType | string) {
+  addChild(element: BlockSuite.EdgelessModel | string) {
     const id = typeof element === 'string' ? element : element.id;
     if (!this.children) {
       return;
@@ -60,7 +65,7 @@ export class GroupElementModel extends SurfaceGroupLikeModel<GroupElementProps> 
     return linePolygonIntersects(start, end, bound.points);
   }
 
-  removeChild(element: BlockSuite.EdgelessModelType | string) {
+  removeChild(element: BlockSuite.EdgelessModel | string) {
     const id = typeof element === 'string' ? element : element.id;
     if (!this.children) {
       return;
@@ -104,6 +109,10 @@ export class GroupElementModel extends SurfaceGroupLikeModel<GroupElementProps> 
 declare global {
   namespace BlockSuite {
     interface SurfaceGroupLikeModelMap {
+      group: GroupElementModel;
+    }
+
+    interface SurfaceElementModelMap {
       group: GroupElementModel;
     }
   }

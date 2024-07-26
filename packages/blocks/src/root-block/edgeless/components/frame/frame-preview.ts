@@ -27,7 +27,7 @@ import { SpecProvider } from '../../../../specs/index.js';
 import '../../../../surface-ref-block/surface-ref-portal.js';
 import { isTopLevelBlock } from '../../utils/query.js';
 
-type RefElement = Exclude<BlockSuite.EdgelessModelType, NoteBlockModel>;
+type RefElement = Exclude<BlockSuite.EdgelessModel, NoteBlockModel>;
 
 const DEFAULT_PREVIEW_CONTAINER_WIDTH = 280;
 const DEFAULT_PREVIEW_CONTAINER_HEIGHT = 166;
@@ -220,6 +220,11 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
 
   private _renderSurfaceContent(referencedModel: FrameBlockModel) {
     const { width, height } = this._getViewportWH(referencedModel);
+    const backgroundColor = this.surfaceRenderer.generateColorProperty(
+      referencedModel.background,
+      '--affine-platte-transparent'
+    );
+
     return html`<div
       class="frame-preview-surface-container"
       style=${styleMap({
@@ -229,9 +234,7 @@ export class FramePreview extends WithDisposable(ShadowlessElement) {
     >
       <div
         style=${styleMap({
-          backgroundColor: referencedModel.background
-            ? `var(${referencedModel.background})`
-            : 'var(--affine-platte-transparent)',
+          backgroundColor,
           borderRadius: '4px',
         })}
       >

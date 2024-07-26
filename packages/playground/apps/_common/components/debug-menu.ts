@@ -36,8 +36,8 @@ import '@shoelace-style/shoelace/dist/components/select/select.js';
 import '@shoelace-style/shoelace/dist/components/tab/tab.js';
 import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import '@shoelace-style/shoelace/dist/themes/dark.css';
 import '@shoelace-style/shoelace/dist/themes/light.css';
+import '@shoelace-style/shoelace/dist/themes/dark.css';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { css, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -46,6 +46,7 @@ import * as lz from 'lz-string';
 import type { CustomChatPanel } from './custom-chat-panel.js';
 import type { CustomFramePanel } from './custom-frame-panel.js';
 import type { CustomOutlinePanel } from './custom-outline-panel.js';
+import type { CustomOutlineViewer } from './custom-outline-viewer.js';
 import type { DocsPanel } from './docs-panel.js';
 import type { LeftSidePanel } from './left-side-panel.js';
 import type { SidePanel } from './side-panel.js';
@@ -196,6 +197,10 @@ export class DebugMenu extends ShadowlessElement {
     this.doc.addBlock('affine:paragraph', {}, noteId);
   }
 
+  private _enableOutlineViewer() {
+    this.outlineViewer.toggleDisplay();
+  }
+
   private _exportHtml() {
     HtmlTransformer.exportDoc(this.doc).catch(console.error);
   }
@@ -205,11 +210,11 @@ export class DebugMenu extends ShadowlessElement {
   }
 
   private _exportPdf() {
-    this.rootService.exportManager.exportPdf().catch(console.error);
+    this.rootService?.exportManager.exportPdf().catch(console.error);
   }
 
   private _exportPng() {
-    this.rootService.exportManager.exportPng().catch(console.error);
+    this.rootService?.exportManager.exportPng().catch(console.error);
   }
 
   private async _exportSnapshot() {
@@ -343,6 +348,7 @@ export class DebugMenu extends ShadowlessElement {
   }
 
   private _switchEditorMode() {
+    if (!this.editor.host) return;
     const { docModeService } = this.editor.host.spec.getService('affine:page');
     this.mode = docModeService.toggleMode();
   }
@@ -564,6 +570,9 @@ export class DebugMenu extends ShadowlessElement {
               <sl-menu-item @click="${this._toggleOutlinePanel}">
                 Toggle Outline Panel
               </sl-menu-item>
+              <sl-menu-item @click="${this._enableOutlineViewer}">
+                Enable Outline Viewer
+              </sl-menu-item>
               <sl-menu-item @click="${this._toggleFramePanel}">
                 Toggle Frame Panel
               </sl-menu-item>
@@ -630,16 +639,8 @@ export class DebugMenu extends ShadowlessElement {
     super.update(changedProperties);
   }
 
-  get command() {
-    return this.host.command;
-  }
-
   get doc() {
     return this.editor.doc;
-  }
-
-  get host() {
-    return this.editor.host;
   }
 
   get mode() {
@@ -651,7 +652,7 @@ export class DebugMenu extends ShadowlessElement {
   }
 
   get rootService() {
-    return this.host.spec.getService('affine:page');
+    return this.editor.host?.spec.getService('affine:page');
   }
 
   @state()
@@ -692,6 +693,9 @@ export class DebugMenu extends ShadowlessElement {
 
   @property({ attribute: false })
   accessor outlinePanel!: CustomOutlinePanel;
+
+  @property({ attribute: false })
+  accessor outlineViewer!: CustomOutlineViewer;
 
   @property({ attribute: false })
   accessor readonly = false;

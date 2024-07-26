@@ -1,4 +1,4 @@
-import { WidgetElement } from '@blocksuite/block-std';
+import { WidgetComponent } from '@blocksuite/block-std';
 import { type TemplateResult, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { join } from 'lit/directives/join.js';
@@ -94,14 +94,14 @@ type CategorizedElements = {
 
 type CustomEntry = {
   render: (edgeless: EdgelessRootBlockComponent) => TemplateResult | null;
-  when: (model: BlockSuite.EdgelessModelType[]) => boolean;
+  when: (model: BlockSuite.EdgelessModel[]) => boolean;
 };
 
 export const EDGELESS_ELEMENT_TOOLBAR_WIDGET =
   'edgeless-element-toolbar-widget';
 
 @customElement(EDGELESS_ELEMENT_TOOLBAR_WIDGET)
-export class EdgelessElementToolbarWidget extends WidgetElement<
+export class EdgelessElementToolbarWidget extends WidgetComponent<
   RootBlockModel,
   EdgelessRootBlockComponent
 > {
@@ -159,7 +159,7 @@ export class EdgelessElementToolbarWidget extends WidgetElement<
         return 'edgelessText';
       }
 
-      return (model as BlockSuite.SurfaceElementModelType).type;
+      return (model as BlockSuite.SurfaceElementModel).type;
     });
     return result as CategorizedElements;
   }
@@ -400,7 +400,7 @@ export class EdgelessElementToolbarWidget extends WidgetElement<
   @state()
   private accessor _registeredEntries: {
     render: (edgeless: EdgelessRootBlockComponent) => TemplateResult | null;
-    when: (model: BlockSuite.EdgelessModelType[]) => boolean;
+    when: (model: BlockSuite.EdgelessModel[]) => boolean;
   }[] = [];
 
   @property({ attribute: false })

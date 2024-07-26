@@ -1,12 +1,24 @@
-import type { PointLocation } from '@blocksuite/global/utils';
-import type { IVec } from '@blocksuite/global/utils';
-import type { Bound } from '@blocksuite/global/utils';
-import type { IBound } from '@blocksuite/global/utils';
-import type { SerializedXYWH } from '@blocksuite/global/utils';
+import type {
+  BaseElementProps,
+  ElementHitTestOptions,
+} from '@blocksuite/block-std/gfx';
+import type {
+  Bound,
+  IBound,
+  IVec,
+  PointLocation,
+  SerializedXYWH,
+} from '@blocksuite/global/utils';
 
+import {
+  GfxPrimitiveElementModel,
+  local,
+  yfield,
+} from '@blocksuite/block-std/gfx';
 import { DocCollection, type Y } from '@blocksuite/store';
 
 import {
+  type CustomColor,
   DEFAULT_ROUGHNESS,
   FontFamily,
   FontStyle,
@@ -17,12 +29,6 @@ import {
   type TextStyleProps,
   TextVerticalAlign,
 } from '../consts.js';
-import {
-  type IBaseProps,
-  type IHitTestOptions,
-  SurfaceElementModel,
-} from './base.js';
-import { local, yfield } from './decorators.js';
 import { diamond } from './utils/shape/diamond.js';
 import { ellipse } from './utils/shape/ellipse.js';
 import { rect } from './utils/shape/rect.js';
@@ -47,13 +53,13 @@ export enum ShapeTextFontSize {
   XLARGE = 36,
 }
 
-export type ShapeProps = IBaseProps & {
+export type ShapeProps = BaseElementProps & {
   shapeType: ShapeType;
   radius: number;
   filled: boolean;
-  fillColor: string;
+  fillColor: string | CustomColor;
   strokeWidth: number;
-  strokeColor: string;
+  strokeColor: string | CustomColor;
   strokeStyle: StrokeStyle;
   shapeStyle: ShapeStyle;
   // https://github.com/rough-stuff/rough/wiki#roughness
@@ -69,7 +75,7 @@ export type ShapeProps = IBaseProps & {
 export const SHAPE_TEXT_PADDING = 20;
 export const SHAPE_TEXT_VERTICAL_PADDING = 10;
 
-export class ShapeElementModel extends SurfaceElementModel<ShapeProps> {
+export class ShapeElementModel extends GfxPrimitiveElementModel<ShapeProps> {
   textBound: IBound | null = null;
 
   static override propsToY(props: ShapeProps) {
@@ -92,7 +98,7 @@ export class ShapeElementModel extends SurfaceElementModel<ShapeProps> {
     return shapeMethods[this.shapeType].getRelativePointLocation(point, this);
   }
 
-  override hitTest(x: number, y: number, options: IHitTestOptions) {
+  override hitTest(x: number, y: number, options: ElementHitTestOptions) {
     return shapeMethods[this.shapeType].hitTest.call(this, x, y, {
       ...options,
       ignoreTransparent: options.ignoreTransparent ?? true,
@@ -107,11 +113,11 @@ export class ShapeElementModel extends SurfaceElementModel<ShapeProps> {
     return 'shape';
   }
 
-  @yfield('#000000')
-  accessor color!: string;
+  @yfield()
+  accessor color: string | CustomColor = '#000000';
 
   @yfield()
-  accessor fillColor: string = '--affine-palette-shape-yellow';
+  accessor fillColor: string | CustomColor = '--affine-palette-shape-yellow';
 
   @yfield()
   accessor filled: boolean = false;
@@ -161,7 +167,7 @@ export class ShapeElementModel extends SurfaceElementModel<ShapeProps> {
   accessor shapeType: ShapeType = 'rect';
 
   @yfield()
-  accessor strokeColor: string = '--affine-palette-line-yellow';
+  accessor strokeColor: string | CustomColor = '--affine-palette-line-yellow';
 
   @yfield()
   accessor strokeStyle: StrokeStyle = StrokeStyle.Solid;

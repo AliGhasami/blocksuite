@@ -1,6 +1,6 @@
 import type { BlockComponent } from '@blocksuite/block-std';
 
-import { EdgelessBlockComponent } from '@blocksuite/block-std';
+import { GfxBlockComponent } from '@blocksuite/block-std';
 import { Bound } from '@blocksuite/global/utils';
 import { type PropertyValueMap, css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
@@ -13,7 +13,6 @@ import type {
 import type { EdgelessTextBlockModel } from './edgeless-text-model.js';
 import type { EdgelessTextBlockService } from './edgeless-text-service.js';
 
-import { isCssVariable } from '../_common/theme/css-variables.js';
 import { matchFlavours } from '../_common/utils/model.js';
 import { HandleDirection } from '../root-block/edgeless/components/resize/resize-handles.js';
 import {
@@ -26,7 +25,7 @@ export const EDGELESS_TEXT_BLOCK_MIN_WIDTH = 50;
 export const EDGELESS_TEXT_BLOCK_MIN_HEIGHT = 50;
 
 @customElement('affine-edgeless-text')
-export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
+export class EdgelessTextBlockComponent extends GfxBlockComponent<
   EdgelessRootService,
   EdgelessTextBlockModel,
   EdgelessTextBlockService
@@ -34,6 +33,10 @@ export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
   private _horizontalResizing = false;
 
   private _resizeObserver = new ResizeObserver(() => {
+    if (this.doc.readonly) {
+      return;
+    }
+
     const rect = this._textContainer.getBoundingClientRect();
     const bound = Bound.deserialize(this.model.xywh);
     if (!this.rootService) {
@@ -58,6 +61,41 @@ export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
   `;
 
   override rootServiceFlavour = 'affine:page';
+
+  private _initDragEffect() {
+    const edgelessSelection = this.rootService.selection;
+    const selectedRect = this.parentBlock.selectedRect;
+    const disposables = this.disposables;
+
+    if (!edgelessSelection || !selectedRect) {
+      return;
+    }
+
+    disposables.add(
+      selectedRect.slots.dragStart
+        .filter(() => edgelessSelection.selectedElements.includes(this.model))
+        .on(() => {
+          if (
+            selectedRect.dragDirection === HandleDirection.Left ||
+            selectedRect.dragDirection === HandleDirection.Right
+          ) {
+            this._horizontalResizing = true;
+          }
+        })
+    );
+    disposables.add(
+      selectedRect.slots.dragEnd
+        .filter(() => edgelessSelection.selectedElements.includes(this.model))
+        .on(() => {
+          if (
+            selectedRect.dragDirection === HandleDirection.Left ||
+            selectedRect.dragDirection === HandleDirection.Right
+          ) {
+            this._horizontalResizing = false;
+          }
+        })
+    );
+  }
 
   private _updateH() {
     const bound = Bound.deserialize(this.model.xywh);
@@ -149,32 +187,8 @@ export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
 
     const { disposables, rootService } = this;
     const edgelessSelection = rootService.selection;
-    const selectedRect = this.parentBlock.selectedRect;
 
-    disposables.add(
-      selectedRect.slots.dragStart
-        .filter(() => edgelessSelection.selectedElements.includes(this.model))
-        .on(() => {
-          if (
-            selectedRect.dragDirection === HandleDirection.Left ||
-            selectedRect.dragDirection === HandleDirection.Right
-          ) {
-            this._horizontalResizing = true;
-          }
-        })
-    );
-    disposables.add(
-      selectedRect.slots.dragEnd
-        .filter(() => edgelessSelection.selectedElements.includes(this.model))
-        .on(() => {
-          if (
-            selectedRect.dragDirection === HandleDirection.Left ||
-            selectedRect.dragDirection === HandleDirection.Right
-          ) {
-            this._horizontalResizing = false;
-          }
-        })
-    );
+    this._initDragEffect();
 
     disposables.add(
       edgelessSelection.slots.updated.on(() => {
@@ -187,7 +201,8 @@ export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
     );
 
     this._resizeObserver.observe(this._textContainer);
-    this.model.deleted.on(() => {
+
+    disposables.add(() => {
       this._resizeObserver.disconnect();
     });
 
@@ -264,7 +279,7 @@ export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
     };
   }
 
-  override renderEdgelessBlock() {
+  override renderGfxBlock() {
     const { model } = this;
     const { scale, rotate, hasMaxWidth } = model;
     const containerStyle: StyleInfo = {
@@ -301,10 +316,14 @@ export class EdgelessTextBlockComponent extends EdgelessBlockComponent<
   }
 
   override renderPageContent() {
-    const { color, fontFamily, fontStyle, fontWeight, textAlign } = this.model;
+    const { fontFamily, fontStyle, fontWeight, textAlign } = this.model;
+    const color = this.rootService.themeObserver.generateColorProperty(
+      this.model.color,
+      '#000000'
+    );
 
     const style = styleMap({
-      color: isCssVariable(color) ? `var(${color})` : color,
+      color,
       fontFamily: wrapFontFamily(fontFamily),
       fontStyle,
       fontWeight,

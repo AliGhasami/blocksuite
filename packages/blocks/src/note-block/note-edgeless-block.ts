@@ -4,7 +4,7 @@ import type { BlockModel } from '@blocksuite/store';
 import {
   ShadowlessElement,
   WithDisposable,
-  toEdgelessBlockComponent,
+  toGfxBlockComponent,
 } from '@blocksuite/block-std';
 import { Point } from '@blocksuite/global/utils';
 import { Bound, almostEqual, clamp } from '@blocksuite/global/utils';
@@ -101,7 +101,7 @@ export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
 const ACTIVE_NOTE_EXTRA_PADDING = 20;
 
 @customElement('affine-edgeless-note')
-export class EdgelessNoteBlockComponent extends toEdgelessBlockComponent(
+export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
   NoteBlockComponent
 ) {
   static override styles = css`
@@ -377,13 +377,13 @@ export class EdgelessNoteBlockComponent extends toEdgelessBlockComponent(
     };
   }
 
-  override renderEdgelessBlock() {
+  override renderGfxBlock() {
     const { model } = this;
     const { displayMode } = model;
     if (!!displayMode && displayMode === NoteDisplayMode.DocOnly)
       return nothing;
 
-    const { xywh, background, edgeless } = model;
+    const { xywh, edgeless } = model;
     const { borderRadius, borderSize, borderStyle, shadowType } =
       edgeless.style;
     const { collapse, collapsedHeight, scale = 1 } = edgeless;
@@ -405,6 +405,19 @@ export class EdgelessNoteBlockComponent extends toEdgelessBlockComponent(
     };
 
     const extra = this._editing ? ACTIVE_NOTE_EXTRA_PADDING : 0;
+    let backgroundColor = `${DEFAULT_NOTE_BACKGROUND_COLOR}`;
+
+    // The root service may not be initialized when switching page mode
+    if (this.rootService) {
+      backgroundColor = this.rootService.themeObserver.generateColorProperty(
+        model.background,
+        backgroundColor
+      );
+    } else if (typeof model.background === 'string') {
+      backgroundColor = model.background.startsWith('--')
+        ? `var(${model.background})`
+        : model.background;
+    }
 
     const backgroundStyle = {
       position: 'absolute',
@@ -416,7 +429,7 @@ export class EdgelessNoteBlockComponent extends toEdgelessBlockComponent(
       transition: this._editing
         ? 'left 0.3s, top 0.3s, width 0.3s, height 0.3s'
         : 'none',
-      background: `var(${background ?? DEFAULT_NOTE_BACKGROUND_COLOR})`,
+      backgroundColor,
       border: `${borderSize}px ${
         borderStyle === StrokeStyle.Dash ? 'dashed' : borderStyle
       } var(--affine-black-10)`,
@@ -444,23 +457,21 @@ export class EdgelessNoteBlockComponent extends toEdgelessBlockComponent(
         @mouseleave=${this._leaved}
         @mousemove=${this._hovered}
         data-scale="${scale}"
-        contenteditable="false"
       >
         <div
           class="note-background"
           style=${styleMap(backgroundStyle)}
           @pointerdown=${(e: MouseEvent) => e.stopPropagation()}
           @click=${this._handleClickAtBackground}
-          contenteditable="false"
         ></div>
 
         <div
+          class="edgeless-note-page-content"
           style=${styleMap({
             width: '100%',
             height: '100%',
             'overflow-y': this._isShowCollapsedContent ? 'initial' : 'clip',
           })}
-          contenteditable="false"
         >
           ${this.renderPageContent()}
         </div>

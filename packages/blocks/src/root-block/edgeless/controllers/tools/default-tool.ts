@@ -20,7 +20,7 @@ import {
 } from '../../../../_common/utils/index.js';
 import { clamp } from '../../../../_common/utils/math.js';
 import {
-  type IHitTestOptions,
+  type ElementHitTestOptions,
   SurfaceGroupLikeModel,
 } from '../../../../surface-block/element-model/base.js';
 import { isConnectorWithLabel } from '../../../../surface-block/element-model/connector.js';
@@ -183,7 +183,7 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     }
   };
 
-  private _toBeMoved: BlockSuite.EdgelessModelType[] = [];
+  private _toBeMoved: BlockSuite.EdgelessModel[] = [];
 
   private _updateSelectingState = () => {
     const { tools, service } = this._edgeless;
@@ -367,7 +367,7 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     });
   }
 
-  private _isDraggable(element: BlockSuite.EdgelessModelType) {
+  private _isDraggable(element: BlockSuite.EdgelessModel) {
     return !(
       element instanceof ConnectorElementModel &&
       !isConnectorAndBindingsAllSelected(element, this._toBeMoved)
@@ -444,8 +444,8 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
         .pickElement(x, y, { all: true, expand: 40 })
         .filter(
           el =>
-            (el.group as BlockSuite.SurfaceElementModelType)?.type ===
-              'mindmap' && el !== current
+            (el.group as BlockSuite.SurfaceElementModel)?.type === 'mindmap' &&
+            el !== current
         )
         .map(el => ({
           element: el as ShapeElementModel,
@@ -520,14 +520,14 @@ export class DefaultToolController extends EdgelessToolController<DefaultTool> {
     });
   }
 
-  private _pick(x: number, y: number, options?: IHitTestOptions) {
+  private _pick(x: number, y: number, options?: ElementHitTestOptions) {
     const service = this._service;
     const modelPos = service.viewport.toModelCoord(x, y);
     const group = service.pickElementInGroup(modelPos[0], modelPos[1], options);
 
     if (group instanceof MindmapElementModel) {
       const picked = service.pickElement(modelPos[0], modelPos[1], {
-        ...((options ?? {}) as IHitTestOptions),
+        ...((options ?? {}) as ElementHitTestOptions),
         all: true,
       });
 

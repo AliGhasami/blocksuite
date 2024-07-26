@@ -1,4 +1,4 @@
-import type { BlockComponent, EditorHost } from '@blocksuite/block-std';
+import type { BlockComponent } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
 import { BlockService } from '@blocksuite/block-std';
@@ -28,6 +28,7 @@ import {
   EMBED_CARD_WIDTH,
 } from '../_common/consts.js';
 import { ExportManager } from '../_common/export-manager/export-manager.js';
+import { ThemeObserver } from '../_common/theme/theme-observer.js';
 import {
   HtmlTransformer,
   MarkdownTransformer,
@@ -171,7 +172,7 @@ export class RootService extends BlockService<RootBlockModel> {
     targetStyle: EmbedCardStyle,
     props: Record<string, unknown>
   ) => {
-    const host = this.host as EditorHost;
+    const host = this.host;
 
     const mode = this.docModeService.getMode();
     const { model, index } = this._getParentModelBySelection();
@@ -225,7 +226,7 @@ export class RootService extends BlockService<RootBlockModel> {
   };
 
   private _insertLink = (url: string) => {
-    const host = this.host as EditorHost;
+    const host = this.host;
     const rootService = host.spec.getService('affine:page');
 
     const embedOptions = rootService.getEmbedBlockOptions(url);
@@ -256,7 +257,7 @@ export class RootService extends BlockService<RootBlockModel> {
       noteId
     );
 
-    asyncFocusRichText(this.host as EditorHost, id, {
+    asyncFocusRichText(this.host, id, {
       index: text.length,
       length: 0,
     })?.catch(console.error);
@@ -329,6 +330,8 @@ export class RootService extends BlockService<RootBlockModel> {
   };
 
   telemetryService: TelemetryService | null = null;
+
+  readonly themeObserver = new ThemeObserver();
 
   transformers = {
     markdown: MarkdownTransformer,
@@ -433,11 +436,11 @@ export class RootService extends BlockService<RootBlockModel> {
   }
 
   get viewportElement() {
-    const rootElement = this.std.view.viewFromPath('block', [
+    const rootComponent = this.std.view.viewFromPath('block', [
       this.std.doc.root?.id ?? '',
     ]) as RootBlockComponent | null;
-    assertExists(rootElement);
-    const viewportElement = rootElement.viewportElement as HTMLElement | null;
+    assertExists(rootComponent);
+    const viewportElement = rootComponent.viewportElement as HTMLElement | null;
     assertExists(viewportElement);
     return viewportElement;
   }

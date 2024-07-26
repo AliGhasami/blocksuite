@@ -4,13 +4,14 @@ import type { Text } from '@blocksuite/store';
 import { Bound } from '@blocksuite/global/utils';
 import { BlockModel, defineBlockSchema } from '@blocksuite/store';
 
-import type { IHitTestOptions } from '../surface-block/element-model/base.js';
+import type { CustomColor } from '../surface-block/consts.js';
+import type { ElementHitTestOptions } from '../surface-block/element-model/base.js';
 
 import { selectable } from '../_common/edgeless/mixin/edgeless-selectable.js';
 
 type FrameBlockProps = {
   title: Text;
-  background: string;
+  background: string | CustomColor;
   xywh: SerializedXYWH;
   index: string;
 };
@@ -44,7 +45,7 @@ export class FrameBlockModel extends selectable<FrameBlockProps>(BlockModel) {
     );
   }
 
-  override hitTest(x: number, y: number, _: IHitTestOptions): boolean {
+  override hitTest(x: number, y: number, _: ElementHitTestOptions): boolean {
     const bound = Bound.deserialize(this.xywh);
     const hit = bound.isPointNearBound([x, y], 5);
 

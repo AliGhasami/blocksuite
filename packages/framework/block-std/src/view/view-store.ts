@@ -1,13 +1,11 @@
 import type { BlockModel } from '@blocksuite/store';
 
-import { assertExists } from '@blocksuite/global/utils';
-
-import type { BlockComponent, WidgetElement } from './element/index.js';
+import type { BlockComponent, WidgetComponent } from './element/index.js';
 
 export class ViewStore {
   private readonly _blockMap = new Map<string, BlockComponent>();
 
-  private readonly _widgetMap = new Map<string, WidgetElement>();
+  private readonly _widgetMap = new Map<string, WidgetComponent>();
 
   calculatePath = (model: BlockModel): string[] => {
     const path: string[] = [];
@@ -23,7 +21,7 @@ export class ViewStore {
     this._blockMap.delete(node.id);
   };
 
-  deleteWidget = (node: WidgetElement) => {
+  deleteWidget = (node: WidgetComponent) => {
     const id = node.dataset.widgetId as string;
     const widgetIndex = `${node.model.id}|${id}`;
     this._widgetMap.delete(widgetIndex);
@@ -44,7 +42,7 @@ export class ViewStore {
   getWidget = (
     widgetName: string,
     hostBlockId: string
-  ): WidgetElement | null => {
+  ): WidgetComponent | null => {
     const widgetIndex = `${hostBlockId}|${widgetName}`;
     return this._widgetMap.get(widgetIndex) ?? null;
   };
@@ -53,7 +51,7 @@ export class ViewStore {
     this._blockMap.set(node.model.id, node);
   };
 
-  setWidget = (node: WidgetElement) => {
+  setWidget = (node: WidgetComponent) => {
     const id = node.dataset.widgetId as string;
     const widgetIndex = `${node.model.id}|${id}`;
     this._widgetMap.set(widgetIndex, node);
@@ -68,7 +66,9 @@ export class ViewStore {
     path?: string | undefined | null
   ) => {
     const tree = this.fromPath(path);
-    assertExists(tree, `Invalid path to get node in view: ${path}`);
+    if (!tree) {
+      return;
+    }
 
     const iterate =
       (parent: BlockComponent) => (node: BlockComponent, index: number) => {
@@ -102,14 +102,16 @@ export class ViewStore {
     this._widgetMap.clear();
   }
 
+  /**
+   * @deprecated
+   * Use `getBlock` or `getWidget` instead
+   */
   viewFromPath(type: 'block', path: string[]): null | BlockComponent;
-
-  viewFromPath(type: 'widget', path: string[]): null | WidgetElement;
-
+  viewFromPath(type: 'widget', path: string[]): null | WidgetComponent;
   viewFromPath(
     type: 'block' | 'widget',
     path: string[]
-  ): null | BlockComponent | WidgetElement {
+  ): null | BlockComponent | WidgetComponent {
     if (type === 'block') {
       return this.fromPath(path[path.length - 1]);
     }

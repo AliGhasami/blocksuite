@@ -1,6 +1,6 @@
 import type { Doc } from '@blocksuite/store';
 
-import { assertExists } from '@blocksuite/global/utils';
+import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import { type BlockModel, BlockViewType } from '@blocksuite/store';
 import { consume, createContext, provide } from '@lit/context';
 import { SignalWatcher, computed } from '@lit-labs/preact-signals';
@@ -13,7 +13,7 @@ import { html } from 'lit/static-html.js';
 import type { EventName, UIEventHandler } from '../../event/index.js';
 import type { BlockStdScope } from '../../scope/index.js';
 import type { BlockService } from '../../service/index.js';
-import type { WidgetElement } from './widget-element.js';
+import type { WidgetComponent } from './widget-component.js';
 
 import { WithDisposable } from '../utils/with-disposable.js';
 import { docContext, stdContext } from './lit-host.js';
@@ -29,7 +29,7 @@ export class BlockComponent<
 > extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   private _selected = computed(() => {
     const selection = this.std.selection.value.find(selection => {
-      return selection.blockId === this.model.id;
+      return selection.blockId === this.model?.id;
     });
 
     if (!selection) {
@@ -44,12 +44,11 @@ export class BlockComponent<
     handler: UIEventHandler,
     options?: { global?: boolean; flavour?: boolean }
   ) => {
-    assertExists(this.path, 'Cannot bind block level hotkey without path');
     const config = {
       flavour: options?.global
         ? undefined
         : options?.flavour
-          ? this.model.flavour
+          ? this.model?.flavour
           : undefined,
       path: options?.global || options?.flavour ? undefined : this.path,
     };
@@ -67,10 +66,12 @@ export class BlockComponent<
       this.isVersionMismatch,
       () => {
         const schema = this.doc.schema.flavourSchemaMap.get(this.model.flavour);
-        assertExists(
-          schema,
-          `Cannot find schema for flavour ${this.model.flavour}`
-        );
+        if (!schema) {
+          throw new BlockSuiteError(
+            ErrorCode.ValueNotExists,
+            `Cannot find schema for flavour ${this.model.flavour}`
+          );
+        }
         const expectedVersion = schema.version;
         const actualVersion = this.model.version;
         return this.renderVersionMismatch(expectedVersion, actualVersion);
@@ -95,7 +96,6 @@ export class BlockComponent<
     keymap: Record<string, UIEventHandler>,
     options?: { global?: boolean; flavour?: boolean }
   ) {
-    assertExists(this.path, 'Cannot bind block level hotkey without path');
     const config = {
       flavour: options?.global
         ? undefined
@@ -235,10 +235,12 @@ export class BlockComponent<
 
   get isVersionMismatch() {
     const schema = this.doc.schema.flavourSchemaMap.get(this.model.flavour);
-    assertExists(
-      schema,
-      `Cannot find schema for flavour ${this.model.flavour}`
-    );
+    if (!schema) {
+      throw new BlockSuiteError(
+        ErrorCode.ValueNotExists,
+        `Cannot find schema for flavour ${this.model.flavour}`
+      );
+    }
     const expectedVersion = schema.version;
     const actualVersion = this.model.version;
     if (expectedVersion !== actualVersion) {
@@ -256,7 +258,12 @@ export class BlockComponent<
       return this._model;
     }
     const model = this.doc.getBlockById<Model>(this.blockId);
-    assertExists(model, `Cannot find block model for id ${this.blockId}`);
+    if (!model) {
+      throw new BlockSuiteError(
+        ErrorCode.MissingViewModelError,
+        `Cannot find block model for id ${this.blockId}`
+      );
+    }
     this._model = model;
     return model;
   }
@@ -267,13 +274,13 @@ export class BlockComponent<
     return el?.closest('[data-block-id]') as BlockComponent;
   }
 
-  get rootElement(): BlockComponent | null {
+  get rootComponent(): BlockComponent | null {
     const rootId = this.doc.root?.id;
     if (!rootId) {
       return null;
     }
-    const rootElement = this.host.view.getBlock(rootId);
-    return rootElement ?? null;
+    const rootComponent = this.host.view.getBlock(rootId);
+    return rootComponent ?? null;
   }
 
   get selected() {
@@ -289,19 +296,21 @@ export class BlockComponent<
       return this._service;
     }
     const service = this.std.spec.getService(this.model.flavour) as Service;
-    assertExists(
-      service,
-      `Cannot find service for flavour ${this.model.flavour}`
-    );
+    if (!service) {
+      throw new BlockSuiteError(
+        ErrorCode.MissingViewModelError,
+        `Cannot find service for flavour ${this.model.flavour}`
+      );
+    }
     this._service = service;
     return service;
   }
 
   get topContenteditableElement(): BlockComponent | null {
-    return this.rootElement;
+    return this.rootComponent;
   }
 
-  get widgetElements(): Partial<Record<WidgetName, WidgetElement>> {
+  get widgetComponents(): Partial<Record<WidgetName, WidgetComponent>> {
     return Object.keys(this.widgets).reduce(
       (mapping, key) => ({
         ...mapping,

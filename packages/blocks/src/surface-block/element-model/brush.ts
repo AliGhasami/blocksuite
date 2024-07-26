@@ -1,9 +1,19 @@
-import type { IVec, IVec3 } from '@blocksuite/global/utils';
-import type { SerializedXYWH } from '@blocksuite/global/utils';
+import type {
+  BaseElementProps,
+  ElementHitTestOptions,
+} from '@blocksuite/block-std/gfx';
+import type { IVec, IVec3, SerializedXYWH } from '@blocksuite/global/utils';
 
-import { Vec } from '@blocksuite/global/utils';
-import { Bound } from '@blocksuite/global/utils';
-import { PointLocation } from '@blocksuite/global/utils';
+import {
+  GfxPrimitiveElementModel,
+  convert,
+  derive,
+  watch,
+  yfield,
+} from '@blocksuite/block-std/gfx';
+import { Bound, PointLocation, Vec } from '@blocksuite/global/utils';
+
+import type { CustomColor } from '../consts.js';
 
 import { getSolidStrokePoints } from '../canvas-renderer/element-renderer/brush/utils.js';
 import {
@@ -19,24 +29,18 @@ import {
   lineIntersects,
   polyLineNearestPoint,
 } from '../utils/math-utils.js';
-import {
-  type IBaseProps,
-  type IHitTestOptions,
-  SurfaceElementModel,
-} from './base.js';
-import { convert, derive, watch, yfield } from './decorators.js';
 
-export type BrushProps = IBaseProps & {
+export type BrushProps = BaseElementProps & {
   /**
    * [[x0,y0,pressure0?],[x1,y1,pressure1?]...]
    * pressure is optional and exsits when pressure sensitivity is supported, otherwise not.
    */
   points: number[][];
-  color: string;
+  color: string | CustomColor;
   lineWidth: number;
 };
 
-export class BrushElementModel extends SurfaceElementModel<BrushProps> {
+export class BrushElementModel extends GfxPrimitiveElementModel<BrushProps> {
   static override propsToY(props: BrushProps) {
     return props;
   }
@@ -60,7 +64,11 @@ export class BrushElementModel extends SurfaceElementModel<BrushProps> {
     return new PointLocation(point);
   }
 
-  override hitTest(px: number, py: number, options?: IHitTestOptions): boolean {
+  override hitTest(
+    px: number,
+    py: number,
+    options?: ElementHitTestOptions
+  ): boolean {
     const hit = isPointOnlines(
       Bound.deserialize(this.xywh),
       this.points as [number, number][],
@@ -123,7 +131,7 @@ export class BrushElementModel extends SurfaceElementModel<BrushProps> {
   }
 
   @yfield()
-  accessor color: string = '#000000';
+  accessor color: string | CustomColor = '#000000';
 
   @watch((_, instance: BrushElementModel) => {
     instance['_local'].delete('commands');

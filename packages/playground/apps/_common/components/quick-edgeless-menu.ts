@@ -26,8 +26,8 @@ import '@shoelace-style/shoelace/dist/components/select/select.js';
 import '@shoelace-style/shoelace/dist/components/tab/tab.js';
 import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import '@shoelace-style/shoelace/dist/themes/dark.css';
 import '@shoelace-style/shoelace/dist/themes/light.css';
+import '@shoelace-style/shoelace/dist/themes/dark.css';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -112,24 +112,25 @@ export class QuickEdgelessMenu extends ShadowlessElement {
   }
 
   private _exportHtml() {
-    const htmlTransformer = this.rootService.transformers.html;
-    htmlTransformer.exportDoc(this.doc).catch(console.error);
+    const htmlTransformer = this.rootService?.transformers.html;
+    htmlTransformer?.exportDoc(this.doc).catch(console.error);
   }
 
   private _exportMarkDown() {
-    const markdownTransformer = this.rootService.transformers.markdown;
-    markdownTransformer.exportDoc(this.doc).catch(console.error);
+    const markdownTransformer = this.rootService?.transformers.markdown;
+    markdownTransformer?.exportDoc(this.doc).catch(console.error);
   }
 
   private _exportPdf() {
-    this.rootService.exportManager.exportPdf().catch(console.error);
+    this.rootService?.exportManager.exportPdf().catch(console.error);
   }
 
   private _exportPng() {
-    this.rootService.exportManager.exportPng().catch(console.error);
+    this.rootService?.exportManager.exportPng().catch(console.error);
   }
 
   private async _exportSnapshot() {
+    if (!this.rootService) return;
     const zipTransformer = this.rootService.transformers.zip;
     const file = await zipTransformer.exportDocs(this.collection, [this.doc]);
     const url = URL.createObjectURL(file);
@@ -148,9 +149,8 @@ export class QuickEdgelessMenu extends ShadowlessElement {
     input.multiple = false;
     input.onchange = async () => {
       const file = input.files?.item(0);
-      if (!file) {
-        return;
-      }
+      if (!file) return;
+      if (!this.rootService) return;
       try {
         const zipTransformer = this.rootService.transformers.zip;
         const docs = await zipTransformer.importDocs(this.collection, file);
@@ -247,6 +247,7 @@ export class QuickEdgelessMenu extends ShadowlessElement {
   }
 
   private _switchEditorMode() {
+    if (!this.rootService) return;
     this._docMode = this.rootService.docModeService.toggleMode();
   }
 
@@ -266,7 +267,7 @@ export class QuickEdgelessMenu extends ShadowlessElement {
     super.connectedCallback();
 
     this._docMode = this.editor.mode;
-    this.rootService.docModeService.onModeChange(mode => {
+    this.rootService?.docModeService.onModeChange(mode => {
       this._docMode = mode;
     });
     this.editor.slots.docUpdated.on(() => {
@@ -560,7 +561,7 @@ export class QuickEdgelessMenu extends ShadowlessElement {
   }
 
   get rootService() {
-    return this.editor.host.spec.getService('affine:page');
+    return this.editor.host?.spec.getService('affine:page');
   }
 
   @state()
