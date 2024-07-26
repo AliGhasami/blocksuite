@@ -1,5 +1,3 @@
-import '../../../_common/components/button.js';
-
 import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
@@ -10,39 +8,34 @@ import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+//import { isFuzzyMatch } from '../../../_common/utils/string.js';
+import type { MentionOptions } from './index.js';
+import type { UserMention } from './types.js';
+
+import '../../../_common/components/button.js';
 import {
   cleanSpecifiedTail,
   createKeydownObserver,
 } from '../../../_common/components/utils.js';
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
-//import { isFuzzyMatch } from '../../../_common/utils/string.js';
-import type { MentionOptions } from './index.js';
 import { styles } from './styles.js';
-import type { UserMention } from './types.js';
 
 //ShadowlessElement
 @customElement('affine-date-popover')
 export class DatePopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
-  private _menu() {
-    let index = 0;
-    return html`<div class="${Prefix}-mention-menu-container">
-      ${this._filterItems.map(item => {
-        return html`<div
-          class="mention-item ${index == this._activatedItemIndex
-            ? 'hover'
-            : ''}"
-          data-index="${index++}"
-          @click=${() => {
-            return this._handleClickItem(item);
-          }}
-        >
-          ${item.name}
-        </div>`;
-      })}
-    </div>`;
+  constructor(
+    private editorHost: EditorHost,
+    private inlineEditor: AffineInlineEditor,
+    private abortController = new AbortController()
+  ) {
+    //debugger;
+    //console.log('ppppp', inlineEditor.getInlineRange());
+    super();
+    //this.temp = inlineEditor;
+    //console.log('ppppp 22222', this.inlineEditor.getInlineRange());
   }
 
   private _handleClickItem(user: UserMention) {
@@ -107,45 +100,24 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
       .run();*/
   }
 
-  @property({ attribute: false })
-  accessor options!: MentionOptions;
-
-  @property({ attribute: false })
-  accessor triggerKey!: string;
-
-  //@state()
-  //private _hide = false;
-
-  @state()
-  private accessor _position: {
-    height: number;
-    x: string;
-    y: string;
-  } | null = null;
-
-  @state()
-  private accessor _query = '';
-
-  //private accessor _searchString = '';
-
-  @state()
-  private accessor _filterItems: UserMention[] = [];
-
-  @state()
-  accessor userList: UserMention[] = [];
-
-  @state()
-  private accessor _activatedItemIndex = 0;
-
-  //private _actionGroup: LinkedDocGroup[] = [];
-
-  /*private get _flattenActionList() {
-    return this._actionGroup
-      .map(group =>
-        group.items.map(item => ({ ...item, groupName: group.name }))
-      )
-      .flat();
-  }*/
+  private _menu() {
+    let index = 0;
+    return html`<div class="${Prefix}-mention-menu-container">
+      ${this._filterItems.map(item => {
+        return html`<div
+          class="mention-item ${index == this._activatedItemIndex
+            ? 'hover'
+            : ''}"
+          data-index="${index++}"
+          @click=${() => {
+            return this._handleClickItem(item);
+          }}
+        >
+          ${item.name}
+        </div>`;
+      })}
+    </div>`;
+  }
 
   private _updateItem(query: string) {
     //this._searchString = query;
@@ -181,53 +153,8 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     //return this.userList.filter(item => isFuzzyMatch(item.name, searchStr));
   }
 
-  /* private _updateActionList() {
-    this._actionGroup = this.options.getMenus({
-      editorHost: this.editorHost,
-      query: this._query,
-      inlineEditor: this.inlineEditor,
-      docMetas: this._doc.collection.meta.docMetas,
-    });
-  }*/
-
-  @query(`.${Prefix}-date-picker-popover`)
-  accessor DatePickerPopOverElement: Element | null = null;
-
-  /* private get _doc() {
-    return this.editorHost.doc;
-  }*/
-
-  /*private _scrollToItem(index: number, force = true) {
-    //console.log('index,this', index, this);
-    /!* const shadowRoot = this.rootElement;
-    if (!shadowRoot) {
-      return;
-    }*!/
-    const ele = this.querySelector(`[data-index='${index}']`);
-    if (!ele) {
-      return;
-    }
-    if (force) {
-      // set parameter to `true` to align to top
-      ele.scrollIntoView(true);
-      return;
-    }
-    ele.scrollIntoView({
-      block: 'nearest',
-    });
-  }*/
-
-  constructor(
-    private editorHost: EditorHost,
-    private inlineEditor: AffineInlineEditor,
-    private abortController = new AbortController()
-  ) {
-    //debugger;
-    //console.log('ppppp', inlineEditor.getInlineRange());
-    super();
-    //this.temp = inlineEditor;
-    //console.log('ppppp 22222', this.inlineEditor.getInlineRange());
-  }
+  //@state()
+  //private _hide = false;
 
   override connectedCallback() {
     //console.log('111111');
@@ -408,11 +335,6 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
     });*/
   }
 
-  updatePosition(position: { height: number; x: string; y: string }) {
-    //console.log('11111', this.inlineEditor.getInlineRange());
-    this._position = position;
-  }
-
   override render() {
     //const MAX_HEIGHT = 200;
     const style = this._position
@@ -444,4 +366,82 @@ export class DatePopover extends WithDisposable(ShadowlessElement) {
       </div>
     </div>`;
   }
+
+  //private accessor _searchString = '';
+
+  updatePosition(position: { height: number; x: string; y: string }) {
+    //console.log('11111', this.inlineEditor.getInlineRange());
+    this._position = position;
+  }
+
+  @state()
+  private accessor _activatedItemIndex = 0;
+
+  @state()
+  private accessor _filterItems: UserMention[] = [];
+
+  //private _actionGroup: LinkedDocGroup[] = [];
+
+  /*private get _flattenActionList() {
+    return this._actionGroup
+      .map(group =>
+        group.items.map(item => ({ ...item, groupName: group.name }))
+      )
+      .flat();
+  }*/
+
+  @state()
+  private accessor _position: {
+    height: number;
+    x: string;
+    y: string;
+  } | null = null;
+
+  /* private _updateActionList() {
+    this._actionGroup = this.options.getMenus({
+      editorHost: this.editorHost,
+      query: this._query,
+      inlineEditor: this.inlineEditor,
+      docMetas: this._doc.collection.meta.docMetas,
+    });
+  }*/
+
+  @state()
+  private accessor _query = '';
+
+  /* private get _doc() {
+    return this.editorHost.doc;
+  }*/
+
+  /*private _scrollToItem(index: number, force = true) {
+    //console.log('index,this', index, this);
+    /!* const shadowRoot = this.rootElement;
+    if (!shadowRoot) {
+      return;
+    }*!/
+    const ele = this.querySelector(`[data-index='${index}']`);
+    if (!ele) {
+      return;
+    }
+    if (force) {
+      // set parameter to `true` to align to top
+      ele.scrollIntoView(true);
+      return;
+    }
+    ele.scrollIntoView({
+      block: 'nearest',
+    });
+  }*/
+
+  @query(`.${Prefix}-date-picker-popover`)
+  accessor DatePickerPopOverElement: Element | null = null;
+
+  @property({ attribute: false })
+  accessor options!: MentionOptions;
+
+  @property({ attribute: false })
+  accessor triggerKey!: string;
+
+  @state()
+  accessor userList: UserMention[] = [];
 }

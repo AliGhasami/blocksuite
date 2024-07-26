@@ -1,5 +1,3 @@
-import '../../../_common/components/button.js';
-
 import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
@@ -10,61 +8,145 @@ import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+import type { MentionOptions } from './index.js';
+import type { UserMention } from './types.js';
+
+import '../../../_common/components/button.js';
 import {
   cleanSpecifiedTail,
   createKeydownObserver,
 } from '../../../_common/components/utils.js';
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
-import type { MentionOptions } from './index.js';
 import { styles } from './styles.js';
-import type { UserMention } from './types.js';
 
 //ShadowlessElement
 @customElement('affine-mention-popover')
 export class MentionPopover extends WithDisposable(ShadowlessElement) {
+  private _searchString = '';
+
   static override styles = styles;
 
-  @property({ attribute: false })
-  accessor options!: MentionOptions;
-
-  @property({ attribute: false })
-  accessor triggerKey!: string;
+  constructor(
+    private editorHost: EditorHost,
+    private inlineEditor: AffineInlineEditor,
+    private abortController = new AbortController()
+  ) {
+    //debugger;
+    //console.log('ppppp', inlineEditor.getInlineRange());
+    super();
+    //this.temp = inlineEditor;
+    //console.log('ppppp 22222', this.inlineEditor.getInlineRange());
+  }
 
   //@state()
   //private _hide = false;
 
-  @state()
-  private accessor _position: {
-    height: number;
-    x: string;
-    y: string;
-  } | null = null;
+  private _handleClickItem(user: UserMention) {
+    // assertExists(inlineEditor, 'Editor not found');
+    cleanSpecifiedTail(
+      this.editorHost,
+      this.inlineEditor,
+      this.triggerKey + this._query
+    );
 
-  @state()
-  private accessor _query = '';
+    const inlineRange = this.inlineEditor.getInlineRange();
+    assertExists(inlineRange);
+    this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
+      mention: { ...user, user_id: user.id, id: uuidv4() },
+      //mention: { name: user., id: '1' },
+      //mention: { type: 'LinkedPage', pageId: '11' },
+    });
+    this.inlineEditor.setInlineRange({
+      index: inlineRange.index + 1,
+      length: 0,
+    });
 
-  private _searchString = '';
+    /*if (
+      //this._leftPanelActivated ||
+      index < 0 ||
+      index >= this._filterItems.length
+    ) {
+      return;
+    }*/
+    // Need to remove the search string
+    // We must to do clean the slash string before we do the action
+    // Otherwise, the action may change the model and cause the slash string to be changed
+    /*    cleanSpecifiedTail(
+      this.host,
+      this.model,
+      this.triggerKey + this._searchString
+    );*/
+    this.abortController.abort();
+    //console.log('this is item', item);
+    //const { action } = this._filterItems[index];
+    /*action({ rootElement: this.rootElement, model: this.model })?.catch(
+      console.error
+    );*/
 
-  @state()
-  private accessor _filterItems: UserMention[] = [];
+    /*this.rootElement.host.std.command
+      .chain()
+      .updateBlockType({
+        flavour: 'affine:mention',
+        props: {
+          text: new Text(item),
+        }, //type
+      })
+      .inline((ctx, next) => {
+        //console.log('this is inline in menu ', ctx);
+        const newModels = ctx.updatedBlocks;
+        if (!newModels || newModels.length == 0) {
+          return false;
+        }
+        return next();
+      })
+      .run();*/
+  }
 
-  @state()
-  public accessor userList: UserMention[] = [];
+  private _menu() {
+    let index = 0;
+    if (this._filterItems.length < 1) {
+      return html`<div style="color: var(--bu-neutral-3);text-align: center">
+        No user found
+      </div>`;
+    }
+    return html`<div class="${Prefix}-mention-menu-container">
+      ${this._filterItems.map(item => {
+        return html`<div
+          class="mention-item ${index == this._activatedItemIndex
+            ? 'hover'
+            : ''}"
+          data-index="${index++}"
+          @click=${() => {
+            return this._handleClickItem(item);
+          }}
+        >
+          ${item.name}
+        </div>`;
+      })}
+    </div>`;
+  }
 
-  @state()
-  private accessor _activatedItemIndex = 0;
-
-  //private _actionGroup: LinkedDocGroup[] = [];
-
-  /*private get _flattenActionList() {
-    return this._actionGroup
-      .map(group =>
-        group.items.map(item => ({ ...item, groupName: group.name }))
-      )
-      .flat();
-  }*/
+  private _scrollToItem(index: number, force = true) {
+    //console.log('index,this', index, this);
+    /* const shadowRoot = this.rootElement;
+    if (!shadowRoot) {
+      return;
+    }*/
+    const ele = this.querySelector(`[data-index='${index}']`);
+    if (!ele) {
+      return;
+    }
+    if (force) {
+      // set parameter to `true` to align to top
+      ele.scrollIntoView(true);
+      return;
+    }
+    ele.scrollIntoView({
+      block: 'nearest',
+    });
+  }
 
   private _updateItem(query: string): UserMention[] {
     this._searchString = query;
@@ -99,54 +181,6 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     }
 
     return this.userList.filter(item => isFuzzyMatch(item.name, searchStr));
-  }
-
-  /* private _updateActionList() {
-    this._actionGroup = this.options.getMenus({
-      editorHost: this.editorHost,
-      query: this._query,
-      inlineEditor: this.inlineEditor,
-      docMetas: this._doc.collection.meta.docMetas,
-    });
-  }*/
-
-  @query(`.${Prefix}-mention-popover`)
-  accessor MentionPopOverElement: Element | null = null;
-
-  /* private get _doc() {
-    return this.editorHost.doc;
-  }*/
-
-  private _scrollToItem(index: number, force = true) {
-    //console.log('index,this', index, this);
-    /* const shadowRoot = this.rootElement;
-    if (!shadowRoot) {
-      return;
-    }*/
-    const ele = this.querySelector(`[data-index='${index}']`);
-    if (!ele) {
-      return;
-    }
-    if (force) {
-      // set parameter to `true` to align to top
-      ele.scrollIntoView(true);
-      return;
-    }
-    ele.scrollIntoView({
-      block: 'nearest',
-    });
-  }
-
-  constructor(
-    private editorHost: EditorHost,
-    private inlineEditor: AffineInlineEditor,
-    private abortController = new AbortController()
-  ) {
-    //debugger;
-    //console.log('ppppp', inlineEditor.getInlineRange());
-    super();
-    //this.temp = inlineEditor;
-    //console.log('ppppp 22222', this.inlineEditor.getInlineRange());
   }
 
   override connectedCallback() {
@@ -327,96 +361,6 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
     });*/
   }
 
-  updatePosition(position: { height: number; x: string; y: string }) {
-    //console.log('11111', this.inlineEditor.getInlineRange());
-    this._position = position;
-  }
-
-  private _handleClickItem(user: UserMention) {
-    // assertExists(inlineEditor, 'Editor not found');
-    cleanSpecifiedTail(
-      this.editorHost,
-      this.inlineEditor,
-      this.triggerKey + this._query
-    );
-
-    const inlineRange = this.inlineEditor.getInlineRange();
-    assertExists(inlineRange);
-    this.inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
-      mention: { ...user, user_id: user.id, id: uuidv4() },
-      //mention: { name: user., id: '1' },
-      //mention: { type: 'LinkedPage', pageId: '11' },
-    });
-    this.inlineEditor.setInlineRange({
-      index: inlineRange.index + 1,
-      length: 0,
-    });
-
-    /*if (
-      //this._leftPanelActivated ||
-      index < 0 ||
-      index >= this._filterItems.length
-    ) {
-      return;
-    }*/
-    // Need to remove the search string
-    // We must to do clean the slash string before we do the action
-    // Otherwise, the action may change the model and cause the slash string to be changed
-    /*    cleanSpecifiedTail(
-      this.host,
-      this.model,
-      this.triggerKey + this._searchString
-    );*/
-    this.abortController.abort();
-    //console.log('this is item', item);
-    //const { action } = this._filterItems[index];
-    /*action({ rootElement: this.rootElement, model: this.model })?.catch(
-      console.error
-    );*/
-
-    /*this.rootElement.host.std.command
-      .chain()
-      .updateBlockType({
-        flavour: 'affine:mention',
-        props: {
-          text: new Text(item),
-        }, //type
-      })
-      .inline((ctx, next) => {
-        //console.log('this is inline in menu ', ctx);
-        const newModels = ctx.updatedBlocks;
-        if (!newModels || newModels.length == 0) {
-          return false;
-        }
-        return next();
-      })
-      .run();*/
-  }
-
-  private _menu() {
-    let index = 0;
-    if (this._filterItems.length < 1) {
-      return html`<div style="color: var(--bu-neutral-3);text-align: center">
-        No user found
-      </div>`;
-    }
-    return html`<div class="${Prefix}-mention-menu-container">
-      ${this._filterItems.map(item => {
-        return html`<div
-          class="mention-item ${index == this._activatedItemIndex
-            ? 'hover'
-            : ''}"
-          data-index="${index++}"
-          @click=${() => {
-            return this._handleClickItem(item);
-          }}
-        >
-          ${item.name}
-        </div>`;
-      })}
-    </div>`;
-  }
-
   override render() {
     const MAX_HEIGHT = 200;
     const style = this._position
@@ -444,4 +388,60 @@ export class MentionPopover extends WithDisposable(ShadowlessElement) {
       </div>
     </div>`;
   }
+
+  //private _actionGroup: LinkedDocGroup[] = [];
+
+  /*private get _flattenActionList() {
+    return this._actionGroup
+      .map(group =>
+        group.items.map(item => ({ ...item, groupName: group.name }))
+      )
+      .flat();
+  }*/
+
+  updatePosition(position: { height: number; x: string; y: string }) {
+    //console.log('11111', this.inlineEditor.getInlineRange());
+    this._position = position;
+  }
+
+  /* private _updateActionList() {
+    this._actionGroup = this.options.getMenus({
+      editorHost: this.editorHost,
+      query: this._query,
+      inlineEditor: this.inlineEditor,
+      docMetas: this._doc.collection.meta.docMetas,
+    });
+  }*/
+
+  @state()
+  private accessor _activatedItemIndex = 0;
+
+  /* private get _doc() {
+    return this.editorHost.doc;
+  }*/
+
+  @state()
+  private accessor _filterItems: UserMention[] = [];
+
+  @state()
+  private accessor _position: {
+    height: number;
+    x: string;
+    y: string;
+  } | null = null;
+
+  @state()
+  private accessor _query = '';
+
+  @query(`.${Prefix}-mention-popover`)
+  accessor MentionPopOverElement: Element | null = null;
+
+  @property({ attribute: false })
+  accessor options!: MentionOptions;
+
+  @property({ attribute: false })
+  accessor triggerKey!: string;
+
+  @state()
+  public accessor userList: UserMention[] = [];
 }

@@ -1,6 +1,9 @@
-import { assertExists } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
+
+import { assertExists } from '@blocksuite/global/utils';
 import { Text } from '@blocksuite/store';
+
+import type { RootBlockComponent } from '../../types.js';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
@@ -11,11 +14,11 @@ import {
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import { viewPresets } from '../../../database-block/index.js';
 import { addSiblingImageBlock } from '../../../image-block/utils.js';
-import type { RootBlockComponent } from '../../types.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMentionWidget } from '../mention/index.js';
+
 /*import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';

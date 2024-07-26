@@ -10,7 +10,6 @@ import './default/default-tool-button.js';
 import './default/pan-tool-button.js';
 // import './lasso/lasso-tool-button.js';
 import './connector/connector-tool-button.js';
-import './default/default-tool-button.js';
 import './eraser/eraser-tool-button.js';
 import { buildFrameDenseMenu } from './frame/frame-dense-menu.js';
 import './frame/frame-tool-button.js';
@@ -27,6 +26,7 @@ import './template/template-tool-button.js';
 export interface QuickTool {
   type?: EdgelessTool['type'];
   content: TemplateResult;
+
   /**
    * if not configured, the tool will not be shown in dense mode
    */

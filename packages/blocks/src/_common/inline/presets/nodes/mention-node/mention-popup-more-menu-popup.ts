@@ -1,14 +1,16 @@
 import type { BlockElement } from '@blocksuite/block-std';
+import type { InlineRange } from '@blocksuite/inline/types';
+
 import { WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import type { InlineRange } from '@blocksuite/inline/types';
-import { css, html, LitElement } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { RootBlockComponent } from '../../../../../root-block/types.js';
+import type { AffineInlineEditor } from '../../affine-inline-specs.js';
+
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import { DeleteIcon, OpenIcon } from '../../../../icons/index.js';
-import type { AffineInlineEditor } from '../../affine-inline-specs.js';
 
 @customElement('mention-popup-more-menu')
 export class MentionPopupMoreMenu extends WithDisposable(LitElement) {
@@ -56,34 +58,11 @@ export class MentionPopupMoreMenu extends WithDisposable(LitElement) {
     }
   `;
 
-  @property({ attribute: false })
-  accessor inlineEditor!: AffineInlineEditor;
-
-  @property({ attribute: false })
-  accessor targetInlineRange!: InlineRange;
-
-  @property({ attribute: false })
-  accessor abortController!: AbortController;
-
-  get referenceDocId() {
-    const docId = this.inlineEditor.getFormat(this.targetInlineRange).reference
-      ?.pageId;
-    assertExists(docId);
-    return docId;
-  }
-
-  get blockElement() {
-    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
-      `[${BLOCK_ID_ATTR}]`
-    );
-    assertExists(blockElement);
-    return blockElement;
-  }
-
-  get std() {
-    const std = this.blockElement.std;
-    assertExists(std);
-    return std;
+  private _delete() {
+    if (this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
+      this.inlineEditor.deleteText(this.targetInlineRange);
+    }
+    this.abortController.abort();
   }
 
   private _openDoc() {
@@ -97,13 +76,6 @@ export class MentionPopupMoreMenu extends WithDisposable(LitElement) {
     assertExists(rootElement);
 
     rootElement.slots.docLinkClicked.emit({ docId: refDocId });
-  }
-
-  private _delete() {
-    if (this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
-      this.inlineEditor.deleteText(this.targetInlineRange);
-    }
-    this.abortController.abort();
   }
 
   override render() {
@@ -135,6 +107,36 @@ export class MentionPopupMoreMenu extends WithDisposable(LitElement) {
       </div>
     `;
   }
+
+  get blockElement() {
+    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
+      `[${BLOCK_ID_ATTR}]`
+    );
+    assertExists(blockElement);
+    return blockElement;
+  }
+
+  get referenceDocId() {
+    const docId = this.inlineEditor.getFormat(this.targetInlineRange).reference
+      ?.pageId;
+    assertExists(docId);
+    return docId;
+  }
+
+  get std() {
+    const std = this.blockElement.std;
+    assertExists(std);
+    return std;
+  }
+
+  @property({ attribute: false })
+  accessor abortController!: AbortController;
+
+  @property({ attribute: false })
+  accessor inlineEditor!: AffineInlineEditor;
+
+  @property({ attribute: false })
+  accessor targetInlineRange!: InlineRange;
 }
 
 declare global {

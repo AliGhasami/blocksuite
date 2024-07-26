@@ -3,11 +3,7 @@ import { customElement, query } from 'lit/decorators.js';
 
 import type { EdgelessTool } from '../../../types.js';
 
-import {
-  ArrowUpIcon,
-  HandIcon,
-  SelectIcon,
-} from '../../../../../_common/icons/index.js';
+import { SelectIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
 
@@ -34,10 +30,11 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }
   `;
 
-  override type: EdgelessTool['type'][] = ['default', 'pan'];
+  override type: EdgelessTool['type'][] = ['default'];
 
   private _changeTool() {
-    if (this.toolbar.activePopper) {
+    this.setEdgelessTool({ type: 'default' });
+    /*if (this.toolbar.activePopper) {
       // click manually always closes the popper
       this.toolbar.activePopper.dispose();
     }
@@ -59,7 +56,7 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
         this.setEdgelessTool({ type: 'default' });
       }
       this._fadeIn();
-    }, 100);
+    }, 100);*/
   }
 
   private _fadeIn() {
@@ -79,7 +76,7 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }
     this.disposables.add(
       this.edgeless.slots.edgelessToolUpdated.on(({ type }) => {
-        if (type === 'default' || type === 'pan') {
+        if (type === 'default') {
           localStorage.defaultTool = type;
         }
       })
@@ -92,18 +89,13 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     return html`
       <edgeless-tool-icon-button
         class="edgeless-default-button ${type} ${active ? 'active' : ''}"
-        .tooltip=${type === 'pan'
-          ? getTooltipWithShortcut('Hand', 'H')
-          : getTooltipWithShortcut('Select', 'V')}
+        .tooltip=${getTooltipWithShortcut('Select', 'V')}
         .tooltipOffset=${17}
         .active=${active}
         .iconContainerPadding=${6}
         @click=${this._changeTool}
       >
-        <span class="current-icon">
-          ${localStorage.defaultTool === 'default' ? SelectIcon : HandIcon}
-        </span>
-        <span class="arrow-up-icon">${ArrowUpIcon}</span>
+        <span class="current-icon"> ${SelectIcon} </span>
       </edgeless-tool-icon-button>
     `;
   }

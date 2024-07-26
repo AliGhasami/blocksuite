@@ -29,7 +29,6 @@ import {
   BringForwardIcon,
   BringToFrontIcon,
   CenterPeekIcon,
-  CopyAsPngIcon,
   FrameIcon,
   GroupIcon,
   LinkedDocIcon,
@@ -102,7 +101,7 @@ const REORDER_ACTIONS: Action[] = [
 
 const COPY_ACTIONS: Action[] = [
   { icon: MoreCopyIcon, name: 'Copy', type: 'copy' },
-  { icon: CopyAsPngIcon, name: 'Copy as PNG', type: 'copy-as-png' },
+  //{ icon: CopyAsPngIcon, name: 'Copy as PNG', type: 'copy-as-png' },
   { icon: MoreDuplicateIcon, name: 'Duplicate', type: 'duplicate' },
 ] as const;
 
@@ -365,7 +364,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       REORDER_ACTIONS,
       this.getOpenActions(),
       [...COPY_ACTIONS, this.getRefreshAction()],
-      [this.getLinkedDocAction()],
+      //[this.getLinkedDocAction()],
       [DELETE_ACTION],
     ];
   }
@@ -374,7 +373,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     return [
       [FRAME_ACTION],
       COPY_ACTIONS,
-      [this.getLinkedDocAction()],
+      //[this.getLinkedDocAction()],
       [DELETE_ACTION],
     ];
   }

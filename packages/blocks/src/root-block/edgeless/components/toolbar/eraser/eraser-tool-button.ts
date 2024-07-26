@@ -3,11 +3,7 @@ import { customElement } from 'lit/decorators.js';
 
 import type { EdgelessTool } from '../../../types.js';
 
-import {
-  EdgelessEraserDarkIcon,
-  EdgelessEraserLightIcon,
-  EraserTablerIcon,
-} from '../../../../../_common/icons/index.js';
+import { EraserTablerIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 

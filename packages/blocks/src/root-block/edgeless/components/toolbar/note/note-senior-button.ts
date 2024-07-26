@@ -4,12 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import type { NoteTool } from '../../../controllers/tools/note-tool.js';
 
 import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../../../../_common/edgeless/note/consts.js';
-import {
-  Heading1Icon,
-  LinkIcon,
-  TextIcon,
-} from '../../../../../_common/icons/text.js';
 import { FileIcon } from '../../../../../_common/icons/index.js';
+import { Heading1Icon, TextIcon } from '../../../../../_common/icons/text.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { toShapeNotToAdapt } from './icon.js';

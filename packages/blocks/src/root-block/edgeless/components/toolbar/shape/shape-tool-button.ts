@@ -71,6 +71,20 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     if (!this.popper) this._toggleMenu();
   }*/
 
+  private _handleShapeClick(shape: DraggableShape) {
+    const name = shape.name;
+    if (name !== this.states.shapeType) {
+      const shapeConfig = ShapeComponentConfig.find(s => s.name === name);
+      if (!shapeConfig) return;
+      this.edgeless.service.editPropsStore.recordLastProps(
+        'shape',
+        shapeConfig?.value
+      );
+      this.updateMenu();
+    }
+    if (!this.popper) this._toggleMenu();
+  }
+
   private _toggleMenu() {
     if (this.tryDisposePopper()) return;
     this.setEdgelessTool({
@@ -99,25 +113,6 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     if (controller instanceof ShapeToolController) {
       controller.createOverlay();
     }
-  }
-
-  private _handleShapeClick(shape: DraggableShape) {
-    const name = shape.name;
-    if (name !== this.states.shapeType) {
-      const shapeConfig = ShapeComponentConfig.find(s => s.name === name);
-      if (!shapeConfig) return;
-      this.edgeless.service.editPropsStore.recordLastProps(
-        'shape',
-        shapeConfig?.value
-      );
-      this.updateMenu();
-    }
-    if (!this.popper) this._toggleMenu();
-  }
-
-  updateMenu() {
-    if (!this.popper) return;
-    Object.assign(this.popper.element, this.states);
   }
 
   override connectedCallback(): void {
@@ -153,7 +148,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     return html`
       <edgeless-tool-icon-button
         class="edgeless-eraser-button"
-        .tooltip=${getTooltipWithShortcut('Eraser', 'E')}
+        .tooltip=${getTooltipWithShortcut('Shape', 'S')}
         .tooltipOffset=${4}
         .iconContainerPadding=${6}
         .active=${active}
@@ -190,6 +185,11 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     //     </edgeless-toolbar-shape-draggable>
     //   </edgeless-toolbar-button>
     // `;
+  }
+
+  updateMenu() {
+    if (!this.popper) return;
+    Object.assign(this.popper.element, this.states);
   }
 
   /*updateMenu() {

@@ -1,18 +1,18 @@
-import './ur-toolbar.js';
-import './ur-bar-toggle-button.js';
-
-import { WidgetElement } from '@blocksuite/block-std';
+import { WidgetComponent } from '@blocksuite/block-std';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 import type { RootBlockModel } from '../../root-model.js';
 
+import './ur-bar-toggle-button.js';
+import './ur-toolbar.js';
+
 export const AFFINE_EDGELESS_UR_TOOLBAR_WIDGET =
   'affine-edgeless-ur-toolbar-widget';
 
 @customElement(AFFINE_EDGELESS_UR_TOOLBAR_WIDGET)
-export class AffineEdgelessURToolbarWidget extends WidgetElement<
+export class AffineEdgelessURToolbarWidget extends WidgetComponent<
   RootBlockModel,
   EdgelessRootBlockComponent
 > {
@@ -41,15 +41,9 @@ export class AffineEdgelessURToolbarWidget extends WidgetElement<
     }
   `;
 
-  @state()
-  private accessor _hide = false;
-
-  get edgeless() {
-    return this.blockElement;
-  }
-
   override firstUpdated() {
-    const {
+    //todo check ali ghasami
+    /*const {
       disposables,
       edgeless: { slots },
     } = this;
@@ -67,7 +61,7 @@ export class AffineEdgelessURToolbarWidget extends WidgetElement<
           this._hide = hideToolbar;
         }
       })
-    );
+    );*/
   }
 
   override render() {
@@ -79,6 +73,13 @@ export class AffineEdgelessURToolbarWidget extends WidgetElement<
       <edgeless-ur-toolbar .edgeless=${this.edgeless}></edgeless-ur-toolbar>
     `;
   }
+
+  get edgeless() {
+    return this.block;
+  }
+
+  @state()
+  private accessor _hide = false;
 }
 
 declare global {

@@ -1,29 +1,28 @@
+import type { BlockModel } from '@blocksuite/store';
+
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
-import type { BlockModel } from '@blocksuite/store';
 import { html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
-//import { literal, unsafeStatic } from 'lit/static-html.js';
-import {
-  cleanSpecifiedTail,
-  createKeydownObserver,
-} from '../../../_common/components/utils.js';
-import {
-  getInlineEditorByModel,
-  getRichTextByModel,
-} from '../../../_common/utils/index.js';
-import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import type { RootBlockComponent } from '../../../root-block/types.js';
 import type {
   SlashMenuActionItem,
   SlashMenuContext,
   SlashMenuStaticConfig,
 } from './config.js';
-import { clayTapGroupMenu, type ClayTapSlashMenu } from './mahdaad_menu.js';
+
+//import { literal, unsafeStatic } from 'lit/static-html.js';
+import {
+  cleanSpecifiedTail,
+  createKeydownObserver,
+} from '../../../_common/components/utils.js';
+import { getInlineEditorByModel } from '../../../_common/utils/index.js';
+import { isFuzzyMatch } from '../../../_common/utils/string.js';
+import { type ClayTapSlashMenu, clayTapGroupMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
 //import type { SlashMenuOptions } from './utils.js';
 
@@ -34,7 +33,13 @@ export type InnerSlashMenuContext = SlashMenuContext & {
 
 @customElement('affine-slash-menu')
 export class SlashMenu extends WithDisposable(ShadowlessElement) {
-  static override styles = styles;
+  // Handle click outside
+  private _onClickAway = () => {
+    // if (e.target === this) return;
+    if (!this._hide) return;
+    // If the slash menu is hidden, click anywhere will close the slash menu
+    this.abortController.abort();
+  };
 
   /**
    * Does not include the slash character
@@ -43,48 +48,45 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   private slasheMenuID = 'mahdaad-claytap-slash-menu';
 
-  @property({ attribute: false })
-  accessor rootElement!: RootBlockComponent;
-
-  @property({ attribute: false })
-  accessor model!: BlockModel;
-
-  @property({ attribute: false })
-  accessor context!: SlashMenuContext;
-
-  @property({ attribute: false })
-  accessor config!: SlashMenuStaticConfig;
-
-  //@property({ attribute: false })
-  //accessor options!: SlashMenuOptions;
-
-  @property({ attribute: false })
-  accessor triggerKey!: string;
-
-  @query(`.${Prefix}-slash-menu`)
-  accessor slashMenuElement: HTMLElement | null = null;
-
-  //private _leftPanelActivated = false;
-  @state()
-  private accessor _activatedItemIndex = 0;
-
-  @state()
-  private accessor _filterItems: ClayTapSlashMenu[] = [];
-
-  @state()
-  private accessor _hide = false;
-
-  @state()
-  private accessor _position: {
-    x: string;
-    y: string;
-    height: number;
-  } | null = null;
+  static override styles = styles;
 
   abortController = new AbortController();
 
-  get host() {
-    return this.context.rootElement.host;
+  private _clayTapMenu() {
+    //console.log('this._activatedItemIndex', this._activatedItemIndex);
+    const group: string[] = [];
+    this._filterItems.forEach(item => {
+      if (item.group && !group.includes(item.group)) group.push(item.group);
+    });
+    let index = 0;
+    return html`<div>
+      ${group.map(itemGroup => {
+        return html`<span class="group-title"> ${itemGroup} </span>
+          <div class="claytap-slash-menu">
+            ${this._filterItems
+              .filter(item => item.group == itemGroup)
+              .map(item => {
+                const currentIndex = index;
+                return html`<div
+                  class="claytap-slash-menu-item ${this._activatedItemIndex ==
+                  index++
+                    ? 'hover'
+                    : ''}"
+                  text="menu-item-${item.title}"
+                  @click=${() => {
+                    return this._handleClickItem(currentIndex);
+                  }}
+                >
+                  <div class="icon">${html`${unsafeSVG(item.icon)}`}</div>
+                  <div class="item-title">
+                    <span class="title">${item.title}</span>
+                    <span class="description">${item.description}</span>
+                  </div>
+                </div>`;
+              })}
+          </div>`;
+      })}
+    </div>`;
   }
 
   private _handleClickItem(index: number) {
@@ -123,73 +125,61 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     action(this.context)?.catch(console.error);
   }
 
-  /*private _handleClickCategory(groupName: string) {
-    const item = this._filterItems.find(item => item.groupName === groupName);
-    if (!item) return;
-    this._scrollToItem(item);
-    this._activatedItemIndex = this._filterItems.findIndex(
-      i => i.name === item.name
+  //@property({ attribute: false })
+  //accessor options!: SlashMenuOptions;
+
+  private _scrollToItem(item: ClayTapSlashMenu, force = true) {
+    /*const shadowRoot = this.rootElement;
+    if (!shadowRoot) {
+      return;
+    }*/
+    const ele = this.renderRoot.querySelector(
+      `#${this.slasheMenuID} div[text="menu-item-${item.title}"]`
     );
-  }
-*/
-  /* private _categoryTemplate() {
-    const showCategory = !this._searchString.length;
-    const activatedGroupName =
-      this._filterItems[this._activatedItemIndex]?.groupName;
-    const groups = collectGroupNames(this._filterItems);
-
-    return html`<div
-      class="slash-category ${!showCategory ? 'slash-category-hide' : ''}"
-    >
-      ${groups.map(
-        groupName =>
-          html`<div
-            class="slash-category-name ${activatedGroupName === groupName
-              ? 'slash-active-category'
-              : ''}"
-            @click=${() => this._handleClickCategory(groupName)}
-          >
-            ${groupName}
-          </div>`
-      )}
-    </div>`;
-  }*/
-
-  private _clayTapMenu() {
-    //console.log('this._activatedItemIndex', this._activatedItemIndex);
-    const group: string[] = [];
-    this._filterItems.forEach(item => {
-      if (item.group && !group.includes(item.group)) group.push(item.group);
+    if (!ele) {
+      return;
+    }
+    if (force) {
+      // set parameter to `true` to align to top
+      ele.scrollIntoView(true);
+      return;
+    }
+    ele.scrollIntoView({
+      block: 'nearest',
     });
-    let index = 0;
-    return html`<div>
-      ${group.map(itemGroup => {
-        return html`<span class="group-title"> ${itemGroup} </span>
-          <div class="claytap-slash-menu">
-            ${this._filterItems
-              .filter(item => item.group == itemGroup)
-              .map(item => {
-                const currentIndex = index;
-                return html`<div
-                  class="claytap-slash-menu-item ${this._activatedItemIndex ==
-                  index++
-                    ? 'hover'
-                    : ''}"
-                  text="menu-item-${item.title}"
-                  @click=${() => {
-                    return this._handleClickItem(currentIndex);
-                  }}
-                >
-                  <div class="icon">${html`${unsafeSVG(item.icon)}`}</div>
-                  <div class="item-title">
-                    <span class="title">${item.title}</span>
-                    <span class="description">${item.description}</span>
-                  </div>
-                </div>`;
-              })}
-          </div>`;
-      })}
-    </div>`;
+  }
+
+  private _updateItem(query: string): ClayTapSlashMenu[] {
+    this._searchString = query;
+    this._activatedItemIndex = 0;
+    const _menu: ClayTapSlashMenu[] = [];
+    clayTapGroupMenu.map(group => {
+      _menu.push(
+        ...group.children.map(item => ({ ...item, group: group.groupName }))
+      );
+    });
+    // Activate the right panel when search string is not empty
+    /*if (this._leftPanelActivated) {
+      this._leftPanelActivated = false;
+    }*/
+    const searchStr = this._searchString.toLowerCase();
+    /*let allMenus = this.options.menus
+      .map(group =>
+        typeof group.items === 'function'
+          ? group
+              .items({ rootElement: this.rootElement, model: this.model })
+              .map(item => ({ ...item, groupName: group.name }))
+          : group.items.map(item => ({ ...item, groupName: group.name }))
+      )
+      .flat();*/
+    /*allMenus = allMenus.filter(({ showWhen = () => true }) =>
+      showWhen(this.model, this.rootElement)
+    );*/
+    if (!searchStr) {
+      return _menu;
+    }
+
+    return _menu.filter(item => isFuzzyMatch(item.title, searchStr));
   }
 
   override connectedCallback() {
@@ -320,72 +310,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     });
   }
 
-  updatePosition(position: { x: string; y: string; height: number }) {
-    this._position = position;
-  }
-
-  // Handle click outside
-  private _onClickAway = () => {
-    // if (e.target === this) return;
-    if (!this._hide) return;
-    // If the slash menu is hidden, click anywhere will close the slash menu
-    this.abortController.abort();
-  };
-
-  private _updateItem(query: string): ClayTapSlashMenu[] {
-    this._searchString = query;
-    this._activatedItemIndex = 0;
-    const _menu: ClayTapSlashMenu[] = [];
-    clayTapGroupMenu.map(group => {
-      _menu.push(
-        ...group.children.map(item => ({ ...item, group: group.groupName }))
-      );
-    });
-    // Activate the right panel when search string is not empty
-    /*if (this._leftPanelActivated) {
-      this._leftPanelActivated = false;
-    }*/
-    const searchStr = this._searchString.toLowerCase();
-    /*let allMenus = this.options.menus
-      .map(group =>
-        typeof group.items === 'function'
-          ? group
-              .items({ rootElement: this.rootElement, model: this.model })
-              .map(item => ({ ...item, groupName: group.name }))
-          : group.items.map(item => ({ ...item, groupName: group.name }))
-      )
-      .flat();*/
-    /*allMenus = allMenus.filter(({ showWhen = () => true }) =>
-      showWhen(this.model, this.rootElement)
-    );*/
-    if (!searchStr) {
-      return _menu;
-    }
-
-    return _menu.filter(item => isFuzzyMatch(item.title, searchStr));
-  }
-
-  private _scrollToItem(item: ClayTapSlashMenu, force = true) {
-    /*const shadowRoot = this.rootElement;
-    if (!shadowRoot) {
-      return;
-    }*/
-    const ele = this.renderRoot.querySelector(
-      `#${this.slasheMenuID} div[text="menu-item-${item.title}"]`
-    );
-    if (!ele) {
-      return;
-    }
-    if (force) {
-      // set parameter to `true` to align to top
-      ele.scrollIntoView(true);
-      return;
-    }
-    ele.scrollIntoView({
-      block: 'nearest',
-    });
-  }
-
   override render() {
     if (this._hide) {
       return nothing;
@@ -458,4 +382,79 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       </div>
     </div>`;
   }
+
+  updatePosition(position: { x: string; y: string; height: number }) {
+    this._position = position;
+  }
+
+  get host() {
+    return this.context.rootElement.host;
+  }
+
+  //private _leftPanelActivated = false;
+  @state()
+  private accessor _activatedItemIndex = 0;
+
+  @state()
+  private accessor _filterItems: ClayTapSlashMenu[] = [];
+
+  @state()
+  private accessor _hide = false;
+
+  /*private _handleClickCategory(groupName: string) {
+    const item = this._filterItems.find(item => item.groupName === groupName);
+    if (!item) return;
+    this._scrollToItem(item);
+    this._activatedItemIndex = this._filterItems.findIndex(
+      i => i.name === item.name
+    );
+  }
+*/
+  /* private _categoryTemplate() {
+    const showCategory = !this._searchString.length;
+    const activatedGroupName =
+      this._filterItems[this._activatedItemIndex]?.groupName;
+    const groups = collectGroupNames(this._filterItems);
+
+    return html`<div
+      class="slash-category ${!showCategory ? 'slash-category-hide' : ''}"
+    >
+      ${groups.map(
+        groupName =>
+          html`<div
+            class="slash-category-name ${activatedGroupName === groupName
+              ? 'slash-active-category'
+              : ''}"
+            @click=${() => this._handleClickCategory(groupName)}
+          >
+            ${groupName}
+          </div>`
+      )}
+    </div>`;
+  }*/
+
+  @state()
+  private accessor _position: {
+    x: string;
+    y: string;
+    height: number;
+  } | null = null;
+
+  @property({ attribute: false })
+  accessor config!: SlashMenuStaticConfig;
+
+  @property({ attribute: false })
+  accessor context!: SlashMenuContext;
+
+  @property({ attribute: false })
+  accessor model!: BlockModel;
+
+  @property({ attribute: false })
+  accessor rootElement!: RootBlockComponent;
+
+  @query(`.${Prefix}-slash-menu`)
+  accessor slashMenuElement: HTMLElement | null = null;
+
+  @property({ attribute: false })
+  accessor triggerKey!: string;
 }

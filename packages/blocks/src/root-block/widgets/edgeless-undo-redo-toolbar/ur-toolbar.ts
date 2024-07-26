@@ -1,44 +1,19 @@
 import { WithDisposable } from '@blocksuite/block-std';
 import { baseTheme } from '@toeverything/theme';
-import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
+import { LitElement, css, html, nothing, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+import type { EdgelessTool } from '../../edgeless/types.js';
 
 import {
   BackTablerIcon,
   RedoTablerIcon,
 } from '../../../_common/icons/edgeless.js';
 import { stopPropagation } from '../../../_common/utils/event.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-import type { EdgelessTool } from '../../edgeless/types.js';
 
 @customElement('edgeless-ur-toolbar')
 export class EdgelessURToolbar extends WithDisposable(LitElement) {
-  get edgelessTool() {
-    return this.edgeless.edgelessTool;
-  }
-
-  get edgelessService() {
-    return this.edgeless.service;
-  }
-
-  @state()
-  private accessor _canUndo = false;
-
-  @state()
-  private accessor _canRedo = false;
-
-  get zoom() {
-    return this.viewport.zoom;
-  }
-
-  get viewport() {
-    return this.edgelessService.viewport;
-  }
-
-  get locked() {
-    return this.edgelessService.locked;
-  }
-
   static override styles = css`
     :host {
       display: flex;
@@ -111,11 +86,9 @@ export class EdgelessURToolbar extends WithDisposable(LitElement) {
     }
   `;
 
-  @property({ attribute: false })
-  accessor layout: 'horizontal' | 'vertical' = 'horizontal';
-
-  @property({ attribute: false })
-  accessor edgeless: EdgelessRootBlockComponent;
+  setEdgelessTool = (edgelessTool: EdgelessTool) => {
+    this.edgeless.tools.setEdgelessTool(edgelessTool);
+  };
 
   constructor(edgeless: EdgelessRootBlockComponent) {
     super();
@@ -125,10 +98,6 @@ export class EdgelessURToolbar extends WithDisposable(LitElement) {
   private _isVerticalBar() {
     return this.layout === 'vertical';
   }
-
-  setEdgelessTool = (edgelessTool: EdgelessTool) => {
-    this.edgeless.tools.setEdgelessTool(edgelessTool);
-  };
 
   override firstUpdated() {
     const { disposables } = this;
@@ -191,6 +160,38 @@ export class EdgelessURToolbar extends WithDisposable(LitElement) {
       </div>
     `;
   }
+
+  get edgelessService() {
+    return this.edgeless.service;
+  }
+
+  get edgelessTool() {
+    return this.edgeless.edgelessTool;
+  }
+
+  get locked() {
+    return this.edgelessService.locked;
+  }
+
+  get viewport() {
+    return this.edgelessService.viewport;
+  }
+
+  get zoom() {
+    return this.viewport.zoom;
+  }
+
+  @state()
+  private accessor _canRedo = false;
+
+  @state()
+  private accessor _canUndo = false;
+
+  @property({ attribute: false })
+  accessor edgeless: EdgelessRootBlockComponent;
+
+  @property({ attribute: false })
+  accessor layout: 'horizontal' | 'vertical' = 'horizontal';
 }
 
 declare global {

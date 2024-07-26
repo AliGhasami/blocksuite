@@ -1,5 +1,5 @@
 //import type { DeltaInsert } from '@blocksuite/inline';
-import { defineBlockSchema, type SchemaToModel, Text } from '@blocksuite/store';
+import { type SchemaToModel, Text, defineBlockSchema } from '@blocksuite/store';
 //import type * as Y from 'yjs';
 export type HintType = 'default' | 'warning' | 'info' | 'success' | 'error';
 export type HintBlockProps = {

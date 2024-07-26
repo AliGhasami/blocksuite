@@ -1,8 +1,9 @@
-import { css, html, LitElement } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
-import { HandIcon } from '../../../../../_common/icons/index.js';
 import type { EdgelessTool } from '../../../types.js';
+
+import { HandIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
 
@@ -30,9 +31,6 @@ export class EdgelessPanToolButton extends QuickToolMixin(LitElement) {
   `;
 
   override type: EdgelessTool['type'][] = ['pan'];
-
-  @query('.current-icon')
-  accessor currentIcon!: HTMLInputElement;
 
   private _changeTool() {
     this.setEdgelessTool({ type: 'pan', panning: false });
@@ -68,6 +66,9 @@ export class EdgelessPanToolButton extends QuickToolMixin(LitElement) {
       </edgeless-tool-icon-button>
     `;
   }
+
+  @query('.current-icon')
+  accessor currentIcon!: HTMLInputElement;
 }
 
 declare global {

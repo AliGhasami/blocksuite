@@ -1,12 +1,12 @@
 /// <reference types="vite/client" />
-import '../_common/components/block-selection.js';
-
 import { BlockElement } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
+
+import '../_common/components/block-selection.js';
 //import { assertExists } from '@blocksuite/global/utils';
 ///import { limitShift, offset, shift } from '@floating-ui/dom';
 //import type { HTMLElement } from 'happy-dom';
-import { css, html, nothing, type TemplateResult } from 'lit';
+import { type TemplateResult, css, html, nothing } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import tippy from 'tippy.js';
@@ -15,8 +15,9 @@ import type { RichText } from '../_common/components/index.js';
 //import { createKeydownObserver } from '../_common/components/utils.js';
 //import { PAGE_HEADER_HEIGHT } from '../_common/consts.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
-import { EdgelessRootBlockComponent } from '../root-block/index.js';
 import type { HintBlockModel, HintType } from './hint-model.js';
+
+import { EdgelessRootBlockComponent } from '../root-block/index.js';
 import DefaultIcon from './icons/default.svg?raw';
 import ErrorIcon from './icons/error.svg?raw';
 import InfoIcon from './icons/info.svg?raw';
@@ -57,63 +58,6 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
 
   //private _inlineRangeProvider: InlineRangeProvider | null = null;
 
-  @query('rich-text')
-  accessor _richTextElement: RichText | null = null;
-
-  //popover?: HTMLElement | null;
-  //popover?: HTMLElement | null;
-  @query('.popover')
-  accessor optionPopover: HTMLElement | null = null;
-
-  @query('.title-text')
-  private accessor _richTextTitle: RichText | null = null;
-
-  @query('.description-text')
-  private accessor _richTextDescription: RichText | null = null;
-
-  //@query('.affine-paragraph-placeholder')
-  //private _placeholderContainer?: HTMLElement;
-
-  override get topContenteditableElement() {
-    if (this.rootElement instanceof EdgelessRootBlockComponent) {
-      const note = this.closest<NoteBlockComponent>('affine-note');
-      return note;
-    }
-    return this.rootElement;
-  }
-
-  getIcon(type: HintType) {
-    switch (type) {
-      case 'success':
-        return SuccessIcon;
-      case 'warning':
-        return WarningIcon;
-      case 'info':
-        return InfoIcon;
-      case 'error':
-        return ErrorIcon;
-      default:
-        return DefaultIcon;
-    }
-  }
-
-  get inlineEditor() {
-    //return null
-    return this._richTextElement?.inlineEditor;
-  }
-
-  override async getUpdateComplete() {
-    const result = await super.getUpdateComplete();
-    await this._richTextElement?.updateComplete;
-    return result;
-  }
-
-  handleChangeType(event: CustomEvent) {
-    //console.log('11111', event);
-    this.model.type = event.detail[0];
-    //console.log('this is type', type, test);
-  }
-
   override connectedCallback() {
     super.connectedCallback();
     //bindContainerHotkey(this);
@@ -149,6 +93,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
     //this._inlineRangeProvider = getInlineRangeProvider(this);
   }
 
+  //popover?: HTMLElement | null;
   override firstUpdated() {
     this.updateComplete
       .then(() => {
@@ -239,6 +184,36 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       .catch(console.error);
   }
 
+  getIcon(type: HintType) {
+    switch (type) {
+      case 'success':
+        return SuccessIcon;
+      case 'warning':
+        return WarningIcon;
+      case 'info':
+        return InfoIcon;
+      case 'error':
+        return ErrorIcon;
+      default:
+        return DefaultIcon;
+    }
+  }
+
+  override async getUpdateComplete() {
+    const result = await super.getUpdateComplete();
+    await this._richTextElement?.updateComplete;
+    return result;
+  }
+
+  //@query('.affine-paragraph-placeholder')
+  //private _placeholderContainer?: HTMLElement;
+
+  handleChangeType(event: CustomEvent) {
+    //console.log('11111', event);
+    this.model.type = event.detail[0];
+    //console.log('this is type', type, test);
+  }
+
   override renderBlock(): TemplateResult<1> {
     return html`
       <div class="popover">
@@ -271,6 +246,32 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
       </div>
     `;
   }
+
+  get inlineEditor() {
+    //return null
+    return this._richTextElement?.inlineEditor;
+  }
+
+  override get topContenteditableElement() {
+    if (this.rootElement instanceof EdgelessRootBlockComponent) {
+      const note = this.closest<NoteBlockComponent>('affine-note');
+      return note;
+    }
+    return this.rootElement;
+  }
+
+  @query('.description-text')
+  private accessor _richTextDescription: RichText | null = null;
+
+  @query('rich-text')
+  accessor _richTextElement: RichText | null = null;
+
+  @query('.title-text')
+  private accessor _richTextTitle: RichText | null = null;
+
+  //popover?: HTMLElement | null;
+  @query('.popover')
+  accessor optionPopover: HTMLElement | null = null;
 }
 declare global {
   interface HTMLElementTagNameMap {

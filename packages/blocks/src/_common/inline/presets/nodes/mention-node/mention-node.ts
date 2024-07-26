@@ -1,6 +1,7 @@
 import type { BlockElement } from '@blocksuite/block-std';
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import type { Slot } from '@blocksuite/global/utils';
+
+import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 import {
   type DeltaInsert,
@@ -12,12 +13,13 @@ import {
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-//import { ref } from 'lit/directives/ref.js';
-import { BLOCK_ID_ATTR } from '../../../../consts.js';
 //import { FontDocIcon, FontLinkedDocIcon } from '../../../../icons/text.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
-import { REFERENCE_NODE } from '../consts.js';
 import type { ReferenceNodeConfig } from './mention-config.js';
+
+//import { ref } from 'lit/directives/ref.js';
+import { BLOCK_ID_ATTR } from '../../../../consts.js';
+import { REFERENCE_NODE } from '../consts.js';
 
 export type RefNodeSlots = {
   docLinkClicked: Slot<{ docId: string; blockId?: string }>;
@@ -56,75 +58,6 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
     }
   `;
 
-  @property({ type: Object })
-  accessor delta: DeltaInsert<AffineTextAttributes> = {
-    insert: ZERO_WIDTH_SPACE,
-    attributes: {},
-  };
-
-  @property({ type: Boolean })
-  accessor selected = false;
-
-  @property({ attribute: false })
-  accessor config!: ReferenceNodeConfig;
-
-  // Since the linked doc may be deleted, the `_refMeta` could be undefined.
-  //@state()
-  //private _refMeta?: DocMeta;
-
-  /*private _refAttribute: NonNullable<AffineTextAttributes['mention']> = {
-    name: '',
-    id: '0',
-    //type: 'LinkedPage',
-    //pageId: '0',
-  };*/
-
-  get inlineEditor() {
-    const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
-      `[${INLINE_ROOT_ATTR}]`
-    );
-    assertExists(inlineRoot);
-    return inlineRoot.inlineEditor;
-  }
-
-  get selfInlineRange() {
-    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
-    assertExists(selfInlineRange);
-    return selfInlineRange;
-  }
-
-  get blockElement() {
-    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
-      `[${BLOCK_ID_ATTR}]`
-    );
-    assertExists(blockElement);
-    return blockElement;
-  }
-
-  get std() {
-    const std = this.blockElement.std;
-    assertExists(std);
-    return std;
-  }
-
-  get doc() {
-    const doc = this.config.doc;
-    assertExists(doc, '`reference-node` need `Doc`.');
-    return doc;
-  }
-
-  /*get customIcon() {
-    return this.config.customIcon;
-  }*/
-
-  /*get customTitle() {
-    return this.config.customTitle;
-  }*/
-
-  /*get customContent() {
-    return this.config.customContent;
-  }*/
-
   override connectedCallback() {
     //debugger;
     super.connectedCallback();
@@ -152,12 +85,137 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
       .catch(console.error);*/
   }
 
+  override render() {
+    //const refMeta = this._refMeta;
+    //const isDeleted = !refMeta;
+
+    const attributes = this.delta.attributes;
+    assertExists(attributes, 'Failed to get attributes!');
+    const name = attributes.mention?.name;
+    assertExists(name, 'Unable to get mention name!');
+    //const type = attributes.mention?.type;
+
+    /* const title = this.customTitle
+      ? this.customTitle(this)
+      : isDeleted
+        ? 'Deleted doc'
+        : refMeta.title.length > 0
+          ? refMeta.title
+          : DEFAULT_DOC_NAME;*/
+    /*const icon = this.customIcon
+      ? this.customIcon(this)
+      : type === 'LinkedPage'
+        ? FontLinkedDocIcon
+        : FontDocIcon;*/
+
+    /*const style = affineTextStyles(
+      attributes,
+      isDeleted
+        ? {
+            color: 'var(--affine-text-disable-color)',
+            textDecoration: 'line-through',
+            fill: 'var(--affine-text-disable-color)',
+          }
+        : {}
+    );*/
+
+    /* const content = this.customContent
+      ? this.customContent(this)
+      : html`<span data-title=${title} class="affine-reference-title"
+          >${title}</span
+        >`;*/
+
+    // we need to add `<v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>` in an
+    // embed element to make sure inline range calculation is correct
+    return html`
+      <span class="affine-mention" data-selected=${this.selected}>
+        <span>@</span>
+        ${name}
+        <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>
+      </span>
+    `;
+    /*return html`<span
+      ${this.config.interactable ? ref(this._whenHover.setReference) : ''}
+      data-selected=${this.selected}
+      class="affine-mention"
+      style=${style}
+      @click=${this._onClick}
+      >${content}<v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
+    ></span>`;*/
+  }
+
   override willUpdate(_changedProperties: Map<PropertyKey, unknown>) {
     super.willUpdate(_changedProperties);
 
     //const doc = this.doc;
     //this._updateRefMeta(doc);
   }
+
+  // Since the linked doc may be deleted, the `_refMeta` could be undefined.
+  //@state()
+  //private _refMeta?: DocMeta;
+
+  /*private _refAttribute: NonNullable<AffineTextAttributes['mention']> = {
+    name: '',
+    id: '0',
+    //type: 'LinkedPage',
+    //pageId: '0',
+  };*/
+
+  get blockElement() {
+    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
+      `[${BLOCK_ID_ATTR}]`
+    );
+    assertExists(blockElement);
+    return blockElement;
+  }
+
+  get doc() {
+    const doc = this.config.doc;
+    assertExists(doc, '`reference-node` need `Doc`.');
+    return doc;
+  }
+
+  get inlineEditor() {
+    const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
+      `[${INLINE_ROOT_ATTR}]`
+    );
+    assertExists(inlineRoot);
+    return inlineRoot.inlineEditor;
+  }
+
+  get selfInlineRange() {
+    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
+    assertExists(selfInlineRange);
+    return selfInlineRange;
+  }
+
+  get std() {
+    const std = this.blockElement.std;
+    assertExists(std);
+    return std;
+  }
+
+  /*get customIcon() {
+    return this.config.customIcon;
+  }*/
+
+  /*get customTitle() {
+    return this.config.customTitle;
+  }*/
+
+  /*get customContent() {
+    return this.config.customContent;
+  }*/
+
+  @property({ attribute: false })
+  accessor config!: ReferenceNodeConfig;
+
+  @property({ type: Object })
+  accessor delta: DeltaInsert<AffineTextAttributes> = {
+    insert: ZERO_WIDTH_SPACE,
+    attributes: {},
+  };
 
   /*private _updateRefMeta = (doc: Doc) => {
     const refAttribute = this.delta.attributes?.mention;
@@ -224,64 +282,8 @@ export class AffineMention extends WithDisposable(ShadowlessElement) {
     };
   });*/
 
-  override render() {
-    //const refMeta = this._refMeta;
-    //const isDeleted = !refMeta;
-
-    const attributes = this.delta.attributes;
-    assertExists(attributes, 'Failed to get attributes!');
-    const name = attributes.mention?.name;
-    assertExists(name, 'Unable to get mention name!');
-    //const type = attributes.mention?.type;
-
-    /* const title = this.customTitle
-      ? this.customTitle(this)
-      : isDeleted
-        ? 'Deleted doc'
-        : refMeta.title.length > 0
-          ? refMeta.title
-          : DEFAULT_DOC_NAME;*/
-    /*const icon = this.customIcon
-      ? this.customIcon(this)
-      : type === 'LinkedPage'
-        ? FontLinkedDocIcon
-        : FontDocIcon;*/
-
-    /*const style = affineTextStyles(
-      attributes,
-      isDeleted
-        ? {
-            color: 'var(--affine-text-disable-color)',
-            textDecoration: 'line-through',
-            fill: 'var(--affine-text-disable-color)',
-          }
-        : {}
-    );*/
-
-    /* const content = this.customContent
-      ? this.customContent(this)
-      : html`<span data-title=${title} class="affine-reference-title"
-          >${title}</span
-        >`;*/
-
-    // we need to add `<v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>` in an
-    // embed element to make sure inline range calculation is correct
-    return html`
-      <span class="affine-mention" data-selected=${this.selected}>
-        <span>@</span>
-        ${name}
-        <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>
-      </span>
-    `;
-    /*return html`<span
-      ${this.config.interactable ? ref(this._whenHover.setReference) : ''}
-      data-selected=${this.selected}
-      class="affine-mention"
-      style=${style}
-      @click=${this._onClick}
-      >${content}<v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
-    ></span>`;*/
-  }
+  @property({ type: Boolean })
+  accessor selected = false;
 }
 
 declare global {

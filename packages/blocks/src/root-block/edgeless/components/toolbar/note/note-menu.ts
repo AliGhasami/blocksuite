@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import type { NoteTool } from '../../../controllers/tools/note-tool.js';
 import type { EdgelessTool } from '../../../types.js';
 
-import { AttachmentIcon, LinkIcon } from '../../../../../_common/icons/text.js';
+import { AttachmentIcon } from '../../../../../_common/icons/text.js';
 import {
   type NoteChildrenFlavour,
   getImageFilesFromLocal,
@@ -13,7 +13,6 @@ import {
 } from '../../../../../_common/utils/index.js';
 import { ImageIcon } from '../../../../../image-block/styles.js';
 import '../../buttons/tool-icon-button.js';
-import { getTooltipWithShortcut } from '../../utils.js';
 import '../common/slide-menu.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { NOTE_MENU_ITEMS } from './note-menu-config.js';
@@ -121,8 +120,8 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
 
     return html`
       <edgeless-slide-menu>
-        <div class="menu-content">
-          <!-- add to edgeless -->
+        <!-- add to edgeless -->
+        <!-- <div class="menu-content">
           <div class="button-group-container">
             <edgeless-tool-icon-button
               .activeMode=${'background'}
@@ -131,7 +130,7 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               .disabled=${this._imageLoading}
             >
               ${ImageIcon}
-            </edgeless-tool-icon-button>
+            </edgeless-tool-icon-button> 
 
             <edgeless-tool-icon-button
               .activeMode=${'background'}
@@ -154,10 +153,10 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               }}
             >
               ${AttachmentIcon}
-            </edgeless-tool-icon-button>
-          </div>
+            </edgeless-tool-icon-button> 
+          </div> -->
 
-          <div class="divider"></div>
+          <!--<div class="divider"></div> -->
 
           <!-- add to note -->
           <div class="button-group-container">

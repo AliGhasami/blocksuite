@@ -1,14 +1,17 @@
 import type { EditorHost, UIEventStateContext } from '@blocksuite/block-std';
-import { WidgetElement } from '@blocksuite/block-std';
+
+import { WidgetComponent } from '@blocksuite/block-std';
 import {
-  assertExists,
   DisposableGroup,
+  assertExists,
   throttle,
 } from '@blocksuite/global/utils';
 import { InlineEditor } from '@blocksuite/inline';
 import { customElement } from 'lit/decorators.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+import type { UserMention } from './types.js';
+
 import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 import { matchFlavours } from '../../../_common/utils/index.js';
 import {
@@ -18,7 +21,6 @@ import {
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
 import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { MentionPopover } from './mention-popover.js';
-import type { UserMention } from './types.js';
 
 export type MentionOptions = {
   triggerKeys: string[];
@@ -107,74 +109,7 @@ export function showMentionPopover({
 export const AFFINE_MENTION_WIDGET = 'affine-mention-widget';
 
 @customElement(AFFINE_MENTION_WIDGET)
-export class AffineMentionWidget extends WidgetElement {
-  static DEFAULT_OPTIONS: MentionOptions = {
-    /**
-     * The first item of the trigger keys will be the primary key
-     */
-    triggerKeys: [
-      //comment for support mention
-      '@',
-    ],
-    ignoreBlockTypes: ['affine:code'],
-    /**
-     * Convert trigger key to primary key (the first item of the trigger keys)
-     */
-    convertTriggerKey: true,
-    //getMenus,
-  };
-
-  options = AffineMentionWidget.DEFAULT_OPTIONS;
-
-  override connectedCallback() {
-    super.connectedCallback();
-    //console.log('this is block', this.blockElement.model);
-    this.handleEvent('keyDown', this._onKeyDown);
-  }
-
-  public showMention = (
-    inlineEditor: AffineInlineEditor,
-    triggerKey: string
-  ) => {
-    const curRange = getCurrentNativeRange();
-    if (!curRange) return;
-    showMentionPopover({
-      editorHost: this.host,
-      inlineEditor,
-      range: curRange,
-      options: this.options,
-      triggerKey,
-      //TODO ali ghasami - important
-      //@ts-ignore
-      userList: this.blockElement.model.mentionUserList,
-    });
-  };
-
-  private getInlineEditor = (evt: KeyboardEvent) => {
-    if (evt.target instanceof HTMLElement) {
-      const editor = (
-        evt.target.closest('.inline-editor') as {
-          inlineEditor?: AffineInlineEditor;
-        }
-      )?.inlineEditor;
-      if (editor instanceof InlineEditor) {
-        return editor;
-      }
-    }
-    const text = this.host.selection.value.find(selection =>
-      selection.is('text')
-    );
-    if (!text) {
-      return;
-    }
-    const model = this.host.doc.getBlockById(text.blockId);
-    if (!model) {
-      return;
-    }
-    if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
-    return getInlineEditorByModel(this.host, model);
-  };
-
+export class AffineMentionWidget extends WidgetComponent {
   private _onKeyDown = (ctx: UIEventStateContext) => {
     const eventState = ctx.get('keyboardState');
     const event = eventState.raw;
@@ -230,6 +165,70 @@ export class AffineMentionWidget extends WidgetElement {
       this.showMention(inlineEditor, matchedKey);
     });
   };
+
+  private getInlineEditor = (evt: KeyboardEvent) => {
+    if (evt.target instanceof HTMLElement) {
+      const editor = (
+        evt.target.closest('.inline-editor') as {
+          inlineEditor?: AffineInlineEditor;
+        }
+      )?.inlineEditor;
+      if (editor instanceof InlineEditor) {
+        return editor;
+      }
+    }
+    const text = this.host.selection.value.find(selection =>
+      selection.is('text')
+    );
+    if (!text) {
+      return;
+    }
+    const model = this.host.doc.getBlockById(text.blockId);
+    if (!model) {
+      return;
+    }
+    if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
+    return getInlineEditorByModel(this.host, model);
+  };
+
+  static DEFAULT_OPTIONS: MentionOptions = {
+    /**
+     * The first item of the trigger keys will be the primary key
+     */
+    triggerKeys: [
+      //comment for support mention
+      '@',
+    ],
+    ignoreBlockTypes: ['affine:code'],
+    /**
+     * Convert trigger key to primary key (the first item of the trigger keys)
+     */
+    convertTriggerKey: true,
+    //getMenus,
+  };
+
+  options = AffineMentionWidget.DEFAULT_OPTIONS;
+
+  showMention = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
+    const curRange = getCurrentNativeRange();
+    if (!curRange) return;
+    showMentionPopover({
+      editorHost: this.host,
+      inlineEditor,
+      range: curRange,
+      options: this.options,
+      triggerKey,
+      //TODO ali ghasami - important
+      //@ts-ignore
+      userList: this.blockElement.model.mentionUserList,
+    });
+  };
+
+  override connectedCallback() {
+    super.connectedCallback();
+    //console.log('this is block', this.blockElement.model);
+    this.handleEvent('keyDown', this._onKeyDown);
+  }
 }
 
 declare global {
