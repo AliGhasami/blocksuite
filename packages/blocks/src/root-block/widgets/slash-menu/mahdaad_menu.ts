@@ -2,10 +2,10 @@ import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, uuidv4 } from '@blocksuite/store';
 import { Text } from '@blocksuite/store';
 import dayjs from 'dayjs';
-import { nanoid } from 'nanoid';
 
+//import { nanoid } from 'nanoid';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
-import { defaultDateFormat } from '../../../_common/inline/presets/nodes/date-time-node/config.js';
+//import { defaultDateFormat } from '../../../_common/inline/presets/nodes/date-time-node/config.js';
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
   getImageFilesFromLocal,
@@ -235,18 +235,21 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootElement, model }) => {
-          const triggerKey = dayjs().format('YYYY-MM-DD'); //defaultDateFormat
+          const triggerKey = dayjs().format('YYYY-MM-DD');
           //const inlineEditor = getInlineEditorByModel(rootElement.host, model);
           //assertExists(inlineEditor);
           //const inlineRange = inlineEditor.getInlineRange();
           //const index = inlineRange ? inlineRange.index : 0;
+          const temp = {
+            date: triggerKey,
+            time: null,
+            id: uuidv4(),
+          };
           insertContent(rootElement.host, model, REFERENCE_NODE, {
-            date: {
-              date: triggerKey,
-              time: null,
-              id: uuidv4(),
-            },
+            date: temp,
           });
+          model.doc.slots.dateTimeEvent.emit({ type: 'add', meta: temp });
+          //model.doc.slots.inlineUpdate.emit({type:});
           //inlineEditor.deleteText({ index: 1, length: 30 });
           //console.log('this is index', index);
           //model.text.insert(text, index, attributes as Record<string, unknown>);
@@ -258,10 +261,12 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           //old method
           /*const date = new Date();
           insertContent(rootElement.host, model, formatDate(date));*/
-
           //const date = '1111';
           //insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
+
+          //model.doc.slots.yBlockUpdated.emit({ id: '55555', type: '111' });
+
           //@ts-ignore
           const widgetEle =
             rootElement.widgetElements['affine-date-time-widget'];

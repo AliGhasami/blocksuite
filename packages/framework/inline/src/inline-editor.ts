@@ -162,6 +162,7 @@ export class InlineEditor<
      * Triggered only when the `inlineRange` is not null.
      */
     keydown: new Slot<KeyboardEvent>(),
+    inlineRangeDelete: new Slot<TextAttributes>(),
   };
 
   setAttributeSchema = this._attributeService.setAttributeSchema;

@@ -1,18 +1,18 @@
-import type { EditorHost, UIEventStateContext } from '@blocksuite/block-std';
+import type { EditorHost } from '@blocksuite/block-std';
 import { WidgetElement } from '@blocksuite/block-std';
 import {
   assertExists,
   DisposableGroup,
   throttle,
 } from '@blocksuite/global/utils';
-import { InlineEditor } from '@blocksuite/inline';
+//import { InlineEditor } from '@blocksuite/inline';
 import { customElement } from 'lit/decorators.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
-import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
-import { matchFlavours } from '../../../_common/utils/index.js';
+//import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
+//import { matchFlavours } from '../../../_common/utils/index.js';
 import {
-  getInlineEditorByModel,
+  //getInlineEditorByModel,
   getViewportElement,
 } from '../../../_common/utils/query.js';
 import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
@@ -162,7 +162,7 @@ export class AffineDateTimeWidget extends WidgetElement {
   showDateTime = (inlineEditor: AffineInlineEditor, triggerKey: string) => {
     const curRange = getCurrentNativeRange();
     if (!curRange) return;
-    console.log('this is cu range', curRange);
+    //console.log('this is cu range', curRange);
     showDateTimePopover({
       editorHost: this.host,
       inlineEditor,

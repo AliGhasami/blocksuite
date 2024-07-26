@@ -11,6 +11,7 @@ import {
   //ZERO_WIDTH_NON_JOINER,
   //ZERO_WIDTH_SPACE,
 } from '@blocksuite/inline';
+import dayjs from 'dayjs';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
@@ -19,6 +20,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { HoverController } from '../../../../components/hover/index.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
+import { defaultDateFormat, defaultTimeFormat } from './config.js';
 //import { affineTextStyles } from '../affine-text.js';
 import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
 
@@ -127,9 +129,90 @@ export class AffineDateTime extends ShadowlessElement {
     if (!dateTime) {
       return '';
     }
-    //console.log('111', dateTime);
-    return dateTime;
+    let tempStr = dayjs(this.delta.attributes?.date?.date).format(
+      defaultDateFormat
+    );
+    const time = this.delta.attributes?.date?.time;
+    if (time) {
+      tempStr +=
+        ' ' +
+        dayjs(`${this.delta.attributes?.date?.date} ${time}`).format(
+          defaultTimeFormat
+        );
+    }
+    return tempStr;
   }
+
+  override connectedCallback() {
+    super.connectedCallback();
+    // console.log('this is connected');
+    //console.log("this",this.delta.);
+
+    // this.inlineEditor.slots.mounted.on(() => {
+    //   console.log('this is mont');
+    // });
+    //
+    // this.inlineEditor.slots.inlineRangeApply.on(() => {
+    //   console.log('this is inlineRangeApply');
+    // });
+    //
+    // this.inlineEditor.slots.render.on(() => {
+    //   console.log('this is render');
+    // });
+    //
+    // this.inlineEditor.slots.textChange.on(() => {
+    //   console.log('this is textChange');
+    // });
+    // this.inlineEditor.slots.inputting.on(() => {
+    //   console.log('this is inputting');
+    // });
+    //
+    // this.inlineEditor.slots.inlineRangeUpdate.on(() => {
+    //   console.log('this is inlineRangeUpdate');
+    // });
+    //
+    // this.inlineEditor.slots.keydown.on(event => {
+    //   console.log('this is keydown', event);
+    // });
+    //
+    // this.inlineEditor.slots.renderComplete.on(() => {
+    //   console.log('this is renderComplete');
+    // });
+    //
+    // this.inlineEditor.slots.unmounted.on(() => {
+    //   console.log('this is unmounted');
+    // });
+
+    // this.inlineEditor.slots.textChange.on(() => this._updateRefMeta(doc))
+
+    /*this.std.doc.slots.rootDeleted.on(() => {
+      console.log('rootDeleted');
+    });*/
+    //this.pare
+    /*this.inlineEditor.slots. inlineRangeApply.on(data => {
+      console.log('66666', data);
+    });*/
+    /*this.inlineEditor.unmount(() => {
+      console.log('1111', this.inlineEditor);
+    });*/
+    //this.std
+    /* this.inlineEditor.slots.inputting.on(([data]) => {
+      console.log('this is inputting', data);
+    });
+
+    this.inlineEditor.slots.inlineRangeApply.on(data => {
+      console.log('this is inlineRangeApply', data);
+    });
+
+    this.inlineEditor.slots.textChange.on(data => {
+      console.log('this is textChange', data);
+    });*/
+  }
+
+  /*  override disconnectedCallback() {
+    super.disconnectedCallback();
+    console.log('this is disconnected');
+  }*/
 
   override render() {
     /*const style = this.delta.attributes

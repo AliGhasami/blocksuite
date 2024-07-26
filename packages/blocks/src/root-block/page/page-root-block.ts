@@ -245,6 +245,10 @@ export class PageRootBlockComponent extends BlockElement<
 
     this.keyboardManager = new PageKeyboardManager(this);
 
+    //dispatchEvent()
+    //this.doc.slots.blockUpdated.
+    //this.disposables.add(this.in);
+
     this.bindHotKey({
       'Mod-a': () => {
         const blocks = this.model.children

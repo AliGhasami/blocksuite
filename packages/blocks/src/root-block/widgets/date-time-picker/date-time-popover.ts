@@ -423,6 +423,9 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
     </div>`;
   }
 
+  /*@property({ attribute: false })
+  accessor host!: EditorHost;*/
+
   override render() {
     //const MAX_HEIGHT = 200;
     const style = this._position
@@ -437,6 +440,9 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
     //const accIdx = 0;
     //mention-popover popover-menu-container blocksuite-overlay
     //${Prefix}-popover
+    //console.log('555', this.);
+    //console.log('5555', this.editorHost, this.doc, this.slots, ...this);
+
     return html`<div>
       <!--<div
         class="${Prefix}-overlay-mask"
@@ -458,20 +464,40 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
               //console.log('8888', inlineRange);
               //assertExists(inlineRange);
               if (!this.index) return;
-              this.inlineEditor.deleteText({
+              const inlineRange = { index: this.index - 1, length: 1 };
+              const temp = {
+                date: event.detail[0],
+                time: event.detail[1], //'11:00:00'
+                //id: uuidv4(),
+              };
+
+              const format = this.inlineEditor.getFormat(inlineRange);
+              if (format && format.date && format.date.id) {
+                Object.assign(temp, { id: format.date.id });
+              }
+              //console.log('this is tt', format);
+              //this.inlineEditor.attributeService.setAttributeSchema()
+              //this.inlineEditor.
+              /*console.log(
+                '100000',
+                this.inlineEditor.getDeltasByInlineRange({
+                  index: this.index - 1,
+                  length: 1,
+                })
+              );*/
+              this.inlineEditor.formatText(inlineRange, { date: temp });
+              this.editorHost.doc.slots.dateTimeEvent.emit({
+                type: 'update',
+                meta: temp,
+              });
+
+              /*this.inlineEditor.deleteText({
                 index: this.index - 1,
                 //index: inlineRange.index - 1,
                 length: 1,
-              });
-              //return;
-              /*cleanSpecifiedTail(
-                this.editorHost,
-                this.inlineEditor,
-                this.triggerKey
-              );*/
-              //return;
+              });*/
 
-              this.inlineEditor.insertText(
+              /* this.inlineEditor.insertText(
                 {
                   index: this.index - 1,
                   //index: inlineRange.index - 1,
@@ -479,16 +505,11 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
                 },
                 REFERENCE_NODE,
                 {
-                  date: {
-                    date: event.detail[0],
-                    time: event.detail[1], //'11:00:00'
-                    id: uuidv4(),
-                  },
-                  //mention: { ...user, user_id: user.id, id: uuidv4() },
-                  //mention: { name: user., id: '1' },
-                  //mention: { type: 'LinkedPage', pageId: '11' },
+                  date: temp,
+
                 }
-              );
+              );*/
+
               /* this.inlineEditor.setInlineRange({
                 index: this.index + 1,
                 length: 0,

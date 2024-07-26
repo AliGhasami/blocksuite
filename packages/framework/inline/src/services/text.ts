@@ -13,9 +13,21 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   constructor(readonly editor: InlineEditor<TextAttributes>) {}
 
   deleteText = (inlineRange: InlineRange): void => {
+    /* this.editor.slots.textChange;
+    console.log(
+      'this is delete text',
+      inlineRange,
+      this.editor.getFormat(inlineRange, true)
+    );*/
+    //console.log('this is delete');
+    /** Add event for delete inline range */
+    /*this.editor.slots.inlineRangeDelete.emit(
+      this.editor.getFormat(inlineRange, true)
+    );*/
     this.transact(() => {
       this.yText.delete(inlineRange.index, inlineRange.length);
     });
+    //.deltaService.getDeltasByInlineRange(inlineRange)
   };
 
   insertText = (

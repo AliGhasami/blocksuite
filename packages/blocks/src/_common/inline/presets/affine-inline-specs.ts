@@ -10,6 +10,12 @@ import type { ReferenceNodeConfig } from './nodes/reference-node/reference-confi
 export type AffineInlineEditor = InlineEditor<AffineTextAttributes>;
 export type AffineInlineRootElement = InlineRootElement<AffineTextAttributes>;
 
+export interface DateTimeEvent {
+  id?: string;
+  time: string | null;
+  date: string;
+}
+
 export interface AffineTextAttributes {
   bold?: true | null;
   italic?: true | null;
@@ -17,11 +23,7 @@ export interface AffineTextAttributes {
   strike?: true | null;
   code?: true | null;
   link?: string | null;
-  date?: {
-    id: string;
-    time: string | null;
-    date: string;
-  };
+  date?: DateTimeEvent;
   reference?: {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
@@ -156,7 +158,7 @@ export function getAffineInlineSpecsWithReference(
         .object({
           time: z.string().nullable(),
           date: z.string(),
-          id: z.string(),
+          id: z.string().optional(),
         })
         .optional()
         .nullable()
@@ -166,10 +168,6 @@ export function getAffineInlineSpecsWithReference(
         return !!delta.attributes?.date;
       },
       renderer: delta => {
-        //return html`this is date`;
-        //console.log('11111');
-        //return '11111';
-        //console.log('11111', delta);
         return html`<affine-date-time .delta=${delta}></affine-date-time>`;
       },
     },

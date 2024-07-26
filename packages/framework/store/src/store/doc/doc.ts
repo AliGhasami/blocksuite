@@ -196,11 +196,20 @@ export class Doc {
           props: { key: string };
         }
     >;
+    dateTimeEvent: Slot<{
+      type: 'update' | 'add' | 'delete';
+      meta: {
+        id?: string;
+        date: string;
+        time: string | null;
+      };
+    }>;
   } = {
     ready: new Slot(),
     rootAdded: new Slot(),
     rootDeleted: new Slot(),
     blockUpdated: new Slot(),
+    dateTimeEvent: new Slot(),
   };
 
   constructor({
