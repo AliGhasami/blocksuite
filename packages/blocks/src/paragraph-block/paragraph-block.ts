@@ -50,22 +50,22 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     this._inlineRangeProvider = getInlineRangeProvider(this);
 
     this._displayPlaceholder = computed(() => {
-      //const textSelection = this.host.selection.find('text');
-      //const isCollapsed = textSelection?.isCollapsed() ?? false;
-      const isEmpty = false;
+      const textSelection = this.host.selection.find('text');
+      const isCollapsed = textSelection?.isCollapsed() ?? false;
+      //const isEmpty = false;
       //todo ali ghasami for fix bug
-      /*const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
-      const paragraphList = note.length ? note[0].yChildren : [];
+      const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
+      const paragraphList = note.length ? note[0].model.children : [];
       if (paragraphList.length == 1) {
-        isEmpty = true;
-      }*/
+        //isEmpty = true;
+      }
 
       if (
         this.doc.readonly ||
         (this.inlineEditor?.yTextLength ?? 0) > 0 ||
         this.inlineEditor?.isComposing ||
-        (!this.selected && !isEmpty) || //!this.selected
-        //!isCollapsed ||
+        !this.selected || //!this.selected //&& !isEmpty
+        !isCollapsed ||
         this._isInDatabase()
       ) {
         return false;

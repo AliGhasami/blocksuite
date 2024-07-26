@@ -1,4 +1,3 @@
-import { cssVar } from '@toeverything/theme';
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -11,7 +10,6 @@ import {
   ArrowUpIcon,
   ShapeTablerIcon,
 } from '../../../../../_common/icons/index.js';
-import { isTransparent } from '../../../../../_common/theme/css-variables.js';
 import {
   DEFAULT_SHAPE_FILL_COLOR,
   DEFAULT_SHAPE_STROKE_COLOR,
@@ -134,15 +132,18 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
   }
 
   override render() {
-    const { active, states } = this;
-    const { fillColor, strokeColor } = states;
+    const {
+      active,
+      //states
+    } = this;
+    //const { fillColor, strokeColor } = states;
 
-    const shapeColor = isTransparent(fillColor!)
+    /*const shapeColor = isTransparent(fillColor!)
       ? cssVar('white60')
-      : `var(${fillColor})`;
-    const shapeStroke = isTransparent(strokeColor!)
+      : `var(${fillColor})`;*/
+    /*const shapeStroke = isTransparent(strokeColor!)
       ? cssVar('black10')
-      : `var(${strokeColor})`;
+      : `var(${strokeColor})`;*/
     const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`

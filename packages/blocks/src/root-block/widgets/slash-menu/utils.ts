@@ -14,6 +14,7 @@ import type {
   SlashMenuStaticItem,
   SlashSubMenu,
 } from './config.js';
+import type { ClayTapSlashMenu } from './mahdaad_menu.js';
 
 import { isInsideBlockByFlavour } from '../../../_common/utils/index.js';
 import { getInlineEditorByModel } from '../../../_common/utils/query.js';
@@ -75,10 +76,12 @@ export function filterEnabledSlashMenuItems(
 }
 
 export function getFirstNotDividerItem(
-  items: SlashMenuStaticItem[]
-): SlashMenuActionItem | SlashSubMenu | null {
+  items: SlashMenuStaticItem[] | ClayTapSlashMenu[]
+): SlashMenuActionItem | SlashSubMenu | ClayTapSlashMenu | null {
   const firstItem = items.find(item => !isGroupDivider(item));
-  assertType<SlashMenuActionItem | SlashSubMenu | undefined>(firstItem);
+  assertType<ClayTapSlashMenu | SlashMenuActionItem | SlashSubMenu | undefined>(
+    firstItem
+  );
   return firstItem ?? null;
 }
 

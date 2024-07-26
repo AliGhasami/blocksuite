@@ -31,7 +31,6 @@ import {
   CenterPeekIcon,
   FrameIcon,
   GroupIcon,
-  LinkedDocIcon,
   MoreCopyIcon,
   MoreDeleteIcon,
   MoreDuplicateIcon,
@@ -129,17 +128,17 @@ const RELOAD_ACTION: Action = {
   type: 'reload',
 };
 
-const TURN_INTO_LINKED_DOC_ACTION: Action = {
+/*const TURN_INTO_LINKED_DOC_ACTION: Action = {
   icon: LinkedDocIcon,
   name: 'Turn into linked doc',
   type: 'turn-into-linked-doc',
-};
+};*/
 
-const CREATE_LINKED_DOC_ACTION: Action = {
+/*const CREATE_LINKED_DOC_ACTION: Action = {
   icon: LinkedDocIcon,
   name: 'Create linked doc',
   type: 'create-linked-doc',
-};
+};*/
 
 @customElement('edgeless-more-button')
 export class EdgelessMoreButton extends WithDisposable(LitElement) {
@@ -402,7 +401,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     );
   }
 
-  private getLinkedDocAction() {
+  /*private getLinkedDocAction() {
     const isSingleSelect = this.selection.selectedElements.length === 1;
     const { firstElement } = this.selection;
     if (
@@ -418,7 +417,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     }
 
     return CREATE_LINKED_DOC_ACTION;
-  }
+  }*/
 
   private getOpenActions(): Action[] {
     const isSingleSelect = this.selection.selectedElements.length === 1;

@@ -1,23 +1,17 @@
-import type { BlockModel } from '@blocksuite/store';
-
 import { assertExists } from '@blocksuite/global/utils';
 import { Text } from '@blocksuite/store';
 
 import type { RootBlockComponent } from '../../types.js';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
-import {
-  getImageFilesFromLocal,
-  getInlineEditorByModel,
-  openFileOrFiles,
-} from '../../../_common/utils/index.js';
+import { openFileOrFiles } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 import { viewPresets } from '../../../database-block/index.js';
-import { addSiblingImageBlock } from '../../../image-block/utils.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
-import type { AffineMentionWidget } from '../mention/index.js';
+//import link from './icons/link.svg?raw';
+import type { SlashMenuContext } from './config.js';
 
 /*import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
@@ -27,7 +21,6 @@ import bread_crumb from './icons/bread_crumb.svg?raw';*/
 import bulleted_list from './icons/bulleted_list.svg?raw';
 //import button_link from './icons/button_link.svg?raw';
 import check_list from './icons/check_list.svg?raw';
-import code from './icons/code.svg?raw';
 import date from './icons/date.svg?raw';
 import divider from './icons/divider.svg?raw';
 //import empty_title from './icons/empty_title.svg?raw';
@@ -36,17 +29,13 @@ import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
 import hint from './icons/hint.svg?raw';
-import image from './icons/image.svg?raw';
-//import link from './icons/link.svg?raw';
 //import link_to_page from './icons/link_to_page.svg?raw';
-import mention from './icons/mention.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
 //import table_of_content from './icons/table_of_content.svg?raw';
 import table_view from './icons/table_view.svg?raw';
 import text from './icons/text.svg?raw';
-import today from './icons/today.svg?raw';
 //import video from './icons/video.svg?raw';
 import { formatDate, insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
@@ -59,93 +48,87 @@ export interface ClayTapSlashMenu {
   group?: string;
   //key: string;
   description: string;
-  action: ({
-    rootElement,
-    model,
-  }: {
-    rootElement: RootBlockComponent;
-    model: BlockModel;
-  }) => void | Promise<void>;
+  action: (ctx: SlashMenuContext) => void | Promise<void>;
 }
 export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
-    groupName: 'Text Style',
+    groupName: 'Basic',
     children: [
       {
         title: 'Text',
         description: 'Normal Text',
         icon: text,
-        action: ({ rootElement }) => {
+        action: ({ rootComponent }) => {
           //console.log('this is root element', rootElement);
-          runCommand(rootElement, 'affine:paragraph', 'text');
+          runCommand(rootComponent, 'affine:paragraph', 'text');
         },
       },
       {
         title: 'Heading 1',
         description: 'A Large Heading.',
         icon: h1,
-        action: ({ rootElement }) => {
+        action: ({ rootComponent }) => {
           //console.log('this is root element', rootElement);
-          runCommand(rootElement, 'affine:paragraph', 'h1');
+          runCommand(rootComponent, 'affine:paragraph', 'h1');
         },
       },
       {
         title: 'Heading 2',
         description: 'A Medium Heading.',
         icon: h2,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:paragraph', 'h2');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:paragraph', 'h2');
         },
       },
       {
         title: 'Heading 3',
         description: 'A Small Heading',
         icon: h3,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:paragraph', 'h3');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:paragraph', 'h3');
         },
       },
       {
         title: 'Bulleted List',
         description: 'Normal text + Bullet',
         icon: bulleted_list,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:list', 'bulleted');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:list', 'bulleted');
         },
       },
       {
         title: 'Numbered List',
         description: 'Normal text + Number',
         icon: numbered_list,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:list', 'numbered');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:list', 'numbered');
         },
       },
       {
         title: 'Check List',
         description: 'Normal text + Checkbox',
         icon: check_list,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:list', 'todo');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:list', 'todo');
         },
       },
       {
         title: 'Quote',
         description: 'Description',
         icon: quote,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:paragraph', 'quote');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
       },
       {
         title: 'Hint',
         description: 'Description',
         icon: hint,
-        action: ({ rootElement, model }) => {
+        action: ({ rootComponent }) => {
           //console.log('rootElement', rootElement);
-          console.log('rootElement', rootElement);
-          console.log('model', model);
-          rootElement.host.std.command
+          //console.log('rootElement', rootComponent);
+          //console.log('model', model);
+          rootComponent.host.std.command
             .chain()
             .updateBlockType({
               flavour: 'affine:hint',
@@ -188,26 +171,18 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           //rootElement.doc.addBlock('affine:paragraph', {}, parent);
         },
       },
-      {
-        title: 'Divider',
-        description: 'Description',
-        icon: divider,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:divider', 'divider');
-        },
-      },
     ],
   },
   {
     groupName: 'Insert',
     children: [
-      {
+      /*{
         title: 'Mention',
         description: 'Description',
         icon: mention,
-        action: ({ rootElement, model }) => {
+        action: ({ rootComponent, model }) => {
           const triggerKey = '@';
-          insertContent(rootElement.host, model, triggerKey);
+          insertContent(rootComponent.host, model, triggerKey);
           assertExists(model.doc.root);
           //console.log('|11111', rootElement.widgetElements);
           //todo fix ali ghasami
@@ -219,7 +194,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           // Wait for range to be updated
           setTimeout(() => {
             const inlineEditor = getInlineEditorByModel(
-              rootElement.host,
+              rootComponent.host,
               model
             );
             assertExists(inlineEditor);
@@ -227,15 +202,15 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
-      },
+      },*/
       {
         title: 'Date',
         description: 'Description',
         icon: date,
-        action: ({ rootElement, model }) => {
+        action: ({ rootComponent, model }) => {
           //old method
           const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));
+          insertContent(rootComponent.host, model, formatDate(date));
           //todo fix ali ghasami
           /*const triggerKey = '';
           insertContent(rootElement.host, model, triggerKey);
@@ -257,15 +232,15 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           });*/
         },
       },
-      {
+      /*{
         title: 'Today',
         description: 'Description',
         icon: today,
-        action: ({ rootElement, model }) => {
+        action: ({ rootComponent, model }) => {
           const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));
+          insertContent(rootComponent.host, model, formatDate(date));
         },
-      },
+      },*/
       /*{
         title: 'Link To Page',
         description: 'Description',
@@ -276,21 +251,21 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         title: 'Table View',
         description: 'Description',
         icon: table_view,
-        action: ({ rootElement, model }) => {
+        action: ({ rootComponent, model }) => {
           //return;
-          const parent = rootElement.doc.getParent(model);
+          const parent = rootComponent.doc.getParent(model);
           assertExists(parent);
           const index = parent.children.indexOf(model);
 
-          const id = rootElement.doc.addBlock(
+          const id = rootComponent.doc.addBlock(
             'affine:database',
             {},
-            rootElement.doc.getParent(model),
+            rootComponent.doc.getParent(model),
             index + 1
           );
-          const service = rootElement.std.spec.getService('affine:database');
+          const service = rootComponent.std.spec.getService('affine:database');
           service.initDatabaseBlock(
-            rootElement.doc,
+            rootComponent.doc,
             model,
             id,
             viewPresets.tableViewConfig,
@@ -300,29 +275,38 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
       {
+        title: 'Divider',
+        description: 'Description',
+        icon: divider,
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:divider', 'divider');
+        },
+      },
+      /*{
         title: 'Image',
         description: 'Description',
         icon: image,
-        action: async ({ rootElement, model }) => {
+        action: async ({ rootComponent, model }) => {
           //old method
-          const parent = rootElement.doc.getParent(model);
+          const parent = rootComponent.doc.getParent(model);
           if (!parent) {
             return;
           }
           const imageFiles = await getImageFilesFromLocal();
           if (!imageFiles.length) return;
-          const imageService = rootElement.host.spec.getService('affine:image');
+          const imageService =
+            rootComponent.host.spec.getService('affine:image');
           const maxFileSize = imageService.maxFileSize;
           addSiblingImageBlock(
-            rootElement.host,
+            rootComponent.host,
             imageFiles,
             maxFileSize,
             model
           );
           tryRemoveEmptyLine(model);
-          rootElement.doc.addBlock('affine:paragraph', {}, parent);
+          rootComponent.doc.addBlock('affine:paragraph', {}, parent);
 
-          /*const parent = rootElement.doc.getParent(model);
+          /!*const parent = rootElement.doc.getParent(model);
           if (!parent) {
             return;
           }
@@ -339,9 +323,9 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             maxFileSize,
             model
           );
-          tryRemoveEmptyLine(model);*/
+          tryRemoveEmptyLine(model);*!/
         },
-      },
+      },*/
       /* {
         title: 'Video',
         description: 'Description',
@@ -354,35 +338,15 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: audio,
         action: () => {},
       },*/
-      {
+      /* {
         title: 'Code',
         description: 'Description',
         icon: code,
-        action: ({ rootElement }) => {
-          runCommand(rootElement, 'affine:code');
+        action: ({ rootComponent }) => {
+          runCommand(rootComponent, 'affine:code');
         },
-      },
-      {
-        title: 'File',
-        description: 'Description',
-        icon: file,
-        action: async ({ rootElement, model }) => {
-          const file = await openFileOrFiles();
-          if (!file) return;
-          const attachmentService =
-            rootElement.host.spec.getService('affine:attachment');
-          assertExists(attachmentService);
-          const maxFileSize = attachmentService.maxFileSize;
+      },*/
 
-          await addSiblingAttachmentBlocks(
-            rootElement.host,
-            [file],
-            maxFileSize,
-            model
-          );
-          tryRemoveEmptyLine(model);
-        },
-      },
       /*{
         title: 'Link',
         description: 'Description',
@@ -464,8 +428,29 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
     ],
   },
   {
-    groupName: 'Embed',
+    groupName: 'Media',
     children: [
+      {
+        title: 'Attachment',
+        description: 'Attachment  Description',
+        icon: file,
+        action: async ({ rootComponent, model }) => {
+          const file = await openFileOrFiles();
+          if (!file) return;
+          const attachmentService =
+            rootComponent.host.spec.getService('affine:attachment');
+          assertExists(attachmentService);
+          const maxFileSize = attachmentService.maxFileSize;
+
+          await addSiblingAttachmentBlocks(
+            rootComponent.host,
+            [file],
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);
+        },
+      },
       /* {
         title: 'Title ',
         description: 'Description',
@@ -601,7 +586,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
 ];
 
 function runCommand(
-  rootElement: RootBlockComponent,
+  rootComponent: RootBlockComponent,
   flavour: BlockSuite.Flavour,
   type?: string
 ) {
@@ -615,7 +600,7 @@ function runCommand(
     .run();*/
 
   //console.log('this is root element', rootElement);
-  rootElement.host.std.command
+  rootComponent.host.std.command
     .chain()
     .updateBlockType({
       flavour,
@@ -633,7 +618,7 @@ function runCommand(
           return false;
         }
         const codeModel = newModels[0];
-        onModelTextUpdated(rootElement.host, codeModel, richText => {
+        onModelTextUpdated(rootComponent.host, codeModel, richText => {
           const inlineEditor = richText.inlineEditor;
           assertExists(inlineEditor);
           inlineEditor.focusEnd();

@@ -63,7 +63,7 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
     );
   }
 
-  private _onHandleLinkButtonClick() {
+  /*private _onHandleLinkButtonClick() {
     const { insertedLinkType } = this.edgeless.service.std.command.exec(
       'insertLinkByQuickSearch'
     );
@@ -88,7 +88,7 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
         }
       })
       .catch(console.error);
-  }
+  }*/
 
   override disconnectedCallback() {
     super.disconnectedCallback();

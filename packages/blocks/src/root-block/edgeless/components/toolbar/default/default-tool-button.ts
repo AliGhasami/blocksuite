@@ -59,15 +59,15 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }, 100);*/
   }
 
-  private _fadeIn() {
+  /*private _fadeIn() {
     this.currentIcon.style.opacity = '1';
     this.currentIcon.style.transform = `translateY(0px)`;
-  }
+  }*/
 
-  private _fadeOut() {
+  /*private _fadeOut() {
     this.currentIcon.style.opacity = '0';
     this.currentIcon.style.transform = `translateY(-5px)`;
-  }
+  }*/
 
   override connectedCallback(): void {
     super.connectedCallback();

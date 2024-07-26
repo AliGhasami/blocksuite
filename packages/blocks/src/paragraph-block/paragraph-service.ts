@@ -44,8 +44,11 @@ export class ParagraphBlockService<
 
   readonly inlineManager = new InlineManager<TextAttributes>();
 
-  placeholderGenerator: (model: ParagraphBlockModel) => string = model => {
-    if (model.type === 'text') {
+  placeholderGenerator: (
+    model: ParagraphBlockModel
+  ) => TemplateResult<1> | string = model => {
+    return this.getPlaceholder(model);
+    /*if (model.type === 'text') {
       return "Type '/' for commands";
     }
 
@@ -58,7 +61,7 @@ export class ParagraphBlockService<
       h6: 'Heading 6',
       quote: '',
     };
-    return placeholders[model.type];
+    return placeholders[model.type];*/
   };
 
   readonly referenceNodeConfig = new ReferenceNodeConfig();
