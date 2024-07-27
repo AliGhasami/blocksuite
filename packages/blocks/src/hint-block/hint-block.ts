@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { BlockElement } from '@blocksuite/block-std';
+import { BlockComponent } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
 
 import '../_common/components/block-selection.js';
@@ -25,7 +25,7 @@ import SuccessIcon from './icons/success.svg?raw';
 import WarningIcon from './icons/warning.svg?raw';
 
 @customElement('affine-hint')
-export class HintBlockComponent extends BlockElement<HintBlockModel> {
+export class HintBlockComponent extends BlockComponent<HintBlockModel> {
   static override styles = css`
     affine-hint {
       display: block;
@@ -223,7 +223,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
         ></select-hint-type>
       </div>
       <div class="affine-hint-container affine-hint-${this.model.type}">
-        <div class="affine-hint">
+        <!-- <div class="affine-hint">
           <span>${html`${unsafeSVG(this.getIcon(this.model.type))}`}</span>
           <div class="affine-content">
             <div class="affine-hint-title">
@@ -241,7 +241,7 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
               ></rich-text>
             </div>
           </div>
-        </div>
+        </div> -->
         <affine-block-selection .block=${this}></affine-block-selection>
       </div>
     `;
@@ -253,11 +253,11 @@ export class HintBlockComponent extends BlockElement<HintBlockModel> {
   }
 
   override get topContenteditableElement() {
-    if (this.rootElement instanceof EdgelessRootBlockComponent) {
+    if (this.rootComponent instanceof EdgelessRootBlockComponent) {
       const note = this.closest<NoteBlockComponent>('affine-note');
       return note;
     }
-    return this.rootElement;
+    return this.rootComponent;
   }
 
   @query('.description-text')

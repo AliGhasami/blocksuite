@@ -1,9 +1,9 @@
 <template>
   <div ref="container" class="hint-select">
-      <Select @focus.stop @focus.prevent v-model:value="val" :bordered="false" style="width: 120px" :getPopupContainer="()=>{
+      <Select v-model:value="val" :bordered="false" style="width: 120px" :getPopupContainer="()=>{
         return container
       }">
-        <SelectOption v-for="item in options" :value="item.value" @focus.prevent @focus.stop>
+        <SelectOption v-for="item in options" :value="item.value" >
           <div class="select-option">
             <img :src="item.icon" class="icon" />
             <span>{{ item.label }}</span>

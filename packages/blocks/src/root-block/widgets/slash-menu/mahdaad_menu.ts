@@ -36,6 +36,7 @@ import file from './icons/file.svg?raw';
 import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
+import hint from './icons/hint.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
@@ -126,7 +127,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
       },
-      /* {
+      {
         title: 'Hint',
         description: 'Description',
         icon: hint,
@@ -134,7 +135,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           //console.log('rootElement', rootElement);
           //console.log('rootElement', rootComponent);
           //console.log('model', model);
-          rootComponent.host.std.command
+          /*rootComponent.host.std.command
             .chain()
             .updateBlockType({
               flavour: 'affine:hint',
@@ -146,16 +147,50 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             })
             .inline((ctx, next) => {
               //console.log('this is inline in menu ', ctx);
-              const newModels = ctx.updatedBlocks;
+              /!* const newModels = ctx.updatedBlocks;
               if (!newModels || newModels.length == 0) {
                 return false;
               }
+              return next();*!/
+            })
+            .run();*/
+
+          rootComponent.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:hint',
+              props: {
+                title: new Text('Title'),
+                description: new Text('Description'),
+                type: 'success',
+              },
+            })
+            .inline((ctx, next) => {
+              const newModels = ctx.updatedBlocks;
+              if (!newModels) {
+                return false;
+              }
+              // Reset selection if the target is code block
+              /*if (['affine:code'].includes(flavour)) {
+                if (newModels.length !== 1) {
+                  console.error(
+                    "Failed to reset selection! New model length isn't 1"
+                  );
+                  return false;
+                }
+                const codeModel = newModels[0];
+                onModelTextUpdated(rootComponent.host, codeModel, richText => {
+                  const inlineEditor = richText.inlineEditor;
+                  assertExists(inlineEditor);
+                  inlineEditor.focusEnd();
+                }).catch(console.error);
+              }*/
+              //console.log('next - change inline menu');
               return next();
             })
             .run();
-
         },
-      }*/
+      },
     ],
   },
   {

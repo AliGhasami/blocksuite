@@ -111,22 +111,32 @@ const getYears = (value: Dayjs) => {
   return years;
 };
 
-function handleOKTime(){
+
+function _okBtn(){
   if(thisRef.value){
     const okBtn : HTMLElement | null=(thisRef.value as HTMLElement).querySelector('.ant-picker-ok button');
     //console.log("this is ok button",okBtn);
     if(okBtn){
       okBtn.click()
-      handleChange()
-      emit('close')
+      //handleChange()
+      //emit('close')
     }
   }
 }
 
-const onSelect = (date, { source }) => {
-  //console.log("this is close in web component");
+function handleOKTime(){
+  _okBtn()
   handleChange()
   emit('close')
+}
+
+const onSelect = (date, { source }) => {
+  //console.log("1111")
+  //console.log("this is close in web component");
+  //handleOKTime()
+  _okBtn()
+  handleChange()
+  //emit('close')
   //console.log("this is select");
   /*if (source === 'date') {
     console.log('Panel Select:', source);
