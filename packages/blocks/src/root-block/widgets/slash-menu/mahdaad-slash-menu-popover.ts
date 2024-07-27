@@ -927,12 +927,13 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
   private _clayTapMenu(menu: ClayTapSlashMenu[]) {
+    //console.log('1111', menu);
     //console.log('this._activatedItemIndex', this._activatedItemIndex);
     const group: string[] = [];
     menu.forEach(item => {
       if (item.group && !group.includes(item.group)) group.push(item.group);
     });
-    const index = 0;
+    //const index = 0;
     return html`<div>
       ${group.map(itemGroup => {
         return html`<span class="group-title"> ${itemGroup} </span>
