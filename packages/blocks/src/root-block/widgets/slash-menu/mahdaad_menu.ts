@@ -617,6 +617,164 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
       },*/
     ],
   },
+  {
+    groupName: 'Object',
+    children: [
+      {
+        title: 'Page',
+        description: 'Create a page or link an existing one.',
+        icon: file,
+        action: async ({ rootComponent, model }) => {
+          console.log('1111');
+        },
+        /* const file = await openFileOrFiles();
+          if (!file) return;
+          const attachmentService =
+            rootComponent.host.spec.getService('affine:attachment');
+          assertExists(attachmentService);
+          const maxFileSize = attachmentService.maxFileSize;
+
+          await addSiblingAttachmentBlocks(
+            rootComponent.host,
+            [file],
+            maxFileSize,
+            model
+          );
+          tryRemoveEmptyLine(model);
+        },*/
+      },
+      /* {
+        title: 'Title ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /* {
+        title: 'Title  ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /*{
+        title: 'Title   ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /* {
+        title: 'Title     ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /*{
+        title: 'Title         ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /* {
+        title: 'figma',
+        description: 'Description',
+        icon: empty_title,
+        action: async ({ rootElement, model }) => {
+          const parentModel = rootElement.doc.getParent(model);
+          if (!parentModel) {
+            return;
+          }
+          const index = parentModel.children.indexOf(model) + 1;
+          await toggleEmbedCardCreateModal(
+            rootElement.host,
+            'Figma',
+            'The added Figma link will be displayed as an embed view.',
+            { mode: 'page', parentModel, index }
+          );
+          tryRemoveEmptyLine(model);
+        },
+      },*/
+      /*{
+        title: 'simple',
+        description: 'simple',
+        icon: empty_title,
+        action: async ({ rootElement }) => {
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:simple',
+              props: {
+                test_props: 'test_value',
+                title: new Text('Title'),
+                //title: new Text('Hello World!---titiel '),
+                description: new Text(''),
+              }, //type
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
+        },
+      },*/
+      /*{
+        title: 'Embed',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Figma',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Github',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Jira',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Oktuple',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Google Drive',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Miro',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Trello',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Gitlab',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },*/
+    ],
+  },
 ];
 
 function runCommand(

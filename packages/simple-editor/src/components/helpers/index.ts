@@ -30,6 +30,7 @@ export function createEmptyDoc(isBoard: boolean = false) {
         if (!isBoard) {
           const noteId = doc.addBlock('affine:note', {}, rootId)
           doc.addBlock('affine:paragraph', {}, noteId)
+          doc.addBlock('affine:mahdaad-object', {}, noteId)
         }
       })
       //console.log("this is doc",doc)

@@ -307,7 +307,7 @@ defineExpose({
 
   .place-holder {
     @apply flex items-center gap-1 text-neutral-4 mt-body;
-    line-height: unset;
+    //line-height: unset;
     transition: all 0.3s ease-in-out;
     .short-code {
       font-size: 10px;
@@ -418,21 +418,21 @@ defineExpose({
   .claytap-text {
     //background-color: red;
     @apply text-neutral-8; //mt-body
-    line-height: unset;
+    //line-height: unset;
   }
 
   .claytap-h1 {
     @apply mt-page-display text-neutral-8;
-    line-height: unset;
+    //line-height: unset;
   }
 
   .claytap-h2 {
     @apply mt-page-heading text-neutral-8;
-    line-height: unset;
+    //line-height: unset;
   }
   .claytap-h3 {
     @apply mt-page-subheading text-neutral-8;
-    line-height: unset;
+    //line-height: unset;
   }
 
   /* Fix rtl - ltr Style */

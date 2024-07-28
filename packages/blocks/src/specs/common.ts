@@ -16,6 +16,7 @@ import { EmbedYoutubeBlockSpec } from '../embed-youtube-block/embed-youtube-spec
 import { HintBlockSpec } from '../hint-block/hint-block-spec.js';
 import { ImageBlockSpec } from '../image-block/image-spec.js';
 import { ListBlockSpec } from '../list-block/list-spec.js';
+import { ObjectBlockSpec } from '../mahdaad-object-block/object-spec.js';
 import {
   EdgelessNoteBlockSpec,
   NoteBlockSpec,
@@ -41,6 +42,7 @@ export const CommonFirstPartyBlockSpecs: BlockSpec[] = [
   EmbedSyncedDocBlockSpec,
   EmbedLinkedDocBlockSpec,
   HintBlockSpec,
+  ObjectBlockSpec,
 ];
 
 export const EdgelessFirstPartyBlockSpecs: BlockSpec[] = [
