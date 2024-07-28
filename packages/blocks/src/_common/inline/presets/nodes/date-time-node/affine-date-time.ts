@@ -1,4 +1,5 @@
 import type { BlockElement } from '@blocksuite/block-std';
+
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
@@ -16,10 +17,11 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 //import { ref } from 'lit/directives/ref.js';
+import type { AffineTextAttributes } from '../../affine-inline-specs.js';
+
 //import { styleMap } from 'lit/directives/style-map.js';
 import { HoverController } from '../../../../components/hover/index.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
-import type { AffineTextAttributes } from '../../affine-inline-specs.js';
 import { defaultDateFormat, defaultTimeFormat } from './config.js';
 //import { affineTextStyles } from '../affine-text.js';
 import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
@@ -33,40 +35,6 @@ export class AffineDateTime extends ShadowlessElement {
     }
     return link;
   }*/
-
-  get inlineEditor() {
-    const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
-      `[${INLINE_ROOT_ATTR}]`
-    );
-    assertExists(inlineRoot);
-    return inlineRoot.inlineEditor;
-  }
-
-  get selfInlineRange() {
-    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
-    assertExists(selfInlineRange);
-    return selfInlineRange;
-  }
-
-  get blockElement() {
-    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
-      `[${BLOCK_ID_ATTR}]`
-    );
-    assertExists(blockElement);
-    return blockElement;
-  }
-
-  get std() {
-    const std = this.blockElement.std;
-    assertExists(std);
-    return std;
-  }
-
-  static override styles = css`
-    affine-link > a:hover [data-v-text='true'] {
-      text-decoration: underline;
-    }
-  `;
 
   private _whenHover = new HoverController(
     this,
@@ -101,47 +69,11 @@ export class AffineDateTime extends ShadowlessElement {
     { enterDelay: 500 }
   );
 
-  @property({ type: Object })
-  accessor delta: DeltaInsert<AffineTextAttributes> = {
-    insert: ZERO_WIDTH_SPACE,
-  };
-
-  // Workaround for links not working in contenteditable div
-  // see also https://stackoverflow.com/questions/12059211/how-to-make-clickable-anchor-in-contenteditable-div
-  //
-  // Note: We cannot use JS to directly open a new page as this may be blocked by the browser.
-  //
-  // Please also note that when readonly mode active,
-  // this workaround is not necessary and links work normally.
-  // see https://github.com/toeverything/AFFiNE/issues/1540
-  private _onMouseUp() {
-    const anchorElement = this.querySelector('a');
-    assertExists(anchorElement);
-    if (!anchorElement.isContentEditable) return;
-    anchorElement.contentEditable = 'false';
-    setTimeout(() => {
-      anchorElement.removeAttribute('contenteditable');
-    }, 0);
-  }
-
-  get dateTime() {
-    const dateTime = this.delta.attributes?.date?.date;
-    if (!dateTime) {
-      return '';
+  static override styles = css`
+    affine-link > a:hover [data-v-text='true'] {
+      text-decoration: underline;
     }
-    let tempStr = dayjs(this.delta.attributes?.date?.date).format(
-      defaultDateFormat
-    );
-    const time = this.delta.attributes?.date?.time;
-    if (time) {
-      tempStr +=
-        ' ' +
-        dayjs(`${this.delta.attributes?.date?.date} ${time}`).format(
-          defaultTimeFormat
-        );
-    }
-    return tempStr;
-  }
+  `;
 
   override connectedCallback() {
     super.connectedCallback();
@@ -209,11 +141,6 @@ export class AffineDateTime extends ShadowlessElement {
     });*/
   }
 
-  /*  override disconnectedCallback() {
-    super.disconnectedCallback();
-    console.log('this is disconnected');
-  }*/
-
   override render() {
     /*const style = this.delta.attributes
       ? affineTextStyles(this.delta.attributes, {
@@ -247,6 +174,81 @@ export class AffineDateTime extends ShadowlessElement {
       <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
     </span>`;
   }
+
+  get blockElement() {
+    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
+      `[${BLOCK_ID_ATTR}]`
+    );
+    assertExists(blockElement);
+    return blockElement;
+  }
+
+  get dateTime() {
+    const dateTime = this.delta.attributes?.date?.date;
+    if (!dateTime) {
+      return '';
+    }
+    let tempStr = dayjs(this.delta.attributes?.date?.date).format(
+      defaultDateFormat
+    );
+    const time = this.delta.attributes?.date?.time;
+    if (time) {
+      tempStr +=
+        ' ' +
+        dayjs(`${this.delta.attributes?.date?.date} ${time}`).format(
+          defaultTimeFormat
+        );
+    }
+    return tempStr;
+  }
+
+  get inlineEditor() {
+    const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
+      `[${INLINE_ROOT_ATTR}]`
+    );
+    assertExists(inlineRoot);
+    return inlineRoot.inlineEditor;
+  }
+
+  // Workaround for links not working in contenteditable div
+  // see also https://stackoverflow.com/questions/12059211/how-to-make-clickable-anchor-in-contenteditable-div
+  //
+  // Note: We cannot use JS to directly open a new page as this may be blocked by the browser.
+  //
+  // Please also note that when readonly mode active,
+  // this workaround is not necessary and links work normally.
+  // see https://github.com/toeverything/AFFiNE/issues/1540
+  /*private _onMouseUp() {
+    const anchorElement = this.querySelector('a');
+    assertExists(anchorElement);
+    if (!anchorElement.isContentEditable) return;
+    anchorElement.contentEditable = 'false';
+    setTimeout(() => {
+      anchorElement.removeAttribute('contenteditable');
+    }, 0);
+  }*/
+
+  get selfInlineRange() {
+    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
+    assertExists(selfInlineRange);
+    return selfInlineRange;
+  }
+
+  get std() {
+    const std = this.blockElement.std;
+    assertExists(std);
+    return std;
+  }
+
+  /*  override disconnectedCallback() {
+    super.disconnectedCallback();
+    console.log('this is disconnected');
+  }*/
+
+  @property({ type: Object })
+  accessor delta: DeltaInsert<AffineTextAttributes> = {
+    insert: ZERO_WIDTH_SPACE,
+  };
 }
 
 declare global {

@@ -1,13 +1,11 @@
 <template>
-    <div class="claytap-mobile-editor">
-      <Editor />
-    </div>
+  <div class="claytap-mobile-editor">
+    <Editor />
+  </div>
 </template>
 
 <script setup lang="ts">
-import Editor from "@/components/Editor.vue";
+import Editor from '@/components/Editor.vue'
 </script>
 
-<style lang="less">
-
-</style>
+<style lang="less"></style>

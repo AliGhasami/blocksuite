@@ -171,6 +171,7 @@ export function getAffineInlineSpecsWithReference(
       renderer: delta => {
         return html`<affine-date-time .delta=${delta}></affine-date-time>`;
       },
+      embed: true,
     },
     {
       name: 'mention',
