@@ -479,7 +479,7 @@ defineExpose({
   box-sizing: border-box;
   overflow-y: auto;
   padding: 0 8px;
-  width: 200px;
+  width: 300px;
 }
 
 /* overlay mask */

@@ -1,5 +1,5 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { uuidv4 } from '@blocksuite/store';
+import { type BlockModel, uuidv4 } from '@blocksuite/store';
 
 import type { RootBlockComponent } from '../../types.js';
 import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
@@ -17,6 +17,8 @@ import { onModelTextUpdated } from '../../utils/index.js';
 //import link_to_page from './icons/link_to_page.svg?raw';
 import dayjs from 'dayjs';
 
+import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
+import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
@@ -36,6 +38,7 @@ import file from './icons/file.svg?raw';
 import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
+import notebook from './icons/notebook.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
@@ -153,7 +156,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               return next();
             })
             .run();
-
         },
       }*/
     ],
@@ -193,34 +195,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootComponent, model }) => {
-          //old method
-          //const date = new Date();
-          //insertContent(rootComponent.host, model, formatDate(date));
-          //todo fix ali ghasami
-          /*const triggerKey = '';
-          insertContent(rootElement.host, model, triggerKey);
-          assertExists(model.doc.root);
-          //@ts-ignore
-          const widgetEle = rootElement.widgetElements['affine-date-widget'];
-          assertExists(widgetEle);
-          // We have checked the existence of showLinkedDoc method in the showWhen
-          const mentionWidget = widgetEle as AffineMentionWidget;
-          // Wait for range to be updated
-          setTimeout(() => {
-            const inlineEditor = getInlineEditorByModel(
-              rootElement.host,
-              model
-            );
-            assertExists(inlineEditor);
-            mentionWidget.showMention(inlineEditor, triggerKey);
-            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
-          });*/
-
           const triggerKey = dayjs().format('YYYY-MM-DD');
-          //const inlineEditor = getInlineEditorByModel(rootElement.host, model);
-          //assertExists(inlineEditor);
-          //const inlineRange = inlineEditor.getInlineRange();
-          //const index = inlineRange ? inlineRange.index : 0;
+
           const temp = {
             date: triggerKey,
             time: null,
@@ -229,26 +205,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           insertContent(rootComponent.host, model, REFERENCE_NODE, {
             date: temp,
           });
-          //model.doc.slots.dateTimeEvent.emit({ type: 'add', meta: temp });
-          //model.doc.slots.inlineUpdate.emit({type:});
-          //inlineEditor.deleteText({ index: 1, length: 30 });
-          //console.log('this is index', index);
-          //model.text.insert(text, index, attributes as Record<string, unknown>);
-          //console.log('this is inline editgor', inlineEditor);
-          //console.log('this is model', model);
-          //console.log('this is host', rootElement.host);
-          //return;
-          /*const temp=dayjs*/
-          //old method
-          /*const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));*/
-          //const date = '1111';
-          //insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
-
-          //model.doc.slots.yBlockUpdated.emit({ id: '55555', type: '111' });
-
-          //@ts-ignore
           const widgetEle =
             rootComponent.widgetComponents['affine-date-time-widget'];
           assertExists(widgetEle);
@@ -262,7 +219,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             );
             assertExists(inlineEditor);
             dateWidget.showDateTime(inlineEditor, triggerKey);
-            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
       },
@@ -623,25 +579,26 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
       {
         title: 'Page',
         description: 'Create a page or link an existing one.',
-        icon: file,
-        action: async ({ rootComponent, model }) => {
-          console.log('1111');
+        icon: notebook,
+        action: ({ rootComponent, model }) => {
+          openObjectPicker(rootComponent, model, 'document');
         },
-        /* const file = await openFileOrFiles();
-          if (!file) return;
-          const attachmentService =
-            rootComponent.host.spec.getService('affine:attachment');
-          assertExists(attachmentService);
-          const maxFileSize = attachmentService.maxFileSize;
-
-          await addSiblingAttachmentBlocks(
-            rootComponent.host,
-            [file],
-            maxFileSize,
-            model
-          );
-          tryRemoveEmptyLine(model);
-        },*/
+      },
+      {
+        title: 'File',
+        description: 'Create a file or link an existing one.',
+        icon: file,
+        action: ({ rootComponent, model }) => {
+          openObjectPicker(rootComponent, model, 'file');
+        },
+      },
+      {
+        title: 'Image',
+        description: 'Upload a image or link an existing one.',
+        icon: file,
+        action: ({ rootComponent, model }) => {
+          openObjectPicker(rootComponent, model, 'image');
+        },
       },
       /* {
         title: 'Title ',
@@ -776,6 +733,26 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
     ],
   },
 ];
+
+function openObjectPicker(
+  rootComponent: RootBlockComponent,
+  model: BlockModel,
+  obj_type: IObjectType
+) {
+  const triggerKey = '';
+  const widgetEle =
+    // @ts-ignore
+    rootComponent.widgetComponents['affine-mahdaad-object-picker-widget'];
+  assertExists(widgetEle);
+  // We have checked the existence of showLinkedDoc method in the showWhen
+  const objectPickerWidget = widgetEle as AffineMahdaadObjectPickerWidget;
+  // Wait for range to be updated
+  setTimeout(() => {
+    const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
+    assertExists(inlineEditor);
+    objectPickerWidget.showObjectPicker(inlineEditor, triggerKey, obj_type);
+  });
+}
 
 function runCommand(
   rootComponent: RootBlockComponent,

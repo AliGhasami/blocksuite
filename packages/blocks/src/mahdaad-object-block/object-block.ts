@@ -32,17 +32,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         @click=${() => {
           alert('1111');
         }}
-      >
-        <mahdaad-object-container
-          @click=${data => {
-            console.log('this is data in click', data);
-            //alert('1111');
-          }}
-          @change=${data => {
-            console.log('this is data in change', data);
-          }}
-        ></mahdaad-object-container>
-      </div> `;
+      ></div> `;
   }
 }
 
@@ -51,3 +41,13 @@ declare global {
     'affine-mahdaad-object': ObjectBlockComponent;
   }
 }
+
+/*<mahdaad-object-container
+          @click=${data :any => {
+            console.log('this is data in click', data);
+            //alert('1111');
+          }}
+          @change=${data => {
+            console.log('this is data in change', data);
+          }}
+        ></mahdaad-object-container>*/
