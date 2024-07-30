@@ -138,8 +138,16 @@ function bindEvent(doc: Doc) {
     console.log("this is data",data);
   })*/
 
+  /*doc.slots.yBlockUpdated.on((data)=>{
+    console.log("1111",data)
+  })
+
+  doc.slots.rootAdded.on((data)=>{
+    console.log("doc.slots.rootAdded",data)
+  })*/
+
   doc.slots.blockUpdated.on((data) => {
-    //console.log("this is event",data.model);
+    //console.log("this is event",data);
     emit('change', data)
     if (data.type == 'add') emit('addBlock', data)
     if (data.type == 'delete') {
