@@ -739,6 +739,39 @@ function openObjectPicker(
   model: BlockModel,
   obj_type: IObjectType
 ) {
+  //console.log('111', rootComponent.host);
+  /*rootComponent.host.std.command
+    .chain()
+    .updateBlockType({
+      flavour: 'affine:code',
+      props: {},
+      //props: { type },
+    })
+    .inline((ctx, next) => {
+      const newModels = ctx.updatedBlocks;
+      if (!newModels) {
+        return false;
+      }
+      // Reset selection if the target is code block
+      if (['affine:code'].includes('affine:code')) {
+        if (newModels.length !== 1) {
+          console.error("Failed to reset selection! New model length isn't 1");
+          return false;
+        }
+        const codeModel = newModels[0];
+        onModelTextUpdated(rootComponent.host, codeModel, richText => {
+          const inlineEditor = richText.inlineEditor;
+          assertExists(inlineEditor);
+          inlineEditor.focusEnd();
+        }).catch(console.error);
+      }
+      //console.log('next - change inline menu');
+      return next();
+    })
+    .run();
+
+  return;*/
+
   const triggerKey = '';
   const widgetEle =
     // @ts-ignore
@@ -752,6 +785,12 @@ function openObjectPicker(
     assertExists(inlineEditor);
     objectPickerWidget.showObjectPicker(inlineEditor, triggerKey, obj_type);
   });
+
+  /*setTimeout(() => {
+    const inlineEditor = getInlineEditorByModel(rootElement.host, model);
+    assertExists(inlineEditor);
+    linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+  });*/
 }
 
 function runCommand(

@@ -14,6 +14,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
 
   override connectedCallback() {
     super.connectedCallback();
+
     /*this.contentEditable = 'false';
 
     this.handleEvent('click', () => {
@@ -26,13 +27,9 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   }
 
   override renderBlock() {
-    return html`<span>this is object</span>
-      <div
-        style="width: 50px;height: 50px;background-color: red"
-        @click=${() => {
-          alert('1111');
-        }}
-      ></div> `;
+    return html`<div>
+      <mahdaad-object-link-component></mahdaad-object-link-component>
+    </div>`;
   }
 }
 

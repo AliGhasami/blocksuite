@@ -71,7 +71,7 @@ export function showPopover({
 
   // Handle position
   const updatePosition = throttle(() => {
-    const objectPickerPopOverElement = objectPicker.DateTimePopOverElement;
+    const objectPickerPopOverElement = objectPicker.PopOverElement;
     assertExists(
       objectPickerPopOverElement,
       'You should render the object picker PopOver Element node even if no position'
@@ -92,7 +92,7 @@ export function showPopover({
   setTimeout(updatePosition);
 
   disposables.addFromEvent(window, 'mousedown', () => {
-    abortController.abort();
+    //abortController.abort();
   });
   return objectPicker;
 }

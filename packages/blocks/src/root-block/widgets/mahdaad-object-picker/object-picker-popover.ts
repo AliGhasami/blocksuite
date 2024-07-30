@@ -1,7 +1,8 @@
-import { EditorHost, ShadowlessElement } from '@blocksuite/block-std';
+import type { EditorHost } from '@blocksuite/block-std';
+
+import { ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
-import { assertExists } from '@blocksuite/global/utils';
 //import type { InlineEditor } from '@blocksuite/inline';
 import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -27,8 +28,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   ShadowlessElement
 ) {
   //private _searchString = '';
-
-  //private temp = null;
 
   /*private _updateItem(query: string): UserMention[] {
     this._searchString = query;
@@ -66,10 +65,21 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   }*/
   private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
 
+  static override styles = styles;
+
   //@state()
   //private _hide = false;
 
-  static override styles = styles;
+  constructor(
+    private editorHost: EditorHost,
+    private inlineEditor: AffineInlineEditor,
+    private abortController = new AbortController(),
+    private obj_type: IObjectType
+  ) {
+    super();
+    //this.addObjectLink();
+    //console.log('1111', editorHost);
+  }
 
   /* private _handleClickItem(user: UserMention) {
     // assertExists(inlineEditor, 'Editor not found');
@@ -176,23 +186,111 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     });
   }*/
 
-  constructor(
-    private editorHost: EditorHost,
-    private inlineEditor: AffineInlineEditor,
-    private abortController = new AbortController(),
-    private obj_type: IObjectType
-  ) {
-    super();
+  private get _query() {
+    //console.log('11111', getQuery(this.inlineEditor, this._startIndex) || '');
+    return getQuery(this.inlineEditor, this._startIndex) || '';
   }
 
-  private get _query() {
-    console.log('11111', this.inlineEditor, this._startIndex);
-    return getQuery(this.inlineEditor, this._startIndex) || '2222';
+  addObjectLink() {
+    this.editorHost.std.command
+      .chain()
+      .updateBlockType({
+        flavour: 'affine:mahdaad-object',
+        props: {},
+        //props: { type },
+      })
+      .inline((ctx, next) => {
+        const newModels = ctx.updatedBlocks;
+        if (!newModels) {
+          return false;
+        }
+        // Reset selection if the target is code block
+        /*if (['affine:code'].includes('affine:code')) {
+          if (newModels.length !== 1) {
+            console.error(
+              "Failed to reset selection! New model length isn't 1"
+            );
+            return false;
+          }
+          /!*const codeModel = newModels[0];
+          onModelTextUpdated(rootComponent.host, codeModel, richText => {
+            const inlineEditor = richText.inlineEditor;
+            assertExists(inlineEditor);
+            inlineEditor.focusEnd();
+          }).catch(console.error);*!/
+        }*/
+        //console.log('next - change inline menu');
+        return next();
+      })
+      .run();
   }
 
   override connectedCallback() {
     //console.log('111111');
     super.connectedCallback();
+
+    const inlineEditor = this.inlineEditor;
+
+    if (!inlineEditor || !inlineEditor.eventSource) {
+      console.error('inlineEditor or eventSource is not found');
+      return;
+    }
+
+    createKeydownObserver({
+      target: inlineEditor.eventSource,
+      signal: this.abortController.signal,
+      interceptor: (e, next) => {
+        this._searchText = this._query;
+        //console.log('1111');
+        next();
+      },
+      onInput: () => {
+        this._searchText = this._query;
+        console.log('this is query', this._query);
+        //this._activatedItemIndex = 0;
+        //this._linkedDocGroup = this._getLinkedDocGroup();
+      },
+      onDelete: () => {
+        //const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+        /*if (curIndex < this._startIndex) {
+          this.abortController.abort();
+        }*/
+        //this._activatedItemIndex = 0;
+        //this._linkedDocGroup = this._getLinkedDocGroup();
+      },
+      onMove: step => {
+        /*const itemLen = this._flattenActionList.length;
+        this._activatedItemIndex =
+          (itemLen + this._activatedItemIndex + step) % itemLen;
+
+        // Scroll to the active item
+        const item = this._flattenActionList[this._activatedItemIndex];
+        const shadowRoot = this.shadowRoot;
+        if (!shadowRoot) {
+          console.warn('Failed to find the shadow root!', this);
+          return;
+        }
+        const ele = shadowRoot.querySelector(
+          `icon-button[data-id="${item.key}"]`
+        );
+        if (!ele) {
+          console.warn('Failed to find the active item!', item);
+          return;
+        }
+        ele.scrollIntoView({
+          block: 'nearest',
+        });*/
+      },
+      onConfirm: () => {
+        /*this._flattenActionList[this._activatedItemIndex]
+          .action()
+          ?.catch(console.error);*/
+      },
+      onAbort: () => {
+        //this.abortController.abort();
+      },
+    });
+
     /*this._disposables.addFromEvent(window, 'mousedown', () => {
       this.abortController.abort();
     });
@@ -200,10 +298,10 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       // Prevent input from losing focus
       e.preventDefault();
     });*/
-    const inlineEditor = this.inlineEditor;
-    assertExists(inlineEditor, 'RichText InlineEditor not found');
+    // const inlineEditor = this.inlineEditor;
+    //assertExists(inlineEditor, 'RichText InlineEditor not found');
     //if (!inlineEditor) return;
-    createKeydownObserver({
+    /*createKeydownObserver({
       target: inlineEditor.eventSource,
       //inlineEditor,
       signal: this.abortController.signal,
@@ -227,9 +325,9 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         //   return;
         // }
 
-        /* if (key === 'ArrowRight' || key === 'ArrowLeft' || key === 'Escape') {
+        /!* if (key === 'ArrowRight' || key === 'ArrowLeft' || key === 'Escape') {
           return;
-        }*/
+        }*!/
 
         next();
       },
@@ -237,14 +335,14 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         //this.abortController.abort()
       },
       onDelete: () => {
-        /*const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+        /!*const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
         if (curIndex < this._startIndex) {
           this.abortController.abort();
         }
-        this._updateFilteredItems();*/
+        this._updateFilteredItems();*!/
       },
       onAbort: () => this.abortController.abort(),
-    });
+    });*/
 
     //this.temp = inlineEditor.getInlineRange();
     //this._filterItems = this._updateItem('');
@@ -255,12 +353,56 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         this._updateActionList();
       })
     );*/
-    this._disposables.addFromEvent(this, 'mousedown', e => {
+    /*this._disposables.addFromEvent(this, 'mousedown', e => {
       e.stopPropagation();
       //debugger;
       // Prevent input from losing focus
       e.preventDefault();
-    });
+    });*/
+  }
+
+  override render() {
+    //console.log('this is render', this._query);
+    //const MAX_HEIGHT = 200;
+    const style = this._position
+      ? styleMap({
+          transform: `translate(${this._position.x}, ${this._position.y})`,
+          //maxHeight: `${Math.min(this._position.height, MAX_HEIGHT)}px`,
+        })
+      : styleMap({
+          visibility: 'hidden',
+        });
+
+    // XXX This is a side effect
+    //const accIdx = 0;
+    //mention-popover popover-menu-container blocksuite-overlay
+    //${Prefix}-popover
+    //console.log('555', this.);
+    //console.log('5555', this.editorHost, this.doc, this.slots, ...this);
+    return html`<div>
+      <div
+        class="${Prefix}-popover  ${Prefix}-popover-element"
+        style="${style}"
+      >
+        <div class="${Prefix}-popover-container">
+          <span>${this._searchText}</span>
+          <mahdaad-object-picker-component
+            search-text="${this._searchText}"
+            type="${this.obj_type}"
+            @select="${(data: object) => {
+              //debugger;
+              this.addObjectLink();
+              this.abortController.abort();
+              //<template>
+              //     <Card ></Card>
+              // </template>
+              //console.log(data);
+            }}"
+          >
+          </mahdaad-object-picker-component>
+        </div>
+      </div>
+    </div>`;
   }
 
   //private _actionGroup: LinkedDocGroup[] = [];
@@ -273,38 +415,9 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       .flat();
   }*/
 
-  override render() {
-    console.log('222222', this._query);
-    //const MAX_HEIGHT = 200;
-    const style = this._position
-      ? styleMap({
-          transform: `translate(${this._position.x}, ${this._position.y})`,
-          //maxHeight: `${Math.min(this._position.height, MAX_HEIGHT)}px`,
-        })
-      : styleMap({
-          visibility: 'hidden',
-        });
-    // XXX This is a side effect
-    //const accIdx = 0;
-    //mention-popover popover-menu-container blocksuite-overlay
-    //${Prefix}-popover
-    //console.log('555', this.);
-    //console.log('5555', this.editorHost, this.doc, this.slots, ...this);
-    return html`<div>
-      <div
-        class="${Prefix}-popover  ${Prefix}-date-time-popover"
-        style="${style}"
-      >
-        <div class="${Prefix}-popover-container">
-          <mahdaad-object-picker-component
-            @select="${data => {
-              console.log(data);
-            }}"
-          >
-          </mahdaad-object-picker-component>
-        </div>
-      </div>
-    </div>`;
+  updatePosition(position: { height: number; x: string; y: string }) {
+    //console.log('11111', this.inlineEditor.getInlineRange());
+    this._position = position;
   }
 
   /* private _updateActionList() {
@@ -316,10 +429,12 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     });
   }*/
 
-  updatePosition(position: { height: number; x: string; y: string }) {
-    //console.log('11111', this.inlineEditor.getInlineRange());
-    this._position = position;
-  }
+  @state()
+  private accessor _position: {
+    height: number;
+    x: string;
+    y: string;
+  } | null = null;
 
   /* private get _doc() {
     return this.editorHost.doc;
@@ -331,18 +446,15 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   //@state()
   //private accessor _filterItems: UserMention[] = [];
 
+  //private temp = null;
   @state()
-  private accessor _position: {
-    height: number;
-    x: string;
-    y: string;
-  } | null = null;
+  private accessor _searchText = '';
 
   //@state()
   //private accessor _query = '';
 
-  @query(`.${Prefix}-date-time-popover`)
-  accessor DateTimePopOverElement: Element | null = null;
+  @query(`.${Prefix}-popover-element`)
+  accessor PopOverElement: Element | null = null;
 
   @property({ attribute: false })
   accessor options!: MentionOptions;
