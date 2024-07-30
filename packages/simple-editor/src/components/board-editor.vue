@@ -139,7 +139,7 @@ function bindEvent(doc: Doc) {
   })*/
 
   doc.slots.blockUpdated.on((data) => {
-    //console.log("this is event",data);
+    //console.log("this is event",data.model);
     emit('change', data)
     if (data.type == 'add') emit('addBlock', data)
     if (data.type == 'delete') {
