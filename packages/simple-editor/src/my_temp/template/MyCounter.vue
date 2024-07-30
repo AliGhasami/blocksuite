@@ -11,15 +11,15 @@ export default {
   data() {
     return {
       count: 0
-    };
+    }
   },
   methods: {
     increment() {
-      this.count++;
+      this.count++
     },
     decrement() {
-      this.count--;
+      this.count--
     }
   }
-};
+}
 </script>

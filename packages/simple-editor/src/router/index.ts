@@ -8,13 +8,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'editor',
-      component: ()=> import('../views/EditorView.vue')
+      component: () => import('../views/EditorView.vue')
     },
     {
       path: '/board',
       name: 'board',
-      component: ()=> import('../views/BoardView.vue')
-    },
+      component: () => import('../views/BoardView.vue')
+    }
     /*{
       path: '/about',
       name: 'about',

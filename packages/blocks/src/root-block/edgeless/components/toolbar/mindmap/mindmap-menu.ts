@@ -118,35 +118,36 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(LitElement) {
     const showNextText = dragOut && !cancelled;
     return html`<edgeless-slide-menu .height=${'64px'}>
       <div class="text-and-mindmap">
-        <div class="text-item">
+        <!-- <div class="text-item">
           ${isDraggingText
-            ? html`<button
-                class="next"
-                style="transform: translateY(${showNextText ? 0 : 64}px)"
-              >
-                ${textItem.icon}
-              </button>`
-            : nothing}
+          ? html`<button
+              class="next"
+              style="transform: translateY(${showNextText ? 0 : 64}px)"
+            >
+              ${textItem.icon}
+            </button>`
+          : nothing}
+
           <button
             style="opacity: ${isDraggingText ? 0 : 1}"
             @mousedown=${(e: MouseEvent) =>
-              this.draggableController.onMouseDown(e, {
-                preview: textItem.icon,
-                data: textItem,
-              })}
+          this.draggableController.onMouseDown(e, {
+            preview: textItem.icon,
+            data: textItem,
+          })}
             @touchstart=${(e: TouchEvent) =>
-              this.draggableController.onTouchStart(e, {
-                preview: textItem.icon,
-                data: textItem,
-              })}
+          this.draggableController.onTouchStart(e, {
+            preview: textItem.icon,
+            data: textItem,
+          })}
           >
             ${textItem.icon}
           </button>
           <affine-tooltip tip-position="top" .offset=${12}>
             ${getTooltipWithShortcut('Edgeless Text', 'T')}
           </affine-tooltip>
-        </div>
-        <div class="thin-divider"></div>
+        </div> -->
+        <!-- <div class="thin-divider"></div>-->
         <!-- mind map -->
         ${repeat(this.mindMaps, mindMap => {
           const isDraggingMindMap = draggingElement?.data?.type !== 'text';

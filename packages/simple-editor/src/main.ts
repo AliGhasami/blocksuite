@@ -4,8 +4,8 @@ import { createPinia } from 'pinia'
 import 'virtual:uno.css'
 import App from './App.vue'
 import router from './router'
-import '@mahdaad/tokens/dist/index.css';
-import {defineCssVars} from "@mahdaad/tokens";
+import '@mahdaad/tokens/dist/index.css'
+import { defineCssVars } from '@mahdaad/tokens'
 
 // TODO: hidden feature
 //import '@mahdaad/tokens/dist/index.css'
@@ -16,8 +16,6 @@ defineCssVars()
 app.use(createPinia())
 app.use(router)
 app.mount('#app')
-
-
 
 /**************************/
 /*import MyCustomComponent from './components/web-component/Test3.vue';

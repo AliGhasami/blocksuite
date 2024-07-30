@@ -6,10 +6,8 @@ import UnoCSS from 'unocss/vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import { resolve } from 'path'
-import dts from "vite-plugin-dts";
+import dts from 'vite-plugin-dts'
 import { lessVars } from '@mahdaad/tokens'
-
-
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,24 +23,24 @@ export default defineConfig({
     vueJsx(),
     VueDevTools(),
     UnoCSS(),
-    dts(),
+    dts()
   ],
   esbuild: {
-    target: 'es2018',
+    target: 'es2018'
   },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  server:{
-    port:3000
+  server: {
+    port: 3000
   },
   css: {
     preprocessorOptions: {
       less: {
         modifyVars: {
-          ...lessVars,
+          ...lessVars
           // Used for global import to avoid the need to import each style file separately
           // reference:  Avoid repeated references
           //hack: ` ; @import (reference) "${resolve('./assets/css/var.less')}"`
@@ -53,17 +51,17 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
-      name: "Editor",
-      fileName: "vue-block-editor",
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'Editor',
+      fileName: 'vue-block-editor'
     },
     rollupOptions: {
-      external: ["vue"],
+      external: ['vue'],
       output: {
         globals: {
-          vue: "Vue",
-        },
-      },
-    },
-  },
+          vue: 'Vue'
+        }
+      }
+    }
+  }
 })

@@ -1,8 +1,7 @@
-import type { BlockComponent } from '@blocksuite/block-std';
-import type { Slot } from '@blocksuite/global/utils';
-import type { Doc, DocMeta } from '@blocksuite/store';
+import type { BlockElement } from '@blocksuite/block-std';
 
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
+import { ShadowlessElement } from '@blocksuite/block-std';
+import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
 import {
   type DeltaInsert,
@@ -10,61 +9,37 @@ import {
   type InlineRootElement,
   ZERO_WIDTH_NON_JOINER,
   ZERO_WIDTH_SPACE,
+  //ZERO_WIDTH_NON_JOINER,
+  //ZERO_WIDTH_SPACE,
 } from '@blocksuite/inline';
+import dayjs from 'dayjs';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
-import type { RootBlockComponent } from '../../../../../root-block/types.js';
+//import { ref } from 'lit/directives/ref.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
-import type { ReferenceNodeConfig } from './reference-config.js';
 
-import { HoverController } from '../../../../components/hover/controller.js';
-import { Peekable } from '../../../../components/peekable.js';
+//import { styleMap } from 'lit/directives/style-map.js';
+import { HoverController } from '../../../../components/hover/index.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
-import {
-  getModelByElement,
-  getRootByElement,
-} from '../../../../utils/query.js';
-import { DEFAULT_DOC_NAME } from '../consts.js';
-import { toggleReferencePopup } from './reference-popup.js';
-
-export type RefNodeSlots = {
-  docLinkClicked: Slot<{ docId: string; blockId?: string }>;
-  tagClicked: Slot<{ tagId: string }>;
-};
-
-declare module '@blocksuite/blocks' {
-  interface PeekViewService {
-    peek(target: AffineDateTime): void;
-  }
-}
+import { defaultDateFormat, defaultTimeFormat } from './config.js';
+//import { affineTextStyles } from '../affine-text.js';
+import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
 
 @customElement('affine-date-time')
-@Peekable({ action: false })
-export class AffineDateTime extends WithDisposable(ShadowlessElement) {
-  private _refAttribute: NonNullable<AffineTextAttributes['reference']> = {
-    type: 'LinkedPage',
-    pageId: '0',
-  };
+export class AffineDateTime extends ShadowlessElement {
+  /*get link() {
+    const link = this.delta.attributes?.link;
+    if (!link) {
+      return '';
+    }
+    return link;
+  }*/
 
-  private _updateRefMeta = (doc: Doc) => {
-    const refAttribute = this.delta.attributes?.reference;
-    assertExists(refAttribute, 'Failed to get reference attribute!');
-    this._refAttribute = refAttribute;
-    const refMeta = doc.collection.meta.docMetas.find(
-      doc => doc.id === refAttribute.pageId
-    );
-    this.refMeta = refMeta
-      ? {
-          ...refMeta,
-        }
-      : undefined;
-  };
-
-  private _whenHover: HoverController = new HoverController(
+  private _whenHover = new HoverController(
     this,
     ({ abortController }) => {
-      if (this.doc.readonly) {
+      if (this.blockElement.doc.readonly) {
         return null;
       }
 
@@ -83,11 +58,10 @@ export class AffineDateTime extends WithDisposable(ShadowlessElement) {
       }
 
       return {
-        template: toggleReferencePopup(
-          this,
+        template: toggleLinkPopup(
           this.inlineEditor,
+          'view',
           this.selfInlineRange,
-          this.refMeta?.title ?? DEFAULT_DOC_NAME,
           abortController
         ),
       };
@@ -96,167 +70,136 @@ export class AffineDateTime extends WithDisposable(ShadowlessElement) {
   );
 
   static override styles = css`
-    .affine-reference {
-      white-space: normal;
-      word-break: break-word;
-      color: var(--affine-text-primary-color);
-      fill: var(--affine-icon-color);
-      border-radius: 4px;
-      text-decoration: none;
-      cursor: pointer;
-      user-select: none;
-      padding: 1px 2px 1px 0;
-    }
-    .affine-reference:hover {
-      background: var(--affine-hover-color);
-    }
-
-    .affine-reference[data-selected='true'] {
-      background: var(--affine-hover-color);
-    }
-
-    .affine-reference-title {
-      margin-left: 4px;
-      border-bottom: 0.5px solid var(--affine-divider-color);
-      transition: border 0.2s ease-out;
-    }
-    .affine-reference-title:hover {
-      border-bottom: 0.5px solid var(--affine-icon-color);
+    affine-link > a:hover [data-v-text='true'] {
+      text-decoration: underline;
     }
   `;
 
-  private _onClick() {
-    return;
-    if (!this.config.interactable) return;
-
-    const refMeta = this.refMeta;
-    const model = getModelByElement(this);
-    if (!refMeta) {
-      // The doc is deleted
-      console.warn('The doc is deleted', this._refAttribute.pageId);
-      return;
-    }
-    if (refMeta.id === model.doc.id) {
-      // the doc is the current doc.
-      return;
-    }
-    const targetDocId = refMeta.id;
-    const rootModel = model.doc.root;
-    assertExists(rootModel);
-    const rootComponent = getRootByElement(this) as RootBlockComponent;
-    assertExists(rootComponent);
-    rootComponent.slots.docLinkClicked.emit({ docId: targetDocId });
-  }
-
   override connectedCallback() {
     super.connectedCallback();
+    // console.log('this is connected');
+    //console.log("this",this.delta.);
 
-    //assertExists(this.config, '`reference-node` need `ReferenceNodeConfig`.');
+    // this.inlineEditor.slots.mounted.on(() => {
+    //   console.log('this is mont');
+    // });
+    //
+    // this.inlineEditor.slots.inlineRangeApply.on(() => {
+    //   console.log('this is inlineRangeApply');
+    // });
+    //
+    // this.inlineEditor.slots.render.on(() => {
+    //   console.log('this is render');
+    // });
+    //
+    // this.inlineEditor.slots.textChange.on(() => {
+    //   console.log('this is textChange');
+    // });
+    // this.inlineEditor.slots.inputting.on(() => {
+    //   console.log('this is inputting');
+    // });
+    //
+    // this.inlineEditor.slots.inlineRangeUpdate.on(() => {
+    //   console.log('this is inlineRangeUpdate');
+    // });
+    //
+    // this.inlineEditor.slots.keydown.on(event => {
+    //   console.log('this is keydown', event);
+    // });
+    //
+    // this.inlineEditor.slots.renderComplete.on(() => {
+    //   console.log('this is renderComplete');
+    // });
+    //
+    // this.inlineEditor.slots.unmounted.on(() => {
+    //   console.log('this is unmounted');
+    // });
 
-    /*if (this.delta.insert !== REFERENCE_NODE) {
-      console.error(
-        `Reference node must be initialized with '${REFERENCE_NODE}', but got '${this.delta.insert}'`
-      );
-    }*/
+    // this.inlineEditor.slots.textChange.on(() => this._updateRefMeta(doc))
 
-    /*const doc = this.doc;
-    this._disposables.add(
-      doc.collection.slots.docUpdated.on(() => this._updateRefMeta(doc))
-    );*/
+    /*this.std.doc.slots.rootDeleted.on(() => {
+      console.log('rootDeleted');
+    });*/
+    //this.pare
+    /*this.inlineEditor.slots. inlineRangeApply.on(data => {
+      console.log('66666', data);
+    });*/
+    /*this.inlineEditor.unmount(() => {
+      console.log('1111', this.inlineEditor);
+    });*/
+    //this.std
+    /* this.inlineEditor.slots.inputting.on(([data]) => {
+      console.log('this is inputting', data);
+    });
 
-    /*this.updateComplete
-      .then(() => {
-        // observe yText update
-        this.disposables.add(
-          this.inlineEditor.slots.textChange.on(() => this._updateRefMeta(doc))
-        );
-      })
-      .catch(console.error);*/
+    this.inlineEditor.slots.inlineRangeApply.on(data => {
+      console.log('this is inlineRangeApply', data);
+    });
+
+    this.inlineEditor.slots.textChange.on(data => {
+      console.log('this is textChange', data);
+    });*/
   }
 
   override render() {
-    const refMeta = this.refMeta;
-    const isDeleted = !refMeta;
+    /*const style = this.delta.attributes
+      ? affineTextStyles(this.delta.attributes, {
+          color: 'var(--affine-link-color)',
+          fill: 'var(--affine-link-color)',
+          'text-decoration': 'none',
+          cursor: 'pointer',
+        })
+      : styleMap({});*/
 
-    //const attributes = this.delta.attributes;
-    //assertExists(attributes, 'Failed to get attributes!');
+    //data-selected=${this.selected}
+    /* return html`
+      <span class="affine-mention">
+        <span>@</span>
+        11111
+        <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>
+      </span>
+    `;*/
 
-    //const type = attributes.reference?.type;
-    //assertExists(type, 'Unable to get reference type!');
-
-    /*const title = this.customTitle
-      ? this.customTitle(this)
-      : isDeleted
-        ? 'Deleted doc'
-        : refMeta.title.length > 0
-          ? refMeta.title
-          : DEFAULT_DOC_NAME;*/
-    /*const icon = this.customIcon
-      ? this.customIcon(this)
-      : type === 'LinkedPage'
-        ? FontLinkedDocIcon
-        : FontDocIcon;*/
-
-    /*const style = affineTextStyles(
-      attributes,
-      isDeleted
-        ? {
-            color: 'var(--affine-text-disable-color)',
-            textDecoration: 'line-through',
-            fill: 'var(--affine-text-disable-color)',
-          }
-        : {}
-    );*/
-
-    /*const content = this.customContent
-      ? this.customContent(this)
-      : html`${icon}<span data-title=${title} class="affine-reference-title"
-            >${title}</span
-          >`;*/
-
-    // we need to add `<v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>` in an
-    // embed element to make sure inline range calculation is correct
-    /*style=${style}*/
-    /*${this.config.interactable ? ref(this._whenHover.setReference) : ''}*/
-    return html`<span
-      data-selected=${this.selected}
-      class="affine-reference"
-      @click=${this._onClick}
-      >1111<v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
-    ></span>`;
+    /*${ref(this._whenHover.setReference)}
+    href=${this.link}
+      affine-link
+    rel="noopener noreferrer"
+    target="_blank"
+    style=${style}
+      @mouseup=${this._onMouseUp}*/
+    //console.log('1111', this.delta);
+    return html`<span>
+      <span class="${Prefix}-date-time">${this.dateTime}</span>
+      <v-text .str=${this.delta.insert}></v-text>
+      <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
+    </span>`;
   }
 
-  override willUpdate(_changedProperties: Map<PropertyKey, unknown>) {
-    super.willUpdate(_changedProperties);
-
-    //const doc = this.doc;
-    //this._updateRefMeta(doc);
-  }
-
-  get block() {
-    const block = this.inlineEditor.rootElement.closest<BlockComponent>(
+  get blockElement() {
+    const blockElement = this.inlineEditor.rootElement.closest<BlockElement>(
       `[${BLOCK_ID_ATTR}]`
     );
-    assertExists(block);
-    return block;
+    assertExists(blockElement);
+    return blockElement;
   }
 
-  get customContent() {
-    return this.config.customContent;
-  }
-
-  get customIcon() {
-    return this.config.customIcon;
-  }
-
-  get customTitle() {
-    return this.config.customTitle;
-  }
-
-  get doc() {
-    const doc = this.config.doc;
-    assertExists(doc, '`reference-node` need `Doc`.');
-    return doc;
+  get dateTime() {
+    const dateTime = this.delta.attributes?.date?.date;
+    if (!dateTime) {
+      return '';
+    }
+    let tempStr = dayjs(this.delta.attributes?.date?.date).format(
+      defaultDateFormat
+    );
+    const time = this.delta.attributes?.date?.time;
+    if (time) {
+      tempStr +=
+        ' ' +
+        dayjs(`${this.delta.attributes?.date?.date} ${time}`).format(
+          defaultTimeFormat
+        );
+    }
+    return tempStr;
   }
 
   get inlineEditor() {
@@ -267,6 +210,24 @@ export class AffineDateTime extends WithDisposable(ShadowlessElement) {
     return inlineRoot.inlineEditor;
   }
 
+  // Workaround for links not working in contenteditable div
+  // see also https://stackoverflow.com/questions/12059211/how-to-make-clickable-anchor-in-contenteditable-div
+  //
+  // Note: We cannot use JS to directly open a new page as this may be blocked by the browser.
+  //
+  // Please also note that when readonly mode active,
+  // this workaround is not necessary and links work normally.
+  // see https://github.com/toeverything/AFFiNE/issues/1540
+  /*private _onMouseUp() {
+    const anchorElement = this.querySelector('a');
+    assertExists(anchorElement);
+    if (!anchorElement.isContentEditable) return;
+    anchorElement.contentEditable = 'false';
+    setTimeout(() => {
+      anchorElement.removeAttribute('contenteditable');
+    }, 0);
+  }*/
+
   get selfInlineRange() {
     const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
     assertExists(selfInlineRange);
@@ -274,26 +235,20 @@ export class AffineDateTime extends WithDisposable(ShadowlessElement) {
   }
 
   get std() {
-    const std = this.block.std;
+    const std = this.blockElement.std;
     assertExists(std);
     return std;
   }
 
-  @property({ attribute: false })
-  accessor config!: ReferenceNodeConfig;
+  /*  override disconnectedCallback() {
+    super.disconnectedCallback();
+    console.log('this is disconnected');
+  }*/
 
   @property({ type: Object })
   accessor delta: DeltaInsert<AffineTextAttributes> = {
     insert: ZERO_WIDTH_SPACE,
-    attributes: {},
   };
-
-  // Since the linked doc may be deleted, the `_refMeta` could be undefined.
-  @state()
-  accessor refMeta: DocMeta | undefined = undefined;
-
-  @property({ type: Boolean })
-  accessor selected = false;
 }
 
 declare global {
