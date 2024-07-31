@@ -26,9 +26,22 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     });*/
   }
 
+  removeBlock() {
+    //debugger;
+    this.doc.deleteBlock(this.model);
+  }
+
   override renderBlock() {
-    return html`<div>
-      <mahdaad-object-link-component></mahdaad-object-link-component>
+    //console.log('this is model and props', this.model);
+    return html`<div contenteditable="false">
+      <mahdaad-object-link-component
+        object-id="${this.model.object_id}"
+        link-id="${this.model.link_id}"
+        type="${this.model.type}"
+        @remove="${() => {
+          this.removeBlock();
+        }}"
+      ></mahdaad-object-link-component>
     </div>`;
   }
 }

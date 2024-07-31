@@ -44,6 +44,7 @@ import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
 //import table_of_content from './icons/table_of_content.svg?raw';
 import table_view from './icons/table_view.svg?raw';
+import tabler_files from './icons/tabler_files.svg?raw';
 import text from './icons/text.svg?raw';
 //import video from './icons/video.svg?raw';
 import { insertContent, tryRemoveEmptyLine } from './utils.js';
@@ -581,13 +582,14 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Create a page or link an existing one.',
         icon: notebook,
         action: ({ rootComponent, model }) => {
+          //rootComponent.doc.deleteBlock(model)
           openObjectPicker(rootComponent, model, 'document');
         },
       },
       {
         title: 'File',
         description: 'Create a file or link an existing one.',
-        icon: file,
+        icon: tabler_files,
         action: ({ rootComponent, model }) => {
           openObjectPicker(rootComponent, model, 'file');
         },
@@ -783,7 +785,12 @@ function openObjectPicker(
   setTimeout(() => {
     const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
     assertExists(inlineEditor);
-    objectPickerWidget.showObjectPicker(inlineEditor, triggerKey, obj_type);
+    objectPickerWidget.showObjectPicker(
+      inlineEditor,
+      triggerKey,
+      obj_type,
+      model
+    );
   });
 
   /*setTimeout(() => {

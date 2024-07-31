@@ -12,6 +12,8 @@ import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-
 import type { MentionOptions } from './index.js';
 //import type { UserMention } from './types.js';
 
+import type { BlockModel } from '@blocksuite/store';
+
 import type { IObjectType } from './type.js';
 
 import '../../../_common/components/button.js';
@@ -19,9 +21,14 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
+import { tryRemoveEmptyLine } from '../slash-menu/utils.js';
 //import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { styles } from './styles.js';
-
+export interface ObjectLink {
+  link_id: string;
+  object_id: string;
+  type: IObjectType;
+}
 //ShadowlessElement
 @customElement('affine-mahdaad-object-picker-popover')
 export class MahdaadObjectPickerPopover extends WithDisposable(
@@ -74,9 +81,11 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     private editorHost: EditorHost,
     private inlineEditor: AffineInlineEditor,
     private abortController = new AbortController(),
-    private obj_type: IObjectType
+    private obj_type: IObjectType,
+    private model: BlockModel
   ) {
     super();
+
     //this.addObjectLink();
     //console.log('1111', editorHost);
   }
@@ -191,12 +200,27 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     return getQuery(this.inlineEditor, this._startIndex) || '';
   }
 
-  addObjectLink() {
-    this.editorHost.std.command
+  addObjectLink(lnk: ObjectLink) {
+    // console.log('this is lnk', lnk);
+    this.editorHost.doc.addSiblingBlocks(this.model, [
+      {
+        flavour: 'affine:mahdaad-object',
+        ...lnk,
+        //name: file.name,
+        //size: file.size,
+        //type: types[index],
+      },
+    ]);
+    tryRemoveEmptyLine(this.model);
+    this.abortController.abort();
+    //.doc.('affine:mahdaad-object');
+    /*this.editorHost.std.command
       .chain()
       .updateBlockType({
         flavour: 'affine:mahdaad-object',
-        props: {},
+        props: {
+          ...lnk,
+        },
         //props: { type },
       })
       .inline((ctx, next) => {
@@ -204,8 +228,39 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         if (!newModels) {
           return false;
         }
+        //debugger;
+        //return false;
+        //debugger;
+
+        /!*onModelTextUpdated(this.editorHost, this.model, richText => {
+          //debugger;
+          //const inlineEditor = richText.inlineEditor;
+          //assertExists(inlineEditor);
+          //inlineEditor.focusEnd();
+        }).catch(console.error);*!/
+
         // Reset selection if the target is code block
-        /*if (['affine:code'].includes('affine:code')) {
+        /!*if (['affine:code'].includes(flavour)) {
+          if (newModels.length !== 1) {
+            console.error(
+              "Failed to reset selection! New model length isn't 1"
+            );
+            return false;
+          }
+          const codeModel = newModels[0];
+
+        }*!/
+        //console.log('next - change inline menu');
+        return next();
+      })
+      .run();*/
+    /*.inline((ctx, next) => {
+        const newModels = ctx.updatedBlocks;
+        if (!newModels) {
+          return false;
+        }
+        // Reset selection if the target is code block
+        /!*if (['affine:code'].includes('affine:code')) {
           if (newModels.length !== 1) {
             console.error(
               "Failed to reset selection! New model length isn't 1"
@@ -218,15 +273,13 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
             assertExists(inlineEditor);
             inlineEditor.focusEnd();
           }).catch(console.error);*!/
-        }*/
+        }*!/
         //console.log('next - change inline menu');
         return next();
-      })
-      .run();
+      })*/
   }
 
   override connectedCallback() {
-    //console.log('111111');
     super.connectedCallback();
 
     const inlineEditor = this.inlineEditor;
@@ -236,25 +289,36 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       return;
     }
 
+    /*this.addObjectLink({
+      object_id: '111',
+      link_id: '20222',
+      type: 'document',
+    });*/
+
     createKeydownObserver({
       target: inlineEditor.eventSource,
       signal: this.abortController.signal,
       interceptor: (e, next) => {
-        this._searchText = this._query;
-        //console.log('1111');
+        console.log('this is interceptor');
+        //this._searchText = this._query;
+        //console.log('this is search text 1', this._searchText);
         next();
       },
       onInput: () => {
         this._searchText = this._query;
-        console.log('this is query', this._query);
+        //console.log('this is search text 2', this._searchText);
+        //console.log('this is query', this._query);
         //this._activatedItemIndex = 0;
         //this._linkedDocGroup = this._getLinkedDocGroup();
       },
       onDelete: () => {
-        //const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
-        /*if (curIndex < this._startIndex) {
+        this._searchText = this._query;
+        //console.log('this is search text 3', this._query);
+        const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+        //console.log('99999', curIndex, this._startIndex);
+        if (curIndex == this._startIndex) {
           this.abortController.abort();
-        }*/
+        }
         //this._activatedItemIndex = 0;
         //this._linkedDocGroup = this._getLinkedDocGroup();
       },
@@ -282,12 +346,14 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         });*/
       },
       onConfirm: () => {
+        this.abortController.abort();
+        //debugger;
         /*this._flattenActionList[this._activatedItemIndex]
           .action()
           ?.catch(console.error);*/
       },
       onAbort: () => {
-        //this.abortController.abort();
+        this.abortController.abort();
       },
     });
 
@@ -381,22 +447,18 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     //console.log('5555', this.editorHost, this.doc, this.slots, ...this);
     return html`<div>
       <div
-        class="${Prefix}-popover  ${Prefix}-popover-element"
+        class="${Prefix}-popover ${Prefix}-popover-element ${Prefix}-object-link-popover"
         style="${style}"
       >
         <div class="${Prefix}-popover-container">
-          <span>${this._searchText}</span>
+          <!-- <span>${this._searchText}</span> -->
           <mahdaad-object-picker-component
             search-text="${this._searchText}"
             type="${this.obj_type}"
-            @select="${(data: object) => {
-              //debugger;
-              this.addObjectLink();
+            @select="${(event: CustomEvent) => {
+              //console.log('this is ', event);
+              this.addObjectLink(event.detail as ObjectLink);
               this.abortController.abort();
-              //<template>
-              //     <Card ></Card>
-              // </template>
-              //console.log(data);
             }}"
           >
           </mahdaad-object-picker-component>

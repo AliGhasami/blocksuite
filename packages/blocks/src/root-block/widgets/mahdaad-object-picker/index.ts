@@ -1,4 +1,5 @@
 import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockModel } from '@blocksuite/store';
 
 import { WidgetComponent } from '@blocksuite/block-std';
 import {
@@ -44,6 +45,7 @@ export function showPopover({
   options,
   triggerKey,
   obj_type,
+  model,
 }: {
   editorHost: EditorHost;
   inlineEditor: AffineInlineEditor;
@@ -53,6 +55,7 @@ export function showPopover({
   options: MentionOptions;
   triggerKey: string;
   obj_type: IObjectType;
+  model: BlockModel;
 }) {
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
@@ -60,7 +63,8 @@ export function showPopover({
     editorHost,
     inlineEditor,
     abortController,
-    obj_type
+    obj_type,
+    model
   );
   objectPicker.options = options;
   objectPicker.triggerKey = triggerKey;
@@ -91,9 +95,32 @@ export function showPopover({
   // Wait for node to be mounted
   setTimeout(updatePosition);
 
-  disposables.addFromEvent(window, 'mousedown', () => {
-    //abortController.abort();
-  });
+  disposables.addFromEvent(
+    objectPicker,
+    'mousedown',
+    e => {
+      e.stopPropagation();
+      //console.log('this is objectPicker');
+      // console.log('555', e, e.target);
+      //if (e.target === objectPicker) return;
+      //abortController.abort();
+      //abortController.abort();
+    }
+    //{ passive: true }
+  );
+
+  disposables.addFromEvent(
+    window,
+    'mousedown',
+    e => {
+      //console.log('this is windows event');
+      //console.log('555', e, e.target);
+      //if (e.target === objectPicker) return;
+      abortController.abort();
+      //abortController.abort();
+    }
+    //{ passive: true }
+  );
   return objectPicker;
 }
 
@@ -123,7 +150,8 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
   showObjectPicker = (
     inlineEditor: AffineInlineEditor,
     triggerKey: string,
-    obj_type: IObjectType
+    obj_type: IObjectType,
+    model: BlockModel
   ) => {
     const curRange = getCurrentNativeRange();
     if (!curRange) return;
@@ -134,6 +162,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
       options: this.options,
       triggerKey,
       obj_type,
+      model,
     });
   };
 
