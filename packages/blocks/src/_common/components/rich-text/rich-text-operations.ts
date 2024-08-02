@@ -665,6 +665,7 @@ function handleParagraphDeleteActions(
       'affine:code',
       'affine:image',
       'affine:divider',
+      'affine:mahdaad-object',
       ...EMBED_BLOCK_FLAVOUR_LIST,
     ])
   ) {

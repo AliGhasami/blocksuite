@@ -153,6 +153,7 @@ function bindEvent(doc: Doc) {
 
   doc.slots.blockUpdated.on((data) => {
     //console.log("this is event",data);
+    checkNotEmptyDocBlock(doc)
     emit('change', data)
     if (data.type == 'add') {
       if(data.flavour=='affine:mahdaad-object'){
@@ -171,13 +172,14 @@ function bindEvent(doc: Doc) {
         data.model.object_id='25300000'
       },8000)*/
       emit('addBlock', data)
+      //checkNotEmptyDocBlock(doc)
     }
     if (data.type == 'delete') {
       if(data.flavour=='affine:mahdaad-object'){
         //console.log("this is delete affine:mahdaad-object",data)
         emit('deleteObjectLink',data)
       }
-      checkNotEmptyDocBlock(doc)
+      //checkNotEmptyDocBlock(doc)
       emit('deleteBlock', data)
     }
     if (data.type == 'update') emit('updateBlock', data)
@@ -187,11 +189,15 @@ function bindEvent(doc: Doc) {
 function checkNotEmptyDocBlock(doc: Doc) {
   const noteList = doc.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
-  if (note && note.children.length == 0) {
-    doc.addBlock('affine:paragraph', {}, note)
-    /*nextTick(()=>{
-      setFocus()
-    })*/
+  if (note) {
+    if(note.children.length == 0
+      ||
+      (note.children.length>0 && note.children[note.children.length-1].flavour!='affine:paragraph' )
+      ||
+      (note.children.length>0 && note.children[note.children.length-1].flavour=='affine:paragraph' &&  note.children[note.children.length-1].text?.length!=0)
+    ){
+      doc.addBlock('affine:paragraph', {}, note)
+    }
   }
 }
 

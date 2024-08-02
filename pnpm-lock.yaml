@@ -376,7 +376,7 @@ importers:
         version: 10.11.0(vue@3.4.31(typescript@5.4.5))
       '@vueuse/integrations':
         specifier: ^10.11.0
-        version: 10.11.0(async-validator@4.2.5)(axios@1.7.2(debug@4.3.6))(focus-trap@7.5.4)(idb-keyval@6.2.1)(qrcode@1.5.3)(sortablejs@1.15.2)(vue@3.4.31(typescript@5.4.5))
+        version: 10.11.0(async-validator@4.2.5)(axios@1.7.2)(focus-trap@7.5.4)(idb-keyval@6.2.1)(qrcode@1.5.3)(sortablejs@1.15.2)(vue@3.4.31(typescript@5.4.5))
       '@zxcvbn-ts/core':
         specifier: ^3.0.4
         version: 3.0.4
@@ -13759,7 +13759,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@vueuse/integrations@10.11.0(async-validator@4.2.5)(axios@1.7.2(debug@4.3.6))(focus-trap@7.5.4)(idb-keyval@6.2.1)(qrcode@1.5.3)(sortablejs@1.15.2)(vue@3.4.31(typescript@5.4.5))':
+  '@vueuse/integrations@10.11.0(async-validator@4.2.5)(axios@1.7.2)(focus-trap@7.5.4)(idb-keyval@6.2.1)(qrcode@1.5.3)(sortablejs@1.15.2)(vue@3.4.31(typescript@5.4.5))':
     dependencies:
       '@vueuse/core': 10.11.0(vue@3.4.31(typescript@5.4.5))
       '@vueuse/shared': 10.11.0(vue@3.4.31(typescript@5.4.5))
@@ -20257,7 +20257,7 @@ snapshots:
       '@vue/devtools-api': 7.3.5
       '@vue/shared': 3.4.31
       '@vueuse/core': 10.11.0(vue@3.4.31(typescript@5.4.5))
-      '@vueuse/integrations': 10.11.0(async-validator@4.2.5)(axios@1.7.2(debug@4.3.6))(focus-trap@7.5.4)(idb-keyval@6.2.1)(qrcode@1.5.3)(sortablejs@1.15.2)(vue@3.4.31(typescript@5.4.5))
+      '@vueuse/integrations': 10.11.0(async-validator@4.2.5)(axios@1.7.2)(focus-trap@7.5.4)(idb-keyval@6.2.1)(qrcode@1.5.3)(sortablejs@1.15.2)(vue@3.4.31(typescript@5.4.5))
       focus-trap: 7.5.4
       mark.js: 8.11.1
       minisearch: 6.3.0

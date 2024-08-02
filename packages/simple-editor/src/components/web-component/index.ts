@@ -9,7 +9,7 @@ const components = {
   'select-hint-type': SelectHintType,
   'mahdaad-date-picker': DatePicker,
   //'mahdaad-object-picker-component':Test,
-  'mahdaad-object-link-component':Test2
+  //'mahdaad-object-link-component':Test2
 }
 
 Object.keys(components).forEach((item) => {

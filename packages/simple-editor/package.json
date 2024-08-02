@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "0.2.4-beta-10",
+  "version": "0.3.1",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -13,14 +13,7 @@
   "main": "./dist/vue-block-editor.umd.cjs",
   "module": "./dist/vue-block-editor.js",
   "exports": {
-    ".": {
-      "import": "./dist/vue-block-editor.js",
-      "require": "./dist/vue-block-editor.umd.cjs"
-    },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    }
+    ".": "./src/index.ts"
   },
   "types": "./dist/index.d.ts",
   "author": "Ali Ghasami",

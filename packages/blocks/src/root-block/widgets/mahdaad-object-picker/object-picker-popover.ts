@@ -21,7 +21,6 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
-import { tryRemoveEmptyLine } from '../slash-menu/utils.js';
 //import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { styles } from './styles.js';
 export interface ObjectLink {
@@ -206,12 +205,17 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       {
         flavour: 'affine:mahdaad-object',
         ...lnk,
+
         //name: file.name,
         //size: file.size,
         //type: types[index],
       },
     ]);
-    tryRemoveEmptyLine(this.model);
+    this.model.doc.deleteBlock(this.model);
+    //tryRemoveEmptyLine(this.model);
+    /*if (!this.model.text?.length) {
+      model.doc.deleteBlock(model);
+    }*/
     this.abortController.abort();
     //.doc.('affine:mahdaad-object');
     /*this.editorHost.std.command
@@ -299,7 +303,9 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       target: inlineEditor.eventSource,
       signal: this.abortController.signal,
       interceptor: (e, next) => {
-        console.log('this is interceptor');
+        //e.preventDefault();
+        //e.stopPropagation();
+        // console.log('this is interceptor');
         //this._searchText = this._query;
         //console.log('this is search text 1', this._searchText);
         next();
