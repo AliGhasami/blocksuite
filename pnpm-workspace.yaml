@@ -9,3 +9,4 @@ packages:
   - 'packages/playground'
   - 'packages/presets'
   - 'packages/simple-editor'
+  - 'packages/claytap'

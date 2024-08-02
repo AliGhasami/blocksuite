@@ -65,6 +65,8 @@ const emit = defineEmits<{
   (e: 'addBlock', val: IBlockChange): void
   (e: 'deleteBlock', val: IBlockChange): void
   (e: 'updateBlock', val: IBlockChange): void
+  (e: 'addObjectLink', val: IBlockChange): void
+  (e: 'deleteObjectLink',val: IBlockChange): void
 }>()
 
 watch(
@@ -138,11 +140,43 @@ function bindEvent(doc: Doc) {
     console.log("this is data",data);
   })*/
 
+  /*doc.slots.yBlockUpdated.on((data)=>{
+    console.log("1111",data)
+  })
+
+  doc.slots.rootAdded.on((data)=>{
+    console.log("doc.slots.rootAdded",data)
+  })*/
+  /*doc.slots.yBlockUpdated.on((data)=>{
+    console.log("this is update yBlockUpdated",data)
+  })*/
+
   doc.slots.blockUpdated.on((data) => {
     //console.log("this is event",data);
     emit('change', data)
-    if (data.type == 'add') emit('addBlock', data)
+    if (data.type == 'add') {
+      if(data.flavour=='affine:mahdaad-object'){
+        //console.log("this is add affine:mahdaad-object",data)
+        /*setTimeout(()=>{
+          data.model.type='544545545'
+        },8000)*/
+        emit('addObjectLink', data)
+      }
+      //data.model.propsUpdated.
+      //data.model.type='25300000'
+      //console.log("this is model",data.model)
+      //setData()
+      /*setTimeout(()=>{
+        data.model.type='25300000'
+        data.model.object_id='25300000'
+      },8000)*/
+      emit('addBlock', data)
+    }
     if (data.type == 'delete') {
+      if(data.flavour=='affine:mahdaad-object'){
+        //console.log("this is delete affine:mahdaad-object",data)
+        emit('deleteObjectLink',data)
+      }
       checkNotEmptyDocBlock(doc)
       emit('deleteBlock', data)
     }
@@ -307,7 +341,7 @@ defineExpose({
 
   .place-holder {
     @apply flex items-center gap-1 text-neutral-4 mt-body;
-    line-height: unset;
+    //line-height: unset;
     transition: all 0.3s ease-in-out;
     .short-code {
       font-size: 10px;
@@ -418,21 +452,21 @@ defineExpose({
   .claytap-text {
     //background-color: red;
     @apply text-neutral-8; //mt-body
-    line-height: unset;
+    //line-height: unset;
   }
 
   .claytap-h1 {
     @apply mt-page-display text-neutral-8;
-    line-height: unset;
+    //line-height: unset;
   }
 
   .claytap-h2 {
     @apply mt-page-heading text-neutral-8;
-    line-height: unset;
+    //line-height: unset;
   }
   .claytap-h3 {
     @apply mt-page-subheading text-neutral-8;
-    line-height: unset;
+    //line-height: unset;
   }
 
   /* Fix rtl - ltr Style */
@@ -479,7 +513,7 @@ defineExpose({
   box-sizing: border-box;
   overflow-y: auto;
   padding: 0 8px;
-  width: 200px;
+  width: 300px;
 }
 
 /* overlay mask */
@@ -492,11 +526,27 @@ defineExpose({
   z-index: var(--affine-z-index-popover);
 }
 
+.@{prefix}-object-link-popover{
+  //background-color: red;
+  padding: 0;
+
+  .@{prefix}-popover-container{
+    padding: 0;
+    min-height: 30px;
+    min-width: 250px;
+    width: auto;
+  }
+
+}
+
+
 /* slash Menu Style */
 .@{prefix}-slash-menu {
   .icon {
     width: 32px;
     height: 32px;
+    display: flex;
+    align-items: center;
   }
 
   .group-title {

@@ -8,6 +8,7 @@ export {
 } from './ai-panel/type.js';
 export { AffineCodeLanguageListWidget } from './code-language-list/index.js';
 export { AffineCodeToolbarWidget } from './code-toolbar/index.js';
+export { AffineDateTimeWidget } from './date-time-picker/index.js';
 export { AffineDocRemoteSelectionWidget } from './doc-remote-selection/doc-remote-selection.js';
 export { AffineDragHandleWidget } from './drag-handle/drag-handle.js';
 export {
@@ -31,6 +32,7 @@ export {
   AffineFormatBarWidget,
 } from './format-bar/format-bar.js';
 export { AffineImageToolbarWidget } from './image-toolbar/index.js';
+
 export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
 export { LinkedWidgetUtils } from './linked-doc/config.js';
 export {
@@ -38,6 +40,7 @@ export {
   showImportModal,
 } from './linked-doc/import-doc/index.js';
 export { AffineLinkedDocWidget } from './linked-doc/index.js';
+export { AffineMahdaadObjectPickerWidget } from './mahdaad-object-picker/index.js';
 export { AffineModalWidget } from './modal/modal.js';
 export { AffinePageDraggingAreaWidget } from './page-dragging-area/page-dragging-area.js';
 export { AffinePieMenuWidget } from './pie-menu/index.js';

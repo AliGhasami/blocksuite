@@ -4,4 +4,6 @@
 }*/
 //import './components/types'
 import BoardEditor from './components/board-editor.vue'
-export { BoardEditor }
+import type { Doc , BlockModel } from '@blocksuite/store'
+export type {Doc,BlockModel}
+export { BoardEditor}

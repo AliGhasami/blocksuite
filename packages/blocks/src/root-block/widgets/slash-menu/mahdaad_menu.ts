@@ -1,5 +1,5 @@
 import { assertExists } from '@blocksuite/global/utils';
-import { uuidv4 } from '@blocksuite/store';
+import { type BlockModel, uuidv4 } from '@blocksuite/store';
 
 import type { RootBlockComponent } from '../../types.js';
 import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
@@ -17,6 +17,8 @@ import { onModelTextUpdated } from '../../utils/index.js';
 //import link_to_page from './icons/link_to_page.svg?raw';
 import dayjs from 'dayjs';
 
+import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
+import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
@@ -36,12 +38,14 @@ import file from './icons/file.svg?raw';
 import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
+import notebook from './icons/notebook.svg?raw';
 import hint from './icons/hint.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
 //import table_of_content from './icons/table_of_content.svg?raw';
 import table_view from './icons/table_view.svg?raw';
+import tabler_files from './icons/tabler_files.svg?raw';
 import text from './icons/text.svg?raw';
 //import video from './icons/video.svg?raw';
 import { insertContent, tryRemoveEmptyLine } from './utils.js';
@@ -127,7 +131,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
       },
-      {
+      /* {
         title: 'Hint',
         description: 'Description',
         icon: hint,
@@ -135,26 +139,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           //console.log('rootElement', rootElement);
           //console.log('rootElement', rootComponent);
           //console.log('model', model);
-          /*rootComponent.host.std.command
-            .chain()
-            .updateBlockType({
-              flavour: 'affine:hint',
-              props: {
-                title: new Text('Title'),
-                description: new Text('Description'),
-                type: 'success',
-              },
-            })
-            .inline((ctx, next) => {
-              //console.log('this is inline in menu ', ctx);
-              /!* const newModels = ctx.updatedBlocks;
-              if (!newModels || newModels.length == 0) {
-                return false;
-              }
-              return next();*!/
-            })
-            .run();*/
-
           rootComponent.host.std.command
             .chain()
             .updateBlockType({
@@ -166,31 +150,17 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               },
             })
             .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
               const newModels = ctx.updatedBlocks;
-              if (!newModels) {
+              if (!newModels || newModels.length == 0) {
                 return false;
               }
-              // Reset selection if the target is code block
-              /*if (['affine:code'].includes(flavour)) {
-                if (newModels.length !== 1) {
-                  console.error(
-                    "Failed to reset selection! New model length isn't 1"
-                  );
-                  return false;
-                }
-                const codeModel = newModels[0];
-                onModelTextUpdated(rootComponent.host, codeModel, richText => {
-                  const inlineEditor = richText.inlineEditor;
-                  assertExists(inlineEditor);
-                  inlineEditor.focusEnd();
-                }).catch(console.error);
-              }*/
-              //console.log('next - change inline menu');
               return next();
             })
             .run();
+
         },
-      },
+      }*/
     ],
   },
   {
@@ -228,34 +198,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootComponent, model }) => {
-          //old method
-          //const date = new Date();
-          //insertContent(rootComponent.host, model, formatDate(date));
-          //todo fix ali ghasami
-          /*const triggerKey = '';
-          insertContent(rootElement.host, model, triggerKey);
-          assertExists(model.doc.root);
-          //@ts-ignore
-          const widgetEle = rootElement.widgetElements['affine-date-widget'];
-          assertExists(widgetEle);
-          // We have checked the existence of showLinkedDoc method in the showWhen
-          const mentionWidget = widgetEle as AffineMentionWidget;
-          // Wait for range to be updated
-          setTimeout(() => {
-            const inlineEditor = getInlineEditorByModel(
-              rootElement.host,
-              model
-            );
-            assertExists(inlineEditor);
-            mentionWidget.showMention(inlineEditor, triggerKey);
-            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
-          });*/
-
           const triggerKey = dayjs().format('YYYY-MM-DD');
-          //const inlineEditor = getInlineEditorByModel(rootElement.host, model);
-          //assertExists(inlineEditor);
-          //const inlineRange = inlineEditor.getInlineRange();
-          //const index = inlineRange ? inlineRange.index : 0;
+
           const temp = {
             date: triggerKey,
             time: null,
@@ -264,26 +208,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           insertContent(rootComponent.host, model, REFERENCE_NODE, {
             date: temp,
           });
-          //model.doc.slots.dateTimeEvent.emit({ type: 'add', meta: temp });
-          //model.doc.slots.inlineUpdate.emit({type:});
-          //inlineEditor.deleteText({ index: 1, length: 30 });
-          //console.log('this is index', index);
-          //model.text.insert(text, index, attributes as Record<string, unknown>);
-          //console.log('this is inline editgor', inlineEditor);
-          //console.log('this is model', model);
-          //console.log('this is host', rootElement.host);
-          //return;
-          /*const temp=dayjs*/
-          //old method
-          /*const date = new Date();
-          insertContent(rootElement.host, model, formatDate(date));*/
-          //const date = '1111';
-          //insertContent(rootElement.host, model, triggerKey);
           assertExists(model.doc.root);
-
-          //model.doc.slots.yBlockUpdated.emit({ id: '55555', type: '111' });
-
-          //@ts-ignore
           const widgetEle =
             rootComponent.widgetComponents['affine-date-time-widget'];
           assertExists(widgetEle);
@@ -297,7 +222,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             );
             assertExists(inlineEditor);
             dateWidget.showDateTime(inlineEditor, triggerKey);
-            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
       },
@@ -652,7 +576,231 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
       },*/
     ],
   },
+  {
+    groupName: 'Object',
+    children: [
+      {
+        title: 'Page',
+        description: 'Create a page or link an existing one.',
+        icon: notebook,
+        action: ({ rootComponent, model }) => {
+          //rootComponent.doc.deleteBlock(model)
+          openObjectPicker(rootComponent, model, 'document');
+        },
+      },
+      {
+        title: 'File',
+        description: 'Create a file or link an existing one.',
+        icon: tabler_files,
+        action: ({ rootComponent, model }) => {
+          openObjectPicker(rootComponent, model, 'file');
+        },
+      },
+      {
+        title: 'Image',
+        description: 'Upload a image or link an existing one.',
+        icon: file,
+        action: ({ rootComponent, model }) => {
+          openObjectPicker(rootComponent, model, 'image');
+        },
+      },
+      /* {
+        title: 'Title ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /* {
+        title: 'Title  ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /*{
+        title: 'Title   ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /* {
+        title: 'Title     ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /*{
+        title: 'Title         ',
+        description: 'Description',
+        icon: empty_title,
+        action: () => {},
+      },*/
+      /* {
+        title: 'figma',
+        description: 'Description',
+        icon: empty_title,
+        action: async ({ rootElement, model }) => {
+          const parentModel = rootElement.doc.getParent(model);
+          if (!parentModel) {
+            return;
+          }
+          const index = parentModel.children.indexOf(model) + 1;
+          await toggleEmbedCardCreateModal(
+            rootElement.host,
+            'Figma',
+            'The added Figma link will be displayed as an embed view.',
+            { mode: 'page', parentModel, index }
+          );
+          tryRemoveEmptyLine(model);
+        },
+      },*/
+      /*{
+        title: 'simple',
+        description: 'simple',
+        icon: empty_title,
+        action: async ({ rootElement }) => {
+          rootElement.host.std.command
+            .chain()
+            .updateBlockType({
+              flavour: 'affine:simple',
+              props: {
+                test_props: 'test_value',
+                title: new Text('Title'),
+                //title: new Text('Hello World!---titiel '),
+                description: new Text(''),
+              }, //type
+            })
+            .inline((ctx, next) => {
+              //console.log('this is inline in menu ', ctx);
+              const newModels = ctx.updatedBlocks;
+              if (!newModels || newModels.length == 0) {
+                return false;
+              }
+              return next();
+            })
+            .run();
+        },
+      },*/
+      /*{
+        title: 'Embed',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Figma',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Github',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Jira',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Oktuple',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Google Drive',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Miro',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Trello',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },
+      {
+        title: 'Gitlab',
+        description: 'Description',
+        icon: h1,
+        action: ({ rootElement }) => {},
+      },*/
+    ],
+  },
 ];
+
+function openObjectPicker(
+  rootComponent: RootBlockComponent,
+  model: BlockModel,
+  obj_type: IObjectType
+) {
+  //console.log('111', rootComponent.host);
+  /*rootComponent.host.std.command
+    .chain()
+    .updateBlockType({
+      flavour: 'affine:code',
+      props: {},
+      //props: { type },
+    })
+    .inline((ctx, next) => {
+      const newModels = ctx.updatedBlocks;
+      if (!newModels) {
+        return false;
+      }
+      // Reset selection if the target is code block
+      if (['affine:code'].includes('affine:code')) {
+        if (newModels.length !== 1) {
+          console.error("Failed to reset selection! New model length isn't 1");
+          return false;
+        }
+        const codeModel = newModels[0];
+        onModelTextUpdated(rootComponent.host, codeModel, richText => {
+          const inlineEditor = richText.inlineEditor;
+          assertExists(inlineEditor);
+          inlineEditor.focusEnd();
+        }).catch(console.error);
+      }
+      //console.log('next - change inline menu');
+      return next();
+    })
+    .run();
+
+  return;*/
+
+  const triggerKey = '';
+  const widgetEle =
+    // @ts-ignore
+    rootComponent.widgetComponents['affine-mahdaad-object-picker-widget'];
+  assertExists(widgetEle);
+  // We have checked the existence of showLinkedDoc method in the showWhen
+  const objectPickerWidget = widgetEle as AffineMahdaadObjectPickerWidget;
+  // Wait for range to be updated
+  setTimeout(() => {
+    const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
+    assertExists(inlineEditor);
+    objectPickerWidget.showObjectPicker(
+      inlineEditor,
+      triggerKey,
+      obj_type,
+      model
+    );
+  });
+
+  /*setTimeout(() => {
+    const inlineEditor = getInlineEditorByModel(rootElement.host, model);
+    assertExists(inlineEditor);
+    linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+  });*/
+}
 
 function runCommand(
   rootComponent: RootBlockComponent,
@@ -698,3 +846,4 @@ function runCommand(
     })
     .run();
 }
+
