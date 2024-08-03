@@ -134,6 +134,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
      * The first item of the trigger keys will be the primary key
      */
     triggerKeys: [
+      //'@',
       //comment for support mention
       //'@',
     ],
