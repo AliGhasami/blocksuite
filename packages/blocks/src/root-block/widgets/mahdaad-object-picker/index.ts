@@ -1,4 +1,4 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { EditorHost, UIEventStateContext } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
 import { WidgetComponent } from '@blocksuite/block-std';
@@ -16,6 +16,7 @@ import type { IObjectType } from './type.js';
 
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
+  getInlineEditorByModel,
   //getInlineEditorByModel,
   getViewportElement,
 } from '../../../_common/utils/query.js';
@@ -24,8 +25,9 @@ import { getPopperPosition } from '../../../root-block/utils/position.js';
 import { MahdaadObjectPickerPopover } from './object-picker-popover.js';
 //import type { UserMention } from './types.js';
 
-export type MentionOptions = {
+export type Options = {
   triggerKeys: string[];
+  triggerWords: { word: string; type: string }[];
   ignoreBlockTypes: BlockSuite.Flavour[];
   convertTriggerKey: boolean;
   /*getMenus: (ctx: {
@@ -52,7 +54,7 @@ export function showPopover({
   range: Range;
   container?: HTMLElement;
   abortController?: AbortController;
-  options: MentionOptions;
+  options: Options;
   triggerKey: string;
   obj_type: IObjectType;
   model: BlockModel;
@@ -129,7 +131,73 @@ export const AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET =
 
 @customElement(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)
 export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
-  static DEFAULT_OPTIONS: MentionOptions = {
+  private _onBeforeInput = (ctx: UIEventStateContext) => {
+    //console.log('1111');
+    //debugger;
+    //const eventState = ctx.get('defaultState');
+    //const event = eventState.event as InputEvent;
+
+    //const triggerKey = event.data;
+    //console.log('1111', triggerKey);
+    //if (!triggerKey || !this.config.triggerKeys.includes(triggerKey)) return;
+
+    const textSelection = this.host.selection.find('text');
+    if (!textSelection) return;
+
+    const block = this.host.doc.getBlock(textSelection.blockId);
+    assertExists(block);
+
+    const { model } = block;
+
+    //if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
+
+    const inlineEditor = getInlineEditorByModel(this.host, model);
+    if (!inlineEditor) return;
+    //console.log('1111', inlineEditor.yTextString);
+    const text = inlineEditor.yTextString;
+    if (text) {
+      //const triggerWorkds = this.options.triggerWords.map(item => item.word);
+      this.options.triggerWords.forEach(item => {
+        if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
+          //alert('11110');
+        }
+      });
+    }
+    /*if ( == '/file/') {
+      alert('11111');
+    }*/
+    /*inlineEditor.slots.inlineRangeApply.once(() => {
+      const rootComponent = this.block;
+      if (!isRootComponent(rootComponent)) {
+        console.error('SlashMenuWidget should be used in RootBlock');
+        return;
+      }
+
+      const config: SlashMenuStaticConfig = {
+        ...this.config,
+        items: filterEnabledSlashMenuItems(this.config.items, {
+          model,
+          rootComponent: rootComponent,
+        }),
+      };
+
+      // Wait for dom update, see this case https://github.com/toeverything/blocksuite/issues/2611
+      requestAnimationFrame(() => {
+        const curRange = getCurrentNativeRange();
+        if (!curRange) return;
+
+        closeSlashMenu();
+        showSlashMenu({
+          context: { model, rootComponent: rootComponent },
+          range: curRange,
+          triggerKey,
+          config,
+        });
+      });
+    });*/
+  };
+
+  static DEFAULT_OPTIONS: Options = {
     /**
      * The first item of the trigger keys will be the primary key
      */
@@ -138,11 +206,26 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
       //comment for support mention
       //'@',
     ],
+    triggerWords: [
+      {
+        word: '/File/',
+        type: 'file',
+      },
+      {
+        word: '/Page/',
+        type: 'page',
+      },
+      {
+        word: '/Image/',
+        type: 'image',
+      },
+    ],
     ignoreBlockTypes: ['affine:code'],
     /**
      * Convert trigger key to primary key (the first item of the trigger keys)
      */
     convertTriggerKey: true,
+
     //getMenus,
   };
 
@@ -171,6 +254,8 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     super.connectedCallback();
     //console.log('this is block', this.blockElement.model);
     //this.handleEvent('keyDown', this._onKeyDown);
+
+    this.handleEvent('beforeInput', this._onBeforeInput);
   }
 
   /*private getInlineEditor = (evt: KeyboardEvent) => {

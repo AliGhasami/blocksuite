@@ -39,7 +39,6 @@ import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
 import notebook from './icons/notebook.svg?raw';
-import hint from './icons/hint.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
 import quote from './icons/quote.svg?raw';
@@ -585,6 +584,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         icon: notebook,
         action: ({ rootComponent, model }) => {
           //rootComponent.doc.deleteBlock(model)
+          const triggerKey = '/page/';
+          insertContent(rootComponent.host, model, triggerKey);
           openObjectPicker(rootComponent, model, 'document');
         },
       },
@@ -593,6 +594,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Create a file or link an existing one.',
         icon: tabler_files,
         action: ({ rootComponent, model }) => {
+          const triggerKey = '/file/';
+          insertContent(rootComponent.host, model, triggerKey);
           openObjectPicker(rootComponent, model, 'file');
         },
       },
@@ -601,6 +604,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Upload a image or link an existing one.',
         icon: file,
         action: ({ rootComponent, model }) => {
+          const triggerKey = '/image/';
+          insertContent(rootComponent.host, model, triggerKey);
           openObjectPicker(rootComponent, model, 'image');
         },
       },
@@ -846,4 +851,3 @@ function runCommand(
     })
     .run();
 }
-
