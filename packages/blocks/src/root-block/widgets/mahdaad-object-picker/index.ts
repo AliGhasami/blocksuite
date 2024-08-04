@@ -14,6 +14,7 @@ import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-
 //import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 import type { IObjectType } from './type.js';
 
+import { matchFlavours } from '../../../_common/utils/index.js';
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
   getInlineEditorByModel,
@@ -27,7 +28,7 @@ import { MahdaadObjectPickerPopover } from './object-picker-popover.js';
 
 export type Options = {
   triggerKeys: string[];
-  triggerWords: { word: string; type: string }[];
+  triggerWords: { word: string; type: IObjectType }[];
   ignoreBlockTypes: BlockSuite.Flavour[];
   convertTriggerKey: boolean;
   /*getMenus: (ctx: {
@@ -37,6 +38,12 @@ export type Options = {
     docMetas: DocMeta[];
   }) => LinkedDocGroup[];*/
 };
+
+let globalAbortController = new AbortController();
+
+function closePopover() {
+  globalAbortController.abort();
+}
 
 export function showPopover({
   editorHost,
@@ -59,6 +66,7 @@ export function showPopover({
   obj_type: IObjectType;
   model: BlockModel;
 }) {
+  globalAbortController = abortController;
   const disposables = new DisposableGroup();
   abortController.signal.addEventListener('abort', () => disposables.dispose());
   const objectPicker = new MahdaadObjectPickerPopover(
@@ -149,17 +157,31 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
 
     const { model } = block;
 
-    //if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
+    if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
 
     const inlineEditor = getInlineEditorByModel(this.host, model);
     if (!inlineEditor) return;
+    //console.log(inlineEditor.inlineRangeProvider, inlineEditor);
     //console.log('1111', inlineEditor.yTextString);
     const text = inlineEditor.yTextString;
     if (text) {
       //const triggerWorkds = this.options.triggerWords.map(item => item.word);
       this.options.triggerWords.forEach(item => {
-        if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
+        if (text.toLowerCase() == item.word.toLowerCase()) {
+          //showPopover({})
           //alert('11110');
+          const curRange = getCurrentNativeRange();
+          if (!curRange) return;
+          closePopover();
+          showPopover({
+            editorHost: this.host,
+            inlineEditor,
+            range: curRange,
+            options: this.options,
+            triggerKey: '',
+            obj_type: item.type,
+            model,
+          });
         }
       });
     }
@@ -213,7 +235,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
       },
       {
         word: '/Page/',
-        type: 'page',
+        type: 'document',
       },
       {
         word: '/Image/',

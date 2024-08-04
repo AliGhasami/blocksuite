@@ -9,7 +9,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
-import type { MentionOptions } from './index.js';
+import type { Options } from './index.js';
 //import type { UserMention } from './types.js';
 
 import type { BlockModel } from '@blocksuite/store';
@@ -28,6 +28,7 @@ export interface ObjectLink {
   object_id: string;
   type: IObjectType;
 }
+
 //ShadowlessElement
 @customElement('affine-mahdaad-object-picker-popover')
 export class MahdaadObjectPickerPopover extends WithDisposable(
@@ -303,6 +304,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       target: inlineEditor.eventSource,
       signal: this.abortController.signal,
       interceptor: (e, next) => {
+        //console.log('this is search text 3', this._query);
         //e.preventDefault();
         //e.stopPropagation();
         // console.log('this is interceptor');
@@ -311,6 +313,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         next();
       },
       onInput: () => {
+        //console.log('this is 3');
         this._searchText = this._query;
         //console.log('this is search text 2', this._searchText);
         //console.log('this is query', this._query);
@@ -318,17 +321,20 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         //this._linkedDocGroup = this._getLinkedDocGroup();
       },
       onDelete: () => {
+        //console.log('this is 1');
         this._searchText = this._query;
-        //console.log('this is search text 3', this._query);
         const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
         //console.log('99999', curIndex, this._startIndex);
-        if (curIndex == this._startIndex) {
+        if (curIndex == this._startIndex - 1) {
+          //debugger;
           this.abortController.abort();
         }
         //this._activatedItemIndex = 0;
         //this._linkedDocGroup = this._getLinkedDocGroup();
       },
       onMove: step => {
+        //console.log('this is 2');
+        this.abortController.abort();
         /*const itemLen = this._flattenActionList.length;
         this._activatedItemIndex =
           (itemLen + this._activatedItemIndex + step) % itemLen;
@@ -352,6 +358,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         });*/
       },
       onConfirm: () => {
+        console.log('this is 4');
         this.abortController.abort();
         //debugger;
         /*this._flattenActionList[this._activatedItemIndex]
@@ -359,6 +366,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
           ?.catch(console.error);*/
       },
       onAbort: () => {
+        console.log('this is 5');
         this.abortController.abort();
       },
     });
@@ -525,7 +533,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   accessor PopOverElement: Element | null = null;
 
   @property({ attribute: false })
-  accessor options!: MentionOptions;
+  accessor options!: Options;
 
   @property({ attribute: false })
   accessor triggerKey!: string;

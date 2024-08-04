@@ -16,6 +16,7 @@ import {
 } from '../../../_common/utils/index.js';
 import { isRootComponent } from '../../utils/guard.js';
 import { getPopperPosition } from '../../utils/position.js';
+import { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import {
   type SlashMenuActionItem,
   type SlashMenuContext,
@@ -128,7 +129,26 @@ export class AffineSlashMenuWidget extends WidgetComponent {
 
     const inlineEditor = getInlineEditorByModel(this.host, model);
     if (!inlineEditor) return;
+    const text = inlineEditor.yTextString;
+    if (text) {
+      //const triggerWorkds = this.options.triggerWords.map(item => item.word);
+      for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS
+        .triggerWords) {
+        if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
+          //debugger;
+          closeSlashMenu();
+          return;
+          //showPopover({})
+          //alert('11110');
+        }
+      }
+      /*AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS.triggerWords.forEach(
+        item => {
 
+        }
+      );*/
+    }
+    //debugger;
     inlineEditor.slots.inlineRangeApply.once(() => {
       const rootComponent = this.block;
       if (!isRootComponent(rootComponent)) {
