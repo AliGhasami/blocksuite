@@ -18,7 +18,6 @@ import { onMounted, ref, watch } from 'vue'
 import { replaceIdMiddleware } from '@blocksuite/blocks'
 import 'tippy.js/dist/tippy.css'
 import './web-component/index'
-
 const refEditor = ref<HTMLElement | null>(null)
 let currentDocument: Doc | null = null
 let myCollection: DocCollection | null = null
@@ -302,7 +301,7 @@ defineExpose({
 @prefix:~ 'vue-block-board-editor';
 .@{prefix} {
   .affine-menu-action-text {
-    @apply text-gray-8;
+  @apply text-gray-8;
   }
 
   /**{
@@ -346,7 +345,7 @@ defineExpose({
   }
 
   .place-holder {
-    @apply flex items-center gap-1 text-neutral-4 mt-body;
+  @apply flex items-center gap-1 text-neutral-4 mt-body;
     //line-height: unset;
     transition: all 0.3s ease-in-out;
     .short-code {
@@ -367,7 +366,7 @@ defineExpose({
 
   /* Mention Style */
   .affine-mention {
-    @apply flex-inline gap-2 mt-overline cursor-pointer text-neutral-8 bg-gray-1;
+  @apply flex-inline gap-2 mt-overline cursor-pointer text-neutral-8 bg-gray-1;
     width: fit-content;
     border-radius: @roundness-sm;
     padding: 0 @space-2;
@@ -386,18 +385,18 @@ defineExpose({
     }
 
     & .affine-hint {
-      @apply flex  gap-2;
+    @apply flex  gap-2;
       padding: @space-4 @space-6 @space-4 @space-6;
       border: 1px solid @gray-2;
       .affine-content {
-        @apply flex flex-col gap-2;
+      @apply flex flex-col gap-2;
       }
       .affine-hint-title {
-        @apply mt-section-tittle;
+      @apply mt-section-tittle;
       }
 
       .affine-hint-description {
-        @apply mt-overline text-gray-7 pl-;
+      @apply mt-overline text-gray-7 pl-;
       }
     }
 
@@ -405,7 +404,7 @@ defineExpose({
       border-color: #c1ebcd;
       background: #eafaef;
       .affine-hint-title {
-        @apply text-green-5;
+      @apply text-green-5;
       }
     }
 
@@ -413,7 +412,7 @@ defineExpose({
       border-color: #fac7c7;
       background: #fcf2f2;
       .affine-hint-title {
-        @apply text-red-5;
+      @apply text-red-5;
       }
     }
     &.affine-hint-warning {
@@ -436,15 +435,16 @@ defineExpose({
       border-color: @gray-2;
       background: #fafafa;
       .affine-hint-title {
-        @apply text-gray-7;
+      @apply text-gray-7;
       }
     }
   }
 
+
   /* reset Style */
   .affine-paragraph-block-container {
     &:hover .place-holder {
-      @apply text-neutral-6;
+    @apply text-neutral-6;
     }
     /*&:hover{
       //background-color: red;
@@ -457,21 +457,21 @@ defineExpose({
   /* paragraph Style */
   .claytap-text {
     //background-color: red;
-    @apply text-neutral-8; //mt-body
+  @apply text-neutral-8; //mt-body
     //line-height: unset;
   }
 
   .claytap-h1 {
-    @apply mt-page-display text-neutral-8;
+  @apply mt-page-display text-neutral-8;
     //line-height: unset;
   }
 
   .claytap-h2 {
-    @apply mt-page-heading text-neutral-8;
+  @apply mt-page-heading text-neutral-8;
     //line-height: unset;
   }
   .claytap-h3 {
-    @apply mt-page-subheading text-neutral-8;
+  @apply mt-page-subheading text-neutral-8;
     //line-height: unset;
   }
 
@@ -497,7 +497,7 @@ defineExpose({
 
 /* popover Style */
 .@{prefix}-popover {
-  @apply pt-3 pb-1 shadow-floated border-roundness bg-white;
+@apply pt-3 pb-1 shadow-floated border-roundness bg-white;
   position: fixed;
   left: 0;
   top: 0;
@@ -556,28 +556,28 @@ defineExpose({
   }
 
   .group-title {
-    @apply mt-footnote text-neutral-5 block my-2;
+  @apply mt-footnote text-neutral-5 block my-2;
   }
 
   .title {
-    @apply mt-overline;
+  @apply mt-overline;
   }
 
   .item-title {
-    @apply flex flex-col mt-body; //gap-2
+  @apply flex flex-col mt-body; //gap-2
   }
 
   .description {
-    @apply mt-footnote text-neutral-5;
+  @apply mt-footnote text-neutral-5;
   }
 
   .claytap-slash-menu {
-    @apply flex flex-col gap-2;
+  @apply flex flex-col gap-2;
     //width: 260px;
   }
 
   .claytap-slash-menu-item {
-    @apply py-2 px-3 gap-2 items-center flex px-2 cursor-pointer;
+  @apply py-2 px-3 gap-2 items-center flex px-2 cursor-pointer;
     border-radius: 4px;
     &:hover,
     &.hover {
@@ -588,10 +588,10 @@ defineExpose({
 
 /* Mention menu Style */
 .@{prefix}-mention-menu-container {
-  @apply flex flex-col gap-2;
+@apply flex flex-col gap-2;
 
   .mention-item {
-    @apply mt-overline cursor-pointer;
+  @apply mt-overline cursor-pointer;
     transition: all 30ms ease-in-out;
     color: #6e737c;
     padding: @space-1;
@@ -633,7 +633,7 @@ defineExpose({
 }
 
 .tippy-box[data-theme='block-editor'] {
-  @apply bg-gray-0 shadow-floated  text-gray-8;
+@apply bg-gray-0 shadow-floated  text-gray-8;
   border-radius: @roundness-3;
   position: relative;
 }
@@ -643,4 +643,5 @@ defineExpose({
   border-radius: var(--mt-roundness-3);
   //background-color: red;
 }*!*/
+
 </style>
