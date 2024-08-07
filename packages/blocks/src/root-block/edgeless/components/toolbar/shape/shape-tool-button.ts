@@ -35,37 +35,17 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
   static override styles = css`
     :host {
       display: block;
-      //width: 100%;
-      //height: 100%;
+      width: 100%;
+      height: 100%;
     }
     edgeless-toolbar-button,
     .shapes {
-      //width: 100%;
-      //height: 64px;
-    }
-    .arrow-up-icon {
-      position: absolute;
-      top: 4px;
-      right: 2px;
-      font-size: 0;
+      width: 100%;
+      height: 64px;
     }
   `;
 
   override type = 'shape' as const;
-
-  /*private _handleShapeClick(shape: DraggableShape) {
-    const name = shape.name;
-    if (name !== this.states.shapeType) {
-      const shapeConfig = ShapeComponentConfig.find(s => s.name === name);
-      if (!shapeConfig) return;
-      this.edgeless.service.editPropsStore.recordLastProps(
-        'shape',
-        shapeConfig?.value
-      );
-      this.updateMenu();
-    }
-    if (!this.popper) this._toggleMenu();
-  }*/
 
   private _handleShapeClick(shape: DraggableShape) {
     const name = shape.name;
@@ -133,26 +113,17 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
   override render() {
     const {
       active,
-      //states
+      states: { fillColor, strokeColor },
     } = this;
-    //const { fillColor, strokeColor } = states;
 
-    //const color = ThemeObserver.generateColorProperty(fillColor!);
-    //const stroke = ThemeObserver.generateColorProperty(strokeColor!);
-    /*const shapeColor = isTransparent(fillColor!)
-      ? cssVar('white60')
-      : `var(${fillColor})`;*/
-    /*const shapeStroke = isTransparent(strokeColor!)
-      ? cssVar('black10')
-      : `var(${strokeColor})`;*/
-    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
+    const color = ThemeObserver.generateColorProperty(fillColor!);
+    const stroke = ThemeObserver.generateColorProperty(strokeColor!);
 
     return html`
-      <edgeless-tool-icon-button
-        class="edgeless-eraser-button"
-        .tooltip=${getTooltipWithShortcut('Shape', 'S')}
-        .tooltipOffset=${4}
-        .iconContainerPadding=${6}
+      <edgeless-toolbar-button
+        class="edgeless-shape-button"
+        .tooltip=${this.popper ? '' : getTooltipWithShortcut('Shape', 'S')}
+        .tooltipOffset=${5}
         .active=${active}
       >
         <edgeless-toolbar-shape-draggable
@@ -162,51 +133,18 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
           style=${styleMap({ color, stroke })}
           .color=${color}
           .stroke=${stroke}
-        .onShapeClick=${this._handleShapeClick.bind(this)}
           @click=${this._toggleMenu}
-        @click=${this._toggleMenu}
-      >
-        ${ShapeTablerIcon}
-        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
-          ${ArrowUpIcon}
-        </span>
-      </edgeless-tool-icon-button>
+          .onShapeClick=${this._handleShapeClick.bind(this)}
+        >
+        </edgeless-toolbar-shape-draggable>
+      </edgeless-toolbar-button>
     `;
-
-    // return html`
-    //   <edgeless-toolbar-button
-    //     class="edgeless-shape-button"
-    //     .tooltip=${this.popper ? '' : getTooltipWithShortcut('Shape', 'S')}
-    //     .tooltipOffset=${5}
-    //     .active=${active}
-    //   >
-    //     <edgeless-toolbar-shape-draggable
-    //       .edgeless=${this.edgeless}
-    //       .toolbarContainer=${this.toolbarContainer}
-    //       class="shapes"
-    //       style=${styleMap({
-    //         color: shapeColor,
-    //         stroke: shapeStroke,
-    //       })}
-    //       .color=${shapeColor}
-    //       .stroke=${shapeStroke}
-    //       @click=${this._toggleMenu}
-    //       .onShapeClick=${this._handleShapeClick.bind(this)}
-    //     >
-    //     </edgeless-toolbar-shape-draggable>
-    //   </edgeless-toolbar-button>
-    // `;
   }
 
   updateMenu() {
     if (!this.popper) return;
     Object.assign(this.popper.element, this.states);
   }
-
-  /*updateMenu() {
-    if (!this.popper) return;
-    Object.assign(this.popper.element, this.states);
-  }*/
 
   get stateKeys() {
     return Object.keys(this.states) as Array<keyof typeof this.states>;

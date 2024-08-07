@@ -1,20 +1,21 @@
+//TODO check ali ghasami
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 import type { EdgelessTool } from '../../../types.js';
 
-import { EraserTablerIcon } from '../../../../../_common/icons/index.js';
+import {
+  EdgelessEraserDarkIcon,
+  EdgelessEraserLightIcon,
+} from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 
 @customElement('edgeless-eraser-tool-button')
-export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
-  LitElement
-) {
+export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(LitElement) {
   static override styles = css`
     :host {
-      //height: 100%;
-      display: flex;
+      height: 100%;
       overflow-y: hidden;
     }
     .eraser-button {
@@ -56,22 +57,21 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
 
   override render() {
     const type = this.edgelessTool?.type;
-    // const { theme } = this;
-    //
-    // const icon =
-    //   theme === 'dark' ? EdgelessEraserDarkIcon : EdgelessEraserLightIcon;
+    const { theme } = this;
+
+    const icon =
+      theme === 'dark' ? EdgelessEraserDarkIcon : EdgelessEraserLightIcon;
 
     return html`
-      <edgeless-tool-icon-button
+      <edgeless-toolbar-button
         class="edgeless-eraser-button"
         .tooltip=${getTooltipWithShortcut('Eraser', 'E')}
         .tooltipOffset=${4}
         .active=${type === 'eraser'}
-        .iconContainerPadding=${6}
         @click=${() => this.setEdgelessTool({ type: 'eraser' })}
       >
-        ${EraserTablerIcon}
-      </edgeless-tool-icon-button>
+        <div class="eraser-button">${icon}</div>
+      </edgeless-toolbar-button>
     `;
   }
 }

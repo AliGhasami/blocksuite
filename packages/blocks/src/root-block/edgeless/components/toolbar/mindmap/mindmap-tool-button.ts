@@ -1,16 +1,13 @@
+//TODO check ali ghasami
 import { assertExists } from '@blocksuite/global/utils';
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-//import { classMap } from 'lit/directives/class-map.js';
-//import { repeat } from 'lit/directives/repeat.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { EdgelessTool } from '../../../types.js';
 
-import {
-  ArrowUpIcon,
-  MapTablerIcon,
-} from '../../../../../_common/icons/index.js';
 import { MindmapStyle } from '../../../../../surface-block/index.js';
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
@@ -21,7 +18,7 @@ import {
   mindmapConfig,
   textConfig,
   textRender,
-  //toolConfig2StyleObj,
+  toolConfig2StyleObj,
 } from './basket-elements.js';
 import { basketIconDark, basketIconLight, textIcon } from './icons.js';
 import './mindmap-menu.js';
@@ -37,12 +34,6 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-    .arrow-up-icon {
-      position: absolute;
-      top: 4px;
-      right: 2px;
-      font-size: 0;
     }
     .partial-clip {
       flex-shrink: 0;
@@ -253,26 +244,7 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
 
     const active = popper || draggingElement;
 
-    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
-
-    return html`
-      <edgeless-tool-icon-button
-        class="edgeless-mindmap-button"
-        .tooltip=${popper ? '' : 'Mindmap'}
-        .tooltipOffset=${4}
-        .iconContainerPadding=${6}
-        .active=${active}
-        .onShapeClick=${this._toggleMenu}
-        @click=${this._toggleMenu}
-      >
-        ${MapTablerIcon}
-        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
-          ${ArrowUpIcon}
-        </span>
-      </edgeless-tool-icon-button>
-    `;
-
-    /*return html`<edgeless-toolbar-button
+    return html`<edgeless-toolbar-button
       class="edgeless-mindmap-button"
       ?withHover=${true}
       .tooltip=${popper ? '' : 'Others'}
@@ -366,7 +338,7 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
           </mask>
         </defs>
       </svg>
-    </edgeless-toolbar-button>`;*/
+    </edgeless-toolbar-button>`;
   }
 
   override updated(_changedProperties: Map<PropertyKey, unknown>) {

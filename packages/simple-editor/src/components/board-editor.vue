@@ -109,7 +109,10 @@ async function setData(data: any) {
     editor.doc = new_doc
     currentDocument = new_doc
     appendTODOM(editor)
+    //new_doc.awarenessStore.setReadonly(new_doc.blockCollection, !new_doc.readonly);
     checkNotEmptyDocBlock(currentDocument)
+    //console.log("this is new doc",new_doc);
+
     /*if (refEditor.value) {
       const children = refEditor.value.children
       if (children.length) {
@@ -236,11 +239,20 @@ function init() {
   } else {
     editor = new PageEditor()
   }
+
   editor.doc = doc
   appendTODOM(editor)
+  //editor.doc.awarenessStore
+  //doc.awarenessStore.setReadonly(doc.blockCollection, !doc.readonly);
+  //const doc = this.doc;
+
+ /* setTimeout(()=>{
+    new_doc.awarenessStore.setReadonly(new_doc.blockCollection,false)
+  },6000)*/
   /*if(refEditor.value){
     refEditor.value.appendChild(editor);
   }*/
+
   bindEvent(doc)
   updateMentionList()
 }
