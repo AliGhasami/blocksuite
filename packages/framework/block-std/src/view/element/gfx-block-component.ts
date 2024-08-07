@@ -62,8 +62,27 @@ export abstract class GfxBlockComponent<
     return nothing;
   }
 
+  override async scheduleUpdate() {
+    const parent = this.parentElement;
+
+    if (this.hasUpdated || !parent || !('scheduleUpdateChildren' in parent)) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      super.scheduleUpdate();
+    } else {
+      await (parent.scheduleUpdateChildren as (id: string) => Promise<void>)(
+        this.model.id
+      );
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      super.scheduleUpdate();
+    }
+  }
+
   toZIndex(): string {
     return `${1}`;
+  }
+
+  updateZIndex(): void {
+    this.style.zIndex = this.toZIndex();
   }
 
   get rootService() {
@@ -149,8 +168,27 @@ export function toGfxBlockComponent<
       return super.renderBlock();
     }
 
+    override async scheduleUpdate() {
+      const parent = this.parentElement;
+
+      if (this.hasUpdated || !parent || !('scheduleUpdateChildren' in parent)) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        super.scheduleUpdate();
+      } else {
+        await (parent.scheduleUpdateChildren as (id: string) => Promise<void>)(
+          this.model.id
+        );
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        super.scheduleUpdate();
+      }
+    }
+
     toZIndex(): string {
       return `${1}`;
+    }
+
+    updateZIndex(): void {
+      this.style.zIndex = this.toZIndex();
     }
 
     get rootService() {

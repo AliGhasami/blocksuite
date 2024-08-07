@@ -1,7 +1,6 @@
 import type { EditorHost } from '@blocksuite/block-std';
-import type { InlineEditor } from '@blocksuite/inline';
+import type { InlineEditor, InlineRange } from '@blocksuite/inline';
 
-import { assertExists } from '@blocksuite/global/utils';
 import { BlockModel } from '@blocksuite/store';
 import { css, unsafeCSS } from 'lit';
 
@@ -11,56 +10,71 @@ import { isControlledKeyboardEvent } from '../../_common/utils/event.js';
 import { getInlineEditorByModel } from '../../_common/utils/query.js';
 import { getCurrentNativeRange } from '../../_common/utils/selection.js';
 
-export function getQuery(inlineEditor: InlineEditor, startIndex: number) {
-  const range = getCurrentNativeRange();
-  if (!range) {
+export function getQuery(
+  inlineEditor: InlineEditor,
+  startRange: InlineRange | null
+) {
+  const nativeRange = getCurrentNativeRange();
+  if (!nativeRange) {
     return null;
   }
-  if (range.startContainer !== range.endContainer) {
+  if (nativeRange.startContainer !== nativeRange.endContainer) {
     console.warn(
       'Failed to parse query! Current range is not collapsed.',
-      range
+      nativeRange
     );
     return null;
   }
-  const textNode = range.startContainer;
+  const textNode = nativeRange.startContainer;
   if (textNode.nodeType !== Node.TEXT_NODE) {
     console.warn(
       'Failed to parse query! Current range is not a text node.',
-      range
+      nativeRange
     );
     return null;
   }
-  const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
-  if (curIndex < startIndex) {
+  const curRange = inlineEditor.getInlineRange();
+  if (!startRange || !curRange) {
     return null;
   }
-
+  if (curRange.index < startRange.index) {
+    return null;
+  }
   const text = inlineEditor.yText.toString();
-  return text.slice(startIndex, curIndex);
+  return text.slice(startRange.index, curRange.index);
 }
 
 interface ObserverParams {
   target: HTMLElement;
   signal: AbortSignal;
+  inlineEditor: InlineEditor;
   onInput?: () => void;
   onDelete?: () => void;
   onMove?: (step: 1 | -1) => void;
   onConfirm?: () => void;
   onAbort?: () => void;
+  onPaste?: () => void;
   interceptor?: (e: KeyboardEvent, next: () => void) => void;
 }
 
 export const createKeydownObserver = ({
   target,
   signal,
+  inlineEditor,
   onInput,
   onDelete,
   onMove,
   onConfirm,
   onAbort,
+  onPaste,
   interceptor = (_, next) => next(),
 }: ObserverParams) => {
+  // In iOS webkit, using requestAnimationFrame has some timing issues
+  // we need wait inline editor updated before handle the next action
+  const waitForInlineEditorUpdated = (fn: () => void) => {
+    inlineEditor.slots.inlineRangeUpdate.once(fn);
+  };
+
   const keyDownListener = (e: KeyboardEvent) => {
     if (e.defaultPrevented) return;
 
@@ -83,6 +97,11 @@ export const createKeydownObserver = ({
             e.preventDefault();
             return;
           }
+          // Paste command
+          case 'v': {
+            onPaste?.();
+            return;
+          }
         }
       }
 
@@ -95,7 +114,7 @@ export const createKeydownObserver = ({
       }
 
       // Abort when press modifier key + any other key to avoid weird behavior
-      // e.g. press ctrl + a to select all or press ctrl + v to paste
+      // e.g. press ctrl + a to select all
       onAbort?.();
       return;
     }
@@ -107,7 +126,7 @@ export const createKeydownObserver = ({
       (!isControlledKeyboardEvent(e) && e.key.length === 1) ||
       e.isComposing
     ) {
-      requestAnimationFrame(() => onInput?.());
+      waitForInlineEditorUpdated(() => onInput?.());
       return;
     }
 
@@ -117,7 +136,7 @@ export const createKeydownObserver = ({
         return;
       }
       case 'Backspace': {
-        requestAnimationFrame(() => onDelete?.());
+        waitForInlineEditorUpdated(() => onDelete?.());
         return;
       }
       case 'Enter': {
@@ -177,10 +196,17 @@ export const createKeydownObserver = ({
     }
   );
 
+  // Fix paste input
+  target.addEventListener(
+    'paste',
+    () => waitForInlineEditorUpdated(() => onInput?.()),
+    { signal }
+  );
+
   // Fix composition input
   target.addEventListener(
     'input',
-    () => requestAnimationFrame(() => onInput?.()),
+    () => waitForInlineEditorUpdated(() => onInput?.()),
     { signal }
   );
 };
@@ -201,10 +227,13 @@ export function cleanSpecifiedTail(
     inlineEditorOrModel instanceof BlockModel
       ? getInlineEditorByModel(editorHost, inlineEditorOrModel)
       : inlineEditorOrModel;
-  assertExists(inlineEditor, 'Inline editor not found');
-
+  if (!inlineEditor) {
+    return;
+  }
   const inlineRange = inlineEditor.getInlineRange();
-  assertExists(inlineRange);
+  if (!inlineRange) {
+    return;
+  }
   const idx = inlineRange.index - str.length;
   const textStr = inlineEditor.yText.toString().slice(idx, idx + str.length);
   if (textStr !== str) {

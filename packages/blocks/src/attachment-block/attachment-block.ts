@@ -46,8 +46,6 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
 
   private _isSelected = false;
 
-  private readonly _themeObserver = new ThemeObserver();
-
   private _whenHover = new HoverController(this, ({ abortController }) => {
     const selection = this.host.selection;
     const textSelection = selection.find('text');
@@ -170,9 +168,7 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     });
 
     // Workaround for https://github.com/toeverything/blocksuite/issues/4724
-    this._themeObserver.observe(document.documentElement);
-    this._themeObserver.on(() => this.requestUpdate());
-    this.disposables.add(() => this._themeObserver.dispose());
+    this.disposables.add(ThemeObserver.subscribe(() => this.requestUpdate()));
 
     // this is required to prevent iframe from capturing pointer events
     this.disposables.add(
@@ -211,12 +207,6 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
             this._isResizing = false;
             this._showOverlay =
               this._isResizing || this._isDragging || !this._isSelected;
-          })
-        );
-
-        this._disposables.add(
-          this.rootService.layer.slots.layerUpdated.on(() => {
-            this.requestUpdate();
           })
         );
       }
@@ -329,6 +319,10 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
 
   toZIndex() {
     return this.rootService?.layer.getZIndex(this.model) ?? 1;
+  }
+
+  updateZIndex() {
+    this.style.zIndex = `${this.toZIndex()}`;
   }
 
   get isInSurface() {

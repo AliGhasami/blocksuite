@@ -9,12 +9,12 @@ import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { NoteBlockModel } from '../../../../note-block/index.js';
+import type { Color } from '../../../../surface-block/consts.js';
 import type { ConnectorElementModel } from '../../../../surface-block/element-model/connector.js';
 import type { ShapeType } from '../../../../surface-block/element-model/shape.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 import type { SelectedRect } from '../rects/edgeless-selected-rect.js';
 
-import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../../../_common/edgeless/note/consts.js';
 import {
   AutoCompleteArrowIcon,
   MindMapChildIcon,
@@ -219,25 +219,22 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
   private _addConnector(source: Connection, target: Connection) {
     const { current, edgeless } = this;
 
-    let color = '';
+    let stroke: Color = DEFAULT_CONNECTOR_COLOR;
     if (isShape(current)) {
-      color = edgeless.surface.themeObserver.getColor(
-        current.strokeColor,
-        DEFAULT_SHAPE_STROKE_COLOR
-      );
+      if (typeof current.strokeColor === 'object') {
+        stroke = { ...current.strokeColor };
+      } else {
+        stroke = current.strokeColor;
+      }
     } else {
-      const tmpColor = edgeless.surface.themeObserver.getColor(
-        current.background,
-        DEFAULT_NOTE_BACKGROUND_COLOR
-      );
-      let tag = tmpColor.split('-').pop();
-      if (!tag || tag === 'gray') tag = 'grey';
-      color = `--affine-palette-line-${tag}`;
+      if (typeof current.background === 'object') {
+        stroke = { ...current.background };
+      } else {
+        let tag = current.background.split('-').pop();
+        if (!tag || tag === 'gray') tag = 'grey';
+        stroke = `--affine-palette-line-${tag}`;
+      }
     }
-
-    const stroke = getComputedStyle(edgeless).getPropertyValue(color)
-      ? color
-      : DEFAULT_CONNECTOR_COLOR;
 
     const id = edgeless.service.addElement(CanvasElementType.CONNECTOR, {
       mode: ConnectorMode.Orthogonal,
@@ -259,7 +256,7 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
 
     const parentNode =
       target === 'sibling'
-        ? mindmap.getParentNode(this.current.id) ?? this.current
+        ? (mindmap.getParentNode(this.current.id) ?? this.current)
         : this.current;
 
     const newNode = mindmap.addNode(
@@ -620,7 +617,7 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     const { surface } = this.edgeless;
     surface.renderer.addOverlay(this._autoCompleteOverlay);
 
-    this._autoCompleteOverlay.stroke = surface.renderer.getColor(
+    this._autoCompleteOverlay.stroke = surface.renderer.getColorValue(
       current.strokeColor,
       DEFAULT_SHAPE_STROKE_COLOR,
       true

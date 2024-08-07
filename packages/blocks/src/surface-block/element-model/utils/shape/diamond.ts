@@ -4,7 +4,7 @@ import type { IVec } from '@blocksuite/global/utils';
 import { Bound } from '@blocksuite/global/utils';
 import { PointLocation } from '@blocksuite/global/utils';
 
-import type { ElementHitTestOptions } from '../../base.js';
+import type { PointTestOptions } from '../../base.js';
 import type { ShapeElementModel } from '../../shape.js';
 
 import { DEFAULT_CENTRAL_AREA_RATIO } from '../../../consts.js';
@@ -47,16 +47,17 @@ export const diamond = {
     ctx.restore();
   },
 
-  hitTest(
+  includesPoint(
     this: ShapeElementModel,
     x: number,
     y: number,
-    options: ElementHitTestOptions
+    options: PointTestOptions
   ) {
+    const point: IVec = [x, y];
     const points = getPointsFromBoundsWithRotation(this, diamond.points);
 
     let hit = pointOnPolygonStoke(
-      [x, y],
+      point,
       points,
       (options?.expand ?? 1) / (options.zoom ?? 1)
     );
@@ -77,14 +78,15 @@ export const diamond = {
             centralBounds,
             diamond.points
           );
-          hit = pointInPolygon([x, y], centralPoints);
-        } else {
-          hit = this.textBound
-            ? pointInPolygon(
-                [x, y],
-                getPointsFromBoundsWithRotation(this.textBound)
-              )
-            : false;
+          hit = pointInPolygon(point, centralPoints);
+        } else if (this.textBound) {
+          hit = pointInPolygon(
+            point,
+            getPointsFromBoundsWithRotation(
+              this,
+              () => Bound.from(this.textBound!).points
+            )
+          );
         }
       }
     }
@@ -92,7 +94,7 @@ export const diamond = {
     return hit;
   },
 
-  containedByBounds(bounds: Bound, element: ShapeElementModel) {
+  containsBound(bounds: Bound, element: ShapeElementModel) {
     const points = getPointsFromBoundsWithRotation(element, diamond.points);
     return points.some(point => bounds.containsPoint(point));
   },
@@ -102,7 +104,7 @@ export const diamond = {
     return polygonNearestPoint(points, point);
   },
 
-  intersectWithLine(start: IVec, end: IVec, element: ShapeElementModel) {
+  getLineIntersections(start: IVec, end: IVec, element: ShapeElementModel) {
     const points = getPointsFromBoundsWithRotation(element, diamond.points);
     return linePolygonIntersects(start, end, points);
   },

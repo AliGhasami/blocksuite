@@ -10,11 +10,7 @@ import {
 import { Point } from '@blocksuite/global/utils';
 import { Bound } from '@blocksuite/global/utils';
 import { DisposableGroup, throttle } from '@blocksuite/global/utils';
-import {
-  type BlockModel,
-  type BlockSelector,
-  BlockViewType,
-} from '@blocksuite/store';
+import { type BlockModel, BlockViewType, type Query } from '@blocksuite/store';
 import { html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -25,7 +21,7 @@ import type {
 } from '../../../note-block/index.js';
 import type { EdgelessRootBlockComponent } from '../../../root-block/edgeless/edgeless-root-block.js';
 import type { RootBlockModel } from '../../../root-block/root-model.js';
-import type { EdgelessBlockModel } from '../../edgeless/edgeless-block-model.js';
+import type { GfxBlockModel } from '../../edgeless/block-model.js';
 import type { EdgelessTool } from '../../edgeless/types.js';
 import type { DragHandleOption, DropResult, DropType } from './config.js';
 
@@ -102,11 +98,11 @@ export class AffineDragHandleWidget extends WidgetComponent<
     return previewOffset;
   };
 
-  private _calculateSelector = (selectedIds: string[]): BlockSelector => {
-    const ids: Array<{ id: string; type: BlockViewType }> = selectedIds.map(
+  private _calculateQuery = (selectedIds: string[]): Query => {
+    const ids: Array<{ id: string; viewType: BlockViewType }> = selectedIds.map(
       id => ({
         id,
-        type: BlockViewType.Display,
+        viewType: BlockViewType.Display,
       })
     );
 
@@ -115,7 +111,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
       let parent: string | null = block;
       do {
         if (!selectedIds.includes(parent)) {
-          ids.push({ type: BlockViewType.Bypass, id: parent });
+          ids.push({ viewType: BlockViewType.Bypass, id: parent });
         }
         parent = this.doc.blockCollection.crud.getParent(parent);
       } while (parent && !ids.map(({ id }) => id).includes(parent));
@@ -125,21 +121,16 @@ export class AffineDragHandleWidget extends WidgetComponent<
     const addChildren = (id: string) => {
       const children = this.doc.getBlock(id)?.model.children ?? [];
       children.forEach(child => {
-        ids.push({ type: BlockViewType.Display, id: child.id });
+        ids.push({ viewType: BlockViewType.Display, id: child.id });
         addChildren(child.id);
       });
     };
     selectedIds.forEach(addChildren);
 
-    const selector: BlockSelector = block => {
-      const includes = ids.find(({ id }) => id === block.id);
-      if (includes) {
-        return includes.type;
-      }
-      return BlockViewType.Hidden;
+    return {
+      match: ids,
+      mode: 'strict',
     };
-
-    return selector;
   };
 
   private _canEditing = (noteBlock: BlockComponent) => {
@@ -258,9 +249,9 @@ export class AffineDragHandleWidget extends WidgetComponent<
 
       const selectedIds = blocks.map(block => block.model.id);
 
-      const selector = this._calculateSelector(selectedIds);
+      const query = this._calculateQuery(selectedIds);
 
-      const doc = this.doc.blockCollection.getDoc({ selector });
+      const doc = this.doc.blockCollection.getDoc({ query });
 
       const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
       const previewTemplate = this.host.renderSpecPortal(
@@ -276,7 +267,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
       dragPreview = new DragPreview(offset);
       dragPreview.template = previewTemplate;
       dragPreview.onRemove = () => {
-        this.doc.blockCollection.clearSelector(selector);
+        this.doc.blockCollection.clearQuery(query);
       };
       dragPreview.style.width = `${width / this.scale / this.noteScale / this.cumulativeParentScale}px`;
       dragPreview.style.transform = `translate(${posX}px, ${posY}px) scale(${
@@ -565,7 +556,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
     const paddingTop = parseInt(computedStyle.paddingTop) * this.scale;
     return (
       (top +
-        paddingTop +
+        paddingTop -
         this.dragHandleContainerOffsetParent.getBoundingClientRect().top) /
       this.cumulativeParentScale
     );
@@ -1286,7 +1277,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
 
     this.noteScale = isInsidePageEditor(this.host)
       ? 1
-      : closestNoteBlock?.model.edgeless.scale ?? 1;
+      : (closestNoteBlock?.model.edgeless.scale ?? 1);
 
     if (
       closestNoteBlock &&
@@ -1462,7 +1453,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
   }
 
   private _getHoverAreaRectTopLevelBlock(
-    edgelessElement: EdgelessBlockModel
+    edgelessElement: GfxBlockModel
   ): Rect | null {
     if (isInsidePageEditor(this.host)) return null;
     const edgelessRoot = this.rootComponent as EdgelessRootBlockComponent;
@@ -1489,7 +1480,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
   }
 
   private get _rangeManager() {
-    return this.host.rangeManager;
+    return this.std.range;
   }
 
   private get dragHandleContainerOffsetParent() {
@@ -1653,7 +1644,7 @@ export class AffineDragHandleWidget extends WidgetComponent<
     return this._getBlockComponentFromViewStore(this._anchorBlockPath);
   }
 
-  get anchorEdgelessElement(): EdgelessBlockModel | null {
+  get anchorEdgelessElement(): GfxBlockModel | null {
     if (isInsidePageEditor(this.host) || !this._anchorBlockId) return null;
     const { service } = this.rootComponent as EdgelessRootBlockComponent;
     const edgelessElement = service.getElementById(this._anchorBlockId);

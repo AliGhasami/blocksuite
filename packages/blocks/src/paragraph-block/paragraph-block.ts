@@ -1,9 +1,10 @@
+//TODO check ali ghasami
 import type { BlockComponent } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { type ReadonlySignal, computed } from '@lit-labs/preact-signals';
+import { effect, signal } from '@lit-labs/preact-signals';
 import { type TemplateResult, html, nothing } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
@@ -26,7 +27,9 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   ParagraphBlockModel,
   ParagraphBlockService
 > {
-  private _displayPlaceholder!: ReadonlySignal<boolean>;
+  private _composing = signal(false);
+
+  private _displayPlaceholder = signal(false);
 
   private _inlineRangeProvider: InlineRangeProvider | null = null;
 
@@ -46,32 +49,51 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   override connectedCallback() {
     super.connectedCallback();
     bindContainerHotkey(this);
+    this.handleEvent(
+      'compositionStart',
+      () => {
+        this._composing.value = true;
+      },
+      { flavour: true }
+    );
+    this.handleEvent(
+      'compositionEnd',
+      () => {
+        this._composing.value = false;
+      },
+      { flavour: true }
+    );
 
     this._inlineRangeProvider = getInlineRangeProvider(this);
+    this.disposables.add(
+      effect(() => {
+        const composing = this._composing.value;
+        if (composing || this.doc.readonly) {
+          this._displayPlaceholder.value = false;
+          return;
+        }
+        const textSelection = this.host.selection.find('text');
+        const isCollapsed = textSelection?.isCollapsed() ?? false;
+        if (!this.selected || !isCollapsed) {
+          this._displayPlaceholder.value = false;
+          return;
+        }
 
-    this._displayPlaceholder = computed(() => {
-      //const textSelection = this.host.selection.find('text');
-      //const isCollapsed = textSelection?.isCollapsed() ?? false;
-      let isEmpty = false;
-      //todo ali ghasami for fix bug
-      const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
-      const paragraphList = note.length ? note[0].model.children : [];
-      if (paragraphList.length == 1) {
-        isEmpty = true;
-      }
-
-      if (
-        this.doc.readonly ||
-        (this.inlineEditor?.yTextLength ?? 0) > 0 ||
-        this.inlineEditor?.isComposing ||
-        (!this.selected && !isEmpty) || //!this.selected //&& !isEmpty
-        //!isCollapsed ||
-        this._isInDatabase()
-      ) {
-        return false;
-      }
-      return true;
-    });
+        this.updateComplete
+          .then(() => {
+            if (
+              (this.inlineEditor?.yTextLength ?? 0) > 0 ||
+              this._isInDatabase()
+            ) {
+              this._displayPlaceholder.value = false;
+              return;
+            }
+            this._displayPlaceholder.value = true;
+            return;
+          })
+          .catch(console.error);
+      })
+    );
   }
 
   override async getUpdateComplete() {

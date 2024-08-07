@@ -2,15 +2,14 @@ import type { AffineAIPanelState } from '@blocksuite/blocks';
 
 import { type EditorHost, WithDisposable } from '@blocksuite/block-std';
 import {
-  BlocksUtils,
   CodeBlockComponent,
   DividerBlockComponent,
   ListBlockComponent,
   ParagraphBlockComponent,
   SpecProvider,
 } from '@blocksuite/blocks';
-import { type BlockSelector, BlockViewType, type Doc } from '@blocksuite/store';
-import { LitElement, type PropertyValues, css, html } from 'lit';
+import { BlockViewType, type Doc, type Query } from '@blocksuite/store';
+import { LitElement, type PropertyValues, css, html, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { keyed } from 'lit/directives/keyed.js';
@@ -81,10 +80,11 @@ export class TextRenderer extends WithDisposable(LitElement) {
     }
   };
 
-  private _doc!: Doc;
+  private _doc: Doc | null = null;
 
-  private _selector: BlockSelector = block =>
-    BlocksUtils.matchFlavours(block.model, [
+  private readonly _query: Query = {
+    mode: 'strict',
+    match: [
       'affine:page',
       'affine:note',
       'affine:surface',
@@ -92,9 +92,8 @@ export class TextRenderer extends WithDisposable(LitElement) {
       'affine:code',
       'affine:list',
       'affine:divider',
-    ])
-      ? BlockViewType.Display
-      : BlockViewType.Hidden;
+    ].map(flavour => ({ flavour, viewType: BlockViewType.Display })),
+  };
 
   private _timer?: ReturnType<typeof setInterval> | null = null;
 
@@ -106,10 +105,10 @@ export class TextRenderer extends WithDisposable(LitElement) {
         markDownToDoc(this.host, latestAnswer)
           .then(doc => {
             this._doc = doc.blockCollection.getDoc({
-              selector: this._selector,
+              query: this._query,
             });
             this.disposables.add(() => {
-              doc.blockCollection.clearSelector(this._selector);
+              doc.blockCollection.clearQuery(this._query);
             });
             this._doc.awarenessStore.setReadonly(
               this._doc.blockCollection,
@@ -219,6 +218,10 @@ export class TextRenderer extends WithDisposable(LitElement) {
   }
 
   override render() {
+    if (!this._doc) {
+      return nothing;
+    }
+
     const { maxHeight, customHeading } = this.options;
     const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
     const classes = classMap({

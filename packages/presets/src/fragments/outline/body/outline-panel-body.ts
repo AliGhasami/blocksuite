@@ -1,9 +1,9 @@
-import type { EditorHost } from '@blocksuite/block-std';
 import type {
   EdgelessRootBlockComponent,
   NoteBlockModel,
 } from '@blocksuite/blocks';
 import type { Doc } from '@blocksuite/store';
+import type { Signal } from '@lit-labs/preact-signals';
 
 import { WithDisposable } from '@blocksuite/block-std';
 import { BlocksUtils, NoteDisplayMode } from '@blocksuite/blocks';
@@ -11,16 +11,17 @@ import { Bound, DisposableGroup } from '@blocksuite/global/utils';
 import { SignalWatcher, effect } from '@lit-labs/preact-signals';
 import { LitElement, type PropertyValues, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import type { AffineEditorContainer } from '../../../editors/editor-container.js';
 import type {
   ClickBlockEvent,
   DisplayModeChangeEvent,
   FitViewEvent,
   SelectEvent,
-} from '../card/outline-card.js';
+} from '../utils/custom-events.js';
 
-import { getDocTitleByEditorHost } from '../../doc-title/doc-title.js';
 import '../card/outline-card.js';
 import { startDragging } from '../utils/drag.js';
 import {
@@ -28,6 +29,7 @@ import {
   getNotesFromDoc,
   isHeadingBlock,
 } from '../utils/query.js';
+import { scrollToBlock, scrollToBlockWithHighlight } from '../utils/scroll.js';
 import './outline-notice.js';
 
 type OutlineNoteItem = {
@@ -113,11 +115,9 @@ export class OutlinePanelBody extends SignalWatcher(
 ) {
   private _changedFlag = false;
 
+  private _clearHighlightMask = () => {};
+
   private _docDisposables: DisposableGroup | null = null;
-
-  private _highlightMask: HTMLDivElement | null = null;
-
-  private _highlightTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   private _indicatorTranslateY = 0;
 
@@ -161,9 +161,8 @@ export class OutlinePanelBody extends SignalWatcher(
                 .number=${idx + 1}
                 .index=${note.index}
                 .doc=${this.doc}
-                .editorMode=${this.mode}
-                .editorHost=${this.editorHost}
-                .activeHeadingId=${this.activeHeadingId}
+                .editorMode=${this.editor.mode}
+                .activeHeadingId=${this.activeHeadingId.value}
                 .status=${selectedNotesSet.has(note.note.id)
                   ? this._dragging
                     ? 'placeholder'
@@ -192,7 +191,7 @@ export class OutlinePanelBody extends SignalWatcher(
                   .number=${idx + 1}
                   .index=${note.index}
                   .doc=${this.doc}
-                  .activeHeadingId=${this.activeHeadingId}
+                  .activeHeadingId=${this.activeHeadingId.value}
                   .invisible=${true}
                   .showPreviewIcon=${this.showPreviewIcon}
                   .enableNotesSorting=${this.enableNotesSorting}
@@ -207,15 +206,6 @@ export class OutlinePanelBody extends SignalWatcher(
   private _clearDocDisposables() {
     this._docDisposables?.dispose();
     this._docDisposables = null;
-  }
-
-  private _clearHighlightMask() {
-    this._highlightMask?.remove();
-    this._highlightMask = null;
-    if (this._highlightTimeoutId) {
-      clearTimeout(this._highlightTimeoutId);
-      this._highlightTimeoutId = null;
-    }
   }
 
   /*
@@ -364,7 +354,7 @@ export class OutlinePanelBody extends SignalWatcher(
   }
 
   private _isEdgelessMode() {
-    return this.mode === 'edgeless';
+    return this.editor.mode === 'edgeless';
   }
 
   private _moveNotes(
@@ -398,6 +388,8 @@ export class OutlinePanelBody extends SignalWatcher(
   }
 
   private _renderDocTitle() {
+    if (!this.doc.root) return nothing;
+
     const hasNotEmptyHeadings =
       getHeadingBlocksFromDoc(
         this.doc,
@@ -406,87 +398,32 @@ export class OutlinePanelBody extends SignalWatcher(
       ).length > 0;
 
     if (!hasNotEmptyHeadings) return nothing;
+
     return html`<affine-outline-block-preview
+      class=${classMap({
+        active: this.doc.root.id === this.activeHeadingId.value,
+      })}
       .block=${this.doc.root}
+      .className=${this.doc.root?.id === this.activeHeadingId.value
+        ? 'active'
+        : ''}
       .cardNumber=${1}
       .enableNotesSorting=${false}
       .showPreviewIcon=${this.showPreviewIcon}
       @click=${() => {
-        if (this._isEdgelessMode() || !this.editorHost) return;
-
-        const docTitle = getDocTitleByEditorHost(this.editorHost);
-        if (!docTitle) return;
-
-        docTitle.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        if (!this.doc.root) return;
+        scrollToBlock(this.editor, this.doc.root.id);
+        this.activeHeadingId.value = this.doc.root.id;
       }}
     ></affine-outline-block-preview>`;
   }
 
-  private _scrollToBlock(e: ClickBlockEvent) {
-    if (this._isEdgelessMode() || !this.editorHost) return;
-
-    const rootComponent = this.editorHost.querySelector('affine-page-root');
-    if (!rootComponent) return;
-
-    const { blockPath } = e.detail;
-    const path = [rootComponent.model.id, ...blockPath];
-    const block = this.editorHost.view.viewFromPath('block', path);
-    if (!block) return;
-
-    block.scrollIntoView({
-      behavior: 'instant',
-      block: 'center',
-      inline: 'center',
-    });
-
-    requestAnimationFrame(() => {
-      if (!rootComponent.viewport) {
-        console.error('viewport should exist');
-        return;
-      }
-
-      const blockRect = block.getBoundingClientRect();
-      const { top, left, width, height } = blockRect;
-
-      const {
-        top: offsetY,
-        left: offsetX,
-        scrollTop,
-        scrollLeft,
-      } = rootComponent.viewport;
-
-      if (!this._highlightMask) {
-        this._highlightMask = document.createElement('div');
-        rootComponent.append(this._highlightMask);
-      }
-
-      Object.assign(this._highlightMask.style, {
-        position: 'absolute',
-        top: `${top - offsetY + scrollTop}px`,
-        left: `${left - offsetX + scrollLeft}px`,
-        width: `${width}px`,
-        height: `${height}px`,
-        background: 'var(--affine-hover-color)',
-        borderRadius: '4px',
-        display: 'block',
-      });
-
-      this.activeHeadingId = block.model.id;
-
-      // Clear the previous timeout if it exists
-      if (this._highlightTimeoutId !== null) {
-        clearTimeout(this._highlightTimeoutId);
-      }
-
-      this._highlightTimeoutId = setTimeout(() => {
-        if (this._highlightMask) {
-          this._highlightMask.style.display = 'none';
-        }
-      }, 1000);
-    });
+  private async _scrollToBlock(e: ClickBlockEvent) {
+    this._clearHighlightMask = await scrollToBlockWithHighlight(
+      this.editor,
+      e.detail.blockId
+    );
+    this.activeHeadingId.value = e.detail.blockId;
   }
 
   private _selectNote(e: SelectEvent) {
@@ -670,9 +607,10 @@ export class OutlinePanelBody extends SignalWatcher(
     const shouldRenderPageVisibleNotes = this._shouldRenderNoteList(
       this._pageVisibleNotes
     );
-    const shouldRenderEdgelessOnlyNotes = this._shouldRenderNoteList(
-      this._edgelessOnlyNotes
-    );
+    const shouldRenderEdgelessOnlyNotes =
+      this.renderEdgelessOnlyNotes &&
+      this._shouldRenderNoteList(this._edgelessOnlyNotes);
+
     const shouldRenderEmptyPanel =
       !shouldRenderPageVisibleNotes && !shouldRenderEdgelessOnlyNotes;
 
@@ -729,7 +667,7 @@ export class OutlinePanelBody extends SignalWatcher(
   accessor OutlinePanelContainer!: HTMLElement;
 
   @property({ attribute: false })
-  accessor activeHeadingId: string | null = null;
+  accessor activeHeadingId!: Signal<string | null>;
 
   @property({ attribute: false })
   accessor doc!: Doc;
@@ -741,7 +679,7 @@ export class OutlinePanelBody extends SignalWatcher(
   accessor edgeless!: EdgelessRootBlockComponent | null;
 
   @property({ attribute: false })
-  accessor editorHost!: EditorHost;
+  accessor editor!: AffineEditorContainer;
 
   @property({ attribute: false })
   accessor enableNotesSorting!: boolean;
@@ -753,13 +691,13 @@ export class OutlinePanelBody extends SignalWatcher(
   accessor insertIndex: number | undefined = undefined;
 
   @property({ attribute: false })
-  accessor mode: 'page' | 'edgeless' = 'page';
-
-  @property({ attribute: false })
   accessor noticeVisible!: boolean;
 
   @query('.panel-list')
   accessor panelListElement!: HTMLElement;
+
+  @property({ attribute: false })
+  accessor renderEdgelessOnlyNotes: boolean = true;
 
   @property({ attribute: false })
   accessor setNoticeVisibility!: (visibility: boolean) => void;

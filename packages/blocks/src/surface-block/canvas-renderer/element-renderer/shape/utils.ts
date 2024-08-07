@@ -17,7 +17,7 @@ import {
   wrapTextDeltas,
 } from '../text/utils.js';
 
-export type CustomStyle = {
+export type Colors = {
   color: string;
   fillColor: string;
   strokeColor: string;
@@ -27,6 +27,7 @@ export function drawGeneralShape(
   ctx: CanvasRenderingContext2D,
   shapeModel: ShapeElementModel,
   renderer: Renderer,
+  filled: boolean,
   fillColor: string,
   strokeColor: string
 ) {
@@ -50,7 +51,7 @@ export function drawGeneralShape(
 
   ctx.lineWidth = shapeModel.strokeWidth;
   ctx.strokeStyle = strokeColor;
-  ctx.fillStyle = fillColor;
+  ctx.fillStyle = filled ? fillColor : 'transparent';
 
   switch (shapeModel.strokeStyle) {
     case 'none':
@@ -58,11 +59,9 @@ export function drawGeneralShape(
       break;
     case 'dash':
       ctx.setLineDash([12, 12]);
-      ctx.strokeStyle = renderer.getVariableColor(shapeModel.strokeStyle);
       break;
-    default:
-      ctx.strokeStyle = renderer.getVariableColor(shapeModel.strokeStyle);
   }
+
   if (shapeModel.shadow) {
     const { blur, offsetX, offsetY, color } = shapeModel.shadow;
     const scale = ctx.getTransform().a;
@@ -70,7 +69,7 @@ export function drawGeneralShape(
     ctx.shadowBlur = blur * scale;
     ctx.shadowOffsetX = offsetX * scale;
     ctx.shadowOffsetY = offsetY * scale;
-    ctx.shadowColor = renderer.getVariableColor(color);
+    ctx.shadowColor = renderer.getPropertyValue(color);
   }
 
   ctx.stroke();

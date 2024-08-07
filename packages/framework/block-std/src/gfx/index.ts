@@ -1,28 +1,31 @@
-export * from './model.js';
+export * from './gfx-block-model.js';
 export {
   convert,
   convertProps,
   derive,
-  getDeriveProperties,
+  getDerivedProps,
   getYFieldPropsSet,
+  initializeObservers,
   initializeWatchers,
-  initializedObservers,
   local,
   observe,
-  updateDerivedProp,
+  updateDerivedProps,
   watch,
   yfield,
 } from './surface/decorators/index.js';
 export {
   type BaseElementProps,
+  type GfxElementGeometry,
   GfxGroupLikeElementModel,
   GfxLocalElementModel,
   GfxPrimitiveElementModel,
+  type PointTestOptions,
   type SerializedElement,
 } from './surface/element-model.js';
 export {
   SurfaceBlockModel,
   type SurfaceBlockProps,
   type SurfaceMiddleware,
-} from './surface/model.js';
+} from './surface/surface-model.js';
 export * from './viewport.js';
+export { GfxViewportElement } from './viewport-element.js';

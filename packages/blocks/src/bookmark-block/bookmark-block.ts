@@ -10,6 +10,7 @@ import type { BookmarkBlockService } from './bookmark-service.js';
 import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
 import { bindContainerHotkey } from '../_common/components/rich-text/keymap/container.js';
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
+import { BOOKMARK_MIN_WIDTH } from '../root-block/edgeless/utils/consts.js';
 import './components/bookmark-card.js';
 import { refreshBookmarkUrlData } from './utils.js';
 
@@ -65,12 +66,6 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
     );
 
     if (this._isInSurface) {
-      this.rootService &&
-        this._disposables.add(
-          this.rootService.layer.slots.layerUpdated.on(() => {
-            this.requestUpdate();
-          })
-        );
       this.style.position = 'absolute';
     }
   }
@@ -86,7 +81,7 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
     let containerStyleMap = styleMap({
       position: 'relative',
       width: '100%',
-      minWidth: '450px',
+      minWidth: `${BOOKMARK_MIN_WIDTH}px`,
     });
 
     if (this.isInSurface) {
@@ -125,6 +120,10 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
 
   toZIndex() {
     return this.rootService?.layer.getZIndex(this.model) ?? 1;
+  }
+
+  updateZIndex() {
+    this.style.zIndex = `${this.toZIndex()}`;
   }
 
   get isInSurface() {

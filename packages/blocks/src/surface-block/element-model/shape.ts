@@ -1,6 +1,6 @@
 import type {
   BaseElementProps,
-  ElementHitTestOptions,
+  PointTestOptions,
 } from '@blocksuite/block-std/gfx';
 import type {
   Bound,
@@ -18,7 +18,7 @@ import {
 import { DocCollection, type Y } from '@blocksuite/store';
 
 import {
-  type CustomColor,
+  type Color,
   DEFAULT_ROUGHNESS,
   FontFamily,
   FontStyle,
@@ -57,9 +57,9 @@ export type ShapeProps = BaseElementProps & {
   shapeType: ShapeType;
   radius: number;
   filled: boolean;
-  fillColor: string | CustomColor;
+  fillColor: Color;
   strokeWidth: number;
-  strokeColor: string | CustomColor;
+  strokeColor: Color;
   strokeStyle: StrokeStyle;
   shapeStyle: ShapeStyle;
   // https://github.com/rough-stuff/rough/wiki#roughness
@@ -86,8 +86,12 @@ export class ShapeElementModel extends GfxPrimitiveElementModel<ShapeProps> {
     return props;
   }
 
-  override containedByBounds(bounds: Bound) {
-    return shapeMethods[this.shapeType].containedByBounds(bounds, this);
+  override containsBound(bounds: Bound) {
+    return shapeMethods[this.shapeType].containsBound(bounds, this);
+  }
+
+  override getLineIntersections(start: IVec, end: IVec) {
+    return shapeMethods[this.shapeType].getLineIntersections(start, end, this);
   }
 
   override getNearestPoint(point: IVec): IVec {
@@ -98,26 +102,22 @@ export class ShapeElementModel extends GfxPrimitiveElementModel<ShapeProps> {
     return shapeMethods[this.shapeType].getRelativePointLocation(point, this);
   }
 
-  override hitTest(x: number, y: number, options: ElementHitTestOptions) {
-    return shapeMethods[this.shapeType].hitTest.call(this, x, y, {
+  override includesPoint(x: number, y: number, options: PointTestOptions) {
+    return shapeMethods[this.shapeType].includesPoint.call(this, x, y, {
       ...options,
       ignoreTransparent: options.ignoreTransparent ?? true,
     });
-  }
-
-  override intersectWithLine(start: IVec, end: IVec) {
-    return shapeMethods[this.shapeType].intersectWithLine(start, end, this);
   }
 
   get type() {
     return 'shape';
   }
 
-  @yfield()
-  accessor color: string | CustomColor = '#000000';
+  @yfield('#000000' as Color)
+  accessor color!: Color;
 
   @yfield()
-  accessor fillColor: string | CustomColor = '--affine-palette-shape-yellow';
+  accessor fillColor: Color = '--affine-palette-shape-yellow';
 
   @yfield()
   accessor filled: boolean = false;
@@ -167,7 +167,7 @@ export class ShapeElementModel extends GfxPrimitiveElementModel<ShapeProps> {
   accessor shapeType: ShapeType = 'rect';
 
   @yfield()
-  accessor strokeColor: string | CustomColor = '--affine-palette-line-yellow';
+  accessor strokeColor: Color = '--affine-palette-line-yellow';
 
   @yfield()
   accessor strokeStyle: StrokeStyle = StrokeStyle.Solid;

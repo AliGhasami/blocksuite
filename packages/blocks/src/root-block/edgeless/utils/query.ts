@@ -20,7 +20,7 @@ import type { FrameBlockModel } from '../../../frame-block/index.js';
 import type { ImageBlockModel } from '../../../image-block/index.js';
 import type { NoteBlockModel } from '../../../note-block/index.js';
 import type { Viewport } from '../../../root-block/edgeless/utils/viewport.js';
-import type { EdgelessBlockModel } from '../edgeless-block-model.js';
+import type { GfxBlockModel } from '../block-model.js';
 import type { EdgelessTool } from '../types.js';
 
 import {
@@ -37,14 +37,14 @@ import {
 import { getElementsWithoutGroup } from './group.js';
 
 export function isMindmapNode(
-  element: EdgelessBlockModel | BlockSuite.EdgelessModel | null
+  element: GfxBlockModel | BlockSuite.EdgelessModel | null
 ) {
   return element?.group instanceof MindmapElementModel;
 }
 
 export function isTopLevelBlock(
   selectable: BlockModel | BlockSuite.EdgelessModel | BlockModel | null
-): selectable is EdgelessBlockModel {
+): selectable is GfxBlockModel {
   return !!selectable && 'flavour' in selectable;
 }
 
@@ -101,6 +101,23 @@ export function isEmbeddedBlock(
 ): element is EmbedBlockModel {
   return (
     !!element && 'flavour' in element && /affine:embed-*/.test(element.flavour)
+  );
+}
+
+/**
+ * TODO: Remove this function after the edgeless refactor completed
+ * This function is used to check if the block is an AI chat block for edgeless selected rect
+ * Should not be used in the future
+ * Related issue: https://linear.app/affine-design/issue/BS-1009/
+ * @deprecated
+ */
+export function isAIChatBlock(
+  element: BlockModel | BlockSuite.EdgelessModel | null
+) {
+  return (
+    !!element &&
+    'flavour' in element &&
+    element.flavour === 'affine:embed-ai-chat'
   );
 }
 

@@ -1,3 +1,4 @@
+//TODO check ali ghasami
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -6,10 +7,7 @@ import type { LastProps } from '../../../../../surface-block/managers/edit-sessi
 import type { ShapeName } from './shape-tool-element.js';
 import type { DraggableShape } from './utils.js';
 
-import {
-  ArrowUpIcon,
-  ShapeTablerIcon,
-} from '../../../../../_common/icons/index.js';
+import { ThemeObserver } from '../../../../../_common/theme/theme-observer.js';
 import {
   DEFAULT_SHAPE_FILL_COLOR,
   DEFAULT_SHAPE_STROKE_COLOR,
@@ -126,6 +124,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         states,
         updates => {
           this.states = { ...this.states, ...updates };
+          this.updateMenu();
         }
       )
     );
@@ -138,6 +137,8 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     } = this;
     //const { fillColor, strokeColor } = states;
 
+    //const color = ThemeObserver.generateColorProperty(fillColor!);
+    //const stroke = ThemeObserver.generateColorProperty(strokeColor!);
     /*const shapeColor = isTransparent(fillColor!)
       ? cssVar('white60')
       : `var(${fillColor})`;*/
@@ -153,7 +154,16 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         .tooltipOffset=${4}
         .iconContainerPadding=${6}
         .active=${active}
+      >
+        <edgeless-toolbar-shape-draggable
+          .edgeless=${this.edgeless}
+          .toolbarContainer=${this.toolbarContainer}
+          class="shapes"
+          style=${styleMap({ color, stroke })}
+          .color=${color}
+          .stroke=${stroke}
         .onShapeClick=${this._handleShapeClick.bind(this)}
+          @click=${this._toggleMenu}
         @click=${this._toggleMenu}
       >
         ${ShapeTablerIcon}

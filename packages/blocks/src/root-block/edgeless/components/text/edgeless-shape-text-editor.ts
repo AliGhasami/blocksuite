@@ -17,6 +17,7 @@ import {
   getNearestTranslation,
   isElementOutsideViewport,
 } from '../../../../_common/edgeless/mindmap/index.js';
+import { ThemeObserver } from '../../../../_common/theme/theme-observer.js';
 import { TextResizing } from '../../../../surface-block/consts.js';
 import {
   MindmapElementModel,
@@ -44,6 +45,8 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
     this._disposables.addFromEvent(this, 'keydown', evt => {
       switch (evt.key) {
         case 'Enter': {
+          if (evt.shiftKey || evt.isComposing) return;
+
           evt.preventDefault();
           const edgeless = this.edgeless;
           const element = this.element;
@@ -282,7 +285,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
       leftTopY
     );
     const autoWidth = textResizing === TextResizing.AUTO_WIDTH;
-    const color = this.edgeless.surface.themeObserver.getColor(
+    const color = ThemeObserver.generateColorProperty(
       this.element.color,
       '#000000'
     );
@@ -313,7 +316,7 @@ export class EdgelessShapeTextEditor extends WithDisposable(ShadowlessElement) {
       outline: 'none',
       transform: `scale(${zoom}, ${zoom}) rotate(${rotate}deg)`,
       transformOrigin: 'top left',
-      color: color.startsWith('--') ? `var(${color})` : color,
+      color,
       padding: `${verticalPadding}px ${horiPadding}px`,
       textAlign: this.element.textAlign,
       display: 'grid',

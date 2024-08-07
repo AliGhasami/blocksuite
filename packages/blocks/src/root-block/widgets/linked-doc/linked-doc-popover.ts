@@ -1,10 +1,11 @@
 import type { EditorHost } from '@blocksuite/block-std';
 
 import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { LitElement, html, nothing } from 'lit';
+import { customElement, query, queryAll, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
+import type { IconButton } from '../../../_common/components/button.js';
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import type { LinkedMenuGroup } from './config.js';
 
@@ -26,13 +27,13 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
     cleanSpecifiedTail(
       this.editorHost,
       this.inlineEditor,
-      this.triggerKey + this._query
+      this.triggerKey + (this._query || '')
     );
   };
 
   private _expanded = new Map<string, boolean>();
 
-  private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
+  private _startRange = this.inlineEditor.getInlineRange();
 
   static override styles = styles;
 
@@ -89,13 +90,22 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
     return group.items;
   }
 
+  private _isTextOverflowing(element: HTMLElement) {
+    return element.scrollWidth > element.clientWidth;
+  }
+
   private get _query() {
-    return getQuery(this.inlineEditor, this._startIndex) || '';
+    return getQuery(this.inlineEditor, this._startRange);
   }
 
   private async _updateLinkedDocGroup() {
+    const query = this._query;
+    if (query === null) {
+      this.abortController.abort();
+      return;
+    }
     this._linkedDocGroup = await this.getMenus(
-      this._query,
+      query,
       this._abort,
       this.editorHost,
       this.inlineEditor
@@ -117,13 +127,23 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
     createKeydownObserver({
       target: eventSource,
       signal: this.abortController.signal,
+      inlineEditor: this.inlineEditor,
       onInput: () => {
         this._activatedItemIndex = 0;
         void this._updateLinkedDocGroup();
       },
+      onPaste: () => {
+        this._activatedItemIndex = 0;
+        setTimeout(() => {
+          void this._updateLinkedDocGroup();
+        }, 20);
+      },
       onDelete: () => {
-        const curIndex = this.inlineEditor.getInlineRange()?.index ?? 0;
-        if (curIndex < this._startIndex) {
+        const curRange = this.inlineEditor.getInlineRange();
+        if (!this._startRange || !curRange) {
+          return;
+        }
+        if (curRange.index < this._startRange.index) {
           this.abortController.abort();
         }
         this._activatedItemIndex = 0;
@@ -187,6 +207,11 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
               ${group.items.map(({ key, name, icon, action }) => {
                 accIdx++;
                 const curIdx = accIdx - 1;
+                const tooltip = this._showTooltip
+                  ? html`<affine-tooltip tip-position=${'right'}
+                      >${name}</affine-tooltip
+                    >`
+                  : nothing;
                 return html`<icon-button
                   width="280px"
                   height="32px"
@@ -199,9 +224,20 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
                   @mousemove=${() => {
                     // Use `mousemove` instead of `mouseover` to avoid navigate conflict with keyboard
                     this._activatedItemIndex = curIdx;
+                    // show tooltip whether text length overflows
+                    for (const button of this.iconButtons.values()) {
+                      if (button.dataset.id == key && button.textElement) {
+                        const isOverflowing = this._isTextOverflowing(
+                          button.textElement
+                        );
+                        this._showTooltip = isOverflowing;
+                        break;
+                      }
+                    }
                   }}
-                  >${icon}</icon-button
-                >`;
+                >
+                  ${icon} ${tooltip}
+                </icon-button>`;
               })}
             </div>
           `;
@@ -225,6 +261,12 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
     x: string;
     y: string;
   } | null = null;
+
+  @state()
+  private accessor _showTooltip = false;
+
+  @queryAll('icon-button')
+  accessor iconButtons!: NodeListOf<IconButton>;
 
   @query('.linked-doc-popover')
   accessor linkedDocElement: Element | null = null;

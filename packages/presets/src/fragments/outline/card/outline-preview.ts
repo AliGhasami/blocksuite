@@ -31,6 +31,12 @@ const styles = css`
   :host {
     display: block;
     width: 100%;
+    font-family: var(--affine-font-family);
+  }
+
+  :host(:hover) {
+    cursor: pointer;
+    background: var(--affine-hover-color);
   }
 
   :host(.active) {

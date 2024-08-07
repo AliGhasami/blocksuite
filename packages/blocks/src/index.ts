@@ -71,10 +71,7 @@ export {
   SizeVariables,
   StyleVariables,
 } from './_common/theme/css-variables.js';
-export {
-  ThemeObserver,
-  extractCssVariables,
-} from './_common/theme/theme-observer.js';
+export { ThemeObserver } from './_common/theme/theme-observer.js';
 export * from './_common/transformers/index.js';
 export {
   type AbstractEditor,
@@ -90,7 +87,6 @@ export {
 } from './_common/utils/index.js';
 export { createDefaultDoc } from './_common/utils/init.js';
 export {
-  getThemeMode,
   isInsideEdgelessEditor,
   isInsidePageEditor,
 } from './_common/utils/query.js';

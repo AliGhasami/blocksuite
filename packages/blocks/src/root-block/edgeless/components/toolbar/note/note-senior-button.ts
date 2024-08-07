@@ -1,11 +1,15 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
+//TODO check ali ghasami
 import type { NoteTool } from '../../../controllers/tools/note-tool.js';
 
 import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../../../../_common/edgeless/note/consts.js';
-import { FileIcon } from '../../../../../_common/icons/index.js';
-import { Heading1Icon, TextIcon } from '../../../../../_common/icons/text.js';
+import {
+  Heading1Icon,
+  LinkIcon,
+  TextIcon,
+} from '../../../../../_common/icons/text.js';
+import { ThemeObserver } from '../../../../../_common/theme/theme-observer.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { toShapeNotToAdapt } from './icon.js';
@@ -169,15 +173,24 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
   override connectedCallback() {
     super.connectedCallback();
 
-    this._noteBg =
-      this.edgeless.service.editPropsStore.getLastProps(this.type).background ??
-      DEFAULT_NOTE_BACKGROUND_COLOR;
+    const { background } = this.edgeless.service.editPropsStore.getLastProps(
+      this.type
+    );
+    this._noteBg = ThemeObserver.generateColorProperty(
+      background,
+      DEFAULT_NOTE_BACKGROUND_COLOR
+    );
 
     this.disposables.add(
       this.edgeless.service.editPropsStore.slots.lastPropsUpdated.on(
         ({ type, props }) => {
           if (type !== this.type) return;
-          if (props.background) this._noteBg = props.background as string;
+          if (props.background) {
+            this._noteBg = ThemeObserver.generateColorProperty(
+              props.background,
+              DEFAULT_NOTE_BACKGROUND_COLOR
+            );
+          }
         }
       )
     );
@@ -195,10 +208,10 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
         class="note-root"
         data-dark=${theme === 'dark'}
         @click=${this._toggleNoteMenu}
-        style="--paper-bg: var(${_noteBg})"
+        style="--paper-bg: ${_noteBg}"
       >
         <div class="paper">${toShapeNotToAdapt}</div>
-        <div class="edgeless-toolbar-note-icon link">${FileIcon}</div>
+        <div class="edgeless-toolbar-note-icon link">${LinkIcon}</div>
         <div class="edgeless-toolbar-note-icon heading">${Heading1Icon}</div>
         <div class="edgeless-toolbar-note-icon text">${TextIcon}</div>
       </div>
@@ -206,7 +219,7 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
   }
 
   @state()
-  private accessor _noteBg: string = DEFAULT_NOTE_BACKGROUND_COLOR;
+  private accessor _noteBg: string = `var(${DEFAULT_NOTE_BACKGROUND_COLOR})`;
 
   // TODO: better to extract these states outside of component?
   @state()

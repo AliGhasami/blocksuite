@@ -9,13 +9,13 @@ node_modules
 *.tgz
 
 # playwright
-/test-results/
-/playwright-report/
-/playwright/.cache/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # code coverage
-/.nyc_output
-/.coverage
+.nyc_output
+.coverage
 
 # Build out
 dist/
@@ -30,5 +30,10 @@ next-env.d.ts
 .eslintcache
 
 __screenshots__/
+
+
+.nx/cache
+.nx/workspace-data
+
 /packages/claytap/
 /packages/claytap/

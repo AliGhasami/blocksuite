@@ -4,7 +4,7 @@ import type { Doc } from '@blocksuite/store';
 import { DisposableGroup, Slot } from '@blocksuite/global/utils';
 
 import type { NoteBlockModel } from '../note-block/index.js';
-import type { CustomColor } from '../surface-block/consts.js';
+import type { Color } from '../surface-block/consts.js';
 import type { SurfaceBlockModel } from '../surface-block/surface-model.js';
 
 import { ThemeObserver } from '../_common/theme/theme-observer.js';
@@ -39,34 +39,24 @@ export class SurfaceRefRenderer {
       enableStackingCanvas: false,
     }
   ) {
-    const themeObserver = new ThemeObserver();
     const viewport = new Viewport();
     const renderer = new Renderer({
       viewport,
       layerManager: this.surfaceService.layer,
       enableStackingCanvas: options.enableStackingCanvas,
       provider: {
-        getColorScheme: () => themeObserver.mode,
-        getVariableColor: (variable: string) =>
-          themeObserver.getVariableValue(variable),
-        getColor: (
-          color: string | CustomColor,
-          fallback?: string,
-          real?: boolean
-        ) => themeObserver.getColor(color, fallback, real),
-        generateColorProperty: (
-          color: string | CustomColor,
-          fallback: string
-        ) => themeObserver.generateColorProperty(color, fallback),
+        generateColorProperty: (color: Color, fallback: string) =>
+          ThemeObserver.generateColorProperty(color, fallback),
+        getColorScheme: () => ThemeObserver.mode,
+        getColorValue: (color: Color, fallback?: string, real?: boolean) =>
+          ThemeObserver.getColorValue(color, fallback, real),
+        getPropertyValue: (property: string) =>
+          ThemeObserver.getPropertyValue(property),
       },
     });
 
-    themeObserver.observe(document.documentElement);
     this._surfaceRenderer = renderer;
     this._viewport = viewport;
-    this.slots.unmounted.once(() => {
-      themeObserver.dispose();
-    });
   }
 
   private _initSurfaceModel() {

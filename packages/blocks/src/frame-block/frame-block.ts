@@ -12,6 +12,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 import type { EdgelessRootService } from '../root-block/index.js';
 
+import { ThemeObserver } from '../_common/theme/theme-observer.js';
 import { FrameBlockModel } from './frame-model.js';
 
 const NESTED_FRAME_OFFSET = 4;
@@ -23,6 +24,10 @@ export class EdgelessFrameTitle extends WithDisposable(ShadowlessElement) {
   private _cachedWidth = 0;
 
   static override styles = css`
+    edgeless-frame-title {
+      position: relative;
+    }
+
     .affine-frame-title {
       position: absolute;
       z-index: 1;
@@ -249,16 +254,6 @@ export class FrameBlockComponent extends GfxBlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    let lastZoom = 0;
-    this._disposables.add(
-      this.rootService!.viewport.viewportUpdated.on(({ zoom }) => {
-        if (zoom !== lastZoom) {
-          lastZoom = zoom;
-          this.requestUpdate();
-        }
-      })
-    );
-
     this._disposables.add(
       this.doc.slots.blockUpdated.on(({ type, id }) => {
         if (id === this.model.id && type === 'update') {
@@ -276,29 +271,25 @@ export class FrameBlockComponent extends GfxBlockComponent<
 
   override renderGfxBlock() {
     const { model, _isNavigator, showBorder, doc, rootService } = this;
-    let backgroundColor = '--affine-platte-transparent';
-
-    // The root service may not be initialized when switching page mode
-    if (rootService) {
-      backgroundColor = rootService.themeObserver.generateColorProperty(
-        model.background,
-        backgroundColor
-      );
-    } else if (typeof model.background === 'string') {
-      backgroundColor = model.background.startsWith('--')
-        ? `var(${model.background})`
-        : model.background;
-    }
+    const backgroundColor = ThemeObserver.generateColorProperty(
+      model.background,
+      '--affine-platte-transparent'
+    );
+    const frameIndex = rootService.layer.getZIndex(model);
 
     return html`
       <edgeless-frame-title
         .service=${rootService}
         .doc=${doc}
         .model=${model}
+        style=${styleMap({
+          zIndex: 2147483647 - -frameIndex,
+        })}
       ></edgeless-frame-title>
       <div
         class="affine-frame-container"
         style=${styleMap({
+          zIndex: `${frameIndex}`,
           backgroundColor,
           height: '100%',
           width: '100%',
@@ -310,6 +301,10 @@ export class FrameBlockComponent extends GfxBlockComponent<
         })}
       ></div>
     `;
+  }
+
+  override toZIndex(): string {
+    return 'auto';
   }
 
   @state()

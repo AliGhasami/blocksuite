@@ -2,7 +2,7 @@ import { html } from 'lit';
 
 import type { RootBlockComponent } from '../../../../../../root-block/index.js';
 import type { DataViewRenderer } from '../../../../data-view.js';
-import type { DataViewColumnManager } from '../../../data-view-manager.js';
+import type { Column } from '../../../../view-manager/column.js';
 import type { TableSelectionController } from '../controller/selection.js';
 
 import {
@@ -10,6 +10,7 @@ import {
   popFilterableSimpleMenu,
 } from '../../../../../../_common/components/index.js';
 import {
+  CopyIcon,
   ExpandFullIcon,
   MoveLeftIcon,
   MoveRightIcon,
@@ -22,6 +23,7 @@ import {
   commonCalcOps,
   numberColCalcOps,
 } from '../stat-ops.js';
+import { TableRowSelection } from '../types.js';
 
 export const openDetail = (
   dataViewEle: DataViewRenderer,
@@ -42,16 +44,67 @@ export const openDetail = (
 export const popRowMenu = (
   dataViewEle: DataViewRenderer,
   ele: HTMLElement,
-  rowId: string,
-  selection: TableSelectionController
+  selectionController: TableSelectionController
 ) => {
+  const selection = selectionController.selection;
+  if (!TableRowSelection.is(selection)) {
+    return;
+  }
+  if (selection.rows.length > 1) {
+    const rows = TableRowSelection.rowsIds(selection);
+    popFilterableSimpleMenu(ele, [
+      {
+        type: 'group',
+        name: '',
+        children: () => [
+          {
+            type: 'action',
+            name: 'Copy',
+            icon: html` <div
+              style="transform: rotate(90deg);display:flex;align-items:center;"
+            >
+              ${CopyIcon}
+            </div>`,
+            select: () => {
+              selectionController.host.clipboardController.copy();
+            },
+          },
+          // {
+          //   type: 'action',
+          //   name: 'Duplicate',
+          //   icon: DuplicateIcon,
+          //   select: () => {
+          //     selectionController.duplicateRow(rowId);
+          //   },
+          // },
+        ],
+      },
+      {
+        type: 'group',
+        name: '',
+        children: () => [
+          {
+            type: 'action',
+            name: 'Delete Rows',
+            class: 'delete-item',
+            icon: DeleteIcon,
+            select: () => {
+              selectionController.view.rowDelete(rows);
+            },
+          },
+        ],
+      },
+    ]);
+    return;
+  }
+  const row = selection.rows[0];
   popFilterableSimpleMenu(ele, [
     {
       type: 'action',
       name: 'Expand Row',
       icon: ExpandFullIcon,
       select: () => {
-        openDetail(dataViewEle, rowId, selection);
+        openDetail(dataViewEle, row.id, selectionController);
       },
     },
     // {
@@ -89,7 +142,7 @@ export const popRowMenu = (
             ${MoveLeftIcon}
           </div>`,
           select: () => {
-            selection.insertRowBefore(selection.selection?.groupKey, rowId);
+            selectionController.insertRowBefore(row.groupKey, row.id);
           },
         },
         {
@@ -101,7 +154,7 @@ export const popRowMenu = (
             ${MoveRightIcon}
           </div>`,
           select: () => {
-            selection.insertRowAfter(selection.selection?.groupKey, rowId);
+            selectionController.insertRowAfter(row.groupKey, row.id);
           },
         },
         // {
@@ -109,7 +162,7 @@ export const popRowMenu = (
         //   name: 'Duplicate',
         //   icon: DuplicateIcon,
         //   select: () => {
-        //     selection.duplicateRow(rowId);
+        //     selectionController.duplicateRow(rowId);
         //   },
         // },
       ],
@@ -124,7 +177,7 @@ export const popRowMenu = (
           class: 'delete-item',
           icon: DeleteIcon,
           select: () => {
-            selection.deleteRow(rowId);
+            selectionController.deleteRow(row.id);
           },
         },
       ],
@@ -135,7 +188,7 @@ export const popRowMenu = (
 export const popColStatOperationMenu = (
   _rootComponent: RootBlockComponent | null,
   elem: HTMLElement,
-  _column: DataViewColumnManager,
+  _column: Column,
   calcType: ColumnDataType,
   onSelect: (formula: StatCalcOp) => void
 ) => {

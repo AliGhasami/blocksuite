@@ -25,10 +25,7 @@ type Type = 'normal' | 'custom';
 @customElement('edgeless-color-picker-button')
 export class EdgelessColorPickerButton extends WithDisposable(LitElement) {
   #select = (e: ColorEvent) => {
-    this.#pick({
-      type: 'palette',
-      value: e.detail,
-    });
+    this.#pick({ palette: e.detail });
   };
 
   switchToCustomTab = (e: MouseEvent) => {
@@ -93,11 +90,12 @@ export class EdgelessColorPickerButton extends WithDisposable(LitElement) {
                   .options=${this.palettes}
                   .hollowCircle=${this.hollowCircle}
                   .openColorPicker=${this.switchToCustomTab}
+                  .hasTransparent=${false}
                   @select=${this.#select}
                 >
                   <edgeless-color-custom-button
                     slot="custom"
-                    style=${this.customButtonStyle}
+                    style=${styleMap(this.customButtonStyle)}
                     .active=${!this.isCSSVariable}
                     @click=${this.switchToCustomTab}
                   ></edgeless-color-custom-button>
@@ -109,6 +107,7 @@ export class EdgelessColorPickerButton extends WithDisposable(LitElement) {
             'custom',
             () => html`
               <edgeless-color-picker
+                class="custom"
                 .pick=${this.pick}
                 .colors=${{
                   type:
@@ -136,10 +135,7 @@ export class EdgelessColorPickerButton extends WithDisposable(LitElement) {
       b = 'var(--affine-background-overlay-panel-color)';
       c = keepColor(this.color);
     }
-    return styleMap({
-      '--b': b,
-      '--c': c,
-    });
+    return { '--b': b, '--c': c };
   }
 
   get isCSSVariable() {

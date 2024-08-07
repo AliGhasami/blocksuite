@@ -6,7 +6,8 @@ import {
   handleError,
 } from '@blocksuite/global/exceptions';
 import { Slot } from '@blocksuite/global/utils';
-import { type BlockModel, BlockViewType, type Doc } from '@blocksuite/store';
+import { Doc } from '@blocksuite/store';
+import { type BlockModel, BlockViewType } from '@blocksuite/store';
 import { createContext, provide } from '@lit/context';
 import { SignalWatcher } from '@lit-labs/preact-signals';
 import {
@@ -22,18 +23,24 @@ import { html, unsafeStatic } from 'lit/static-html.js';
 
 import type { CommandManager } from '../../command/index.js';
 import type { UIEventDispatcher } from '../../event/index.js';
+import type { RangeManager } from '../../range/index.js';
 import type { SelectionManager } from '../../selection/index.js';
 import type { BlockSpec, SpecStore } from '../../spec/index.js';
 import type { ViewStore } from '../view-store.js';
 
-import { BlockStdScope } from '../../scope/index.js';
-import { RangeManager } from '../utils/range-manager.js';
+import { BlockStdScope } from '../../scope/block-std-scope.js';
+import { PropTypes, requiredProperties } from '../decorators/required.js';
 import { WithDisposable } from '../utils/with-disposable.js';
 import { ShadowlessElement } from './shadowless-element.js';
 
 export const docContext = createContext<Doc>('doc');
 export const stdContext = createContext<BlockStdScope>('std');
 
+@requiredProperties({
+  doc: PropTypes.instanceOf(Doc),
+  std: PropTypes.instanceOf(BlockStdScope),
+  specs: PropTypes.arrayOf(PropTypes.object),
+})
 @customElement('editor-host')
 export class EditorHost extends SignalWatcher(
   WithDisposable(ShadowlessElement)
@@ -76,8 +83,6 @@ export class EditorHost extends SignalWatcher(
       isolation: isolate;
     }
   `;
-
-  rangeManager: RangeManager | null = null;
 
   renderChildren = (model: BlockModel): TemplateResult => {
     return html`${repeat(
@@ -127,14 +132,12 @@ export class EditorHost extends SignalWatcher(
 
     this.std.mount();
     this.std.spec.applySpecs(this.specs);
-    this.rangeManager = new RangeManager(this);
     this.tabIndex = 0;
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.std.unmount();
-    this.rangeManager = null;
     this.slots.unmounted.emit();
   }
 
@@ -187,6 +190,10 @@ export class EditorHost extends SignalWatcher(
 
   get event(): UIEventDispatcher {
     return this.std.event;
+  }
+
+  get range(): RangeManager {
+    return this.std.range;
   }
 
   get selection(): SelectionManager {

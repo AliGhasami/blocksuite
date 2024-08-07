@@ -34,10 +34,9 @@ export class KanbanSelectionController implements ReactiveController {
     if (!closestGroupKey) return;
     const cards = selection?.selectionType === 'card' ? selection.cards : [];
 
-    const newCards =
-      cards.findIndex(card => card.cardId === closestCardId) >= 0
-        ? cards.filter(card => card.cardId !== closestCardId)
-        : [...cards, { cardId: closestCardId, groupKey: closestGroupKey }];
+    const newCards = cards.some(card => card.cardId === closestCardId)
+      ? cards.filter(card => card.cardId !== closestCardId)
+      : [...cards, { cardId: closestCardId, groupKey: closestGroupKey }];
     this.selection = atLeastOne(newCards)
       ? {
           selectionType: 'card',
@@ -64,7 +63,9 @@ export class KanbanSelectionController implements ReactiveController {
     const cell = container?.cell;
 
     if (selection.isEditing) {
-      cell?.onExitEditMode();
+      requestAnimationFrame(() => {
+        cell?.onExitEditMode();
+      });
       if (cell?.blurCell()) {
         container.blur();
       }
@@ -402,7 +403,7 @@ export class KanbanSelectionController implements ReactiveController {
 
   hostConnected() {
     this.host.disposables.add(
-      this.host.selectionUpdated.on(selection => {
+      this.host.selection$.subscribe(selection => {
         const old = this._selection;
         if (old) {
           this.blur(old);
@@ -425,7 +426,7 @@ export class KanbanSelectionController implements ReactiveController {
     const id = this.view.addCard({ before: false, id: cardId }, groupKey);
 
     requestAnimationFrame(() => {
-      const columnId = this.view.header.titleColumn;
+      const columnId = this.view.header$.value.titleColumn;
       if (columnId) {
         this.selection = {
           selectionType: 'cell',
@@ -458,7 +459,7 @@ export class KanbanSelectionController implements ReactiveController {
     const id = this.view.addCard({ before: true, id: cardId }, groupKey);
 
     requestAnimationFrame(() => {
-      const columnId = this.view.header.titleColumn;
+      const columnId = this.view.header$.value.titleColumn;
       if (columnId) {
         this.selection = {
           selectionType: 'cell',

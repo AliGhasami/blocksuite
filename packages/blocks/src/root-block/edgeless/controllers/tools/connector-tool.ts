@@ -54,7 +54,11 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
   } as ConnectorTool;
 
   private _createConnector() {
-    if (!this._source || !this._startPoint) return;
+    if (!(this._source && this._startPoint)) {
+      this._source = null;
+      this._startPoint = null;
+      return;
+    }
 
     this._doc.captureSync();
     const id = this._edgeless.service.addElement(CanvasElementType.CONNECTOR, {
@@ -63,6 +67,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
       source: this._source,
       target: { position: this._startPoint },
     });
+
     this._edgeless.service.telemetryService?.track('CanvasElementAdded', {
       control: 'canvas:draw',
       page: 'whiteboard editor',
@@ -70,9 +75,15 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
       segment: 'toolbar',
       type: CanvasElementType.CONNECTOR,
     });
-    this._connector = this._edgeless.service.getElementById(
-      id
-    ) as ConnectorElementModel;
+
+    const connector = this._edgeless.service.getElementById(id);
+    if (!connector) {
+      this._source = null;
+      this._startPoint = null;
+      return;
+    }
+
+    this._connector = connector as ConnectorElementModel;
   }
 
   afterModeSwitch() {
@@ -108,7 +119,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
     point = viewport.toModelCoord(point[0], point[1]);
 
     const excludedIds = [];
-    if (_connector.source.id) {
+    if (_connector.source?.id) {
       excludedIds.push(_connector.source.id);
     }
 
@@ -123,7 +134,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
     const { id, source, target } = this._connector;
     let focusedId = id;
 
-    if (source.id && !target.id) {
+    if (source?.id && !target?.id) {
       focusedId = source.id;
       this._allowCancel = true;
     }
@@ -167,7 +178,7 @@ export class ConnectorToolController extends EdgelessToolController<ConnectorToo
     if (this._mode === ConnectorToolMode.Dragging) return;
     if (!this._sourceBounds) return;
     if (!this._connector) return;
-    const sourceId = this._connector.source.id;
+    const sourceId = this._connector.source?.id;
     if (!sourceId) return;
 
     const point = this._service.viewport.toModelCoord(e.x, e.y);

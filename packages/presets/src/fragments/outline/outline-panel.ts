@@ -11,7 +11,7 @@ import './body/outline-notice.js';
 import './body/outline-panel-body.js';
 import { type OutlineSettingsDataType, outlineSettingsKey } from './config.js';
 import './header/outline-panel-header.js';
-import { observeActiveHeading } from './utils/heading-highlight.js';
+import { observeActiveHeading } from './utils/scroll.js';
 
 const styles = css`
   :host {
@@ -138,7 +138,7 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
     super.connectedCallback();
     this._loadSettingsFromLocalStorage();
     this.disposables.add(
-      observeActiveHeading(() => this.host, this._activeHeadingId$)
+      observeActiveHeading(() => this.editor, this._activeHeadingId$)
     );
   }
 
@@ -163,8 +163,8 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
           .doc=${this.doc}
           .fitPadding=${this.fitPadding}
           .edgeless=${this.edgeless}
-          .editorHost=${this.host}
-          .activeHeadingId=${this._activeHeadingId$.value}
+          .editor=${this.editor}
+          .activeHeadingId=${this._activeHeadingId$}
           .mode=${this.mode}
           .showPreviewIcon=${this._showPreviewIcon}
           .enableNotesSorting=${this._enableNotesSorting}

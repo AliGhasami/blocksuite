@@ -78,7 +78,7 @@ export const COLOR_PICKER_STYLE = css`
 
     ${FONT_XS};
     font-weight: 400;
-    color: var(--affine-text-primary-color);
+    color: #8e8d91;
   }
   .modes .mode.light button {
     background: white;
@@ -115,7 +115,7 @@ export const COLOR_PICKER_STYLE = css`
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 4px;
+    border-radius: 8px;
   }
   .color-palette-wrapper::after {
     content: '';
@@ -126,7 +126,7 @@ export const COLOR_PICKER_STYLE = css`
     bottom: 0;
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 8px;
     overflow: hidden;
     pointer-events: none;
   }
@@ -264,7 +264,7 @@ export const COLOR_PICKER_STYLE = css`
     width: 134px;
   }
 
-  .field.opacity {
+  .field.alpha {
     width: 56px;
     gap: 0;
   }

@@ -1,4 +1,4 @@
-import type { UIEventStateContext } from '@blocksuite/block-std';
+import type { BaseSelection, UIEventStateContext } from '@blocksuite/block-std';
 
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { type PropertyValues, css, html } from 'lit';
@@ -57,7 +57,7 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
 
       selection.update(selList =>
         selList
-          .filter(sel => !sel.is('image'))
+          .filter<BaseSelection>(sel => !sel.is('image'))
           .concat(
             selection.create('text', {
               from: {
@@ -103,6 +103,56 @@ export class ImageBlockPageComponent extends WithDisposable(ShadowlessElement) {
         if (this._host.doc.readonly || !this._isSelected) return;
 
         addParagraph(ctx);
+        return true;
+      },
+      ArrowDown: ctx => {
+        const std = this._host.std;
+
+        // If the selection is not image selection, we should not handle it.
+        // eslint-disable-next-line unicorn/prefer-array-some
+        if (!std.selection.find('image')) {
+          return false;
+        }
+
+        const event = ctx.get('keyboardState');
+        event.raw.preventDefault();
+
+        std.command
+          .chain()
+          .getNextBlock({ path: this.block.blockId })
+          .inline((ctx, next) => {
+            const { nextBlock } = ctx;
+            if (!nextBlock) return;
+
+            return next({ focusBlock: nextBlock });
+          })
+          .focusBlockStart()
+          .run();
+        return true;
+      },
+      ArrowUp: ctx => {
+        const std = this._host.std;
+
+        // If the selection is not image selection, we should not handle it.
+        // eslint-disable-next-line unicorn/prefer-array-some
+        if (!std.selection.find('image')) {
+          return false;
+        }
+
+        const event = ctx.get('keyboardState');
+        event.raw.preventDefault();
+
+        std.command
+          .chain()
+          .getPrevBlock({ path: this.block.blockId })
+          .inline((ctx, next) => {
+            const { prevBlock } = ctx;
+            if (!prevBlock) return;
+
+            return next({ focusBlock: prevBlock });
+          })
+          .focusBlockEnd()
+          .run();
         return true;
       },
     });

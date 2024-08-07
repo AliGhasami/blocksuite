@@ -18,12 +18,10 @@ import {
 import {
   getBoundingClientRect,
   getEditorHostLocator,
+  getPageSnapshot,
+  initParagraphsByCount,
 } from './utils/actions/misc.js';
-import {
-  assertBlockChildrenIds,
-  assertRichTexts,
-  assertStoreMatchJSX,
-} from './utils/asserts.js';
+import { assertBlockChildrenIds, assertRichTexts } from './utils/asserts.js';
 import { test } from './utils/playwright.js';
 
 test('only have one drag handle in screen', async ({ page }) => {
@@ -166,7 +164,7 @@ test('move drag handle into another block', async ({ page }) => {
 
 test('move to the last block of each level in multi-level nesting', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
 
@@ -189,143 +187,15 @@ test('move to the last block of each level in multi-level nesting', async ({
   await pressEnter(page);
   await type(page, 'G');
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="A"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="B"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   await dragHandleFromBlockToBlockBottomById(page, '3', '9');
   await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="B"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="A"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_drag_3_9.json`
   );
 
   await dragHandleFromBlockToBlockBottomById(
@@ -337,72 +207,8 @@ test('move to the last block of each level in multi-level nesting', async ({
   );
   await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="A"
-          prop:type="bulleted"
-        />
-      </affine:list>
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="B"
-        prop:type="bulleted"
-      />
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_drag_4_3.json`
   );
 
   await assertRichTexts(page, ['C', 'D', 'E', 'F', 'G', 'A', 'B']);
@@ -415,72 +221,8 @@ test('move to the last block of each level in multi-level nesting', async ({
   );
   await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="B"
-        prop:type="bulleted"
-      />
-    </affine:list>
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="A"
-      prop:type="bulleted"
-    />
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_drag_3_4.json`
   );
 
   await assertRichTexts(page, ['C', 'D', 'E', 'F', 'G', 'B', 'A']);
@@ -541,7 +283,7 @@ test('should be able to drag & drop multiple blocks', async ({ page }) => {
 
 test('should be able to drag & drop multiple blocks to nested block', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
 
@@ -564,72 +306,8 @@ test('should be able to drag & drop multiple blocks to nested block', async ({
   await pressEnter(page);
   await type(page, 'G');
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="A"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="B"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   await dragBetweenIndices(
@@ -650,72 +328,8 @@ test('should be able to drag & drop multiple blocks to nested block', async ({
 
   await dragHandleFromBlockToBlockBottomById(page, '3', '8');
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="A"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="B"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_finial.json`
   );
 });
 
@@ -1097,4 +711,45 @@ test('should support moving blocks from multiple notes', async ({ page }) => {
 
   await assertRichTexts(page, ['654', '321', '123', '987', '456', '789']);
   await expect(blockSelections).toHaveCount(2);
+});
+
+test('drag handle should show on right block when scroll viewport', async ({
+  page,
+}) => {
+  await enterPlaygroundRoom(page);
+  await initEmptyParagraphState(page);
+  await initParagraphsByCount(page, 30);
+
+  await page.mouse.wheel(0, 200);
+
+  const editorHost = getEditorHostLocator(page);
+  const editors = editorHost.locator('rich-text');
+  const blockRect28 = await editors.nth(28).boundingBox();
+  if (!blockRect28) {
+    throw new Error();
+  }
+
+  await page.mouse.move(blockRect28.x + 10, blockRect28.y + 10);
+  const dragHandle = page.locator('.affine-drag-handle-container');
+  await expect(dragHandle).toBeVisible();
+
+  await page.mouse.move(
+    blockRect28.x - 10,
+    blockRect28.y + blockRect28.height / 2
+  );
+  await page.mouse.down();
+  await page.mouse.up();
+
+  const blockSelections = page
+    .locator('affine-block-selection')
+    .locator('visible=true');
+  await expect(blockSelections).toHaveCount(1);
+
+  const selectedBlockRect = await blockSelections.nth(0).boundingBox();
+
+  if (!selectedBlockRect) {
+    throw new Error();
+  }
+
+  expect(blockRect28).toEqual(selectedBlockRect);
 });

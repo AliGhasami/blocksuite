@@ -7,52 +7,43 @@ import { styleMap } from 'lit/directives/style-map.js';
 import { html } from 'lit/static-html.js';
 
 import type { DataViewRenderer } from '../../../../data-view.js';
-import type { DataViewTableManager } from '../table-view-manager.js';
-import type { TableViewSelection } from '../types.js';
+import type { TableSingleView } from '../table-view-manager.js';
 
 import {
   CenterPeekIcon,
   MoreHorizontalIcon,
 } from '../../../../common/icons/index.js';
 import { DEFAULT_COLUMN_MIN_WIDTH } from '../consts.js';
+import { TableRowSelection, type TableViewSelection } from '../types.js';
 import { openDetail, popRowMenu } from './menu.js';
+import './row-select-checkbox.js';
 
 @customElement('data-view-table-row')
 export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   private _clickDragHandler = () => {
-    if (this.view.readonly) {
+    if (this.view.readonly$.value) {
       return;
     }
-    const selectionController = this.selectionController;
-    if (selectionController) {
-      if (
-        selectionController.isRowSelected(this.groupKey, this.rowIndex) &&
-        selectionController.selection
-      ) {
-        selectionController.selection = {
-          ...selectionController.selection,
-          rowsSelection: undefined,
-        };
-      } else {
-        selectionController.selection = {
-          groupKey: this.groupKey,
-          rowsSelection: {
-            start: this.rowIndex,
-            end: this.rowIndex,
-          },
-          focus: {
-            rowIndex: this.rowIndex,
-            columnIndex: 0,
-          },
-          isEditing: false,
-        };
-      }
-    }
+    this.selectionController?.toggleRow(this.rowId, this.groupKey);
   };
 
   static override styles = css`
-    .data-view-table-row {
-      width: 100%;
+    .affine-database-block-row:has(.row-select-checkbox.selected) {
+      background: var(--affine-primary-color-04);
+    }
+    .affine-database-block-row:has(.row-select-checkbox.selected)
+      .row-selected-bg {
+      position: relative;
+    }
+    .affine-database-block-row:has(.row-select-checkbox.selected)
+      .row-selected-bg:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: var(--affine-primary-color-04);
     }
     .affine-database-block-row {
       width: 100%;
@@ -86,13 +77,9 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
       margin-right: 8px;
     }
 
-    .affine-database-block-row:hover .row-ops {
-      visibility: visible;
-    }
     .affine-database-block-row .show-on-hover-row {
       visibility: hidden;
       opacity: 0;
-      transition: opacity 150ms cubic-bezier(0.42, 0, 1, 1);
     }
     .affine-database-block-row:hover .show-on-hover-row {
       visibility: visible;
@@ -125,10 +112,19 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
       width: 16px;
       height: 16px;
     }
+    .data-view-table-view-drag-handler {
+      width: 8px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      background-color: var(--affine-background-primary-color);
+    }
   `;
 
   contextMenu = (e: MouseEvent) => {
-    if (this.view.readonly) {
+    if (this.view.readonly$.value) {
       return;
     }
     const selection = this.selectionController;
@@ -138,28 +134,21 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
     e.preventDefault();
     const ele = e.target as HTMLElement;
     const cell = ele.closest('affine-database-cell-container');
-    const columnIndex = cell?.columnIndex ?? 0;
-    selection.selection = {
-      groupKey: this.groupKey,
-      rowsSelection: {
-        start: this.rowIndex,
-        end: this.rowIndex,
-      },
-      focus: {
-        rowIndex: this.rowIndex,
-        columnIndex: columnIndex,
-      },
-      isEditing: false,
-    };
+    const row = { id: this.rowId, groupKey: this.groupKey };
+    if (!TableRowSelection.includes(selection.selection, row)) {
+      selection.selection = TableRowSelection.create({
+        rows: [row],
+      });
+    }
     const target =
       cell ??
       (e.target as HTMLElement).closest('.database-cell') ?? // for last add btn cell
       (e.target as HTMLElement);
 
-    popRowMenu(this.dataViewEle, target, this.rowId, selection);
+    popRowMenu(this.dataViewEle, target, selection);
   };
 
-  setSelection = (selection?: Omit<TableViewSelection, 'viewId' | 'type'>) => {
+  setSelection = (selection?: TableViewSelection) => {
     if (this.selectionController) {
       this.selectionController.selection = selection;
     }
@@ -175,43 +164,41 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   protected override render(): unknown {
     const view = this.view;
     return html`
-      ${view.readonly
+      ${view.readonly$.value
         ? nothing
-        : html`<div class="data-view-table-left-bar">
-            <div
-              class="data-view-table-view-drag-handler"
-              @click=${this._clickDragHandler}
-              style="width: 8px;height: 100%;display:flex;align-items:center;justify-content:center;cursor:grab;"
-            >
+        : html`<div class="data-view-table-left-bar" style="height: 38px">
+            <div style="display: flex;">
               <div
-                class="show-on-hover-row"
-                style="width: 4px;
-            border-radius: 2px;
-            height: 12px;
-            background-color: var(--affine-placeholder-color);"
-              ></div>
+                class="data-view-table-view-drag-handler show-on-hover-row row-selected-bg"
+                @click=${this._clickDragHandler}
+              >
+                <div
+                  style="width: 4px;
+                  border-radius: 2px;
+                  height: 12px;
+                  background-color: var(--affine-placeholder-color);"
+                ></div>
+              </div>
+              <row-select-checkbox
+                .selection="${this.dataViewEle.config.selection$}"
+                .rowId="${this.rowId}"
+                .groupKey="${this.groupKey}"
+              ></row-select-checkbox>
             </div>
           </div>`}
       ${repeat(
-        view.columnManagerList,
+        view.columnManagerList$.value,
         v => v.id,
         (column, i) => {
           const clickDetail = () => {
             if (!this.selectionController) {
               return;
             }
-            this.setSelection({
-              groupKey: this.groupKey,
-              rowsSelection: {
-                start: this.rowIndex,
-                end: this.rowIndex,
-              },
-              focus: {
-                rowIndex: this.rowIndex,
-                columnIndex: i,
-              },
-              isEditing: false,
-            });
+            this.setSelection(
+              TableRowSelection.create({
+                rows: [{ id: this.rowId, groupKey: this.groupKey }],
+              })
+            );
             openDetail(this.dataViewEle, this.rowId, this.selectionController);
           };
           const openMenu = (e: MouseEvent) => {
@@ -219,31 +206,20 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
               return;
             }
             const ele = e.currentTarget as HTMLElement;
-            this.setSelection({
-              groupKey: this.groupKey,
-              rowsSelection: {
-                start: this.rowIndex,
-                end: this.rowIndex,
-              },
-              focus: {
-                rowIndex: this.rowIndex,
-                columnIndex: i,
-              },
-              isEditing: false,
-            });
-            popRowMenu(
-              this.dataViewEle,
-              ele,
-              this.rowId,
-              this.selectionController
+            const row = { id: this.rowId, groupKey: this.groupKey };
+            this.setSelection(
+              TableRowSelection.create({
+                rows: [row],
+              })
             );
+            popRowMenu(this.dataViewEle, ele, this.selectionController);
           };
           return html`
             <div>
               <affine-database-cell-container
                 class="database-cell"
                 style=${styleMap({
-                  width: `${column.width}px`,
+                  width: `${column.width$.value}px`,
                   border: i === 0 ? 'none' : undefined,
                 })}
                 .view="${view}"
@@ -259,13 +235,13 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
               >
               </affine-database-cell-container>
             </div>
-            ${!column.readonly &&
-            column.dataViewManager.header.titleColumn === column.id
-              ? html`<div class="row-ops">
+            ${!column.readonly$.value &&
+            column.view.header$.value.titleColumn === column.id
+              ? html`<div class="row-ops show-on-hover-row">
                   <div class="row-op" @click="${clickDetail}">
                     ${CenterPeekIcon}
                   </div>
-                  ${!view.readonly
+                  ${!view.readonly$.value
                     ? html`<div class="row-op" @click="${openMenu}">
                         ${MoreHorizontalIcon}
                       </div>`
@@ -297,7 +273,7 @@ export class TableRow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   accessor rowIndex!: number;
 
   @property({ attribute: false })
-  accessor view!: DataViewTableManager;
+  accessor view!: TableSingleView;
 }
 
 declare global {

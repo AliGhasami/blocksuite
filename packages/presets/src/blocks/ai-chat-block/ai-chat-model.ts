@@ -1,6 +1,6 @@
 import type { SerializedXYWH } from '@blocksuite/global/utils';
 
-import { selectable } from '@blocksuite/block-std/gfx';
+import { GfxCompatible } from '@blocksuite/block-std/gfx';
 import { BlockModel, defineBlockSchema } from '@blocksuite/store';
 
 type AIChatProps = {
@@ -8,7 +8,9 @@ type AIChatProps = {
   index: string;
   scale: number;
   messages: string; // JSON string of ChatMessage[]
-  sessionId: string;
+  sessionId: string; // forked session id
+  rootWorkspaceId: string; // workspace id of root chat session
+  rootDocId: string; // doc id of root chat session
 };
 
 export const AIChatBlockSchema = defineBlockSchema({
@@ -19,6 +21,8 @@ export const AIChatBlockSchema = defineBlockSchema({
     scale: 1,
     messages: '',
     sessionId: '',
+    rootWorkspaceId: '',
+    rootDocId: '',
   }),
   metadata: {
     version: 1,
@@ -30,4 +34,4 @@ export const AIChatBlockSchema = defineBlockSchema({
   },
 });
 
-export class AIChatBlockModel extends selectable<AIChatProps>(BlockModel) {}
+export class AIChatBlockModel extends GfxCompatible<AIChatProps>(BlockModel) {}

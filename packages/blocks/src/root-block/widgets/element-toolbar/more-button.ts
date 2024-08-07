@@ -48,12 +48,8 @@ import {
   promptDocTitle,
 } from '../../../_common/utils/render-linked-doc.js';
 import '../../edgeless/components/toolbar/shape/shape-menu.js';
-import { removeContainedFrames } from '../../edgeless/frame-manager.js';
 import { edgelessElementsBound } from '../../edgeless/utils/bound-utils.js';
-import {
-  duplicate,
-  splitElements,
-} from '../../edgeless/utils/clipboard-utils.js';
+import { duplicate } from '../../edgeless/utils/clipboard-utils.js';
 import { getCloneElements } from '../../edgeless/utils/clone-utils.js';
 import { moveConnectors } from '../../edgeless/utils/connector.js';
 import { deleteElements } from '../../edgeless/utils/crud.js';
@@ -229,16 +225,6 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       }
       case 'delete': {
         this._delete();
-        break;
-      }
-      case 'copy-as-png': {
-        const { notes, frames, shapes, images } = splitElements(
-          this.selection.selectedElements
-        );
-        this.slots.copyAsPng.emit({
-          blocks: [...notes, ...removeContainedFrames(frames), ...images],
-          shapes,
-        });
         break;
       }
       case 'turn-into-linked-doc': {

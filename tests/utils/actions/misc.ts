@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
 import type { EditorHost } from '@block-std/view/element/lit-host.js';
-import type { CssVariableName } from '@blocks/_common/theme/css-variables.js';
-import type {
-  DatabaseBlockModel,
-  ListType,
-  RichText,
-  ThemeObserver,
-} from '@blocks/index.js';
+import type { DatabaseBlockModel, ListType, RichText } from '@blocks/index.js';
 import type { InlineRange, InlineRootElement } from '@inline/index.js';
 import type { CustomFramePanel } from '@playground/apps/_common/components/custom-frame-panel.js';
 import type { CustomOutlinePanel } from '@playground/apps/_common/components/custom-outline-panel.js';
@@ -39,7 +33,9 @@ declare global {
   }
 }
 
-export const defaultPlaygroundURL = new URL(`http://localhost:5173/starter/`);
+export const defaultPlaygroundURL = new URL(
+  `http://localhost:${process.env.CI ? 4173 : 5173}/starter/`
+);
 
 const NEXT_FRAME_TIMEOUT = 50;
 const DEFAULT_PLAYGROUND = defaultPlaygroundURL.toString();
@@ -937,6 +933,31 @@ export async function pasteContent(
   await waitNextFrame(page);
 }
 
+export async function pasteTestImage(page: Page) {
+  await page.evaluate(async () => {
+    const imageBlob = await fetch(`${location.origin}/test-card-1.png`).then(
+      response => response.blob()
+    );
+
+    const imageFile = new File([imageBlob], 'test-card-1.png', {
+      type: 'image/png',
+    });
+
+    const e = new ClipboardEvent('paste', {
+      clipboardData: new DataTransfer(),
+    });
+
+    Object.defineProperty(e, 'target', {
+      writable: false,
+      value: document,
+    });
+
+    e.clipboardData?.items.add(imageFile);
+    document.dispatchEvent(e);
+  });
+  await waitNextFrame(page);
+}
+
 export async function getClipboardHTML(page: Page) {
   const dataInClipboard = await page.evaluate(async () => {
     function format(node: HTMLElement, level: number) {
@@ -1278,11 +1299,8 @@ export async function waitForInlineEditorStateUpdated(page: Page) {
   });
 }
 
-export async function initImageState(page: Page) {
-  // await initEmptyParagraphState(page);
-  // await focusRichText(page);
-
-  await page.evaluate(async () => {
+export async function initImageState(page: Page, prependParagraph = false) {
+  await page.evaluate(async prepend => {
     const { doc } = window;
     const rootId = doc.addBlock('affine:page', {
       title: new doc.Text(),
@@ -1298,6 +1316,9 @@ export async function initImageState(page: Page) {
     );
     const storage = pageRoot.doc.blobSync;
     const sourceId = await storage.set(imageBlob);
+    if (prepend) {
+      doc.addBlock('affine:paragraph', {}, noteId);
+    }
     const imageId = doc.addBlock(
       'affine:image',
       {
@@ -1309,7 +1330,7 @@ export async function initImageState(page: Page) {
     doc.resetHistory();
 
     return { rootId, noteId, imageId };
-  });
+  }, prependParagraph);
 
   // due to pasting img calls fetch, so we need timeout for downloading finished.
   await page.waitForTimeout(500);
@@ -1334,23 +1355,29 @@ export async function getCurrentEditorTheme(page: Page) {
   const mode = await page
     .locator('affine-editor-container')
     .first()
-    .evaluate(ele => {
-      return (ele as unknown as Element & { themeObserver: ThemeObserver })
-        .themeObserver.cssVariables?.['--affine-theme-mode'];
-    });
+    .evaluate(() =>
+      window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue('--affine-theme-mode')
+        .trim()
+    );
   return mode;
 }
 
 export async function getCurrentThemeCSSPropertyValue(
   page: Page,
-  property: CssVariableName
+  property: string
 ) {
   const value = await page
     .locator('affine-editor-container')
-    .evaluate((ele, property: CssVariableName) => {
-      return (ele as unknown as Element & { themeObserver: ThemeObserver })
-        .themeObserver.cssVariables?.[property];
-    }, property);
+    .evaluate(
+      (_, property) =>
+        window
+          .getComputedStyle(document.documentElement)
+          .getPropertyValue(property)
+          .trim(),
+      property
+    );
   return value;
 }
 

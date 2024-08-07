@@ -113,7 +113,10 @@ export class DataViewHeaderToolsAddRow extends WidgetBase {
     const selection = this.viewMethods.getSelection?.();
     if (!selection) {
       this.addRow('start');
-    } else if (selection.type === 'table') {
+    } else if (
+      selection.type === 'table' &&
+      selection.selectionType === 'area'
+    ) {
       const { rowsSelection, columnsSelection, focus } = selection;
       let index = 0;
       if (rowsSelection && !columnsSelection) {
@@ -138,7 +141,7 @@ export class DataViewHeaderToolsAddRow extends WidgetBase {
   };
 
   private get readonly() {
-    return this.view.readonly;
+    return this.view.readonly$.value;
   }
 
   override connectedCallback() {

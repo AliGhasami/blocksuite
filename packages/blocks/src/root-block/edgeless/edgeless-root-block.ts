@@ -1,4 +1,8 @@
-import type { SurfaceSelection } from '@blocksuite/block-std';
+import type {
+  GfxBlockComponent,
+  SurfaceSelection,
+} from '@blocksuite/block-std';
+import type { GfxViewportElement } from '@blocksuite/block-std/gfx';
 import type { IBound, IPoint, IVec } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
@@ -24,12 +28,7 @@ import type { EdgelessToolConstructor } from './services/tools-manager.js';
 import type { EdgelessTool } from './types.js';
 
 import { toast } from '../../_common/components/toast.js';
-import {
-  BLOCK_ID_ATTR,
-  EMBED_CARD_HEIGHT,
-  EMBED_CARD_WIDTH,
-} from '../../_common/consts.js';
-import { ThemeObserver } from '../../_common/theme/theme-observer.js';
+import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../../_common/consts.js';
 import {
   NoteDisplayMode,
   type Viewport,
@@ -37,7 +36,7 @@ import {
   handleNativeRangeAtPoint,
   isTouchPadPinchEvent,
   requestConnectedFrame,
-  requestThrottledConnectFrame,
+  requestThrottledConnectedFrame,
 } from '../../_common/utils/index.js';
 import { humanFileSize } from '../../_common/utils/math.js';
 import {
@@ -86,23 +85,23 @@ export class EdgelessRootBlockComponent extends BlockComponent<
   EdgelessRootService,
   EdgelessRootBlockWidgetName
 > {
-  private _refreshLayerViewport = requestThrottledConnectFrame(() => {
+  private _refreshLayerViewport = requestThrottledConnectedFrame(() => {
     const { zoom, translateX, translateY } = this.service.viewport;
     const { gap } = getBackgroundGrid(zoom, true);
 
-    this.background.style.setProperty(
-      'background-position',
-      `${translateX}px ${translateY}px`
-    );
-    this.background.style.setProperty('background-size', `${gap}px ${gap}px`);
-
-    this.layer.style.setProperty('transform', this._getLayerViewport());
-    this.layer.dataset.scale = zoom.toString();
+    if (this.backgroundElm) {
+      this.backgroundElm.style.setProperty(
+        'background-position',
+        `${translateX}px ${translateY}px`
+      );
+      this.backgroundElm.style.setProperty(
+        'background-size',
+        `${gap}px ${gap}px`
+      );
+    }
   }, this);
 
   private _resizeObserver: ResizeObserver | null = null;
-
-  private readonly _themeObserver = new ThemeObserver();
 
   private _viewportElement: HTMLElement | null = null;
 
@@ -131,13 +130,6 @@ export class EdgelessRootBlockComponent extends BlockComponent<
         var(--affine-edgeless-grid-color) 1px,
         var(--affine-background-primary-color) 1px
       );
-    }
-
-    .edgeless-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      contain: size layout style;
     }
 
     @media print {
@@ -169,16 +161,6 @@ export class EdgelessRootBlockComponent extends BlockComponent<
 
   mouseRoot!: HTMLElement;
 
-  private _getLayerViewport(negative = false) {
-    const { translateX, translateY, zoom } = this.service.viewport;
-
-    if (negative) {
-      return `scale(${1 / zoom}) translate(${-translateX}px, ${-translateY}px)`;
-    }
-
-    return `translate(${translateX}px, ${translateY}px) scale(${zoom})`;
-  }
-
   private _handleToolbarFlag() {
     const createToolbar = () => {
       const toolbar = new EdgelessToolbar(this);
@@ -203,6 +185,42 @@ export class EdgelessRootBlockComponent extends BlockComponent<
       .catch(console.error);
   }
 
+  private _initLayerUpdateEffect() {
+    const updateLayers = requestThrottledConnectedFrame(() => {
+      const blocks = Array.from(
+        this.gfxViewportElm.children as HTMLCollectionOf<GfxBlockComponent>
+      );
+
+      blocks.forEach((block: GfxBlockComponent) => {
+        block.updateZIndex?.();
+      });
+    });
+
+    this._disposables.add(
+      this.service.layer.slots.layerUpdated.on(() => updateLayers())
+    );
+  }
+
+  private _initPanEvent() {
+    this.disposables.add(
+      this.dispatcher.add('pan', ctx => {
+        const { viewport } = this.service;
+        if (viewport.locked) return;
+
+        const multiPointersState = ctx.get('multiPointerState');
+        const [p1, p2] = multiPointersState.pointers;
+
+        const dx =
+          (0.5 * (p1.delta.x + p2.delta.x)) / viewport.zoom / viewport.scale;
+        const dy =
+          (0.5 * (p1.delta.y + p2.delta.y)) / viewport.zoom / viewport.scale;
+
+        // direction is opposite
+        viewport.applyDeltaCenter(-dx, -dy);
+      })
+    );
+  }
+
   private _initPinchEvent() {
     this.disposables.add(
       this.dispatcher.add('pinch', ctx => {
@@ -212,9 +230,9 @@ export class EdgelessRootBlockComponent extends BlockComponent<
         const multiPointersState = ctx.get('multiPointerState');
         const [p1, p2] = multiPointersState.pointers;
 
-        const startCenter = new Point(
-          0.5 * (p1.start.x + p2.start.x),
-          0.5 * (p1.start.y + p2.start.y)
+        const currentCenter = new Point(
+          0.5 * (p1.x + p2.x),
+          0.5 * (p1.y + p2.y)
         );
 
         const lastDistance = Vec.dist(
@@ -226,8 +244,8 @@ export class EdgelessRootBlockComponent extends BlockComponent<
         const zoom = (currentDistance / lastDistance) * viewport.zoom;
 
         const [baseX, baseY] = viewport.toModelCoord(
-          startCenter.x,
-          startCenter.y
+          currentCenter.x,
+          currentCenter.y
         );
 
         viewport.setZoom(zoom, new Point(baseX, baseY));
@@ -297,9 +315,9 @@ export class EdgelessRootBlockComponent extends BlockComponent<
   private _initSlotEffects() {
     const { disposables, slots } = this;
 
-    this._themeObserver.observe(document.documentElement);
-    this._themeObserver.on(() => this.surface.refresh());
-    this.disposables.add(() => this._themeObserver.dispose());
+    this.disposables.add(
+      this.service.themeObserver.mode$.subscribe(() => this.surface.refresh())
+    );
 
     disposables.add(this.service.selection);
     disposables.add(
@@ -749,10 +767,11 @@ export class EdgelessRootBlockComponent extends BlockComponent<
     this._initPixelRatioChangeEffect();
     this._initFontLoader();
     this._initRemoteCursor();
-    // this._initSurface();
+    this._initLayerUpdateEffect();
 
     this._initViewport();
     this._initWheelEvent();
+    this._initPanEvent();
     this._initPinchEvent();
 
     if (this.doc.readonly) {
@@ -780,8 +799,6 @@ export class EdgelessRootBlockComponent extends BlockComponent<
   }
 
   override renderBlock() {
-    this.setAttribute(BLOCK_ID_ATTR, this.model.id);
-
     const widgets = repeat(
       Object.entries(this.widgets),
       ([id]) => id,
@@ -790,12 +807,35 @@ export class EdgelessRootBlockComponent extends BlockComponent<
 
     return html`
       <div class="edgeless-background edgeless-container">
-        <div class="edgeless-layer">
+        <gfx-viewport
+          .maxConcurrentRenders=${6}
+          .viewport=${this.service.viewport}
+          .getModelsInViewport=${() => {
+            const blocks = this.service.layer.blocksGrid.search(
+              this.service.viewport.viewportBounds,
+              undefined,
+              true
+            );
+
+            this.service.layer.framesGrid
+              .search(this.service.viewport.viewportBounds, undefined, true)
+              .forEach(frame => blocks.add(frame));
+
+            return blocks;
+          }}
+          .host=${this.host}
+        >
           ${this.renderChildren(this.model)}${this.renderChildren(
             this.surfaceBlockModel
           )}
-        </div>
+        </gfx-viewport>
       </div>
+
+      <!--
+        Used to mount component before widgets
+        Eg., canvas text editor
+      -->
+      <div class="edgeless-mount-point"></div>
 
       <!-- need to be converted to widget -->
       <edgeless-dragging-area-rect
@@ -899,15 +939,18 @@ export class EdgelessRootBlockComponent extends BlockComponent<
   private accessor _isResizing = false;
 
   @query('.edgeless-background')
-  accessor background!: HTMLDivElement;
+  accessor backgroundElm: HTMLDivElement | null = null;
 
   @state()
   accessor edgelessTool: EdgelessTool = {
     type: localStorage.defaultTool ?? 'default',
   };
 
-  @query('.edgeless-layer')
-  accessor layer!: HTMLDivElement;
+  @query('gfx-viewport')
+  accessor gfxViewportElm!: GfxViewportElement;
+
+  @query('.edgeless-mount-point')
+  accessor mountElm: HTMLDivElement | null = null;
 
   @query('edgeless-selected-rect')
   accessor selectedRect!: EdgelessSelectedRect;

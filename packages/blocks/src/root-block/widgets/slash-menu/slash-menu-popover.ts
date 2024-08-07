@@ -56,7 +56,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
     cleanSpecifiedTail(
       this.host,
       this.context.model,
-      this.triggerKey + this._query
+      this.triggerKey + (this._query || '')
     );
     item.action(this.context)?.catch(console.error);
     this.abortController.abort();
@@ -81,12 +81,16 @@ export class SlashMenu extends WithDisposable(LitElement) {
 
   private _queryState: 'off' | 'on' | 'no_result' = 'off';
 
-  private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
+  private _startRange = this.inlineEditor.getInlineRange();
 
   private _updateFilteredItems = () => {
+    const query = this._query;
+    if (query === null) {
+      this.abortController.abort();
+      return;
+    }
     this._filteredItems = [];
-
-    const searchStr = this._query.toLowerCase();
+    const searchStr = query.toLowerCase();
     if (searchStr === '' || searchStr.endsWith(' ')) {
       this._queryState = searchStr === '' ? 'off' : 'no_result';
       return;
@@ -147,7 +151,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
   }
 
   private get _query() {
-    return getQuery(this.inlineEditor, this._startIndex) || '';
+    return getQuery(this.inlineEditor, this._startRange);
   }
 
   override connectedCallback() {
@@ -186,6 +190,7 @@ export class SlashMenu extends WithDisposable(LitElement) {
       target: inlineEditor.eventSource,
       //inlineEditor,
       signal: this.abortController.signal,
+      inlineEditor: this.inlineEditor,
       interceptor: (event, next) => {
         const { key, isComposing, code } = event;
         if (key === this.triggerKey) {
@@ -213,9 +218,15 @@ export class SlashMenu extends WithDisposable(LitElement) {
         next();
       },
       onInput: () => this._updateFilteredItems(),
+      onPaste: () => {
+        setTimeout(() => this._updateFilteredItems(), 20);
+      },
       onDelete: () => {
-        const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
-        if (curIndex < this._startIndex) {
+        const curRange = this.inlineEditor.getInlineRange();
+        if (!this._startRange || !curRange) {
+          return;
+        }
+        if (curRange.index < this._startRange.index) {
           this.abortController.abort();
         }
         this._updateFilteredItems();

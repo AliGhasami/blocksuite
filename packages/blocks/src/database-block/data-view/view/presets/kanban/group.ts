@@ -6,7 +6,7 @@ import { html } from 'lit/static-html.js';
 
 import type { GroupData } from '../../../common/group-by/helper.js';
 import type { DataViewRenderer } from '../../../data-view.js';
-import type { DataViewKanbanManager } from './kanban-view-manager.js';
+import type { KanbanSingleView } from './kanban-view-manager.js';
 
 import { popFilterableSimpleMenu } from '../../../../../_common/components/index.js';
 import { AddCursorIcon } from '../../../../../_common/icons/index.js';
@@ -56,7 +56,6 @@ const styles = css`
   .add-card {
     display: flex;
     align-items: center;
-    height: 28px;
     padding: 4px;
     border-radius: 4px;
     cursor: pointer;
@@ -74,11 +73,6 @@ const styles = css`
   }
 
   affine-data-view-kanban-group .add-card:hover {
-    background-color: var(--affine-hover-color);
-    color: var(--affine-text-primary-color);
-  }
-
-  affine-data-view-kanban-group:has(.add-card:hover) .add-card {
     background-color: var(--affine-hover-color);
     color: var(--affine-text-primary-color);
   }
@@ -104,7 +98,8 @@ export class KanbanGroup extends WithDisposable(ShadowlessElement) {
           selectionType: 'cell',
           groupKey: this.group.key,
           cardId: id,
-          columnId: this.view.header.titleColumn || this.view.columns[0],
+          columnId:
+            this.view.header$.value.titleColumn || this.view.columns$.value[0],
           isEditing: true,
         };
       }
@@ -120,7 +115,8 @@ export class KanbanGroup extends WithDisposable(ShadowlessElement) {
           selectionType: 'cell',
           groupKey: this.group.key,
           cardId: id,
-          columnId: this.view.header.titleColumn || this.view.columns[0],
+          columnId:
+            this.view.header$.value.titleColumn || this.view.columns$.value[0],
           isEditing: true,
         };
       }
@@ -157,7 +153,7 @@ export class KanbanGroup extends WithDisposable(ShadowlessElement) {
     return html`
       <div class="group-header">
         ${GroupTitle(this.group, {
-          readonly: this.view.readonly,
+          readonly: this.view.readonly$.value,
           clickAdd: this.clickAddCardInStart,
           clickOps: this.clickGroupOptions,
         })}
@@ -178,7 +174,7 @@ export class KanbanGroup extends WithDisposable(ShadowlessElement) {
             `;
           }
         )}
-        ${this.view.readonly
+        ${this.view.readonly$.value
           ? nothing
           : html`<div class="add-card" @click="${this.clickAddCard}">
               <div
@@ -199,7 +195,7 @@ export class KanbanGroup extends WithDisposable(ShadowlessElement) {
   accessor group!: GroupData;
 
   @property({ attribute: false })
-  accessor view!: DataViewKanbanManager;
+  accessor view!: KanbanSingleView;
 }
 
 declare global {

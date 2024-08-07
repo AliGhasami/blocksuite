@@ -23,10 +23,10 @@ import {
   ShapeType,
 } from '../../surface-block/index.js';
 import { PageKeyboardManager } from '../keyboard/keyboard-manager.js';
+import { GfxBlockModel } from './block-model.js';
 import { CopilotSelectionController } from './controllers/tools/copilot-tool.js';
 import { LassoToolController } from './controllers/tools/lasso-tool.js';
 import { ShapeToolController } from './controllers/tools/shape-tool.js';
-import { EdgelessBlockModel } from './edgeless-block-model.js';
 import {
   DEFAULT_NOTE_CHILD_FLAVOUR,
   DEFAULT_NOTE_CHILD_TYPE,
@@ -127,8 +127,8 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
 
           if (
             selection.selectedElements.length === 1 &&
-            selection.firstElement instanceof EdgelessBlockModel &&
-            matchFlavours(selection.firstElement as EdgelessBlockModel, [
+            selection.firstElement instanceof GfxBlockModel &&
+            matchFlavours(selection.firstElement as GfxBlockModel, [
               'affine:note',
             ])
           ) {
@@ -556,16 +556,16 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
         case 'ArrowLeft':
           targetNode =
             nodeDirection === LayoutType.RIGHT
-              ? mindmap.getParentNode(node.id)?.element ?? null
-              : mindmap.getChildNodes(node.id, 'left')[0]?.element ?? null;
+              ? (mindmap.getParentNode(node.id)?.element ?? null)
+              : (mindmap.getChildNodes(node.id, 'left')[0]?.element ?? null);
 
           break;
         case 'ArrowRight':
           targetNode =
             nodeDirection === LayoutType.RIGHT ||
             nodeDirection === LayoutType.BALANCE
-              ? mindmap.getChildNodes(node.id, 'right')[0]?.element ?? null
-              : mindmap.getParentNode(node.id)?.element ?? null;
+              ? (mindmap.getChildNodes(node.id, 'right')[0]?.element ?? null)
+              : (mindmap.getParentNode(node.id)?.element ?? null);
           break;
       }
 

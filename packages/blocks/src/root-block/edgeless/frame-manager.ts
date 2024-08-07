@@ -10,7 +10,7 @@ import type { NoteBlockModel } from '../../note-block/note-model.js';
 import type { SurfaceBlockModel } from '../../surface-block/surface-model.js';
 
 import { Overlay, type RoughCanvas } from '../../surface-block/index.js';
-import { EdgelessBlockModel } from './edgeless-block-model.js';
+import { GfxBlockModel } from './block-model.js';
 import { edgelessElementsBound } from './utils/bound-utils.js';
 import { isFrameBlock } from './utils/query.js';
 
@@ -32,14 +32,14 @@ export class FrameOverlay extends Overlay {
 
   clear() {
     this.bound = null;
-    this._renderer.refresh();
+    this._renderer?.refresh();
   }
 
   highlight(frame: FrameBlockModel) {
     const bound = Bound.deserialize(frame.xywh);
 
     this.bound = bound;
-    this._renderer.refresh();
+    this._renderer?.refresh();
   }
 
   override render(ctx: CanvasRenderingContext2D, _rc: RoughCanvas): void {
@@ -173,7 +173,7 @@ export function getBlocksInFrame(
   ).concat(
     surfaceModel[0].children.filter(ele => {
       if (ele.id === model.id) return;
-      if (ele instanceof EdgelessBlockModel) {
+      if (ele instanceof GfxBlockModel) {
         const blockBound = Bound.deserialize(ele.xywh);
         return fullyContained
           ? bound.contains(blockBound)

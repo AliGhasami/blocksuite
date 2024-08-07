@@ -9,6 +9,7 @@ import type {
 import type { RoughCanvas } from '../../../rough/canvas.js';
 import type { Renderer } from '../../renderer.js';
 
+import { TextAlign } from '../../../consts.js';
 import {
   DEFAULT_SHAPE_FILL_COLOR,
   DEFAULT_SHAPE_STROKE_COLOR,
@@ -27,7 +28,7 @@ import { diamond } from './diamond.js';
 import { ellipse } from './ellipse.js';
 import { rect } from './rect.js';
 import { triangle } from './triangle.js';
-import { type CustomStyle, horizontalOffset, verticalOffset } from './utils.js';
+import { type Colors, horizontalOffset, verticalOffset } from './utils.js';
 
 const shapeRenderers: {
   [key in ShapeType]: (
@@ -36,7 +37,7 @@ const shapeRenderers: {
     matrix: DOMMatrix,
     renderer: Renderer,
     rc: RoughCanvas,
-    custom: CustomStyle
+    colors: Colors
   ) => void;
 } = {
   diamond,
@@ -52,37 +53,34 @@ export function shape(
   renderer: Renderer,
   rc: RoughCanvas
 ) {
-  const color = renderer.getColor(model.color, DEFAULT_SHAPE_TEXT_COLOR, true);
-  const fillColor = renderer.getColor(
-    model.fillColor,
-    DEFAULT_SHAPE_STROKE_COLOR,
+  const color = renderer.getColorValue(
+    model.color,
+    DEFAULT_SHAPE_TEXT_COLOR,
     true
   );
-  const strokeColor = renderer.getColor(
-    model.strokeColor,
+  const fillColor = renderer.getColorValue(
+    model.fillColor,
     DEFAULT_SHAPE_FILL_COLOR,
     true
   );
-  const customStyle = { color, fillColor, strokeColor };
-
-  shapeRenderers[model.shapeType](
-    model,
-    ctx,
-    matrix,
-    renderer,
-    rc,
-    customStyle
+  const strokeColor = renderer.getColorValue(
+    model.strokeColor,
+    DEFAULT_SHAPE_STROKE_COLOR,
+    true
   );
+  const colors = { color, fillColor, strokeColor };
+
+  shapeRenderers[model.shapeType](model, ctx, matrix, renderer, rc, colors);
 
   if (model.textDisplay) {
-    renderText(model, ctx, customStyle);
+    renderText(model, ctx, colors);
   }
 }
 
 function renderText(
   model: ShapeElementModel,
   ctx: CanvasRenderingContext2D,
-  { color }: CustomStyle
+  { color }: Colors
 ) {
   const {
     x,
@@ -158,9 +156,17 @@ function renderText(
     }
   }
 
+  const offsetX =
+    model.textAlign === TextAlign.Center
+      ? (w - maxLineWidth) / 2
+      : model.textAlign === TextAlign.Left
+        ? horOffset
+        : horOffset - maxLineWidth;
+  const offsetY = vertOffset - lineHeight + verticalPadding / 2;
+
   const bound = new Bound(
-    x + (w - maxLineWidth) / 2,
-    y + vertOffset - 2,
+    x + offsetX,
+    y + offsetY,
     maxLineWidth,
     lineHeight * lines.length
   ) as IBound;

@@ -7,7 +7,6 @@ import { join } from 'lit/directives/join.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { when } from 'lit/directives/when.js';
 
-import type { CssVariableName } from '../../../_common/theme/css-variables.js';
 import type { ColorScheme } from '../../../_common/theme/theme-observer.js';
 import type { ShapeProps } from '../../../surface-block/element-model/shape.js';
 import type { EdgelessColorPickerButton } from '../../edgeless/components/color-picker/button.js';
@@ -30,6 +29,8 @@ import { LineWidth } from '../../../_common/types.js';
 import { countBy, maxBy } from '../../../_common/utils/iterable.js';
 import { FontFamily } from '../../../surface-block/consts.js';
 import {
+  DEFAULT_SHAPE_FILL_COLOR,
+  DEFAULT_SHAPE_STROKE_COLOR,
   FILL_COLORS,
   STROKE_COLORS,
   ShapeType,
@@ -98,7 +99,7 @@ function getMostCommonFillColor(
   const colors = countBy(elements, (ele: ShapeElementModel) => {
     if (ele.filled) {
       return typeof ele.fillColor === 'object'
-        ? ele.fillColor[colorScheme] ?? ele.fillColor.normal ?? null
+        ? (ele.fillColor[colorScheme] ?? ele.fillColor.normal ?? null)
         : ele.fillColor;
     }
     return '--affine-palette-transparent';
@@ -113,7 +114,7 @@ function getMostCommonStrokeColor(
 ): string | null {
   const colors = countBy(elements, (ele: ShapeElementModel) => {
     return typeof ele.strokeColor === 'object'
-      ? ele.strokeColor[colorScheme] ?? ele.strokeColor.normal ?? null
+      ? (ele.strokeColor[colorScheme] ?? ele.strokeColor.normal ?? null)
       : ele.strokeColor;
   });
   const max = maxBy(Object.entries(colors), ([_k, count]) => count);
@@ -165,12 +166,13 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
   ) {
     return (event: PickColorEvent) => {
       if (event.type === 'pick') {
-        const { type, value } = event.detail;
         this.elements.forEach(ele => {
-          this.service.updateElement(
-            ele.id,
-            packColor(type, key, value, ele[key])
-          );
+          const props = packColor(key, { ...event.detail });
+          // If `filled` can be set separately, this logic can be removed
+          if (key === 'fillColor' && !ele.filled) {
+            Object.assign(props, { filled: true });
+          }
+          this.service.updateElement(ele.id, props);
         });
         return;
       }
@@ -185,7 +187,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     mountShapeTextEditor(this.elements[0], this.edgeless);
   }
 
-  private _getTextColor(fillColor: CssVariableName) {
+  private _getTextColor(fillColor: string) {
     // When the shape is filled with black color, the text color should be white.
     // When the shape is transparent, the text color should be set according to the theme.
     // Otherwise, the text color should be black.
@@ -198,7 +200,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     return textColor;
   }
 
-  private _setShapeFillColor(fillColor: CssVariableName) {
+  private _setShapeFillColor(fillColor: string) {
     const filled = !isTransparent(fillColor);
     const color = this._getTextColor(fillColor);
     this.elements.forEach(ele =>
@@ -206,7 +208,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     );
   }
 
-  private _setShapeStrokeColor(strokeColor: CssVariableName) {
+  private _setShapeStrokeColor(strokeColor: string) {
     this.elements.forEach(ele =>
       this.service.updateElement(ele.id, { strokeColor })
     );
@@ -276,9 +278,10 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     const elements = this.elements;
     const selectedShape = getMostCommonShape(elements);
     const selectedFillColor =
-      getMostCommonFillColor(elements, colorScheme) ?? FILL_COLORS[0];
+      getMostCommonFillColor(elements, colorScheme) ?? DEFAULT_SHAPE_FILL_COLOR;
     const selectedStrokeColor =
-      getMostCommonStrokeColor(elements, colorScheme) ?? STROKE_COLORS[0];
+      getMostCommonStrokeColor(elements, colorScheme) ??
+      DEFAULT_SHAPE_STROKE_COLOR;
     const selectedLineSize = getMostCommonLineSize(elements) ?? LineWidth.Four;
     const selectedLineStyle =
       getMostCommonLineStyle(elements) ?? StrokeStyle.Solid;
@@ -367,7 +370,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
                 role="listbox"
                 aria-label="Fill colors"
                 .value=${selectedFillColor}
-                .options=${['--affine-palette-transparent', ...FILL_COLORS]}
+                .options=${FILL_COLORS}
                 @select=${(e: ColorEvent) => this._setShapeFillColor(e.detail)}
               >
               </edgeless-color-panel>

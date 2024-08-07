@@ -1,4 +1,3 @@
-import type { CssVariableName } from '@blocks/_common/theme/css-variables.js';
 import type { NoteDisplayMode } from '@blocks/_common/types.js';
 import type { NoteBlockModel } from '@blocks/note-block/index.js';
 import type { IPoint, IVec } from '@global/utils/index.js';
@@ -581,7 +580,7 @@ export async function rotateElementByHandle(
   );
 }
 
-export async function selectBrushColor(page: Page, color: CssVariableName) {
+export async function selectBrushColor(page: Page, color: string) {
   const colorButton = page.locator(
     `edgeless-brush-menu .color-unit[aria-label="${color.toLowerCase()}"]`
   );
@@ -647,6 +646,22 @@ export async function getAllNoteIds(page: Page) {
   return page.evaluate(() => {
     return Array.from(document.querySelectorAll('affine-note')).map(
       note => note.model.id
+    );
+  });
+}
+
+export async function getAllEdgelessNoteIds(page: Page) {
+  return page.evaluate(() => {
+    return Array.from(document.querySelectorAll('affine-edgeless-note')).map(
+      note => note.model.id
+    );
+  });
+}
+
+export async function getAllEdgelessTextIds(page: Page) {
+  return page.evaluate(() => {
+    return Array.from(document.querySelectorAll('affine-edgeless-text')).map(
+      text => text.model.id
     );
   });
 }
@@ -747,109 +762,99 @@ export async function zoomByMouseWheel(
   await page.keyboard.up(SHORT_KEY);
 }
 
-// touch screen zooming is not supported by Playwright now
+// touch screen is not supported by Playwright now
 // use pointer event mock instead
 // https://github.com/microsoft/playwright/issues/2903
-export async function zoomByPinch(
+export async function multiTouchDown(page: Page, points: Point[]) {
+  await page.evaluate(points => {
+    const target = document.querySelector('affine-edgeless-root');
+    if (!target) {
+      throw new Error('Missing edgeless page');
+    }
+    points.forEach((point, index) => {
+      const clientX = point.x;
+      const clientY = point.y;
+
+      target.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          clientX,
+          clientY,
+          bubbles: true,
+          pointerType: 'touch',
+          pointerId: index,
+          isPrimary: index === 0,
+        })
+      );
+    });
+  }, points);
+}
+
+export async function multiTouchMove(
   page: Page,
-  start1: IPoint,
-  start2: IPoint,
-  end1: IPoint,
-  end2: IPoint,
-  step: number = 5
+  from: Point[],
+  to: Point[],
+  step = 5
 ) {
   await page.evaluate(
-    async ({ start1, start2, end1, end2, step }) => {
+    async ({ from, to, step }) => {
       const target = document.querySelector('affine-edgeless-root');
       if (!target) {
         throw new Error('Missing edgeless page');
       }
 
-      const pointerdown = (position: IPoint, isPrimary: boolean) => {
-        const clientX = position.x;
-        const clientY = position.y;
-
-        target.dispatchEvent(
-          new PointerEvent('pointerdown', {
-            clientX,
-            clientY,
-            bubbles: true,
-            pointerId: isPrimary ? 1 : 2,
-            isPrimary,
-          })
-        );
-      };
-
-      const pointermove = (position: IPoint, isPrimary: boolean) => {
-        const clientX = position.x;
-        const clientY = position.y;
-
-        target.dispatchEvent(
-          new PointerEvent('pointermove', {
-            clientX,
-            clientY,
-            bubbles: true,
-            pointerId: isPrimary ? 1 : 2,
-            isPrimary,
-          })
-        );
-      };
-
-      const pointerup = (position: IPoint, isPrimary: boolean) => {
-        const clientX = position.x;
-        const clientY = position.y;
-
-        target.dispatchEvent(
-          new PointerEvent('pointerup', {
-            clientX,
-            clientY,
-            bubbles: true,
-            pointerId: isPrimary ? 1 : 2,
-            isPrimary,
-          })
-        );
-      };
-
-      pointerdown(start1, true);
-      pointerdown(start2, false);
+      if (from.length !== to.length) {
+        throw new Error('from and to should have the same length');
+      }
 
       if (step !== 0) {
-        const xStep1 = (end1.x - start1.x) / step;
-        const yStep1 = (end1.y - start1.y) / step;
-        const xStep2 = (end2.x - start2.x) / step;
-        const yStep2 = (end2.y - start2.y) / step;
-
         for (const [i] of Array.from({ length: step }).entries()) {
-          pointermove(
-            {
-              x: start1.x + xStep1 * (i + 1),
-              y: start1.y + yStep1 * (i + 1),
-            },
-            true
-          );
-          pointermove(
-            {
-              x: start2.x + xStep2 * (i + 1),
-              y: start2.y + yStep2 * (i + 1),
-            },
-            false
-          );
+          from.forEach((point, index) => {
+            const clientX =
+              point.x + ((to[index].x - point.x) / step) * (i + 1);
+            const clientY =
+              point.y + ((to[index].y - point.y) / step) * (i + 1);
 
+            target.dispatchEvent(
+              new PointerEvent('pointermove', {
+                clientX,
+                clientY,
+                bubbles: true,
+                pointerType: 'touch',
+                pointerId: index,
+                isPrimary: index === 0,
+              })
+            );
+          });
           await new Promise(resolve => setTimeout(resolve, 16));
         }
-
-        pointerup(end1, true);
-        pointerup(end2, false);
       }
     },
-    {
-      start1,
-      start2,
-      end1,
-      end2,
-      step,
-    }
+    { from, to, step }
   );
+}
+
+export async function multiTouchUp(page: Page, points: Point[]) {
+  await page.evaluate(points => {
+    const target = document.querySelector('affine-edgeless-root');
+    if (!target) {
+      throw new Error('Missing edgeless page');
+    }
+    points.forEach((point, index) => {
+      const clientX = point.x;
+      const clientY = point.y;
+
+      target.dispatchEvent(
+        new PointerEvent('pointerup', {
+          clientX,
+          clientY,
+          bubbles: true,
+          pointerType: 'touch',
+          pointerId: index,
+          isPrimary: index === 0,
+        })
+      );
+    });
+  }, points);
 }
 
 export async function zoomFitByKeyboard(page: Page) {
@@ -1155,14 +1160,14 @@ export async function triggerComponentToolbarAction(
     case 'ungroup': {
       const button = locatorComponentToolbar(page)
         .locator('edgeless-change-group-button')
-        .locator('.edgeless-component-toolbar-ungroup-button');
+        .getByRole('button', { name: 'Ungroup' });
       await button.click();
       break;
     }
     case 'renameGroup': {
       const button = locatorComponentToolbar(page)
         .locator('edgeless-change-group-button')
-        .locator('.edgeless-component-toolbar-group-rename-button');
+        .getByRole('button', { name: 'Rename' });
       await button.click();
       break;
     }
@@ -1272,17 +1277,14 @@ export async function triggerComponentToolbarAction(
   }
 }
 
-export async function changeEdgelessNoteBackground(
-  page: Page,
-  color: CssVariableName
-) {
+export async function changeEdgelessNoteBackground(page: Page, color: string) {
   const colorButton = page
     .locator('edgeless-change-note-button')
     .locator(`.color-unit[aria-label="${color}"]`);
   await colorButton.click();
 }
 
-export async function changeShapeFillColor(page: Page, color: CssVariableName) {
+export async function changeShapeFillColor(page: Page, color: string) {
   const colorButton = page
     .locator('edgeless-change-shape-button')
     .getByRole('listbox', { name: 'Fill colors' })
@@ -1290,10 +1292,7 @@ export async function changeShapeFillColor(page: Page, color: CssVariableName) {
   await colorButton.click();
 }
 
-export async function changeShapeStrokeColor(
-  page: Page,
-  color: CssVariableName
-) {
+export async function changeShapeStrokeColor(page: Page, color: string) {
   const colorButton = page
     .locator('edgeless-change-shape-button')
     .getByRole('listbox', { name: 'Border colors' })
@@ -1373,10 +1372,7 @@ export async function changeShapeStyle(
   await button.click();
 }
 
-export async function changeConnectorStrokeColor(
-  page: Page,
-  color: CssVariableName
-) {
+export async function changeConnectorStrokeColor(page: Page, color: string) {
   const colorButton = page
     .locator('edgeless-change-connector-button')
     .locator('edgeless-color-panel')

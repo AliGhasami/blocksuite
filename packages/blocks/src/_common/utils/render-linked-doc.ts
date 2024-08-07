@@ -5,9 +5,9 @@ import { Bound } from '@blocksuite/global/utils';
 import { assertExists } from '@blocksuite/global/utils';
 import {
   type BlockModel,
-  type BlockSelector,
   BlockViewType,
   type Doc,
+  type Query,
 } from '@blocksuite/store';
 import { type TemplateResult, css, render } from 'lit';
 
@@ -16,7 +16,7 @@ import type { EmbedSyncedDocCard } from '../../embed-synced-doc-block/components
 import type { ImageBlockModel } from '../../image-block/index.js';
 import type { NoteBlockModel } from '../../note-block/note-model.js';
 
-import { EdgelessBlockModel } from '../../root-block/edgeless/edgeless-block-model.js';
+import { GfxBlockModel } from '../../root-block/edgeless/block-model.js';
 import {
   getElementProps,
   sortEdgelessElements,
@@ -303,12 +303,11 @@ async function renderNoteContent(
       parent = doc.blockCollection.crud.getParent(parent);
     }
   });
-  const selector: BlockSelector = block => {
-    return ids.includes(block.id)
-      ? BlockViewType.Display
-      : BlockViewType.Hidden;
+  const query: Query = {
+    mode: 'strict',
+    match: ids.map(id => ({ id, viewType: BlockViewType.Display })),
   };
-  const previewDoc = doc.blockCollection.getDoc({ selector });
+  const previewDoc = doc.blockCollection.getDoc({ query });
   const previewSpec = SpecProvider.getInstance().getSpec('page:preview');
   const previewTemplate = card.host.renderSpecPortal(
     previewDoc,
@@ -568,7 +567,7 @@ export function createLinkedDocFromEdgelessElements(
     const ids = new Map<string, string>();
     sortedElements.forEach(model => {
       let newId = model.id;
-      if (model instanceof EdgelessBlockModel) {
+      if (model instanceof GfxBlockModel) {
         const blockProps = getBlockProps(model);
         if (isNoteBlock(model)) {
           newId = linkedDoc.addBlock('affine:note', blockProps, rootId);

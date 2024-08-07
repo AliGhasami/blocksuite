@@ -22,9 +22,11 @@ import {
   ArrowRightSmallIcon,
   MoreHorizontalIcon,
 } from '../../../../_common/icons/index.js';
-import { ThemeObserver } from '../../../../_common/theme/theme-observer.js';
+import {
+  ColorScheme,
+  ThemeObserver,
+} from '../../../../_common/theme/theme-observer.js';
 import { stopPropagation } from '../../../../_common/utils/event.js';
-import { getThemeMode } from '../../../../_common/utils/query.js';
 import '../buttons/tool-icon-button.js';
 import '../buttons/toolbar-button.js';
 import {
@@ -91,11 +93,9 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
     initialValue: { resize: new Slot() } satisfies EdgelessToolbarSlots,
   });
 
-  private _themeObserver = new ThemeObserver();
-
   private _themeProvider = new ContextProvider(this, {
     context: edgelessToolbarThemeContext,
-    initialValue: getThemeMode(),
+    initialValue: ColorScheme.Light,
   });
 
   private _toolbarProvider = new ContextProvider(this, {
@@ -126,6 +126,7 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
       padding-bottom: 16px;
       width: fit-content;
       max-width: calc(100% - ${unsafeCSS(SAFE_AREA_WIDTH)}px * 2);
+      min-width: 264px;
     }
     .edgeless-toolbar-toggle-control[data-enable='true'] {
       transition: 0.23s ease;
@@ -243,6 +244,10 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
     }
     .senior-nav-button {
       padding: 0;
+    }
+    .senior-nav-button svg {
+      width: 20px;
+      height: 20px;
     }
     [data-dense-senior='true'] .senior-nav-button-wrapper {
       width: ${unsafeCSS(SENIOR_TOOL_NAV_SIZE)}px;
@@ -517,9 +522,9 @@ export class EdgelessToolbar extends WithDisposable(LitElement) {
       }
     });
     this._resizeObserver.observe(this);
-    this._themeObserver.observe(document.documentElement);
-    this._themeObserver.on(() => this._themeProvider.setValue(getThemeMode()));
-    this._disposables.add(() => this._themeObserver.dispose());
+    this._disposables.add(
+      ThemeObserver.subscribe(mode => this._themeProvider.setValue(mode))
+    );
     this._disposables.add(
       this.edgeless.slots.edgelessToolUpdated.on(tool => {
         this.edgelessTool = tool;

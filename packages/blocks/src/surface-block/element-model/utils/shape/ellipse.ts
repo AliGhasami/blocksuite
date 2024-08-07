@@ -5,7 +5,7 @@ import { Vec } from '@blocksuite/global/utils';
 import { Bound } from '@blocksuite/global/utils';
 import { PointLocation } from '@blocksuite/global/utils';
 
-import type { ElementHitTestOptions } from '../../base.js';
+import type { PointTestOptions } from '../../base.js';
 import type { ShapeElementModel } from '../../shape.js';
 
 import { DEFAULT_CENTRAL_AREA_RATIO } from '../../../consts.js';
@@ -42,11 +42,11 @@ export const ellipse = {
 
     ctx.restore();
   },
-  hitTest(
+  includesPoint(
     this: ShapeElementModel,
     x: number,
     y: number,
-    options: ElementHitTestOptions
+    options: PointTestOptions
   ) {
     const point: IVec = [x, y];
     const expand = (options?.expand ?? 1) / (options?.zoom ?? 1);
@@ -70,20 +70,21 @@ export const ellipse = {
           const centralRx = rx * DEFAULT_CENTRAL_AREA_RATIO;
           const centralRy = ry * DEFAULT_CENTRAL_AREA_RATIO;
           hit = pointInEllipse(point, center, centralRx, centralRy, rad);
-        } else {
-          hit = this.textBound
-            ? pointInPolygon(
-                [x, y],
-                getPointsFromBoundsWithRotation(this.textBound)
-              )
-            : false;
+        } else if (this.textBound) {
+          hit = pointInPolygon(
+            point,
+            getPointsFromBoundsWithRotation(
+              this,
+              () => Bound.from(this.textBound!).points
+            )
+          );
         }
       }
     }
 
     return hit;
   },
-  containedByBounds(bounds: Bound, element: ShapeElementModel): boolean {
+  containsBound(bounds: Bound, element: ShapeElementModel): boolean {
     const points = getPointsFromBoundsWithRotation(element, ellipse.points);
     return points.some(point => bounds.containsPoint(point));
   },
@@ -144,7 +145,7 @@ export const ellipse = {
     );
   },
 
-  intersectWithLine(
+  getLineIntersections(
     start: IVec,
     end: IVec,
     { rotate, xywh }: ShapeElementModel

@@ -1,4 +1,5 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { BaseSelection, EditorHost } from '@blocksuite/block-std';
+import type { Doc } from '@blocksuite/store';
 
 import { BlockComponent } from '@blocksuite/block-std';
 import { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
@@ -8,7 +9,6 @@ import {
   deserializeXYWH,
 } from '@blocksuite/global/utils';
 import { assertExists, noop } from '@blocksuite/global/utils';
-import { BlockViewType, type Doc } from '@blocksuite/store';
 import { type TemplateResult, css, html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -254,7 +254,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<
       requestConnectedFrame(() => {
         selection.update(selList => {
           return selList
-            .filter(sel => !sel.is('block'))
+            .filter<BaseSelection>(sel => !sel.is('block'))
             .concat(
               selection.create('text', {
                 from: {
@@ -285,19 +285,69 @@ export class SurfaceRefBlockComponent extends BlockComponent<
         | undefined) ?? null;
     this._surfaceModel = surfaceModel;
 
-    const selector = () => BlockViewType.Display;
+    const findReferencedModel = (): [
+      BlockSuite.EdgelessModel | null,
+      string,
+    ] => {
+      if (!this.model.reference) return [null, this.doc.id];
+
+      if (this.doc.getBlock(this.model.reference)) {
+        return [
+          this.doc.getBlock(this.model.reference).model as GfxBlockElementModel,
+          this.doc.id,
+        ];
+      }
+
+      if (this._surfaceModel?.getElementById(this.model.reference)) {
+        return [
+          this._surfaceModel.getElementById(this.model.reference),
+          this.doc.id,
+        ];
+      }
+
+      const doc = [...this.std.collection.docs.values()]
+        .map(doc => doc.getDoc())
+        .find(
+          doc =>
+            doc.getBlock(this.model.reference) ||
+            (
+              doc.getBlocksByFlavour('affine:surface')[0]
+                .model as SurfaceBlockModel
+            ).getElementById(this.model.reference)
+        );
+
+      if (doc) {
+        this._surfaceModel = doc.getBlocksByFlavour('affine:surface')[0]
+          .model as SurfaceBlockModel;
+      }
+
+      if (doc && doc.getBlock(this.model.reference)) {
+        return [
+          doc.getBlock(this.model.reference).model as GfxBlockElementModel,
+          doc.id,
+        ];
+      }
+
+      if (doc && doc.getBlocksByFlavour('affine:surface')[0]) {
+        return [
+          (
+            doc.getBlocksByFlavour('affine:surface')[0]
+              .model as SurfaceBlockModel
+          ).getElementById(this.model.reference),
+          doc.id,
+        ];
+      }
+
+      return [null, this.doc.id];
+    };
+
     const init = () => {
-      const referencedModel: BlockSuite.EdgelessModel =
-        (this.doc.getBlock(this.model.reference)
-          ?.model as GfxBlockElementModel) ??
-        surfaceModel?.getElementById(this.model.reference) ??
-        null;
+      const [referencedModel, docId] = findReferencedModel();
 
       this._referencedModel =
         referencedModel && referencedModel.xywh ? referencedModel : null;
-      this._previewDoc = this.doc.collection.getDoc(this.doc.id, {
+      this._previewDoc = this.doc.collection.getDoc(docId, {
         readonly: true,
-        selector,
       });
       this._referenceXYWH = this._referencedModel?.xywh ?? null;
     };

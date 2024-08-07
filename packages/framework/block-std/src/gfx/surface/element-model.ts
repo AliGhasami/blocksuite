@@ -1,10 +1,5 @@
 import type { EditorHost } from '@blocksuite/block-std';
-import type {
-  CommonElement,
-  ElementHitTestOptions,
-} from '@blocksuite/block-std/gfx';
 import type { IVec, SerializedXYWH, XYWH } from '@blocksuite/global/utils';
-import type { Y } from '@blocksuite/store';
 
 import {
   Bound,
@@ -19,21 +14,21 @@ import {
   randomSeed,
   rotatePoints,
 } from '@blocksuite/global/utils';
+import { DocCollection, type Y } from '@blocksuite/store';
+import { createMutex } from 'lib0/mutex';
 
-import type { GfxBlockElementModel, GfxModel } from '../model.js';
-import type { SurfaceBlockModel } from './model.js';
+import type { GfxBlockElementModel, GfxModel } from '../gfx-block-model.js';
+import type { SurfaceBlockModel } from './surface-model.js';
 
 import {
   convertProps,
-  getDeriveProperties,
+  getDerivedProps,
   getYFieldPropsSet,
   local,
-  updateDerivedProp,
+  updateDerivedProps,
   watch,
   yfield,
 } from './decorators/index.js';
-
-export type { ElementHitTestOptions as ElementHitTestOptions } from '@blocksuite/block-std/gfx';
 
 export type BaseElementProps = {
   index: string;
@@ -48,15 +43,44 @@ export type SerializedElement = Record<string, unknown> & {
   props: Record<string, unknown>;
 };
 
+export interface PointTestOptions {
+  expand?: number;
+
+  /**
+   * If true, the transparent area of the element will be ignored during the point inclusion test.
+   * Otherwise, the transparent area will be considered as filled area.
+   *
+   * Default is true.
+   */
+  ignoreTransparent?: boolean;
+
+  all?: boolean;
+  zoom?: number;
+}
+
+export interface GfxElementGeometry {
+  containsBound(bound: Bound): boolean;
+  getNearestPoint(point: IVec): IVec;
+  getLineIntersections(start: IVec, end: IVec): PointLocation[] | null;
+  getRelativePointLocation(point: IVec): PointLocation;
+  includesPoint(
+    x: number,
+    y: number,
+    options: PointTestOptions,
+    host: EditorHost
+  ): boolean;
+  intersectsBound(bound: Bound): boolean;
+}
+
 export abstract class GfxPrimitiveElementModel<
   Props extends BaseElementProps = BaseElementProps,
-> implements CommonElement
+> implements GfxElementGeometry
 {
   protected _disposable = new DisposableGroup();
 
   protected _id: string;
 
-  private _lastXYWH: SerializedXYWH = '[0,0,0,0]';
+  private _lastXYWH!: SerializedXYWH;
 
   protected _local = new Map<string | symbol, unknown>();
 
@@ -67,11 +91,7 @@ export abstract class GfxPrimitiveElementModel<
   }) => void;
 
   /**
-   * When the ymap is not connected to the doc, its value cannot be read.
-   * But we need to use those value during the creation, so the yfield decorated field's value will
-   * be stored in this map too during the creation.
-   *
-   * After the ymap is connected to the doc, this map will be cleared.
+   * Used to store a copy of data in the yMap.
    */
   protected _preserved = new Map<string, unknown>();
 
@@ -100,8 +120,6 @@ export abstract class GfxPrimitiveElementModel<
     this._stashed = stashedStore as Map<keyof Props, unknown>;
     this._onChange = onChange;
 
-    // class properties is initialized before yMap has been set
-    // so we need to manually assign the default value here
     this.index = 'a0';
     this.seed = randomSeed();
   }
@@ -110,19 +128,15 @@ export abstract class GfxPrimitiveElementModel<
     return props;
   }
 
-  boxSelect(bound: Bound): boolean {
-    return (
-      this.containedByBounds(bound) ||
-      bound.points.some((point, i, points) =>
-        this.intersectWithLine(point, points[(i + 1) % points.length])
-      )
-    );
-  }
-
-  containedByBounds(bounds: Bound): boolean {
+  containsBound(bounds: Bound): boolean {
     return getPointsFromBoundsWithRotation(this).some(point =>
       bounds.containsPoint(point)
     );
+  }
+
+  getLineIntersections(start: IVec, end: IVec) {
+    const points = getPointsFromBoundsWithRotation(this);
+    return linePolygonIntersects(start, end, points);
   }
 
   getNearestPoint(point: IVec) {
@@ -139,24 +153,24 @@ export abstract class GfxPrimitiveElementModel<
     return new PointLocation(rotatePoint, tangent);
   }
 
-  hitTest(
+  includesPoint(
     x: number,
     y: number,
-    _: ElementHitTestOptions,
+    _: PointTestOptions,
     __: EditorHost
   ): boolean {
     return this.elementBound.isPointInBound([x, y]);
   }
 
-  intersectWithLine(start: IVec, end: IVec) {
-    const points = getPointsFromBoundsWithRotation(this);
-    return linePolygonIntersects(start, end, points);
+  intersectsBound(bound: Bound): boolean {
+    return (
+      this.containsBound(bound) ||
+      bound.points.some((point, i, points) =>
+        this.getLineIntersections(point, points[(i + 1) % points.length])
+      )
+    );
   }
 
-  /**
-   * `onCreated` function will be executed when
-   * element is created in local rather than remote peers
-   */
   onCreated() {}
 
   pop(prop: keyof Props | string) {
@@ -171,8 +185,6 @@ export abstract class GfxPrimitiveElementModel<
 
     if (getYFieldPropsSet(this).has(prop as string)) {
       this.surface.doc.transact(() => {
-        // directly set the value to the ymap to avoid
-        // executing derive and convert decorators again
         this.yMap.set(prop as string, value);
       });
     } else {
@@ -204,7 +216,7 @@ export abstract class GfxPrimitiveElementModel<
       set: (original: unknown) => {
         const value = convertProps(prop as string, original, this);
         const oldValue = this._stashed.get(prop);
-        const derivedProps = getDeriveProperties(
+        const derivedProps = getDerivedProps(
           prop as string,
           original,
           this as unknown as GfxPrimitiveElementModel
@@ -231,7 +243,7 @@ export abstract class GfxPrimitiveElementModel<
           },
         });
 
-        updateDerivedProp(
+        updateDerivedProps(
           derivedProps,
           this as unknown as GfxPrimitiveElementModel
         );
@@ -244,7 +256,7 @@ export abstract class GfxPrimitiveElementModel<
   }
 
   get deserializedXYWH() {
-    if (this.xywh !== this._lastXYWH) {
+    if (!this._lastXYWH || this.xywh !== this._lastXYWH) {
       const xywh = this.xywh;
       this._local.set('deserializedXYWH', deserializeXYWH(xywh));
       this._lastXYWH = xywh;
@@ -253,6 +265,10 @@ export abstract class GfxPrimitiveElementModel<
     return (this._local.get('deserializedXYWH') as XYWH) ?? [0, 0, 0, 0];
   }
 
+  /**
+   * The bound of the element after rotation.
+   * The bound without rotation should be created by `Bound.deserialize(this.xywh)`.
+   */
   get elementBound() {
     if (this.rotate) {
       return Bound.from(getBoundsWithRotation(this));
@@ -311,6 +327,13 @@ export abstract class GfxPrimitiveElementModel<
   @watch((_, instance) => {
     instance['_local'].delete('externalBound');
   })
+
+  /**
+   * In some cases, you need to draw something related to the element, but it does not belong to the element itself.
+   * And it is also interactive, you can select element by clicking on it. E.g. the title of the group element.
+   * In this case, we need to store this kind of external xywh in order to do hit test. This property should not be synced to the doc.
+   * This property should be updated every time it gets rendered.
+   */
   @local()
   accessor externalXYWH: SerializedXYWH | undefined = undefined;
 
@@ -333,7 +356,40 @@ export abstract class GfxPrimitiveElementModel<
 export abstract class GfxGroupLikeElementModel<
   Props extends BaseElementProps = BaseElementProps,
 > extends GfxPrimitiveElementModel<Props> {
+  private _childBoundCacheKey: string = '';
+
   private _childIds: string[] = [];
+
+  private _mutex = createMutex();
+
+  private _updateXYWH() {
+    let bound: Bound | undefined;
+    let cacheKey = '';
+    const oldValue = (this._local.get('xywh') as SerializedXYWH) ?? '[0,0,0,0]';
+
+    this.childElements.forEach(child => {
+      cacheKey += child.xywh ?? '';
+      bound = bound ? bound.unite(child.elementBound) : child.elementBound;
+    });
+
+    if (bound) {
+      this._local.set('xywh', bound.serialize());
+      this._childBoundCacheKey = cacheKey;
+    } else {
+      this._local.delete('xywh');
+      this._childBoundCacheKey = '';
+    }
+
+    this._onChange({
+      props: {
+        xywh: bound?.serialize(),
+      },
+      oldValues: {
+        xywh: oldValue,
+      },
+      local: true,
+    });
+  }
 
   /**
    * Get all descendants of this group
@@ -353,6 +409,10 @@ export abstract class GfxGroupLikeElementModel<
     }, [] as GfxModel[]);
   }
 
+  /**
+   * The actual field that stores the children of the group.
+   * It should be a ymap decorated with `@yfield`.
+   */
   hasChild(element: string | GfxModel) {
     return (
       (typeof element === 'string'
@@ -361,10 +421,6 @@ export abstract class GfxGroupLikeElementModel<
     );
   }
 
-  /**
-   * The actual field that stores the children of the group.
-   * It should be a ymap decorated with `@yfield`.
-   */
   /**
    * Check if the group has the given descendant.
    */
@@ -428,6 +484,24 @@ export abstract class GfxGroupLikeElementModel<
     return this._childIds;
   }
 
+  get xywh() {
+    if (
+      !this._local.has('xywh') ||
+      this.childElements.reduce(
+        (pre, model) => pre + (model.xywh ?? ''),
+        ''
+      ) !== this._childBoundCacheKey
+    ) {
+      this._mutex(() => {
+        this._updateXYWH();
+      });
+    }
+
+    return (this._local.get('xywh') as SerializedXYWH) ?? '[0,0,0,0]';
+  }
+
+  set xywh(_) {}
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abstract children: Y.Map<any>;
 
@@ -435,9 +509,6 @@ export abstract class GfxGroupLikeElementModel<
    * Remove the child from the group
    */
   abstract removeChild(id: string): void;
-
-  @local<SerializedXYWH, GfxGroupLikeElementModel>()
-  accessor xywh: SerializedXYWH = '[0,0,0,0]';
 }
 
 export abstract class GfxLocalElementModel {
@@ -478,14 +549,15 @@ export abstract class GfxLocalElementModel {
   abstract xywh: SerializedXYWH;
 }
 
-export function onElementChange(
-  yMap: Y.Map<unknown>,
+export function syncElementFromY(
+  model: GfxPrimitiveElementModel,
   callback: (payload: {
     props: Record<string, unknown>;
     oldValues: Record<string, unknown>;
     local: boolean;
   }) => void
 ) {
+  const disposables: Record<string, () => void> = {};
   const observer = (
     event: Y.YMapEvent<unknown>,
     transaction: Y.Transaction
@@ -502,7 +574,15 @@ export function onElementChange(
       }
 
       if (type.action === 'update' || type.action === 'add') {
-        props[key] = yMap.get(key);
+        const value = model.yMap.get(key);
+
+        if (value instanceof DocCollection.Y.Text) {
+          disposables[key]?.();
+          disposables[key] = watchText(key, value, callback);
+        }
+
+        model['_preserved'].set(key, value);
+        props[key] = value;
         oldValues[key] = oldValue;
       }
     });
@@ -514,9 +594,46 @@ export function onElementChange(
     });
   };
 
-  yMap.observe(observer);
+  Array.from(model.yMap.entries()).forEach(([key, value]) => {
+    if (value instanceof DocCollection.Y.Text) {
+      disposables[key] = watchText(key, value, callback);
+    }
+
+    model['_preserved'].set(key, value);
+  });
+
+  model.yMap.observe(observer);
+  disposables['ymap'] = () => {
+    model.yMap.unobserve(observer);
+  };
 
   return () => {
-    yMap.observe(observer);
+    Object.values(disposables).forEach(fn => fn());
+  };
+}
+
+function watchText(
+  key: string,
+  value: Y.Text,
+  callback: (payload: {
+    props: Record<string, unknown>;
+    oldValues: Record<string, unknown>;
+    local: boolean;
+  }) => void
+) {
+  const fn = (_: Y.YTextEvent, transaction: Y.Transaction) => {
+    callback({
+      props: {
+        [key]: value,
+      },
+      oldValues: {},
+      local: transaction.local,
+    });
+  };
+
+  value.observe(fn);
+
+  return () => {
+    value.unobserve(fn);
   };
 }

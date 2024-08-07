@@ -104,6 +104,7 @@ interface DocCreatedEvent extends TelemetryEvent {
 export interface TelemetryEventMap {
   DocCreated: DocCreatedEvent;
   LinkedDocCreated: TelemetryEvent;
+  SplitNote: TelemetryEvent;
 }
 
 export interface TelemetryService {
@@ -226,10 +227,7 @@ export class RootService extends BlockService<RootBlockModel> {
   };
 
   private _insertLink = (url: string) => {
-    const host = this.host;
-    const rootService = host.spec.getService('affine:page');
-
-    const embedOptions = rootService.getEmbedBlockOptions(url);
+    const embedOptions = this.getEmbedBlockOptions(url);
 
     let flavour = 'affine:bookmark';
     let targetStyle: EmbedCardStyle = 'vertical';
@@ -257,19 +255,16 @@ export class RootService extends BlockService<RootBlockModel> {
       noteId
     );
 
-    asyncFocusRichText(this.host, id, {
-      index: text.length,
-      length: 0,
-    })?.catch(console.error);
+    asyncFocusRichText(this.host, id, text.length)?.catch(console.error);
   };
 
   docModeService: DocModeService = createDocModeService(this.doc.id);
 
   readonly editPropsStore: EditPropsStore = new EditPropsStore(this);
 
-  exportManager!: ExportManager;
+  readonly exportManager = new ExportManager(this, this._exportOptions);
 
-  fileDropManager!: FileDropManager;
+  readonly fileDropManager = new FileDropManager(this, this._fileDropOptions);
 
   readonly fontLoader = new FontLoader();
 
@@ -331,7 +326,7 @@ export class RootService extends BlockService<RootBlockModel> {
 
   telemetryService: TelemetryService | null = null;
 
-  readonly themeObserver = new ThemeObserver();
+  readonly themeObserver = ThemeObserver.instance;
 
   transformers = {
     markdown: MarkdownTransformer,
@@ -385,9 +380,6 @@ export class RootService extends BlockService<RootBlockModel> {
 
     this.loadFonts();
 
-    this.exportManager = new ExportManager(this, this._exportOptions);
-
-    this.fileDropManager = new FileDropManager(this, this._fileDropOptions);
     this.disposables.addFromEvent(
       this.host,
       'dragover',

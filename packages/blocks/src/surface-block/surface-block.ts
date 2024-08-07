@@ -4,7 +4,7 @@ import { css, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import type { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
-import type { CustomColor } from './consts.js';
+import type { Color } from './consts.js';
 import type { SurfaceBlockModel } from './surface-model.js';
 import type { SurfaceBlockService } from './surface-service.js';
 
@@ -41,9 +41,7 @@ export class SurfaceBlockComponent extends BlockComponent<
   };
 
   private _initThemeObserver = () => {
-    this.themeObserver.observe(document.documentElement);
-    this.themeObserver.on(() => this.requestUpdate());
-    this.disposables.add(() => this.themeObserver.dispose());
+    this.disposables.add(ThemeObserver.subscribe(() => this.requestUpdate()));
   };
 
   private _lastTime = 0;
@@ -140,8 +138,6 @@ export class SurfaceBlockComponent extends BlockComponent<
     this._renderer?.refresh();
   };
 
-  readonly themeObserver = new ThemeObserver();
-
   private _getReversedTransform() {
     const { translateX, translateY, zoom } = this.edgeless.service.viewport;
 
@@ -167,19 +163,14 @@ export class SurfaceBlockComponent extends BlockComponent<
       layerManager: service.layer,
       enableStackingCanvas: true,
       provider: {
+        generateColorProperty: (color: Color, fallback: string) =>
+          ThemeObserver.generateColorProperty(color, fallback),
+        getColorValue: (color: Color, fallback?: string, real?: boolean) =>
+          ThemeObserver.getColorValue(color, fallback, real),
+        getColorScheme: () => ThemeObserver.mode,
+        getPropertyValue: (property: string) =>
+          ThemeObserver.getPropertyValue(property),
         selectedElements: () => service.selection.selectedIds,
-        getColorScheme: () => this.themeObserver.mode,
-        getVariableColor: (val: string) =>
-          this.themeObserver.getVariableValue(val),
-        getColor: (
-          color: string | CustomColor,
-          fallback?: string,
-          real?: boolean
-        ) => this.themeObserver.getColor(color, fallback, real),
-        generateColorProperty: (
-          color: string | CustomColor,
-          fallback: string
-        ) => this.themeObserver.generateColorProperty(color, fallback),
       },
       onStackingCanvasCreated(canvas) {
         canvas.className = 'indexable-canvas';
@@ -217,6 +208,11 @@ export class SurfaceBlockComponent extends BlockComponent<
             canvas.remove();
           });
         }
+      })
+    );
+    this._disposables.add(
+      service.selection.slots.updated.on(() => {
+        this._renderer.refresh();
       })
     );
   }

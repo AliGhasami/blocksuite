@@ -1,9 +1,11 @@
+//TODO check ali ghasami
 /// <reference types="vite/client" />
-import type { BlockComponent } from '@blocksuite/block-std';
+import type { BaseSelection, BlockComponent } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { getInlineRangeProvider } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
+import { effect } from '@lit-labs/preact-signals';
 import { type TemplateResult, html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 
@@ -18,9 +20,10 @@ import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
 import { NOTE_SELECTOR } from '../_common/edgeless/note/consts.js';
 import { getViewportElement } from '../_common/utils/query.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
+import { correctNumberedListsOrderToPrev } from './commands/utils.js';
 import { listBlockStyles } from './styles.js';
-import { ListIcon } from './utils/get-list-icon.js';
-import { toggleDown, toggleRight } from './utils/icons.js';
+import { getListIcon } from './utils/get-list-icon.js';
+import { playCheckAnimation, toggleDown, toggleRight } from './utils/icons.js';
 
 @customElement('affine-list')
 export class ListBlockComponent extends CaptionedBlockComponent<
@@ -57,7 +60,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     const selection = this.host.selection;
     selection.update(selList => {
       return selList
-        .filter(sel => !sel.is('text') && !sel.is('block'))
+        .filter<BaseSelection>(sel => !sel.is('text') && !sel.is('block'))
         .concat(selection.create('block', { blockId: this.blockId }));
     });
   }
@@ -104,6 +107,21 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     bindContainerHotkey(this);
 
     this._inlineRangeProvider = getInlineRangeProvider(this);
+
+    this.disposables.add(
+      effect(() => {
+        const type = this.model.type$.value;
+        const order = this.model.order$.value;
+        // old numbered list has no order
+        if (type === 'numbered' && !Number.isInteger(order)) {
+          correctNumberedListsOrderToPrev(this.doc, this.model, false);
+        }
+        // if list is not numbered, order should be null
+        if (type !== 'numbered' && order !== null) {
+          this.model.order = null;
+        }
+      })
+    );
   }
 
   override async getUpdateComplete() {
@@ -117,7 +135,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     const collapsed = this.doc.readonly
       ? this._isCollapsedWhenReadOnly
       : !!model.collapsed;
-    const listIcon = ListIcon(model, !collapsed, _onClickIcon);
+    const listIcon = getListIcon(model, !collapsed, _onClickIcon);
 
     const checked =
       this.model.type === 'todo' && this.model.checked

@@ -2,7 +2,7 @@ import type { BlockComponent } from '@blocksuite/block-std';
 
 import { GfxBlockComponent } from '@blocksuite/block-std';
 import { Bound } from '@blocksuite/global/utils';
-import { type PropertyValueMap, css, html } from 'lit';
+import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { type StyleInfo, styleMap } from 'lit/directives/style-map.js';
 
@@ -13,6 +13,7 @@ import type {
 import type { EdgelessTextBlockModel } from './edgeless-text-model.js';
 import type { EdgelessTextBlockService } from './edgeless-text-service.js';
 
+import { ThemeObserver } from '../_common/theme/theme-observer.js';
 import { matchFlavours } from '../_common/utils/model.js';
 import { HandleDirection } from '../root-block/edgeless/components/resize/resize-handles.js';
 import {
@@ -182,7 +183,7 @@ export class EdgelessTextBlockComponent extends GfxBlockComponent<
     this.style.transformOrigin = '0 0';
   }
 
-  override firstUpdated(props: PropertyValueMap<unknown>) {
+  override firstUpdated(props: Map<string, unknown>) {
     super.firstUpdated(props);
 
     const { disposables, rootService } = this;
@@ -317,7 +318,7 @@ export class EdgelessTextBlockComponent extends GfxBlockComponent<
 
   override renderPageContent() {
     const { fontFamily, fontStyle, fontWeight, textAlign } = this.model;
-    const color = this.rootService.themeObserver.generateColorProperty(
+    const color = ThemeObserver.generateColorProperty(
       this.model.color,
       '#000000'
     );
@@ -337,6 +338,10 @@ export class EdgelessTextBlockComponent extends GfxBlockComponent<
         </div>
       </div>
     `;
+  }
+
+  override toZIndex() {
+    return `${this.rootService.layer.getZIndex(this.model)}`;
   }
 
   tryFocusEnd() {

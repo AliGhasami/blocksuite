@@ -5,9 +5,9 @@
   "type": "module",
   "repository": "toeverything/blocksuite",
   "scripts": {
-    "test:unit": "vitest --run",
-    "test:unit:coverage": "vitest run --coverage",
-    "test:unit:ui": "vitest --ui",
+    "test:unit": "nx vite:test --run",
+    "test:unit:coverage": "nx vite:test --run --coverage",
+    "test:unit:ui": "nx vite:test --ui",
     "build": "tsc"
   },
   "sideEffects": false,
@@ -49,7 +49,7 @@
     "!dist/__tests__"
   ],
   "dependencies": {
-    "lib0": "^0.2.94",
+    "lib0": "^0.2.95",
     "zod": "^3.23.8"
   }
 }
