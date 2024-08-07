@@ -110,6 +110,7 @@ async function setData(data: any) {
     currentDocument = new_doc
     appendTODOM(editor)
     checkNotEmptyDocBlock(currentDocument)
+    //new_doc.awarenessStore.setReadonly(new_doc.blockCollection, !new_doc.readonly);
     /*if (refEditor.value) {
       const children = refEditor.value.children
       if (children.length) {
@@ -226,6 +227,7 @@ watch(
 )
 
 function init() {
+
   const { doc, collection } = createEmptyDoc(props.isBoardView).init()
   myCollection = collection
   currentDocument = doc
@@ -238,6 +240,7 @@ function init() {
   }
   editor.doc = doc
   appendTODOM(editor)
+  //doc.awarenessStore.setReadonly(doc.blockCollection, !doc.readonly);
   /*if(refEditor.value){
     refEditor.value.appendChild(editor);
   }*/
