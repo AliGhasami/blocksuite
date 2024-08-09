@@ -186,7 +186,6 @@ export class SlashMenu extends WithDisposable(LitElement) {
      */
     createKeydownObserver({
       target: inlineEditor.eventSource,
-      //inlineEditor,
       signal: this.abortController.signal,
       inlineEditor: this.inlineEditor,
       interceptor: (event, next) => {

@@ -1,4 +1,3 @@
-//import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { isFuzzyMatch } from '@blocksuite/affine-shared/utils';
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
@@ -453,7 +452,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
                     : ''}"
                   text="menu-item-${item.title}"
                   @click=${() => {
-                    console.log('1111', this._activeItem);
+                    //console.log('1111', this._activeItem);
                     //this._filterItems[index]
                     this.context.onClickItem(item);
                     //return this._handleClickItem(currentIndex);

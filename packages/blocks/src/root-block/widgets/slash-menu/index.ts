@@ -191,6 +191,7 @@ export class AffineSlashMenuWidget extends WidgetComponent {
       console.error('Trigger key of slash menu should not be empty string');
       return;
     }
+
     this.handleEvent('beforeInput', this._onBeforeInput);
   }
 }
