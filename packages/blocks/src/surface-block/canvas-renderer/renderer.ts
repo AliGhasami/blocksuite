@@ -145,7 +145,6 @@ export class Renderer {
           : document.createElement('canvas');
 
         if (!created) {
-          this._stackingCanvas.push(canvas);
           onCreated?.(canvas);
         }
 

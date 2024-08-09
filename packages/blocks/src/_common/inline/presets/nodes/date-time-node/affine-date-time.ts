@@ -24,7 +24,7 @@ import { HoverController } from '../../../../components/hover/index.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import { defaultDateFormat, defaultTimeFormat } from './config.js';
 //import { affineTextStyles } from '../affine-text.js';
-import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
+//import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
 
 @customElement('affine-date-time')
 export class AffineDateTime extends ShadowlessElement {
@@ -36,7 +36,7 @@ export class AffineDateTime extends ShadowlessElement {
     return link;
   }*/
 
-  private _whenHover = new HoverController(
+  /*private _whenHover = new HoverController(
     this,
     ({ abortController }) => {
       if (this.blockElement.doc.readonly) {
@@ -67,7 +67,7 @@ export class AffineDateTime extends ShadowlessElement {
       };
     },
     { enterDelay: 500 }
-  );
+  );*/
 
   static override styles = css`
     affine-link > a:hover [data-v-text='true'] {

@@ -27,8 +27,8 @@ import { EmbedSyncedDocBlockSchema } from './embed-synced-doc-block/embed-synced
 import { EmbedYoutubeBlockSchema } from './embed-youtube-block/embed-youtube-schema.js';
 import { FrameBlockSchema } from './frame-block/frame-model.js';
 import { HintBlockSchema } from './hint-block/hint-model.js';
-import { ImageBlockSchema } from './image-block/image-model.js';
-import { ListBlockSchema } from './list-block/list-model.js';
+//import { ImageBlockSchema } from './image-block/image-model.js';
+//import { ListBlockSchema } from './list-block/list-model.js';
 import { ObjectBlockSchema } from './mahdaad-object-block/object-model.js';
 import { NoteBlockSchema } from './note-block/note-model.js';
 import { RootBlockSchema } from './root-block/root-model.js';
