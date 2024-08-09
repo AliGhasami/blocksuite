@@ -9,6 +9,9 @@ packages=(
   "framework/store"
   "framework/inline"
   "framework/sync"
+  "affine/model"
+  "affine/shared"
+  "affine/components"
   "blocks"
   # "docs" # NOT PUBLISHING
   "presets"
@@ -18,7 +21,7 @@ packages=(
 replace() {
   mv package-modified.json package.json
 
-  CURRENT_VERSION="0.15.0"
+  CURRENT_VERSION="0.16.0"
   IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
   MINOR=$((MINOR + 1))
   VERSION="$MAJOR.$MINOR.$PATCH"

@@ -1,7 +1,7 @@
-import { BlockService } from '@blocksuite/block-std';
-import { type TemplateResult, html } from 'lit';
+import type { ParagraphBlockModel } from '@blocksuite/affine-model';
 
-import type { ParagraphBlockModel } from './paragraph-model.js';
+//todo ali ghasami
+import { BlockService } from '@blocksuite/block-std';
 
 import { InlineManager } from '../_common/inline/inline-manager.js';
 import {
@@ -14,41 +14,10 @@ import { ReferenceNodeConfig } from '../_common/inline/presets/nodes/reference-n
 export class ParagraphBlockService<
   TextAttributes extends AffineTextAttributes = AffineTextAttributes,
 > extends BlockService<ParagraphBlockModel> {
-  getPlaceholder = (model: ParagraphBlockModel): TemplateResult<1> | string => {
-    if (model.type === 'text') {
-      return html`<div class="affine-paragraph-placeholder-content">
-        <div>
-          <span class="place-holder">
-            Start typing or Press
-            <span class="short-code">/</span>
-            for block types ...
-          </span>
-        </div>
-        <!-- TODO ali ghasami  -->
-        <div>&nbsp;</div>
-      </div>`;
-      // return "Type '/' for commands";
-    }
-
-    const placeholders = {
-      h1: 'Heading 1',
-      h2: 'Heading 2',
-      h3: 'Heading 3',
-      h4: 'Heading 4',
-      h5: 'Heading 5',
-      h6: 'Heading 6',
-      quote: '',
-    };
-    return placeholders[model.type];
-  };
-
   readonly inlineManager = new InlineManager<TextAttributes>();
 
-  placeholderGenerator: (
-    model: ParagraphBlockModel
-  ) => TemplateResult<1> | string = model => {
-    return this.getPlaceholder(model);
-    /*if (model.type === 'text') {
+  placeholderGenerator: (model: ParagraphBlockModel) => string = model => {
+    if (model.type === 'text') {
       return "Type '/' for commands";
     }
 
@@ -61,7 +30,7 @@ export class ParagraphBlockService<
       h6: 'Heading 6',
       quote: '',
     };
-    return placeholders[model.type];*/
+    return placeholders[model.type];
   };
 
   readonly referenceNodeConfig = new ReferenceNodeConfig();

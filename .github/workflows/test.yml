@@ -18,6 +18,7 @@ on:
       - '**.md'
       - 'scripts/**'
       - 'packages/docs/**'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -103,3 +104,11 @@ jobs:
 
       - run: npx nx-cloud complete-ci-run
         if: always()
+
+      - name: Upload test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results-main
+          path: dist/.playwright/tests
+          if-no-files-found: ignore

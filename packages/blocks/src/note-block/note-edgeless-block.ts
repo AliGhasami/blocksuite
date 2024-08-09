@@ -1,13 +1,18 @@
 import type { BlockComponent, EditorHost } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
+import { MoreIndicatorIcon } from '@blocksuite/affine-components/icons';
+import { ThemeObserver } from '@blocksuite/affine-shared/theme';
+import {
+  matchFlavours,
+  stopPropagation,
+} from '@blocksuite/affine-shared/utils';
 import {
   ShadowlessElement,
   WithDisposable,
   toGfxBlockComponent,
 } from '@blocksuite/block-std';
-import { Point } from '@blocksuite/global/utils';
-import { Bound, almostEqual, clamp } from '@blocksuite/global/utils';
+import { Bound, Point, almostEqual, clamp } from '@blocksuite/global/utils';
 import { css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -18,10 +23,7 @@ import type { NoteBlockModel } from './note-model.js';
 
 import { EDGELESS_BLOCK_CHILD_PADDING } from '../_common/consts.js';
 import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../_common/edgeless/note/consts.js';
-import { MoreIndicatorIcon } from '../_common/icons/edgeless.js';
-import { ThemeObserver } from '../_common/theme/theme-observer.js';
 import { NoteDisplayMode } from '../_common/types.js';
-import { matchFlavours } from '../_common/utils/model.js';
 import { getClosestBlockComponentByPoint } from '../_common/utils/query.js';
 import { handleNativeRangeAtPoint } from '../_common/utils/selection.js';
 import { StrokeStyle } from '../surface-block/consts.js';
@@ -448,7 +450,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
         <div
           class="note-background"
           style=${styleMap(backgroundStyle)}
-          @pointerdown=${(e: MouseEvent) => e.stopPropagation()}
+          @pointerdown=${stopPropagation}
           @click=${this._handleClickAtBackground}
         ></div>
 
@@ -473,8 +475,8 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
               style=${styleMap({
                 bottom: this._editing ? `${-extra}px` : '0',
               })}
-              @mousedown=${(e: MouseEvent) => e.stopPropagation()}
-              @mouseup=${(e: MouseEvent) => e.stopPropagation()}
+              @mousedown=${stopPropagation}
+              @mouseup=${stopPropagation}
               @click=${this._setCollapse}
             >
               ${MoreIndicatorIcon}

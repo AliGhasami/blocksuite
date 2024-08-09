@@ -1,16 +1,21 @@
+//todo ali ghasami
+import type { ImageBlockModel } from '@blocksuite/affine-model';
+import type {
+  AttachmentBlockProps,
+  ImageBlockProps,
+} from '@blocksuite/affine-model';
 import type { EditorHost } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
+import {
+  downloadBlob,
+  humanFileSize,
+  withTempBlobData,
+} from '@blocksuite/affine-shared/utils';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import { assertExists } from '@blocksuite/global/utils';
 
-import type { AttachmentBlockProps } from '../attachment-block/attachment-model.js';
 import type { ImageBlockComponent } from './image-block.js';
-import type { ImageBlockModel, ImageBlockProps } from './image-model.js';
 
-import { uploadFile } from '../_common/upload.js';
-import { downloadBlob, withTempBlobData } from '../_common/utils/filesys.js';
-import { humanFileSize } from '../_common/utils/math.js';
 import { readImageSize } from '../root-block/edgeless/components/utils.js';
 import { transformModel } from '../root-block/utils/operations/model.js';
 import { toast } from './../_common/components/toast.js';
@@ -38,22 +43,12 @@ export async function uploadBlobForImage(
     console.error('The image is already uploading!');
     return;
   }
-  //setImageUploading(blockId);
+  setImageUploading(blockId);
   const doc = editorHost.doc;
-  //let sourceId: string | undefined;
-  const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
-  assertExists(imageModel);
-  try {
-    //setImageUploaded(blockId);
-    //sourceId = await doc.blobSync.set(blob);
+  let sourceId: string | undefined;
 
-    const { data } = await uploadFile(blob);
-    doc.withoutTransact(() => {
-      doc.updateBlock(imageModel, {
-        src: `${data.data.storage}`,
-        // blobUrl: '1111',
-      } satisfies Partial<ImageBlockProps>);
-    });
+  try {
+    sourceId = await doc.blobSync.set(blob);
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -63,7 +58,7 @@ export async function uploadBlobForImage(
       );
     }
   } finally {
-    /*setImageUploaded(blockId);
+    setImageUploaded(blockId);
 
     const imageModel = doc.getBlockById(blockId) as ImageBlockModel | null;
 
@@ -74,7 +69,7 @@ export async function uploadBlobForImage(
       doc.updateBlock(imageModel, {
         sourceId,
       } satisfies Partial<ImageBlockProps>);
-    });*/
+    });
   }
 }
 
@@ -317,7 +312,6 @@ export function addSiblingImageBlock(
     }[] = imageFiles.map(file => ({
     flavour: 'affine:image',
     size: file.size,
-    src: URL.createObjectURL(file),
   }));
 
   const doc = editorHost.doc;

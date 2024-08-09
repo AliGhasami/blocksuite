@@ -1,9 +1,14 @@
+//todo ali ghasami
+import {
+  ArrowUpIcon,
+  HandIcon,
+  SelectIcon,
+} from '@blocksuite/affine-components/icons';
 import { LitElement, css, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 
 import type { EdgelessTool } from '../../../types.js';
 
-import { SelectIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
 
@@ -30,11 +35,10 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }
   `;
 
-  override type: EdgelessTool['type'][] = ['default'];
+  override type: EdgelessTool['type'][] = ['default', 'pan'];
 
   private _changeTool() {
-    this.setEdgelessTool({ type: 'default' });
-    /*if (this.toolbar.activePopper) {
+    if (this.toolbar.activePopper) {
       // click manually always closes the popper
       this.toolbar.activePopper.dispose();
     }
@@ -56,18 +60,18 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
         this.setEdgelessTool({ type: 'default' });
       }
       this._fadeIn();
-    }, 100);*/
+    }, 100);
   }
 
-  /*private _fadeIn() {
+  private _fadeIn() {
     this.currentIcon.style.opacity = '1';
     this.currentIcon.style.transform = `translateY(0px)`;
-  }*/
+  }
 
-  /*private _fadeOut() {
+  private _fadeOut() {
     this.currentIcon.style.opacity = '0';
     this.currentIcon.style.transform = `translateY(-5px)`;
-  }*/
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -76,7 +80,7 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }
     this.disposables.add(
       this.edgeless.slots.edgelessToolUpdated.on(({ type }) => {
-        if (type === 'default') {
+        if (type === 'default' || type === 'pan') {
           localStorage.defaultTool = type;
         }
       })
@@ -89,13 +93,18 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     return html`
       <edgeless-tool-icon-button
         class="edgeless-default-button ${type} ${active ? 'active' : ''}"
-        .tooltip=${getTooltipWithShortcut('Select', 'V')}
+        .tooltip=${type === 'pan'
+          ? getTooltipWithShortcut('Hand', 'H')
+          : getTooltipWithShortcut('Select', 'V')}
         .tooltipOffset=${17}
         .active=${active}
         .iconContainerPadding=${6}
         @click=${this._changeTool}
       >
-        <span class="current-icon"> ${SelectIcon} </span>
+        <span class="current-icon">
+          ${localStorage.defaultTool === 'default' ? SelectIcon : HandIcon}
+        </span>
+        <span class="arrow-up-icon">${ArrowUpIcon}</span>
       </edgeless-tool-icon-button>
     `;
   }

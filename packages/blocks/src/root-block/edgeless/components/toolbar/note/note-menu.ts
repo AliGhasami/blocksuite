@@ -1,3 +1,5 @@
+import { AttachmentIcon, LinkIcon } from '@blocksuite/affine-components/icons';
+//todo ali ghasami
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -5,7 +7,6 @@ import { repeat } from 'lit/directives/repeat.js';
 import type { NoteTool } from '../../../controllers/tools/note-tool.js';
 import type { EdgelessTool } from '../../../types.js';
 
-import { AttachmentIcon } from '../../../../../_common/icons/text.js';
 import {
   type NoteChildrenFlavour,
   getImageFilesFromLocal,
@@ -13,6 +14,7 @@ import {
 } from '../../../../../_common/utils/index.js';
 import { ImageIcon } from '../../../../../image-block/styles.js';
 import '../../buttons/tool-icon-button.js';
+import { getTooltipWithShortcut } from '../../utils.js';
 import '../common/slide-menu.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { NOTE_MENU_ITEMS } from './note-menu-config.js';
@@ -63,7 +65,7 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
     );
   }
 
-  /*private _onHandleLinkButtonClick() {
+  private _onHandleLinkButtonClick() {
     const { insertedLinkType } = this.edgeless.service.std.command.exec(
       'insertLinkByQuickSearch'
     );
@@ -88,7 +90,7 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
         }
       })
       .catch(console.error);
-  }*/
+  }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
@@ -107,21 +109,11 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
 
   override render() {
     const { childType } = this;
-    // TODO: hidden feature
-    // <edgeless-tool-icon-button
-    //   .activeMode=${'background'}
-    //   .tooltip=${getTooltipWithShortcut('Link', '@')}
-    //   @click=${() => {
-    //     this._onHandleLinkButtonClick();
-    //   }}
-    // >
-    //   ${LinkIcon}
-    // </edgeless-tool-icon-button>
 
     return html`
       <edgeless-slide-menu>
-        <!-- add to edgeless -->
-        <!-- <div class="menu-content">
+        <div class="menu-content">
+          <!-- add to edgeless -->
           <div class="button-group-container">
             <edgeless-tool-icon-button
               .activeMode=${'background'}
@@ -130,7 +122,17 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               .disabled=${this._imageLoading}
             >
               ${ImageIcon}
-            </edgeless-tool-icon-button> 
+            </edgeless-tool-icon-button>
+
+            <edgeless-tool-icon-button
+              .activeMode=${'background'}
+              .tooltip=${getTooltipWithShortcut('Link', '@')}
+              @click=${() => {
+                this._onHandleLinkButtonClick();
+              }}
+            >
+              ${LinkIcon}
+            </edgeless-tool-icon-button>
 
             <edgeless-tool-icon-button
               .activeMode=${'background'}
@@ -153,10 +155,10 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               }}
             >
               ${AttachmentIcon}
-            </edgeless-tool-icon-button> 
-          </div> -->
+            </edgeless-tool-icon-button>
+          </div>
 
-          <!--<div class="divider"></div> -->
+          <div class="divider"></div>
 
           <!-- add to note -->
           <div class="button-group-container">

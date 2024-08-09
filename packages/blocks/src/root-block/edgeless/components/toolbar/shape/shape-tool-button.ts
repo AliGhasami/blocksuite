@@ -1,4 +1,5 @@
-//TODO check ali ghasami
+//todo ali ghasami
+import { ThemeObserver } from '@blocksuite/affine-shared/theme';
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -7,7 +8,6 @@ import type { LastProps } from '../../../../../surface-block/managers/edit-sessi
 import type { ShapeName } from './shape-tool-element.js';
 import type { DraggableShape } from './utils.js';
 
-import { ThemeObserver } from '../../../../../_common/theme/theme-observer.js';
 import {
   DEFAULT_SHAPE_FILL_COLOR,
   DEFAULT_SHAPE_STROKE_COLOR,

@@ -1,9 +1,23 @@
+import type { AttachmentBlockModel } from '@blocksuite/affine-model';
+
+import {
+  CaptionIcon,
+  CopyIcon,
+  DeleteIcon,
+  DownloadIcon,
+  DuplicateIcon,
+  EditIcon,
+  MoreVerticalIcon,
+  RefreshIcon,
+  SmallArrowDownIcon,
+} from '@blocksuite/affine-components/icons';
+//todo ali ghasami
 import { flip, offset } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { join } from 'lit/directives/join.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 import type { AttachmentBlockComponent } from '../attachment-block.js';
-import type { AttachmentBlockModel } from '../attachment-model.js';
 
 import { createLitPortal } from '../../_common/components/portal.js';
 import '../../_common/components/toolbar/icon-button.js';
@@ -12,15 +26,7 @@ import '../../_common/components/toolbar/separator.js';
 import { renderToolbarSeparator } from '../../_common/components/toolbar/separator.js';
 import '../../_common/components/toolbar/toolbar.js';
 import { renderActions } from '../../_common/components/toolbar/utils.js';
-import {
-  CaptionIcon,
-  CopyIcon,
-  DeleteIcon,
-  DuplicateIcon,
-  EditIcon,
-  MoreVerticalIcon,
-  // ViewIcon,
-} from '../../_common/icons/index.js';
+import { allowEmbed, convertToEmbed } from '../embed.js';
 import { cloneAttachmentProperties } from '../utils.js';
 import { RenameModal } from './rename-model.js';
 import { styles } from './styles.js';
@@ -30,8 +36,8 @@ export function AttachmentOptionsTemplate({
   model,
   showCaption,
   copy,
-  //download,
-  //refresh,
+  download,
+  refresh,
   abortController,
 }: {
   anchor: AttachmentBlockComponent;
@@ -42,11 +48,11 @@ export function AttachmentOptionsTemplate({
   showCaption: () => void;
   abortController: AbortController;
 }) {
-  //const disableEmbed = !allowEmbed(model, anchor.service.maxFileSize);
+  const disableEmbed = !allowEmbed(model, anchor.service.maxFileSize);
   const readonly = model.doc.readonly;
-  //const viewType = model.embed ? 'embed' : 'card';
+  const viewType = model.embed ? 'embed' : 'card';
 
-  /*const viewActions = [
+  const viewActions = [
     {
       type: 'card',
       name: 'Card view',
@@ -65,7 +71,7 @@ export function AttachmentOptionsTemplate({
         abortController.abort();
       },
     },
-  ];*/
+  ];
 
   const moreActions = renderActions([
     [
@@ -89,20 +95,20 @@ export function AttachmentOptionsTemplate({
           model.doc.addSiblingBlocks(model, [prop]);
         },
       },
-      /* {
+      {
         type: 'reload',
         name: 'Reload',
         icon: RefreshIcon,
         disabled: readonly,
         handler: refresh,
-      },*/
-      /*{
+      },
+      {
         type: 'download',
         name: 'Download',
         icon: DownloadIcon,
         disabled: readonly,
         handler: download,
-      },*/
+      },
     ],
     [
       {
@@ -156,8 +162,7 @@ export function AttachmentOptionsTemplate({
           </editor-icon-button>
         `,
 
-    ,
-    /*html`
+    html`
       <editor-menu-button
         .contentPadding=${'8px'}
         .button=${html`
@@ -191,7 +196,9 @@ export function AttachmentOptionsTemplate({
           )}
         </div>
       </editor-menu-button>
-    `*/ /*readonly
+    `,
+
+    readonly
       ? nothing
       : html`
           <editor-icon-button
@@ -201,7 +208,7 @@ export function AttachmentOptionsTemplate({
           >
             ${DownloadIcon}
           </editor-icon-button>
-        `,*/
+        `,
 
     readonly
       ? nothing

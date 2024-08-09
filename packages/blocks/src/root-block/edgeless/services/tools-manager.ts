@@ -72,6 +72,9 @@ export class EdgelessToolsManager {
   };
 
   private _onContainerContextMenu = (e: UIEventState) => {
+    // should display context menu when right-clicking on editing block
+    // e.g. `note` `edgeless-text` and `shape-text`
+    if (this.selection.editing) return;
     e.event.preventDefault();
   };
 
@@ -126,9 +129,10 @@ export class EdgelessToolsManager {
     const metaKeyPressed = IS_MAC ? pointEvt.metaKey : pointEvt.ctrlKey;
 
     if (
-      isMiddleButtonPressed(pointEvt) ||
-      isRightButtonPressed(pointEvt) ||
-      metaKeyPressed
+      !this.selection.editing &&
+      (isMiddleButtonPressed(pointEvt) ||
+        isRightButtonPressed(pointEvt) ||
+        metaKeyPressed)
     ) {
       const isRightButton = isRightButtonPressed(pointEvt);
       const targetTool = (

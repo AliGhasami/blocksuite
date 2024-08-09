@@ -1,6 +1,24 @@
+//todo ali ghasami
 import type { SurfaceSelection } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
+import {
+  BringForwardIcon,
+  BringToFrontIcon,
+  CenterPeekIcon,
+  FrameIcon,
+  GroupIcon,
+  LinkedDocIcon,
+  MoreCopyIcon,
+  MoreDeleteIcon,
+  MoreDuplicateIcon,
+  MoreHorizontalIcon,
+  MoreVerticalIcon,
+  OpenIcon,
+  RefreshIcon,
+  SendBackwardIcon,
+  SendToBackIcon,
+} from '@blocksuite/affine-components/icons';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Bound } from '@blocksuite/global/utils';
 import { LitElement, html, nothing } from 'lit';
@@ -25,22 +43,6 @@ import {
   type FatActions,
   renderActions,
 } from '../../../_common/components/toolbar/utils.js';
-import {
-  BringForwardIcon,
-  BringToFrontIcon,
-  CenterPeekIcon,
-  FrameIcon,
-  GroupIcon,
-  MoreCopyIcon,
-  MoreDeleteIcon,
-  MoreDuplicateIcon,
-  MoreHorizontalIcon,
-  MoreVerticalIcon,
-  OpenIcon,
-  RefreshIcon,
-  SendBackwardIcon,
-  SendToBackIcon,
-} from '../../../_common/icons/index.js';
 import {
   createLinkedDocFromEdgelessElements,
   createLinkedDocFromNote,
@@ -96,7 +98,6 @@ const REORDER_ACTIONS: Action[] = [
 
 const COPY_ACTIONS: Action[] = [
   { icon: MoreCopyIcon, name: 'Copy', type: 'copy' },
-  //{ icon: CopyAsPngIcon, name: 'Copy as PNG', type: 'copy-as-png' },
   { icon: MoreDuplicateIcon, name: 'Duplicate', type: 'duplicate' },
 ] as const;
 
@@ -124,17 +125,17 @@ const RELOAD_ACTION: Action = {
   type: 'reload',
 };
 
-/*const TURN_INTO_LINKED_DOC_ACTION: Action = {
+const TURN_INTO_LINKED_DOC_ACTION: Action = {
   icon: LinkedDocIcon,
   name: 'Turn into linked doc',
   type: 'turn-into-linked-doc',
-};*/
+};
 
-/*const CREATE_LINKED_DOC_ACTION: Action = {
+const CREATE_LINKED_DOC_ACTION: Action = {
   icon: LinkedDocIcon,
   name: 'Create linked doc',
   type: 'create-linked-doc',
-};*/
+};
 
 @customElement('edgeless-more-button')
 export class EdgelessMoreButton extends WithDisposable(LitElement) {
@@ -169,20 +170,19 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       segment: 'toolbar',
       type: 'embed-linked-doc',
     });
-    // TODO: hidden feature
-    // this.edgeless.service.telemetryService?.track('DocCreated', {
-    //   control: 'create linked doc',
-    //   page: 'whiteboard editor',
-    //   module: 'format toolbar',
-    //   type: 'embed-linked-doc',
-    // });
-    // this.edgeless.service.telemetryService?.track('LinkedDocCreated', {
-    //   control: 'create linked doc',
-    //   page: 'whiteboard editor',
-    //   module: 'format toolbar',
-    //   type: 'embed-linked-doc',
-    //   other: 'new doc',
-    // });
+    this.edgeless.service.telemetryService?.track('DocCreated', {
+      control: 'create linked doc',
+      page: 'whiteboard editor',
+      module: 'format toolbar',
+      type: 'embed-linked-doc',
+    });
+    this.edgeless.service.telemetryService?.track('LinkedDocCreated', {
+      control: 'create linked doc',
+      page: 'whiteboard editor',
+      module: 'format toolbar',
+      type: 'embed-linked-doc',
+      other: 'new doc',
+    });
     // delete selected elements
     this.doc.transact(() => {
       deleteElements(this.surface, elements);
@@ -349,7 +349,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
       REORDER_ACTIONS,
       this.getOpenActions(),
       [...COPY_ACTIONS, this.getRefreshAction()],
-      //[this.getLinkedDocAction()],
+      [this.getLinkedDocAction()],
       [DELETE_ACTION],
     ];
   }
@@ -358,7 +358,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     return [
       [FRAME_ACTION],
       COPY_ACTIONS,
-      //[this.getLinkedDocAction()],
+      [this.getLinkedDocAction()],
       [DELETE_ACTION],
     ];
   }
@@ -387,7 +387,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     );
   }
 
-  /*private getLinkedDocAction() {
+  private getLinkedDocAction() {
     const isSingleSelect = this.selection.selectedElements.length === 1;
     const { firstElement } = this.selection;
     if (
@@ -403,7 +403,7 @@ export class EdgelessMoreButton extends WithDisposable(LitElement) {
     }
 
     return CREATE_LINKED_DOC_ACTION;
-  }*/
+  }
 
   private getOpenActions(): Action[] {
     const isSingleSelect = this.selection.selectedElements.length === 1;
