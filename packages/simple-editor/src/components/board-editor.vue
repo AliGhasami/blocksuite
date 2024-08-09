@@ -32,6 +32,7 @@ interface Props {
   uploadUrl?: string
   storageUrl?: string
   apiToken?: string
+  readonly ?:boolean
 }
 
 type IBlockChange =
@@ -56,6 +57,7 @@ type IBlockChange =
 
 const props = withDefaults(defineProps<Props>(), {
   isBoardView: false,
+  readonly:false,
   mentionUserList: () => []
 })
 
@@ -93,7 +95,17 @@ async function getData() {
   return null
 }
 
-//TODO(@ali ghasami) for fix after and check performance
+watch(()=>props.readonly,()=>{
+  checkReadOnly()
+},{immediate:true})
+
+function checkReadOnly(){
+  if(currentDocument){
+    currentDocument.awarenessStore.setReadonly(currentDocument.blockCollection, props.readonly);
+  }
+}
+
+
 async function setData(data: any) {
   if (myCollection) {
     //const editor = new PageEditor();
@@ -110,6 +122,7 @@ async function setData(data: any) {
     currentDocument = new_doc
     appendTODOM(editor)
     checkNotEmptyDocBlock(currentDocument)
+    checkReadOnly()
     //new_doc.awarenessStore.setReadonly(new_doc.blockCollection, !new_doc.readonly);
     /*if (refEditor.value) {
       const children = refEditor.value.children
@@ -126,6 +139,31 @@ function reset() {
 }
 
 function bindEvent(doc: Doc) {
+  /*doc.slots.rootAdded.on((a)=>{
+    console.log("this is rootAdded",a)
+  })
+
+  doc.slots.yBlockUpdated.on((a)=>{
+    console.log("this is yBlockUpdated",a)
+  })
+
+  doc.slots.blockUpdated.on((a)=>{
+    console.log("this is blockUpdated",a)
+  })
+
+  doc.slots.rootDeleted.on((a)=>{
+    console.log("this is rootDeleted",a)
+  })
+
+  doc.slots.ready.on((a)=>{
+    console.log("this is ready",a)
+  })
+
+  doc.slots.historyUpdated.on((a)=>{
+    console.log("this is historyUpdated",a)
+  })*/
+
+
   /*console.log("11111",doc);
 
   doc.slots.yBlockUpdated.on((data)=>{
@@ -227,7 +265,6 @@ watch(
 )
 
 function init() {
-
   const { doc, collection } = createEmptyDoc(props.isBoardView).init()
   myCollection = collection
   currentDocument = doc
@@ -240,6 +277,7 @@ function init() {
   }
   editor.doc = doc
   appendTODOM(editor)
+  checkReadOnly()
   //doc.awarenessStore.setReadonly(doc.blockCollection, !doc.readonly);
   /*if(refEditor.value){
     refEditor.value.appendChild(editor);

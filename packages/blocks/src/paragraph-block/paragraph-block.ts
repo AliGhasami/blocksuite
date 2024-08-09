@@ -16,7 +16,7 @@ import { bindContainerHotkey } from '../_common/components/rich-text/keymap/inde
 import '../_common/components/rich-text/rich-text.js';
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
 import { NOTE_SELECTOR } from '../_common/edgeless/note/consts.js';
-import { getViewportElement } from '../_common/utils/query.js';
+import { getViewportElement } from '../_common/utils/index.js';
 import { EdgelessTextBlockComponent } from '../edgeless-text/edgeless-text-block.js';
 import { EdgelessRootBlockComponent } from '../root-block/edgeless/edgeless-root-block.js';
 import { paragraphBlockStyles } from './styles.js';
@@ -52,8 +52,39 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     this._displayPlaceholder = computed(() => {
       //const textSelection = this.host.selection.find('text');
       //const isCollapsed = textSelection?.isCollapsed() ?? false;
+      // console.log('this is inline', this.inlineEditor);
+
+      /****************************/
+      if (this.inlineEditor) {
+        /* this.inlineEditor.slots.textChange.on(a => {
+          console.log('this is text change', a);
+        });*/
+        /* this.inlineEditor.slots.unmounted.on(a => {
+          console.log('this is unmounted', a);
+        });*/
+        this.inlineEditor.slots.inlineRangeUpdate.on(a => {
+          console.log('this is inlineRangeUpdate', a);
+        });
+        /* this.inlineEditor.slots.keydown.on(a => {
+          console.log('this is keydown', a);
+        });*/
+        this.inlineEditor.slots.inlineRangeApply.on(a => {
+          console.log('this is inlineRangeApply', a);
+        });
+        this.inlineEditor.slots.renderComplete.on(a => {
+          console.log('this is renderComplete', a);
+        });
+        // this.inlineEditor.slots.inputting.on(a => {
+        //   console.log('this is inputting', a);
+        // });
+        /*this.inlineEditor.slots.mounted.on(a => {
+          console.log('this is mounted', a);
+        });*/
+      }
+
+      /*****************************/
+
       let isEmpty = false;
-      //todo ali ghasami for fix bug
       const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
       const paragraphList = note.length ? note[0].model.children : [];
       if (paragraphList.length == 1) {
@@ -88,7 +119,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     >
       ${this.renderChildren(this.model)}
     </div>`;
-
+    const temp = document.getElementById('editor-scroll-container');
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
     return html`
       <div class="affine-paragraph-block-container">
         <div class="affine-paragraph-rich-text-wrapper claytap-${type$.value}">
@@ -104,8 +136,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .verticalScrollContainerGetter=${() =>
-              getViewportElement(this.host)}
+            .verticalScrollContainerGetter=${() => scrollContainer}
           ></rich-text>
           ${this.inEdgelessText
             ? nothing
