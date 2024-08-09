@@ -83,7 +83,7 @@ export class AffineDateTime extends ShadowlessElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log('this is connected');
+    //console.log('this is connected');
     //console.log("this",this.delta.);
 
     // this.inlineEditor.slots.mounted.on(() => {
@@ -149,7 +149,7 @@ export class AffineDateTime extends ShadowlessElement {
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    console.log('this is disconnected');
+    //console.log('this is disconnected');
   }
 
   override render() {
@@ -180,7 +180,9 @@ export class AffineDateTime extends ShadowlessElement {
       @mouseup=${this._onMouseUp}*/
     //console.log('1111', this.delta);
     return html`<span>
-      <span class="${Prefix}-date-time">${this.dateTime}</span>
+      <span class="${Prefix}-date-time" data-event-id="${this.id}">
+        ${this.dateTime}
+      </span>
       <v-text .str=${this.delta.insert}></v-text>
       <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
     </span>`;
@@ -211,6 +213,10 @@ export class AffineDateTime extends ShadowlessElement {
         );
     }
     return tempStr;
+  }
+
+  get id() {
+    return this.delta.attributes?.date?.id ?? null;
   }
 
   get inlineEditor() {

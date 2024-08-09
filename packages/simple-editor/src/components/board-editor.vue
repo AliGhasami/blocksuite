@@ -123,6 +123,8 @@ async function setData(data: any) {
     appendTODOM(editor)
     checkNotEmptyDocBlock(currentDocument)
     checkReadOnly()
+    //debugger
+    //console.log("100000")
     //new_doc.awarenessStore.setReadonly(new_doc.blockCollection, !new_doc.readonly);
     /*if (refEditor.value) {
       const children = refEditor.value.children
@@ -188,6 +190,12 @@ function bindEvent(doc: Doc) {
   /*doc.slots.yBlockUpdated.on((data)=>{
     console.log("this is update yBlockUpdated",data)
   })*/
+
+ /* doc.slots.yBlockUpdated.on(()=>{
+    console.log("this is ready")
+  })*/
+
+
 
   doc.slots.blockUpdated.on((data) => {
     //console.log("this is event",data);

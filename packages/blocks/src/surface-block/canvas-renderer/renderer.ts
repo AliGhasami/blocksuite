@@ -154,7 +154,6 @@ export class Renderer {
           : document.createElement('canvas');
 
         if (!created) {
-          this._stackingCanvas.push(canvas);
           onCreated?.(canvas);
         }
 
@@ -359,8 +358,8 @@ export class Renderer {
   }
 
   generateColorProperty(color: string | CustomColor, fallback: string) {
-    return this.provider.generateColorProperty?.(color, fallback) ??
-      fallback.startsWith('--')
+    return (this.provider.generateColorProperty?.(color, fallback) ??
+      fallback.startsWith('--'))
       ? `var(${fallback})`
       : fallback;
   }
