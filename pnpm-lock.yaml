@@ -342,8 +342,8 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1
       '@mahdaad/block-editor':
-        specifier: ^0.3.22
-        version: 0.3.22(@types/node@20.14.11)(browserslist@4.23.1)(lightningcss@1.25.1)(rollup@2.79.1)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))
+        specifier: ^0.3.24
+        version: 0.3.24(@types/node@20.14.11)(browserslist@4.23.1)(lightningcss@1.25.1)(rollup@2.79.1)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))
       '@mahdaad/bounty-theme':
         specifier: ^0.0.15
         version: 0.0.15
@@ -2670,8 +2670,8 @@ packages:
   '@lit/reactive-element@2.0.4':
     resolution: {integrity: sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ==}
 
-  '@mahdaad/block-editor@0.3.22':
-    resolution: {integrity: sha512-usXV8MclGy6QzJfLZMQxvoiiJWj2EnR09azWJ3sceRaMsqD3HSi+IN4DFI6awnsp2o84vFFuSqGYdi7GSk7mRA==}
+  '@mahdaad/block-editor@0.3.24':
+    resolution: {integrity: sha512-4r/xp3NwnnAvLp43oXfHaFl6mLXyj33LrcSbrMv/EJRR+AWFBXlbrYi0jBIWG27UNMVRdmvL2Y90hlRE2SRVgw==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -12019,7 +12019,7 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.2.0
 
-  '@mahdaad/block-editor@0.3.22(@types/node@20.14.11)(browserslist@4.23.1)(lightningcss@1.25.1)(rollup@2.79.1)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))':
+  '@mahdaad/block-editor@0.3.24(@types/node@20.14.11)(browserslist@4.23.1)(lightningcss@1.25.1)(rollup@2.79.1)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))':
     dependencies:
       '@mahdaad/tokens': 0.0.36
       '@unhead/vue': 1.9.15(vue@3.4.31(typescript@5.4.5))
