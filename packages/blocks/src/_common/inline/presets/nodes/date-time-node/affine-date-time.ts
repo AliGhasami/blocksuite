@@ -69,6 +69,12 @@ export class AffineDateTime extends ShadowlessElement {
     { enterDelay: 500 }
   );
 
+  /*get doc() {
+    const doc = this.config.doc;
+    assertExists(doc, '`reference-node` need `Doc`.');
+    return doc;
+  }*/
+
   static override styles = css`
     affine-link > a:hover [data-v-text='true'] {
       text-decoration: underline;
@@ -77,7 +83,7 @@ export class AffineDateTime extends ShadowlessElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    // console.log('this is connected');
+    console.log('this is connected');
     //console.log("this",this.delta.);
 
     // this.inlineEditor.slots.mounted.on(() => {
@@ -139,6 +145,11 @@ export class AffineDateTime extends ShadowlessElement {
     this.inlineEditor.slots.textChange.on(data => {
       console.log('this is textChange', data);
     });*/
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    console.log('this is disconnected');
   }
 
   override render() {
