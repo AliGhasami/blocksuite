@@ -342,8 +342,8 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1
       '@mahdaad/block-editor':
-        specifier: ^0.3.22
-        version: 0.3.22(@types/node@20.14.11)(browserslist@4.23.1)(lightningcss@1.25.1)(rollup@2.79.1)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))
+        specifier: workspace:*
+        version: link:../simple-editor
       '@mahdaad/bounty-theme':
         specifier: ^0.0.15
         version: 0.0.15
@@ -697,7 +697,7 @@ importers:
         specifier: ^0.26.2
         version: 0.26.2(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))
       vite:
-        specifier: ^5.2.13
+        specifier: ^5.3.5
         version: 5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
       vite-plugin-html:
         specifier: ^3.2.2
@@ -737,7 +737,7 @@ importers:
         version: 4.0.0
       vitepress-plugin-sandpack:
         specifier: ^1.1.4
-        version: 1.1.4(@lezer/common@1.2.1)(vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vitepress@1.2.2(@algolia/client-search@4.24.0)(@types/node@20.14.11)(@types/react@18.3.3)(async-validator@4.2.5)(axios@1.7.2)(idb-keyval@6.2.1)(less@4.2.0)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(search-insights@2.14.0)(sortablejs@1.15.2)(terser@5.31.1)(typescript@5.4.5))(vue@3.4.31(typescript@5.4.5))
+        version: 1.1.4(@lezer/common@1.2.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vitepress@1.2.2(@algolia/client-search@4.24.0)(@types/node@20.14.11)(@types/react@18.3.3)(async-validator@4.2.5)(axios@1.7.2)(idb-keyval@6.2.1)(less@4.2.0)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(search-insights@2.14.0)(sortablejs@1.15.2)(terser@5.31.1)(typescript@5.4.5))(vue@3.4.31(typescript@5.4.5))
     devDependencies:
       typedoc:
         specifier: ^0.25.13
@@ -747,7 +747,7 @@ importers:
         version: 4.0.3(typedoc@0.25.13(typescript@5.4.5))
       vite-plugin-wasm:
         specifier: ^3.3.0
-        version: 3.3.0(vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))
+        version: 3.3.0(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))
       vitepress:
         specifier: 1.2.2
         version: 1.2.2(@algolia/client-search@4.24.0)(@types/node@20.14.11)(@types/react@18.3.3)(async-validator@4.2.5)(axios@1.7.2)(idb-keyval@6.2.1)(less@4.2.0)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(search-insights@2.14.0)(sortablejs@1.15.2)(terser@5.31.1)(typescript@5.4.5)
@@ -2669,11 +2669,6 @@ packages:
 
   '@lit/reactive-element@2.0.4':
     resolution: {integrity: sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ==}
-
-  '@mahdaad/block-editor@0.3.22':
-    resolution: {integrity: sha512-usXV8MclGy6QzJfLZMQxvoiiJWj2EnR09azWJ3sceRaMsqD3HSi+IN4DFI6awnsp2o84vFFuSqGYdi7GSk7mRA==}
-    peerDependencies:
-      vue: ^3.0.0
 
   '@mahdaad/bounty-theme@0.0.15':
     resolution: {integrity: sha512-fWmpRSmgQ5tpuLRcV0WLXHoqWnwhby442s3zGQWZA4FgukXoWsSPROuQOwr7l1KmnKmjNhA2MX293fha7q5Xlw==}
@@ -12019,33 +12014,6 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.2.0
 
-  '@mahdaad/block-editor@0.3.22(@types/node@20.14.11)(browserslist@4.23.1)(lightningcss@1.25.1)(rollup@2.79.1)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))':
-    dependencies:
-      '@mahdaad/tokens': 0.0.36
-      '@unhead/vue': 1.9.15(vue@3.4.31(typescript@5.4.5))
-      '@vueuse/core': 10.11.0(vue@3.4.31(typescript@5.4.5))
-      ant-design-vue: 4.2.3(vue@3.4.31(typescript@5.4.5))
-      dayjs: 1.11.12
-      less: 4.2.0
-      pinia: 2.1.7(typescript@5.4.5)(vue@3.4.31(typescript@5.4.5))
-      radix-vue: 1.9.2(vue@3.4.31(typescript@5.4.5))
-      tippy.js: 6.3.7
-      unocss-preset-autoprefixer: 0.0.7(browserslist@4.23.1)(lightningcss@1.25.1)(unocss@0.60.4(postcss@8.4.39)(rollup@2.79.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)))
-      vite-plugin-dts: 3.9.1(@types/node@20.14.11)(rollup@2.79.1)(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))
-      vue: 3.4.31(typescript@5.4.5)
-      vue-router: 4.4.0(vue@3.4.31(typescript@5.4.5))
-      vue3-webcomponent-wrapper: 0.2.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - '@vue/composition-api'
-      - browserslist
-      - lightningcss
-      - rollup
-      - supports-color
-      - typescript
-      - unocss
-      - vite
-
   '@mahdaad/bounty-theme@0.0.15':
     dependencies:
       tailwind-merge: 2.4.0
@@ -12108,14 +12076,6 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor-model@7.28.13(@types/node@20.14.11)':
-    dependencies:
-      '@microsoft/tsdoc': 0.14.2
-      '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 4.0.2(@types/node@20.14.11)
-    transitivePeerDependencies:
-      - '@types/node'
-
   '@microsoft/api-extractor@7.43.0(@types/node@20.14.10)':
     dependencies:
       '@microsoft/api-extractor-model': 7.28.13(@types/node@20.14.10)
@@ -12125,24 +12085,6 @@ snapshots:
       '@rushstack/rig-package': 0.5.2
       '@rushstack/terminal': 0.10.0(@types/node@20.14.10)
       '@rushstack/ts-command-line': 4.19.1(@types/node@20.14.10)
-      lodash: 4.17.21
-      minimatch: 3.0.8
-      resolve: 1.22.8
-      semver: 7.5.4
-      source-map: 0.6.1
-      typescript: 5.4.2
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@microsoft/api-extractor@7.43.0(@types/node@20.14.11)':
-    dependencies:
-      '@microsoft/api-extractor-model': 7.28.13(@types/node@20.14.11)
-      '@microsoft/tsdoc': 0.14.2
-      '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 4.0.2(@types/node@20.14.11)
-      '@rushstack/rig-package': 0.5.2
-      '@rushstack/terminal': 0.10.0(@types/node@20.14.11)
-      '@rushstack/ts-command-line': 4.19.1(@types/node@20.14.11)
       lodash: 4.17.21
       minimatch: 3.0.8
       resolve: 1.22.8
@@ -12401,17 +12343,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.14.10
 
-  '@rushstack/node-core-library@4.0.2(@types/node@20.14.11)':
-    dependencies:
-      fs-extra: 7.0.1
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.8
-      semver: 7.5.4
-      z-schema: 5.0.5
-    optionalDependencies:
-      '@types/node': 20.14.11
-
   '@rushstack/rig-package@0.5.2':
     dependencies:
       resolve: 1.22.8
@@ -12424,25 +12355,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.14.10
 
-  '@rushstack/terminal@0.10.0(@types/node@20.14.11)':
-    dependencies:
-      '@rushstack/node-core-library': 4.0.2(@types/node@20.14.11)
-      supports-color: 8.1.1
-    optionalDependencies:
-      '@types/node': 20.14.11
-
   '@rushstack/ts-command-line@4.19.1(@types/node@20.14.10)':
     dependencies:
       '@rushstack/terminal': 0.10.0(@types/node@20.14.10)
-      '@types/argparse': 1.0.38
-      argparse: 1.0.10
-      string-argv: 0.3.2
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@rushstack/ts-command-line@4.19.1(@types/node@20.14.11)':
-    dependencies:
-      '@rushstack/terminal': 0.10.0(@types/node@20.14.11)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -13455,11 +13370,6 @@ snapshots:
   '@vitejs/plugin-vue@5.0.5(vite@5.2.12(@types/node@20.14.10)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))':
     dependencies:
       vite: 5.2.12(@types/node@20.14.10)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
-      vue: 3.4.31(typescript@5.4.5)
-
-  '@vitejs/plugin-vue@5.0.5(vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))':
-    dependencies:
-      vite: 5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
       vue: 3.4.31(typescript@5.4.5)
 
   '@vitejs/plugin-vue@5.0.5(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))':
@@ -14995,8 +14905,8 @@ snapshots:
   detective-postcss@6.1.3:
     dependencies:
       is-url: 1.2.4
-      postcss: 8.4.39
-      postcss-values-parser: 6.0.2(postcss@8.4.39)
+      postcss: 8.4.40
+      postcss-values-parser: 6.0.2(postcss@8.4.40)
 
   detective-sass@5.0.3:
     dependencies:
@@ -18403,11 +18313,11 @@ snapshots:
 
   postcss-value-parser@4.2.0: {}
 
-  postcss-values-parser@6.0.2(postcss@8.4.39):
+  postcss-values-parser@6.0.2(postcss@8.4.40):
     dependencies:
       color-name: 1.1.4
       is-url-superb: 4.0.0
-      postcss: 8.4.39
+      postcss: 8.4.40
       quote-unquote: 1.0.0
 
   postcss@8.4.39:
@@ -20137,23 +20047,6 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-dts@3.9.1(@types/node@20.14.11)(rollup@2.79.1)(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)):
-    dependencies:
-      '@microsoft/api-extractor': 7.43.0(@types/node@20.14.11)
-      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
-      '@vue/language-core': 1.8.27(typescript@5.4.5)
-      debug: 4.3.6
-      kolorist: 1.8.0
-      magic-string: 0.30.10
-      typescript: 5.4.5
-      vue-tsc: 1.8.27(typescript@5.4.5)
-    optionalDependencies:
-      vite: 5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
-    transitivePeerDependencies:
-      - '@types/node'
-      - rollup
-      - supports-color
-
   vite-plugin-html@3.2.2(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
@@ -20269,10 +20162,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-wasm@3.3.0(vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)):
-    dependencies:
-      vite: 5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
-
   vite-plugin-wasm@3.3.0(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)):
     dependencies:
       vite: 5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
@@ -20300,22 +20189,10 @@ snapshots:
       lightningcss: 1.25.1
       terser: 5.31.1
 
-  vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1):
-    dependencies:
-      esbuild: 0.23.0
-      postcss: 8.4.39
-      rollup: 4.18.0
-    optionalDependencies:
-      '@types/node': 20.14.11
-      fsevents: 2.3.3
-      less: 4.2.0
-      lightningcss: 1.25.1
-      terser: 5.31.1
-
   vite@5.3.5(@types/node@20.14.10)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1):
     dependencies:
       esbuild: 0.23.0
-      postcss: 8.4.39
+      postcss: 8.4.40
       rollup: 4.18.0
     optionalDependencies:
       '@types/node': 20.14.10
@@ -20327,7 +20204,7 @@ snapshots:
   vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1):
     dependencies:
       esbuild: 0.23.0
-      postcss: 8.4.39
+      postcss: 8.4.40
       rollup: 4.18.0
     optionalDependencies:
       '@types/node': 20.14.11
@@ -20336,13 +20213,13 @@ snapshots:
       lightningcss: 1.25.1
       terser: 5.31.1
 
-  vitepress-plugin-sandpack@1.1.4(@lezer/common@1.2.1)(vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vitepress@1.2.2(@algolia/client-search@4.24.0)(@types/node@20.14.11)(@types/react@18.3.3)(async-validator@4.2.5)(axios@1.7.2)(idb-keyval@6.2.1)(less@4.2.0)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(search-insights@2.14.0)(sortablejs@1.15.2)(terser@5.31.1)(typescript@5.4.5))(vue@3.4.31(typescript@5.4.5)):
+  vitepress-plugin-sandpack@1.1.4(@lezer/common@1.2.1)(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vitepress@1.2.2(@algolia/client-search@4.24.0)(@types/node@20.14.11)(@types/react@18.3.3)(async-validator@4.2.5)(axios@1.7.2)(idb-keyval@6.2.1)(less@4.2.0)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(search-insights@2.14.0)(sortablejs@1.15.2)(terser@5.31.1)(typescript@5.4.5))(vue@3.4.31(typescript@5.4.5)):
     dependencies:
       '@codesandbox/sandpack-themes': 2.0.21
       markdown-it-container: 3.0.0
       sandpack-vue3: 3.1.11(@lezer/common@1.2.1)(vue@3.4.31(typescript@5.4.5))
     optionalDependencies:
-      vite: 5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
+      vite: 5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
       vitepress: 1.2.2(@algolia/client-search@4.24.0)(@types/node@20.14.11)(@types/react@18.3.3)(async-validator@4.2.5)(axios@1.7.2)(idb-keyval@6.2.1)(less@4.2.0)(lightningcss@1.25.1)(postcss@8.4.40)(qrcode@1.5.3)(search-insights@2.14.0)(sortablejs@1.15.2)(terser@5.31.1)(typescript@5.4.5)
       vue: 3.4.31(typescript@5.4.5)
     transitivePeerDependencies:
@@ -20355,7 +20232,7 @@ snapshots:
       '@shikijs/core': 1.10.2
       '@shikijs/transformers': 1.10.2
       '@types/markdown-it': 14.1.1
-      '@vitejs/plugin-vue': 5.0.5(vite@5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))
+      '@vitejs/plugin-vue': 5.0.5(vite@5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1))(vue@3.4.31(typescript@5.4.5))
       '@vue/devtools-api': 7.3.5
       '@vue/shared': 3.4.31
       '@vueuse/core': 10.11.0(vue@3.4.31(typescript@5.4.5))
@@ -20364,7 +20241,7 @@ snapshots:
       mark.js: 8.11.1
       minisearch: 6.3.0
       shiki: 1.10.2
-      vite: 5.2.12(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
+      vite: 5.3.5(@types/node@20.14.11)(less@4.2.0)(lightningcss@1.25.1)(terser@5.31.1)
       vue: 3.4.31(typescript@5.4.5)
     optionalDependencies:
       postcss: 8.4.40

@@ -55,19 +55,19 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       // console.log('this is inline', this.inlineEditor);
 
       /****************************/
-      if (this.inlineEditor) {
-        /* this.inlineEditor.slots.textChange.on(a => {
+      /* if (this.inlineEditor) {
+        /!* this.inlineEditor.slots.textChange.on(a => {
           console.log('this is text change', a);
-        });*/
-        /* this.inlineEditor.slots.unmounted.on(a => {
+        });*!/
+        /!* this.inlineEditor.slots.unmounted.on(a => {
           console.log('this is unmounted', a);
-        });*/
+        });*!/
         this.inlineEditor.slots.inlineRangeUpdate.on(a => {
           console.log('this is inlineRangeUpdate', a);
         });
-        /* this.inlineEditor.slots.keydown.on(a => {
+        /!* this.inlineEditor.slots.keydown.on(a => {
           console.log('this is keydown', a);
-        });*/
+        });*!/
         this.inlineEditor.slots.inlineRangeApply.on(a => {
           console.log('this is inlineRangeApply', a);
         });
@@ -77,10 +77,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
         // this.inlineEditor.slots.inputting.on(a => {
         //   console.log('this is inputting', a);
         // });
-        /*this.inlineEditor.slots.mounted.on(a => {
+        /!*this.inlineEditor.slots.mounted.on(a => {
           console.log('this is mounted', a);
-        });*/
-      }
+        });*!/
+      }*/
 
       /*****************************/
 
@@ -152,7 +152,6 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
                 </div>
               `}
         </div>
-
         ${children}
       </div>
     `;

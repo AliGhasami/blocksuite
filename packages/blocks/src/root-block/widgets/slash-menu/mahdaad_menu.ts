@@ -609,6 +609,16 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           openObjectPicker(rootComponent, model, 'image');
         },
       },
+      {
+        title: 'Weblink',
+        description: 'create weblink or link an existing one.',
+        icon: file,
+        action: ({ rootComponent, model }) => {
+          const triggerKey = '/weblink/';
+          insertContent(rootComponent.host, model, triggerKey);
+          openObjectPicker(rootComponent, model, 'weblink');
+        },
+      },
       /* {
         title: 'Title ',
         description: 'Description',

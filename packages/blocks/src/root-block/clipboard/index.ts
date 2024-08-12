@@ -110,7 +110,6 @@ export class PageClipboard {
   onPageCut: UIEventHandler = ctx => {
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
-
     this._copySelected(() => {
       this._std.command
         .chain()
