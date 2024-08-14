@@ -50,6 +50,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     return html`<div contenteditable="false">
       <mahdaad-object-link-component
         .model="${this.model}"
+        read-only="${this.doc.readonly}"
         object-id="${this.model.object_id}"
         link-id="${this.model.link_id}"
         type="${this.model.type}"
@@ -58,7 +59,6 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
           this.removeBlock();
         }}"
         @duplicate="${() => {
-          //debugger;
           this.duplicate();
         }}"
       ></mahdaad-object-link-component>

@@ -538,7 +538,7 @@ defineExpose({
 
 /* popover Style */
 .@{prefix}-popover {
-@apply pt-3 pb-1 shadow-floated border-roundness bg-white;
+@apply pt-3 pb-1 shadow-floated border-roundness bg-gray-0;
   position: fixed;
   left: 0;
   top: 0;
@@ -622,7 +622,8 @@ defineExpose({
     border-radius: 4px;
     &:hover,
     &.hover {
-      background: #f4f4f5;
+      @apply bg-gray-1;
+      //background: #f4f4f5;
     }
   }
 }

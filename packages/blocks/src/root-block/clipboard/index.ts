@@ -124,7 +124,7 @@ export class PageClipboard {
   onPagePaste: UIEventHandler = ctx => {
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
-
+    if (this._std.doc.readonly) return;
     this._std.doc.captureSync();
     this._std.command
       .chain()
