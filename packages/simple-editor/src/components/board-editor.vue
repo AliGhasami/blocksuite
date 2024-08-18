@@ -276,6 +276,8 @@ function init() {
     editor = new PageEditor()
   }
   editor.doc = doc
+  //console.log("this is editor",editor);
+  //console.log("this is doc",doc);
   appendTODOM(editor)
   checkReadOnly()
   //doc.awarenessStore.setReadonly(doc.blockCollection, !doc.readonly);

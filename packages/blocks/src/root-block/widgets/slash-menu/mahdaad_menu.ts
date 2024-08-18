@@ -197,8 +197,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: date,
         action: ({ rootComponent, model }) => {
+          //console.log('this is root', rootComponent.host);
+          //console.log('13', isInsidePageEditor(rootComponent.host));
+          //console.log('this is model', model);
           const triggerKey = dayjs().format('YYYY-MM-DD');
-
           const temp = {
             date: triggerKey,
             time: null,
@@ -208,6 +210,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             date: temp,
           });
           assertExists(model.doc.root);
+          console.log('11111', rootComponent);
           const widgetEle =
             rootComponent.widgetComponents['affine-date-time-widget'];
           assertExists(widgetEle);
