@@ -210,7 +210,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             date: temp,
           });
           assertExists(model.doc.root);
-          console.log('11111', rootComponent);
           const widgetEle =
             rootComponent.widgetComponents['affine-date-time-widget'];
           assertExists(widgetEle);

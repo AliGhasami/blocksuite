@@ -1,0 +1,21 @@
+{
+  "name": "js-block",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type":"module",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@blocksuite/block-std": "^0.16.0",
+    "@blocksuite/blocks": "^0.16.0",
+    "@blocksuite/global": "^0.16.0",
+    "@blocksuite/inline": "^0.16.0",
+    "@blocksuite/presets": "^0.16.0",
+    "@blocksuite/store": "^0.16.0",
+    "@blocksuite/sync": "^0.16.0"
+  }
+}

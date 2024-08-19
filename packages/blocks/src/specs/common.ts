@@ -66,4 +66,5 @@ export const EdgelessFirstPartyBlockSpecs: BlockSpec[] = [
   EmbedHtmlBlockSpec,
   EmbedSyncedDocBlockSpec,
   EmbedLinkedDocBlockSpec,
+  ObjectBlockSpec,
 ];

@@ -10,3 +10,4 @@ packages:
   - 'packages/presets'
   - 'packages/simple-editor'
   - 'packages/claytap'
+  - 'packages/node-js-block'

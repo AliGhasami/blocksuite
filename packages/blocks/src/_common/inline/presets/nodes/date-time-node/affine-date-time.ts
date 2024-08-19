@@ -83,7 +83,7 @@ export class AffineDateTime extends ShadowlessElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log('this is connected');
+    //console.log('this is connected');
     //console.log("this",this.delta.);
 
     // this.inlineEditor.slots.mounted.on(() => {
@@ -149,7 +149,7 @@ export class AffineDateTime extends ShadowlessElement {
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    console.log('this is disconnected');
+    //console.log('this is disconnected');
   }
 
   override render() {
