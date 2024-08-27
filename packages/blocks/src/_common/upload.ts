@@ -73,6 +73,7 @@ declare global {
       uploadUrl: string;
       storageUrl: string;
       apiToken: string;
+      //i18n: never;
     };
   }
 }

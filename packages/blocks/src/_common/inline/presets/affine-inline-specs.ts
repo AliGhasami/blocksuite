@@ -170,7 +170,10 @@ export function getAffineInlineSpecsWithReference(
       },
       renderer: delta => {
         //console.log('2222', referenceNodeConfig, delta);
-        return html`<affine-date-time .delta=${delta}></affine-date-time>`;
+        return html`<affine-date-time
+          data-event-id="${delta?.attributes?.date?.id}"
+          .delta=${delta}
+        ></affine-date-time>`;
       },
       embed: true,
     },
