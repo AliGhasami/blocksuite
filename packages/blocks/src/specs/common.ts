@@ -14,7 +14,8 @@ import { EmbedLoomBlockSpec } from '../embed-loom-block/embed-loom-spec.js';
 import { EmbedSyncedDocBlockSpec } from '../embed-synced-doc-block/embed-synced-doc-spec.js';
 import { EmbedYoutubeBlockSpec } from '../embed-youtube-block/embed-youtube-spec.js';
 import { HintBlockSpec } from '../hint-block/hint-block-spec.js';
-import { ImageBlockSpec } from '../image-block/image-spec.js';
+/** disable for claytap */
+//import { ImageBlockSpec } from '../image-block/image-spec.js';
 import { ListBlockSpec } from '../list-block/list-spec.js';
 import { ObjectBlockSpec } from '../mahdaad-object-block/object-spec.js';
 import {
@@ -30,7 +31,8 @@ export const CommonFirstPartyBlockSpecs: BlockSpec[] = [
   DataViewBlockSpec,
   DividerBlockSpec,
   CodeBlockSpec,
-  ImageBlockSpec,
+  /** disable for claytap */
+  //ImageBlockSpec,
   ParagraphBlockSpec,
   BookmarkBlockSpec,
   AttachmentBlockSpec,
@@ -52,7 +54,8 @@ export const EdgelessFirstPartyBlockSpecs: BlockSpec[] = [
   DataViewBlockSpec,
   DividerBlockSpec,
   CodeBlockSpec,
-  ImageBlockSpec,
+  /** disable for claytap */
+  //ImageBlockSpec,
   ParagraphBlockSpec,
   BookmarkBlockSpec,
   AttachmentBlockSpec,
@@ -63,4 +66,5 @@ export const EdgelessFirstPartyBlockSpecs: BlockSpec[] = [
   EmbedHtmlBlockSpec,
   EmbedSyncedDocBlockSpec,
   EmbedLinkedDocBlockSpec,
+  ObjectBlockSpec,
 ];

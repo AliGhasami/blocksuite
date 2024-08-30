@@ -6,7 +6,7 @@ import DatePicker from './DatePicker.vue'
 import Test from './Test.vue'
 import Test2 from './Test2.vue'
 const components = {
-  'select-hint-type': SelectHintType,
+  //'select-hint-type': SelectHintType,
   'mahdaad-date-picker': DatePicker,
   //'mahdaad-object-picker-component':Test,
   //'mahdaad-object-link-component':Test2

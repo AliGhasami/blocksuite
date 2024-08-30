@@ -124,6 +124,8 @@ export class Clipboard {
         ) {
           continue;
         }
+        /**@(ali ghasami)  - for disable paste image or file for calytap */
+        continue;
       }
       if (item) {
         const job = this._getJob();

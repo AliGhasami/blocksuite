@@ -81,6 +81,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
           console.log('this is mounted', a);
         });*!/
       }*/
+
       /*****************************/
 
       let isEmpty = false;
@@ -151,7 +152,6 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
                 </div>
               `}
         </div>
-
         ${children}
       </div>
     `;

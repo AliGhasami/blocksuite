@@ -1,5 +1,6 @@
 import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, uuidv4 } from '@blocksuite/store';
+import { translate as t } from 'lit-i18n/';
 
 import type { RootBlockComponent } from '../../types.js';
 import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
@@ -14,6 +15,8 @@ import { viewPresets } from '../../../database-block/index.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+import type { DirectiveResult } from 'lit/directive.js';
+
 //import link_to_page from './icons/link_to_page.svg?raw';
 import dayjs from 'dayjs';
 
@@ -49,83 +52,89 @@ import text from './icons/text.svg?raw';
 //import video from './icons/video.svg?raw';
 import { insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
-  groupName: string;
+  groupName: DirectiveResult;
   children: ClayTapSlashMenu[];
 }
 export interface ClayTapSlashMenu {
   icon: string;
-  title: string;
+  title: DirectiveResult;
   group?: string;
-  //key: string;
-  description: string;
+  key: string;
+  description: DirectiveResult;
   action: (ctx: SlashMenuContext) => void | Promise<void>;
 }
 export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
-    groupName: 'Basic',
+    groupName: t('basic'),
     children: [
       {
-        title: 'Text',
-        description: 'Normal Text',
+        title: t('text'),
+        description: t('normal_text'),
         icon: text,
+        key: 'text',
         action: ({ rootComponent }) => {
-          //console.log('this is root element', rootElement);
           runCommand(rootComponent, 'affine:paragraph', 'text');
         },
       },
       {
-        title: 'Heading 1',
-        description: 'A Large Heading.',
+        title: t('heading_1'),
+        description: t('heading_1_description'),
         icon: h1,
+        key: 'heading_1',
         action: ({ rootComponent }) => {
-          //console.log('this is root element', rootElement);
           runCommand(rootComponent, 'affine:paragraph', 'h1');
         },
       },
       {
-        title: 'Heading 2',
-        description: 'A Medium Heading.',
+        title: t('heading_2'),
+        description: t('heading_2_description'),
         icon: h2,
+        key: 'heading_2',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h2');
         },
       },
       {
-        title: 'Heading 3',
-        description: 'A Small Heading',
+        title: t('heading_3'),
+        description: t('heading_3_description'),
         icon: h3,
+        key: 'Heading_3',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h3');
         },
       },
       {
-        title: 'Bulleted List',
-        description: 'Normal text + Bullet',
+        title: t('bulleted_list'),
+        description: t('bulleted_list_description'),
         icon: bulleted_list,
+        key: 'bulleted_list',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'bulleted');
         },
       },
       {
-        title: 'Numbered List',
-        description: 'Normal text + Number',
+        title: t('numbered_list'),
+        description: t('numbered_list_description'),
         icon: numbered_list,
+        key: 'numbered_list',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'numbered');
         },
       },
       {
-        title: 'Check List',
-        description: 'Normal text + Checkbox',
+        title: t('check_list'),
+        description: t('check_list_description'),
         icon: check_list,
+        key: 'check_list',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'todo');
         },
       },
       {
-        title: 'Quote',
-        description: 'Description',
+        title: t('quote'),
+        description: t('quote_description'),
         icon: quote,
+        key: 'quote',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
@@ -193,12 +202,15 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },*/
       {
-        title: 'Date',
-        description: 'Description',
+        title: t('date'),
+        description: t('date_description'),
         icon: date,
+        key: 'date',
         action: ({ rootComponent, model }) => {
+          //console.log('this is root', rootComponent.host);
+          //console.log('13', isInsidePageEditor(rootComponent.host));
+          //console.log('this is model', model);
           const triggerKey = dayjs().format('YYYY-MM-DD');
-
           const temp = {
             date: triggerKey,
             time: null,
@@ -240,9 +252,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: () => {},
       },*/
       {
-        title: 'Table View',
-        description: 'Description',
+        title: t('table_view'),
+        description: t('table_view_description'),
         icon: table_view,
+        key: 'table_view',
         action: ({ rootComponent, model }) => {
           //return;
           const parent = rootComponent.doc.getParent(model);
@@ -267,9 +280,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
       {
-        title: 'Divider',
-        description: 'Description',
+        title: t('divider'),
+        description: t('divider_description'),
         icon: divider,
+        key: 'divider',
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:divider', 'divider');
         },
@@ -420,12 +434,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
     ],
   },
   {
-    groupName: 'Media',
+    groupName: t('media'),
     children: [
       {
-        title: 'Attachment',
-        description: 'Attachment  Description',
+        title: t('attachment'),
+        description: t('attachment_description'),
         icon: file,
+        key: 'attachment',
         action: async ({ rootComponent, model }) => {
           const file = await openFileOrFiles();
           if (!file) return;
@@ -576,12 +591,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
     ],
   },
   {
-    groupName: 'Object',
+    groupName: t('object'),
     children: [
       {
-        title: 'Page',
-        description: 'Create a page or link an existing one.',
+        title: t('page'),
+        description: t('page_description'),
         icon: notebook,
+        key: 'page',
         action: ({ rootComponent, model }) => {
           //rootComponent.doc.deleteBlock(model)
           const triggerKey = '/page/';
@@ -590,9 +606,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
       {
-        title: 'File',
-        description: 'Create a file or link an existing one.',
+        title: t('file'),
+        description: t('file_description'),
         icon: tabler_files,
+        key: 'file',
         action: ({ rootComponent, model }) => {
           const triggerKey = '/file/';
           insertContent(rootComponent.host, model, triggerKey);
@@ -600,13 +617,25 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         },
       },
       {
-        title: 'Image',
-        description: 'Upload a image or link an existing one.',
+        title: t('image'),
+        description: t('image_description'),
         icon: file,
+        key: 'image',
         action: ({ rootComponent, model }) => {
           const triggerKey = '/image/';
           insertContent(rootComponent.host, model, triggerKey);
           openObjectPicker(rootComponent, model, 'image');
+        },
+      },
+      {
+        title: t('weblink'),
+        description: t('weblink_description'),
+        icon: file,
+        key: 'weblink',
+        action: ({ rootComponent, model }) => {
+          const triggerKey = '/weblink/';
+          insertContent(rootComponent.host, model, triggerKey);
+          openObjectPicker(rootComponent, model, 'weblink');
         },
       },
       /* {

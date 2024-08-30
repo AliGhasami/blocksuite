@@ -1,1 +1,1 @@
-export type IObjectType = 'document' | 'file' | 'board' | 'image';
+export type IObjectType = 'document' | 'file' | 'board' | 'image' | 'weblink';

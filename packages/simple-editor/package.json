@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "0.3.24",
+  "version": "0.3.30",
   "private": false,
   "type": "module",
   "files": [
@@ -10,10 +10,7 @@
   "main": "./dist/vue-block-editor.umd.cjs",
   "module": "./dist/vue-block-editor.js",
   "exports": {
-    ".": {
-      "require": "./dist/vue-block-editor.js",
-      "import": "./dist/vue-block-editor.js"
-    },
+    ".": "./src/index.ts",
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
@@ -50,7 +47,9 @@
     "@vueuse/core": "^10.9.0",
     "ant-design-vue": "^4.2.3",
     "dayjs": "^1.11.12",
+    "i18n-js": "^4.4.3",
     "less": "^4.2.0",
+    "lit-i18n": "^4.1.0",
     "pinia": "^2.1.7",
     "radix-vue": "^1.7.3",
     "tippy.js": "^6.3.7",

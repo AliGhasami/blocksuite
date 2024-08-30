@@ -1,5 +1,6 @@
 import { BlockService } from '@blocksuite/block-std';
 import { type TemplateResult, html } from 'lit';
+import { translate as t } from 'lit-i18n';
 
 import type { ParagraphBlockModel } from './paragraph-model.js';
 
@@ -10,7 +11,7 @@ import {
 } from '../_common/inline/presets/affine-inline-specs.js';
 import { affineInlineMarkdownMatches } from '../_common/inline/presets/markdown.js';
 import { ReferenceNodeConfig } from '../_common/inline/presets/nodes/reference-node/reference-config.js';
-
+//${i18next.getFixedT() .t('typing_placeholder')}
 export class ParagraphBlockService<
   TextAttributes extends AffineTextAttributes = AffineTextAttributes,
 > extends BlockService<ParagraphBlockModel> {
@@ -19,9 +20,9 @@ export class ParagraphBlockService<
       return html`<div class="affine-paragraph-placeholder-content">
         <div>
           <span class="place-holder">
-            Start typing or Press
+            ${t('typing_placeholder')}
             <span class="short-code">/</span>
-            for block types ...
+            ${t('for_block_types')}
           </span>
         </div>
         <!-- TODO ali ghasami  -->
