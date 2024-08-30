@@ -211,6 +211,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           //console.log('13', isInsidePageEditor(rootComponent.host));
           //console.log('this is model', model);
           const triggerKey = dayjs().format('YYYY-MM-DD');
+          /* .calendar('gregory')
+            .locale('en')
+            .tz('Pacific/Auckland')*/
+          console.log('11111', triggerKey);
           const temp = {
             date: triggerKey,
             time: null,
