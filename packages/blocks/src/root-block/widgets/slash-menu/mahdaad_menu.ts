@@ -16,9 +16,8 @@ import { onModelTextUpdated } from '../../utils/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { DirectiveResult } from 'lit/directive.js';
-
+//import { format, formatISO } from 'date-fns';
 //import link_to_page from './icons/link_to_page.svg?raw';
-import dayjs from 'dayjs';
 
 import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import type { IObjectType } from '../mahdaad-object-picker/type.js';
@@ -210,11 +209,46 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           //console.log('this is root', rootComponent.host);
           //console.log('13', isInsidePageEditor(rootComponent.host));
           //console.log('this is model', model);
-          const triggerKey = dayjs().format('YYYY-MM-DD');
-          /* .calendar('gregory')
+          /* const triggerKey = dayjs()
+            .calendar('gregory')
             .locale('en')
-            .tz('Pacific/Auckland')*/
-          console.log('11111', triggerKey);
+            .format('YYYY-MM-DD');*/
+          //console.log(dayjs().calendar('gregory').locale('en').format());
+          // Create a new Date object for the current date and time
+          const date = new Date();
+          // Extract UTC time components
+          const year = date.getUTCFullYear(); // Get hours in UTC and pad with leading zero if needed
+          const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
+          const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
+          const triggerKey = `${year}-${month}-${day}`;
+          // Format the time as HH:mm:ss in UTC
+          //const formattedUtcTime =
+          //console.log('3333', formattedUtcTime);
+          /* console.log(
+            '22222',
+            dayjs()
+              .utc()
+              .calendar('gregory')
+              .locale('en')
+              .format('YYYY-MM-DD-HH:mm:ss')
+          );
+          console.log(
+            '3333',
+            dayjs.utc('2024-08-31T05:54:24').tz('Pacific/Midway').format()
+          );
+
+          console.log('4444', new Date().toISOString());
+          console.log('5555', dayjs(new Date()).locale('en').format());
+          console.log(
+            '7777',
+            new Date().toUTCString(),
+            format(new Date().toUTCString(), 'yyyy-mm-dd-hh:mm:ss')
+          );
+          console.log("8888",formatISO(new Date(), { representation: 'time' }));
+          /!* .calendar('gregory')
+            .locale('en')
+            .tz('Pacific/Auckland')*!/
+          console.log('11111', triggerKey);*/
           const temp = {
             date: triggerKey,
             time: null,

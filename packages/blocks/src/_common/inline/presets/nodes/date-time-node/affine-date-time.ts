@@ -181,9 +181,13 @@ export class AffineDateTime extends ShadowlessElement {
     //console.log('1111', this.delta);
     return html`<span>
       <span class="${Prefix}-date-time" data-event-id="${this.id}">
-        ${this.dateTime}
+        <!--  ${this.dateTime} -->
+        <mahdaad-date-time
+          date="${this.delta.attributes?.date?.date}"
+          time="${this.delta.attributes?.date?.time}"
+        ></mahdaad-date-time>
       </span>
-      <!-- <mahdaad-date-time></mahdaad-date-time>-->
+      <!-- -->
       <v-text .str=${this.delta.insert}></v-text>
       <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
     </span>`;
