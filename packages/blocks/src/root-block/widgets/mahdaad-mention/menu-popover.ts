@@ -46,8 +46,8 @@ export type InnerSlashMenuContext = SlashMenuContext & {
   onClickItem: (item: SlashMenuActionItem) => void;
 };
 
-@customElement('affine-slash-menu')
-export class SlashMenu extends WithDisposable(ShadowlessElement) {
+@customElement('mahdaad-menu-popover')
+export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
   private _handleClickItem = (item: SlashMenuActionItem) => {
     // Need to remove the search string
     // We must to do clean the slash string before we do the action

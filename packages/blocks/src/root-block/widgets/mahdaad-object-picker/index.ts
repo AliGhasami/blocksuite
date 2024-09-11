@@ -245,6 +245,10 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
         word: '/Weblink/',
         type: 'weblink',
       },
+      {
+        word: '/Tag/',
+        type: 'tag',
+      },
     ],
     ignoreBlockTypes: ['affine:code'],
     /**

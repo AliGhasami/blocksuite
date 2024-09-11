@@ -38,6 +38,10 @@ export default {
       image_description:'Upload a image or link an existing one.',
       weblink:'Weblink',
       weblink_description:'create weblink or link an existing one.',
+      tag:'Tag',
+      tag_description:'create tag or link an existing one.',
+      mention:'Mention',
+      mention_description:'Description'
     },
   },
   fa: {
@@ -79,6 +83,10 @@ export default {
       image_description:'Upload a image or link an existing one.',
       weblink:'Weblink',
       weblink_description:'create weblink or link an existing one.',
+      tag:'Tag',
+      tag_description:'create tag or link an existing one.',
+      mention:'Mention',
+      mention_description:'Description'
     },
   },
 }

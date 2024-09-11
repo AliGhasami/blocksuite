@@ -13,6 +13,8 @@ import type {
   AFFINE_LINKED_DOC_WIDGET,
   LinkedWidgetConfig,
 } from './widgets/linked-doc/index.js';
+import type { Mahdaad_Mention_MENU_WIDGET } from './widgets/mahdaad-mention/index.js';
+//import type { AFFINE_MENTION_WIDGET } from './widgets/mention/index.js';
 import type { AFFINE_MODAL_WIDGET } from './widgets/modal/modal.js';
 import type { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from './widgets/page-dragging-area/page-dragging-area.js';
 import type { AFFINE_PIE_MENU_ID_EDGELESS_TOOLS } from './widgets/pie-menu/config.js';
@@ -32,7 +34,8 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_FORMAT_BAR_WIDGET
   | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
-  | typeof AFFINE_DATE_TIME_WIDGET;
+  | typeof AFFINE_DATE_TIME_WIDGET
+  | typeof Mahdaad_Mention_MENU_WIDGET;
 
 export type EdgelessRootBlockWidgetName =
   // | typeof AFFINE_BLOCK_HUB_WIDGET
@@ -49,7 +52,8 @@ export type EdgelessRootBlockWidgetName =
   | typeof AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET
   | typeof EDGELESS_ELEMENT_TOOLBAR_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
-  | typeof AFFINE_DATE_TIME_WIDGET;
+  | typeof AFFINE_DATE_TIME_WIDGET
+  | typeof Mahdaad_Mention_MENU_WIDGET;
 
 export type RootBlockComponent =
   | PageRootBlockComponent

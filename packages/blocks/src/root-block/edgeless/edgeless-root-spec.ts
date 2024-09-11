@@ -23,6 +23,7 @@ import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { EDGELESS_ELEMENT_TOOLBAR_WIDGET } from '../widgets/index.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
 import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
+import { Mahdaad_Mention_MENU_WIDGET } from '../widgets/mahdaad-mention/index.js';
 import { AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET } from '../widgets/mahdaad-object-picker/index.js';
 import { AFFINE_MODAL_WIDGET } from '../widgets/modal/modal.js';
 import { AFFINE_PIE_MENU_WIDGET } from '../widgets/pie-menu/index.js';
@@ -49,6 +50,7 @@ export type EdgelessRootBlockWidgetName =
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
   | typeof AFFINE_EDGELESS_AUTO_CONNECT_WIDGET
   | typeof AFFINE_DATE_TIME_WIDGET
+  | typeof Mahdaad_Mention_MENU_WIDGET
   | typeof AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET;
 
 export type EdgelessRootBlockSpecType = BlockSpec<
@@ -105,6 +107,7 @@ export const EdgelessRootBlockSpec: EdgelessRootBlockSpecType = {
       )}`,
       [AFFINE_DATE_TIME_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_TIME_WIDGET)}`,
       [AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET]: literal`${unsafeStatic(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)}`,
+      [Mahdaad_Mention_MENU_WIDGET]: literal`${unsafeStatic(Mahdaad_Mention_MENU_WIDGET)}`,
     },
   },
 };

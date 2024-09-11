@@ -19,6 +19,7 @@ import type { DirectiveResult } from 'lit/directive.js';
 //import { format, formatISO } from 'date-fns';
 //import link_to_page from './icons/link_to_page.svg?raw';
 
+import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
@@ -40,6 +41,7 @@ import file from './icons/file.svg?raw';
 import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
+import mention from './icons/mention.svg?raw';
 import notebook from './icons/notebook.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
@@ -173,12 +175,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: 'Insert',
     children: [
-      /*{
-        title: 'Mention',
-        description: 'Description',
+      {
+        title: t('mention'),
+        description: t('mention_description'),
         icon: mention,
+        key: 'mention',
         action: ({ rootComponent, model }) => {
-          const triggerKey = '@';
+          /*const triggerKey = '@';
           insertContent(rootComponent.host, model, triggerKey);
           assertExists(model.doc.root);
           //console.log('|11111', rootElement.widgetElements);
@@ -197,58 +200,39 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             assertExists(inlineEditor);
             mentionWidget.showMention(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+          });*/
+
+          const triggerKey = '@';
+          insertContent(rootComponent.host, model, triggerKey);
+          if (!model.doc.root) return;
+          const widgetEle =
+            rootComponent.widgetComponents['affine-linked-doc-widget'];
+          if (!widgetEle) return;
+          // We have checked the existence of showLinkedDoc method in the showWhen
+          const linkedDocWidget = widgetEle as AffineLinkedDocWidget;
+          // Wait for range to be updated
+          setTimeout(() => {
+            const inlineEditor = getInlineEditorByModel(
+              rootComponent.host,
+              model
+            );
+            if (!inlineEditor) return;
+            linkedDocWidget.showLinkedDocPopover(inlineEditor, triggerKey);
           });
         },
-      },*/
+      },
       {
         title: t('date'),
         description: t('date_description'),
         icon: date,
         key: 'date',
         action: ({ rootComponent, model }) => {
-          //console.log('this is root', rootComponent.host);
-          //console.log('13', isInsidePageEditor(rootComponent.host));
-          //console.log('this is model', model);
-          /* const triggerKey = dayjs()
-            .calendar('gregory')
-            .locale('en')
-            .format('YYYY-MM-DD');*/
-          //console.log(dayjs().calendar('gregory').locale('en').format());
-          // Create a new Date object for the current date and time
           const date = new Date();
           // Extract UTC time components
           const year = date.getUTCFullYear(); // Get hours in UTC and pad with leading zero if needed
           const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
           const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
           const triggerKey = `${year}-${month}-${day}`;
-          // Format the time as HH:mm:ss in UTC
-          //const formattedUtcTime =
-          //console.log('3333', formattedUtcTime);
-          /* console.log(
-            '22222',
-            dayjs()
-              .utc()
-              .calendar('gregory')
-              .locale('en')
-              .format('YYYY-MM-DD-HH:mm:ss')
-          );
-          console.log(
-            '3333',
-            dayjs.utc('2024-08-31T05:54:24').tz('Pacific/Midway').format()
-          );
-
-          console.log('4444', new Date().toISOString());
-          console.log('5555', dayjs(new Date()).locale('en').format());
-          console.log(
-            '7777',
-            new Date().toUTCString(),
-            format(new Date().toUTCString(), 'yyyy-mm-dd-hh:mm:ss')
-          );
-          console.log("8888",formatISO(new Date(), { representation: 'time' }));
-          /!* .calendar('gregory')
-            .locale('en')
-            .tz('Pacific/Auckland')*!/
-          console.log('11111', triggerKey);*/
           const temp = {
             date: triggerKey,
             time: null,
@@ -674,6 +658,17 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           const triggerKey = '/weblink/';
           insertContent(rootComponent.host, model, triggerKey);
           openObjectPicker(rootComponent, model, 'weblink');
+        },
+      },
+      {
+        title: t('tag'),
+        description: t('tag_description'),
+        icon: file,
+        key: 'tag',
+        action: ({ rootComponent, model }) => {
+          const triggerKey = '/tag/';
+          insertContent(rootComponent.host, model, triggerKey);
+          openObjectPicker(rootComponent, model, 'tag');
         },
       },
       /* {
