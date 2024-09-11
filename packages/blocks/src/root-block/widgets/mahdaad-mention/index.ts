@@ -10,6 +10,8 @@ import {
 import { customElement } from 'lit/decorators.js';
 
 import type { SlashMenuContext } from '../slash-menu/config.js';
+//import { SlashMenu } from './slash-menu-popover.js';
+import type { InnerSlashMenuContext } from '../slash-menu/mahdaad-slash-menu-popover.js';
 
 import {
   getCurrentNativeRange,
@@ -19,12 +21,8 @@ import {
 import { isRootComponent } from '../../utils/guard.js';
 import { getPopperPosition } from '../../utils/position.js';
 import { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
-//import { SlashMenu } from './slash-menu-popover.js';
-import {
-  type InnerSlashMenuContext,
-  SlashMenu,
-} from '../slash-menu/mahdaad-slash-menu-popover.js';
 import { defaultMahdaadMentionMenuConfig } from './config.js';
+import { MahdaadMenuPopover } from './menu-popover.js';
 
 export { insertContent } from '../slash-menu/utils.js';
 
@@ -61,21 +59,22 @@ const showMenu = debounce(
       context.model
     );
     if (!inlineEditor) return;
-    const slashMenu = new SlashMenu(inlineEditor, abortController);
-    disposables.add(() => slashMenu.remove());
-    slashMenu.context = context;
-    slashMenu.config = config;
-    slashMenu.triggerKey = triggerKey;
+    //todo ali ghasami
+    const menu = new MahdaadMenuPopover(inlineEditor, abortController);
+    disposables.add(() => menu.remove());
+    //slashMenu.context = context;
+    //slashMenu.config = config;
+    menu.triggerKey = triggerKey;
 
     // Handle position
     const updatePosition = throttle(() => {
-      const slashMenuElement = slashMenu.slashMenuElement;
+      const menuElement = menu.PopOverElement;
       assertExists(
-        slashMenuElement,
+        menuElement,
         'You should render the slash menu node even if no position'
       );
-      const position = getPopperPosition(slashMenuElement, range);
-      slashMenu.updatePosition(position);
+      const position = getPopperPosition(menuElement, range);
+      menu.updatePosition(position);
     }, 10);
 
     disposables.addFromEvent(window, 'resize', updatePosition);
@@ -83,10 +82,10 @@ const showMenu = debounce(
     // FIXME(Flrande): It is not a best practice,
     // but merely a temporary measure for reusing previous components.
     // Mount
-    container.append(slashMenu);
+    container.append(menu);
     // Wait for the Node to be mounted
     setTimeout(updatePosition);
-    return slashMenu;
+    return menu;
   },
   100
 );

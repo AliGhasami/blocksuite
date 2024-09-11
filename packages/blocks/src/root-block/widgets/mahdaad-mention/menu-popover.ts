@@ -1,54 +1,36 @@
+/*
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import { Prefix } from '@blocksuite/global/env';
-import { assertExists } from '@blocksuite/global/utils';
-import { autoPlacement, offset } from '@floating-ui/dom';
-import i18next from 'i18next';
-import { type PropertyValues, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { styleMap } from 'lit/directives/style-map.js';
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+/!*
 import type {
   SlashMenuActionItem,
   SlashMenuContext,
-  SlashMenuGroupDivider,
   SlashMenuItem,
   SlashMenuStaticConfig,
   SlashMenuStaticItem,
-  SlashSubMenu,
 } from './config.js';
+*!/
 
-import { createLitPortal } from '../../../_common/components/portal.js';
+//import type { ClayTapSlashMenu } from './mahdaad_menu.js';
+
 import {
-  cleanSpecifiedTail,
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
-import {
-  getInlineEditorByModel,
-  isControlledKeyboardEvent,
-} from '../../../_common/utils/index.js';
-import { isFuzzyMatch } from '../../../_common/utils/string.js';
-import { type ClayTapSlashMenu, clayTapGroupMenu } from './mahdaad_menu.js';
-import { slashItemToolTipStyle, styles } from './styles.js';
-import {
-  getFirstNotDividerItem,
-  isActionItem,
-  isGroupDivider,
-  isSubMenuItem,
-  slashItemClassName,
-} from './utils.js';
+//import { isFuzzyMatch } from '../../../_common/utils/string.js';
+import { styles } from './styles.js';
 
-export type InnerSlashMenuContext = SlashMenuContext & {
+/!*export type InnerSlashMenuContext = SlashMenuContext & {
   tooltipTimeout: number;
   onClickItem: (item: SlashMenuActionItem) => void;
-};
+};*!/
 
 @customElement('mahdaad-menu-popover')
 export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
-  private _handleClickItem = (item: SlashMenuActionItem) => {
+  /!* private _handleClickItem = (item: SlashMenuActionItem) => {
     // Need to remove the search string
     // We must to do clean the slash string before we do the action
     // Otherwise, the action may change the model and cause the slash string to be changed
@@ -59,9 +41,9 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
     );
     item.action(this.context)?.catch(console.error);
     this.abortController.abort();
-  };
+  };*!/
 
-  private _initItemPathMap = () => {
+  /!*private _initItemPathMap = () => {
     const traverse = (item: SlashMenuStaticItem, path: number[]) => {
       this._itemPathMap.set(item, [...path]);
       if (isSubMenuItem(item)) {
@@ -72,13 +54,13 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
     };
 
     this.config.items.forEach((item, index) => traverse(item, [index]));
-  };
+  };*!/
 
-  private _innerSlashMenuContext!: InnerSlashMenuContext;
+  /!*  private _innerSlashMenuContext!: InnerSlashMenuContext;
 
-  private _itemPathMap = new Map<SlashMenuItem, number[]>();
+  private _itemPathMap = new Map<SlashMenuItem, number[]>();*!/
 
-  private _menuItems: ClayTapSlashMenu[] = [];
+  //private _menuItems: ClayTapSlashMenu[] = [];
 
   private _queryState: 'off' | 'on' | 'no_result' = 'off';
 
@@ -93,13 +75,13 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
       return;
     }
 
-    this._filteredItems = this._menuItems.filter(item => {
+    /!* this._filteredItems = this._menuItems.filter(item => {
       //@ts-ignore
       return isFuzzyMatch(i18next.t(item.title.values[0]), searchStr);
-    });
+    });*!/
 
     // Layer order traversal
-    /*let depth = 0;
+    /!*let depth = 0;
    let queue = this.config.items.filter(notGroupDivider);
    while (queue.length !== 0) {
      // remove the sub menu item from the previous layer result
@@ -134,7 +116,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
        substringMatchScore(a.name, searchStr) -
        substringMatchScore(b.name, searchStr)
      );
-   });*/
+   });*!/
 
     this._queryState = this._filteredItems.length === 0 ? 'no_result' : 'on';
   };
@@ -158,19 +140,19 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
 
   override connectedCallback() {
     super.connectedCallback();
-    clayTapGroupMenu.map(group => {
+    /!*clayTapGroupMenu.map(group => {
       this._menuItems.push(
         ...group.children.map(item => ({ ...item, group: group.groupName }))
       );
-    });
+    });*!/
 
-    this._innerSlashMenuContext = {
+    /!* this._innerSlashMenuContext = {
       ...this.context,
       onClickItem: this._handleClickItem,
       tooltipTimeout: this.config.tooltipTimeout,
     };
 
-    this._initItemPathMap();
+    this._initItemPathMap();*!/
 
     this._disposables.addFromEvent(this, 'mousedown', e => {
       // Prevent input from losing focus
@@ -183,7 +165,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
       return;
     }
 
-    /**
+    /!**
      * Handle arrow key
      *
      * The slash menu will be closed in the following keyboard cases:
@@ -192,7 +174,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
      * - Press the escape key
      * - When the search item is empty, the slash menu will be hidden temporarily,
      *   and if the following key is not the backspace key, the slash menu will be closed
-     */
+     *!/
     createKeydownObserver({
       target: inlineEditor.eventSource,
       //inlineEditor,
@@ -236,6 +218,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
+    debugger;
     const slashMenuStyles = this._position
       ? {
           transform: `translate(${this._position.x}, ${this._position.y})`,
@@ -250,24 +233,15 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
             @click="${() => this.abortController.abort()}"
           ></div>`
         : nothing}
-      <inner-slash-menu
-        .context=${this._innerSlashMenuContext}
-        .menu=${this._queryState === 'off'
-          ? this._menuItems
-          : this._filteredItems}
-        .onClickItem=${this._handleClickItem}
-        .mainMenuStyle=${slashMenuStyles}
-        .abortController=${this.abortController}
-      >
-      </inner-slash-menu>`;
+      <span>11111</span> `;
   }
 
-  get host() {
+  /!*get host() {
     return this.context.rootComponent.host;
-  }
+  }*!/
 
-  @state()
-  private accessor _filteredItems: ClayTapSlashMenu[] = [];
+  /!*@state()
+  private accessor _filteredItems: ClayTapSlashMenu[] = [];*!/
 
   @state()
   private accessor _position: {
@@ -279,8 +253,8 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   accessor config!: SlashMenuStaticConfig;
 
-  @property({ attribute: false })
-  accessor context!: SlashMenuContext;
+  /!*@property({ attribute: false })
+  accessor context!: SlashMenuContext;*!/
 
   @query('inner-slash-menu')
   accessor slashMenuElement!: HTMLElement;
@@ -288,371 +262,229 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   accessor triggerKey!: string;
 }
+*/
 
-@customElement('inner-slash-menu')
-export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
-  _activatedItemIndex = 0;
+import { ShadowlessElement } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/block-std';
+import { Prefix } from '@blocksuite/global/env';
+//import type { InlineEditor } from '@blocksuite/inline';
+import { html } from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 
-  private _closeSubMenu = () => {
-    this._subMenuAbortController?.abort();
-    this._subMenuAbortController = null;
-    this._currentSubMenu = null;
-  };
+import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+//import type { Options } from './index.js';
+//import type { UserMention } from './types.js';
 
-  private _currentSubMenu: SlashSubMenu | null = null;
+//import type { BlockModel } from '@blocksuite/store';
 
-  private _openSubMenu = (item: SlashSubMenu) => {
-    if (item === this._currentSubMenu) return;
+import type { IObjectType } from './type.js';
 
-    const itemElement = this.shadowRoot?.querySelector(
-      `.${slashItemClassName(item)}`
-    );
-    if (!itemElement) return;
+import '../../../_common/components/button.js';
+import {
+  createKeydownObserver,
+  getQuery,
+} from '../../../_common/components/utils.js';
+//import { isFuzzyMatch } from '../../../_common/utils/string.js';
+import { styles } from './styles.js';
+export interface ObjectLink {
+  link_id: string;
+  object_id: string;
+  type: IObjectType;
+}
 
-    this._closeSubMenu();
-    this._currentSubMenu = item;
-    this._subMenuAbortController = new AbortController();
-    this._subMenuAbortController.signal.addEventListener('abort', () => {
-      this._closeSubMenu();
-    });
-
-    const subMenuElement = createLitPortal({
-      shadowDom: false,
-      template: html`<inner-slash-menu
-        .context=${this.context}
-        .menu=${item.subMenu}
-        .depth=${this.depth + 1}
-        .abortController=${this._subMenuAbortController}
-      >
-        ${item.subMenu.map(this._renderItem)}
-      </inner-slash-menu>`,
-      computePosition: {
-        referenceElement: itemElement,
-        autoUpdate: true,
-        middleware: [
-          offset(12),
-          autoPlacement({
-            allowedPlacements: ['right-start', 'right-end'],
-          }),
-        ],
-      },
-      abortController: this._subMenuAbortController,
-    });
-
-    subMenuElement.style.zIndex = `calc(var(--affine-z-index-popover) + ${this.depth})`;
-    subMenuElement.focus();
-  };
-
-  private _renderActionItem = (item: SlashMenuActionItem) => {
-    const { name, icon, description, tooltip, customTemplate } = item;
-
-    const hover = item === this._activeItem;
-
-    return html`<icon-button
-      class="slash-menu-item ${slashItemClassName(item)}"
-      width="100%"
-      height="44px"
-      text=${customTemplate ?? name}
-      subText=${ifDefined(description)}
-      data-testid="${name}"
-      hover=${hover}
-      @mousemove=${() => {
-        this._activeItem = item;
-        this._closeSubMenu();
-      }}
-      @click=${() => this.context.onClickItem(item)}
-    >
-      ${icon && html`<div class="slash-menu-item-icon">${icon}</div>`}
-      ${tooltip &&
-      html`<affine-tooltip
-        tip-position="right"
-        .offset=${22}
-        .tooltipStyle=${slashItemToolTipStyle}
-        .hoverOptions=${{
-          enterDelay: this.context.tooltipTimeout,
-          allowMultiple: false,
-        }}
-      >
-        <div class="tooltip-figure">${tooltip.figure}</div>
-        <div class="tooltip-caption">${tooltip.caption}</div>
-      </affine-tooltip>`}
-    </icon-button>`;
-  };
-
-  private _renderGroupItem = (item: SlashMenuGroupDivider) => {
-    return html`<div class="slash-menu-group-name">${item.groupName}</div>`;
-  };
-
-  private _renderItem = (item: SlashMenuStaticItem) => {
-    if (isGroupDivider(item)) return this._renderGroupItem(item);
-    else if (isActionItem(item)) return this._renderActionItem(item);
-    //else if (isSubMenuItem(item)) return this._renderSubMenuItem(item);
-    else {
-      console.error('Unknown item type for slash menu');
-      console.error(item);
-      return nothing;
-    }
-  };
-
-  /*private _renderSubMenuItem = (item: SlashSubMenu) => {
-    const { name, icon, description } = item;
-
-    const hover = item === this._activeItem;
-
-    return html`<icon-button
-      class="slash-menu-item ${slashItemClassName(item)}"
-      width="100%"
-      height="44px"
-      text=${name}
-      subText=${ifDefined(description)}
-      data-testid="${name}"
-      hover=${hover}
-      @mousemove=${() => {
-        this._activeItem = item;
-        this._openSubMenu(item);
-      }}
-      @touchstart=${() => {
-        isSubMenuItem(item) &&
-          (this._currentSubMenu === item
-            ? this._closeSubMenu()
-            : this._openSubMenu(item));
-      }}
-    >
-      ${icon && html`<div class="slash-menu-item-icon">${icon}</div>`}
-      <div slot="suffix" style="transform: rotate(-90deg);">
-        ${ArrowDownIcon}
-      </div>
-    </icon-button>`;
-  };*/
-
-  private _subMenuAbortController: AbortController | null = null;
-
-  private slashMenuID = 'mahdaad-claytap-slash-menu';
+//ShadowlessElement
+@customElement('mahdaad-menu-popover')
+export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
+  private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
 
   static override styles = styles;
 
-  private _clayTapMenu(menu: ClayTapSlashMenu[]) {
-    //console.log('1111', menu);
-    //console.log('this._activatedItemIndex', this._activatedItemIndex);
-    const group: string[] = [];
-    menu.forEach(item => {
-      if (item.group && !group.includes(item.group)) group.push(item.group);
-    });
-    //const index = 0;
-    return html`<div>
-      ${group.map(itemGroup => {
-        return html`<span class="group-title"> ${itemGroup} </span>
-          <div class="claytap-slash-menu">
-            ${menu
-              .filter(item => item.group == itemGroup)
-              .map(item => {
-                //const currentIndex = index;
-                return html`<div
-                  class="claytap-slash-menu-item ${this._activeItem == item
-                    ? 'hover'
-                    : ''}"
-                  text="menu-item-${item.key}"
-                  @click=${() => {
-                    console.log('1111', this._activeItem);
-                    //this._filterItems[index]
-                    this.context.onClickItem(item);
-                    //return this._handleClickItem(currentIndex);
-                  }}
-                >
-                  <div class="icon">${html`${unsafeSVG(item.icon)}`}</div>
-                  <div class="item-title">
-                    <span class="title">${item.title}</span>
-                    <span class="description">${item.description}</span>
-                  </div>
-                </div>`;
-              })}
-          </div>`;
-      })}
-    </div>`;
+  constructor(
+    //private editorHost: EditorHost,
+    private inlineEditor: AffineInlineEditor,
+    private abortController = new AbortController()
+    //private obj_type: IObjectType,
+    //private model: BlockModel
+  ) {
+    super();
   }
 
-  private _scrollToItem(item: ClayTapSlashMenu) {
-    const ele = this.renderRoot.querySelector(
-      `#${this.slashMenuID} div[text="menu-item-${item.key}"]`
-    );
-    if (!ele) {
-      return;
-    }
-    /*if (force) {
-      // set parameter to `true` to align to top
-      ele.scrollIntoView(true);
-      return;
-    }*/
-    ele.scrollIntoView({
-      block: 'nearest',
-    });
-    /*const shadowRoot = this.shadowRoot;
-    if (!shadowRoot) {
-      return;
-    }
-
-    const text = isGroupDivider(item) ? item.groupName : item.name;
-
-    const ele = shadowRoot.querySelector(`icon-button[text="${text}"]`);
-    if (!ele) {
-      return;
-    }
-    ele.scrollIntoView({
-      block: 'nearest',
-    });*/
+  private get _query() {
+    return getQuery(this.inlineEditor, this._startIndex) || '';
   }
+
+  /*addObjectLink(model: BlockModel, lnk: ObjectLink) {
+    /!* this.editorHost.doc.addSiblingBlocks(this.model, [
+      {
+        flavour: 'affine:mahdaad-object',
+        ...lnk,
+      },
+    ]);*!/
+    //debugger;
+    model.doc.addSiblingBlocks(this.model, [
+      {
+        flavour: 'affine:mahdaad-object',
+        ...lnk,
+      },
+    ]);
+    model.doc.deleteBlock(this.model);
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  }*/
 
   override connectedCallback() {
     super.connectedCallback();
 
-    // close all sub menus
-    this.abortController?.signal?.addEventListener('abort', () => {
-      this._subMenuAbortController?.abort();
-    });
-    this.addEventListener('wheel', event => {
-      if (this._currentSubMenu) {
-        event.preventDefault();
-      }
-    });
-
-    const inlineEditor = getInlineEditorByModel(
-      this.context.rootComponent.host,
-      this.context.model
-    );
+    const inlineEditor = this.inlineEditor;
 
     if (!inlineEditor || !inlineEditor.eventSource) {
       console.error('inlineEditor or eventSource is not found');
       return;
     }
 
-    inlineEditor.eventSource.addEventListener(
-      'keydown',
-      event => {
-        if (this._currentSubMenu) return;
-        if (event.isComposing) return;
+    /*this.addObjectLink({
+      object_id: '111',
+      link_id: '20222',
+      type: 'document',
+    });*/
 
-        const { key, ctrlKey, metaKey, altKey, shiftKey } = event;
-
-        const onlyCmd = (ctrlKey || metaKey) && !altKey && !shiftKey;
-        const onlyShift = shiftKey && !isControlledKeyboardEvent(event);
-        const notControlShift = !(ctrlKey || metaKey || altKey || shiftKey);
-
-        let moveStep = 0;
-        if (
-          (key === 'ArrowUp' && notControlShift) ||
-          (key === 'Tab' && onlyShift) ||
-          (key === 'P' && onlyCmd) ||
-          (key === 'p' && onlyCmd)
-        ) {
-          moveStep = -1;
-        }
-
-        if (
-          (key === 'ArrowDown' && notControlShift) ||
-          (key === 'Tab' && notControlShift) ||
-          (key === 'n' && onlyCmd) ||
-          (key === 'N' && onlyCmd)
-        ) {
-          moveStep = 1;
-        }
-
-        if (moveStep !== 0) {
-          let itemIndex = this.menu.indexOf(this._activeItem);
-          do {
-            itemIndex =
-              (itemIndex + moveStep + this.menu.length) % this.menu.length;
-          } while (isGroupDivider(this.menu[itemIndex]));
-
-          this._activeItem = this.menu[itemIndex] as typeof this._activeItem;
-          this._scrollToItem(this._activeItem);
-
-          event.preventDefault();
-          event.stopPropagation();
-        }
-
-        if (key === 'ArrowRight' && notControlShift) {
-          if (isSubMenuItem(this._activeItem)) {
-            this._openSubMenu(this._activeItem);
-          }
-
-          event.preventDefault();
-          event.stopPropagation();
-        }
-
-        if ((key === 'ArrowLeft' || key === 'Escape') && notControlShift) {
-          this.abortController.abort();
-
-          event.preventDefault();
-          event.stopPropagation();
-        }
-
-        if (key === 'Enter' && notControlShift) {
-          if (isSubMenuItem(this._activeItem)) {
-            this._openSubMenu(this._activeItem);
-          } else if (isActionItem(this._activeItem)) {
-            this.context.onClickItem(this._activeItem);
-          }
-
-          event.preventDefault();
-          event.stopPropagation();
-        }
+    createKeydownObserver({
+      target: inlineEditor.eventSource,
+      signal: this.abortController.signal,
+      interceptor: (e, next) => {
+        //console.log('this is search text 3', this._query);
+        //e.preventDefault();
+        //e.stopPropagation();
+        // console.log('this is interceptor');
+        //this._searchText = this._query;
+        //console.log('this is search text 1', this._searchText);
+        next();
       },
-      {
-        capture: true,
-        signal: this.abortController.signal,
-      }
-    );
-  }
+      onInput: () => {
+        //console.log('this is 3');
+        this._searchText = this._query;
+        //console.log('this is search text 2', this._searchText);
+        //console.log('this is query', this._query);
+        //this._activatedItemIndex = 0;
+        //this._linkedDocGroup = this._getLinkedDocGroup();
+      },
+      onDelete: () => {
+        //console.log('this is 1');
+        this._searchText = this._query;
+        const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+        //console.log('99999', curIndex, this._startIndex);
+        if (curIndex == this._startIndex - 1) {
+          //debugger;
+          this.abortController.abort();
+        }
+        //this._activatedItemIndex = 0;
+        //this._linkedDocGroup = this._getLinkedDocGroup();
+      },
+      onMove: step => {
+        //console.log('this is 2');
+        this.abortController.abort();
+        /*const itemLen = this._flattenActionList.length;
+        this._activatedItemIndex =
+          (itemLen + this._activatedItemIndex + step) % itemLen;
 
-  override disconnectedCallback() {
-    this.abortController.abort();
+        // Scroll to the active item
+        const item = this._flattenActionList[this._activatedItemIndex];
+        const shadowRoot = this.shadowRoot;
+        if (!shadowRoot) {
+          console.warn('Failed to find the shadow root!', this);
+          return;
+        }
+        const ele = shadowRoot.querySelector(
+          `icon-button[data-id="${item.key}"]`
+        );
+        if (!ele) {
+          console.warn('Failed to find the active item!', item);
+          return;
+        }
+        ele.scrollIntoView({
+          block: 'nearest',
+        });*/
+      },
+      onConfirm: () => {
+        //console.log('this is 4');
+        this.abortController.abort();
+        //debugger;
+        /*this._flattenActionList[this._activatedItemIndex]
+          .action()
+          ?.catch(console.error);*/
+      },
+      onAbort: () => {
+        //console.log('this is 5');
+        this.abortController.abort();
+      },
+    });
   }
 
   override render() {
-    if (this.menu.length === 0) return nothing;
+    //debugger;
+    //console.log('this is render', this._query);
+    //const MAX_HEIGHT = 200;
+    const style = this._position
+      ? styleMap({
+          transform: `translate(${this._position.x}, ${this._position.y})`,
+          //maxHeight: `${Math.min(this._position.height, MAX_HEIGHT)}px`,
+        })
+      : styleMap({
+          visibility: 'hidden',
+        });
 
-    const style = styleMap(this.mainMenuStyle ?? { position: 'relative' });
-    //console.log('11111', this.menu);
-    // ${this.menu.map(this._renderItem)}
-    //slash-menu
-    return html`<div
-      id="${this.slashMenuID}"
-      class="vue-block-board-editor-popover  ${Prefix}-slash-menu"
-      style=${style}
-      data-testid=${`sub-menu-${this.depth}`}
-    >
-      <div class="${Prefix}-popover-container">
-        ${this._clayTapMenu(this.menu)}
+    // XXX This is a side effect
+    //const accIdx = 0;
+    return html`<div>
+      <div
+        class="${Prefix}-popover ${Prefix}-popover-element ${Prefix}-object-link-popover"
+        style="${style}"
+      >
+        <div class="${Prefix}-popover-container">
+          111111
+          <!-- <span>${this._searchText}</span> -->
+          <!--<mahdaad-object-picker-component
+            search-text="${this._searchText}"
+            type="${this.obj_type}"
+            .model="${this.model}"
+            .create-function="${this.addObjectLink}"
+            @select="${(event: CustomEvent) => {
+            this.addObjectLink(this.model, event.detail as ObjectLink);
+            this.abortController.abort();
+          }}"
+            @close="${() => {
+            this.abortController.abort();
+          }}"
+          >
+          </mahdaad-object-picker-component
+          >-->
+        </div>
       </div>
     </div>`;
   }
 
-  override willUpdate(changedProperties: PropertyValues<this>) {
-    if (changedProperties.has('menu') && this.menu.length !== 0) {
-      const firstItem = getFirstNotDividerItem(this.menu);
-      assertExists(firstItem);
-      this._activeItem = firstItem as ClayTapSlashMenu;
-
-      // this case happen on query updated
-      this._subMenuAbortController?.abort();
-    }
+  updatePosition(position: { height: number; x: string; y: string }) {
+    this._position = position;
   }
 
   @state()
-  private accessor _activeItem!: ClayTapSlashMenu;
+  private accessor _position: {
+    height: number;
+    x: string;
+    y: string;
+  } | null = null;
+
+  @state()
+  private accessor _searchText = '';
+
+  @query(`.${Prefix}-popover-element`)
+  accessor PopOverElement: Element | null = null;
+
+  /* @property({ attribute: false })
+  accessor options!: Options;*/
 
   @property({ attribute: false })
-  accessor abortController!: AbortController;
-
-  @property({ attribute: false })
-  accessor context!: InnerSlashMenuContext;
-
-  @property({ attribute: false })
-  accessor depth: number = 0;
-
-  @property({ attribute: false })
-  accessor mainMenuStyle: Parameters<typeof styleMap>[0] | null = null;
-
-  @property({ attribute: false })
-  accessor menu!: ClayTapSlashMenu[];
+  accessor triggerKey!: string;
 }
