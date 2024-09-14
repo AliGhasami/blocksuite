@@ -8,7 +8,7 @@ import { matchFlavours } from './_common/utils/index.js';
 import './code-block/affine-code-line.js';
 import './database-block/index.js';
 import './divider-block/index.js';
-import './mahdaad-object-block/index.js'
+import './mahdaad-object-block/index.js';
 import './frame-block/index.js';
 import './image-block/index.js';
 import './list-block/index.js';
