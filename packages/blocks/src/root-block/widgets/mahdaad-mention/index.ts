@@ -59,8 +59,12 @@ const showMenu = debounce(
       context.model
     );
     if (!inlineEditor) return;
-    //todo ali ghasami
-    const menu = new MahdaadMenuPopover(inlineEditor, abortController);
+    const menu = new MahdaadMenuPopover(
+      context.rootComponent.host,
+      inlineEditor,
+      abortController,
+      context.model
+    );
     disposables.add(() => menu.remove());
     //slashMenu.context = context;
     //slashMenu.config = config;
@@ -85,6 +89,11 @@ const showMenu = debounce(
     container.append(menu);
     // Wait for the Node to be mounted
     setTimeout(updatePosition);
+
+    disposables.addFromEvent(window, 'mousedown', e => {
+      abortController.abort();
+    });
+
     return menu;
   },
   100

@@ -6,9 +6,7 @@ export type MahdaadMentionMenuConfig = {
 };
 
 export const defaultMahdaadMentionMenuConfig: MahdaadMentionMenuConfig = {
-  triggerKeys: [
-    //'@'
-  ],
+  triggerKeys: ['@'],
   ignoreBlockTypes: ['affine:code'],
   maxHeight: 344,
   tooltipTimeout: 800,

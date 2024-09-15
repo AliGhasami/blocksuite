@@ -31,7 +31,7 @@ export interface AffineTextAttributes {
   } | null;
   mention?: {
     user_id: string;
-    name: string;
+    //name: string;
     id: string;
   } | null;
   background?: string | null;
@@ -178,7 +178,7 @@ export function getAffineInlineSpecsWithReference(
       name: 'mention',
       schema: z
         .object({
-          name: z.string(),
+          //name: z.string(),
           user_id: z.string(),
           id: z.string(),
         })
@@ -189,11 +189,11 @@ export function getAffineInlineSpecsWithReference(
         return !!delta.attributes?.mention;
       },
       renderer: (delta, selected) => {
-        return html`<affine-mention
+        return html`<mahdaad-mention
           .delta=${delta}
           .selected=${selected}
           .config=${referenceNodeConfig}
-        ></affine-mention>`;
+        ></mahdaad-mention>`;
       },
       embed: true,
     },

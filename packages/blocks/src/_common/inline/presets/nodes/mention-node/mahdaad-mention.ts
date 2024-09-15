@@ -7,12 +7,10 @@ import {
   type DeltaInsert,
   INLINE_ROOT_ATTR,
   type InlineRootElement,
-  ZERO_WIDTH_NON_JOINER,
   ZERO_WIDTH_SPACE,
   //ZERO_WIDTH_NON_JOINER,
   //ZERO_WIDTH_SPACE,
 } from '@blocksuite/inline';
-import dayjs from 'dayjs';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
@@ -20,14 +18,14 @@ import { customElement, property } from 'lit/decorators.js';
 import type { AffineTextAttributes } from '../../affine-inline-specs.js';
 
 //import { styleMap } from 'lit/directives/style-map.js';
-import { HoverController } from '../../../../components/hover/index.js';
+//import { HoverController } from '../../../../components/hover/index.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
-import { defaultDateFormat, defaultTimeFormat } from './config.js';
+//import { defaultDateFormat, defaultTimeFormat } from './config.js';
 //import { affineTextStyles } from '../affine-text.js';
-import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
+//import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
 
-@customElement('affine-date-time')
-export class AffineDateTime extends ShadowlessElement {
+@customElement('mahdaad-mention')
+export class MahdaadMention extends ShadowlessElement {
   /*get link() {
     const link = this.delta.attributes?.link;
     if (!link) {
@@ -35,39 +33,6 @@ export class AffineDateTime extends ShadowlessElement {
     }
     return link;
   }*/
-
-  private _whenHover = new HoverController(
-    this,
-    ({ abortController }) => {
-      if (this.blockElement.doc.readonly) {
-        return null;
-      }
-
-      const selection = this.std.selection;
-      const textSelection = selection.find('text');
-      if (
-        !!textSelection &&
-        (!!textSelection.to || !!textSelection.from.length)
-      ) {
-        return null;
-      }
-
-      const blockSelections = selection.filter('block');
-      if (blockSelections.length) {
-        return null;
-      }
-
-      return {
-        template: toggleLinkPopup(
-          this.inlineEditor,
-          'view',
-          this.selfInlineRange,
-          abortController
-        ),
-      };
-    },
-    { enterDelay: 500 }
-  );
 
   /*get doc() {
     const doc = this.config.doc;
@@ -179,17 +144,12 @@ export class AffineDateTime extends ShadowlessElement {
     style=${style}
       @mouseup=${this._onMouseUp}*/
     //console.log('1111', this.delta);
+    //console.log('111', this.userId);
     return html`<span>
-      <span class="${Prefix}-date-time" data-event-id="${this.id}">
-        <!--  ${this.dateTime} -->
-        <mahdaad-date-time
-          date="${this.delta.attributes?.date?.date}"
-          time="${this.delta.attributes?.date?.time}"
-        ></mahdaad-date-time>
+      <span class="${Prefix}-mahdaad-mention">
+        <mahdaad-mention-item .user-id="${this.userId}"></mahdaad-mention-item>
       </span>
-      <!-- -->
       <v-text .str=${this.delta.insert}></v-text>
-      <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
     </span>`;
   }
 
@@ -201,7 +161,7 @@ export class AffineDateTime extends ShadowlessElement {
     return blockElement;
   }
 
-  get dateTime() {
+  /*get dateTime() {
     const dateTime = this.delta.attributes?.date?.date;
     if (!dateTime) {
       return '';
@@ -218,11 +178,7 @@ export class AffineDateTime extends ShadowlessElement {
         );
     }
     return tempStr;
-  }
-
-  get id() {
-    return this.delta.attributes?.date?.id ?? null;
-  }
+  }*/
 
   get inlineEditor() {
     const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
@@ -230,6 +186,12 @@ export class AffineDateTime extends ShadowlessElement {
     );
     assertExists(inlineRoot);
     return inlineRoot.inlineEditor;
+  }
+
+  get selfInlineRange() {
+    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
+    assertExists(selfInlineRange);
+    return selfInlineRange;
   }
 
   // Workaround for links not working in contenteditable div
@@ -250,16 +212,14 @@ export class AffineDateTime extends ShadowlessElement {
     }, 0);
   }*/
 
-  get selfInlineRange() {
-    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
-    assertExists(selfInlineRange);
-    return selfInlineRange;
-  }
-
   get std() {
     const std = this.blockElement.std;
     assertExists(std);
     return std;
+  }
+
+  get userId() {
+    return this.delta.attributes?.mention?.user_id ?? null;
   }
 
   /*  override disconnectedCallback() {
@@ -275,6 +235,6 @@ export class AffineDateTime extends ShadowlessElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-date-time': AffineDateTime;
+    'mahdaad-mention': MahdaadMention;
   }
 }

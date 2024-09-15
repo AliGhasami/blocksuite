@@ -19,6 +19,7 @@ import type { DirectiveResult } from 'lit/directive.js';
 //import { format, formatISO } from 'date-fns';
 //import link_to_page from './icons/link_to_page.svg?raw';
 
+import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
@@ -40,6 +41,7 @@ import file from './icons/file.svg?raw';
 import h1 from './icons/h1.svg?raw';
 import h2 from './icons/h2.svg?raw';
 import h3 from './icons/h3.svg?raw';
+import mention from './icons/mention.svg?raw';
 import notebook from './icons/notebook.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 import numbered_list from './icons/numbered_list.svg?raw';
@@ -173,13 +175,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: 'Insert',
     children: [
-      /*{
+      {
         title: t('mention'),
         description: t('mention_description'),
         icon: mention,
         key: 'mention',
         action: ({ rootComponent, model }) => {
-          /!*const triggerKey = '@';
+          /*const triggerKey = '@';
           insertContent(rootComponent.host, model, triggerKey);
           assertExists(model.doc.root);
           //console.log('|11111', rootElement.widgetElements);
@@ -198,7 +200,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             assertExists(inlineEditor);
             mentionWidget.showMention(inlineEditor, triggerKey);
             //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
-          });*!/
+          });*/
 
           const triggerKey = '@';
           insertContent(rootComponent.host, model, triggerKey);
@@ -218,7 +220,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             linkedDocWidget.showLinkedDocPopover(inlineEditor, triggerKey);
           });
         },
-      },*/
+      },
       {
         title: t('date'),
         description: t('date_description'),
@@ -658,7 +660,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           openObjectPicker(rootComponent, model, 'weblink');
         },
       },
-      /*{
+      {
         title: t('tag'),
         description: t('tag_description'),
         icon: file,
@@ -668,7 +670,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           insertContent(rootComponent.host, model, triggerKey);
           openObjectPicker(rootComponent, model, 'tag');
         },
-      },*/
+      },
       /* {
         title: 'Title ',
         description: 'Description',

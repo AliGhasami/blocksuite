@@ -264,6 +264,8 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
 }
 */
 
+import type { EditorHost } from '@blocksuite/block-std';
+
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
@@ -278,34 +280,50 @@ import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-
 
 //import type { BlockModel } from '@blocksuite/store';
 
-import type { IObjectType } from './type.js';
+//import type { IObjectType } from './type.js';
+
+import type { BlockModel } from '@blocksuite/store';
 
 import '../../../_common/components/button.js';
 import {
-  createKeydownObserver,
+  cleanSpecifiedTail,
   getQuery,
 } from '../../../_common/components/utils.js';
+import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+import { isControlledKeyboardEvent } from '../../../_common/utils/index.js';
+import { insertContent } from '../slash-menu/index.js';
 //import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { styles } from './styles.js';
-export interface ObjectLink {
+/*export interface ObjectLink {
   link_id: string;
   object_id: string;
   type: IObjectType;
-}
+}*/
 
 //ShadowlessElement
 @customElement('mahdaad-menu-popover')
 export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
+  /*private _abort = () => {
+    // remove popover dom
+    this.abortController.abort();
+    // clear input query
+    cleanSpecifiedTail(
+      this.editorHost,
+      this.inlineEditor,
+      this.triggerKey + this._query
+    );
+  };*/
+
   private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
 
   static override styles = styles;
 
   constructor(
-    //private editorHost: EditorHost,
+    private editorHost: EditorHost,
     private inlineEditor: AffineInlineEditor,
-    private abortController = new AbortController()
+    private abortController = new AbortController(),
     //private obj_type: IObjectType,
-    //private model: BlockModel
+    private model: BlockModel
   ) {
     super();
   }
@@ -344,22 +362,113 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
       return;
     }
 
+    inlineEditor.eventSource.addEventListener(
+      'keydown',
+      event => {
+        console.log('100000000');
+        //if (this._currentSubMenu) return;
+        //if (event.isComposing) return;
+        //return;
+        const { key, ctrlKey, metaKey, altKey, shiftKey } = event;
+
+        const onlyCmd = (ctrlKey || metaKey) && !altKey && !shiftKey;
+        const onlyShift = shiftKey && !isControlledKeyboardEvent(event);
+        const notControlShift = !(ctrlKey || metaKey || altKey || shiftKey);
+
+        let moveStep = 0;
+        if (
+          (key === 'ArrowUp' && notControlShift) ||
+          (key === 'Tab' && onlyShift) ||
+          (key === 'P' && onlyCmd) ||
+          (key === 'p' && onlyCmd)
+        ) {
+          moveStep = -1;
+        }
+
+        if (
+          (key === 'ArrowDown' && notControlShift) ||
+          (key === 'Tab' && notControlShift) ||
+          (key === 'n' && onlyCmd) ||
+          (key === 'N' && onlyCmd)
+        ) {
+          moveStep = 1;
+        }
+
+        if (moveStep !== 0) {
+          console.log('this is change for menu');
+          /*let itemIndex = this.menu.indexOf(this._activeItem);
+          do {
+            itemIndex =
+              (itemIndex + moveStep + this.menu.length) % this.menu.length;
+          } while (isGroupDivider(this.menu[itemIndex]));
+
+          this._activeItem = this.menu[itemIndex] as typeof this._activeItem;
+          this._scrollToItem(this._activeItem);*/
+
+          event.preventDefault();
+          //event.stopPropagation();
+        }
+
+        /*if (key === 'ArrowRight' && notControlShift) {
+          /!*if (isSubMenuItem(this._activeItem)) {
+            this._openSubMenu(this._activeItem);
+          }*!/
+
+          event.preventDefault();
+          event.stopPropagation();
+        }*/
+
+        /*if ((key === 'ArrowLeft' || key === 'Escape') && notControlShift) {
+          this.abortController.abort();
+
+          event.preventDefault();
+          event.stopPropagation();
+        }*/
+
+        /*if (key === 'Enter' && notControlShift) {
+          if (isSubMenuItem(this._activeItem)) {
+            this._openSubMenu(this._activeItem);
+          } else if (isActionItem(this._activeItem)) {
+            this.context.onClickItem(this._activeItem);
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+        }*/
+      },
+      {
+        //capture: true,
+        // signal: this.abortController.signal,
+      }
+    );
+
+    /*inlineEditor.eventSource.addEventListener('keydown', e => {
+      e.preventDefault();
+      console.log('this is event source');
+    });*/
+
     /*this.addObjectLink({
       object_id: '111',
       link_id: '20222',
       type: 'document',
     });*/
 
-    createKeydownObserver({
+    /*createKeydownObserver({
       target: inlineEditor.eventSource,
       signal: this.abortController.signal,
-      interceptor: (e, next) => {
+      interceptor: (event, next) => {
+        console.log('this is interceptor');
         //console.log('this is search text 3', this._query);
         //e.preventDefault();
         //e.stopPropagation();
         // console.log('this is interceptor');
         //this._searchText = this._query;
         //console.log('this is search text 1', this._searchText);
+        /!*const { key, isComposing, code } = event;
+        if (key === 'ArrowRight' || key === 'ArrowLeft' || key === 'Escape') {
+          return;
+        }*!/
+
         next();
       },
       onInput: () => {
@@ -384,8 +493,8 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
       },
       onMove: step => {
         //console.log('this is 2');
-        this.abortController.abort();
-        /*const itemLen = this._flattenActionList.length;
+        // this.abortController.abort();
+        /!*const itemLen = this._flattenActionList.length;
         this._activatedItemIndex =
           (itemLen + this._activatedItemIndex + step) % itemLen;
 
@@ -405,27 +514,30 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
         }
         ele.scrollIntoView({
           block: 'nearest',
-        });*/
+        });*!/
+        console.log('on move', step);
       },
       onConfirm: () => {
         //console.log('this is 4');
         this.abortController.abort();
         //debugger;
-        /*this._flattenActionList[this._activatedItemIndex]
+        /!*this._flattenActionList[this._activatedItemIndex]
           .action()
-          ?.catch(console.error);*/
+          ?.catch(console.error);*!/
       },
       onAbort: () => {
         //console.log('this is 5');
         this.abortController.abort();
       },
+    });*/
+
+    this._disposables.addFromEvent(this, 'mousedown', e => {
+      e.stopPropagation();
+      e.preventDefault();
     });
   }
 
   override render() {
-    //debugger;
-    //console.log('this is render', this._query);
-    //const MAX_HEIGHT = 200;
     const style = this._position
       ? styleMap({
           transform: `translate(${this._position.x}, ${this._position.y})`,
@@ -443,23 +555,26 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
         style="${style}"
       >
         <div class="${Prefix}-popover-container">
-          111111
-          <!-- <span>${this._searchText}</span> -->
-          <!--<mahdaad-object-picker-component
+          <mahdaad-user-picker
             search-text="${this._searchText}"
-            type="${this.obj_type}"
-            .model="${this.model}"
-            .create-function="${this.addObjectLink}"
             @select="${(event: CustomEvent) => {
-            this.addObjectLink(this.model, event.detail as ObjectLink);
-            this.abortController.abort();
-          }}"
+              cleanSpecifiedTail(
+                this.editorHost,
+                this.inlineEditor,
+                this.triggerKey + this._searchText
+              );
+              insertContent(this.editorHost, this.model, REFERENCE_NODE, {
+                mention: {
+                  user_id: event.detail.user_id,
+                  id: event.detail.id,
+                },
+              });
+              this.abortController.abort();
+            }}"
             @close="${() => {
-            this.abortController.abort();
-          }}"
-          >
-          </mahdaad-object-picker-component
-          >-->
+              this.abortController.abort();
+            }}"
+          ></mahdaad-user-picker>
         </div>
       </div>
     </div>`;
