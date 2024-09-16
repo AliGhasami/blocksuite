@@ -6,5 +6,6 @@
 //import './components/style.less'
 import BoardEditor from './components/board-editor.vue'
 import type { Doc , BlockModel } from '@blocksuite/store'
-export type {Doc,BlockModel}
+import type { AffineInlineEditor } from '@blocksuite/blocks'
+export type {Doc,BlockModel,AffineInlineEditor}
 export { BoardEditor}

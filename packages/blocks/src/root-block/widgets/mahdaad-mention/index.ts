@@ -90,7 +90,7 @@ const showMenu = debounce(
     // Wait for the Node to be mounted
     setTimeout(updatePosition);
 
-    disposables.addFromEvent(window, 'mousedown', e => {
+    disposables.addFromEvent(window, 'mousedown', () => {
       abortController.abort();
     });
 

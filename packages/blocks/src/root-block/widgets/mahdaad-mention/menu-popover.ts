@@ -265,6 +265,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
 */
 
 import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockModel } from '@blocksuite/store';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
@@ -275,45 +276,19 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
-//import type { Options } from './index.js';
-//import type { UserMention } from './types.js';
-
-//import type { BlockModel } from '@blocksuite/store';
-
-//import type { IObjectType } from './type.js';
-
-import type { BlockModel } from '@blocksuite/store';
 
 import '../../../_common/components/button.js';
 import {
   cleanSpecifiedTail,
+  createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
-import { isControlledKeyboardEvent } from '../../../_common/utils/index.js';
 import { insertContent } from '../slash-menu/index.js';
-//import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { styles } from './styles.js';
-/*export interface ObjectLink {
-  link_id: string;
-  object_id: string;
-  type: IObjectType;
-}*/
 
-//ShadowlessElement
 @customElement('mahdaad-menu-popover')
 export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
-  /*private _abort = () => {
-    // remove popover dom
-    this.abortController.abort();
-    // clear input query
-    cleanSpecifiedTail(
-      this.editorHost,
-      this.inlineEditor,
-      this.triggerKey + this._query
-    );
-  };*/
-
   private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
 
   static override styles = styles;
@@ -322,7 +297,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
     private editorHost: EditorHost,
     private inlineEditor: AffineInlineEditor,
     private abortController = new AbortController(),
-    //private obj_type: IObjectType,
     private model: BlockModel
   ) {
     super();
@@ -331,26 +305,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
   private get _query() {
     return getQuery(this.inlineEditor, this._startIndex) || '';
   }
-
-  /*addObjectLink(model: BlockModel, lnk: ObjectLink) {
-    /!* this.editorHost.doc.addSiblingBlocks(this.model, [
-      {
-        flavour: 'affine:mahdaad-object',
-        ...lnk,
-      },
-    ]);*!/
-    //debugger;
-    model.doc.addSiblingBlocks(this.model, [
-      {
-        flavour: 'affine:mahdaad-object',
-        ...lnk,
-      },
-    ]);
-    model.doc.deleteBlock(this.model);
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-  }*/
 
   override connectedCallback() {
     super.connectedCallback();
@@ -362,174 +316,35 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
       return;
     }
 
-    inlineEditor.eventSource.addEventListener(
-      'keydown',
-      event => {
-        console.log('100000000');
-        //if (this._currentSubMenu) return;
-        //if (event.isComposing) return;
-        //return;
-        const { key, ctrlKey, metaKey, altKey, shiftKey } = event;
-
-        const onlyCmd = (ctrlKey || metaKey) && !altKey && !shiftKey;
-        const onlyShift = shiftKey && !isControlledKeyboardEvent(event);
-        const notControlShift = !(ctrlKey || metaKey || altKey || shiftKey);
-
-        let moveStep = 0;
-        if (
-          (key === 'ArrowUp' && notControlShift) ||
-          (key === 'Tab' && onlyShift) ||
-          (key === 'P' && onlyCmd) ||
-          (key === 'p' && onlyCmd)
-        ) {
-          moveStep = -1;
-        }
-
-        if (
-          (key === 'ArrowDown' && notControlShift) ||
-          (key === 'Tab' && notControlShift) ||
-          (key === 'n' && onlyCmd) ||
-          (key === 'N' && onlyCmd)
-        ) {
-          moveStep = 1;
-        }
-
-        if (moveStep !== 0) {
-          console.log('this is change for menu');
-          /*let itemIndex = this.menu.indexOf(this._activeItem);
-          do {
-            itemIndex =
-              (itemIndex + moveStep + this.menu.length) % this.menu.length;
-          } while (isGroupDivider(this.menu[itemIndex]));
-
-          this._activeItem = this.menu[itemIndex] as typeof this._activeItem;
-          this._scrollToItem(this._activeItem);*/
-
-          event.preventDefault();
-          //event.stopPropagation();
-        }
-
-        /*if (key === 'ArrowRight' && notControlShift) {
-          /!*if (isSubMenuItem(this._activeItem)) {
-            this._openSubMenu(this._activeItem);
-          }*!/
-
-          event.preventDefault();
-          event.stopPropagation();
-        }*/
-
-        /*if ((key === 'ArrowLeft' || key === 'Escape') && notControlShift) {
-          this.abortController.abort();
-
-          event.preventDefault();
-          event.stopPropagation();
-        }*/
-
-        /*if (key === 'Enter' && notControlShift) {
-          if (isSubMenuItem(this._activeItem)) {
-            this._openSubMenu(this._activeItem);
-          } else if (isActionItem(this._activeItem)) {
-            this.context.onClickItem(this._activeItem);
-          }
-
-          event.preventDefault();
-          event.stopPropagation();
-        }*/
-      },
-      {
-        //capture: true,
-        // signal: this.abortController.signal,
-      }
-    );
-
-    /*inlineEditor.eventSource.addEventListener('keydown', e => {
-      e.preventDefault();
-      console.log('this is event source');
-    });*/
-
-    /*this.addObjectLink({
-      object_id: '111',
-      link_id: '20222',
-      type: 'document',
-    });*/
-
-    /*createKeydownObserver({
+    createKeydownObserver({
       target: inlineEditor.eventSource,
       signal: this.abortController.signal,
       interceptor: (event, next) => {
-        console.log('this is interceptor');
-        //console.log('this is search text 3', this._query);
-        //e.preventDefault();
-        //e.stopPropagation();
-        // console.log('this is interceptor');
-        //this._searchText = this._query;
-        //console.log('this is search text 1', this._searchText);
-        /!*const { key, isComposing, code } = event;
-        if (key === 'ArrowRight' || key === 'ArrowLeft' || key === 'Escape') {
+        const { key } = event;
+        if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'Enter') {
           return;
-        }*!/
+        }
 
         next();
       },
       onInput: () => {
-        //console.log('this is 3');
         this._searchText = this._query;
-        //console.log('this is search text 2', this._searchText);
-        //console.log('this is query', this._query);
-        //this._activatedItemIndex = 0;
-        //this._linkedDocGroup = this._getLinkedDocGroup();
       },
       onDelete: () => {
-        //console.log('this is 1');
         this._searchText = this._query;
         const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
-        //console.log('99999', curIndex, this._startIndex);
         if (curIndex == this._startIndex - 1) {
-          //debugger;
           this.abortController.abort();
         }
-        //this._activatedItemIndex = 0;
-        //this._linkedDocGroup = this._getLinkedDocGroup();
       },
-      onMove: step => {
-        //console.log('this is 2');
-        // this.abortController.abort();
-        /!*const itemLen = this._flattenActionList.length;
-        this._activatedItemIndex =
-          (itemLen + this._activatedItemIndex + step) % itemLen;
-
-        // Scroll to the active item
-        const item = this._flattenActionList[this._activatedItemIndex];
-        const shadowRoot = this.shadowRoot;
-        if (!shadowRoot) {
-          console.warn('Failed to find the shadow root!', this);
-          return;
-        }
-        const ele = shadowRoot.querySelector(
-          `icon-button[data-id="${item.key}"]`
-        );
-        if (!ele) {
-          console.warn('Failed to find the active item!', item);
-          return;
-        }
-        ele.scrollIntoView({
-          block: 'nearest',
-        });*!/
-        console.log('on move', step);
-      },
+      onMove: () => {},
       onConfirm: () => {
-        //console.log('this is 4');
         this.abortController.abort();
-        //debugger;
-        /!*this._flattenActionList[this._activatedItemIndex]
-          .action()
-          ?.catch(console.error);*!/
       },
       onAbort: () => {
-        //console.log('this is 5');
         this.abortController.abort();
       },
-    });*/
+    });
 
     this._disposables.addFromEvent(this, 'mousedown', e => {
       e.stopPropagation();
@@ -547,8 +362,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
           visibility: 'hidden',
         });
 
-    // XXX This is a side effect
-    //const accIdx = 0;
     return html`<div>
       <div
         class="${Prefix}-popover ${Prefix}-popover-element ${Prefix}-object-link-popover"
@@ -557,6 +370,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
         <div class="${Prefix}-popover-container">
           <mahdaad-user-picker
             search-text="${this._searchText}"
+            .inline-editor="${this.inlineEditor}"
             @select="${(event: CustomEvent) => {
               cleanSpecifiedTail(
                 this.editorHost,
@@ -596,9 +410,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
 
   @query(`.${Prefix}-popover-element`)
   accessor PopOverElement: Element | null = null;
-
-  /* @property({ attribute: false })
-  accessor options!: Options;*/
 
   @property({ attribute: false })
   accessor triggerKey!: string;
