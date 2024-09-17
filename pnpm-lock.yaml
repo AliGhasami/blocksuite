@@ -351,8 +351,8 @@ importers:
         specifier: ^0.0.31
         version: 0.0.31(@types/mdx@2.0.11)(class-variance-authority@0.7.0)(radix-vue@1.9.5(vue@3.4.31(typescript@5.4.5)))(vue@3.4.31(typescript@5.4.5))
       '@mahdaad/tokens':
-        specifier: ^0.0.37
-        version: 0.0.37
+        specifier: ^0.0.39
+        version: 0.0.39
       '@novu/headless':
         specifier: ^2.0.0-canary.0
         version: 2.0.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.0)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.0)(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)
@@ -1216,6 +1216,9 @@ packages:
     peerDependencies:
       '@algolia/client-search': '>= 4.9.1 < 6'
       algoliasearch: '>= 4.9.1 < 6'
+    peerDependenciesMeta:
+      '@algolia/client-search':
+        optional: true
 
   '@algolia/cache-browser-local-storage@4.24.0':
     resolution: {integrity: sha512-t63W9BnoXVrGy9iYHBgObNXqYXM3tYXCjDSHeNwnsc324r4o5UiVKUiAB4THQ5z9U5hTj6qUvwg/Ez43ZD85ww==}
@@ -2787,8 +2790,8 @@ packages:
   '@mahdaad/tokens@0.0.36':
     resolution: {integrity: sha512-OMO8Y+dC8/ZpxRVLyA3RnS7lGrCaHrLrsHjKRHv/gTfMbNXj1ROby8TTItspQtjivdm+8/V+DHebnP0gJPG+Ig==}
 
-  '@mahdaad/tokens@0.0.37':
-    resolution: {integrity: sha512-eilsYY2KPCiat7EQsN4tHxv96B6HDTXLEnYhZla/M1/dOLnSaIIPf9sKskbUe8jMNmfV4n6qrIXV3WUEazQK4A==}
+  '@mahdaad/tokens@0.0.39':
+    resolution: {integrity: sha512-nICzv0wkfR91nA3z5Ds2zkIenPG2RNWK7385wAIVXR2dmacxqDqRNB5voT2PYTiTSHKpS+f5rdoJvTJUqQnygQ==}
 
   '@mantine/core@5.10.5':
     resolution: {integrity: sha512-F4tqHSEVM9D6/iSqHfPda+Xl5XgSEPHAAkT01Zwzj4Jnbd10qGrlqr/SFUop2CIcuKYnmra9XltUahUPXBC2BQ==}
@@ -11308,8 +11311,9 @@ snapshots:
 
   '@algolia/autocomplete-shared@1.9.3(@algolia/client-search@4.24.0)(algoliasearch@4.24.0)':
     dependencies:
-      '@algolia/client-search': 4.24.0
       algoliasearch: 4.24.0
+    optionalDependencies:
+      '@algolia/client-search': 4.24.0
 
   '@algolia/cache-browser-local-storage@4.24.0':
     dependencies:
@@ -13293,7 +13297,7 @@ snapshots:
       mitt: 3.0.1
       tinycolor2: 1.6.0
 
-  '@mahdaad/tokens@0.0.37':
+  '@mahdaad/tokens@0.0.39':
     dependencies:
       mitt: 3.0.1
       tinycolor2: 1.6.0

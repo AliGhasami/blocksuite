@@ -7,6 +7,7 @@ import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
+  getCurrentNativeRange,
   getInlineEditorByModel,
   openFileOrFiles,
 } from '../../../_common/utils/index.js';
@@ -19,13 +20,13 @@ import type { DirectiveResult } from 'lit/directive.js';
 //import { format, formatISO } from 'date-fns';
 //import link_to_page from './icons/link_to_page.svg?raw';
 
-import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
 import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+import { closeMentionMenu, showMentionMenu } from '../mahdaad-mention/index.js';
 /*import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
@@ -204,12 +205,16 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
 
           const triggerKey = '@';
           insertContent(rootComponent.host, model, triggerKey);
+          //return;
+          /*insertContent(rootComponent.host, model, REFERENCE_NODE, {
+            date: temp,
+          });*/
           if (!model.doc.root) return;
           const widgetEle =
-            rootComponent.widgetComponents['affine-linked-doc-widget'];
+            rootComponent.widgetComponents['mahdaad-mention-menu-widget'];
           if (!widgetEle) return;
           // We have checked the existence of showLinkedDoc method in the showWhen
-          const linkedDocWidget = widgetEle as AffineLinkedDocWidget;
+          //const mentionWidget = widgetEle as MahdaadMentionMenuWidget;
           // Wait for range to be updated
           setTimeout(() => {
             const inlineEditor = getInlineEditorByModel(
@@ -217,7 +222,14 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
               model
             );
             if (!inlineEditor) return;
-            linkedDocWidget.showLinkedDocPopover(inlineEditor, triggerKey);
+            const curRange = getCurrentNativeRange();
+            if (!curRange) return;
+            closeMentionMenu();
+            showMentionMenu({
+              context: { model, rootComponent: rootComponent },
+              range: curRange,
+              triggerKey,
+            });
           });
         },
       },
@@ -238,6 +250,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             time: null,
             id: uuidv4(),
           };
+          /*{
+            const triggerKey = '$';
+            insertContent(rootComponent.host, model, triggerKey);
+          }*/
           insertContent(rootComponent.host, model, REFERENCE_NODE, {
             date: temp,
           });

@@ -377,6 +377,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
                 this.inlineEditor,
                 this.triggerKey + this._searchText
               );
+              //console.log('this is insert content');
               insertContent(this.editorHost, this.model, REFERENCE_NODE, {
                 mention: {
                   user_id: event.detail.user_id,

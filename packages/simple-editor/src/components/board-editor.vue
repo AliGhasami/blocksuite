@@ -366,7 +366,7 @@ defineExpose({
 /* TODO ali ghasami for fix token */
 @prefix:~ 'vue-block-board-editor';
 .@{prefix} {
-  .affine-menu-action-text {
+  .affine-menu-action-text,.property-item-name,.select-input {
     @apply text-gray-8;
   }
 

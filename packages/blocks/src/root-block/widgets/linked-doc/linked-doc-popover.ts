@@ -36,7 +36,6 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
 
   static override styles = styles;
 
-
   constructor(
     private triggerKey: string,
     private getMenus: (
@@ -51,7 +50,6 @@ export class LinkedDocPopover extends WithDisposable(LitElement) {
   ) {
     super();
   }
-
 
   private get _actionGroup() {
     return this._linkedDocGroup.map(group => {

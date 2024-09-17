@@ -186,10 +186,13 @@ export function getAffineInlineSpecsWithReference(
         .nullable()
         .catch(undefined),
       match: delta => {
+        //console.log('delta', delta);
+        if (delta.insert == '@') return false;
         return !!delta.attributes?.mention;
       },
       renderer: (delta, selected) => {
         return html`<mahdaad-mention
+          style="display: inline-block"
           .delta=${delta}
           .selected=${selected}
           .config=${referenceNodeConfig}

@@ -28,11 +28,11 @@ export { insertContent } from '../slash-menu/utils.js';
 
 let globalAbortController = new AbortController();
 
-function closeSlashMenu() {
+export function closeMentionMenu() {
   globalAbortController.abort();
 }
 
-const showMenu = debounce(
+export const showMentionMenu = debounce(
   ({
     context,
     range,
@@ -104,7 +104,6 @@ export const Mahdaad_Mention_MENU_WIDGET = 'mahdaad-mention-menu-widget';
 @customElement(Mahdaad_Mention_MENU_WIDGET)
 export class MahdaadMentionMenuWidget extends WidgetComponent {
   private _onBeforeInput = (ctx: UIEventStateContext) => {
-    //debugger;
     const eventState = ctx.get('defaultState');
     const event = eventState.event as InputEvent;
 
@@ -124,24 +123,14 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
     if (!inlineEditor) return;
     const text = inlineEditor.yTextString;
     if (text) {
-      //const triggerWorkds = this.options.triggerWords.map(item => item.word);
       for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS
         .triggerWords) {
         if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
-          //debugger;
-          closeSlashMenu();
+          closeMentionMenu();
           return;
-          //showPopover({})
-          //alert('11110');
         }
       }
-      /*AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS.triggerWords.forEach(
-        item => {
-
-        }
-      );*/
     }
-    //debugger;
     inlineEditor.slots.inlineRangeApply.once(() => {
       const rootComponent = this.block;
       if (!isRootComponent(rootComponent)) {
@@ -162,8 +151,8 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
         const curRange = getCurrentNativeRange();
         if (!curRange) return;
 
-        closeSlashMenu();
-        showMenu({
+        closeMentionMenu();
+        showMentionMenu({
           context: { model, rootComponent: rootComponent },
           range: curRange,
           triggerKey,
