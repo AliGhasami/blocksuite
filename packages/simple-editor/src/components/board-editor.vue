@@ -17,7 +17,6 @@ import { type BlockModel, Doc, DocCollection, Job } from '@blocksuite/store'
 import { onMounted, ref, watch } from 'vue'
 import { replaceIdMiddleware } from '@blocksuite/blocks'
 import 'tippy.js/dist/tippy.css'
-//import './web-component/index'
 import resources from './locale/resources'
 import i18next from 'i18next';
 import { initLitI18n } from 'lit-i18n';
@@ -138,16 +137,7 @@ async function setData(data: any) {
     appendTODOM(editor)
     checkNotEmptyDocBlock(currentDocument)
     checkReadOnly()
-    //debugger
-    //console.log("100000")
-    //new_doc.awarenessStore.setReadonly(new_doc.blockCollection, !new_doc.readonly);
-    /*if (refEditor.value) {
-      const children = refEditor.value.children
-      if (children.length) {
-       refEditor.value.removeChild(children[0])
-      }
-      refEditor.value.appendChild(editor)
-    }*/
+
   }
 }
 
@@ -156,59 +146,7 @@ function reset() {
 }
 
 function bindEvent(doc: Doc) {
-  /*doc.slots.rootAdded.on((a)=>{
-    console.log("this is rootAdded",a)
-  })
 
-  doc.slots.yBlockUpdated.on((a)=>{
-    console.log("this is yBlockUpdated",a)
-  })
-
-  doc.slots.blockUpdated.on((a)=>{
-    console.log("this is blockUpdated",a)
-  })
-
-  doc.slots.rootDeleted.on((a)=>{
-    console.log("this is rootDeleted",a)
-  })
-
-  doc.slots.ready.on((a)=>{
-    console.log("this is ready",a)
-  })
-
-  doc.slots.historyUpdated.on((a)=>{
-    console.log("this is historyUpdated",a)
-  })*/
-
-
-  /*console.log("11111",doc);
-
-  doc.slots.yBlockUpdated.on((data)=>{
-    console.log("this iis yBlockUpdated",data);
-  })
-
-  doc.slots.blockUpdated.on((data)=>{
-    console.log("this iis yBlockUpdated",data);
-  })*/
-
-  /*doc.slots.dateTimeEvent.on((data)=>{
-    console.log("this is data",data);
-  })*/
-
-  /*doc.slots.yBlockUpdated.on((data)=>{
-    console.log("1111",data)
-  })
-
-  doc.slots.rootAdded.on((data)=>{
-    console.log("doc.slots.rootAdded",data)
-  })*/
-  /*doc.slots.yBlockUpdated.on((data)=>{
-    console.log("this is update yBlockUpdated",data)
-  })*/
-
- /* doc.slots.yBlockUpdated.on(()=>{
-    console.log("this is ready")
-  })*/
 
 
 
@@ -218,26 +156,13 @@ function bindEvent(doc: Doc) {
     emit('change', data)
     if (data.type == 'add') {
       if(data.flavour=='affine:mahdaad-object'){
-        //console.log("this is add affine:mahdaad-object",data)
-        /*setTimeout(()=>{
-          data.model.type='544545545'
-        },8000)*/
         emit('addObjectLink', data)
       }
-      //data.model.propsUpdated.
-      //data.model.type='25300000'
-      //console.log("this is model",data.model)
-      //setData()
-      /*setTimeout(()=>{
-        data.model.type='25300000'
-        data.model.object_id='25300000'
-      },8000)*/
+
       emit('addBlock', data)
-      //checkNotEmptyDocBlock(doc)
     }
     if (data.type == 'delete') {
       if(data.flavour=='affine:mahdaad-object'){
-        //console.log("this is delete affine:mahdaad-object",data)
         emit('deleteObjectLink',data)
       }
       //checkNotEmptyDocBlock(doc)
@@ -279,6 +204,9 @@ watch(
   }
 )
 
+/**
+ * @deprecated
+ */
 watch(
   () => props.mentionUserList,
   () => {
@@ -299,14 +227,9 @@ function init() {
     editor = new PageEditor()
   }
   editor.doc = doc
-  //console.log("this is editor",editor);
-  //console.log("this is doc",doc);
+
   appendTODOM(editor)
   checkReadOnly()
-  //doc.awarenessStore.setReadonly(doc.blockCollection, !doc.readonly);
-  /*if(refEditor.value){
-    refEditor.value.appendChild(editor);
-  }*/
   bindEvent(doc)
   updateMentionList()
 }
@@ -322,6 +245,9 @@ async function exportData(collection: DocCollection, docs: any[]) {
   return null
 }
 
+/**
+ * @deprecated
+ */
 function updateMentionList() {
   const root = currentDocument?.getBlocksByFlavour('affine:page')
   if (root && root.length > 0) {
@@ -338,6 +264,26 @@ function setFocus() {
   }
 }
 
+function isEmpty(){
+  const noteList =currentDocument.getBlockByFlavour('affine:note')
+  const note = noteList.length ? noteList[0] : null
+  if (note) {
+    for (const child of note.children) {
+      if(child.flavour!='affine:paragraph')
+        return  false
+      else
+      {
+        if(child.text?.length!=0)
+          return false
+      }
+    }
+  }else{
+    return  false
+  }
+  return true
+}
+
+
 onMounted(async () => {
   init()
 })
@@ -346,24 +292,13 @@ defineExpose({
   getData,
   setData,
   setFocus,
-  reset
+  reset,
+  isEmpty
 })
 </script>
 
 <style lang="less">
-/*.affine-block-children-container:not(:has(.with-drag-handle))
-    > affine-paragraph:last-child
-    .affine-paragraph-placeholder {
-    display: block;
-  }*/
 
-/*rich-text *{
-   color:red;
-   //font-family: var(--base-font-family), tahoma, serif;
-   font-family: "blocksuite:surface:Poppins";
- }*/
-
-/* TODO ali ghasami for fix token */
 @prefix:~ 'vue-block-board-editor';
 .@{prefix} {
   .affine-menu-action-text,.property-item-name,.select-input {
