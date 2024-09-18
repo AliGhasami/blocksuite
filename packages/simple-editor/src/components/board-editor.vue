@@ -366,7 +366,7 @@ defineExpose({
   }
 
   /* Mention Style */
-  .affine-mention {
+  /*.affine-mention {
     @apply flex-inline gap-2 mt-overline cursor-pointer text-neutral-8 bg-gray-1;
     width: fit-content;
     border-radius: @roundness-sm;
@@ -376,7 +376,7 @@ defineExpose({
       background: #f7f6fe;
       color: #64428f;
     }
-  }
+  }*/
 
   /* Hint Style */
   .affine-hint-container {
@@ -497,7 +497,7 @@ defineExpose({
 
 /* popover Style */
 .@{prefix}-popover {
-  @apply pt-3 pb-1 shadow-floated border-roundness bg-gray-0;
+  @apply pb-1 shadow-floated border-roundness bg-gray-0;
   position: fixed;
   left: 0;
   top: 0;
@@ -586,7 +586,7 @@ defineExpose({
 }
 
 /* Mention menu Style */
-.@{prefix}-mention-menu-container {
+/*.@{prefix}-mention-menu-container {
   @apply flex flex-col gap-2;
 
   .mention-item {
@@ -602,7 +602,7 @@ defineExpose({
       background-color: #ebf7ff;
     }
   }
-}
+}*/
 
 .fill-gray-0 {
   fill: @gray-0;

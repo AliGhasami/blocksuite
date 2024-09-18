@@ -239,7 +239,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     const slashMenuStyles = this._position
       ? {
           transform: `translate(${this._position.x}, ${this._position.y})`,
-          maxHeight: `${Math.min(this._position.height, this.config.maxHeight)}px`,
+          //maxHeight: `${Math.min(this._position.height, this.config.maxHeight)}px`,
         }
       : {
           visibility: 'hidden',
@@ -621,9 +621,10 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
       style=${style}
       data-testid=${`sub-menu-${this.depth}`}
     >
-      <div class="${Prefix}-popover-container">
+      <mahdaad-slash-menu></mahdaad-slash-menu>
+      <!--  <div class="${Prefix}-popover-container">
         ${this._clayTapMenu(this.menu)}
-      </div>
+      </div> -->
     </div>`;
   }
 
