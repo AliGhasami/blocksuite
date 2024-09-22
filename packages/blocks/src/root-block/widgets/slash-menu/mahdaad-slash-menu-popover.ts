@@ -20,7 +20,12 @@ import {
   getQuery,
 } from '../../../_common/components/utils.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
-import { type ClayTapSlashMenu, clayTapGroupMenu } from './mahdaad_menu.js';
+import {
+  type ClayTapSlashMenu,
+  type MahdaadActionMenu,
+  actionsMenu,
+  clayTapGroupMenu,
+} from './mahdaad_menu.js';
 import { styles } from './styles.js';
 import { isSubMenuItem } from './utils.js';
 
@@ -31,7 +36,7 @@ export type InnerSlashMenuContext = SlashMenuContext & {
 
 @customElement('affine-slash-menu')
 export class SlashMenu extends WithDisposable(ShadowlessElement) {
-  private _handleClickItem = (item: SlashMenuActionItem) => {
+  private _handleClickItem = (item: MahdaadActionMenu) => {
     // Need to remove the search string
     // We must to do clean the slash string before we do the action
     // Otherwise, the action may change the model and cause the slash string to be changed
@@ -248,6 +253,29 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
         <mahdaad-slash-menu
           search-text="${this._query}"
           .inline-editor="${this.inlineEditor}"
+          @select="${(event: CustomEvent) => {
+            //console.log('333', event);
+            const key = event.detail;
+            //console.log('111', key);
+            const item = actionsMenu.find(i => i.key == key);
+            if (item) {
+              this._handleClickItem(item);
+            }
+            //
+            /*cleanSpecifiedTail(
+              this.editorHost,
+              this.inlineEditor,
+              this.triggerKey + this._searchText
+            );
+            //console.log('this is insert content');
+            insertContent(this.editorHost, this.model, REFERENCE_NODE, {
+              mention: {
+                user_id: event.detail.user_id,
+                id: event.detail.id,
+              },
+            });*/
+            this.abortController.abort();
+          }}"
           @close="${() => {
             this.abortController.abort();
           }}"

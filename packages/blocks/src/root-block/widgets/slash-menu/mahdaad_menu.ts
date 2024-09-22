@@ -32,25 +32,15 @@ import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
 import audio from './icons/audio.svg?raw';
 import bread_crumb from './icons/bread_crumb.svg?raw';*/
-import bulleted_list from './icons/bulleted_list.svg?raw';
 //import button_link from './icons/button_link.svg?raw';
-import check_list from './icons/check_list.svg?raw';
-import date from './icons/date.svg?raw';
 import divider from './icons/divider.svg?raw';
 //import empty_title from './icons/empty_title.svg?raw';
 import file from './icons/file.svg?raw';
-import h1 from './icons/h1.svg?raw';
-import h2 from './icons/h2.svg?raw';
-import h3 from './icons/h3.svg?raw';
-import mention from './icons/mention.svg?raw';
 import notebook from './icons/notebook.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
-import numbered_list from './icons/numbered_list.svg?raw';
-import quote from './icons/quote.svg?raw';
 //import table_of_content from './icons/table_of_content.svg?raw';
 import table_view from './icons/table_view.svg?raw';
 import tabler_files from './icons/tabler_files.svg?raw';
-import text from './icons/text.svg?raw';
 //import video from './icons/video.svg?raw';
 import { insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
@@ -65,11 +55,251 @@ export interface ClayTapSlashMenu {
   description: DirectiveResult;
   action: (ctx: SlashMenuContext) => void | Promise<void>;
 }
+
+export interface MahdaadActionMenu {
+  key: string;
+  action: (ctx: SlashMenuContext) => void | Promise<void>;
+}
+
+export const actionsMenu: MahdaadActionMenu[] = [
+  {
+    key: 'text',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:paragraph', 'text');
+    },
+  },
+  {
+    key: 'h1',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:paragraph', 'h1');
+    },
+  },
+  {
+    key: 'h2',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:paragraph', 'h2');
+    },
+  },
+  {
+    key: 'h3',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:paragraph', 'h3');
+    },
+  },
+  {
+    key: 'bullet_list',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:list', 'bulleted');
+    },
+  },
+  {
+    key: 'number_list',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:list', 'numbered');
+    },
+  },
+  {
+    key: 'check_list',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:list', 'todo');
+    },
+  },
+  {
+    key: 'quote',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:paragraph', 'quote');
+    },
+  },
+  /*{
+    key: 'quote',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:paragraph', 'quote');
+    },
+  },*/
+  {
+    key: 'mention',
+    action: ({ rootComponent, model }) => {
+      /*const triggerKey = '@';
+      insertContent(rootComponent.host, model, triggerKey);
+      assertExists(model.doc.root);
+      //console.log('|11111', rootElement.widgetElements);
+      //todo fix ali ghasami
+      //@ts-ignore
+      const widgetEle = rootElement.widgetElements['affine-mention-widget'];
+      assertExists(widgetEle);
+      // We have checked the existence of showLinkedDoc method in the showWhen
+      const mentionWidget = widgetEle as AffineMentionWidget;
+      // Wait for range to be updated
+      setTimeout(() => {
+        const inlineEditor = getInlineEditorByModel(
+          rootComponent.host,
+          model
+        );
+        assertExists(inlineEditor);
+        mentionWidget.showMention(inlineEditor, triggerKey);
+        //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
+      });*/
+
+      const triggerKey = '@';
+      insertContent(rootComponent.host, model, triggerKey);
+      //return;
+      /*insertContent(rootComponent.host, model, REFERENCE_NODE, {
+        date: temp,
+      });*/
+      if (!model.doc.root) return;
+      const widgetEle =
+        rootComponent.widgetComponents['mahdaad-mention-menu-widget'];
+      if (!widgetEle) return;
+      // We have checked the existence of showLinkedDoc method in the showWhen
+      //const mentionWidget = widgetEle as MahdaadMentionMenuWidget;
+      // Wait for range to be updated
+      setTimeout(() => {
+        const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
+        if (!inlineEditor) return;
+        const curRange = getCurrentNativeRange();
+        if (!curRange) return;
+        closeMentionMenu();
+        showMentionMenu({
+          context: { model, rootComponent: rootComponent },
+          range: curRange,
+          triggerKey,
+        });
+      });
+    },
+  },
+  {
+    key: 'date',
+    action: ({ rootComponent, model }) => {
+      const date = new Date();
+      // Extract UTC time components
+      const year = date.getUTCFullYear(); // Get hours in UTC and pad with leading zero if needed
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
+      const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
+      const triggerKey = `${year}-${month}-${day}`;
+      const temp = {
+        date: triggerKey,
+        time: null,
+        id: uuidv4(),
+      };
+      /*{
+        const triggerKey = '$';
+        insertContent(rootComponent.host, model, triggerKey);
+      }*/
+      insertContent(rootComponent.host, model, REFERENCE_NODE, {
+        date: temp,
+      });
+      assertExists(model.doc.root);
+      const widgetEle =
+        rootComponent.widgetComponents['affine-date-time-widget'];
+      assertExists(widgetEle);
+      // We have checked the existence of showLinkedDoc method in the showWhen
+      const dateWidget = widgetEle as AffineDateTimeWidget;
+      // Wait for range to be updated
+      setTimeout(() => {
+        const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
+        assertExists(inlineEditor);
+        dateWidget.showDateTime(inlineEditor, triggerKey);
+      });
+    },
+  },
+  {
+    key: 'table',
+    action: ({ rootComponent, model }) => {
+      //return;
+      const parent = rootComponent.doc.getParent(model);
+      assertExists(parent);
+      const index = parent.children.indexOf(model);
+
+      const id = rootComponent.doc.addBlock(
+        'affine:database',
+        {},
+        rootComponent.doc.getParent(model),
+        index + 1
+      );
+      const service = rootComponent.std.spec.getService('affine:database');
+      service.initDatabaseBlock(
+        rootComponent.doc,
+        model,
+        id,
+        viewPresets.tableViewConfig,
+        false
+      );
+      tryRemoveEmptyLine(model);
+    },
+  },
+  {
+    key: 'divider',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:divider', 'divider');
+    },
+  },
+  {
+    key: 'attachment',
+    action: async ({ rootComponent, model }) => {
+      const file = await openFileOrFiles();
+      if (!file) return;
+      const attachmentService =
+        rootComponent.host.spec.getService('affine:attachment');
+      assertExists(attachmentService);
+      const maxFileSize = attachmentService.maxFileSize;
+
+      await addSiblingAttachmentBlocks(
+        rootComponent.host,
+        [file],
+        maxFileSize,
+        model
+      );
+      tryRemoveEmptyLine(model);
+    },
+  },
+  {
+    key: 'page',
+    action: ({ rootComponent, model }) => {
+      //rootComponent.doc.deleteBlock(model)
+      const triggerKey = '/page/';
+      insertContent(rootComponent.host, model, triggerKey);
+      openObjectPicker(rootComponent, model, 'document');
+    },
+  },
+  {
+    key: 'file',
+    action: ({ rootComponent, model }) => {
+      const triggerKey = '/file/';
+      insertContent(rootComponent.host, model, triggerKey);
+      openObjectPicker(rootComponent, model, 'file');
+    },
+  },
+  {
+    key: 'weblink',
+    action: ({ rootComponent, model }) => {
+      const triggerKey = '/weblink/';
+      insertContent(rootComponent.host, model, triggerKey);
+      openObjectPicker(rootComponent, model, 'weblink');
+    },
+  },
+  {
+    key: 'tag',
+    action: ({ rootComponent, model }) => {
+      const triggerKey = '/tag/';
+      insertContent(rootComponent.host, model, triggerKey);
+      openObjectPicker(rootComponent, model, 'tag');
+    },
+  },
+  {
+    key: 'image',
+    action: ({ rootComponent, model }) => {
+      const triggerKey = '/image/';
+      insertContent(rootComponent.host, model, triggerKey);
+      openObjectPicker(rootComponent, model, 'image');
+    },
+  },
+];
+
 export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: t('basic'),
     children: [
-      {
+      /*{
         title: t('text'),
         description: t('normal_text'),
         icon: text,
@@ -77,8 +307,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'text');
         },
-      },
-      {
+      },*/
+      /*{
         title: t('heading_1'),
         description: t('heading_1_description'),
         icon: h1,
@@ -86,8 +316,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h1');
         },
-      },
-      {
+      },*/
+      /* {
         title: t('heading_2'),
         description: t('heading_2_description'),
         icon: h2,
@@ -95,8 +325,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h2');
         },
-      },
-      {
+      },*/
+      /* {
         title: t('heading_3'),
         description: t('heading_3_description'),
         icon: h3,
@@ -104,8 +334,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h3');
         },
-      },
-      {
+      },*/
+      /*{
         title: t('bulleted_list'),
         description: t('bulleted_list_description'),
         icon: bulleted_list,
@@ -113,8 +343,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'bulleted');
         },
-      },
-      {
+      },*/
+      /*{
         title: t('numbered_list'),
         description: t('numbered_list_description'),
         icon: numbered_list,
@@ -122,8 +352,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'numbered');
         },
-      },
-      {
+      },*/
+      /* {
         title: t('check_list'),
         description: t('check_list_description'),
         icon: check_list,
@@ -131,8 +361,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'todo');
         },
-      },
-      {
+      },*/
+      /*{
         title: t('quote'),
         description: t('quote_description'),
         icon: quote,
@@ -140,7 +370,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
-      },
+      },*/
       /* {
         title: 'Hint',
         description: 'Description',
@@ -176,104 +406,20 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: 'Insert',
     children: [
-      {
+      /* {
         title: t('mention'),
         description: t('mention_description'),
         icon: mention,
         key: 'mention',
-        action: ({ rootComponent, model }) => {
-          /*const triggerKey = '@';
-          insertContent(rootComponent.host, model, triggerKey);
-          assertExists(model.doc.root);
-          //console.log('|11111', rootElement.widgetElements);
-          //todo fix ali ghasami
-          //@ts-ignore
-          const widgetEle = rootElement.widgetElements['affine-mention-widget'];
-          assertExists(widgetEle);
-          // We have checked the existence of showLinkedDoc method in the showWhen
-          const mentionWidget = widgetEle as AffineMentionWidget;
-          // Wait for range to be updated
-          setTimeout(() => {
-            const inlineEditor = getInlineEditorByModel(
-              rootComponent.host,
-              model
-            );
-            assertExists(inlineEditor);
-            mentionWidget.showMention(inlineEditor, triggerKey);
-            //linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
-          });*/
 
-          const triggerKey = '@';
-          insertContent(rootComponent.host, model, triggerKey);
-          //return;
-          /*insertContent(rootComponent.host, model, REFERENCE_NODE, {
-            date: temp,
-          });*/
-          if (!model.doc.root) return;
-          const widgetEle =
-            rootComponent.widgetComponents['mahdaad-mention-menu-widget'];
-          if (!widgetEle) return;
-          // We have checked the existence of showLinkedDoc method in the showWhen
-          //const mentionWidget = widgetEle as MahdaadMentionMenuWidget;
-          // Wait for range to be updated
-          setTimeout(() => {
-            const inlineEditor = getInlineEditorByModel(
-              rootComponent.host,
-              model
-            );
-            if (!inlineEditor) return;
-            const curRange = getCurrentNativeRange();
-            if (!curRange) return;
-            closeMentionMenu();
-            showMentionMenu({
-              context: { model, rootComponent: rootComponent },
-              range: curRange,
-              triggerKey,
-            });
-          });
-        },
-      },
-      {
+      },*/
+      /*{
         title: t('date'),
         description: t('date_description'),
         icon: date,
         key: 'date',
-        action: ({ rootComponent, model }) => {
-          const date = new Date();
-          // Extract UTC time components
-          const year = date.getUTCFullYear(); // Get hours in UTC and pad with leading zero if needed
-          const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
-          const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
-          const triggerKey = `${year}-${month}-${day}`;
-          const temp = {
-            date: triggerKey,
-            time: null,
-            id: uuidv4(),
-          };
-          /*{
-            const triggerKey = '$';
-            insertContent(rootComponent.host, model, triggerKey);
-          }*/
-          insertContent(rootComponent.host, model, REFERENCE_NODE, {
-            date: temp,
-          });
-          assertExists(model.doc.root);
-          const widgetEle =
-            rootComponent.widgetComponents['affine-date-time-widget'];
-          assertExists(widgetEle);
-          // We have checked the existence of showLinkedDoc method in the showWhen
-          const dateWidget = widgetEle as AffineDateTimeWidget;
-          // Wait for range to be updated
-          setTimeout(() => {
-            const inlineEditor = getInlineEditorByModel(
-              rootComponent.host,
-              model
-            );
-            assertExists(inlineEditor);
-            dateWidget.showDateTime(inlineEditor, triggerKey);
-          });
-        },
-      },
+
+      },*/
       /*{
         title: 'Today',
         description: 'Description',
@@ -474,28 +620,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: t('media'),
     children: [
-      {
+      /* {
         title: t('attachment'),
         description: t('attachment_description'),
         icon: file,
         key: 'attachment',
-        action: async ({ rootComponent, model }) => {
-          const file = await openFileOrFiles();
-          if (!file) return;
-          const attachmentService =
-            rootComponent.host.spec.getService('affine:attachment');
-          assertExists(attachmentService);
-          const maxFileSize = attachmentService.maxFileSize;
 
-          await addSiblingAttachmentBlocks(
-            rootComponent.host,
-            [file],
-            maxFileSize,
-            model
-          );
-          tryRemoveEmptyLine(model);
-        },
-      },
+      },*/
       /* {
         title: 'Title ',
         description: 'Description',
@@ -648,11 +779,6 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: t('file_description'),
         icon: tabler_files,
         key: 'file',
-        action: ({ rootComponent, model }) => {
-          const triggerKey = '/file/';
-          insertContent(rootComponent.host, model, triggerKey);
-          openObjectPicker(rootComponent, model, 'file');
-        },
       },
       {
         title: t('image'),
