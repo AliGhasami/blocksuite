@@ -184,6 +184,9 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       signal: this.abortController.signal,
       interceptor: (event, next) => {
         const { key, isComposing, code } = event;
+        if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'Enter') {
+          return;
+        }
         if (key === this.triggerKey) {
           // Can not stopPropagation here,
           // otherwise the rich text will not be able to trigger a new the slash menu
@@ -245,6 +248,9 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
         <mahdaad-slash-menu
           search-text="${this._query}"
           .inline-editor="${this.inlineEditor}"
+          @close="${() => {
+            this.abortController.abort();
+          }}"
         ></mahdaad-slash-menu>
       </div>
       <!-- <inner-slash-menu

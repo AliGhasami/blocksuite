@@ -352,6 +352,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
     });
   }
 
+
   override render() {
     const style = this._position
       ? styleMap({
