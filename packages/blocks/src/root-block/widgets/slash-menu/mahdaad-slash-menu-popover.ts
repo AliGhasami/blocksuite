@@ -1,45 +1,28 @@
 import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
-import { assertExists } from '@blocksuite/global/utils';
-import { autoPlacement, offset } from '@floating-ui/dom';
 import i18next from 'i18next';
-import { type PropertyValues, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import type {
   SlashMenuActionItem,
   SlashMenuContext,
-  SlashMenuGroupDivider,
   SlashMenuItem,
   SlashMenuStaticConfig,
   SlashMenuStaticItem,
-  SlashSubMenu,
 } from './config.js';
 
-import { createLitPortal } from '../../../_common/components/portal.js';
 import {
   cleanSpecifiedTail,
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
-import {
-  getInlineEditorByModel,
-  isControlledKeyboardEvent,
-} from '../../../_common/utils/index.js';
 import { isFuzzyMatch } from '../../../_common/utils/string.js';
 import { type ClayTapSlashMenu, clayTapGroupMenu } from './mahdaad_menu.js';
-import { slashItemToolTipStyle, styles } from './styles.js';
-import {
-  getFirstNotDividerItem,
-  isActionItem,
-  isGroupDivider,
-  isSubMenuItem,
-  slashItemClassName,
-} from './utils.js';
+import { styles } from './styles.js';
+import { isSubMenuItem } from './utils.js';
 
 export type InnerSlashMenuContext = SlashMenuContext & {
   tooltipTimeout: number;
@@ -139,6 +122,8 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     this._queryState = this._filteredItems.length === 0 ? 'no_result' : 'on';
   };
 
+  private slashMenuID = 'mahdaad-claytap-slash-menu';
+
   static override styles = styles;
 
   updatePosition = (position: { x: string; y: string; height: number }) => {
@@ -236,6 +221,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
+    //const style = styleMap(this.mainMenuStyle ?? { position: 'relative' });
     const slashMenuStyles = this._position
       ? {
           transform: `translate(${this._position.x}, ${this._position.y})`,
@@ -250,16 +236,27 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
             @click="${() => this.abortController.abort()}"
           ></div>`
         : nothing}
-      <inner-slash-menu
+
+      <div
+        id="${this.slashMenuID}"
+        class="vue-block-board-editor-popover  ${Prefix}-slash-menu"
+        style="${styleMap(slashMenuStyles)}"
+      >
+        <mahdaad-slash-menu
+          search-text="${this._query}"
+          .inline-editor="${this.inlineEditor}"
+        ></mahdaad-slash-menu>
+      </div>
+      <!-- <inner-slash-menu
         .context=${this._innerSlashMenuContext}
         .menu=${this._queryState === 'off'
-          ? this._menuItems
-          : this._filteredItems}
+        ? this._menuItems
+        : this._filteredItems}
         .onClickItem=${this._handleClickItem}
         .mainMenuStyle=${slashMenuStyles}
         .abortController=${this.abortController}
       >
-      </inner-slash-menu>`;
+      </inner-slash-menu> --->`;
   }
 
   get host() {
@@ -282,14 +279,14 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   accessor context!: SlashMenuContext;
 
-  @query('inner-slash-menu')
+  @query('#mahdaad-claytap-slash-menu')
   accessor slashMenuElement!: HTMLElement;
 
   @property({ attribute: false })
   accessor triggerKey!: string;
 }
 
-@customElement('inner-slash-menu')
+/*@customElement('inner-slash-menu')
 export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
   _activatedItemIndex = 0;
 
@@ -394,7 +391,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
     }
   };
 
-  /*private _renderSubMenuItem = (item: SlashSubMenu) => {
+  /!*private _renderSubMenuItem = (item: SlashSubMenu) => {
     const { name, icon, description } = item;
 
     const hover = item === this._activeItem;
@@ -423,7 +420,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
         ${ArrowDownIcon}
       </div>
     </icon-button>`;
-  };*/
+  };*!/
 
   private _subMenuAbortController: AbortController | null = null;
 
@@ -478,15 +475,15 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
     if (!ele) {
       return;
     }
-    /*if (force) {
+    /!*if (force) {
       // set parameter to `true` to align to top
       ele.scrollIntoView(true);
       return;
-    }*/
+    }*!/
     ele.scrollIntoView({
       block: 'nearest',
     });
-    /*const shadowRoot = this.shadowRoot;
+    /!*const shadowRoot = this.shadowRoot;
     if (!shadowRoot) {
       return;
     }
@@ -499,7 +496,7 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
     }
     ele.scrollIntoView({
       block: 'nearest',
-    });*/
+    });*!/
   }
 
   override connectedCallback() {
@@ -621,7 +618,10 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
       style=${style}
       data-testid=${`sub-menu-${this.depth}`}
     >
-      <mahdaad-slash-menu></mahdaad-slash-menu>
+      <mahdaad-slash-menu
+        search-text="${this.__queryState}"
+        .inline-editor="${this.inlineEditor}"
+      ></mahdaad-slash-menu>
       <!--  <div class="${Prefix}-popover-container">
         ${this._clayTapMenu(this.menu)}
       </div> -->
@@ -656,4 +656,4 @@ export class InnerSlashMenu extends WithDisposable(ShadowlessElement) {
 
   @property({ attribute: false })
   accessor menu!: ClayTapSlashMenu[];
-}
+}*/
