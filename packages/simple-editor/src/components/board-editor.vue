@@ -120,7 +120,7 @@ function checkReadOnly(){
 }
 
 
-async function setData(data: any) {
+async function setData(data: any,clear_history?: boolean = true) {
   if (myCollection) {
     //const editor = new PageEditor();
     let editor = null
@@ -134,6 +134,9 @@ async function setData(data: any) {
     bindEvent(new_doc)
     editor.doc = new_doc
     currentDocument = new_doc
+    if(clear_history){
+      new_doc?.resetHistory()
+    }
     appendTODOM(editor)
     checkNotEmptyDocBlock(currentDocument)
     checkReadOnly()
@@ -146,7 +149,6 @@ function reset() {
 }
 
 function bindEvent(doc: Doc) {
-
   doc.slots.blockUpdated.on((data) => {
     //console.log("this is event",data);
     checkNotEmptyDocBlock(doc)
