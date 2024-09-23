@@ -149,10 +149,6 @@ function reset() {
 }
 
 function bindEvent(doc: Doc) {
-
-
-
-
   doc.slots.blockUpdated.on((data) => {
     //console.log("this is event",data);
     checkNotEmptyDocBlock(doc)
