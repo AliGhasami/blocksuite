@@ -147,9 +147,6 @@ function reset() {
 
 function bindEvent(doc: Doc) {
 
-
-
-
   doc.slots.blockUpdated.on((data) => {
     //console.log("this is event",data);
     checkNotEmptyDocBlock(doc)
@@ -207,13 +204,13 @@ watch(
 /**
  * @deprecated
  */
-watch(
+/*watch(
   () => props.mentionUserList,
   () => {
     updateMentionList()
   },
   { deep: true }
-)
+)*/
 
 function init() {
   const { doc, collection } = createEmptyDoc(props.isBoardView).init()
@@ -231,7 +228,7 @@ function init() {
   appendTODOM(editor)
   checkReadOnly()
   bindEvent(doc)
-  updateMentionList()
+  //updateMentionList()
 }
 
 async function exportData(collection: DocCollection, docs: any[]) {
@@ -248,12 +245,12 @@ async function exportData(collection: DocCollection, docs: any[]) {
 /**
  * @deprecated
  */
-function updateMentionList() {
+/*function updateMentionList() {
   const root = currentDocument?.getBlocksByFlavour('affine:page')
   if (root && root.length > 0) {
     currentDocument?.updateBlock(root[0].model, { mentionUserList: props.mentionUserList })
   }
-}
+}*/
 
 function setFocus() {
   if (refEditor.value) {
