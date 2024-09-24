@@ -125,6 +125,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
+    console.log('1111', this._position);
     const slashMenuStyles = this._position
       ? {
           transform: `translate(${this._position.x}, ${this._position.y})`,

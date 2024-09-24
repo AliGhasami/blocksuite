@@ -1,3 +1,4 @@
+import { isRTL } from '../../_common/global.js';
 import { clamp } from '../../_common/utils/math.js';
 
 type CollisionBox = {
@@ -104,6 +105,9 @@ export function getPopperPosition(
   // because we are calculated its correct height
   const popperRect = popper?.getBoundingClientRect();
 
+  /*console.log('111', positioningPoint);
+  console.log('2222', popperRect);
+  console.log('3333', boundaryRect);*/
   const safeCoordinate = calcSafeCoordinate({
     positioningPoint,
     objRect: popperRect,
@@ -120,7 +124,9 @@ export function getPopperPosition(
      * because sometimes the popper's height is smaller than the available space.
      */
     height,
-    x: `${safeCoordinate.x}px`,
+    x: isRTL()
+      ? `${safeCoordinate.x - popperRect.width}px`
+      : `${safeCoordinate.x}px`,
     y:
       placement === 'bottom'
         ? `${safeCoordinate.y}px`

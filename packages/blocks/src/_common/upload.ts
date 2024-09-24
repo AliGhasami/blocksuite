@@ -73,6 +73,7 @@ declare global {
       uploadUrl: string;
       storageUrl: string;
       apiToken: string;
+      locale: 'fa' | 'en';
       //i18n: never;
     };
   }

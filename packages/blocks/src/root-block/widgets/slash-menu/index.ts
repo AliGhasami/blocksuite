@@ -90,6 +90,7 @@ const showSlashMenu = debounce(
         'You should render the slash menu node even if no position'
       );
       const position = getPopperPosition(slashMenuElement, range);
+      //console.log('2222', position);
       slashMenu.updatePosition(position);
     }, 10);
 

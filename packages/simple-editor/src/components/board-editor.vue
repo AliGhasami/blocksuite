@@ -3,6 +3,7 @@
     <!--    <div style="width: 450px">
       <mahdaad-date-picker :onChange="handleChange" :time="null" date=""></mahdaad-date-picker>
     </div>-->
+<!--    {{ props.locale }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -25,10 +26,6 @@ const refEditor = ref<HTMLElement | null>(null)
 let currentDocument: Doc | null = null
 let myCollection: DocCollection | null = null
 window.$blockEditor = {}
-i18next.use(initLitI18n).init({
-  lng: 'en',
-  resources
-});
 
 
 interface Props {
@@ -68,6 +65,12 @@ const props = withDefaults(defineProps<Props>(), {
   locale:'en'
 })
 
+i18next.use(initLitI18n).init({
+  lng: props.locale ?? 'en',
+  resources
+});
+
+
 const emit = defineEmits<{
   (e: 'change', val: IBlockChange): void
   (e: 'addBlock', val: IBlockChange): void
@@ -82,20 +85,23 @@ const emit = defineEmits<{
 
 watch(()=>props.locale,()=>{
   i18next.changeLanguage(props.locale)
+ // console.log("this is change language",props.locale);
 },{immediate:true})
 
 watch(
-  () => [props.uploadUrl, props.storageUrl, props.apiToken],
+  () => [props.uploadUrl, props.storageUrl, props.apiToken,props.locale],
   () => {
     const temp = {
       uploadUrl: props.uploadUrl ?? '',
       storageUrl: props.storageUrl ?? '',
-      apiToken: props.apiToken ?? ''
+      apiToken: props.apiToken ?? '',
+      locale:props.locale ?? 'en'
     }
 
     if (window.$blockEditor) {
       Object.assign(window.$blockEditor, temp)
     } else {
+
       window.$blockEditor = temp
     }
   },
