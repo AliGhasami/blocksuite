@@ -11,9 +11,6 @@ import {
   type ReferenceElement,
   autoUpdate,
   computePosition,
-  inline,
-  offset,
-  shift,
 } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
@@ -35,7 +32,6 @@ import {
   type InlineActionConfigItem,
   type ParagraphActionConfigItem,
   toolbarDefaultConfig,
-  toolbarMoreButton,
 } from './config.js';
 import { formatBarStyle } from './styles.js';
 
@@ -206,10 +202,12 @@ export class AffineFormatBarWidget extends WidgetComponent {
     const formatQuickBarElement = this.formatBarElement;
     assertExists(formatQuickBarElement, 'format quick bar should exist');
 
+    console.log('formatQuickBarElement', formatQuickBarElement);
     const listenFloatingElement = (
       getElement: () => ReferenceElement | void
     ) => {
       const initialElement = getElement();
+      console.log('initialElement', initialElement);
       if (!initialElement) {
         return;
       }
@@ -222,20 +220,51 @@ export class AffineFormatBarWidget extends WidgetComponent {
           formatQuickBarElement,
           () => {
             const element = getElement();
+            //console.log('11111', element, formatQuickBarElement);
             if (!element) return;
 
+            /*computePosition(document.body, formatQuickBarElement, {}).then(
+              ({ x, y }) => {
+
+                // Get the bounding box of the reference element relative to the viewport
+                const referenceRect = referenceElement.getBoundingClientRect();
+
+                // Calculate the position relative to the top-left corner of the screen
+                const screenX = referenceRect.left + x;
+                const screenY = referenceRect.top + y;
+
+                console.log('this is start', x, y);
+              }
+            );*/
+
             computePosition(element, formatQuickBarElement, {
+              //strategy: 'fixed',
               placement: this._placement,
               middleware: [
-                offset(10),
+                //autoPlacement()
+                /*offset(10),
                 inline(),
                 shift({
                   padding: 6,
-                }),
+                }),*/
               ],
             })
               .then(({ x, y }) => {
+                console.log('this x,y', x, y);
+                // Get the bounding box of the reference element relative to the viewport
+                //console.log('this is element', element);
+                //const referenceRect = element.getBoundingClientRect();
+                //console.log('22222', referenceRect);
+                // Calculate the position relative to the top-left corner of the screen
+                //const screenX = referenceRect.left + x;
+                //const screenY = referenceRect.top + y;
+                //console.log('this is screen', screenX, screenY);
+                //formatQuickBarElement.style.position = 'fixed';
+                //formatQuickBarElement.style.display = 'flex';
+                //formatQuickBarElement.style.top = `${screenY}px`;
+                //formatQuickBarElement.style.left = `${screenX}px`;
                 formatQuickBarElement.style.display = 'flex';
+                formatQuickBarElement.style.position = 'absolute';
                 formatQuickBarElement.style.top = `${y}px`;
                 formatQuickBarElement.style.left = `${x}px`;
               })
@@ -291,8 +320,14 @@ export class AffineFormatBarWidget extends WidgetComponent {
     switch (this.displayType) {
       case 'text':
       case 'native':
+        console.log(
+          'native',
+          getReferenceElementFromText()?.getBoundingClientRect(),
+          getReferenceElementFromText()?.getClientRects()
+        );
         return listenFloatingElement(getReferenceElementFromText);
       case 'block':
+        console.log('block');
         return listenFloatingElement(getReferenceElementFromBlock);
       default:
         return;
@@ -479,6 +514,7 @@ export class AffineFormatBarWidget extends WidgetComponent {
 
   override connectedCallback() {
     super.connectedCallback();
+    //this.shadowRoot.mode = 'closed';
     this._abortController = new AbortController();
 
     const rootComponent = this.block;
@@ -505,6 +541,10 @@ export class AffineFormatBarWidget extends WidgetComponent {
     }
   }
 
+  createRenderRoot() {
+    return this;
+  }
+
   override disconnectedCallback() {
     super.disconnectedCallback();
     this._abortController.abort();
@@ -518,14 +558,23 @@ export class AffineFormatBarWidget extends WidgetComponent {
     }
 
     const items = ConfigRenderer(this);
-
-    return html`
-      <editor-toolbar class="${AFFINE_FORMAT_BAR_WIDGET}">
+    //console.log('11111', items);
+    /*  `
+    <editor-toolbar class="${AFFINE_FORMAT_BAR_WIDGET}">
         ${items}
         <editor-toolbar-separator></editor-toolbar-separator>
         ${toolbarMoreButton(this)}
       </editor-toolbar>
-    `;
+`*/
+    return html`<div style="border: 1px solid red" class="${AFFINE_FORMAT_BAR_WIDGET}">
+      <mahdaad-format-bar ></mahdaad-format-bar>
+    </div`;
+    /*return html`
+      <editor-toolbar class="${AFFINE_FORMAT_BAR_WIDGET}">
+      ${items}
+      <editor-toolbar-separator></editor-toolbar-separator>
+      ${toolbarMoreButton(this)}
+    </editor-toolbar>`;*/
   }
 
   reset() {
