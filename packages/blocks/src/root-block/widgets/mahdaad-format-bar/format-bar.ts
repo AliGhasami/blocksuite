@@ -27,22 +27,20 @@ import {
 } from '../../../_common/components/index.js';
 import '../../../_common/components/toolbar/toolbar.js';
 import { matchFlavours } from '../../../_common/utils/model.js';
-import { isFormatSupported } from '../../../note-block/commands/utils.js';
+//import { isFormatSupported } from '../../../note-block/commands/utils.js';
 import { isRootComponent } from '../../../root-block/utils/guard.js';
-import { ConfigRenderer } from './components/config-renderer.js';
-import {
+/*import {
   type FormatBarConfigItem,
   type InlineActionConfigItem,
   type ParagraphActionConfigItem,
   toolbarDefaultConfig,
-  toolbarMoreButton,
-} from './config.js';
-import { formatBarStyle } from './styles.js';
+} from './config.js';*/
+//import { formatBarStyle } from './styles.js';
 
-export const AFFINE_FORMAT_BAR_WIDGET = 'affine-format-bar-widget';
+export const MAHDAAD_FORMAT_BAR_WIDGET = 'mahdaad-format-bar-widget';
 
-@customElement(AFFINE_FORMAT_BAR_WIDGET)
-export class AffineFormatBarWidget extends WidgetComponent {
+@customElement(MAHDAAD_FORMAT_BAR_WIDGET)
+export class MahdaadFormatBarWidget extends WidgetComponent {
   private _abortController = new AbortController();
 
   private _floatDisposables: DisposableGroup | null = null;
@@ -51,7 +49,7 @@ export class AffineFormatBarWidget extends WidgetComponent {
 
   private _placement: Placement = 'top';
 
-  static override styles = formatBarStyle;
+  //static override styles = formatBarStyle;
 
   private _calculatePlacement() {
     const rootComponent = this.block;
@@ -206,10 +204,12 @@ export class AffineFormatBarWidget extends WidgetComponent {
     const formatQuickBarElement = this.formatBarElement;
     assertExists(formatQuickBarElement, 'format quick bar should exist');
 
+    //console.log('formatQuickBarElement', formatQuickBarElement);
     const listenFloatingElement = (
       getElement: () => ReferenceElement | void
     ) => {
       const initialElement = getElement();
+      //console.log('initialElement', initialElement);
       if (!initialElement) {
         return;
       }
@@ -222,20 +222,59 @@ export class AffineFormatBarWidget extends WidgetComponent {
           formatQuickBarElement,
           () => {
             const element = getElement();
+            //console.log('11111', element, formatQuickBarElement);
             if (!element) return;
 
+            /*computePosition(element, formatQuickBarElement, {
+              strategy: 'fixed',
+            }).then(({ x, y, strategy }) => {
+              // Get the bounding box of the reference element relative to the viewport
+              //const referenceRect = referenceElement.getBoundingClientRect();
+
+              // Calculate the position relative to the top-left corner of the screen
+              //const screenX = referenceRect.left + x;
+              //const screenY = referenceRect.top + y;
+
+              console.log('this is start 100000', x, y, strategy);
+            });*/
+
             computePosition(element, formatQuickBarElement, {
-              placement: this._placement,
+              //strategy: 'absolute',
+              //placement: this._placement,
               middleware: [
                 offset(10),
                 inline(),
                 shift({
                   padding: 6,
                 }),
+                //shift(),
+                // inline(),
+                //autoPlacement(),
+                /*offset(10),
+                inline(),
+                shift({
+                  padding: 6,
+                }),*/
               ],
             })
               .then(({ x, y }) => {
+                //console.log('this x,y', x, y);
+                //console.log('this is start', x, y);
+                // Get the bounding box of the reference element relative to the viewport
+                //console.log('this is element', element);
+                // const referenceRect = element.getBoundingClientRect();
+                //console.log('22222', referenceRect);
+                // Calculate the position relative to the top-left corner of the screen
+                // const screenX = referenceRect.left + x;
+                //const screenY = referenceRect.top + y;
+                // console.log('this is screen', screenX, screenY);
+                //formatQuickBarElement.style.position = 'fixed';
+                //formatQuickBarElement.style.display = 'flex';
+                //formatQuickBarElement.style.top = `${screenY}px`;
+                //formatQuickBarElement.style.left = `${screenX}px`;
                 formatQuickBarElement.style.display = 'flex';
+                formatQuickBarElement.style.position = 'absolute';
+                //formatQuickBarElement.style.position = 'fixed';
                 formatQuickBarElement.style.top = `${y}px`;
                 formatQuickBarElement.style.left = `${x}px`;
               })
@@ -306,7 +345,6 @@ export class AffineFormatBarWidget extends WidgetComponent {
     if (target === current || (target && current && target.equals(current))) {
       return true;
     }
-
     return false;
   }
 
@@ -390,7 +428,32 @@ export class AffineFormatBarWidget extends WidgetComponent {
     return true;
   }
 
-  addBlockTypeSwitch(config: {
+  activeInlineTools() {
+    const keys: Exclude<
+      keyof AffineTextAttributes,
+      'color' | 'background' | 'reference'
+    >[] = ['bold', 'italic', 'underline', 'strike', 'link'];
+    const temp: string[] = [];
+    keys.forEach(key => {
+      const [result] = this.std.command
+        .chain()
+        .isTextStyleActive({ key })
+        .run();
+      if (result) {
+        temp.push(key);
+      }
+    });
+    return temp;
+  }
+
+  activeParagraphTool() {
+    if (this.selectedBlocks.length == 1) {
+      return this.selectedBlocks[0].model.type ?? 'text';
+    }
+    return 'text';
+  }
+
+  /*addBlockTypeSwitch(config: {
     flavour: BlockSuite.Flavour;
     icon: ParagraphActionConfigItem['icon'];
     type?: string;
@@ -411,43 +474,43 @@ export class AffineFormatBarWidget extends WidgetComponent {
           .run();
       },
     });
-  }
+  }*/
 
-  addDivider() {
+  /*addDivider() {
     this.configItems.push({ type: 'divider' });
     return this;
-  }
+  }*/
 
-  addHighlighterDropdown() {
+  /* addHighlighterDropdown() {
     this.configItems.push({ type: 'highlighter-dropdown' });
     return this;
-  }
+  }*/
 
-  addInlineAction(config: Omit<InlineActionConfigItem, 'type'>) {
+  /*addInlineAction(config: Omit<InlineActionConfigItem, 'type'>) {
     this.configItems.push({ ...config, type: 'inline-action' });
     return this;
-  }
+  }*/
 
-  addParagraphAction(config: Omit<ParagraphActionConfigItem, 'type'>) {
+  /*addParagraphAction(config: Omit<ParagraphActionConfigItem, 'type'>) {
     this.configItems.push({ ...config, type: 'paragraph-action' });
     return this;
-  }
+  }*/
 
-  addParagraphDropdown() {
+  /*addParagraphDropdown() {
     this.configItems.push({ type: 'paragraph-dropdown' });
     return this;
-  }
+  }*/
 
-  addRawConfigItems(configItems: FormatBarConfigItem[], index?: number) {
+  /*addRawConfigItems(configItems: FormatBarConfigItem[], index?: number) {
     if (index === undefined) {
       this.configItems.push(...configItems);
     } else {
       this.configItems.splice(index, 0, ...configItems);
     }
     return this;
-  }
+  }*/
 
-  addTextStyleToggle(config: {
+  /*  addTextStyleToggle(config: {
     icon: InlineActionConfigItem['icon'];
     key: Exclude<
       keyof AffineTextAttributes,
@@ -470,23 +533,22 @@ export class AffineFormatBarWidget extends WidgetComponent {
         return result;
       },
     });
-  }
+  }*/
 
   clearConfig() {
-    this.configItems = [];
+    //this.configItems = [];
     return this;
   }
 
   override connectedCallback() {
     super.connectedCallback();
     this._abortController = new AbortController();
-
     const rootComponent = this.block;
     assertExists(rootComponent);
     const widgets = rootComponent.widgets;
 
     // check if the host use the format bar widget
-    if (!Object.hasOwn(widgets, AFFINE_FORMAT_BAR_WIDGET)) {
+    if (!Object.hasOwn(widgets, MAHDAAD_FORMAT_BAR_WIDGET)) {
       return;
     }
 
@@ -500,9 +562,18 @@ export class AffineFormatBarWidget extends WidgetComponent {
 
     this._calculatePlacement();
 
-    if (this.configItems.length === 0) {
+    /* if (this.configItems.length === 0) {
       toolbarDefaultConfig(this);
-    }
+    }*/
+
+    this._disposables.addFromEvent(this, 'mousedown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+  }
+
+  override createRenderRoot() {
+    return this;
   }
 
   override disconnectedCallback() {
@@ -517,15 +588,71 @@ export class AffineFormatBarWidget extends WidgetComponent {
       return nothing;
     }
 
-    const items = ConfigRenderer(this);
-
-    return html`
-      <editor-toolbar class="${AFFINE_FORMAT_BAR_WIDGET}">
-        ${items}
-        <editor-toolbar-separator></editor-toolbar-separator>
-        ${toolbarMoreButton(this)}
-      </editor-toolbar>
-    `;
+    return html`<div class="${MAHDAAD_FORMAT_BAR_WIDGET}">
+      <mahdaad-format-bar 
+        @changeParagraph="${(event: CustomEvent) => {
+          //this._displayType = 'none';
+          const val = event.detail;
+          let flavour: BlockSuite.Flavour = 'affine:paragraph';
+          if (['bulleted', 'numbered', 'todo'].includes(val)) {
+            flavour = 'affine:list';
+          }
+          this.std.command
+            .chain()
+            .updateBlockType({
+              flavour,
+              props: val != null ? { type: val } : undefined,
+            })
+            .run();
+        }}" 
+       
+      @changeInline="${(event: CustomEvent) => {
+        const key = event.detail;
+        const chain = this.std.command.chain();
+        switch (key) {
+          case 'bold':
+            chain.toggleBold().run();
+            this.requestUpdate();
+            break;
+          case 'italic':
+            chain.toggleItalic().run();
+            break;
+          case 'underline':
+            chain.toggleUnderline().run();
+            break;
+          case 'strike':
+            chain.toggleStrike().run();
+            break;
+          case 'link':
+            chain.toggleLink().run();
+            break;
+        }
+      }}"  
+        
+        @changeColor="${(event: CustomEvent) => {
+          const styles = event.detail;
+          console.log('1111', styles);
+          //alert('1111');
+          const payload: {
+            styles: AffineTextAttributes;
+          } = {
+            styles,
+          };
+          console.log('payload', payload);
+          this.std.command
+            .chain()
+            .try(chain => [
+              chain.getTextSelection().formatText(payload),
+              chain.getBlockSelections().formatBlock(payload),
+              chain.formatNative(payload),
+            ])
+            .run();
+        }}"
+        
+      active-paragraph-tool="${this.activeParagraphTool()}"
+      active-inline-tools="${this.activeInlineTools()}"
+      ></mahdaad-format-bar>
+    </div`;
   }
 
   reset() {
@@ -568,20 +695,20 @@ export class AffineFormatBarWidget extends WidgetComponent {
   @state()
   private accessor _selectedBlocks: BlockComponent[] = [];
 
-  @state()
-  accessor configItems: FormatBarConfigItem[] = [];
+  //@state()
+  //accessor configItems: FormatBarConfigItem[] = [];
 
-  @query(`.${AFFINE_FORMAT_BAR_WIDGET}`)
+  @query(`.${MAHDAAD_FORMAT_BAR_WIDGET}`)
   accessor formatBarElement: HTMLElement | null = null;
 }
 
-function camelCaseToWords(s: string) {
+/*function camelCaseToWords(s: string) {
   const result = s.replace(/([A-Z])/g, ' $1');
   return result.charAt(0).toUpperCase() + result.slice(1);
-}
+}*/
 
 declare global {
   interface HTMLElementTagNameMap {
-    [AFFINE_FORMAT_BAR_WIDGET]: AffineFormatBarWidget;
+    [MAHDAAD_FORMAT_BAR_WIDGET]: MahdaadFormatBarWidget;
   }
 }

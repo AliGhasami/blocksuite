@@ -30,7 +30,7 @@ export class AffineDateTime extends ShadowlessElement {
   }
 
   override render() {
-    console.log('this is date time', this.delta.insert);
+    //console.log('this is date time', this.delta.insert);
     return html`<span>
       <span class="${Prefix}-date-time" data-event-id="${this.id}">
         <mahdaad-date-time
