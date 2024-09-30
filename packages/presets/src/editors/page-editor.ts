@@ -38,8 +38,8 @@ export class PageEditor extends WithDisposable(ShadowlessElement) {
       height: 100%;
       overflow-x: hidden;
       overflow-y: auto;
-      container-name: viewport;
-      container-type: inline-size;
+      /* container-name: viewport;
+      container-type: inline-size;*/
     }
 
     .page-editor-container {

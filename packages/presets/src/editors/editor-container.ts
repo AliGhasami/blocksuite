@@ -130,8 +130,8 @@ export class AffineEditorContainer
       height: 100%;
       overflow-x: hidden;
       overflow-y: auto;
-      container-name: viewport;
-      container-type: inline-size;
+      /* container-name: viewport;
+      container-type: inline-size;*/
       font-family: var(--affine-font-family);
     }
     .affine-page-viewport * {

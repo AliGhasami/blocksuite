@@ -203,6 +203,28 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
   private _listenFloatingElement() {
     const formatQuickBarElement = this.formatBarElement;
     assertExists(formatQuickBarElement, 'format quick bar should exist');
+    // const temp = document.getElementById('input-1');
+    //const temp1 = document.getElementById('backlink');
+    // const temp2 = document.querySelector('mahdaad-format-bar-widget');
+    /*  console.log('this is temp', temp);
+    console.log('format bar ', formatQuickBarElement);
+    console.log('temp 2', temp2);*/
+    /*const button = document.querySelector('#button');
+    const tooltip = document.querySelector('#tooltip');*/
+
+    /* const cleanup = autoUpdate(temp, temp2, () => {
+      computePosition(temp, temp2, {
+        strategy: 'fixed', // 'absolute' by default
+      }).then(({ x, y }) => {
+        Object.assign(temp2.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+          position: 'fixed',
+        });
+      });
+    });*/
+
+    // return;
 
     //console.log('formatQuickBarElement', formatQuickBarElement);
     const listenFloatingElement = (
@@ -239,7 +261,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
             });*/
 
             computePosition(element, formatQuickBarElement, {
-              //strategy: 'absolute',
+              strategy: 'fixed',
               //placement: this._placement,
               middleware: [
                 offset(10),
@@ -272,9 +294,9 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
                 //formatQuickBarElement.style.display = 'flex';
                 //formatQuickBarElement.style.top = `${screenY}px`;
                 //formatQuickBarElement.style.left = `${screenX}px`;
-                formatQuickBarElement.style.display = 'flex';
-                formatQuickBarElement.style.position = 'absolute';
-                //formatQuickBarElement.style.position = 'fixed';
+                //formatQuickBarElement.style.display = 'flex';
+                //formatQuickBarElement.style.position = 'absolute';
+                formatQuickBarElement.style.position = 'fixed';
                 formatQuickBarElement.style.top = `${y}px`;
                 formatQuickBarElement.style.left = `${x}px`;
               })
@@ -321,6 +343,11 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
       if (!range) {
         return;
       }
+      /*console.log(
+        'range.getBoundingClientRect()',
+        range.getBoundingClientRect()
+      );
+      console.log('range.getClientRects()', range.getClientRects());*/
       return {
         getBoundingClientRect: () => range.getBoundingClientRect(),
         getClientRects: () => range.getClientRects(),
@@ -631,7 +658,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
         
         @changeColor="${(event: CustomEvent) => {
           const styles = event.detail;
-          console.log('1111', styles);
+          //console.log('1111', styles);
           //alert('1111');
           const payload: {
             styles: AffineTextAttributes;
