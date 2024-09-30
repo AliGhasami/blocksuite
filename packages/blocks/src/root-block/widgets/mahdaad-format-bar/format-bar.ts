@@ -7,7 +7,6 @@ import type {
 import { WidgetComponent } from '@blocksuite/block-std';
 import { DisposableGroup, assertExists } from '@blocksuite/global/utils';
 import {
-  type Placement,
   type ReferenceElement,
   autoUpdate,
   computePosition,
@@ -47,7 +46,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
 
   private _lastCursor: CursorSelection | undefined = undefined;
 
-  private _placement: Placement = 'top';
+  //private _placement: Placement = 'top';
 
   //static override styles = formatBarStyle;
 
@@ -63,28 +62,28 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     });
 
     // calculate placement
-    this.disposables.add(
+    /* this.disposables.add(
       this.host.event.add('pointerUp', ctx => {
-        let targetRect: DOMRect | null = null;
+       // let targetRect: DOMRect | null = null;
         if (this.displayType === 'text' || this.displayType === 'native') {
           const range = this.nativeRange;
           if (!range) {
             this.reset();
             return;
           }
-          targetRect = range.getBoundingClientRect();
+         // targetRect = range.getBoundingClientRect();
         } else if (this.displayType === 'block') {
           const block = this._selectedBlocks[0];
           if (!block) return;
-          targetRect = block.getBoundingClientRect();
+         // targetRect = block.getBoundingClientRect();
         } else {
           return;
         }
 
-        const { top: editorHostTop, bottom: editorHostBottom } =
+        /!*const { top: editorHostTop, bottom: editorHostBottom } =
           this.host.getBoundingClientRect();
-        const e = ctx.get('pointerState');
-        if (editorHostBottom - targetRect.bottom < 50) {
+        const e = ctx.get('pointerState');*!/
+        /!*if (editorHostBottom - targetRect.bottom < 50) {
           this._placement = 'top';
         } else if (targetRect.top - Math.max(editorHostTop, 0) < 50) {
           this._placement = 'bottom';
@@ -92,9 +91,9 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
           this._placement = 'top';
         } else {
           this._placement = 'bottom';
-        }
+        }*!/
       })
-    );
+    );*/
 
     // listen to selection change
     this.disposables.add(
@@ -203,35 +202,10 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
   private _listenFloatingElement() {
     const formatQuickBarElement = this.formatBarElement;
     assertExists(formatQuickBarElement, 'format quick bar should exist');
-    // const temp = document.getElementById('input-1');
-    //const temp1 = document.getElementById('backlink');
-    // const temp2 = document.querySelector('mahdaad-format-bar-widget');
-    /*  console.log('this is temp', temp);
-    console.log('format bar ', formatQuickBarElement);
-    console.log('temp 2', temp2);*/
-    /*const button = document.querySelector('#button');
-    const tooltip = document.querySelector('#tooltip');*/
-
-    /* const cleanup = autoUpdate(temp, temp2, () => {
-      computePosition(temp, temp2, {
-        strategy: 'fixed', // 'absolute' by default
-      }).then(({ x, y }) => {
-        Object.assign(temp2.style, {
-          left: `${x}px`,
-          top: `${y}px`,
-          position: 'fixed',
-        });
-      });
-    });*/
-
-    // return;
-
-    //console.log('formatQuickBarElement', formatQuickBarElement);
     const listenFloatingElement = (
       getElement: () => ReferenceElement | void
     ) => {
       const initialElement = getElement();
-      //console.log('initialElement', initialElement);
       if (!initialElement) {
         return;
       }
@@ -244,22 +218,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
           formatQuickBarElement,
           () => {
             const element = getElement();
-            //console.log('11111', element, formatQuickBarElement);
             if (!element) return;
-
-            /*computePosition(element, formatQuickBarElement, {
-              strategy: 'fixed',
-            }).then(({ x, y, strategy }) => {
-              // Get the bounding box of the reference element relative to the viewport
-              //const referenceRect = referenceElement.getBoundingClientRect();
-
-              // Calculate the position relative to the top-left corner of the screen
-              //const screenX = referenceRect.left + x;
-              //const screenY = referenceRect.top + y;
-
-              console.log('this is start 100000', x, y, strategy);
-            });*/
-
             computePosition(element, formatQuickBarElement, {
               strategy: 'fixed',
               //placement: this._placement,
@@ -269,33 +228,9 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
                 shift({
                   padding: 6,
                 }),
-                //shift(),
-                // inline(),
-                //autoPlacement(),
-                /*offset(10),
-                inline(),
-                shift({
-                  padding: 6,
-                }),*/
               ],
             })
               .then(({ x, y }) => {
-                //console.log('this x,y', x, y);
-                //console.log('this is start', x, y);
-                // Get the bounding box of the reference element relative to the viewport
-                //console.log('this is element', element);
-                // const referenceRect = element.getBoundingClientRect();
-                //console.log('22222', referenceRect);
-                // Calculate the position relative to the top-left corner of the screen
-                // const screenX = referenceRect.left + x;
-                //const screenY = referenceRect.top + y;
-                // console.log('this is screen', screenX, screenY);
-                //formatQuickBarElement.style.position = 'fixed';
-                //formatQuickBarElement.style.display = 'flex';
-                //formatQuickBarElement.style.top = `${screenY}px`;
-                //formatQuickBarElement.style.left = `${screenX}px`;
-                //formatQuickBarElement.style.display = 'flex';
-                //formatQuickBarElement.style.position = 'absolute';
                 formatQuickBarElement.style.position = 'fixed';
                 formatQuickBarElement.style.top = `${y}px`;
                 formatQuickBarElement.style.left = `${x}px`;
@@ -475,6 +410,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
 
   activeParagraphTool() {
     if (this.selectedBlocks.length == 1) {
+      //@ts-ignore
       return this.selectedBlocks[0].model.type ?? 'text';
     }
     return 'text';
@@ -616,7 +552,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     }
 
     return html`<div class="${MAHDAAD_FORMAT_BAR_WIDGET}">
-      <mahdaad-format-bar 
+      <mahdaad-format-bar
         @changeParagraph="${(event: CustomEvent) => {
           //this._displayType = 'none';
           const val = event.detail;
@@ -631,31 +567,29 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
               props: val != null ? { type: val } : undefined,
             })
             .run();
-        }}" 
-       
-      @changeInline="${(event: CustomEvent) => {
-        const key = event.detail;
-        const chain = this.std.command.chain();
-        switch (key) {
-          case 'bold':
-            chain.toggleBold().run();
-            this.requestUpdate();
-            break;
-          case 'italic':
-            chain.toggleItalic().run();
-            break;
-          case 'underline':
-            chain.toggleUnderline().run();
-            break;
-          case 'strike':
-            chain.toggleStrike().run();
-            break;
-          case 'link':
-            chain.toggleLink().run();
-            break;
-        }
-      }}"  
-        
+        }}"
+        @changeInline="${(event: CustomEvent) => {
+          const key = event.detail;
+          const chain = this.std.command.chain();
+          switch (key) {
+            case 'bold':
+              chain.toggleBold().run();
+              this.requestUpdate();
+              break;
+            case 'italic':
+              chain.toggleItalic().run();
+              break;
+            case 'underline':
+              chain.toggleUnderline().run();
+              break;
+            case 'strike':
+              chain.toggleStrike().run();
+              break;
+            case 'link':
+              chain.toggleLink().run();
+              break;
+          }
+        }}"
         @changeColor="${(event: CustomEvent) => {
           const styles = event.detail;
           //console.log('1111', styles);
@@ -665,7 +599,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
           } = {
             styles,
           };
-          console.log('payload', payload);
+          //console.log('payload', payload);
           this.std.command
             .chain()
             .try(chain => [
@@ -675,11 +609,10 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
             ])
             .run();
         }}"
-        
-      active-paragraph-tool="${this.activeParagraphTool()}"
-      active-inline-tools="${this.activeInlineTools()}"
+        active-paragraph-tool="${this.activeParagraphTool()}"
+        active-inline-tools="${this.activeInlineTools()}"
       ></mahdaad-format-bar>
-    </div`;
+    </div>`;
   }
 
   reset() {
