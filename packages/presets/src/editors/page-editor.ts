@@ -34,6 +34,7 @@ export class PageEditor extends WithDisposable(ShadowlessElement) {
     }
 
     .affine-page-viewport {
+      z-index: 10;
       position: relative;
       height: 100%;
       overflow-x: hidden;
