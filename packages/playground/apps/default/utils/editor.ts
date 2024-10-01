@@ -34,8 +34,9 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   assertExists(doc.ready, 'Doc is not ready');
   assertExists(doc.root, 'Doc root is not ready');
 
-  const app = document.getElementById('app');
+  const app = document.getElementById('temp-1');
   if (!app) return;
+  return;
 
   const modeService = mockDocModeService(doc.id);
   setDocModeFromUrlParams(modeService);
@@ -74,6 +75,7 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   app.append(editor);
   await editor.updateComplete;
 
+  return;
   const leftSidePanel = new LeftSidePanel();
 
   const docsPanel = new DocsPanel();

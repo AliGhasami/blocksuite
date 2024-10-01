@@ -278,11 +278,6 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
       if (!range) {
         return;
       }
-      /*console.log(
-        'range.getBoundingClientRect()',
-        range.getBoundingClientRect()
-      );
-      console.log('range.getClientRects()', range.getClientRects());*/
       return {
         getBoundingClientRect: () => range.getBoundingClientRect(),
         getClientRects: () => range.getClientRects(),
@@ -525,9 +520,10 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
 
     this._calculatePlacement();
 
-    /* if (this.configItems.length === 0) {
-      toolbarDefaultConfig(this);
-    }*/
+    this._disposables.addFromEvent(this, 'pointerdown', (e: PointerEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
 
     this._disposables.addFromEvent(this, 'mousedown', e => {
       e.stopPropagation();

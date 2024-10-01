@@ -1,9 +1,5 @@
 <template>
   <div>
-    <!--    <div style="width: 450px">
-      <mahdaad-date-picker :onChange="handleChange" :time="null" date=""></mahdaad-date-picker>
-    </div>-->
-<!--    {{ props.locale }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -30,7 +26,7 @@ window.$blockEditor = {}
 
 interface Props {
   isBoardView?: boolean
-  mentionUserList?: any[]
+  //mentionUserList?: any[]
   uploadUrl?: string
   storageUrl?: string
   apiToken?: string
@@ -61,7 +57,7 @@ type IBlockChange =
 const props = withDefaults(defineProps<Props>(), {
   isBoardView: false,
   readonly:false,
-  mentionUserList: () => [],
+ // mentionUserList: () => [],
   locale:'en'
 })
 
@@ -127,6 +123,7 @@ function checkReadOnly(){
 
 
 async function setData(data: any,clear_history?: boolean = true) {
+  return
   if (myCollection) {
     //const editor = new PageEditor();
     let editor = null
@@ -220,8 +217,18 @@ watch(
   { deep: true }
 )*/
 
-function init() {
-  const { doc, collection } = createEmptyDoc(props.isBoardView).init()
+async function init() {
+  /*************************************************/
+
+
+
+  /*************************************************/
+
+
+
+
+ /* const temp = await createEmptyDoc(props.isBoardView)
+  const { doc, collection } = temp.init()
   myCollection = collection
   currentDocument = doc
   //myNoteId=noteId
@@ -235,7 +242,7 @@ function init() {
 
   appendTODOM(editor)
   checkReadOnly()
-  bindEvent(doc)
+  bindEvent(doc)*/
   //updateMentionList()
 }
 
@@ -270,6 +277,8 @@ function setFocus() {
 }
 
 function isEmpty(){
+  //todo check ali ghasami
+  return true
   const noteList =currentDocument.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
   if (note) {
