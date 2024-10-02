@@ -72,8 +72,8 @@ export class EditorHost extends SignalWatcher(
 
   static override styles = css`
     editor-host {
-      outline: none;
-      isolation: isolate;
+      /*outline: none;
+      isolation: isolate;*/
     }
   `;
 

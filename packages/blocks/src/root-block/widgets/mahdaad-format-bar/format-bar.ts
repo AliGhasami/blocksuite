@@ -528,6 +528,10 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     /* if (this.configItems.length === 0) {
       toolbarDefaultConfig(this);
     }*/
+    this._disposables.addFromEvent(this, 'pointerdown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
 
     this._disposables.addFromEvent(this, 'mousedown', e => {
       e.stopPropagation();
@@ -551,7 +555,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
       return nothing;
     }
 
-    return html`<div class="${MAHDAAD_FORMAT_BAR_WIDGET}">
+    return html`<div class="${MAHDAAD_FORMAT_BAR_WIDGET}" style="z-index:10;">
       <mahdaad-format-bar
         @changeParagraph="${(event: CustomEvent) => {
           //this._displayType = 'none';
