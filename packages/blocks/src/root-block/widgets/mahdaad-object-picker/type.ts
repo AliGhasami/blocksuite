@@ -4,4 +4,5 @@ export type IObjectType =
   | 'board'
   | 'image'
   | 'weblink'
-  | 'tag';
+  | 'tag'
+  | 'template';

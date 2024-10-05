@@ -119,7 +119,17 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     >
       ${this.renderChildren(this.model)}
     </div>`;
-    const temp = document.getElementById('editor-scroll-container');
+    //const temp = document.getElementById('editor-scroll-container');
+    //editor-scroll-container
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    /*console.log('this is temp', temp);
+    console.log(
+      '10000',
+      this.doc.root?.id,
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );*/
     const scrollContainer = temp ? temp : getViewportElement(this.host);
     return html`
       <div class="affine-paragraph-block-container">

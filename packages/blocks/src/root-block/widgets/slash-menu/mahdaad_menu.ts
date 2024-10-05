@@ -286,6 +286,14 @@ export const actionsMenu: MahdaadActionMenu[] = [
     },
   },
   {
+    key: 'template',
+    action: ({ rootComponent, model }) => {
+      const triggerKey = '/templates/';
+      insertContent(rootComponent.host, model, triggerKey);
+      openObjectPicker(rootComponent, model, 'template');
+    },
+  },
+  {
     key: 'image',
     action: ({ rootComponent, model }) => {
       const triggerKey = '/image/';
