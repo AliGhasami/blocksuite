@@ -288,7 +288,6 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     super.connectedCallback();
     //console.log('this is block', this.blockElement.model);
     //this.handleEvent('keyDown', this._onKeyDown);
-
     this.handleEvent('beforeInput', this._onBeforeInput);
   }
 

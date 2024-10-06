@@ -993,7 +993,7 @@ function openObjectPicker(
 
   return;*/
 
-  const triggerKey = '';
+  const triggerKey = 'templates/';
   const widgetEle =
     // @ts-ignore
     rootComponent.widgetComponents['affine-mahdaad-object-picker-widget'];

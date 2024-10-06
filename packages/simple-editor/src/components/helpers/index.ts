@@ -6,7 +6,9 @@ export function createEmptyDoc(isBoard: boolean = false) {
   const schema = new Schema().register(AffineSchemas)
   //console.log("this is schema",schema)
   const collection = new DocCollection({ schema })
+  //console.log("11111",collection);
   collection.meta.initialize()
+  //collection.
   //collection.
   const doc = collection.createDoc() //{ id: 'page1' }
   //doc.readonly=true
@@ -25,6 +27,7 @@ export function createEmptyDoc(isBoard: boolean = false) {
         const rootId = doc.addBlock('affine:page', {
           //userList:['1','2','3','4','5']
         })
+        //doc.addBlocks([],)
         //console.log("this is root id",rootId)
         doc.addBlock('affine:surface', {}, rootId)
         if (!isBoard) {

@@ -407,6 +407,7 @@ export class Job {
       index,
     });
     const { children, flavour, props, id } = snapshot;
+    // console.log('_snapshotToBlock', snapshot);
 
     const schema = this._getSchema(flavour);
     const snapshotLeaf = {
@@ -420,6 +421,7 @@ export class Job {
       assets: this._assetsManager,
       children,
     });
+    //console.log('this is modelData', modelData);
 
     doc.addBlock(
       modelData.flavour as BlockSuite.Flavour,
@@ -429,6 +431,7 @@ export class Job {
     );
 
     for (const [index, child] of children.entries()) {
+      //console.log("1111");
       await this._snapshotToBlock(child, doc, id, index);
     }
 

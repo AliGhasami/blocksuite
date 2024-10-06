@@ -1,13 +1,14 @@
 import type { EditorHost } from '@blocksuite/block-std';
 import type { InlineEditor } from '@blocksuite/inline';
-import type { BlockModel } from '@blocksuite/store';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
+import { type BlockModel, DocCollection, Job, Schema } from '@blocksuite/store';
 import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { get } from 'lodash';
 
 import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import type { Options } from './index.js';
@@ -15,10 +16,13 @@ import type { IObjectType } from './type.js';
 
 import '../../../_common/components/button.js';
 import {
+  cleanSpecifiedTail,
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
+import { replaceIdMiddleware } from '../../../_common/transformers/index.js';
 import { getInlineEditorByModel } from '../../../_common/utils/index.js';
+import { AffineSchemas } from '../../../schemas.js';
 import { styles } from './styles.js';
 export interface ObjectLink {
   link_id: string;
@@ -56,6 +60,9 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         ...lnk,
       },
     ]);
+
+    //model.doc.addBlocks()
+
     model.doc.deleteBlock(this.model);
     const next = model.doc.getNext(temp[0]);
     if (next) {
@@ -69,6 +76,19 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     }
     if (this.abortController) {
       this.abortController.abort();
+    }
+  }
+
+  clearTrigger() {
+    // console.log('11111', this._searchText);
+    try {
+      //todo fix trigger key ali ghasami dynamic
+      const trigger = '/templates/';
+      const text = this._searchText ? trigger + this._searchText : trigger;
+      // console.log('this is text', text);
+      cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
+    } catch (e) {
+      console.log(e);
     }
   }
 
@@ -115,6 +135,41 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     });
   }
 
+  async insertTemplate(data: any) {
+    //debugger;
+    console.log('this is data', data);
+    if (!data.context) return;
+    const content = JSON.parse(data.context);
+    ///console.log('14141444', content);
+    const blocks = get(content, 'blocks.children', []);
+    const note = blocks.find(item => item.flavour == 'affine:note');
+    const noteChildren = get(note, 'children', []);
+    const doc = this.model.doc;
+    if (noteChildren.length > 0) {
+      const schema = new Schema().register(AffineSchemas);
+      const collection = new DocCollection({ schema });
+      const job = new Job({
+        collection: collection,
+        middlewares: [replaceIdMiddleware],
+      });
+      const notes = doc.getBlocksByFlavour('affine:note');
+      if (notes.length > 0) {
+        const parent = doc.getParent(this.model);
+        if (parent) {
+          const targetIndex =
+            parent.children.findIndex(({ id }) => id === this.model.id) ?? 0;
+          let insertIndex = targetIndex + 1; //place === 'before' ? targetIndex :
+          for (const item of noteChildren) {
+            await job.snapshotToBlock(item, doc, parent.id, insertIndex++);
+          }
+        }
+      }
+    }
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  }
+
   override render() {
     const style = this._position
       ? styleMap({
@@ -135,9 +190,19 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
             type="${this.obj_type}"
             .model="${this.model}"
             .create-function="${this.addObjectLink}"
+            .insert-template="${this.insertTemplate}"
+            @clear-trigger="${() => {
+              this.clearTrigger();
+            }}"
             @select="${(event: CustomEvent) => {
-              this.addObjectLink(this.model, event.detail as ObjectLink);
-              this.abortController.abort();
+              if (this.obj_type == 'template') {
+                this.clearTrigger();
+                this.insertTemplate(event.detail);
+              } else {
+                this.addObjectLink(this.model, event.detail as ObjectLink);
+                this.abortController.abort();
+              }
+              //console.log('999999');
             }}"
             @close="${() => {
               this.abortController.abort();
@@ -162,7 +227,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   @state()
   private accessor _searchText = '';
-
 
   @query(`.${Prefix}-popover-element`)
   accessor PopOverElement: Element | null = null;
