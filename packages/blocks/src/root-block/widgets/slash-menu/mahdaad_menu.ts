@@ -1,6 +1,5 @@
 import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, uuidv4 } from '@blocksuite/store';
-import { translate as t } from 'lit-i18n/';
 
 import type { RootBlockComponent } from '../../types.js';
 import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
@@ -33,14 +32,14 @@ import accordion_h3 from './icons/accordion_h3.svg?raw';
 import audio from './icons/audio.svg?raw';
 import bread_crumb from './icons/bread_crumb.svg?raw';*/
 //import button_link from './icons/button_link.svg?raw';
-import divider from './icons/divider.svg?raw';
+//import divider from './icons/divider.svg?raw';
 //import empty_title from './icons/empty_title.svg?raw';
-import file from './icons/file.svg?raw';
-import notebook from './icons/notebook.svg?raw';
+//import file from './icons/file.svg?raw';
+//import notebook from './icons/notebook.svg?raw';
 //import multi_column from './icons/multi_column.svg?raw';
 //import table_of_content from './icons/table_of_content.svg?raw';
-import table_view from './icons/table_view.svg?raw';
-import tabler_files from './icons/tabler_files.svg?raw';
+//import table_view from './icons/table_view.svg?raw';
+//import tabler_files from './icons/tabler_files.svg?raw';
 //import video from './icons/video.svg?raw';
 import { insertContent, tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
@@ -288,7 +287,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'template',
     action: ({ rootComponent, model }) => {
-      const triggerKey = '/templates/';
+      const triggerKey = '/template/';
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'template');
     },
@@ -303,11 +302,11 @@ export const actionsMenu: MahdaadActionMenu[] = [
   },
 ];
 
-export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
+/*export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
   {
     groupName: t('basic'),
     children: [
-      /*{
+      /!*{
         title: t('text'),
         description: t('normal_text'),
         icon: text,
@@ -315,8 +314,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'text');
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: t('heading_1'),
         description: t('heading_1_description'),
         icon: h1,
@@ -324,8 +323,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h1');
         },
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: t('heading_2'),
         description: t('heading_2_description'),
         icon: h2,
@@ -333,8 +332,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h2');
         },
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: t('heading_3'),
         description: t('heading_3_description'),
         icon: h3,
@@ -342,8 +341,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'h3');
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: t('bulleted_list'),
         description: t('bulleted_list_description'),
         icon: bulleted_list,
@@ -351,8 +350,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'bulleted');
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: t('numbered_list'),
         description: t('numbered_list_description'),
         icon: numbered_list,
@@ -360,8 +359,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'numbered');
         },
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: t('check_list'),
         description: t('check_list_description'),
         icon: check_list,
@@ -369,8 +368,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:list', 'todo');
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: t('quote'),
         description: t('quote_description'),
         icon: quote,
@@ -378,8 +377,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:paragraph', 'quote');
         },
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Hint',
         description: 'Description',
         icon: hint,
@@ -408,27 +407,27 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             .run();
 
         },
-      }*/
+      }*!/
     ],
   },
   {
     groupName: 'Insert',
     children: [
-      /* {
+      /!* {
         title: t('mention'),
         description: t('mention_description'),
         icon: mention,
         key: 'mention',
 
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: t('date'),
         description: t('date_description'),
         icon: date,
         key: 'date',
 
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Today',
         description: 'Description',
         icon: today,
@@ -436,13 +435,13 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           const date = new Date();
           insertContent(rootComponent.host, model, formatDate(date));
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Link To Page',
         description: 'Description',
         icon: link_to_page,
         action: () => {},
-      },*/
+      },*!/
       {
         title: t('table_view'),
         description: t('table_view_description'),
@@ -480,7 +479,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           runCommand(rootComponent, 'affine:divider', 'divider');
         },
       },
-      /*{
+      /!*{
         title: 'Image',
         description: 'Description',
         icon: image,
@@ -523,77 +522,77 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           );
           tryRemoveEmptyLine(model);*!/
         },
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Video',
         description: 'Description',
         icon: video,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Audio',
         description: 'Description',
         icon: audio,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Code',
         description: 'Description',
         icon: code,
         action: ({ rootComponent }) => {
           runCommand(rootComponent, 'affine:code');
         },
-      },*/
+      },*!/
 
-      /*{
+      /!*{
         title: 'Link',
         description: 'Description',
         icon: link,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Table Of Content',
         description: 'Description',
         icon: table_of_content,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Button Link',
         description: 'Description',
         icon: button_link,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Bread Crumb',
         description: 'Description',
         icon: bread_crumb,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Accordion Heading 1',
         description: 'Description',
         icon: accordion_h1,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Accordion Heading 2',
         description: 'Description',
         icon: accordion_h2,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Accordion Heading 3',
         description: 'Description',
         icon: accordion_h3,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Multi Column',
         description: 'Description',
         icon: multi_column,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Link Doc',
         description: 'Description',
         icon: multi_column,
@@ -616,56 +615,56 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             linkedDocWidget.showLinkedDoc(inlineEditor, triggerKey);
           });
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Sketch',
         description: 'Description',
         icon: h1,
         action: ({ rootElement }) => {},
-      },*/
+      },*!/
     ],
   },
   {
     groupName: t('media'),
     children: [
-      /* {
+      /!* {
         title: t('attachment'),
         description: t('attachment_description'),
         icon: file,
         key: 'attachment',
 
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Title ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Title  ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Title   ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Title     ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Title         ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'figma',
         description: 'Description',
         icon: empty_title,
@@ -683,8 +682,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           );
           tryRemoveEmptyLine(model);
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'simple',
         description: 'simple',
         icon: empty_title,
@@ -710,8 +709,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             })
             .run();
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Embed',
         description: 'Description',
         icon: h1,
@@ -764,7 +763,7 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: h1,
         action: ({ rootElement }) => {},
-      },*/
+      },*!/
     ],
   },
   {
@@ -821,37 +820,37 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           openObjectPicker(rootComponent, model, 'tag');
         },
       },
-      /* {
+      /!* {
         title: 'Title ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Title  ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Title   ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'Title     ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Title         ',
         description: 'Description',
         icon: empty_title,
         action: () => {},
-      },*/
-      /* {
+      },*!/
+      /!* {
         title: 'figma',
         description: 'Description',
         icon: empty_title,
@@ -869,8 +868,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
           );
           tryRemoveEmptyLine(model);
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'simple',
         description: 'simple',
         icon: empty_title,
@@ -896,8 +895,8 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
             })
             .run();
         },
-      },*/
-      /*{
+      },*!/
+      /!*{
         title: 'Embed',
         description: 'Description',
         icon: h1,
@@ -950,10 +949,10 @@ export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [
         description: 'Description',
         icon: h1,
         action: ({ rootElement }) => {},
-      },*/
+      },*!/
     ],
   },
-];
+];*/
 
 function openObjectPicker(
   rootComponent: RootBlockComponent,

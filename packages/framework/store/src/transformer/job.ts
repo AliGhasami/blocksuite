@@ -175,7 +175,7 @@ export class Job {
     try {
       BlockSnapshotSchema.parse(snapshot);
       const model = await this._snapshotToBlock(snapshot, doc, parent, index);
-
+      //console.log('this is model', model);
       return model;
     } catch (error) {
       console.error(`Error when transforming snapshot to block:`);
@@ -195,6 +195,7 @@ export class Job {
       const doc = this._collection.createDoc({ id: meta.id });
       doc.load();
       await this.snapshotToBlock(blocks, doc);
+      //console.log('10000');
       this._slots.afterImport.emit({
         type: 'page',
         snapshot,
@@ -293,6 +294,8 @@ export class Job {
   };
 
   constructor({ collection, middlewares = [] }: JobConfig) {
+    //console.log('8888888');
+    //debugger;
     this._collection = collection;
     this._assetsManager = new AssetsManager({ blob: collection.blobSync });
 
@@ -421,7 +424,7 @@ export class Job {
       assets: this._assetsManager,
       children,
     });
-    //console.log('this is modelData', modelData);
+    // console.log('this is modelData', modelData);
 
     doc.addBlock(
       modelData.flavour as BlockSuite.Flavour,

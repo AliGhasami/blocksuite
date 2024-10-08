@@ -76,6 +76,10 @@ export class ParagraphBlockService<
       this.referenceNodeConfig
     );
     this.inlineManager.registerSpecs(inlineSpecs);
+    /*this.inlineManager.registerSpecs(
+      this.inlineManager.specs.filter(item => item.name != 'mention')
+    );*/
+    //console.log('11111', this.inlineManager.specs);
     this.inlineManager.registerMarkdownMatches(affineInlineMarkdownMatches);
   }
 }

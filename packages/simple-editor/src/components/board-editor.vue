@@ -1,9 +1,7 @@
 <template>
   <div>
-    <!--    <div style="width: 450px">
-      <mahdaad-date-picker :onChange="handleChange" :time="null" date=""></mahdaad-date-picker>
-    </div>-->
-<!--    {{ props.locale }}-->
+<!--    <Button @click="handleClick">change schema</Button>-->
+<!--    {{ schemas.length }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -15,18 +13,19 @@ import '@blocksuite/presets/themes/affine.css'
 import { PageEditor, EdgelessEditor } from '@blocksuite/presets'
 import { createEmptyDoc } from './helpers'
 import { type BlockModel, Doc, DocCollection, Job } from '@blocksuite/store'
-import { onMounted, ref, watch } from 'vue'
-import { replaceIdMiddleware } from '@blocksuite/blocks'
+import { computed, onMounted, ref, watch } from "vue";
+import { AffineSchemas, replaceIdMiddleware,toolsList } from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next';
 import { initLitI18n } from 'lit-i18n';
 
 const refEditor = ref<HTMLElement | null>(null)
-let currentDocument: Doc | null = null
+const currentDocument  = ref<Doc | null>(null)
+const editorElement=ref<EdgelessEditor | PageEditor |null>(null)
+const isEmpty=ref<boolean>(false)
 let myCollection: DocCollection | null = null
 window.$blockEditor = {}
-
 
 interface Props {
   isBoardView?: boolean
@@ -36,6 +35,7 @@ interface Props {
   apiToken?: string
   readonly ?:boolean,
   locale?:'fa' | 'en'
+  disableTools?:string[]
 }
 
 type IBlockChange =
@@ -62,7 +62,8 @@ const props = withDefaults(defineProps<Props>(), {
   isBoardView: false,
   readonly:false,
   mentionUserList: () => [],
-  locale:'en'
+  locale:'en',
+  disableTools:()=>[]
 })
 
 i18next.use(initLitI18n).init({
@@ -82,10 +83,42 @@ const emit = defineEmits<{
 
 
 
+const schemas=computed(()=>{
+  const temp=props.disableTools.map(item=> toolsList[item])
+  return AffineSchemas.filter(item=> !temp.includes(item.model.flavour))
+})
+
+
+/*function handleClick(){
+  //console.log("editor",editor.specs);
+  //editorElement.value = new PageEditor()
+  const temp= editorElement.value.specs.filter(item=> item.schema.model.flavour!='affine:mahdaad-object')
+  //affine:page
+  console.log("1111",temp);
+  //console.log("2222",temp);
+  editorElement.value.specs = temp
+  //editorElement.value.doc=currentDocument.value
+  //appendTODOM(editorElement.value)
+  //editorElement.value?.doc.clear()
+  //editorElement.value.doc= currentDocument.value
+  //editorElement.value?.updateComplete
+  //console.log("111",editorElement.value);
+  //console.log("1111",currentDocument.value);
+  //editorElement.value.doc= currentDocument.value
+  //currentDocument.value?.
+ // appendTODOM(editorElement.value)
+}*/
+
+
+watch(
+  () => props.isBoardView,
+  () => {
+    init()
+  }
+)
 
 watch(()=>props.locale,()=>{
   i18next.changeLanguage(props.locale)
- // console.log("this is change language",props.locale);
 },{immediate:true})
 
 watch(
@@ -110,7 +143,7 @@ watch(
 
 async function getData() {
   if (myCollection) {
-    return await exportData(myCollection, [currentDocument])
+    return await exportData(myCollection, [currentDocument.value])
   }
   return null
 }
@@ -120,33 +153,33 @@ watch(()=>props.readonly,()=>{
 },{immediate:true})
 
 function checkReadOnly(){
-  if(currentDocument){
-    currentDocument.awarenessStore.setReadonly(currentDocument.blockCollection, props.readonly);
+  if(currentDocument.value){
+    currentDocument.value.awarenessStore.setReadonly(currentDocument.value.blockCollection, props.readonly);
   }
 }
 
 
 async function setData(data: any,clear_history?: boolean = true) {
   if (myCollection) {
-    //const editor = new PageEditor();
-    let editor = null
     if (props.isBoardView) {
-      editor = new EdgelessEditor()
+      editorElement.value = new EdgelessEditor()
     } else {
-      editor = new PageEditor()
+      editorElement.value = new PageEditor()
     }
     const job = new Job({ collection: myCollection, middlewares: [replaceIdMiddleware] })
     const new_doc = await job.snapshotToDoc(data)
     bindEvent(new_doc)
-    editor.doc = new_doc
-    currentDocument = new_doc
+    editorElement.value.doc = new_doc
+    currentDocument.value = new_doc
+
+    checkIsEmpty()
     if(clear_history){
       new_doc?.resetHistory()
     }
-    appendTODOM(editor)
-    checkNotEmptyDocBlock(currentDocument)
+    appendTODOM(editorElement.value)
+    //debugger
+    checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
-
   }
 }
 
@@ -156,8 +189,8 @@ function reset() {
 
 function bindEvent(doc: Doc) {
   doc.slots.blockUpdated.on((data) => {
-    //console.log("this is event",data);
     checkNotEmptyDocBlock(doc)
+    checkIsEmpty()
     emit('change', data)
     if (data.type == 'add') {
       if(data.flavour=='affine:mahdaad-object'){
@@ -170,7 +203,6 @@ function bindEvent(doc: Doc) {
       if(data.flavour=='affine:mahdaad-object'){
         emit('deleteObjectLink',data)
       }
-      //checkNotEmptyDocBlock(doc)
       emit('deleteBlock', data)
     }
     if (data.type == 'update') emit('updateBlock', data)
@@ -178,7 +210,9 @@ function bindEvent(doc: Doc) {
 }
 
 function checkNotEmptyDocBlock(doc: Doc) {
+  //debugger
   const noteList = doc.getBlockByFlavour('affine:note')
+
   const note = noteList.length ? noteList[0] : null
   if (note) {
     if(note.children.length == 0
@@ -188,6 +222,9 @@ function checkNotEmptyDocBlock(doc: Doc) {
       (note.children.length>0 && note.children[note.children.length-1].flavour=='affine:paragraph' &&  note.children[note.children.length-1].text?.length!=0)
     ){
       doc.addBlock('affine:paragraph', {}, note)
+      /*nextTick(()=>{
+      })*/
+      //doc.addBlock('affine:paragraph', {}, note)
     }
   }
 }
@@ -202,12 +239,7 @@ function appendTODOM(element: HTMLElement) {
   }
 }
 
-watch(
-  () => props.isBoardView,
-  () => {
-    init()
-  }
-)
+
 
 /**
  * @deprecated
@@ -221,44 +253,29 @@ watch(
 )*/
 
 function init() {
-  const { doc, collection } = createEmptyDoc(props.isBoardView).init()
+  const { doc, collection } = createEmptyDoc(props.isBoardView,schemas.value).init()
   myCollection = collection
-  currentDocument = doc
-  //myNoteId=noteId
-  let editor = null
+  currentDocument.value = doc
   if (props.isBoardView) {
-    editor = new EdgelessEditor()
+    editorElement.value = new EdgelessEditor()
   } else {
-    editor = new PageEditor()
+    editorElement.value = new PageEditor()
   }
-  editor.doc = doc
-
-  appendTODOM(editor)
+  editorElement.value.doc =  doc
+  checkIsEmpty()
+  appendTODOM(editorElement.value)
   checkReadOnly()
   bindEvent(doc)
-  //updateMentionList()
 }
 
 async function exportData(collection: DocCollection, docs: any[]) {
   const job = new Job({ collection })
-  //job.snapshotToDoc()
   const snapshots = await Promise.all(docs.map(job.docToSnapshot))
   if (snapshots.length > 0) {
     return snapshots[0]
-    //return Object.assign(snapshots[0].blocks, { id: null })
   }
   return null
 }
-
-/**
- * @deprecated
- */
-/*function updateMentionList() {
-  const root = currentDocument?.getBlocksByFlavour('affine:page')
-  if (root && root.length > 0) {
-    currentDocument?.updateBlock(root[0].model, { mentionUserList: props.mentionUserList })
-  }
-}*/
 
 function setFocus() {
   if (refEditor.value) {
@@ -269,25 +286,30 @@ function setFocus() {
   }
 }
 
-function isEmpty(){
-  const noteList =currentDocument.getBlockByFlavour('affine:note')
+function checkIsEmpty(){
+  let res=true
+  const noteList =currentDocument.value.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
   if (note) {
-    for (const child of note.children) {
-      if(child.flavour!='affine:paragraph')
-        return  false
-      else
-      {
-        if(child.text?.length!=0)
-          return false
-      }
+    const children=note.children
+    if(children.length > 1){
+      res=false
+    }
+    else if(children.length>0){
+        const first=children[0]
+        if(first.flavour!='affine:paragraph'){
+          res=false
+        }else{
+          if(first.text?.length!=0)
+            res=false
+        }
     }
   }else{
-    return  false
+    res=false
   }
-  return true
+  isEmpty.value= res
+  return  res
 }
-
 
 onMounted(async () => {
   init()
@@ -298,7 +320,9 @@ defineExpose({
   setData,
   setFocus,
   reset,
-  isEmpty
+  isEmpty,
+  doc:currentDocument,
+  checkIsEmpty
 })
 </script>
 
@@ -384,7 +408,7 @@ defineExpose({
   }*/
 
   /* Hint Style */
-  .affine-hint-container {
+  /*.affine-hint-container {
     &,
     & .affine-hint {
       border-radius: @roundness-lg;
@@ -444,7 +468,7 @@ defineExpose({
         @apply text-gray-7;
       }
     }
-  }
+  }*/
 
   /* reset Style */
   .affine-paragraph-block-container {
@@ -550,7 +574,7 @@ defineExpose({
 }
 
 /* slash Menu Style */
-.@{prefix}-slash-menu {
+/*.@{prefix}-slash-menu {
   .icon {
     width: 32px;
     height: 32px;
@@ -588,7 +612,7 @@ defineExpose({
       //background: #f4f4f5;
     }
   }
-}
+}*/
 
 /* Mention menu Style */
 /*.@{prefix}-mention-menu-container {

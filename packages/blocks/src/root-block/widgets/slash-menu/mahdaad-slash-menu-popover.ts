@@ -16,6 +16,7 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
+import { toolsList } from '../../../_common/mahdaad/toolsList.js';
 import { type MahdaadActionMenu, actionsMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
 
@@ -58,6 +59,35 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   private get _query() {
     return getQuery(this.inlineEditor, this._startIndex) || '';
+  }
+
+  _toolsList() {
+    const keys = Array.from(
+      this.context.model.doc.schema.flavourSchemaMap.keys()
+    );
+    //console.log('22222', keys[0]);
+    const tools = Object.entries(toolsList); //Object.values(toolsList);
+    /* console.log('1111', tools);
+    console.log(
+      'this is config',
+      Array.from(this.context.model.doc.schema.flavourSchemaMap.keys())
+    );*/
+    const list: string[] = [];
+    /*keys.forEach((key) => {
+      const item=tools.find(i=>i[1]==key)
+      if(item){
+        list.push()
+      }
+    })*/
+    //const a= keys.filter(item=> )
+    tools.forEach(item => {
+      const temp = keys.find(i => i == item[1]);
+      if (temp) {
+        list.push(item[0]);
+      }
+    });
+    //console.log('this is list', list);
+    return list;
   }
 
   override connectedCallback() {
@@ -125,6 +155,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   }
 
   override render() {
+    //this._toolsList();
     const slashMenuStyles = this._position
       ? {
           transform: `translate(${this._position.x}, ${this._position.y})`,
@@ -145,6 +176,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       >
         <mahdaad-slash-menu
           search-text="${this._searchText}"
+          .tools-list="${this._toolsList()}"
           .inline-editor="${this.inlineEditor}"
           @select="${(event: CustomEvent) => {
             const key = event.detail;

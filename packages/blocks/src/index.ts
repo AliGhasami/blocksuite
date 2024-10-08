@@ -63,6 +63,7 @@ export {
 } from './_common/inline/presets/affine-inline-specs.js';
 export { ReferenceNodeConfig } from './_common/inline/presets/nodes/reference-node/reference-config.js';
 export { AffineReference } from './_common/inline/presets/nodes/reference-node/reference-node.js';
+export { toolsList } from './_common/mahdaad/toolsList.js';
 export { type TreeNode, type TreeNodeWithId } from './_common/mind-map/draw.js';
 export * from './_common/test-utils/test-utils.js';
 export {

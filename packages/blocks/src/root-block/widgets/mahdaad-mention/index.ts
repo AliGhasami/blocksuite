@@ -111,15 +111,35 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
     if (!triggerKey || !this.config.triggerKeys.includes(triggerKey)) return;
     const textSelection = this.host.selection.find('text');
     if (!textSelection) return;
-
+    //console.log('22222', this.host, this.service);
     const block = this.host.doc.getBlock(textSelection.blockId);
-    assertExists(block);
+    //console.log('30000', this.doc.getBlocksByFlavour('affine:paragraph'));
+    //const service = this.std.spec.getService(this.model.flavour);
+    //this.console.log('3333', service?.inlineManager);
+    /*console.log(
+      '55555',
+      this.host.querySelector('affine-paragraph')?.inlineManager
+    );*/
 
+    assertExists(block);
     const { model } = block;
 
     if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
 
+    const paragraphService = this.host.std.spec.getService('affine:paragraph');
+    assertExists(paragraphService);
+    if (
+      !paragraphService.inlineManager.specs.some(item => item.name == 'mention')
+    ) {
+      return;
+    }
+    /*console.log(
+      '99999',
+      this.host.std.spec.getService('affine:paragraph')?.inlineManager
+    );*/
+
     const inlineEditor = getInlineEditorByModel(this.host, model);
+    console.log('111', inlineEditor);
     if (!inlineEditor) return;
     const text = inlineEditor.yTextString;
     if (text) {

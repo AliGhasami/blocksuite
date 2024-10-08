@@ -13,6 +13,7 @@ import { EmbedLinkedDocBlockSpec } from '../embed-linked-doc-block/embed-linked-
 import { EmbedLoomBlockSpec } from '../embed-loom-block/embed-loom-spec.js';
 import { EmbedSyncedDocBlockSpec } from '../embed-synced-doc-block/embed-synced-doc-spec.js';
 import { EmbedYoutubeBlockSpec } from '../embed-youtube-block/embed-youtube-spec.js';
+
 import { HintBlockSpec } from '../hint-block/hint-block-spec.js';
 /** disable for claytap */
 //import { ImageBlockSpec } from '../image-block/image-spec.js';

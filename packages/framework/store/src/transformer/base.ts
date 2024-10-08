@@ -57,7 +57,7 @@ export class BaseBlockTransformer<Props extends object = object> {
     const { flavour, id, version, props: _props } = json;
 
     const props = this._propsFromSnapshot(_props);
-
+    //console.log('props', props);
     return {
       id,
       flavour,

@@ -64,7 +64,6 @@ export class PageEditor extends WithDisposable(ShadowlessElement) {
 
   override render() {
     if (!this.doc.root) return nothing;
-
     return html`
       <div
         class=${this.hasViewport

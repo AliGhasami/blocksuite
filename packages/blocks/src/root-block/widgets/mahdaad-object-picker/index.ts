@@ -148,7 +148,6 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     //const triggerKey = event.data;
     //console.log('1111', triggerKey);
     //if (!triggerKey || !this.config.triggerKeys.includes(triggerKey)) return;
-
     const textSelection = this.host.selection.find('text');
     if (!textSelection) return;
 
@@ -156,6 +155,9 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     assertExists(block);
 
     const { model } = block;
+    if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
+      return;
+    }
 
     if (matchFlavours(model, this.options.ignoreBlockTypes)) return;
 
@@ -250,7 +252,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
         type: 'tag',
       },
       {
-        word: '/Templates/',
+        word: '/Template/',
         type: 'template',
       },
     ],
@@ -259,7 +261,6 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
      * Convert trigger key to primary key (the first item of the trigger keys)
      */
     convertTriggerKey: true,
-
     //getMenus,
   };
 

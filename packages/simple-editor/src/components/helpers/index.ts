@@ -1,9 +1,11 @@
-import { AffineSchemas } from '@blocksuite/blocks/schemas'
-import { DocCollection, Schema, Text } from '@blocksuite/store'
-export function createEmptyDoc(isBoard: boolean = false) {
+//import { AffineSchemas } from '@blocksuite/blocks/schemas'
+import { type BlockSchema, DocCollection, Schema, Text } from "@blocksuite/store";
+import type { z } from "zod";
+export function createEmptyDoc(isBoard: boolean = false,schemas: z.infer<typeof BlockSchema>[]=[]) {
   //console.log('AffineSchemas', AffineSchemas);
   //AffineSchemas
-  const schema = new Schema().register(AffineSchemas)
+  //AffineSchemas
+  const schema = new Schema().register(schemas)
   //console.log("this is schema",schema)
   const collection = new DocCollection({ schema })
   //console.log("11111",collection);

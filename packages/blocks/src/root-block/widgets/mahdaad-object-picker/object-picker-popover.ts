@@ -54,6 +54,10 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   }
 
   addObjectLink(model: BlockModel, lnk: ObjectLink) {
+    //console.log('111', model.doc.getSchemaByFlavour('affine:mahdaad-object'));
+    if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
+      return;
+    }
     const temp = model.doc.addSiblingBlocks(this.model, [
       {
         flavour: 'affine:mahdaad-object',
@@ -83,7 +87,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     // console.log('11111', this._searchText);
     try {
       //todo fix trigger key ali ghasami dynamic
-      const trigger = '/templates/';
+      const trigger = '/template/';
       const text = this._searchText ? trigger + this._searchText : trigger;
       // console.log('this is text', text);
       cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
@@ -137,7 +141,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   async insertTemplate(data: any) {
     //debugger;
-    console.log('this is data', data);
+    // console.log('this is data', data);
     if (!data.context) return;
     const content = JSON.parse(data.context);
     ///console.log('14141444', content);
