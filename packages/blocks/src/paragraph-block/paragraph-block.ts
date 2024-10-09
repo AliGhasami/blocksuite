@@ -47,6 +47,23 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     super.connectedCallback();
     bindContainerHotkey(this);
 
+    /*this.addEventListener('keydown', e => {
+      console.log('888888');
+      e.preventDefault();
+      //e.stopPropagation();
+    });
+    this.addEventListener('keypress', e => {
+      console.log('888888');
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    this.addEventListener('keyup', e => {
+      console.log('keyup');
+      e.preventDefault();
+      e.stopPropagation();
+    });*/
+
     this._inlineRangeProvider = getInlineRangeProvider(this);
 
     this._displayPlaceholder = computed(() => {
@@ -134,6 +151,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     return html`
       <div class="affine-paragraph-block-container">
         <div class="affine-paragraph-rich-text-wrapper claytap-${type$.value}">
+          <!--  <textarea></textarea>-->
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
