@@ -12,8 +12,8 @@
 import '@blocksuite/presets/themes/affine.css'
 import { PageEditor, EdgelessEditor } from '@blocksuite/presets'
 import { createEmptyDoc } from './helpers'
-import { type BlockModel, Doc, DocCollection, Job } from '@blocksuite/store'
-import { computed, onMounted, ref, watch } from "vue";
+import { type BlockModel, Doc, DocCollection, Job } from "@blocksuite/store";
+import { computed, onMounted, ref, toRaw, unref, watch } from "vue";
 import { AffineSchemas, replaceIdMiddleware,toolsList } from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
@@ -89,14 +89,44 @@ const schemas=computed(()=>{
 })
 
 
-/*function handleClick(){
+function handleClick(){
+  /*************************/
+  //currentDocument.value?.addBlock
+  //const { doc } = window;
+  /*const rootId = doc.addBlock('affine:page', {
+    title: new doc.Text(),
+  });*/
+  //const note =  doc.addBlock('affine:note', {}, rootId);
+  //debugger
+  const doc=unref(toRaw(currentDocument.value))
+  //console.log("currentDocument",currentDocument.value);
+  //console.log("this is temp",temp);
+  const noteList = doc.getBlockByFlavour('affine:note')
+  const note = noteList.length ? noteList[0] : null
+  console.log("note",note);
+  if(note){
+    const delta = [
+      { insert: ' ', attributes: { date:{
+            date: '2024/05/06',
+            time: null,
+            id: '111111',
+          } } },
+      { insert: '2', attributes: { bold: true, underline: true } },
+      { insert: '3', attributes: { bold: true, code: true } },
+    ];
+    const text =  doc.Text.fromDelta(delta);
+    //note
+    doc.addBlock('affine:paragraph', { text },note.id );
+  }
+  /*******************************/
   //console.log("editor",editor.specs);
   //editorElement.value = new PageEditor()
-  const temp= editorElement.value.specs.filter(item=> item.schema.model.flavour!='affine:mahdaad-object')
+//  const temp= editorElement.value.specs.filter(item=> item.schema.model.flavour!='affine:mahdaad-object')
   //affine:page
-  console.log("1111",temp);
+//  console.log("1111",temp);
   //console.log("2222",temp);
-  editorElement.value.specs = temp
+//  editorElement.value.specs = temp
+
   //editorElement.value.doc=currentDocument.value
   //appendTODOM(editorElement.value)
   //editorElement.value?.doc.clear()
@@ -107,7 +137,7 @@ const schemas=computed(()=>{
   //editorElement.value.doc= currentDocument.value
   //currentDocument.value?.
  // appendTODOM(editorElement.value)
-}*/
+}
 
 
 watch(
@@ -171,13 +201,11 @@ async function setData(data: any,clear_history?: boolean = true) {
     bindEvent(new_doc)
     editorElement.value.doc = new_doc
     currentDocument.value = new_doc
-
     checkIsEmpty()
     if(clear_history){
       new_doc?.resetHistory()
     }
     appendTODOM(editorElement.value)
-    //debugger
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
   }

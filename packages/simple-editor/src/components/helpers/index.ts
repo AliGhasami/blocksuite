@@ -35,6 +35,16 @@ export function createEmptyDoc(isBoard: boolean = false,schemas: z.infer<typeof 
         if (!isBoard) {
           const noteId = doc.addBlock('affine:note', {}, rootId)
           doc.addBlock('affine:paragraph', {}, noteId)
+          /*********************************/
+         /* const delta = [
+            { insert: '1', attributes: { bold: true, italic: true } },
+            { insert: '2', attributes: { bold: true, underline: true } },
+            { insert: '3', attributes: { bold: true, code: true } },
+          ];*/
+         // const text =  doc.Text.fromDelta(delta);
+          //note
+         // doc.addBlock('affine:paragraph', {text },noteId);
+          /********************************/
           //doc.updateBlock(,{})
          /* doc.addBlock('affine:mahdaad-object', {}, noteId)
           doc.addBlock('affine:mahdaad-object', {}, noteId)
