@@ -72,6 +72,7 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
               const temp = {
                 date: event.detail[0],
                 time: event.detail[1],
+                meta: event.detail[2],
               };
 
               const format = this.inlineEditor.getFormat(inlineRange);

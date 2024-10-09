@@ -36,6 +36,7 @@ export class AffineDateTime extends ShadowlessElement {
         <mahdaad-date-time
           date="${this.delta.attributes?.date?.date}"
           time="${this.delta.attributes?.date?.time}"
+          meta="${this.delta.attributes?.date?.meta}"
         ></mahdaad-date-time>
       </span>
       <v-text .str=${this.delta.insert}></v-text>

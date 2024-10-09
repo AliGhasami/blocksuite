@@ -15,6 +15,7 @@ export interface DateTimeEvent {
   id?: string;
   time: string | null;
   date: string;
+  meta?: any;
 }
 
 export interface AffineTextAttributes {
@@ -160,6 +161,7 @@ export function getAffineInlineSpecsWithReference(
           time: z.string().nullable(),
           date: z.string(),
           id: z.string().optional(),
+          meta: z.any().optional(),
         })
         .optional()
         .nullable()
