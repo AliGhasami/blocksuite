@@ -169,7 +169,6 @@ export function getAffineInlineSpecsWithReference(
         return !!delta.attributes?.date;
       },
       renderer: delta => {
-        console.log('2222', referenceNodeConfig, delta);
         return html`<affine-date-time .delta=${delta}></affine-date-time>`;
       },
       embed: true,

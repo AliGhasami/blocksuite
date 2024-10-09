@@ -10,11 +10,11 @@ export const styles = css`
     position: absolute;
   }
 
-  ${unsafeCSS(`.${Prefix}-date-time-popover`)} ${unsafeCSS(
+  /*${unsafeCSS(`.${Prefix}-date-time-popover`)} ${unsafeCSS(
     `.${Prefix}-popover-container`
   )} {
     width: 450px;
-  }
+  }*/
 
   ${scrollbarStyle(`${Prefix}-mention-popover .group`)}
 `;
