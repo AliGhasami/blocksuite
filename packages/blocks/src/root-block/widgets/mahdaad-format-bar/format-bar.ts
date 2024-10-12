@@ -49,6 +49,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
   //private _placement: Placement = 'top';
 
   //static override styles = formatBarStyle;
+  private _target: EventTarget | null = null;
 
   private _calculatePlacement() {
     const rootComponent = this.block;
@@ -320,6 +321,13 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     );
     if (readonly) return false;
 
+    if (this._target) {
+      const target = this._target as HTMLElement;
+      if (Object.hasOwn(target.dataset, 'inlineIgnoreInput')) {
+        return false;
+      }
+    }
+
     if (
       this.displayType === 'block' &&
       this._selectedBlocks?.[0]?.flavour === 'affine:surface-ref'
@@ -345,6 +353,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
       return false;
     }
 
+    //console.log('20000', this._selectedBlocks);
     // if the selection is on an embed (ex. linked page), we should not display the format bar
     if (this.displayType === 'text' && this._selectedBlocks.length === 1) {
       const isEmbed = () => {
@@ -533,6 +542,14 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
       e.preventDefault();
     });
 
+    this._disposables.addFromEvent(document, 'mousedown', e => {
+      this._target = e.target;
+    });
+
+    this._disposables.addFromEvent(document, 'keydown', e => {
+      this._target = e.target;
+    });
+
     this._disposables.addFromEvent(this, 'mousedown', e => {
       e.stopPropagation();
       e.preventDefault();
@@ -596,14 +613,11 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
         }}"
         @changeColor="${(event: CustomEvent) => {
           const styles = event.detail;
-          //console.log('1111', styles);
-          //alert('1111');
           const payload: {
             styles: AffineTextAttributes;
           } = {
             styles,
           };
-          //console.log('payload', payload);
           this.std.command
             .chain()
             .try(chain => [
