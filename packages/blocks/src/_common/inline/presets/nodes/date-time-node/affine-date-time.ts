@@ -34,6 +34,7 @@ export class AffineDateTime extends ShadowlessElement {
     return html`<span>
       <span class="${Prefix}-date-time" data-event-id="${this.id}">
         <mahdaad-date-time
+          readonly="${this.blockElement.doc.readonly}"
           date="${this.delta.attributes?.date?.date}"
           time="${this.delta.attributes?.date?.time}"
           meta="${this.delta.attributes?.date?.meta}"
