@@ -192,7 +192,7 @@ export class PageRootBlockComponent extends BlockComponent<
 
     this.bindHotKey({
       'Mod-a': () => {
-        const blocks = this.model.children
+        /* const blocks = this.model.children
           .filter(model => {
             if (matchFlavours(model, ['affine:note'])) {
               const note = model as NoteBlockModel;
@@ -210,7 +210,8 @@ export class PageRootBlockComponent extends BlockComponent<
               });
             });
           });
-        this.std.selection.setGroup('note', blocks);
+        this.std.selection.setGroup('note', blocks);*/
+        this.selectAllBlock();
         return true;
       },
       ArrowUp: () => {
@@ -401,6 +402,27 @@ export class PageRootBlockComponent extends BlockComponent<
     return html`
       <div class="affine-page-root-block-container">${content} ${widgets}</div>
     `;
+  }
+
+  selectAllBlock() {
+    const blocks = this.model.children
+      .filter(model => {
+        if (matchFlavours(model, ['affine:note'])) {
+          const note = model as NoteBlockModel;
+          if (note.displayMode === NoteDisplayMode.EdgelessOnly) return false;
+
+          return true;
+        }
+        return false;
+      })
+      .flatMap(model => {
+        return model.children.map(child => {
+          return this.std.selection.create('block', {
+            blockId: child.id,
+          });
+        });
+      });
+    this.std.selection.setGroup('note', blocks);
   }
 
   get rootScrollContainer() {

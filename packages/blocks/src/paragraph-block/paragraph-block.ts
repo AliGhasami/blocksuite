@@ -90,14 +90,15 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       if (paragraphList.length == 1) {
         isEmpty = true;
       }
-
+      // console.log('11111');
       if (
         this.doc.readonly ||
         (this.inlineEditor?.yTextLength ?? 0) > 0 ||
         this.inlineEditor?.isComposing ||
         (!this.selected && !isEmpty) || //!this.selected //&& !isEmpty
         //!isCollapsed ||
-        this._isInDatabase()
+        this._isInDatabase() ||
+        this.selection.value.length > 1
       ) {
         return false;
       }
