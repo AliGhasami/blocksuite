@@ -13,7 +13,7 @@ import '@blocksuite/presets/themes/affine.css'
 import { PageEditor, EdgelessEditor } from '@blocksuite/presets'
 import { createEmptyDoc } from './helpers'
 import { type BlockModel, Doc, DocCollection, Job } from "@blocksuite/store";
-import { computed, onMounted, ref, toRaw, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
 import { AffineSchemas, replaceIdMiddleware,toolsList } from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
@@ -339,9 +339,34 @@ function checkIsEmpty(){
   return  res
 }
 
+
+function handleSelectAll(event : Event) {
+  // Check if Ctrl (or Cmd on macOS) is pressed along with the 'A' key
+  if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+    const target = event.target as HTMLElement
+    if (!target.closest('page-editor')) {
+      const temp = document.querySelectorAll('page-editor:not(page-editor page-editor):not(.ignore-select page-editor)')
+      if (temp.length > 0) {
+        const pageRoot = temp[temp.length - 1].querySelector('affine-page-root')
+        if (pageRoot) {
+          event.preventDefault()
+          pageRoot.selectAllBlock()
+        }
+      }
+    }
+  }
+}
+
+
 onMounted(async () => {
   init()
+  document.addEventListener('keydown', handleSelectAll);
 })
+
+onUnmounted(()=>{
+  document.removeEventListener('keydown', handleSelectAll)
+})
+
 
 defineExpose({
   getData,
