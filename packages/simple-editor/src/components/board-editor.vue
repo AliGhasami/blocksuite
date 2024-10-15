@@ -38,7 +38,7 @@ import {
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
   IndexedDBBlobSource,
-  IndexedDBDocSource
+  IndexedDBDocSource,
 } from "@blocksuite/sync";
 import { WebSocketDocSource } from "@blocksuite/playground/apps/_common/sync/websocket/doc";
 import { WebSocketAwarenessSource } from "@blocksuite/playground/apps/_common/sync/websocket/awareness";
@@ -396,7 +396,8 @@ function handleSelectAll(event : Event) {
 
 async function init2() {
  // console.log("5555");
-  const BASE_WEBSOCKET_URL= 'wss://collab.claytap.com'
+  const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL= 'wss://collab.claytap.com'
   const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
   const schema = new Schema();
   schema.register(AffineSchemas);
@@ -407,7 +408,6 @@ async function init2() {
   };
   let awarenessSources: DocCollectionOptions['awarenessSources'];
   const room = params.get('room');
-  console.log(11111,room);
   if (room) {
     const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
     await new Promise((resolve, reject) => {
@@ -415,9 +415,9 @@ async function init2() {
       ws.addEventListener('error', reject);
     })
       .then(() => {
-        console.log("10000");
-        docSources = {
-          main: new IndexedDBDocSource(),
+       // console.log("10000");
+       docSources = {
+          main: new IndexedDBDocSource('test1'),
           shadows: [new WebSocketDocSource(ws)],
         };
         awarenessSources = [new WebSocketAwarenessSource(ws)];
@@ -432,7 +432,7 @@ async function init2() {
         ];
       });
   }
-  console.log(666);
+  //console.log(666);
   const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
     [...params.entries()]
       .filter(([key]) => key.startsWith('enable_'))
@@ -443,9 +443,9 @@ async function init2() {
     id: 'quickEdgeless',
     schema,
     idGenerator,
-    blobSources: {
+    /*blobSources: {
       main: new IndexedDBBlobSource('quickEdgeless'),
-    },
+    },*/
     docSources,
     awarenessSources,
     defaultFlags: {
@@ -459,21 +459,21 @@ async function init2() {
   collection.start();
 
   // debug info
-  window.collection = collection;
-  window.blockSchemas = AffineSchemas;
-  window.job = new Job({ collection });
-  window.Y = DocCollection.Y;
-  console.log(7777);
+ // window.collection = collection;
+  //window.blockSchemas = AffineSchemas;
+  //window.job = new Job({ collection });
+  //window.Y = DocCollection.Y;
+  //console.log(7777);
   //return collection;
   /*************************************/
  // return
   //const params = new URLSearchParams(location.search);
   //const params = new URLSearchParams(location.search);
   await collection.waitForSynced();
-  console.log(88888,collection.docs);
+//  console.log(88888,collection.docs);
   const shouldInit = collection.docs.size === 0 && !params.get('room');
   if (shouldInit) {
-    console.log("shouldInit");
+    //console.log("shouldInit");
     collection.meta.initialize();
     const doc = collection.createDoc({ id: 'doc:home' });
     doc.load();
@@ -481,10 +481,10 @@ async function init2() {
       title: new Text(),
     });
     doc.addBlock('affine:surface', {}, rootId);
-    //doc.resetHistory();
-    console.log(8888);
+    doc.resetHistory();
+    //console.log(8888);
   } else {
-    console.log(22222);
+    //console.log(22222);
     // wait for data injected from provider
     const firstPageId =
       collection.docs.size > 0
@@ -492,8 +492,11 @@ async function init2() {
         : await new Promise<string>(resolve =>
           collection.slots.docAdded.once(id => resolve(id))
         );
+    if (!firstPageId) {
+      throw new Error('No first page id found');
+    }
     const doc = collection.getDoc(firstPageId);
-    console.log("9999",doc);
+    //console.log("9999",doc);
     assertExists(doc);
     doc.load();
     // wait for data injected from provider
@@ -501,10 +504,10 @@ async function init2() {
       await new Promise(resolve => doc.slots.rootAdded.once(resolve));
     }
     doc.resetHistory();
-    console.log(99999);
+    //console.log(99999);
   }
 
-  console.log(22222);
+  //console.log(22222);
   /******************************************/
 
 
@@ -534,7 +537,7 @@ async function init2() {
 
     assertExists(doc.ready, 'Doc is not ready');
     assertExists(doc.root, 'Doc root is not ready');
-    console.log("11111");
+    //console.log("11111");
     const app =refEditor.value  //document.getElementById('app');
     if (!app) return;
 
@@ -578,8 +581,8 @@ async function init2() {
 
     //const leftSidePanel = new LeftSidePanel();
 
-    const docsPanel = new DocsPanel();
-    docsPanel.editor = editor;
+    //const docsPanel = new DocsPanel();
+    //docsPanel.editor = editor;
 
     /*const quickEdgelessMenu = new QuickEdgelessMenu();
     quickEdgelessMenu.collection = doc.collection;
@@ -591,9 +594,9 @@ async function init2() {
     //document.body.append(quickEdgelessMenu);
 
     // debug info
-    window.editor = editor;
-    window.doc = doc;
-    Object.defineProperty(globalThis, 'host', {
+    //window.editor = editor;
+    //window.doc = doc;
+    /*Object.defineProperty(globalThis, 'host', {
       get() {
         return document.querySelector<EditorHost>('editor-host');
       },
@@ -602,7 +605,7 @@ async function init2() {
       get() {
         return document.querySelector<EditorHost>('editor-host')?.std;
       },
-    });
+    });*/
 
     return editor;
 
@@ -645,7 +648,7 @@ async function init2() {
 onMounted(async () => {
   init()
   const temp=await init2()
-  console.log("tmep",temp);
+  //console.log("tmep",temp);
   document.addEventListener('keydown', handleSelectAll);
 })
 
