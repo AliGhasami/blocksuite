@@ -128,7 +128,7 @@ export class DocCollection extends DocCollectionAddonType {
       this.awarenessStore.awareness,
       awarenessSources
     );
-    console.log('this doc', this.doc);
+    //console.log('this doc', this.doc);
     this.docSync = new DocEngine(
       this.doc,
       docSources.main,

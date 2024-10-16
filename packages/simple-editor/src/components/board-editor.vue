@@ -174,12 +174,12 @@ function handleClick(){
 }
 
 
-watch(
+/*watch(
   () => props.isBoardView,
   () => {
     init()
   }
-)
+)*/
 
 watch(()=>props.locale,()=>{
   i18next.changeLanguage(props.locale)
@@ -247,7 +247,7 @@ async function setData(data: any,clear_history?: boolean = true) {
 }
 
 function reset() {
-  init()
+ // init()
 }
 
 function bindEvent(doc: Doc) {
@@ -315,9 +315,193 @@ function appendTODOM(element: HTMLElement) {
   { deep: true }
 )*/
 
-function init() {
-  return
-  const { doc, collection } = createEmptyDoc(props.isBoardView,schemas.value).init()
+async function init() {
+  /*******************************************/
+  //console.log('AffineSchemas', AffineSchemas);
+  //AffineSchemas
+  //AffineSchemas
+  const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL= 'wss://collab.claytap.com'
+  const schema = new Schema().register(schemas.value)
+  const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
+
+  const params = new URLSearchParams(location.search);
+  let docSources: DocCollectionOptions['docSources'] = {
+    main: new IndexedDBDocSource(),
+  };
+  let awarenessSources: DocCollectionOptions['awarenessSources'];
+  const room = params.get('room');
+
+  if (room) {
+    const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
+    await new Promise((resolve, reject) => {
+      ws.addEventListener('open', resolve);
+      ws.addEventListener('error', reject);
+    })
+      .then(() => {
+        console.log("the Socket connected");
+        // console.log("10000");
+        docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new WebSocketDocSource(ws)],
+        };
+        awarenessSources = [new WebSocketAwarenessSource(ws)];
+      })
+      .catch(() => {
+        alert('this is catch')
+        /*docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new BroadcastChannelDocSource()],
+        };*/
+        /*awarenessSources = [
+          new BroadcastChannelAwarenessSource('quickEdgeless'),
+        ];*/
+      });
+  }
+
+  //console.log("this is schema",schema)
+  const collection = new DocCollection({
+    id: 'quickEdgeless',
+    schema,
+    //idGenerator,
+    docSources,
+    awarenessSources,
+    defaultFlags: {
+      enable_synced_doc_block: true,
+      enable_pie_menu: true,
+      enable_lasso_tool: true,
+    }, })
+  collection.start();
+  await collection.waitForSynced();
+  //console.log("11111",collection);
+
+  //collection.
+  //collection.
+  console.log("this is collection",collection);
+  let doc=null
+  if(collection.docs.size === 0){
+    // debugger
+    // collection.docs.size === 0
+    collection.meta.initialize()
+    doc = collection.createDoc({ id: 'doc:home' })
+    doc.load();
+    const rootId = doc.addBlock('affine:page', {
+      //userList:['1','2','3','4','5']
+    })
+    doc.addBlock('affine:surface', {}, rootId)
+    //if (!isBoard) {
+      const noteId = doc.addBlock('affine:note', {}, rootId)
+      doc.addBlock('affine:paragraph', {}, noteId)
+    //}
+    doc.resetHistory();
+  }else{
+    //doc=collection.doc.get()
+
+    const firstPageId =
+      collection.docs.size > 0
+        ? collection.docs.keys().next().value
+        : await new Promise<string>(resolve =>
+          collection.slots.docAdded.once(id => resolve(id))
+        );
+    if (!firstPageId) {
+      throw new Error('No first page id found');
+    }
+    doc = collection.getDoc(firstPageId);
+    //console.log("9999",doc);
+    assertExists(doc);
+    doc.load();
+    // wait for data injected from provider
+    if (!doc.root) {
+      await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+    }
+    doc.resetHistory();
+  }
+
+  const blockCollection = collection.docs.values().next()
+    .value as BlockCollection;
+  assertExists(blockCollection, 'Need to create a doc first');
+  doc = blockCollection.getDoc();
+
+  assertExists(doc.ready, 'Doc is not ready');
+  assertExists(doc.root, 'Doc root is not ready');
+
+
+  const app =refEditor.value  //document.getElementById('app');
+  if (!app) return;
+  const editor = new PageEditor();
+  //const editor = new AffineEditorContainer();
+  /*const specs = getExampleSpecs();
+  editor.pageSpecs = [...specs.pageModeSpecs].map(spec => {
+    if (spec.schema.model.flavour === 'affine:page') {
+      spec = patchPageRootSpec(
+        spec as BlockSpec<'affine:page', PageRootService>
+      );
+    }
+    return spec;
+  });
+  editor.edgelessSpecs = [...specs.edgelessModeSpecs].map(spec => {
+    if (spec.schema.model.flavour === 'affine:page') {
+      spec = patchPageRootSpec(
+        spec as BlockSpec<'affine:page', PageRootService>
+      );
+    }
+    return spec;
+  });*/
+
+  editor.doc = doc;
+ /* let editor=null
+  if (props.isBoardView) {
+    //editorElement.value = new EdgelessEditor()
+    editor = new EdgelessEditor()
+  } else {
+    //editorElement.value = new PageEditor()
+    editor = new PageEditor()
+  }
+  editor.doc=doc*/
+  //editorElement.value.doc = doc;
+  //app.append(editor);
+  appendTODOM(editor)
+  //await editor.updateComplete;
+
+
+
+
+  /*function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
+    const setup = spec.setup;
+    const newSpec: typeof spec = {
+      ...spec,
+      setup: (slots, disposable) => {
+        setup?.(slots, disposable);
+        slots.mounted.once(({ service }) => {
+          const pageRootService = service as PageRootService;
+          pageRootService.notificationService =
+            mockNotificationService(pageRootService);
+          pageRootService.quickSearchService =
+            mockQuickSearchService(collection);
+          pageRootService.peekViewService = {
+            peek(target: unknown) {
+              alert('Peek view not implemented in playground');
+              console.log('peek', target);
+              return Promise.resolve();
+            },
+          };
+          pageRootService.docModeService = mockDocModeService(
+            pageRootService.doc.id
+          );
+        });
+      },
+    };
+
+    return newSpec;
+  }*/
+
+  //editorElement.value.doc =  doc
+  /******************************************/
+ // return
+ /* console.log("this is init");
+  const { doc, collection }=await createEmptyDoc(props.isBoardView,schemas.value)
+  console.log("11111",doc,collection);
+  //const { doc, collection } =temp.init()
   myCollection = collection
   currentDocument.value = doc
   if (props.isBoardView) {
@@ -329,7 +513,7 @@ function init() {
   checkIsEmpty()
   appendTODOM(editorElement.value)
   checkReadOnly()
-  bindEvent(doc)
+  bindEvent(doc)*/
 }
 
 async function exportData(collection: DocCollection, docs: any[]) {
@@ -395,6 +579,7 @@ function handleSelectAll(event : Event) {
 
 
 async function init2() {
+  return
  // console.log("5555");
   const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL= 'wss://collab.claytap.com'
@@ -560,6 +745,9 @@ async function init2() {
     });
     editor.doc = doc;
     console.log("editor doc",doc);
+
+
+
    // editor.mode = modeService.getMode();
    /* editor.slots.docLinkClicked.on(({ docId }) => {
       const target = collection.getDoc(docId);
@@ -577,6 +765,8 @@ async function init2() {
     app.append(editor);
     await editor.updateComplete;
     //return
+
+
 
     //const leftSidePanel = new LeftSidePanel();
 
@@ -645,7 +835,8 @@ async function init2() {
 
 
 onMounted(async () => {
-  init()
+  //console.log("5555555555555555555555");
+  await init()
   const temp=await init2()
   //console.log("tmep",temp);
   document.addEventListener('keydown', handleSelectAll);
