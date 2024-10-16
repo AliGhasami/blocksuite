@@ -343,7 +343,7 @@ async function init() {
         // console.log("10000");
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(ws)],
+          //shadows: [new WebSocketDocSource(ws)],
         };
         awarenessSources = [new WebSocketAwarenessSource(ws)];
       })
@@ -373,11 +373,11 @@ async function init() {
     }, })
   collection.start();
   await collection.waitForSynced();
-  //console.log("11111",collection);
+  console.log("this is collection",collection);
 
   //collection.
   //collection.
-  console.log("this is collection",collection);
+  //console.log("this is collection",collection);
   let doc=null
   if(collection.docs.size === 0){
     // debugger

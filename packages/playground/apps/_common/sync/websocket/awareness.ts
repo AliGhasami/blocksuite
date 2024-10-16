@@ -13,6 +13,7 @@ type AwarenessChanges = Record<'added' | 'updated' | 'removed', number[]>;
 
 export class WebSocketAwarenessSource implements AwarenessSource {
   private _onAwareness = (changes: AwarenessChanges, origin: unknown) => {
+    console.log('_onAwareness');
     if (origin === 'remote') return;
 
     const changedClients = Object.values(changes).reduce((res, cur) =>
@@ -33,6 +34,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
   };
 
   private _onWebSocket = (event: MessageEvent<string>) => {
+    console.log('_onWebSocket');
     const data = JSON.parse(event.data) as WebSocketMessage;
 
     if (data.channel !== 'awareness') return;
@@ -65,6 +67,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
   constructor(readonly ws: WebSocket) {}
 
   connect(awareness: Awareness): void {
+    console.log('awareness connect');
     this.awareness = awareness;
     awareness.on('update', this._onAwareness);
 
