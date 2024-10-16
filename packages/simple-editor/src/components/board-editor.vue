@@ -415,21 +415,23 @@ async function init2() {
       ws.addEventListener('error', reject);
     })
       .then(() => {
+        console.log("the Socket connected");
        // console.log("10000");
        docSources = {
-          main: new IndexedDBDocSource('test1'),
+          main: new IndexedDBDocSource(),
           shadows: [new WebSocketDocSource(ws)],
         };
         awarenessSources = [new WebSocketAwarenessSource(ws)];
       })
       .catch(() => {
-        docSources = {
+        alert('this is catch')
+        /*docSources = {
           main: new IndexedDBDocSource(),
           shadows: [new BroadcastChannelDocSource()],
-        };
-        awarenessSources = [
+        };*/
+        /*awarenessSources = [
           new BroadcastChannelAwarenessSource('quickEdgeless'),
-        ];
+        ];*/
       });
   }
   //console.log(666);
@@ -446,7 +448,7 @@ async function init2() {
     /*blobSources: {
       main: new IndexedDBBlobSource('quickEdgeless'),
     },*/
-    docSources,
+   docSources,
     awarenessSources,
     defaultFlags: {
       enable_synced_doc_block: true,
@@ -457,7 +459,6 @@ async function init2() {
   };
   const collection = new DocCollection(options);
   collection.start();
-
   // debug info
  // window.collection = collection;
   //window.blockSchemas = AffineSchemas;
@@ -473,7 +474,7 @@ async function init2() {
 //  console.log(88888,collection.docs);
   const shouldInit = collection.docs.size === 0 && !params.get('room');
   if (shouldInit) {
-    //console.log("shouldInit");
+    console.log("shouldInit");
     collection.meta.initialize();
     const doc = collection.createDoc({ id: 'doc:home' });
     doc.load();
@@ -484,7 +485,7 @@ async function init2() {
     doc.resetHistory();
     //console.log(8888);
   } else {
-    //console.log(22222);
+    console.log(22222);
     // wait for data injected from provider
     const firstPageId =
       collection.docs.size > 0
@@ -509,8 +510,6 @@ async function init2() {
 
   //console.log(22222);
   /******************************************/
-
-
   //part 3
   /***********************************************/
 
@@ -526,8 +525,6 @@ async function init2() {
         service.setMode(docMode);
       }
     }
-
-
 
     //return
     const blockCollection = collection.docs.values().next()
@@ -562,16 +559,18 @@ async function init2() {
       return spec;
     });
     editor.doc = doc;
+    console.log("editor doc",doc);
    // editor.mode = modeService.getMode();
-    editor.slots.docLinkClicked.on(({ docId }) => {
+   /* editor.slots.docLinkClicked.on(({ docId }) => {
       const target = collection.getDoc(docId);
       if (!target) {
         throw new Error(`Failed to jump to doc ${docId}`);
       }
       target.load();
       editor.doc = target;
-    });
+    });*/
     editor.slots.docUpdated.on(({ newDocId }) => {
+      console.log("docUpdated");
       editor.mode = modeService.getMode(newDocId);
     });
 
