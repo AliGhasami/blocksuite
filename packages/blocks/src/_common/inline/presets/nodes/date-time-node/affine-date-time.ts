@@ -34,6 +34,7 @@ export class AffineDateTime extends ShadowlessElement {
     return html`<span>
       <span class="${Prefix}-date-time" data-event-id="${this.id}">
         <mahdaad-date-time
+          @change=${this.selfUpdate}
           readonly="${this.blockElement.doc.readonly}"
           date="${this.delta.attributes?.date?.date}"
           time="${this.delta.attributes?.date?.time}"
@@ -43,6 +44,16 @@ export class AffineDateTime extends ShadowlessElement {
       <v-text .str=${this.delta.insert}></v-text>
       <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
     </span>`;
+  }
+
+  selfUpdate(event){
+    const date = event?.detail;
+    if (date && typeof date === 'object') {
+      const format = this.inlineEditor.getFormat(this.selfInlineRange);
+      if (format && format.date && format.date.id)
+        Object.assign(date, { id: format.date.id });
+      this.inlineEditor.formatText(this.selfInlineRange, { date });
+    }
   }
 
   get blockElement() {
