@@ -51,7 +51,7 @@ import {
 import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
 import type { BlockSpec, EditorHost } from "@blocksuite/block-std";
 //import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
-import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
+//import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
 //import { QuickEdgelessMenu } from "@blocksuite/playground/apps/_common/components/quick-edgeless-menu";
 
 const refEditor = ref<HTMLElement | null>(null)
@@ -223,15 +223,16 @@ function checkReadOnly(){
 }
 
 //todo fix ali ghasami
-
 async function setData(data: any,clear_history?: boolean = true) {
-  debugger
+  console.log("this is data",data);
+  //debugger
   /******************************************/
  // indexedDB.deleteDatabase('blocksuite-local')
   //return
   //debugger
   const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL= 'wss://sence.misdc.com'
+  //const BASE_WEBSOCKET_URL= 'ws://localhost:8080'
   const schema = new Schema().register(schemas.value)
   const params = new URLSearchParams(location.search);
   let docSources: DocCollectionOptions['docSources'] = {
@@ -281,9 +282,25 @@ async function setData(data: any,clear_history?: boolean = true) {
   console.log("200000",myCollection);
   myCollection.start();
   await myCollection.waitForSynced();
-  //myCollection.meta.initialize()
 
-  let doc=null
+  myCollection.meta.initialize()
+  const doc_id=data.meta.id
+  console.log("111111",myCollection);
+  //debugger
+  //const temp= myCollection.docs.get(doc_id)
+  myCollection.docs.delete(doc_id)
+  //console.log("this is temp",temp);
+  //myCollection.docs.delete(0)
+  //debugger
+  /*if(myCollection.get(doc_id)){
+    debugger
+  }*/
+  const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
+  const doc = await job.snapshotToDoc(data)
+  //doc.load();
+  console.log("1111",doc);
+
+  /*let doc=null
   if(myCollection.docs.size === 0){
     // debugger
     // collection.docs.size === 0
@@ -293,7 +310,7 @@ async function setData(data: any,clear_history?: boolean = true) {
     doc = await job.snapshotToDoc(data)
     doc.resetHistory();
     //console.log("this is doc",new_doc);
-    /*doc = myCollection.createDoc({ id: 'doc:home' })
+    /!*doc = myCollection.createDoc({ id: 'doc:home' })
     doc.load();
     const rootId = doc.addBlock('affine:page', {
       //userList:['1','2','3','4','5']
@@ -303,7 +320,7 @@ async function setData(data: any,clear_history?: boolean = true) {
     const noteId = doc.addBlock('affine:note', {}, rootId)
     doc.addBlock('affine:paragraph', {}, noteId)
     //}
-    doc.resetHistory();*/
+    doc.resetHistory();*!/
   }else{
     //doc=collection.doc.get()
 
@@ -325,8 +342,8 @@ async function setData(data: any,clear_history?: boolean = true) {
       await new Promise(resolve => doc.slots.rootAdded.once(resolve));
     }
     doc.resetHistory();
-  }
-  console.log("this is doc",doc);
+  }*/
+  console.log("this is doc",doc.id);
   /******************************************/
   //return
   //debugger
