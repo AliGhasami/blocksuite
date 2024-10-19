@@ -222,30 +222,142 @@ function checkReadOnly(){
   }
 }
 
+//todo fix ali ghasami
 
 async function setData(data: any,clear_history?: boolean = true) {
-  return
+  debugger
+  /******************************************/
+ // indexedDB.deleteDatabase('blocksuite-local')
+  //return
+  //debugger
+  const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL= 'wss://sence.misdc.com'
+  const schema = new Schema().register(schemas.value)
+  const params = new URLSearchParams(location.search);
+  let docSources: DocCollectionOptions['docSources'] = {
+    main: new IndexedDBDocSource(),
+  };
+  let awarenessSources: DocCollectionOptions['awarenessSources'];
+  const room = params.get('room');
+  if (room) {
+    const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
+    //console.log("1111",`${BASE_WEBSOCKET_URL}?r=${room}&u=1`);
+    //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=1`); //new URL(`?r=${room}&u=1`, BASE_WEBSOCKET_URL)
+    await new Promise((resolve, reject) => {
+      ws.addEventListener('open', resolve);
+      ws.addEventListener('error', reject);
+    })
+      .then(() => {
+        console.log("the Socket connected");
+        // console.log("10000");
+        docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new WebSocketDocSource(ws)],
+        };
+        awarenessSources = [new WebSocketAwarenessSource(ws)];
+      })
+      .catch(() => {
+        alert('this is catch')
+        /*docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new BroadcastChannelDocSource()],
+        };*/
+        /*awarenessSources = [
+          new BroadcastChannelAwarenessSource('quickEdgeless'),
+        ];*/
+      });
+  }
+  myCollection = new DocCollection({
+    id: 'quickEdgeless',
+    schema,
+    //idGenerator,
+    docSources,
+    awarenessSources,
+    defaultFlags: {
+      enable_synced_doc_block: true,
+      enable_pie_menu: true,
+      enable_lasso_tool: true,
+    }, })
+  console.log("200000",myCollection);
+  myCollection.start();
+  await myCollection.waitForSynced();
+  //myCollection.meta.initialize()
+
+  let doc=null
+  if(myCollection.docs.size === 0){
+    // debugger
+    // collection.docs.size === 0
+    myCollection.meta.initialize()
+    const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
+    //console.log("this is data",data);
+    doc = await job.snapshotToDoc(data)
+    doc.resetHistory();
+    //console.log("this is doc",new_doc);
+    /*doc = myCollection.createDoc({ id: 'doc:home' })
+    doc.load();
+    const rootId = doc.addBlock('affine:page', {
+      //userList:['1','2','3','4','5']
+    })
+    doc.addBlock('affine:surface', {}, rootId)
+    //if (!isBoard) {
+    const noteId = doc.addBlock('affine:note', {}, rootId)
+    doc.addBlock('affine:paragraph', {}, noteId)
+    //}
+    doc.resetHistory();*/
+  }else{
+    //doc=collection.doc.get()
+
+    const firstPageId =
+      myCollection.docs.size > 0
+        ? myCollection.docs.keys().next().value
+        : await new Promise<string>(resolve =>
+          myCollection.slots.docAdded.once(id => resolve(id))
+        );
+    if (!firstPageId) {
+      throw new Error('No first page id found');
+    }
+    doc = myCollection.getDoc(firstPageId);
+    //console.log("9999",doc);
+    assertExists(doc);
+    doc.load();
+    // wait for data injected from provider
+    if (!doc.root) {
+      await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+    }
+    doc.resetHistory();
+  }
+  console.log("this is doc",doc);
+  /******************************************/
+  //return
+  //debugger
+  //console.log("30000");
   if (myCollection) {
-    if (props.isBoardView) {
+    /*if (props.isBoardView) {
       editorElement.value = new EdgelessEditor()
     } else {
       editorElement.value = new PageEditor()
-    }
-    const job = new Job({ collection: myCollection, middlewares: [replaceIdMiddleware] })
-    const new_doc = await job.snapshotToDoc(data)
-    bindEvent(new_doc)
-    editorElement.value.doc = new_doc
-    currentDocument.value = new_doc
-    checkIsEmpty()
-    if(clear_history){
+    }*/
+    editorElement.value = new PageEditor()
+    //console.log("1111",myCollection);
+   // const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
+    //console.log("this is data",data);
+    //const new_doc = await job.snapshotToDoc(data)
+    //console.log("this is doc",new_doc);
+    //debugger
+    bindEvent(doc)
+    editorElement.value.doc = doc
+    currentDocument.value = doc
+   // checkIsEmpty()
+    /*if(clear_history){
       new_doc?.resetHistory()
-    }
+    }*/
     appendTODOM(editorElement.value)
-    checkNotEmptyDocBlock(currentDocument.value)
-    checkReadOnly()
+   // checkNotEmptyDocBlock(currentDocument.value)
+    //checkReadOnly()
   }
 }
 
+//todo back ali ghasami
 function reset() {
  // init()
 }
@@ -316,14 +428,18 @@ function appendTODOM(element: HTMLElement) {
 )*/
 
 async function init() {
+ // debugger
+  return
+  console.log("10000");
   /*******************************************/
   //console.log('AffineSchemas', AffineSchemas);
   //AffineSchemas
   //AffineSchemas
   const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
+  //wss://sence.misdc.com
   //const BASE_WEBSOCKET_URL= 'wss://collab.claytap.com'
   const schema = new Schema().register(schemas.value)
-  const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
+  //const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
 
   const params = new URLSearchParams(location.search);
   let docSources: DocCollectionOptions['docSources'] = {
@@ -343,7 +459,7 @@ async function init() {
         // console.log("10000");
         docSources = {
           main: new IndexedDBDocSource(),
-          //shadows: [new WebSocketDocSource(ws)],
+          shadows: [new WebSocketDocSource(ws)],
         };
         awarenessSources = [new WebSocketAwarenessSource(ws)];
       })
@@ -360,7 +476,7 @@ async function init() {
   }
 
   //console.log("this is schema",schema)
-  const collection = new DocCollection({
+   myCollection = new DocCollection({
     id: 'quickEdgeless',
     schema,
     //idGenerator,
@@ -371,19 +487,20 @@ async function init() {
       enable_pie_menu: true,
       enable_lasso_tool: true,
     }, })
-  collection.start();
-  await collection.waitForSynced();
-  console.log("this is collection",collection);
+  console.log("200000",myCollection);
+  myCollection.start();
+  await myCollection.waitForSynced();
+  //console.log("this is collection",collection);
 
   //collection.
   //collection.
   //console.log("this is collection",collection);
   let doc=null
-  if(collection.docs.size === 0){
+  if(myCollection.docs.size === 0){
     // debugger
     // collection.docs.size === 0
-    collection.meta.initialize()
-    doc = collection.createDoc({ id: 'doc:home' })
+    myCollection.meta.initialize()
+    doc = myCollection.createDoc({ id: 'doc:home' })
     doc.load();
     const rootId = doc.addBlock('affine:page', {
       //userList:['1','2','3','4','5']
@@ -398,15 +515,15 @@ async function init() {
     //doc=collection.doc.get()
 
     const firstPageId =
-      collection.docs.size > 0
-        ? collection.docs.keys().next().value
+      myCollection.docs.size > 0
+        ? myCollection.docs.keys().next().value
         : await new Promise<string>(resolve =>
-          collection.slots.docAdded.once(id => resolve(id))
+          myCollection.slots.docAdded.once(id => resolve(id))
         );
     if (!firstPageId) {
       throw new Error('No first page id found');
     }
-    doc = collection.getDoc(firstPageId);
+    doc = myCollection.getDoc(firstPageId);
     //console.log("9999",doc);
     assertExists(doc);
     doc.load();
@@ -417,7 +534,7 @@ async function init() {
     doc.resetHistory();
   }
 
-  const blockCollection = collection.docs.values().next()
+  const blockCollection = myCollection.docs.values().next()
     .value as BlockCollection;
   assertExists(blockCollection, 'Need to create a doc first');
   doc = blockCollection.getDoc();
@@ -428,7 +545,7 @@ async function init() {
 
   const app =refEditor.value  //document.getElementById('app');
   if (!app) return;
-  const editor = new PageEditor();
+  editorElement.value = new PageEditor();
   //const editor = new AffineEditorContainer();
   /*const specs = getExampleSpecs();
   editor.pageSpecs = [...specs.pageModeSpecs].map(spec => {
@@ -448,7 +565,7 @@ async function init() {
     return spec;
   });*/
 
-  editor.doc = doc;
+  editorElement.value.doc = doc;
  /* let editor=null
   if (props.isBoardView) {
     //editorElement.value = new EdgelessEditor()
@@ -460,7 +577,7 @@ async function init() {
   editor.doc=doc*/
   //editorElement.value.doc = doc;
   //app.append(editor);
-  appendTODOM(editor)
+  appendTODOM(editorElement.value)
   //await editor.updateComplete;
 
 

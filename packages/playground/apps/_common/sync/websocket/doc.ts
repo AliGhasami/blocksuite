@@ -7,13 +7,14 @@ import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private _onMessage = (event: MessageEvent<string>) => {
-    debugger;
-    console.log('this is on message web socket');
+    //debugger;
+    //console.log('this is on message web socket');
     const data = JSON.parse(event.data) as WebSocketMessage;
     // console.log('this is data', data);
     if (data.channel !== 'doc') return;
+    //debugger;
     if (data.payload.type === 'init') {
-      console.log('this is doc map', this.docMap);
+      //console.log('this is doc map', this.docMap);
       for (const [docId, data] of this.docMap) {
         this.ws.send(
           JSON.stringify({
@@ -30,11 +31,18 @@ export class WebSocketDocSource implements DocSource {
     }
 
     const { docId, updates } = data.payload;
+    //debugger;
     const update = this.docMap.get(docId);
+    //debugger;
     if (update) {
+      //debugger
+      console.log('this is recive update');
+      console.log('this is doc map', this.docMap);
+      //debugger;
       //console.log('this is update', update);
       //console.log('this is updates', new Uint8Array(updates));
       this.docMap.set(docId, mergeUpdates([update, new Uint8Array(updates)]));
+      //console.log("1111");
     } else {
       this.docMap.set(docId, new Uint8Array(updates));
     }
@@ -45,7 +53,7 @@ export class WebSocketDocSource implements DocSource {
   name = 'websocket';
 
   constructor(readonly ws: WebSocket) {
-    debugger;
+    // debugger;
     this.ws.addEventListener('message', this._onMessage);
 
     this.ws.send(
@@ -59,7 +67,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   pull(docId: string, state: Uint8Array) {
-    debugger;
+    // debugger;
     console.log('this is web socket pull');
     const update = this.docMap.get(docId);
     if (!update) return null;
@@ -69,7 +77,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   push(docId: string, data: Uint8Array) {
-    debugger;
+    //debugger;
     console.log('this is web socket push');
     const update = this.docMap.get(docId);
     if (update) {
@@ -93,13 +101,13 @@ export class WebSocketDocSource implements DocSource {
   }
 
   subscribe(cb: (docId: string, data: Uint8Array) => void) {
-    debugger;
+    // debugger;
     console.log('this is web socket subscribe');
     const abortController = new AbortController();
     this.ws.addEventListener(
       'message',
       (event: MessageEvent<string>) => {
-        debugger;
+        //debugger;
         const data = JSON.parse(event.data) as WebSocketMessage;
 
         if (data.channel !== 'doc' || data.payload.type !== 'update') return;
