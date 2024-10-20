@@ -280,15 +280,23 @@ async function setData(data: any,clear_history?: boolean = true) {
       enable_lasso_tool: true,
     }, })
   console.log("200000",myCollection);
-  myCollection.start();
-  await myCollection.waitForSynced();
 
-  myCollection.meta.initialize()
-  const doc_id=data.meta.id
-  console.log("111111",myCollection);
+ // myCollection.start();
+  //await myCollection.waitForSynced();
+
+  //const doc_id=data.meta.id
+  //console.log("111111",myCollection);
+
   //debugger
   //const temp= myCollection.docs.get(doc_id)
-  myCollection.docs.delete(doc_id)
+  //debugger
+
+  //myCollection.docs.delete(doc_id)
+  //myCollection.start();
+  //await myCollection.waitForSynced();
+
+  myCollection.meta.initialize()
+
   //console.log("this is temp",temp);
   //myCollection.docs.delete(0)
   //debugger
@@ -299,6 +307,8 @@ async function setData(data: any,clear_history?: boolean = true) {
   const doc = await job.snapshotToDoc(data)
   //doc.load();
   console.log("1111",doc);
+  myCollection.start();
+  await myCollection.waitForSynced();
 
   /*let doc=null
   if(myCollection.docs.size === 0){
