@@ -227,24 +227,24 @@ async function setData(data: any,clear_history?: boolean = true) {
   console.log("this is data",data);
   //debugger
   /******************************************/
- // indexedDB.deleteDatabase('blocksuite-local')
+  indexedDB.deleteDatabase('blocksuite-local')
   //return
-  //debugger
-  //const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
+ // debugger
+  const BASE_WEBSOCKET_URL= 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL= 'wss://sence.misdc.com'
-  const BASE_WEBSOCKET_URL= 'ws://localhost:8080'
+  //const BASE_WEBSOCKET_URL= 'ws://localhost:8080'
   const schema = new Schema().register(schemas.value)
   const params = new URLSearchParams(location.search);
   let docSources: DocCollectionOptions['docSources'] = {
     main: new IndexedDBDocSource(),
   };
   let awarenessSources: DocCollectionOptions['awarenessSources'];
-  //const room = params.get('room');
-  const room = params.get('id');
+  const room = params.get('room');
+  //const room = params.get('id');
   if (room) {
-    //const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
+    const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
     //console.log("1111",`${BASE_WEBSOCKET_URL}?r=${room}&u=1`);
-    const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=1`); //new URL(`?r=${room}&u=1`, BASE_WEBSOCKET_URL)
+    //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=1`); //new URL(`?r=${room}&u=1`, BASE_WEBSOCKET_URL)
     await new Promise((resolve, reject) => {
       ws.addEventListener('open', resolve);
       ws.addEventListener('error', reject);
@@ -256,7 +256,7 @@ async function setData(data: any,clear_history?: boolean = true) {
           main: new IndexedDBDocSource(),
            shadows: [new WebSocketDocSource(ws)],
         };
-        awarenessSources = [new WebSocketAwarenessSource(ws)];
+       awarenessSources = [new WebSocketAwarenessSource(ws)];
       })
       .catch(() => {
         alert('this is catch')
@@ -282,11 +282,14 @@ async function setData(data: any,clear_history?: boolean = true) {
     }, })
   //console.log("200000",);
   const doc_id=data.meta.id
-  //debugger
-
+ // doc.resetHistory();
   myCollection.start();
   await myCollection.waitForSynced();
+  //debugger
 
+//  myCollection.start();
+ // await myCollection.waitForSynced();
+ // debugger
   //await myCollection.importDocSnapshot(data,doc_id)
   //myCollection.
 
@@ -301,7 +304,8 @@ async function setData(data: any,clear_history?: boolean = true) {
   //debugger
 
 
-
+ // myCollection.start();
+ // await myCollection.waitForSynced();
   //console.log("111111",myCollection);
 
   //debugger
@@ -334,22 +338,50 @@ async function setData(data: any,clear_history?: boolean = true) {
   let doc=null
   /*************************/
   if(myCollection.docs.size === 0){
+   // debugger
     console.log("88888888888888");
+    myCollection.meta.initialize()
     // debugger
     // collection.docs.size === 0
-    myCollection.meta.initialize()
-    doc = myCollection.createDoc({ id: 'doc:home' })
+    /*myCollection.meta.initialize()
+    const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
+    await job.snapshotToDoc(data)
+    myCollection.start();
+    await myCollection.waitForSynced();
+    //doc.load();
+    //doc.resetHistory();
+
+    const firstPageId =
+      myCollection.docs.size > 0
+        ? myCollection.docs.keys().next().value
+        : await new Promise<string>(resolve =>
+          myCollection.slots.docAdded.once(id => resolve(id))
+        );
+    if (!firstPageId) {
+      throw new Error('No first page id found');
+    }
+
+    doc = myCollection.getDoc(firstPageId);
+    //console.log("9999",doc);
+    assertExists(doc);
+    doc.load();
+    // wait for data injected from provider
+    if (!doc.root) {
+      await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+    }
+    doc.resetHistory();*/
+    myCollection.start();
+    await myCollection.waitForSynced();
+    doc = myCollection.createDoc({ id: 'doc:home3' })
     doc.load();
     const rootId = doc.addBlock('affine:page', {
-      //userList:['1','2','3','4','5']
     })
     doc.addBlock('affine:surface', {}, rootId)
-    //if (!isBoard) {
     const noteId = doc.addBlock('affine:note', {}, rootId)
     doc.addBlock('affine:paragraph', {}, noteId)
-    //}
     doc.resetHistory();
   }else{
+    debugger
     //doc=collection.doc.get()
     console.log("9999999999999");
     const firstPageId =
@@ -370,6 +402,7 @@ async function setData(data: any,clear_history?: boolean = true) {
       await new Promise(resolve => doc.slots.rootAdded.once(resolve));
     }
     doc.resetHistory();
+
   }
 
   //const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
@@ -446,6 +479,7 @@ async function setData(data: any,clear_history?: boolean = true) {
     //const new_doc = await job.snapshotToDoc(data)
     //console.log("this is doc",new_doc);
     //debugger
+    console.log("111111",doc)
     bindEvent(doc)
     editorElement.value.doc = doc
     currentDocument.value = doc

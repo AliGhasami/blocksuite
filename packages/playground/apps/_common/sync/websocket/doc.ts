@@ -7,7 +7,6 @@ import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private _onMessage = (event: MessageEvent<string>) => {
-    debugger;
     //console.log('this is on message web socket');
     const data = JSON.parse(event.data) as WebSocketMessage;
     // console.log('this is data', data);
@@ -29,7 +28,6 @@ export class WebSocketDocSource implements DocSource {
       }
       return;
     }
-
     const { docId, updates } = data.payload;
     //debugger;
     const update = this.docMap.get(docId);
@@ -57,17 +55,17 @@ export class WebSocketDocSource implements DocSource {
   name = 'websocket';
 
   constructor(readonly ws: WebSocket) {
-     debugger;
+    //  debugger;
     this.ws.addEventListener('message', this._onMessage);
 
-    this.ws.send(
+    /*this.ws.send(
       JSON.stringify({
         channel: 'doc',
         payload: {
           type: 'init',
         },
       } satisfies WebSocketMessage)
-    );
+    );*/
   }
 
   pull(docId: string, state: Uint8Array) {
