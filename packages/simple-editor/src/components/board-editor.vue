@@ -97,7 +97,6 @@ function handleClick(){
     title: new doc.Text(),
   });*/
   //const note =  doc.addBlock('affine:note', {}, rootId);
-  //debugger
   const doc=unref(toRaw(currentDocument.value))
   //console.log("currentDocument",currentDocument.value);
   //console.log("this is temp",temp);
@@ -238,7 +237,6 @@ function bindEvent(doc: Doc) {
 }
 
 function checkNotEmptyDocBlock(doc: Doc) {
-  //debugger
   const noteList = doc.getBlockByFlavour('affine:note')
 
   const note = noteList.length ? noteList[0] : null

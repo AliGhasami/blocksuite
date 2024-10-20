@@ -100,7 +100,6 @@ const refEditor = ref(null)
 const userMentionList = ref<any[]>([{ id: '1', name: 'test 1' }])
 async function handleGetData() {
   //console.log("1111",refEditor?.value.instance.getData());
-  //debugger
   //const temp=  await refEditor?.value?.getData()
   const temp = await refEditor?.value.getData()
   console.log('this is temp', temp)

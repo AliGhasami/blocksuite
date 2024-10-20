@@ -294,8 +294,6 @@ export class Job {
   };
 
   constructor({ collection, middlewares = [] }: JobConfig) {
-    //console.log('8888888');
-    //debugger;
     this._collection = collection;
     this._assetsManager = new AssetsManager({ blob: collection.blobSync });
 

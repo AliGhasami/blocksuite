@@ -266,7 +266,6 @@ export class Clipboard {
   constructor(public std: BlockSuite.Std) {}
 
   private async _getClipboardItem(slice: Slice, type: string) {
-    //debugger;
     const job = this._getJob();
     const adapterItem = this._adapterMap.get(type);
     if (!adapterItem) {

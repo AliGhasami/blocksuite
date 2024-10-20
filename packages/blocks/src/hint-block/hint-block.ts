@@ -87,7 +87,6 @@ export class HintBlockComponent extends BlockComponent<HintBlockModel> {
     /*this.bindHotkey({
       'Mod-b': () => {},
       'Alt-Space': () => {
-        //debugger;
       },
     });*/
     //this._inlineRangeProvider = getInlineRangeProvider(this);
@@ -109,7 +108,6 @@ export class HintBlockComponent extends BlockComponent<HintBlockModel> {
           inputRule: {
             key: 'q',
             handler: context => {
-              debugger
               console.log('this is 1000');
               return KEYBOARD_ALLOW_DEFAULT;
             },
@@ -126,7 +124,6 @@ export class HintBlockComponent extends BlockComponent<HintBlockModel> {
             inputRule: {
               key: 'q',
               handler: context => {
-                debugger
                 console.log('this is 1000');
                 return KEYBOARD_ALLOW_DEFAULT;
               },
@@ -157,7 +154,6 @@ export class HintBlockComponent extends BlockComponent<HintBlockModel> {
         /*descriptionInlineEditor?.eventSource.addEventListener(
           'keydown',
           (e: KeyboardEvent) => {
-            //debugger;
             /!*if (e.key === 'Enter' && e.shiftKey) {
               console.log('bbbbbbb');
               e.preventDefault();

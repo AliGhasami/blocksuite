@@ -342,8 +342,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1
       '@mahdaad/block-editor':
-        specifier: ^0.6.11
-        version: 0.6.11(@types/node@20.14.2)(browserslist@4.23.1)(i18next@23.15.1)(lightningcss@1.25.1)(lit-html@3.2.0)(rollup@2.79.2)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.47)(rollup@2.79.2)(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)))(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))(vue@3.5.12(typescript@5.4.5))
+        specifier: workspace:*
+        version: link:../simple-editor
       '@mahdaad/bounty-theme':
         specifier: 0.0.15
         version: 0.0.15
@@ -2762,11 +2762,6 @@ packages:
 
   '@lit/reactive-element@2.0.4':
     resolution: {integrity: sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ==}
-
-  '@mahdaad/block-editor@0.6.11':
-    resolution: {integrity: sha512-tXM5dSwAGaRACUT/kPsk+BjY2PMuKTq9kSxNkT5kFBlaqToyeT9qyDSs3qx+XuOWLJSObH1b7k4PrMvC97vyDQ==}
-    peerDependencies:
-      vue: ^3.0.0
 
   '@mahdaad/bounty-theme@0.0.15':
     resolution: {integrity: sha512-fWmpRSmgQ5tpuLRcV0WLXHoqWnwhby442s3zGQWZA4FgukXoWsSPROuQOwr7l1KmnKmjNhA2MX293fha7q5Xlw==}
@@ -13525,37 +13520,6 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.2.1
 
-  '@mahdaad/block-editor@0.6.11(@types/node@20.14.2)(browserslist@4.23.1)(i18next@23.15.1)(lightningcss@1.25.1)(lit-html@3.2.0)(rollup@2.79.2)(typescript@5.4.5)(unocss@0.60.4(postcss@8.4.47)(rollup@2.79.2)(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)))(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))(vue@3.5.12(typescript@5.4.5))':
-    dependencies:
-      '@mahdaad/tokens': 0.0.36
-      '@unhead/vue': 1.11.6(vue@3.5.12(typescript@5.4.5))
-      '@vueuse/core': 10.11.0(vue@3.5.12(typescript@5.4.5))
-      ant-design-vue: 4.2.3(vue@3.5.12(typescript@5.4.5))
-      dayjs: 1.11.12
-      i18n-js: 4.4.3
-      less: 4.2.0
-      lit-i18n: 4.1.0(i18next@23.15.1)(lit-html@3.2.0)
-      pinia: 2.2.2(typescript@5.4.5)(vue@3.5.12(typescript@5.4.5))
-      radix-vue: 1.9.1(vue@3.5.12(typescript@5.4.5))
-      tippy.js: 6.3.7
-      unocss-preset-autoprefixer: 0.0.7(browserslist@4.23.1)(lightningcss@1.25.1)(unocss@0.60.4(postcss@8.4.47)(rollup@2.79.2)(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)))
-      vite-plugin-dts: 3.9.1(@types/node@20.14.2)(rollup@2.79.2)(typescript@5.4.5)(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))
-      vue: 3.5.12(typescript@5.4.5)
-      vue-router: 4.4.5(vue@3.5.12(typescript@5.4.5))
-      vue3-webcomponent-wrapper: 0.2.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - '@vue/composition-api'
-      - browserslist
-      - i18next
-      - lightningcss
-      - lit-html
-      - rollup
-      - supports-color
-      - typescript
-      - unocss
-      - vite
-
   '@mahdaad/bounty-theme@0.0.15':
     dependencies:
       tailwind-merge: 2.5.3
@@ -13640,37 +13604,11 @@ snapshots:
 
   '@mdit-vue/types@2.1.0': {}
 
-  '@microsoft/api-extractor-model@7.28.13(@types/node@20.14.2)':
-    dependencies:
-      '@microsoft/tsdoc': 0.14.2
-      '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 4.0.2(@types/node@20.14.2)
-    transitivePeerDependencies:
-      - '@types/node'
-
   '@microsoft/api-extractor-model@7.28.13(@types/node@20.16.6)':
     dependencies:
       '@microsoft/tsdoc': 0.14.2
       '@microsoft/tsdoc-config': 0.16.2
       '@rushstack/node-core-library': 4.0.2(@types/node@20.16.6)
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@microsoft/api-extractor@7.43.0(@types/node@20.14.2)':
-    dependencies:
-      '@microsoft/api-extractor-model': 7.28.13(@types/node@20.14.2)
-      '@microsoft/tsdoc': 0.14.2
-      '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 4.0.2(@types/node@20.14.2)
-      '@rushstack/rig-package': 0.5.2
-      '@rushstack/terminal': 0.10.0(@types/node@20.14.2)
-      '@rushstack/ts-command-line': 4.19.1(@types/node@20.14.2)
-      lodash: 4.17.21
-      minimatch: 3.0.8
-      resolve: 1.22.8
-      semver: 7.5.4
-      source-map: 0.6.1
-      typescript: 5.4.2
     transitivePeerDependencies:
       - '@types/node'
 
@@ -14071,17 +14009,6 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.4': {}
 
-  '@rushstack/node-core-library@4.0.2(@types/node@20.14.2)':
-    dependencies:
-      fs-extra: 7.0.1
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.8
-      semver: 7.5.4
-      z-schema: 5.0.5
-    optionalDependencies:
-      '@types/node': 20.14.2
-
   '@rushstack/node-core-library@4.0.2(@types/node@20.16.6)':
     dependencies:
       fs-extra: 7.0.1
@@ -14098,28 +14025,12 @@ snapshots:
       resolve: 1.22.8
       strip-json-comments: 3.1.1
 
-  '@rushstack/terminal@0.10.0(@types/node@20.14.2)':
-    dependencies:
-      '@rushstack/node-core-library': 4.0.2(@types/node@20.14.2)
-      supports-color: 8.1.1
-    optionalDependencies:
-      '@types/node': 20.14.2
-
   '@rushstack/terminal@0.10.0(@types/node@20.16.6)':
     dependencies:
       '@rushstack/node-core-library': 4.0.2(@types/node@20.16.6)
       supports-color: 8.1.1
     optionalDependencies:
       '@types/node': 20.16.6
-
-  '@rushstack/ts-command-line@4.19.1(@types/node@20.14.2)':
-    dependencies:
-      '@rushstack/terminal': 0.10.0(@types/node@20.14.2)
-      '@types/argparse': 1.0.38
-      argparse: 1.0.10
-      string-argv: 0.3.2
-    transitivePeerDependencies:
-      - '@types/node'
 
   '@rushstack/ts-command-line@4.19.1(@types/node@20.16.6)':
     dependencies:
@@ -15155,15 +15066,6 @@ snapshots:
       hookable: 5.5.3
       unhead: 1.11.6
       vue: 3.4.31(typescript@5.4.5)
-
-  '@unhead/vue@1.11.6(vue@3.5.12(typescript@5.4.5))':
-    dependencies:
-      '@unhead/schema': 1.11.6
-      '@unhead/shared': 1.11.6
-      defu: 6.1.4
-      hookable: 5.5.3
-      unhead: 1.11.6
-      vue: 3.5.12(typescript@5.4.5)
 
   '@unocss/astro@0.58.9(rollup@4.22.4)(vite@5.4.7(@types/node@20.16.6)(less@4.2.0)(lightningcss@1.27.0)(terser@5.33.0))':
     dependencies:
@@ -23297,23 +23199,6 @@ snapshots:
       - sugarss
       - supports-color
       - terser
-
-  vite-plugin-dts@3.9.1(@types/node@20.14.2)(rollup@2.79.2)(typescript@5.4.5)(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)):
-    dependencies:
-      '@microsoft/api-extractor': 7.43.0(@types/node@20.14.2)
-      '@rollup/pluginutils': 5.1.2(rollup@2.79.2)
-      '@vue/language-core': 1.8.27(typescript@5.4.5)
-      debug: 4.3.6
-      kolorist: 1.8.0
-      magic-string: 0.30.11
-      typescript: 5.4.5
-      vue-tsc: 1.8.27(typescript@5.4.5)
-    optionalDependencies:
-      vite: 5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
-    transitivePeerDependencies:
-      - '@types/node'
-      - rollup
-      - supports-color
 
   vite-plugin-dts@3.9.1(@types/node@20.16.6)(rollup@4.22.4)(typescript@5.4.5)(vite@5.4.7(@types/node@20.16.6)(less@4.2.0)(lightningcss@1.27.0)(terser@5.33.0)):
     dependencies:
