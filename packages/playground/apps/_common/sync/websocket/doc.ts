@@ -33,6 +33,9 @@ export class WebSocketDocSource implements DocSource {
     const { docId, updates } = data.payload;
     //debugger;
     const update = this.docMap.get(docId);
+    console.log('update', update);
+    console.log('update', this.docMap);
+    console.log('update', docId);
     //debugger;
     if (update) {
       //debugger
@@ -44,6 +47,7 @@ export class WebSocketDocSource implements DocSource {
       this.docMap.set(docId, mergeUpdates([update, new Uint8Array(updates)]));
       //console.log("1111");
     } else {
+      console.log('updates', updates);
       this.docMap.set(docId, new Uint8Array(updates));
     }
   };
@@ -88,6 +92,7 @@ export class WebSocketDocSource implements DocSource {
 
     const latest = this.docMap.get(docId);
     assertExists(latest);
+    console.log('rrrrrrr');
     this.ws.send(
       JSON.stringify({
         channel: 'doc',
