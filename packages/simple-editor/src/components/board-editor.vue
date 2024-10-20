@@ -330,6 +330,7 @@ async function setData(data: any,clear_history?: boolean = true) {
   });
   doc.addBlock('affine:surface', {}, rootId);
   doc.resetHistory();*/
+  //debugger
   let doc=null
   /*************************/
   if(myCollection.docs.size === 0){

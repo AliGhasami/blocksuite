@@ -7,7 +7,7 @@ import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private _onMessage = (event: MessageEvent<string>) => {
-    //debugger;
+    debugger;
     //console.log('this is on message web socket');
     const data = JSON.parse(event.data) as WebSocketMessage;
     // console.log('this is data', data);
@@ -57,7 +57,7 @@ export class WebSocketDocSource implements DocSource {
   name = 'websocket';
 
   constructor(readonly ws: WebSocket) {
-    // debugger;
+     debugger;
     this.ws.addEventListener('message', this._onMessage);
 
     this.ws.send(
