@@ -437,9 +437,6 @@ async function  init3(){
 
 //todo fix ali ghasami
 async function setData(data: any,clear_history?: boolean = true) {
-  init3()
-  return
-
   console.log("this is data",data);
   //debugger
   /******************************************/
@@ -498,7 +495,7 @@ async function setData(data: any,clear_history?: boolean = true) {
     }, })
   //console.log("200000",);
   const doc_id=data.meta.id
-
+ // doc.resetHistory();
   myCollection.start();
   await myCollection.waitForSynced();
  // doc.resetHistory();
@@ -565,13 +562,13 @@ async function setData(data: any,clear_history?: boolean = true) {
     // collection.docs.size === 0
     myCollection.meta.initialize()
     const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
-    await job.snapshotToDoc(data)
+    const doc= await job.snapshotToDoc(data)
     //myCollection.start();
     //await myCollection.waitForSynced();
     //doc.load();
     //doc.resetHistory();
 
-    const firstPageId =
+    /*const firstPageId =
       myCollection.docs.size > 0
         ? myCollection.docs.keys().next().value
         : await new Promise<string>(resolve =>
@@ -580,16 +577,16 @@ async function setData(data: any,clear_history?: boolean = true) {
     if (!firstPageId) {
       throw new Error('No first page id found');
     }
-
-    doc = myCollection.getDoc(firstPageId);
+*/
+  //  doc = myCollection.getDoc(firstPageId);
     //console.log("9999",doc);
-    assertExists(doc);
+    /*assertExists(doc);
     doc.load();
     // wait for data injected from provider
     if (!doc.root) {
       await new Promise(resolve => doc.slots.rootAdded.once(resolve));
     }
-    doc.resetHistory();
+    doc.resetHistory();*/
     //myCollection.start();
     //await myCollection.waitForSynced();
     /*doc = myCollection.createDoc({ id: 'doc:home' })
@@ -600,14 +597,14 @@ async function setData(data: any,clear_history?: boolean = true) {
     const noteId = doc.addBlock('affine:note', {}, rootId)
     doc.addBlock('affine:paragraph', {}, noteId)
     doc.resetHistory();*/
-    myCollection?.waitForSynced()
+    //myCollection?.waitForSynced()
     //myCollection?.importDocSnapshot
 
 
   }else{
     debugger
     //doc=collection.doc.get()
-    console.log("9999999999999");
+    //console.log("9999999999999");
     const firstPageId =
       myCollection.docs.size > 0
         ? myCollection.docs.keys().next().value
@@ -712,8 +709,8 @@ async function setData(data: any,clear_history?: boolean = true) {
     //const new_doc = await job.snapshotToDoc(data)
     //console.log("this is doc",new_doc);
     //debugger
-    console.log("111111",doc)
-   // bindEvent(doc)
+    //console.log("111111",doc)
+    bindEvent(doc)
     console.log("this is original doc",doc);
     //editorElement.value.doc = doc
     //currentDocument.value = doc
