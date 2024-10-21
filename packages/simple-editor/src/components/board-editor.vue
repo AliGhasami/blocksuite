@@ -338,7 +338,7 @@ async function setData(data: any,clear_history?: boolean = true) {
     // debugger
     // collection.docs.size === 0
     myCollection.meta.initialize()
-    doc = myCollection.createDoc({ id: 'doc:home' })
+    doc = myCollection.createDoc({ id: room })
     doc.load();
     const rootId = doc.addBlock('affine:page', {
       //userList:['1','2','3','4','5']
@@ -446,7 +446,7 @@ async function setData(data: any,clear_history?: boolean = true) {
     //const new_doc = await job.snapshotToDoc(data)
     //console.log("this is doc",new_doc);
     //debugger
-    bindEvent(doc)
+   // bindEvent(doc)
     editorElement.value.doc = doc
     currentDocument.value = doc
    // checkIsEmpty()
