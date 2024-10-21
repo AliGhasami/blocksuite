@@ -58,13 +58,12 @@ export class IndexedDBDocSource implements DocSource {
     state: Uint8Array
   ): Promise<{ data: Uint8Array; state?: Uint8Array | undefined } | null> {
     //debugger;
-    console.log('this is db pull ');
     const db = await this.getDb();
     const store = db
       .transaction('collection', 'readonly')
       .objectStore('collection');
     const data = await store.get(docId);
-
+    //return null;
     if (!data) {
       return null;
     }
@@ -79,7 +78,6 @@ export class IndexedDBDocSource implements DocSource {
 
   async push(docId: string, data: Uint8Array): Promise<void> {
     //debugger;
-    console.log('this is sb push ', docId, data);
     const db = await this.getDb();
     const store = db
       .transaction('collection', 'readwrite')
@@ -106,9 +104,7 @@ export class IndexedDBDocSource implements DocSource {
 
   subscribe(cb: (docId: string, data: Uint8Array) => void) {
     //debugger;
-    console.log('this is db subsctibe');
     function onMessage(event: MessageEvent<ChannelMessage>) {
-      //debugger;
       const { type, payload } = event.data;
       if (type === 'db-updated') {
         const { docId, update } = payload;
