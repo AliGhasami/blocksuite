@@ -437,6 +437,8 @@ async function  init3(){
 
 //todo fix ali ghasami
 async function setData(data: any,clear_history?: boolean = true) {
+  //debugger
+  //debugger
   console.log("this is data",data);
   //debugger
   /******************************************/
@@ -463,7 +465,7 @@ async function setData(data: any,clear_history?: boolean = true) {
       ws.addEventListener('error', reject);
     })
       .then(() => {
-        console.log("the Socket connected");
+        //console.log("the Socket connected");
         // console.log("10000");
         docSources = {
           main: new IndexedDBDocSource(),
@@ -482,6 +484,7 @@ async function setData(data: any,clear_history?: boolean = true) {
         ];*/
       });
   }
+ // debugger
   myCollection = new DocCollection({
     id: 'quickEdgeless',
     schema,
@@ -555,14 +558,20 @@ async function setData(data: any,clear_history?: boolean = true) {
 
   /*************************/
   if(myCollection.docs.size === 0){
+  //  debugger
    // debugger
     console.log("88888888888888");
     //myCollection.meta.initialize()
     // debugger
     // collection.docs.size === 0
     myCollection.meta.initialize()
-    const job = new Job({ collection: myCollection }) // middlewares: [replaceIdMiddleware]
-    const doc= await job.snapshotToDoc(data)
+    //const job = new Job({ collection: myCollection , }) // middlewares: [replaceIdMiddleware] middlewares: [replaceIdMiddleware]
+    //doc= await job.snapshotToDoc(data)
+    //doc.load()
+    //doc.resetHistory();
+    //await myCollection.waitForSynced();
+    console.log("mycoll",myCollection);
+    console.log("doc",doc)
     //myCollection.start();
     //await myCollection.waitForSynced();
     //doc.load();
@@ -589,14 +598,14 @@ async function setData(data: any,clear_history?: boolean = true) {
     doc.resetHistory();*/
     //myCollection.start();
     //await myCollection.waitForSynced();
-    /*doc = myCollection.createDoc({ id: 'doc:home' })
+    doc = myCollection.createDoc({ id: 'doc:home' })
     doc.load();
     const rootId = doc.addBlock('affine:page', {
     })
     doc.addBlock('affine:surface', {}, rootId)
     const noteId = doc.addBlock('affine:note', {}, rootId)
     doc.addBlock('affine:paragraph', {}, noteId)
-    doc.resetHistory();*/
+    doc.resetHistory();
     //myCollection?.waitForSynced()
     //myCollection?.importDocSnapshot
 
@@ -710,10 +719,10 @@ async function setData(data: any,clear_history?: boolean = true) {
     //console.log("this is doc",new_doc);
     //debugger
     //console.log("111111",doc)
-    bindEvent(doc)
+    //bindEvent(doc)
     console.log("this is original doc",doc);
     //editorElement.value.doc = doc
-    //currentDocument.value = doc
+   //currentDocument.value = doc
     editor.doc=doc
    // checkIsEmpty()
     /*if(clear_history){
@@ -801,7 +810,7 @@ function appendTODOM(element: HTMLElement) {
 
 async function init() {
  // debugger
- // return
+ return
   //console.log("10000");
   indexedDB.deleteDatabase('blocksuite-local')
   /*******************************************/
@@ -899,7 +908,7 @@ async function init() {
 
   }else{
     //doc=collection.doc.get()
-    debugger
+    //debugger
     console.log("200000",myCollection);
     const firstPageId =
       myCollection.docs.size > 0
