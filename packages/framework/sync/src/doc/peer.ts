@@ -163,6 +163,7 @@ export class SyncPeer {
     throwIfAborted(abort);
 
     if (docData && docData.length > 0) {
+      //console.log('this is connectDoc', doc, docData);
       applyUpdate(doc, docData, 'load');
     }
 

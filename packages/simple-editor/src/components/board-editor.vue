@@ -565,11 +565,11 @@ async function setData(data: any,clear_history?: boolean = true) {
     // debugger
     // collection.docs.size === 0
     myCollection.meta.initialize()
-    //const job = new Job({ collection: myCollection , }) // middlewares: [replaceIdMiddleware] middlewares: [replaceIdMiddleware]
-    //doc= await job.snapshotToDoc(data)
-    //doc.load()
-    //doc.resetHistory();
-    //await myCollection.waitForSynced();
+    const job = new Job({ collection: myCollection , }) // middlewares: [replaceIdMiddleware] middlewares: [replaceIdMiddleware]
+    doc= await job.snapshotToDoc(data)
+    doc.load()
+    doc.resetHistory();
+    await myCollection.waitForSynced();
     console.log("mycoll",myCollection);
     console.log("doc",doc)
     //myCollection.start();
@@ -598,14 +598,14 @@ async function setData(data: any,clear_history?: boolean = true) {
     doc.resetHistory();*/
     //myCollection.start();
     //await myCollection.waitForSynced();
-    doc = myCollection.createDoc({ id: 'doc:home' })
+    /*doc = myCollection.createDoc({ id: 'doc:home' })
     doc.load();
     const rootId = doc.addBlock('affine:page', {
     })
     doc.addBlock('affine:surface', {}, rootId)
     const noteId = doc.addBlock('affine:note', {}, rootId)
     doc.addBlock('affine:paragraph', {}, noteId)
-    doc.resetHistory();
+    doc.resetHistory();*/
     //myCollection?.waitForSynced()
     //myCollection?.importDocSnapshot
 

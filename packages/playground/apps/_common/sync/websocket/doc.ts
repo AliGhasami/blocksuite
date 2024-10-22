@@ -43,17 +43,18 @@ export class WebSocketDocSource implements DocSource {
   constructor(readonly ws: WebSocket) {
     this.ws.addEventListener('message', this._onMessage);
 
-    this.ws.send(
+    /*this.ws.send(
       JSON.stringify({
         channel: 'doc',
         payload: {
           type: 'init',
         },
       } satisfies WebSocketMessage)
-    );
+    );*/
   }
 
   pull(docId: string, state: Uint8Array) {
+    console.log('this is pull in websocket ', docId);
     const update = this.docMap.get(docId);
     if (!update) return null;
 
@@ -62,6 +63,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   push(docId: string, data: Uint8Array) {
+    console.log('this is push in websocket ', docId);
     const update = this.docMap.get(docId);
     if (update) {
       this.docMap.set(docId, mergeUpdates([update, data]));
