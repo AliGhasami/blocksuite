@@ -1,8 +1,9 @@
-import type { BlockComponent } from '@blocksuite/block-std';
+import type { BlockComponent, EditorHost } from '@blocksuite/block-std';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
+import { ref } from 'lit/directives/ref.js';
 import {
   type DeltaInsert,
   INLINE_ROOT_ATTR,
@@ -14,10 +15,15 @@ import dayjs from 'dayjs';
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import type { AffineTextAttributes } from '../../affine-inline-specs.js';
+import type { AffineInlineEditor, AffineTextAttributes } from '../../affine-inline-specs.js';
 
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import { defaultDateFormat, defaultTimeFormat } from './config.js';
+import { HoverController } from '../../../../components/index.js';
+import { toggleLinkPopup } from '../link-node/link-popup/toggle-link-popup.js';
+import { AffineDateTimeWidget, showDateTimePopover } from '../../../../../root-block/widgets/date-time-picker/index.js';
+import { DateTimePopover } from '../../../../../root-block/widgets/date-time-picker/date-time-popover.js';
+import { getCurrentNativeRange } from '../../../../utils/index.js';
 
 @customElement('affine-date-time')
 export class AffineDateTime extends ShadowlessElement {
@@ -28,21 +34,57 @@ export class AffineDateTime extends ShadowlessElement {
   override disconnectedCallback() {
     super.disconnectedCallback();
   }
+  private _whenHover = new HoverController(
+    this,
+    ({ abortController }) => {
+      // const editorHost = this.std.host;
+      // const triggerKey = this.date;
+      // const range = getCurrentNativeRange();
+      // console.log('range ===>', range);
+      // const d = showDateTimePopover({
+      //   editorHost,
+      //   inlineEditor: this.inlineEditor,
+      //   range,
+      //   abortController,
+      //   options: AffineDateTimeWidget.DEFAULT_OPTIONS,
+      //   triggerKey,
+      // });
+      // document.body.append(d);
+      return {
+        template: () => {
+          const editorHost = this.std.host;
+          const triggerKey = this.date;
+          const range = getCurrentNativeRange();
+          console.log('range ===>', range);
+          const d = showDateTimePopover({
+            editorHost,
+            inlineEditor: this.inlineEditor,
+            range,
+            abortController,
+            options: AffineDateTimeWidget.DEFAULT_OPTIONS,
+            triggerKey,
+          });
+          document.body.append(d);
+          return d
+        },
+      };
+    },
+    { enterDelay: 500 }
+  );
 
   override render() {
     //console.log('this is date time', this.delta.insert);
-    return html`<span>
+    return html`<span ${ref(this._whenHover.setReference)}>
       <span class="${Prefix}-date-time" data-event-id="${this.id}">
         <mahdaad-date-time
-          @change=${this.selfUpdate}
+          @update=${this.selfUpdate}
           readonly="${this.blockElement.doc.readonly}"
           date="${this.delta.attributes?.date?.date}"
           time="${this.delta.attributes?.date?.time}"
           meta="${this.delta.attributes?.date?.meta}"
         ></mahdaad-date-time>
       </span>
-      <v-text .str=${this.delta.insert}></v-text>
-      <!-- <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text> -->
+      <v-text .str=${this.delta.insert}>${ZERO_WIDTH_NON_JOINER}</v-text>
     </span>`;
   }
 
@@ -52,7 +94,10 @@ export class AffineDateTime extends ShadowlessElement {
       const format = this.inlineEditor.getFormat(this.selfInlineRange);
       if (format && format.date && format.date.id)
         Object.assign(date, { id: format.date.id });
-      this.inlineEditor.formatText(this.selfInlineRange, { date });
+      this.inlineEditor.formatText(this.selfInlineRange, {
+        date,
+        ignoreSyncInlineRange: true,
+      });
     }
   }
 
@@ -62,6 +107,10 @@ export class AffineDateTime extends ShadowlessElement {
     );
     assertExists(blockElement);
     return blockElement;
+  }
+
+  get date() {
+    return dayjs(this.delta.attributes?.date?.date).format(defaultDateFormat);
   }
 
   get dateTime() {

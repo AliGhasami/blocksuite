@@ -26,6 +26,8 @@ export interface AffineTextAttributes {
   code?: true | null;
   link?: string | null;
   date?: DateTimeEvent;
+  // TODO return if has bug
+  ignoreSyncInlineRange?: true | null;
   reference?: {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
@@ -169,6 +171,18 @@ export function getAffineInlineSpecsWithReference(
       //z.string().optional().nullable().catch(undefined)
       match: delta => {
         return !!delta.attributes?.date;
+      },
+      renderer: delta => {
+        return html`<affine-date-time .delta=${delta}></affine-date-time>`;
+      },
+      embed: true,
+    },
+    // TODO return if has bug
+    {
+      name: 'ignoreSyncInlineRange',
+      schema: z.literal(true).optional().nullable().catch(undefined),
+      match: delta => {
+        return !!delta.attributes?.ignoreSyncInlineRange;
       },
       renderer: delta => {
         return html`<affine-date-time .delta=${delta}></affine-date-time>`;

@@ -79,7 +79,11 @@ export class DateTimePopover extends WithDisposable(ShadowlessElement) {
               if (format && format.date && format.date.id) {
                 Object.assign(temp, { id: format.date.id });
               }
-              this.inlineEditor.formatText(inlineRange, { date: temp });
+              // TODO return if has bug
+              this.inlineEditor.formatText(inlineRange, {
+                date: temp,
+                ignoreSyncInlineRange: true,
+              });
             }}
             @close="${() => {
               this.abortController.abort();
