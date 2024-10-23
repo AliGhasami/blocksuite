@@ -26,7 +26,7 @@ export type MentionOptions = {
   ignoreBlockTypes: BlockSuite.Flavour[];
   convertTriggerKey: boolean;
 };
-
+// TODO fix next inline focus on create
 export function showDateTimePopover({
   editorHost,
   inlineEditor,

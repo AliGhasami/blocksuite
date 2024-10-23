@@ -1,4 +1,4 @@
-import type { BlockComponent, EditorHost } from '@blocksuite/block-std';
+import type { BlockComponent } from '@blocksuite/block-std';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
@@ -15,15 +15,12 @@ import dayjs from 'dayjs';
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import type { AffineInlineEditor, AffineTextAttributes } from '../../affine-inline-specs.js';
+import type { AffineTextAttributes } from '../../affine-inline-specs.js';
 
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import { defaultDateFormat, defaultTimeFormat } from './config.js';
 import { HoverController } from '../../../../components/index.js';
-import { toggleLinkPopup } from '../link-node/link-popup/toggle-link-popup.js';
-import { AffineDateTimeWidget, showDateTimePopover } from '../../../../../root-block/widgets/date-time-picker/index.js';
 import { DateTimePopover } from '../../../../../root-block/widgets/date-time-picker/date-time-popover.js';
-import { getCurrentNativeRange } from '../../../../utils/index.js';
 
 @customElement('affine-date-time')
 export class AffineDateTime extends ShadowlessElement {
@@ -34,42 +31,31 @@ export class AffineDateTime extends ShadowlessElement {
   override disconnectedCallback() {
     super.disconnectedCallback();
   }
+  // TODO check edit perve item
   private _whenHover = new HoverController(
     this,
     ({ abortController }) => {
-      // const editorHost = this.std.host;
-      // const triggerKey = this.date;
-      // const range = getCurrentNativeRange();
-      // console.log('range ===>', range);
-      // const d = showDateTimePopover({
-      //   editorHost,
-      //   inlineEditor: this.inlineEditor,
-      //   range,
-      //   abortController,
-      //   options: AffineDateTimeWidget.DEFAULT_OPTIONS,
-      //   triggerKey,
-      // });
-      // document.body.append(d);
       return {
         template: () => {
           const editorHost = this.std.host;
-          const triggerKey = this.date;
-          const range = getCurrentNativeRange();
-          console.log('range ===>', range);
-          const d = showDateTimePopover({
+          const popup = new DateTimePopover(
             editorHost,
-            inlineEditor: this.inlineEditor,
-            range,
+            this.inlineEditor,
             abortController,
-            options: AffineDateTimeWidget.DEFAULT_OPTIONS,
-            triggerKey,
-          });
-          document.body.append(d);
-          return d
+            this.selfInlineRange.index
+          );
+          popup.type = 'edit';
+          popup.delta = this.delta;
+          popup.targetInlineRange = this.selfInlineRange;
+
+          editorHost.append(popup);
+
+          return popup;
         },
       };
     },
-    { enterDelay: 500 }
+    { enterDelay: 500 },
+    false
   );
 
   override render() {
