@@ -534,6 +534,7 @@ export class EmbedCardToolbar extends WidgetComponent<
   }
 
   private _turnIntoInlineView() {
+    //debugger;
     if (this._focusBlock && 'covertToInline' in this._focusBlock) {
       this._focusBlock.covertToInline();
       return;
@@ -684,6 +685,7 @@ export class EmbedCardToolbar extends WidgetComponent<
     const buttons = [
       this._canShowUrlOptions && model && 'url' in model
         ? html`
+            1111
             <a
               class="affine-link-preview"
               href=${model.url}

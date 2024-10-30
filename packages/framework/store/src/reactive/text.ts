@@ -53,6 +53,7 @@ export class Text {
     this._length$ = signal<number>(length);
     this._yText.observe(() => {
       this._length$.value = this._yText.length;
+      console.log('11111', this._yText);
       this._onChange?.(this._yText);
     });
   }
@@ -104,6 +105,7 @@ export class Text {
   }
 
   delete(index: number, length: number) {
+    console.log('this is delete');
     if (length === 0) {
       return;
     }
@@ -125,6 +127,7 @@ export class Text {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   format(index: number, length: number, format: any) {
+    console.log('this is format');
     if (length === 0) {
       return;
     }
@@ -145,6 +148,7 @@ export class Text {
   }
 
   insert(content: string, index: number, attributes?: Record<string, unknown>) {
+    console.log('this is inserted');
     if (!content.length) {
       return;
     }
@@ -182,6 +186,7 @@ export class Text {
     content: string,
     attributes?: BaseTextAttributes
   ) {
+    console.log('this is replace');
     if (index < 0 || length < 0 || index + length > this._yText.length) {
       throw new BlockSuiteError(
         ErrorCode.ReactiveProxyError,
@@ -201,6 +206,7 @@ export class Text {
   }
 
   sliceToDelta(begin: number, end?: number): DeltaOperation[] {
+    console.log('this is slice to delta', begin, end);
     const result: DeltaOperation[] = [];
     if (end && begin >= end) {
       return result;
@@ -270,6 +276,7 @@ export class Text {
    *    right: [{insert: 'hi', ...}]
    */
   split(index: number, length = 0): Text {
+    console.log('this is split');
     if (index < 0 || length < 0 || index + length > this._yText.length) {
       throw new BlockSuiteError(
         ErrorCode.ReactiveProxyError,

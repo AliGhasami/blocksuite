@@ -37,6 +37,11 @@ export interface AffineTextAttributes {
   } | null;
   background?: string | null;
   color?: string | null;
+  mahdaadObjectLink?: {
+    object_id: string;
+    link_id: string | number | undefined;
+    type: string;
+  } | null;
 }
 
 export const affineInlineSpecsWithoutReference: InlineSpecs<AffineTextAttributes>[] =
@@ -133,6 +138,7 @@ export function getAffineInlineSpecsWithReference(
         .nullable()
         .catch(undefined),
       match: delta => {
+        //return false;
         return !!delta.attributes?.reference;
       },
       renderer: (delta, selected) => {
@@ -198,6 +204,36 @@ export function getAffineInlineSpecsWithReference(
           .selected=${selected}
           .config=${referenceNodeConfig}
         ></mahdaad-mention>`;
+      },
+      embed: true,
+    },
+    {
+      name: 'mahdaadObjectLink',
+      schema: z
+        .object({
+          //name: z.string(),
+          //user_id: z.string(),
+          //id: z.string(),
+          object_id: z.string(),
+          link_id: z.union([z.string(), z.number(), z.undefined()]),
+          //link_id: z.string(),
+          type: z.string(),
+        })
+        .optional()
+        .nullable()
+        .catch(undefined),
+      match: delta => {
+        //console.log('delta', delta);
+        //if (delta.insert == '@') return false;
+        return !!delta.attributes?.mahdaadObjectLink;
+      },
+      renderer: (delta, selected) => {
+        return html`<mahdaad-object-link-inline
+          style="display: inline-block"
+          .delta=${delta}
+          .selected=${selected}
+          .config=${referenceNodeConfig}
+        ></mahdaad-object-link-inline>`;
       },
       embed: true,
     },

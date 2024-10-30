@@ -52,8 +52,48 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     this._displayPlaceholder = computed(() => {
       //const textSelection = this.host.selection.find('text');
       //const isCollapsed = textSelection?.isCollapsed() ?? false;
-      // console.log('this is inline', this.inlineEditor);
+      //console.log('this is inline', this.inlineEditor);
+      //this.inlineEditor?.insertText();
 
+      this.inlineEditor?.slots.inlineRangeUpdate.on((a, b, c) => {
+        //console.log('this is inlineRangeUpdate', a, b, c);
+      });
+
+      this.inlineEditor?.slots.mounted.on((a, b, c) => {
+        //console.log('this is monted', a, b, c);
+      });
+
+      this.inlineEditor?.slots.textChange.on((a, b, c) => {
+        console.log('this is text change', a, b, c);
+      });
+
+      this.inlineEditor?.slots.unmounted.on((a, b, c) => {
+        //console.log('this is unmounted', a, b, c);
+      });
+
+      this.inlineEditor?.slots.inputting.on((a, b, c) => {
+        console.log('this is inputteing', a, b, c);
+      });
+
+      this.inlineEditor?.slots.inlineRangeApply.on((a, b, c) => {
+        console.log('inlineRangeApply', a, b, c);
+      });
+
+      this.inlineEditor?.slots.keydown.on((a, b, c) => {
+        //console.log('this is keydown', a, b, c);
+      });
+
+      this.inlineEditor?.slots.render.on((a, b, c) => {
+        //console.log('this is render', a, b, c);
+      });
+
+      this.inlineEditor?.slots.renderComplete.on((a, b, c) => {
+        //console.log('this is renderComplete', a, b, c);
+      });
+
+      /*this.inlineEditor?.slots. .on((a, b, c) => {
+        console.log('this is renderComplete', a, b, c);
+      });*/
       /****************************/
       /* if (this.inlineEditor) {
         /!* this.inlineEditor.slots.textChange.on(a => {

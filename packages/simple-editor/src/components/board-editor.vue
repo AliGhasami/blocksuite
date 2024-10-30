@@ -215,6 +215,10 @@ function reset() {
 }
 
 function bindEvent(doc: Doc) {
+
+  /*doc.slots.blockUpdated.on((a,b,c)=>{
+    console.log("this is update",a,b,c);
+  })*/
   doc.slots.blockUpdated.on((data) => {
     checkNotEmptyDocBlock(doc)
     checkIsEmpty()
@@ -223,7 +227,6 @@ function bindEvent(doc: Doc) {
       if(data.flavour=='affine:mahdaad-object'){
         emit('addObjectLink', data)
       }
-
       emit('addBlock', data)
     }
     if (data.type == 'delete') {
