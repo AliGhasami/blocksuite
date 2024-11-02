@@ -72,6 +72,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
     console.log('this is inser text', inlineRange, text, attributes);
+    //this.editor.slots.
     if (this.editor.isReadonly) return;
     console.log('bbbb', this.editor.getDeltasByInlineRange(inlineRange));
     if (this.editor.attributeService.marks) {

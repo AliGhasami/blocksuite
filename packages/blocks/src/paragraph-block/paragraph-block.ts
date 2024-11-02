@@ -54,9 +54,9 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       //const isCollapsed = textSelection?.isCollapsed() ?? false;
       //console.log('this is inline', this.inlineEditor);
       //this.inlineEditor?.insertText();
-
+      //this.inlineEditor?.slots.
       this.inlineEditor?.slots.inlineRangeUpdate.on((a, b, c) => {
-        // console.log('this is inlineRangeUpdate', a, b, c);
+        //console.log('this is inlineRangeUpdate', a, b, c);
       });
 
       this.inlineEditor?.slots.mounted.on((a, b, c) => {
@@ -68,7 +68,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       });*/
 
       this.inlineEditor?.slots.textChange.on((a, b, c) => {
-        console.log('this is text change', a, b, c);
+        // console.log('this is text change', a, b, c, this.model.id);
         //console.log(this.inlineEditor?.yText);
         //console.log(this.inlineEditor?.yTextDeltas);
         /* console.log(
@@ -83,18 +83,15 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
           this.inlineEditor?.getInlineRange()
         );
         console.log('yTextString', this.inlineEditor?.yTextString);*/
-
         /*this.inlineEditor?.getDeltasByInlineRange({
           index: 0,
           length: this.inlineEditor?.getInlineRange().index,
         })*/
-
         /*console.log(
           22222,
           this.inlineEditor?.deltaService.getDeltaByRangeIndex(5)
         );*/
         //console.log("");
-
         //console.log(this.inlineEditor?.);
       });
 
@@ -107,7 +104,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       });
 
       this.inlineEditor?.slots.inlineRangeApply.on((a, b, c) => {
-        //console.log('inlineRangeApply', a, b, c);
+        // console.log('inlineRangeApply', a, b, c);
       });
 
       this.inlineEditor?.slots.keydown.on((a, b, c) => {
