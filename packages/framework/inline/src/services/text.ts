@@ -9,6 +9,7 @@ import { intersectInlineRange } from '../utils/inline-range.js';
 export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   deleteText = (inlineRange: InlineRange): void => {
     if (this.editor.isReadonly) return;
+    console.log('cccc', this.editor.getDeltasByInlineRange(inlineRange));
     console.log('this is delete text ', inlineRange);
     this.transact(() => {
       this.yText.delete(inlineRange.index, inlineRange.length);
@@ -72,7 +73,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   ): void => {
     console.log('this is inser text', inlineRange, text, attributes);
     if (this.editor.isReadonly) return;
-
+    console.log('bbbb', this.editor.getDeltasByInlineRange(inlineRange));
     if (this.editor.attributeService.marks) {
       attributes = { ...attributes, ...this.editor.attributeService.marks };
     }

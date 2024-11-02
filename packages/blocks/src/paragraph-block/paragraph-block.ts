@@ -56,15 +56,46 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       //this.inlineEditor?.insertText();
 
       this.inlineEditor?.slots.inlineRangeUpdate.on((a, b, c) => {
-        //console.log('this is inlineRangeUpdate', a, b, c);
+        // console.log('this is inlineRangeUpdate', a, b, c);
       });
 
       this.inlineEditor?.slots.mounted.on((a, b, c) => {
         //console.log('this is monted', a, b, c);
       });
 
+      /* this.inlineEditor?.hooks.compositionEnd(() => {
+        console.log('tttt');
+      });*/
+
       this.inlineEditor?.slots.textChange.on((a, b, c) => {
         console.log('this is text change', a, b, c);
+        //console.log(this.inlineEditor?.yText);
+        //console.log(this.inlineEditor?.yTextDeltas);
+        /* console.log(
+          'aaaa',
+          this.inlineEditor?.getDeltasByInlineRange({
+            index: this.inlineEditor?.getInlineRange()?.index + 1,
+            length: 1,
+          })
+        );*/
+        /*console.log(
+          'this is inline range',
+          this.inlineEditor?.getInlineRange()
+        );
+        console.log('yTextString', this.inlineEditor?.yTextString);*/
+
+        /*this.inlineEditor?.getDeltasByInlineRange({
+          index: 0,
+          length: this.inlineEditor?.getInlineRange().index,
+        })*/
+
+        /*console.log(
+          22222,
+          this.inlineEditor?.deltaService.getDeltaByRangeIndex(5)
+        );*/
+        //console.log("");
+
+        //console.log(this.inlineEditor?.);
       });
 
       this.inlineEditor?.slots.unmounted.on((a, b, c) => {
@@ -72,11 +103,11 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       });
 
       this.inlineEditor?.slots.inputting.on((a, b, c) => {
-        console.log('this is inputteing', a, b, c);
+        // console.log('this is inputteing', a, b, c);
       });
 
       this.inlineEditor?.slots.inlineRangeApply.on((a, b, c) => {
-        console.log('inlineRangeApply', a, b, c);
+        //console.log('inlineRangeApply', a, b, c);
       });
 
       this.inlineEditor?.slots.keydown.on((a, b, c) => {

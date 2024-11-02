@@ -53,7 +53,7 @@ export class Text {
     this._length$ = signal<number>(length);
     this._yText.observe(() => {
       this._length$.value = this._yText.length;
-      console.log('11111', this._yText);
+      console.log('11111', this._yText, input);
       this._onChange?.(this._yText);
     });
   }
