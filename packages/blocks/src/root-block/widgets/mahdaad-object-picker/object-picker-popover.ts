@@ -20,11 +20,9 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
-import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { replaceIdMiddleware } from '../../../_common/transformers/index.js';
 import { getInlineEditorByModel } from '../../../_common/utils/index.js';
 import { AffineSchemas } from '../../../schemas.js';
-import { insertContent } from '../slash-menu/index.js';
 import { styles } from './styles.js';
 export interface ObjectLink {
   link_id: string;
@@ -62,14 +60,14 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     }
 
     //console.log('11111', lnk);
-    insertContent(this.editorHost, this.model, REFERENCE_NODE, {
+    /*insertContent(this.editorHost, this.model, REFERENCE_NODE, {
       mahdaadObjectLink: {
         object_id: lnk.object_id,
         link_id: lnk.link_id,
         type: lnk.type,
       },
-    });
-    return;
+    });*/
+    //return;
 
     const temp = model.doc.addSiblingBlocks(this.model, [
       {

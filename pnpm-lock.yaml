@@ -366,8 +366,8 @@ importers:
         specifier: 7.105.0
         version: 7.105.0(vue@3.5.12(typescript@5.4.5))
       '@tato30/vue-pdf':
-        specifier: ^1.11.1
-        version: 1.11.1(vue@3.5.12(typescript@5.4.5))
+        specifier: ^1.11.2
+        version: 1.11.2(vue@3.5.12(typescript@5.4.5))
       '@types/d3':
         specifier: 7.4.3
         version: 7.4.3
@@ -3325,8 +3325,8 @@ packages:
     peerDependencies:
       vue: ^2.7.0 || ^3.0.0
 
-  '@tato30/vue-pdf@1.11.1':
-    resolution: {integrity: sha512-r32h9kLIZsuQGPibpM6jmZK6UisJ1J20BqW1RKtptuiMnukArsINU6Hheo7IWDAljkFk8faLfx2vz+LYhwZV6w==}
+  '@tato30/vue-pdf@1.11.2':
+    resolution: {integrity: sha512-9IqqUzn1JiVD26CMK1Qio2tuY1tboycPEzihTObwNzRhDNmrbE2xhWH3BoxeN8X11pF/mnGReZDmWmcbomctoQ==}
     peerDependencies:
       vue: ^3.2.33
 
@@ -14227,7 +14227,7 @@ snapshots:
       '@tanstack/virtual-core': 3.10.8
       vue: 3.5.12(typescript@5.4.5)
 
-  '@tato30/vue-pdf@1.11.1(vue@3.5.12(typescript@5.4.5))':
+  '@tato30/vue-pdf@1.11.2(vue@3.5.12(typescript@5.4.5))':
     dependencies:
       pdfjs-dist: 4.5.136
       vue: 3.5.12(typescript@5.4.5)

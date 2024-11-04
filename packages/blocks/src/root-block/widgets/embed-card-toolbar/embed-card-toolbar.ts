@@ -685,7 +685,6 @@ export class EmbedCardToolbar extends WidgetComponent<
     const buttons = [
       this._canShowUrlOptions && model && 'url' in model
         ? html`
-            1111
             <a
               class="affine-link-preview"
               href=${model.url}

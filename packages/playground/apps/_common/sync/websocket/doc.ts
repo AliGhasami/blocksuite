@@ -48,6 +48,7 @@ export class WebSocketDocSource implements DocSource {
         channel: 'doc',
         payload: {
           type: 'init',
+          //todo send doc id
         },
       } satisfies WebSocketMessage)
     );

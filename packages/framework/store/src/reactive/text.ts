@@ -147,8 +147,9 @@ export class Text {
     });
   }
 
+  //ToDo ali ghasami for text
   insert(content: string, index: number, attributes?: Record<string, unknown>) {
-    console.log('this is inserted');
+    //console.log('this is inserted');
     if (!content.length) {
       return;
     }
@@ -205,8 +206,9 @@ export class Text {
     });
   }
 
+  //todo ali ghasami for text
   sliceToDelta(begin: number, end?: number): DeltaOperation[] {
-    console.log('this is slice to delta', begin, end);
+    //console.log('this is slice to delta', begin, end);
     const result: DeltaOperation[] = [];
     if (end && begin >= end) {
       return result;

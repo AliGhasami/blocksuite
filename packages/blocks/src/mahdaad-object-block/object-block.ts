@@ -16,16 +16,16 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   static override styles = objectBlockStyles;
 
   changeViewMode(event: CustomEvent) {
-    //console.log('1111', this.model.type);
     const mode = event.detail;
-    if (this.model.type == 'document' && mode == 'inline') {
+    //console.log('1111', this.model.type, mode);
+    if (['document', 'weblink'].includes(this.model.type) && mode == 'inline') {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);
       assertExists(parent);
       const index = parent.children.indexOf(this.model);
       const yText = new DocCollection.Y.Text();
       yText.insert(0, REFERENCE_NODE);
-      console.log('2222', this.model);
+      //console.log('2222', this.model);
       yText.format(0, REFERENCE_NODE.length, {
         mahdaadObjectLink: {
           object_id: this.model.object_id,

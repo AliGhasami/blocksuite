@@ -7,10 +7,11 @@ import type { BaseTextAttributes } from '../utils/base-attributes.js';
 import { intersectInlineRange } from '../utils/inline-range.js';
 
 export class InlineTextService<TextAttributes extends BaseTextAttributes> {
+  //TODO ali ghasami for text
   deleteText = (inlineRange: InlineRange): void => {
     if (this.editor.isReadonly) return;
-    console.log('cccc', this.editor.getDeltasByInlineRange(inlineRange));
-    console.log('this is delete text ', inlineRange);
+    //console.log('cccc', this.editor.getDeltasByInlineRange(inlineRange));
+    //console.log('this is delete text ', inlineRange);
     this.transact(() => {
       this.yText.delete(inlineRange.index, inlineRange.length);
     });
@@ -25,7 +26,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     } = {}
   ): void => {
     if (this.editor.isReadonly) return;
-    console.log('this is format text', inlineRange, attributes, options);
+    //console.log('this is format text', inlineRange, attributes, options);
     const { match = () => true, mode = 'merge' } = options;
     const deltas = this.editor.deltaService.getDeltasByInlineRange(inlineRange);
 
@@ -66,15 +67,16 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     });
   };
 
+  //todo ali ghasami for text
   insertText = (
     inlineRange: InlineRange,
     text: string,
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
-    console.log('this is inser text', inlineRange, text, attributes);
+    //console.log('this is inser text', inlineRange, text, attributes);
     //this.editor.slots.
     if (this.editor.isReadonly) return;
-    console.log('bbbb', this.editor.getDeltasByInlineRange(inlineRange));
+    //console.log('bbbb', this.editor.getDeltasByInlineRange(inlineRange));
     if (this.editor.attributeService.marks) {
       attributes = { ...attributes, ...this.editor.attributeService.marks };
     }
@@ -95,7 +97,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   };
 
   resetText = (inlineRange: InlineRange): void => {
-    console.log('this is rest text', inlineRange);
+    //console.log('this is rest text', inlineRange);
     if (this.editor.isReadonly) return;
 
     const coverDeltas: DeltaInsert[] = [];
@@ -125,11 +127,12 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
     });
   };
 
+  //todo ali ghasami for text
   setText = (
     text: string,
     attributes: TextAttributes = {} as TextAttributes
   ): void => {
-    console.log('this is set text', text, attributes);
+    //console.log('this is set text', text, attributes);
     if (this.editor.isReadonly) return;
 
     this.transact(() => {

@@ -150,7 +150,7 @@ export function getAffineInlineSpecsWithReference(
       },
       embed: true,
     },
-    {
+    /*{
       name: 'link',
       schema: z.string().optional().nullable().catch(undefined),
       match: delta => {
@@ -158,6 +158,18 @@ export function getAffineInlineSpecsWithReference(
       },
       renderer: delta => {
         return html`<affine-link .delta=${delta}></affine-link>`;
+      },
+    },*/
+    {
+      name: 'link',
+      schema: z.string().optional().nullable().catch(undefined),
+      match: delta => {
+        return !!delta.attributes?.link;
+      },
+      renderer: delta => {
+        return html`<mahdaad-weblink-node
+          .delta=${delta}
+        ></mahdaad-weblink-node>`;
       },
     },
     {

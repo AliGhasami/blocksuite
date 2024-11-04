@@ -16,6 +16,7 @@ import type { AffineTextAttributes } from '../../affine-inline-specs.js';
 
 import { Peekable } from '../../../../components/peekable.js';
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
+import { REFERENCE_NODE } from '../consts.js';
 
 declare module '@blocksuite/blocks' {
   interface PeekViewService {
@@ -26,12 +27,51 @@ declare module '@blocksuite/blocks' {
 @customElement('mahdaad-object-link-inline')
 @Peekable({ action: false })
 export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
+  changeViewMode(event: CustomEvent) {
+    const mode = event.detail;
+
+    if (mode == 'inline') return;
+
+    const block = this.block;
+    const doc = block.host.doc;
+    const parent = doc.getParent(block.model);
+    assertExists(parent);
+
+    const index = parent.children.indexOf(block.model);
+    //const docId = this.referenceDocId;
+
+    //return
+    const meta = this.getMeta();
+    doc.addBlock(
+      'affine:mahdaad-object',
+      {
+        link_id: meta?.link_id,
+        object_id: meta?.object_id,
+        type: meta?.type,
+        show_type: mode,
+      },
+      parent,
+      index + 1
+    );
+    const totalTextLength = this.inlineEditor.yTextLength;
+    const inlineTextLength = this.selfInlineRange.length;
+    if (totalTextLength === inlineTextLength) {
+      doc.deleteBlock(block.model);
+    } else {
+      this.inlineEditor.insertText(this.selfInlineRange, REFERENCE_NODE); // this.docTitle
+    }
+  }
+
   override connectedCallback() {
     super.connectedCallback();
   }
 
+  getMeta() {
+    return this.delta.attributes?.mahdaadObjectLink;
+  }
+
   override render() {
-    const meta = this.delta.attributes?.mahdaadObjectLink;
+    const meta = this.getMeta();
     return html`<span
       data-selected=${this.selected}
       class="mahdaad-object-link-inline"
@@ -42,6 +82,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
         link-id="${meta?.link_id}"
         type="${meta?.type}"
         show-type="inline"
+        @changeViewMode="${this.changeViewMode}"
       ></mahdaad-object-link-component
       ><v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
     ></span>`;

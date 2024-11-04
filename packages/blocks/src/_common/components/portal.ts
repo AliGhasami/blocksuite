@@ -124,7 +124,7 @@ export function createSimplePortal({
   container = document.body,
   signal = new AbortController().signal,
   renderOptions,
-  shadowDom = true,
+  shadowDom = false,
   identifyWrapper = true,
 }: PortalOptions) {
   const portalRoot = document.createElement('div');
