@@ -13,12 +13,12 @@ import { EmbedLinkedDocBlockSpec } from '../embed-linked-doc-block/embed-linked-
 import { EmbedLoomBlockSpec } from '../embed-loom-block/embed-loom-spec.js';
 import { EmbedSyncedDocBlockSpec } from '../embed-synced-doc-block/embed-synced-doc-spec.js';
 import { EmbedYoutubeBlockSpec } from '../embed-youtube-block/embed-youtube-spec.js';
-
 import { HintBlockSpec } from '../hint-block/hint-block-spec.js';
 /** disable for claytap */
 //import { ImageBlockSpec } from '../image-block/image-spec.js';
 import { ListBlockSpec } from '../list-block/list-spec.js';
 import { ObjectBlockSpec } from '../mahdaad-object-block/object-spec.js';
+import { MahdaadWeblinkBlockSpec } from '../mahdaad-weblink-block/weblink-spec.js';
 import {
   EdgelessNoteBlockSpec,
   NoteBlockSpec,
@@ -46,6 +46,7 @@ export const CommonFirstPartyBlockSpecs: BlockSpec[] = [
   EmbedLinkedDocBlockSpec,
   HintBlockSpec,
   ObjectBlockSpec,
+  MahdaadWeblinkBlockSpec,
 ];
 
 export const EdgelessFirstPartyBlockSpecs: BlockSpec[] = [
@@ -68,4 +69,5 @@ export const EdgelessFirstPartyBlockSpecs: BlockSpec[] = [
   EmbedSyncedDocBlockSpec,
   EmbedLinkedDocBlockSpec,
   ObjectBlockSpec,
+  MahdaadWeblinkBlockSpec,
 ];

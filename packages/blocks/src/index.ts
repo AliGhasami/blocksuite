@@ -116,8 +116,10 @@ export * from './embed-youtube-block/index.js';
 export * from './frame-block/index.js';
 export * from './image-block/index.js';
 export * from './list-block/index.js';
+export * from './mahdaad-weblink-block/index.js';
 export * from './note-block/index.js';
 export * from './paragraph-block/index.js';
+
 export { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
 export type {
   Template,

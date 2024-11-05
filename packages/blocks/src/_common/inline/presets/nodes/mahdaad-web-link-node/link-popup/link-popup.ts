@@ -21,17 +21,9 @@ import '../../../../../components/toolbar/icon-button.js';
 import '../../../../../components/toolbar/menu-button.js';
 import '../../../../../components/toolbar/separator.js';
 import '../../../../../components/toolbar/toolbar.js';
-import { renderActions } from '../../../../../components/toolbar/utils.js';
 import '../../../../../components/tooltip/tooltip.js';
 import { BLOCK_ID_ATTR } from '../../../../../consts.js';
-import {
-  ConfirmIcon,
-  CopyIcon,
-  DeleteIcon,
-  OpenIcon,
-  SmallArrowDownIcon,
-  UnlinkIcon,
-} from '../../../../../icons/index.js';
+import { SmallArrowDownIcon } from '../../../../../icons/index.js';
 import { normalizeUrl } from '../../../../../utils/url.js';
 
 @customElement('mahdaad-weblink-popup')
@@ -48,31 +40,19 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     this.host?.selection.clear();
     //console.log('1111', this.currentText);
     return html`<div class="popover-block-editor">
-        <mahdaad-inline-weblink-add-editor-form
-          .title="${this.currentText}"
-          @save="${this.handleSave}"
-        ></mahdaad-inline-weblink-add-editor-form>
-      </div>
-      <!-- <div class="affine-link-popover create">
-        11111
-        <input
-          id="link-input"
-          class="affine-link-popover-input"
-          type="text"
-          spellcheck="false"
-          placeholder="Paste or type a link"
-          @input=${this._updateConfirmBtn}
-        />
-        ${this._confirmBtnTemplate()}
-      </div>-->`;
+      <mahdaad-inline-weblink-add-editor-form
+        .title="${this.currentText}"
+        @save="${this.handleSave}"
+      ></mahdaad-inline-weblink-add-editor-form>
+    </div> `;
   };
 
-  private _delete = () => {
+  /* private _delete = () => {
     if (this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
       this.inlineEditor.deleteText(this.targetInlineRange);
     }
     this.abortController.abort();
-  };
+  };*/
 
   private _edit = () => {
     this.type = 'edit';
@@ -132,14 +112,14 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
 
   private _embedOptions: EmbedOptions | null = null;
 
-  private _openLink = () => {
+  /*private _openLink = () => {
     let link = this.currentLink;
     if (!link.match(/^[a-zA-Z]+:\/\//)) {
       link = 'https://' + link;
     }
     window.open(link, '_blank');
     this.abortController.abort();
-  };
+  };*/
 
   private _removeLink = () => {
     if (this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
@@ -246,7 +226,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
 
   //static override styles = linkPopupStyle;
 
-  private _confirmBtnTemplate() {
+  /* private _confirmBtnTemplate() {
     return html`
       <editor-icon-button
         class="affine-confirm-button"
@@ -257,14 +237,14 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         ${ConfirmIcon}
       </editor-icon-button>
     `;
-  }
+  }*/
 
   private _convertToCardView() {
     if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
       return;
     }
 
-    let targetFlavour = 'affine:bookmark';
+    let targetFlavour = 'affine:mahdaad-weblink-block';
 
     if (this._embedOptions && this._embedOptions.viewType === 'card') {
       targetFlavour = this._embedOptions.flavour;
@@ -350,7 +330,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     return true;
   }
 
-  private _moreActions() {
+  /*  private _moreActions() {
     return renderActions([
       [
         {
@@ -381,7 +361,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         },
       ],
     ]);
-  }
+  }*/
 
   private _onConfirm(title: string, url: string) {
     if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
