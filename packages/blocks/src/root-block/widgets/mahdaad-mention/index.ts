@@ -139,7 +139,7 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
     );*/
 
     const inlineEditor = getInlineEditorByModel(this.host, model);
-    console.log('111', inlineEditor);
+    //console.log('111', inlineEditor);
     if (!inlineEditor) return;
     const text = inlineEditor.yTextString;
     if (text) {

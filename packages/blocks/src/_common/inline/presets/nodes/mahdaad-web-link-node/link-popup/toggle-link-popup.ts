@@ -15,9 +15,7 @@ export function toggleLinkPopup(
   popup.inlineEditor = inlineEditor;
   popup.type = type;
   popup.targetInlineRange = targetInlineRange;
-  //popup.abortController = abortController;
-
+  popup.abortController = abortController;
   document.body.append(popup);
-
   return popup;
 }

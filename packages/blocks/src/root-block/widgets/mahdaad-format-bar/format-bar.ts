@@ -607,6 +607,8 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
               chain.toggleStrike().run();
               break;
             case 'link':
+              this.reset();
+              //this._abortController.abort();
               chain.toggleLink().run();
               break;
           }

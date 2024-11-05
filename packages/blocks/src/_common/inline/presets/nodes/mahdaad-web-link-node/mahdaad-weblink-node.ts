@@ -131,16 +131,20 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
       : styleMap({});
 
     /*${ref(this._whenHover.setReference)}*/
+    //${ref(this._whenHover.setReference)}
+    /*@mouseup=${this._onMouseUp}*/
 
-    return html`<a
-      ${ref(this._whenHover.setReference)}
-      href=${this.link}
-      rel="noopener noreferrer"
-      target="_blank"
-      style=${styles}
-      @mouseup=${this._onMouseUp}
-      ><v-text .str=${this.delta.insert}></v-text
-    ></a>`;
+    return html`<mahdaad-weblink>
+      <a
+        @mouseup=${this._onMouseUp}
+        ${ref(this._whenHover.setReference)}
+        href=${this.link}
+        rel="noopener noreferrer"
+        target="_blank"
+        style=${styles}
+        ><v-text .str=${this.delta.insert}></v-text
+      ></a>
+    </mahdaad-weblink>`;
 
     /*return html`<mahdaad-weblink>
       <!-- <p slot="header">Header Content</p> -->

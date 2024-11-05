@@ -9,7 +9,7 @@ import { assertExists } from '@blocksuite/global/utils';
 import { computePosition, inline, offset, shift } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { join } from 'lit/directives/join.js';
+import { choose } from 'lit/directives/choose.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type { EmbedOptions } from '../../../../../../root-block/root-service.js';
@@ -20,7 +20,6 @@ import { toast } from '../../../../../components/toast.js';
 import '../../../../../components/toolbar/icon-button.js';
 import '../../../../../components/toolbar/menu-button.js';
 import '../../../../../components/toolbar/separator.js';
-import { renderToolbarSeparator } from '../../../../../components/toolbar/separator.js';
 import '../../../../../components/toolbar/toolbar.js';
 import { renderActions } from '../../../../../components/toolbar/utils.js';
 import '../../../../../components/tooltip/tooltip.js';
@@ -29,34 +28,33 @@ import {
   ConfirmIcon,
   CopyIcon,
   DeleteIcon,
-  EditIcon,
-  MoreVerticalIcon,
   OpenIcon,
   SmallArrowDownIcon,
   UnlinkIcon,
 } from '../../../../../icons/index.js';
-import {
-  getHostName,
-  isValidUrl,
-  normalizeUrl,
-} from '../../../../../utils/url.js';
-//import { linkPopupStyle } from './styles.js';
+import { normalizeUrl } from '../../../../../utils/url.js';
 
 @customElement('mahdaad-weblink-popup')
 export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
   private _bodyOverflowStyle = '';
 
   private _createTemplate = () => {
-    this.updateComplete
+    /* this.updateComplete
       .then(() => {
-        this.linkInput?.focus();
-
-        this._updateConfirmBtn();
+        //this.linkInput?.focus();
+        //this._updateConfirmBtn();
       })
-      .catch(console.error);
-
-    return html`
-      <div class="affine-link-popover create">
+      .catch(console.error);*/
+    this.host?.selection.clear();
+    //console.log('1111', this.currentText);
+    return html`<div class="popover-block-editor">
+        <mahdaad-inline-weblink-add-editor-form
+          .title="${this.currentText}"
+          @save="${this.handleSave}"
+        ></mahdaad-inline-weblink-add-editor-form>
+      </div>
+      <!-- <div class="affine-link-popover create">
+        11111
         <input
           id="link-input"
           class="affine-link-popover-input"
@@ -66,8 +64,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
           @input=${this._updateConfirmBtn}
         />
         ${this._confirmBtnTemplate()}
-      </div>
-    `;
+      </div>-->`;
   };
 
   private _delete = () => {
@@ -82,7 +79,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
   };
 
   private _editTemplate = () => {
-    this.updateComplete
+    /* this.updateComplete
       .then(() => {
         assertExists(this.textInput);
         this.textInput.value = this.currentText;
@@ -93,11 +90,20 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
 
         this._updateConfirmBtn();
       })
-      .catch(console.error);
+      .catch(console.error);*/
 
-    return html`
+    return html`<div class="popover-block-editor">
+      <mahdaad-inline-weblink-add-editor-form
+        .title="${this.currentText}"
+        .url="${this.currentLink}"
+        @save="${this.handleSave}"
+      ></mahdaad-inline-weblink-add-editor-form>
+    </div>`;
+
+    /*return html`
       <div class="affine-link-edit-popover">
         <div class="affine-edit-area text">
+          555
           <input
             class="affine-edit-input"
             id="text-input"
@@ -108,19 +114,20 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
           <label class="affine-edit-label" for="text-input">Text</label>
         </div>
         <div class="affine-edit-area link">
+          111
           <input
             id="link-input"
             class="affine-edit-input"
             type="text"
             spellcheck="false"
-            placeholder="Paste or type a link"
+            placeholder="Paste or type a link 5555"
             @input=${this._updateConfirmBtn}
           />
           <label class="affine-edit-label" for="link-input">Link</label>
         </div>
         ${this._confirmBtnTemplate()}
       </div>
-    `;
+    `;*/
   };
 
   private _embedOptions: EmbedOptions | null = null;
@@ -152,7 +159,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
       this.currentLink
     );
 
-    const buttons = [
+    /*const buttons = [
       html`
         <a
           class="affine-link-preview"
@@ -198,23 +205,46 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
           </div>
         </editor-menu-button>
       `,
-    ];
+    ];*/
 
-    return html`
-      <editor-toolbar class="affine-link-popover view">
+    return html`<div class="popover-block-editor">
+      <mahdaad-weblink-action
+        .url="${this.currentLink}"
+        @edit="${this._edit}"
+        @remove="${this._removeLink}"
+        @close="${() => {
+          this.abortController.abort();
+        }}"
+        active-view="inline"
+        @changeViewMode="${(event: CustomEvent) => {
+          const mode = event.detail;
+          switch (mode) {
+            case 'card':
+              this._convertToCardView();
+              break;
+            case 'embed':
+              break;
+          }
+        }}"
+      ></mahdaad-weblink-action>
+    </div>`;
+
+    /*return html`
+      1411
+      <!-- <editor-toolbar class="affine-link-popover view">
         ${join(
-          buttons.filter(button => button !== nothing),
-          renderToolbarSeparator
-        )}
-      </editor-toolbar>
-    `;
+        buttons.filter(button => button !== nothing),
+        renderToolbarSeparator
+      )}
+      </editor-toolbar>-->
+    `;*/
   };
-
-  //static override styles = linkPopupStyle;
 
   private get _canConvertToEmbedView() {
     return this._embedOptions?.viewType === 'embed';
   }
+
+  //static override styles = linkPopupStyle;
 
   private _confirmBtnTemplate() {
     return html`
@@ -353,14 +383,29 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     ]);
   }
 
-  private _onConfirm() {
+  private _onConfirm(title: string, url: string) {
     if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
 
-    assertExists(this.linkInput);
-    const linkInputValue = this.linkInput.value;
-    if (!linkInputValue || !isValidUrl(linkInputValue)) return;
+    //assertExists(this.linkInput);
+    //const linkInputValue = this.linkInput.value;
+    //if (!linkInputValue || !isValidUrl(linkInputValue)) return;
 
-    const link = normalizeUrl(linkInputValue);
+    const link = normalizeUrl(url);
+    /*this.inlineEditor.formatText(this.targetInlineRange, title, {
+      link: link,
+      reference: null,
+    });*/
+
+    this.inlineEditor.insertText(this.targetInlineRange, title, {
+      link: link,
+      reference: null,
+    });
+    this.inlineEditor.setInlineRange(this.targetInlineRange);
+    const textSelection = this.host?.selection.find('text');
+    assertExists(textSelection);
+    this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
+    this.abortController.abort();
+    return;
 
     if (this.type === 'create') {
       this.inlineEditor.formatText(this.targetInlineRange, {
@@ -402,10 +447,10 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
   }
 
   private _updateConfirmBtn() {
-    assertExists(this.confirmButton);
+    /*assertExists(this.confirmButton);
     const link = this.linkInput?.value.trim();
     this.confirmButton.disabled = !(link && isValidUrl(link));
-    this.confirmButton.requestUpdate();
+    this.confirmButton.requestUpdate();*/
   }
 
   private _viewMenuButton() {
@@ -466,6 +511,12 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     `;
   }
 
+  private handleSave(event: CustomEvent) {
+    const data = event.detail;
+    this._onConfirm(data.title, data.url);
+    //console.log('this is handle save', data);
+  }
+
   override connectedCallback() {
     super.connectedCallback();
 
@@ -490,9 +541,9 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
   }
 
   protected override firstUpdated() {
-    if (!this.linkInput) return;
+    //if (!this.linkInput) return;
 
-    this._disposables.addFromEvent(this.linkInput, 'copy', e => {
+    /*this._disposables.addFromEvent(this.linkInput, 'copy', e => {
       e.stopPropagation();
     });
     this._disposables.addFromEvent(this.linkInput, 'cut', e => {
@@ -500,6 +551,21 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     });
     this._disposables.addFromEvent(this.linkInput, 'paste', e => {
       e.stopPropagation();
+    });*/
+
+    //this._disposables.addFromEvent('',)
+
+    //this.disposables.
+
+    this._disposables.addFromEvent(this, 'mousedown', e => {
+      //debugger;
+      e.stopPropagation();
+    });
+
+    this._disposables.addFromEvent(window, 'mousedown', e => {
+      //e.stopPropagation()
+      //      debugger;
+      this.abortController.abort();
     });
   }
 
@@ -512,28 +578,77 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
               <div
                 class="affine-link-popover-overlay-mask"
                 @click=${() => {
-                  /*this.abortController.abort();*/
-                  /*this.host?.selection.clear();*/
+                  this.abortController.abort();
+                  this.host?.selection.clear();
+                }}
+              ></div>
+            `}
+        <div class="affine-link-popover-container" @keydown=${this._onKeydown}>
+          ${choose(this.type, [
+            ['create', this._createTemplate],
+            ['edit', this._editTemplate],
+            ['view', this._viewTemplate],
+          ])}
+        </div>
+        <div class="mock-selection-container"></div>
+      </div>
+    `;
+
+    /* return html`
+      <div class="overlay-root">
+        ${this.type === 'view'
+          ? nothing
+          : html`
+              <div
+                class="affine-link-popover-overlay-mask"
+                @click=${() => {
+                  debugger;
+                  this.abortController.abort();
+                  this.host?.selection.clear();
+                }}
+              ></div>
+            `}
+        <div class="affine-link-popover-container" @keydown=${this._onKeydown}>
+          ${choose(this.type, [
+            ['create', this._createTemplate],
+            ['edit', this._editTemplate],
+            ['view', this._viewTemplate],
+          ])}
+        </div>
+        <div class="mock-selection-container"></div>
+      </div>
+    `;*/
+
+    /*return html`
+      <div class="overlay-root">
+        ${this.type === 'view'
+          ? nothing
+          : html`
+              <div
+                class="affine-link-popover-overlay-mask"
+                @click=${() => {
+                  this.abortController.abort();
+                  this.host?.selection.clear();
                 }}
               ></div>
             `}
         <div class="affine-link-popover-container" @keydown=${this._onKeydown}>
           <mahdaad-weblink-action></mahdaad-weblink-action>
         </div>
-        <!--<div class="mock-selection-container"></div>-->
+        <div class="mock-selection-container"></div>
       </div>
-    `;
+    `;*/
 
     // return html` <div>1111111</div> `;
   }
 
   override updated() {
     assertExists(this.popupContainer);
-    console.log('4444', this.targetInlineRange);
+    //console.log('4444', this.targetInlineRange);
     const range = this.inlineEditor.toDomRange(this.targetInlineRange); //toDomRange(this.targetInlineRange);
     assertExists(range);
-    console.log('22222', range);
-    console.log('33333', range.getClientRects());
+    //console.log('22222', range);
+    //console.log('33333', range.getClientRects());
 
     if (this.type !== 'view') {
       const domRects = range.getClientRects();
@@ -542,10 +657,9 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         const mockSelection = document.createElement('div');
         mockSelection.classList.add('mock-selection');
         mockSelection.style.left = `${domRect.left}px`;
-        mockSelection.style.top = `${domRect.top}px`;
+        mockSelection.style.top = `${domRect.top + 6}px`;
         mockSelection.style.width = `${domRect.width}px`;
         mockSelection.style.height = `${domRect.height}px`;
-
         assertExists(this.mockSelectionContainer);
         this.mockSelectionContainer.append(mockSelection);
       });
@@ -567,12 +681,12 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     })
       .then(({ x, y }) => {
         const popupContainer = this.popupContainer;
-        console.log('11111', popupContainer, x, y);
+        //console.log('11111', popupContainer, x, y);
         const domRects = range.getClientRects();
         if (!popupContainer) return;
         popupContainer.style.position = 'fixed';
         popupContainer.style.left = `${domRects[0].x}px`;
-        popupContainer.style.top = `${domRects[0].y + 20}px`;
+        popupContainer.style.top = `${domRects[0].y + 30}px`;
         popupContainer.style.zIndex = `10`;
         /*popupContainer.style.left = `${x}px`;
         popupContainer.style.top = `${y}px`;*/
