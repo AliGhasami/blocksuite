@@ -10,21 +10,19 @@ import { computePosition, inline, offset, shift } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
-import { repeat } from 'lit/directives/repeat.js';
 
-import type { EmbedOptions } from '../../../../../../root-block/root-service.js';
+import type { ObjectLink } from '../../../../../../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
 import type { EditorIconButton } from '../../../../../components/toolbar/icon-button.js';
 import type { AffineInlineEditor } from '../../../affine-inline-specs.js';
 
-import { toast } from '../../../../../components/toast.js';
 import '../../../../../components/toolbar/icon-button.js';
 import '../../../../../components/toolbar/menu-button.js';
 import '../../../../../components/toolbar/separator.js';
 import '../../../../../components/toolbar/toolbar.js';
 import '../../../../../components/tooltip/tooltip.js';
 import { BLOCK_ID_ATTR } from '../../../../../consts.js';
-import { SmallArrowDownIcon } from '../../../../../icons/index.js';
 import { normalizeUrl } from '../../../../../utils/url.js';
+import { REFERENCE_NODE } from '../../consts.js';
 
 @customElement('mahdaad-weblink-popup')
 export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
@@ -37,12 +35,16 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         //this._updateConfirmBtn();
       })
       .catch(console.error);*/
+    //console.log('20000', this.block.doc.meta.);
+    //this.block.doc?.collection.setDocMeta(,)
     this.host?.selection.clear();
     //console.log('1111', this.currentText);
     return html`<div class="popover-block-editor">
       <mahdaad-inline-weblink-add-editor-form
+        object-id="${this.block.doc.meta.object_id}"
         .title="${this.currentText}"
         @save="${this.handleSave}"
+        @generateWeblink="${this.generateWeblink}"
       ></mahdaad-inline-weblink-add-editor-form>
     </div> `;
   };
@@ -110,7 +112,16 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     `;*/
   };
 
-  private _embedOptions: EmbedOptions | null = null;
+  private _removeLink = () => {
+    if (this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
+      this.inlineEditor.formatText(this.targetInlineRange, {
+        link: null,
+      });
+    }
+    this.abortController.abort();
+  };
+
+  //private _embedOptions: EmbedOptions | null = null;
 
   /*private _openLink = () => {
     let link = this.currentLink;
@@ -121,23 +132,14 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     this.abortController.abort();
   };*/
 
-  private _removeLink = () => {
-    if (this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
-      this.inlineEditor.formatText(this.targetInlineRange, {
-        link: null,
-      });
-    }
-    this.abortController.abort();
-  };
-
   private _viewTemplate = () => {
     if (!this._rootService) {
       return nothing;
     }
 
-    this._embedOptions = this._rootService.getEmbedBlockOptions(
+    /* this._embedOptions = this._rootService.getEmbedBlockOptions(
       this.currentLink
-    );
+    );*/
 
     /*const buttons = [
       html`
@@ -190,8 +192,14 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     return html`<div class="popover-block-editor">
       <mahdaad-weblink-action
         .url="${this.currentLink}"
+        title="${this.currentText}"
+        object-id="${this.block.doc.meta.object_id}"
         @edit="${this._edit}"
-        @remove="${this._removeLink}"
+        @removeLink="${this._removeLink}"
+        show-remove-link="true"
+        show-in-container
+        show-generate-link
+        @generateWeblink="${this.generateWeblink}"
         @close="${() => {
           this.abortController.abort();
         }}"
@@ -200,9 +208,10 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
           const mode = event.detail;
           switch (mode) {
             case 'card':
-              this._convertToCardView();
+              this._convertToCardView('card');
               break;
             case 'embed':
+              this._convertToCardView('embed');
               break;
           }
         }}"
@@ -220,9 +229,44 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     `;*/
   };
 
-  private get _canConvertToEmbedView() {
-    return this._embedOptions?.viewType === 'embed';
+  private _convertToCardView(show_type: 'card' | 'embed') {
+    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
+      return;
+    }
+
+    const targetFlavour = 'affine:mahdaad-weblink-block';
+
+    /*if (this._embedOptions && this._embedOptions.viewType === 'card') {
+      targetFlavour = this._embedOptions.flavour;
+    }*/
+
+    const block = this.block;
+    if (!block) return;
+    const url = this.currentLink;
+    const title = this.currentText;
+    const props = {
+      url,
+      title: title === url ? '' : title,
+      show_type,
+    };
+    const doc = block.doc;
+    const parent = doc.getParent(block.model);
+    assertExists(parent);
+    const index = parent.children.indexOf(block.model);
+    doc.addBlock(targetFlavour as never, props, parent, index + 1);
+    const totalTextLength = this.inlineEditor.yTextLength;
+    const inlineTextLength = this.targetInlineRange.length;
+    if (totalTextLength === inlineTextLength) {
+      doc.deleteBlock(block.model);
+    } else {
+      this.inlineEditor.formatText(this.targetInlineRange, { link: null });
+    }
+    this.abortController.abort();
   }
+
+  /* private get _canConvertToEmbedView() {
+    return this._embedOptions?.viewType === 'embed';
+  }*/
 
   //static override styles = linkPopupStyle;
 
@@ -237,130 +281,6 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         ${ConfirmIcon}
       </editor-icon-button>
     `;
-  }*/
-
-  private _convertToCardView() {
-    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
-      return;
-    }
-
-    let targetFlavour = 'affine:mahdaad-weblink-block';
-
-    if (this._embedOptions && this._embedOptions.viewType === 'card') {
-      targetFlavour = this._embedOptions.flavour;
-    }
-
-    const block = this.block;
-    if (!block) return;
-    const url = this.currentLink;
-    const title = this.currentText;
-    const props = {
-      url,
-      title: title === url ? '' : title,
-    };
-    const doc = block.doc;
-    const parent = doc.getParent(block.model);
-    assertExists(parent);
-    const index = parent.children.indexOf(block.model);
-    doc.addBlock(targetFlavour as never, props, parent, index + 1);
-
-    const totalTextLength = this.inlineEditor.yTextLength;
-    const inlineTextLength = this.targetInlineRange.length;
-    if (totalTextLength === inlineTextLength) {
-      doc.deleteBlock(block.model);
-    } else {
-      this.inlineEditor.formatText(this.targetInlineRange, { link: null });
-    }
-
-    this.abortController.abort();
-  }
-
-  private _convertToEmbedView() {
-    if (!this._embedOptions || this._embedOptions.viewType !== 'embed') {
-      return;
-    }
-
-    const { flavour } = this._embedOptions;
-    const url = this.currentLink;
-
-    const block = this.block;
-    if (!block) return;
-    const doc = block.doc;
-    const parent = doc.getParent(block.model);
-    assertExists(parent);
-    const index = parent.children.indexOf(block.model);
-
-    doc.addBlock(flavour as never, { url }, parent, index + 1);
-
-    const totalTextLength = this.inlineEditor.yTextLength;
-    const inlineTextLength = this.targetInlineRange.length;
-    if (totalTextLength === inlineTextLength) {
-      doc.deleteBlock(block.model);
-    } else {
-      this.inlineEditor.formatText(this.targetInlineRange, { link: null });
-    }
-
-    this.abortController.abort();
-  }
-
-  private _copyUrl() {
-    navigator.clipboard.writeText(this.currentLink).catch(console.error);
-    if (!this.host) return;
-    toast(this.host, 'Copied link to clipboard');
-    this.abortController.abort();
-  }
-
-  private get _isBookmarkAllowed() {
-    const block = this.block;
-    if (!block) return false;
-    const schema = block.doc.schema;
-    const parent = block.doc.getParent(block.model);
-    if (!parent) return false;
-    const bookmarkSchema = schema.flavourSchemaMap.get('affine:bookmark');
-    if (!bookmarkSchema) return false;
-    const parentSchema = schema.flavourSchemaMap.get(parent.flavour);
-    if (!parentSchema) return false;
-
-    try {
-      schema.validateSchema(bookmarkSchema, parentSchema);
-    } catch {
-      return false;
-    }
-
-    return true;
-  }
-
-  /*  private _moreActions() {
-    return renderActions([
-      [
-        {
-          name: 'Open',
-          icon: OpenIcon,
-          handler: this._openLink,
-        },
-
-        {
-          name: 'Copy',
-          icon: CopyIcon,
-          handler: this._copyUrl,
-        },
-
-        {
-          name: 'Remove link',
-          icon: UnlinkIcon,
-          handler: this._removeLink,
-        },
-      ],
-
-      [
-        {
-          type: 'delete',
-          name: 'Delete',
-          icon: DeleteIcon,
-          handler: this._delete,
-        },
-      ],
-    ]);
   }*/
 
   private _onConfirm(title: string, url: string) {
@@ -414,6 +334,94 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     this.abortController.abort();
   }
 
+  /*private _convertToEmbedView() {
+    if (!this._embedOptions || this._embedOptions.viewType !== 'embed') {
+      return;
+    }
+
+    const { flavour } = this._embedOptions;
+    const url = this.currentLink;
+
+    const block = this.block;
+    if (!block) return;
+    const doc = block.doc;
+    const parent = doc.getParent(block.model);
+    assertExists(parent);
+    const index = parent.children.indexOf(block.model);
+
+    doc.addBlock(flavour as never, { url }, parent, index + 1);
+
+    const totalTextLength = this.inlineEditor.yTextLength;
+    const inlineTextLength = this.targetInlineRange.length;
+    if (totalTextLength === inlineTextLength) {
+      doc.deleteBlock(block.model);
+    } else {
+      this.inlineEditor.formatText(this.targetInlineRange, { link: null });
+    }
+
+    this.abortController.abort();
+  }*/
+
+  /*private _copyUrl() {
+    navigator.clipboard.writeText(this.currentLink).catch(console.error);
+    if (!this.host) return;
+    toast(this.host, 'Copied link to clipboard');
+    this.abortController.abort();
+  }*/
+
+  /*private get _isBookmarkAllowed() {
+    const block = this.block;
+    if (!block) return false;
+    const schema = block.doc.schema;
+    const parent = block.doc.getParent(block.model);
+    if (!parent) return false;
+    const bookmarkSchema = schema.flavourSchemaMap.get('affine:bookmark');
+    if (!bookmarkSchema) return false;
+    const parentSchema = schema.flavourSchemaMap.get(parent.flavour);
+    if (!parentSchema) return false;
+
+    try {
+      schema.validateSchema(bookmarkSchema, parentSchema);
+    } catch {
+      return false;
+    }
+
+    return true;
+  }*/
+
+  /*  private _moreActions() {
+    return renderActions([
+      [
+        {
+          name: 'Open',
+          icon: OpenIcon,
+          handler: this._openLink,
+        },
+
+        {
+          name: 'Copy',
+          icon: CopyIcon,
+          handler: this._copyUrl,
+        },
+
+        {
+          name: 'Remove link',
+          icon: UnlinkIcon,
+          handler: this._removeLink,
+        },
+      ],
+
+      [
+        {
+          type: 'delete',
+          name: 'Delete',
+          icon: DeleteIcon,
+          handler: this._delete,
+        },
+      ],
+    ]);
+  }*/
+
   private _onKeydown(e: KeyboardEvent) {
     e.stopPropagation();
     if (e.key === 'Enter' && !e.isComposing) {
@@ -426,14 +434,20 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     return this.std?.spec.getService('affine:page');
   }
 
-  private _updateConfirmBtn() {
-    /*assertExists(this.confirmButton);
+  /* private _updateConfirmBtn() {
+    /!*assertExists(this.confirmButton);
     const link = this.linkInput?.value.trim();
     this.confirmButton.disabled = !(link && isValidUrl(link));
-    this.confirmButton.requestUpdate();*/
+    this.confirmButton.requestUpdate();*!/
+  }*/
+
+  private handleSave(event: CustomEvent) {
+    const data = event.detail;
+    this._onConfirm(data.title, data.url);
+    //console.log('this is handle save', data);
   }
 
-  private _viewMenuButton() {
+  /* private _viewMenuButton() {
     if (!this._isBookmarkAllowed) return nothing;
 
     const buttons = [];
@@ -489,13 +503,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         </div>
       </editor-menu-button>
     `;
-  }
-
-  private handleSave(event: CustomEvent) {
-    const data = event.detail;
-    this._onConfirm(data.title, data.url);
-    //console.log('this is handle save', data);
-  }
+  }*/
 
   override connectedCallback() {
     super.connectedCallback();
@@ -543,10 +551,22 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     });
 
     this._disposables.addFromEvent(window, 'mousedown', e => {
-      //e.stopPropagation()
-      //      debugger;
       this.abortController.abort();
     });
+  }
+
+  generateWeblink(event: CustomEvent) {
+    const lnk: ObjectLink = event.detail;
+    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
+    this.inlineEditor.insertText(this.targetInlineRange, REFERENCE_NODE, {
+      mahdaadObjectLink: {
+        object_id: lnk.object_id,
+        link_id: lnk.link_id,
+        type: lnk.type,
+      },
+      reference: null,
+    });
+    this.abortController.abort();
   }
 
   override render() {

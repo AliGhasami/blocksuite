@@ -27,6 +27,34 @@ declare module '@blocksuite/blocks' {
 @customElement('mahdaad-object-link-inline')
 @Peekable({ action: false })
 export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
+  _convertLink(event: CustomEvent) {
+    const data = event.detail;
+    this.inlineEditor.insertText(this.selfInlineRange, data.title, {
+      link: data.url,
+      reference: null,
+    });
+    /*const { doc } = this.model;
+    const parent = doc.getParent(this.model);
+    assertExists(parent);
+    const index = parent.children.indexOf(this.model);
+    const yText = new DocCollection.Y.Text();
+    yText.insert(0, data.title);
+    yText.format(0, data.title.length, {
+      link: data.url,
+      reference: null,
+    });
+    const text = new doc.Text(yText);
+    doc.addBlock(
+      'affine:paragraph',
+      {
+        text,
+      },
+      parent,
+      index
+    );
+    doc.deleteBlock(this.model);*/
+  }
+
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
 
@@ -83,6 +111,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
         type="${meta?.type}"
         show-type="inline"
         @changeViewMode="${this.changeViewMode}"
+        @convertToLink="${this._convertLink}"
       ></mahdaad-object-link-component
       ><v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
     ></span>`;

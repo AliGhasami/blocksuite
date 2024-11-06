@@ -95,6 +95,7 @@ export class Job {
       });
       const rootModel = doc.root;
       const meta = this._exportDocMeta(doc);
+
       if (!rootModel) {
         throw new BlockSuiteError(
           ErrorCode.TransformerError,
@@ -351,6 +352,7 @@ export class Job {
       title: docMeta.title,
       createDate: docMeta.createDate,
       tags: [], // for backward compatibility
+      object_id: docMeta.object_id,
     };
   }
 

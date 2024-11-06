@@ -15,9 +15,32 @@ import { objectBlockStyles } from './styles.js';
 export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockModel> {
   static override styles = objectBlockStyles;
 
+  _convertLink(event: CustomEvent) {
+    const data = event.detail;
+    const { doc } = this.model;
+    const parent = doc.getParent(this.model);
+    assertExists(parent);
+    const index = parent.children.indexOf(this.model);
+    const yText = new DocCollection.Y.Text();
+    yText.insert(0, data.title);
+    yText.format(0, data.title.length, {
+      link: data.url,
+      reference: null,
+    });
+    const text = new doc.Text(yText);
+    doc.addBlock(
+      'affine:paragraph',
+      {
+        text,
+      },
+      parent,
+      index
+    );
+    doc.deleteBlock(this.model);
+  }
+
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
-    //console.log('1111', this.model.type, mode);
     if (['document', 'weblink'].includes(this.model.type) && mode == 'inline') {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);
@@ -25,7 +48,6 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
       const index = parent.children.indexOf(this.model);
       const yText = new DocCollection.Y.Text();
       yText.insert(0, REFERENCE_NODE);
-      //console.log('2222', this.model);
       yText.format(0, REFERENCE_NODE.length, {
         mahdaadObjectLink: {
           object_id: this.model.object_id,
@@ -86,7 +108,6 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   override renderBlock() {
     //console.log('this is model and props', this.model);
     //.doc="${this.doc}"
-
     //this.model.propsUpdated({})
 
     return html`<div contenteditable="false">
@@ -104,6 +125,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
           this.duplicate();
         }}"
         @changeViewMode="${this.changeViewMode}"
+        @convertToLink="${this._convertLink}"
       ></mahdaad-object-link-component>
     </div>`;
   }
@@ -114,13 +136,3 @@ declare global {
     'affine-mahdaad-object': ObjectBlockComponent;
   }
 }
-
-/*<mahdaad-object-container
-          @click=${data :any => {
-            console.log('this is data in click', data);
-            //alert('1111');
-          }}
-          @change=${data => {
-            console.log('this is data in change', data);
-          }}
-        ></mahdaad-object-container>*/

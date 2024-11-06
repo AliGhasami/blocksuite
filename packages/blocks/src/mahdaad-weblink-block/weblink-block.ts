@@ -7,34 +7,24 @@ import { customElement } from 'lit/decorators.js';
 import type { MahdaadWeblinkBlockModel } from './weblink-model.js';
 
 import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
-import { REFERENCE_NODE } from '../_common/inline/presets/nodes/consts.js';
-import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
-//import { objectBlockStyles } from './styles.js';
 
 @customElement('affine-mahdaad-weblink-block')
 export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<MahdaadWeblinkBlockModel> {
-  //static override styles = objectBlockStyles;
-
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
-    //console.log('1111', this.model.type, mode);
-    if (['document', 'weblink'].includes(this.model.type) && mode == 'inline') {
+    if (mode == 'inline') {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);
       assertExists(parent);
       const index = parent.children.indexOf(this.model);
       const yText = new DocCollection.Y.Text();
-      yText.insert(0, REFERENCE_NODE);
-      //console.log('2222', this.model);
-      yText.format(0, REFERENCE_NODE.length, {
-        mahdaadObjectLink: {
-          object_id: this.model.object_id,
-          link_id: this.model.link_id,
-          type: this.model.type,
-        },
+      const title = this.model.title ?? '';
+      yText.insert(0, title);
+      yText.format(0, title.length, {
+        link: this.model.url,
+        reference: null,
       });
       const text = new doc.Text(yText);
-
       doc.addBlock(
         'affine:paragraph',
         {
@@ -63,7 +53,7 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
     });*/
   }
 
-  duplicate() {
+  /*duplicate() {
     this.doc.addSiblingBlocks(this.model, [
       {
         flavour: 'affine:mahdaad-object',
@@ -77,7 +67,7 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
       },
     ]);
     tryRemoveEmptyLine(this.model);
-  }
+  }*/
 
   removeBlock() {
     this.doc.deleteBlock(this.model);
@@ -86,10 +76,24 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
   override renderBlock() {
     //console.log('this is model and props', this.model);
     //.doc="${this.doc}"
-
     //this.model.propsUpdated({})
 
-    return html`<div contenteditable="false">this is weblink block</div>`;
+    return html`<div contenteditable="false">
+      <mahdaad-weblink
+        .model="${this.model}"
+        read-only="${this.doc.readonly}"
+        show-type="${this.model.show_type}"
+        url="${this.model.url}"
+        title="${this.model.title}"
+        @remove="${() => {
+          this.removeBlock();
+        }}"
+        @duplicate="${() => {
+          // this.duplicate();
+        }}"
+        @changeViewMode="${this.changeViewMode}"
+      ></mahdaad-weblink>
+    </div>`;
   }
 }
 

@@ -201,6 +201,7 @@ export class DocCollection extends DocCollectionAddonType {
       title: '',
       createDate: Date.now(),
       tags: [],
+      object_id: null,
     });
     return this.getDoc(docId, { selector }) as Doc;
   }

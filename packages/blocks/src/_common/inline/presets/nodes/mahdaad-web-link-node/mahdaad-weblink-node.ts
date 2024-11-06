@@ -130,11 +130,7 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
       ? affineTextStyles(this.delta.attributes, linkStyles)
       : styleMap({});
 
-    /*${ref(this._whenHover.setReference)}*/
-    //${ref(this._whenHover.setReference)}
-    /*@mouseup=${this._onMouseUp}*/
-
-    return html`<mahdaad-weblink>
+    return html`
       <a
         @mouseup=${this._onMouseUp}
         ${ref(this._whenHover.setReference)}
@@ -144,7 +140,7 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
         style=${styles}
         ><v-text .str=${this.delta.insert}></v-text
       ></a>
-    </mahdaad-weblink>`;
+    `;
 
     /*return html`<mahdaad-weblink>
       <!-- <p slot="header">Header Content</p> -->

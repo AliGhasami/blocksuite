@@ -36,7 +36,9 @@ interface Props {
   readonly ?:boolean,
   locale?:'fa' | 'en'
   disableTools?:string[]
+  objectId?:string | null
 }
+
 
 type IBlockChange =
   | {
@@ -70,6 +72,23 @@ i18next.use(initLitI18n).init({
   lng: props.locale ?? 'en',
   resources
 });
+
+watch(()=>props.objectId,()=>{
+  if(props.objectId){
+    if(currentDocument.value){
+      myCollection?.setDocMeta(currentDocument.value.id,{object_id:props.objectId})
+      //console.log("rrrrrrrrrrrrr",props.objectId,currentDocument.value);
+    }
+  }
+},{immediate:true})
+
+watch(currentDocument,()=>{
+  if(props.objectId){
+    myCollection?.setDocMeta(currentDocument.value.id,{object_id:props.objectId})
+  }
+})
+
+
 
 
 const emit = defineEmits<{

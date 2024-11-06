@@ -40,6 +40,7 @@ export const NoteBlockSchema = defineBlockSchema({
       'affine:code',
       'affine:divider',
       'affine:mahdaad-object',
+      'affine:mahdaad-weblink-block',
       //'affine:mention',
       'affine:simple',
       'affine:database',
