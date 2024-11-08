@@ -22,7 +22,6 @@ import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/
 //import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { EDGELESS_ELEMENT_TOOLBAR_WIDGET } from '../widgets/index.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
-import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
 import { MAHDAAD_FORMAT_BAR_WIDGET } from '../widgets/mahdaad-format-bar/format-bar.js';
 import { Mahdaad_Mention_MENU_WIDGET } from '../widgets/mahdaad-mention/index.js';
 import { AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET } from '../widgets/mahdaad-object-picker/index.js';
@@ -39,7 +38,7 @@ export type EdgelessRootBlockWidgetName =
   | typeof AFFINE_INNER_MODAL_WIDGET
   | typeof AFFINE_PIE_MENU_WIDGET
   | typeof AFFINE_SLASH_MENU_WIDGET
-  | typeof AFFINE_LINKED_DOC_WIDGET
+  //| typeof AFFINE_LINKED_DOC_WIDGET
   | typeof AFFINE_DRAG_HANDLE_WIDGET
   | typeof AFFINE_EMBED_CARD_TOOLBAR_WIDGET
   //| typeof AFFINE_FORMAT_BAR_WIDGET
@@ -76,9 +75,9 @@ export const EdgelessRootBlockSpec: EdgelessRootBlockSpecType = {
       [AFFINE_SLASH_MENU_WIDGET]: literal`${unsafeStatic(
         AFFINE_SLASH_MENU_WIDGET
       )}`,
-      [AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
+      /*[AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
         AFFINE_LINKED_DOC_WIDGET
-      )}`,
+      )}`,*/
       [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
         AFFINE_DRAG_HANDLE_WIDGET
       )}`,

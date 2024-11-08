@@ -77,8 +77,10 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     ]);
 
     //model.doc.addBlocks()
-
-    model.doc.deleteBlock(this.model);
+    //console.log('this', model.text?.length);
+    if (model.text?.length == 0) {
+      model.doc.deleteBlock(this.model);
+    }
     const next = model.doc.getNext(temp[0]);
     if (next) {
       const inline: InlineEditor | null = getInlineEditorByModel(
@@ -96,9 +98,31 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   clearTrigger() {
     // console.log('11111', this._searchText);
+    //todo fix trigger key ali ghasami dynamic
     try {
-      //todo fix trigger key ali ghasami dynamic
-      const trigger = '/template/';
+      let trigger = null;
+      switch (this.obj_type) {
+        case 'template':
+          trigger = '/template/';
+          break;
+        case 'document':
+          trigger = '/page/';
+          break;
+        case 'image':
+          trigger = '/image/';
+          break;
+        case 'weblink':
+          trigger = '/weblink/';
+          break;
+        case 'tag':
+          trigger = '/tag/';
+          break;
+        case 'file':
+          trigger = '/file/';
+          break;
+      }
+
+      //const trigger = '/template/';
       const text = this._searchText ? trigger + this._searchText : trigger;
       // console.log('this is text', text);
       cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
@@ -209,8 +233,8 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
               this.clearTrigger();
             }}"
             @select="${(event: CustomEvent) => {
+              this.clearTrigger();
               if (this.obj_type == 'template') {
-                this.clearTrigger();
                 this.insertTemplate(event.detail);
               } else {
                 this.addObjectLink(this.model, event.detail as ObjectLink);

@@ -129,6 +129,7 @@ export class Job {
   sliceToSnapshot = async (
     slice: Slice
   ): Promise<SliceSnapshot | undefined> => {
+    console.log('sliceToSnapshot');
     try {
       this._slots.beforeExport.emit({
         type: 'slice',
@@ -186,6 +187,7 @@ export class Job {
   };
 
   snapshotToDoc = async (snapshot: DocSnapshot): Promise<Doc | undefined> => {
+    console.log('snapshotToDoc');
     try {
       this._slots.beforeImport.emit({
         type: 'page',
@@ -212,6 +214,7 @@ export class Job {
   };
 
   snapshotToModelData = async (snapshot: BlockSnapshot) => {
+    console.log('snapshotToModelData');
     try {
       const { children, flavour, props, id } = snapshot;
 
@@ -242,6 +245,8 @@ export class Job {
     parent?: string,
     index?: number
   ): Promise<Slice | undefined> => {
+    console.log('snapshotToSlice', snapshot);
+    //return undefined;
     try {
       this._slots.beforeImport.emit({
         type: 'slice',

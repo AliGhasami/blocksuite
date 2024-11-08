@@ -139,12 +139,14 @@ export class Clipboard {
           workspaceId: doc.collection.id,
           pageId: doc.id,
         };
+        console.log('this is result', payload);
         const result = await adapterInstance.toSlice(
           payload,
           doc,
           parent,
           index
         );
+
         if (result) {
           return result;
         }

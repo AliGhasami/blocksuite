@@ -234,7 +234,6 @@ function reset() {
 }
 
 function bindEvent(doc: Doc) {
-
   /*doc.slots.blockUpdated.on((a,b,c)=>{
     console.log("this is update",a,b,c);
   })*/
