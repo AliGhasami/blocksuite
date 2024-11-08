@@ -10,10 +10,7 @@
   "main": "./dist/vue-block-editor.umd.cjs",
   "module": "./dist/vue-block-editor.js",
   "exports": {
-    ".": {
-      "require": "./dist/vue-block-editor.js",
-      "import": "./dist/vue-block-editor.js"
-    },
+    ".": "./src/index.ts",
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
