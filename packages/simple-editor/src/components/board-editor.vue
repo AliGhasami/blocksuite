@@ -10,15 +10,43 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css'
-import { PageEditor, EdgelessEditor } from '@blocksuite/presets'
+import { PageEditor, EdgelessEditor, AffineEditorContainer } from "@blocksuite/presets";
 import { createEmptyDoc } from './helpers'
-import { type BlockModel, Doc, DocCollection, Job } from "@blocksuite/store";
+import {
+  type BlockCollection,
+  type BlockModel,
+  Doc,
+  DocCollection,
+  type DocCollectionOptions,
+  IdGeneratorType,
+  Job,
+  Schema, Text
+} from "@blocksuite/store";
 import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
-import { AffineSchemas, replaceIdMiddleware,toolsList } from "@blocksuite/blocks";
+import { AffineSchemas, type PageRootService, replaceIdMiddleware, toolsList } from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next';
 import { initLitI18n } from 'lit-i18n';
+import {
+  BroadcastChannelAwarenessSource,
+  BroadcastChannelDocSource,
+  IndexedDBBlobSource,
+  IndexedDBDocSource
+} from "@blocksuite/sync";
+import { WebSocketDocSource } from "@blocksuite/playground/apps/_common/sync/websocket/doc";
+import { WebSocketAwarenessSource } from "@blocksuite/playground/apps/_common/sync/websocket/awareness";
+import { assertExists } from "@blocksuite/global/utils";
+import {
+  mockDocModeService,
+  mockNotificationService,
+  mockQuickSearchService
+} from "@blocksuite/playground/apps/_common/mock-services";
+import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
+import type { BlockSpec, EditorHost } from "@blocksuite/block-std";
+//import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
+//import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
+//import { QuickEdgelessMenu } from "@blocksuite/playground/apps/_common/components/quick-edgeless-menu";
 
 const refEditor = ref<HTMLElement | null>(null)
 const currentDocument  = ref<Doc | null>(null)
@@ -161,7 +189,7 @@ function handleClick(){
 watch(
   () => props.isBoardView,
   () => {
-    init()
+   // init()
   }
 )
 
@@ -230,7 +258,7 @@ async function setData(data: any,clear_history?: boolean = true) {
 }
 
 function reset() {
-  init()
+  //init()
 }
 
 function bindEvent(doc: Doc) {
@@ -299,8 +327,220 @@ function appendTODOM(element: HTMLElement) {
   { deep: true }
 )*/
 
-function init() {
-  const { doc, collection } = createEmptyDoc(props.isBoardView,schemas.value).init()
+async function init() {
+  //debugger
+
+  /****************************************************/
+  const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
+
+  const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
+  const schema = new Schema();
+  schema.register(AffineSchemas);
+
+  const params = new URLSearchParams(location.search);
+  let docSources: DocCollectionOptions['docSources'] = {
+    main: new IndexedDBDocSource(),
+  };
+  let awarenessSources: DocCollectionOptions['awarenessSources'];
+  const room = params.get('room');
+  if (room) {
+    const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
+    //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=test`)
+    await new Promise((resolve, reject) => {
+      ws.addEventListener('open', resolve);
+      ws.addEventListener('error', reject);
+    })
+      .then(() => {
+        docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new WebSocketDocSource(ws)],
+        };
+        awarenessSources = [new WebSocketAwarenessSource(ws)];
+      })
+      .catch(() => {
+        docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new BroadcastChannelDocSource()],
+        };
+        awarenessSources = [
+          new BroadcastChannelAwarenessSource('quickEdgeless'),
+        ];
+      });
+  }
+
+  const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
+    [...params.entries()]
+      .filter(([key]) => key.startsWith('enable_'))
+      .map(([k, v]) => [k, v === 'true'])
+  );
+
+  const options: DocCollectionOptions = {
+    id: 'quickEdgeless',
+    schema,
+    idGenerator,
+    blobSources: {
+      main: new IndexedDBBlobSource('quickEdgeless'),
+    },
+    docSources,
+    awarenessSources,
+    defaultFlags: {
+      enable_synced_doc_block: true,
+      enable_pie_menu: true,
+      enable_lasso_tool: true,
+      ...flags,
+    },
+  };
+  const collection = new DocCollection(options);
+  collection.start();
+
+  // debug info
+  window.collection = collection;
+  window.blockSchemas = AffineSchemas;
+  window.job = new Job({ collection });
+  window.Y = DocCollection.Y;
+
+
+  //const params = new URLSearchParams(location.search);
+
+  await collection.waitForSynced();
+
+  const shouldInit = collection.docs.size === 0 && !params.get('room');
+  if (shouldInit) {
+    collection.meta.initialize();
+    const doc = collection.createDoc({ id: 'doc:home' });
+    doc.load();
+    const rootId = doc.addBlock('affine:page', {
+      title: new Text(),
+    });
+    doc.addBlock('affine:surface', {}, rootId);
+    doc.resetHistory();
+  } else {
+    // wait for data injected from provider
+    const firstPageId =
+      collection.docs.size > 0
+        ? collection.docs.keys().next().value
+        : await new Promise<string>(resolve =>
+          collection.slots.docAdded.once(id => resolve(id))
+        );
+    const doc = collection.getDoc(firstPageId);
+    assertExists(doc);
+    doc.load();
+    // wait for data injected from provider
+    if (!doc.root) {
+      await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+    }
+    doc.resetHistory();
+  }
+
+  const blockCollection = collection.docs.values().next()
+    .value as BlockCollection;
+  assertExists(blockCollection, 'Need to create a doc first');
+  const doc = blockCollection.getDoc();
+
+  assertExists(doc.ready, 'Doc is not ready');
+  assertExists(doc.root, 'Doc root is not ready');
+
+  //const app = document.getElementById('app');
+  const app = refEditor.value;
+  if (!app) return;
+
+  //const modeService = mockDocModeService(doc.id);
+  //setDocModeFromUrlParams(modeService);
+  const editor = new AffineEditorContainer();
+  const specs = getExampleSpecs();
+  editor.pageSpecs = [...specs.pageModeSpecs].map(spec => {
+    if (spec.schema.model.flavour === 'affine:page') {
+      spec = patchPageRootSpec(
+        spec as BlockSpec<'affine:page', PageRootService>
+      );
+    }
+    return spec;
+  });
+  editor.edgelessSpecs = [...specs.edgelessModeSpecs].map(spec => {
+    if (spec.schema.model.flavour === 'affine:page') {
+      spec = patchPageRootSpec(
+        spec as BlockSpec<'affine:page', PageRootService>
+      );
+    }
+    return spec;
+  });
+  editor.doc = doc;
+  //editor.mode = modeService.getMode();
+  /*editor.slots.docLinkClicked.on(({ docId }) => {
+    const target = collection.getDoc(docId);
+    if (!target) {
+      throw new Error(`Failed to jump to doc ${docId}`);
+    }
+    target.load();
+    editor.doc = target;
+  });*/
+  /*editor.slots.docUpdated.on(({ newDocId }) => {
+    editor.mode = modeService.getMode(newDocId);
+  });*/
+
+  app.append(editor);
+  await editor.updateComplete;
+
+  //const leftSidePanel = new LeftSidePanel();
+  //const docsPanel = new DocsPanel();
+  //docsPanel.editor = editor;
+  /*const quickEdgelessMenu = new QuickEdgelessMenu();
+  quickEdgelessMenu.collection = doc.collection;
+  quickEdgelessMenu.editor = editor;
+  quickEdgelessMenu.leftSidePanel = leftSidePanel;
+  quickEdgelessMenu.docsPanel = docsPanel;*/
+  ///document.body.append(leftSidePanel);
+  //document.body.append(quickEdgelessMenu);
+
+  // debug info
+  window.editor = editor;
+  window.doc = doc;
+  Object.defineProperty(globalThis, 'host', {
+    get() {
+      return document.querySelector<EditorHost>('editor-host');
+    },
+  });
+  Object.defineProperty(globalThis, 'std', {
+    get() {
+      return document.querySelector<EditorHost>('editor-host')?.std;
+    },
+  });
+
+  return editor;
+
+  function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
+    const setup = spec.setup;
+    const newSpec: typeof spec = {
+      ...spec,
+      setup: (slots, disposable) => {
+        setup?.(slots, disposable);
+        slots.mounted.once(({ service }) => {
+          const pageRootService = service as PageRootService;
+          pageRootService.notificationService =
+            mockNotificationService(pageRootService);
+          pageRootService.quickSearchService =
+            mockQuickSearchService(collection);
+          pageRootService.peekViewService = {
+            peek(target: unknown) {
+              alert('Peek view not implemented in playground');
+              console.log('peek', target);
+              return Promise.resolve();
+            },
+          };
+          pageRootService.docModeService = mockDocModeService(
+            pageRootService.doc.id
+          );
+        });
+      },
+    };
+
+    return newSpec;
+  }
+
+  /*******************************************************/
+
+  /*const { doc, collection } = createEmptyDoc(props.isBoardView,schemas.value).init()
   myCollection = collection
   currentDocument.value = doc
   if (props.isBoardView) {
@@ -312,7 +552,7 @@ function init() {
   checkIsEmpty()
   appendTODOM(editorElement.value)
   checkReadOnly()
-  bindEvent(doc)
+  bindEvent(doc)*/
 }
 
 async function exportData(collection: DocCollection, docs: any[]) {
