@@ -45,6 +45,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         .title="${this.currentText}"
         @save="${this.handleSave}"
         @generateWeblink="${this.generateWeblink}"
+        .create-link="${true}"
       ></mahdaad-inline-weblink-add-editor-form>
     </div> `;
   };
@@ -77,6 +78,9 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     return html`<div class="popover-block-editor">
       <mahdaad-inline-weblink-add-editor-form
         .title="${this.currentText}"
+        object-id="${this.block.doc.meta.object_id}"
+        @generateWeblink="${this.generateWeblink}"
+        .create-link="${true}"
         .url="${this.currentLink}"
         @save="${this.handleSave}"
       ></mahdaad-inline-weblink-add-editor-form>
@@ -557,6 +561,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
 
   generateWeblink(event: CustomEvent) {
     const lnk: ObjectLink = event.detail;
+    //debugger;
     if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
     this.inlineEditor.insertText(this.targetInlineRange, REFERENCE_NODE, {
       mahdaadObjectLink: {

@@ -4,6 +4,7 @@ import { DocCollection } from '@blocksuite/store';
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
+import type { ObjectLink } from '../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
 import type { MahdaadWeblinkBlockModel } from './weblink-model.js';
 
 import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
@@ -69,6 +70,35 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
     tryRemoveEmptyLine(this.model);
   }*/
 
+  generateWeblink(event: CustomEvent) {
+    const lnk: ObjectLink = event.detail;
+    //debugger;
+    this.doc.addSiblingBlocks(this.model, [
+      {
+        flavour: 'affine:mahdaad-object',
+        object_id: lnk.object_id,
+        type: lnk.type,
+        link_id: lnk.link_id,
+        show_type: 'card',
+        //...this.model,
+        //name: file.name,
+        //size: file.size,
+        //type: types[index],
+      },
+    ]);
+    this.doc.deleteBlock(this.model);
+    /*if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
+    this.inlineEditor.insertText(this.targetInlineRange, REFERENCE_NODE, {
+      mahdaadObjectLink: {
+        object_id: lnk.object_id,
+        link_id: lnk.link_id,
+        type: lnk.type,
+      },
+      reference: null,
+    });
+    this.abortController.abort();*/
+  }
+
   removeBlock() {
     this.doc.deleteBlock(this.model);
   }
@@ -81,6 +111,7 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
     return html`<div contenteditable="false">
       <mahdaad-weblink
         .model="${this.model}"
+        object-id="${this.doc.meta.object_id}"
         read-only="${this.doc.readonly}"
         show-type="${this.model.show_type}"
         url="${this.model.url}"
@@ -88,12 +119,22 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
         @remove="${() => {
           this.removeBlock();
         }}"
-        @duplicate="${() => {
-          // this.duplicate();
-        }}"
+        @save="${this.save}"
         @changeViewMode="${this.changeViewMode}"
+        @generateWeblink="${this.generateWeblink}"
       ></mahdaad-weblink>
     </div>`;
+  }
+
+  save(event: CustomEvent) {
+    const data = event.detail;
+    this.doc.updateBlock(this.model, {
+      title: data.title,
+      url: data.url,
+    });
+    //this.model.propsUpdated
+    //debugger;
+    //this._onConfirm(data.title, data.url);
   }
 }
 
