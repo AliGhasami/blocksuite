@@ -22,7 +22,7 @@ import {
   Job,
   Schema, Text
 } from "@blocksuite/store";
-import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch,onBeforeUnmount } from "vue";
 import { AffineSchemas, type PageRootService, replaceIdMiddleware, toolsList } from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
@@ -44,6 +44,8 @@ import {
 } from "@blocksuite/playground/apps/_common/mock-services";
 import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
 import type { BlockSpec, EditorHost } from "@blocksuite/block-std";
+import { useRouter } from "vue-router";
+//import router from "@/router";
 //import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
 //import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
 //import { QuickEdgelessMenu } from "@blocksuite/playground/apps/_common/components/quick-edgeless-menu";
@@ -217,10 +219,12 @@ watch(
   { immediate: true }
 )
 
+
+//todo ali ghasami for back
 async function getData() {
-  if (myCollection) {
+  /*if (myCollection) {
     return await exportData(myCollection, [currentDocument.value])
-  }
+  }*/
   return null
 }
 
@@ -326,12 +330,39 @@ function appendTODOM(element: HTMLElement) {
   },
   { deep: true }
 )*/
+//todo ali ghasami
+watch(()=>props.objectId,()=>{
+  console.log("this is object id 22222222222222");
+  //console.log("100000");
+
+})
+
+const router=useRouter()
+/*watch(()=>router.currentRoute.value.query.id,()=>{
+  if(router.currentRoute.value.query.id){
+    console.log("this is object id 111111",myCollection);
+    init()
+  }
+
+})*/
+
+/*onBeforeUnmount(()=>{
+  myCollection?.forceStop()
+})*/
 
 async function init() {
+
+  indexedDB.deleteDatabase('blocksuite-local')
+  await new Promise((resolve, reject) => {
+    setTimeout(()=>{
+      resolve(true)
+    },5000)
+  })
+  console.log("this is init");
   /****************************************************/
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
-  //indexedDB.deleteDatabase('blocksuite-local')
+
   //return
   const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
   const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
@@ -343,13 +374,16 @@ async function init() {
     main: new IndexedDBDocSource(),
   };
   let awarenessSources: DocCollectionOptions['awarenessSources'];
-  const room = params.get('id');
-  const objectId = params.get('id');
+  const objectId = props.objectId
+  const room = objectId
+ //params.get('id');
+  console.log("object id",objectId);
   const edgelessId=`edgeless_${objectId}`
   if (room) {
     //const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
     //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=test`)
     const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
+    //ws.close()
     await new Promise((resolve, reject) => {
       ws.addEventListener('open', resolve);
       ws.addEventListener('error', reject);
@@ -397,9 +431,9 @@ async function init() {
      // ...flags,
     },
   };
-  const myCollection = new DocCollection(options);
+  myCollection = new DocCollection(options);
   myCollection.start();
-
+  //myCollection.
   // debug info
  /* window.collection = collection;
   window.blockSchemas = AffineSchemas;
@@ -410,8 +444,8 @@ async function init() {
   //const params = new URLSearchParams(location.search);
 
   await myCollection.waitForSynced();
-
-  const shouldInit = myCollection.docs.size === 0 && !params.get('id');
+  myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
+  const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
   if (shouldInit) {
     myCollection.meta.initialize();
     const doc = myCollection.createDoc({ id:objectId });//'doc:home'
@@ -420,6 +454,8 @@ async function init() {
     const rootId = doc.addBlock('affine:page', {
       title: new Text(),
     });
+    const noteId = doc.addBlock('affine:note', {}, rootId)
+    doc.addBlock('affine:paragraph', {}, noteId)
     doc.addBlock('affine:surface', {}, rootId);
     doc.resetHistory();
   } else {
@@ -456,6 +492,7 @@ async function init() {
   } else {
     editorElement.value = new PageEditor()
   }
+  console.log("this is doc",doc);
   currentDocument.value = doc
   editorElement.value.doc =  doc
   appendTODOM(editorElement.value)
@@ -482,7 +519,8 @@ async function init() {
   });
   editor.doc = doc;*/
   //console.log(' ===>',editor.doc);
-  myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
+
+
   //editor.mode = modeService.getMode();
   /*editor.slots.docLinkClicked.on(({ docId }) => {
     const target = collection.getDoc(docId);
