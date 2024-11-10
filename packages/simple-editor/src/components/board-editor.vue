@@ -328,12 +328,12 @@ function appendTODOM(element: HTMLElement) {
 )*/
 
 async function init() {
-  //debugger
-
   /****************************************************/
-  const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
-
+  //indexedDB.deleteDatabase('blocksuite-local')
+  //return
+  const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
   const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
   const schema = new Schema();
   schema.register(AffineSchemas);
@@ -343,10 +343,13 @@ async function init() {
     main: new IndexedDBDocSource(),
   };
   let awarenessSources: DocCollectionOptions['awarenessSources'];
-  const room = params.get('room');
+  const room = params.get('id');
+  const objectId = params.get('id');
+  const edgelessId=`edgeless_${objectId}`
   if (room) {
-    const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
+    //const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
     //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=test`)
+    const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
     await new Promise((resolve, reject) => {
       ws.addEventListener('open', resolve);
       ws.addEventListener('error', reject);
@@ -354,7 +357,7 @@ async function init() {
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(ws)],
+          shadows: [new WebSocketDocSource(ws,objectId)],
         };
         awarenessSources = [new WebSocketAwarenessSource(ws)];
       })
@@ -364,66 +367,71 @@ async function init() {
           shadows: [new BroadcastChannelDocSource()],
         };
         awarenessSources = [
-          new BroadcastChannelAwarenessSource('quickEdgeless'),
+          //new BroadcastChannelAwarenessSource('quickEdgeless'),
+          new BroadcastChannelAwarenessSource(edgelessId),
         ];
       });
   }
 
-  const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
+  /*const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
     [...params.entries()]
       .filter(([key]) => key.startsWith('enable_'))
       .map(([k, v]) => [k, v === 'true'])
-  );
+  );*/
 
   const options: DocCollectionOptions = {
-    id: 'quickEdgeless',
+    //id: 'quickEdgeless',
+    id: edgelessId,
     schema,
     idGenerator,
-    blobSources: {
+    /*blobSources: {
       main: new IndexedDBBlobSource('quickEdgeless'),
-    },
+      //main: new IndexedDBBlobSource(edgelessId),
+    },*/
     docSources,
     awarenessSources,
     defaultFlags: {
       enable_synced_doc_block: true,
       enable_pie_menu: true,
       enable_lasso_tool: true,
-      ...flags,
+     // ...flags,
     },
   };
-  const collection = new DocCollection(options);
-  collection.start();
+  const myCollection = new DocCollection(options);
+  myCollection.start();
 
   // debug info
-  window.collection = collection;
+ /* window.collection = collection;
   window.blockSchemas = AffineSchemas;
   window.job = new Job({ collection });
-  window.Y = DocCollection.Y;
+  window.Y = DocCollection.Y;*/
 
 
   //const params = new URLSearchParams(location.search);
 
-  await collection.waitForSynced();
+  await myCollection.waitForSynced();
 
-  const shouldInit = collection.docs.size === 0 && !params.get('room');
+  const shouldInit = myCollection.docs.size === 0 && !params.get('id');
   if (shouldInit) {
-    collection.meta.initialize();
-    const doc = collection.createDoc({ id: 'doc:home' });
+    myCollection.meta.initialize();
+    const doc = myCollection.createDoc({ id:objectId });//'doc:home'
     doc.load();
+    //collection.docs.
     const rootId = doc.addBlock('affine:page', {
       title: new Text(),
     });
     doc.addBlock('affine:surface', {}, rootId);
     doc.resetHistory();
   } else {
+   // debugger
     // wait for data injected from provider
     const firstPageId =
-      collection.docs.size > 0
-        ? collection.docs.keys().next().value
+      myCollection.docs.size > 0
+        ? myCollection.docs.keys().next().value
         : await new Promise<string>(resolve =>
-          collection.slots.docAdded.once(id => resolve(id))
+          myCollection.slots.docAdded.once(id => resolve(id))
         );
-    const doc = collection.getDoc(firstPageId);
+    const doc = myCollection.getDoc(firstPageId);
     assertExists(doc);
     doc.load();
     // wait for data injected from provider
@@ -433,23 +441,30 @@ async function init() {
     doc.resetHistory();
   }
 
-  const blockCollection = collection.docs.values().next()
+  const blockCollection = myCollection.docs.values().next()
     .value as BlockCollection;
   assertExists(blockCollection, 'Need to create a doc first');
   const doc = blockCollection.getDoc();
-
   assertExists(doc.ready, 'Doc is not ready');
   assertExists(doc.root, 'Doc root is not ready');
 
   //const app = document.getElementById('app');
-  const app = refEditor.value;
-  if (!app) return;
-
+ /* const app = refEditor.value;
+  if (!app) return;*/
+  if (props.isBoardView) {
+    editorElement.value = new EdgelessEditor()
+  } else {
+    editorElement.value = new PageEditor()
+  }
+  currentDocument.value = doc
+  editorElement.value.doc =  doc
+  appendTODOM(editorElement.value)
+  bindEvent(doc)
   //const modeService = mockDocModeService(doc.id);
   //setDocModeFromUrlParams(modeService);
-  const editor = new AffineEditorContainer();
-  const specs = getExampleSpecs();
-  editor.pageSpecs = [...specs.pageModeSpecs].map(spec => {
+  //const editor = new AffineEditorContainer();
+  //const specs = getExampleSpecs();
+  /*editor.pageSpecs = [...specs.pageModeSpecs].map(spec => {
     if (spec.schema.model.flavour === 'affine:page') {
       spec = patchPageRootSpec(
         spec as BlockSpec<'affine:page', PageRootService>
@@ -465,7 +480,9 @@ async function init() {
     }
     return spec;
   });
-  editor.doc = doc;
+  editor.doc = doc;*/
+  //console.log(' ===>',editor.doc);
+  myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
   //editor.mode = modeService.getMode();
   /*editor.slots.docLinkClicked.on(({ docId }) => {
     const target = collection.getDoc(docId);
@@ -479,9 +496,9 @@ async function init() {
     editor.mode = modeService.getMode(newDocId);
   });*/
 
-  app.append(editor);
-  await editor.updateComplete;
-
+ // app.append(editor);
+  //await editor.updateComplete;
+  //console.log(' ===>',editor.doc);
   //const leftSidePanel = new LeftSidePanel();
   //const docsPanel = new DocsPanel();
   //docsPanel.editor = editor;
@@ -494,9 +511,9 @@ async function init() {
   //document.body.append(quickEdgelessMenu);
 
   // debug info
-  window.editor = editor;
-  window.doc = doc;
-  Object.defineProperty(globalThis, 'host', {
+  /*window.editor = editor;
+  window.doc = doc;*/
+  /*Object.defineProperty(globalThis, 'host', {
     get() {
       return document.querySelector<EditorHost>('editor-host');
     },
@@ -505,11 +522,14 @@ async function init() {
     get() {
       return document.querySelector<EditorHost>('editor-host')?.std;
     },
-  });
+  });*/
 
-  return editor;
 
-  function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
+
+
+  //return editor;
+
+  /*function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
     const setup = spec.setup;
     const newSpec: typeof spec = {
       ...spec,
@@ -536,7 +556,7 @@ async function init() {
     };
 
     return newSpec;
-  }
+  }*/
 
   /*******************************************************/
 
