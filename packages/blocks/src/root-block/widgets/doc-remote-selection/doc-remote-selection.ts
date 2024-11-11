@@ -223,6 +223,10 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
     this._remoteColorManager = new RemoteColorManager(this.host);
   }
 
+  override createRenderRoot() {
+    return this;
+  }
+
   override disconnectedCallback() {
     super.disconnectedCallback();
     this._resizeObserver.disconnect();

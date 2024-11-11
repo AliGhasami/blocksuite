@@ -1,6 +1,6 @@
 <template>
   <div>
-<!--    <Button @click="handleClick">change schema</Button>-->
+<!--    <Button @click="handleClick">start collabration</Button>-->
 <!--    {{ schemas.length }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
@@ -10,8 +10,8 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css'
-import { PageEditor, EdgelessEditor, AffineEditorContainer } from "@blocksuite/presets";
-import { createEmptyDoc } from './helpers'
+import { PageEditor, EdgelessEditor } from "@blocksuite/presets";
+//import { createEmptyDoc } from './helpers'
 import {
   type BlockCollection,
   type BlockModel,
@@ -22,8 +22,8 @@ import {
   Job,
   Schema, Text
 } from "@blocksuite/store";
-import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch,onBeforeUnmount } from "vue";
-import { AffineSchemas, type PageRootService, replaceIdMiddleware, toolsList } from "@blocksuite/blocks";
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from "vue";
+import { AffineSchemas, replaceIdMiddleware, toolsList } from "@blocksuite/blocks";
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next';
@@ -31,20 +31,21 @@ import { initLitI18n } from 'lit-i18n';
 import {
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
-  IndexedDBBlobSource,
+  //IndexedDBBlobSource,
   IndexedDBDocSource
 } from "@blocksuite/sync";
 import { WebSocketDocSource } from "@blocksuite/playground/apps/_common/sync/websocket/doc";
 import { WebSocketAwarenessSource } from "@blocksuite/playground/apps/_common/sync/websocket/awareness";
 import { assertExists } from "@blocksuite/global/utils";
-import {
+/*import {
   mockDocModeService,
   mockNotificationService,
   mockQuickSearchService
 } from "@blocksuite/playground/apps/_common/mock-services";
 import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
-import type { BlockSpec, EditorHost } from "@blocksuite/block-std";
+import type { BlockSpec, EditorHost } from "@blocksuite/block-std";*/
 import { useRouter } from "vue-router";
+import { useWebSocket } from "@vueuse/core";
 //import router from "@/router";
 //import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
 //import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
@@ -55,7 +56,9 @@ const currentDocument  = ref<Doc | null>(null)
 const editorElement=ref<EdgelessEditor | PageEditor |null>(null)
 const isEmpty=ref<boolean>(false)
 let myCollection: DocCollection | null = null
-window.$blockEditor = {}
+/*window.$blockEditor = {
+
+}*/
 
 interface Props {
   isBoardView?: boolean
@@ -139,6 +142,11 @@ const schemas=computed(()=>{
 
 
 function handleClick(){
+
+  /*if(myCollection){
+    //myCollection.docSync.shadows=[]
+  }*/
+
   /*************************/
   //currentDocument.value?.addBlock
   //const { doc } = window;
@@ -146,7 +154,7 @@ function handleClick(){
     title: new doc.Text(),
   });*/
   //const note =  doc.addBlock('affine:note', {}, rootId);
-  const doc=unref(toRaw(currentDocument.value))
+  /*const doc=unref(toRaw(currentDocument.value))
   //console.log("currentDocument",currentDocument.value);
   //console.log("this is temp",temp);
   const noteList = doc.getBlockByFlavour('affine:note')
@@ -164,8 +172,8 @@ function handleClick(){
     ];
     const text =  doc.Text.fromDelta(delta);
     //note
-    doc.addBlock('affine:paragraph', { text },note.id );
-  }
+    doc.addBlock('affine:paragraph', { text },note.id );*/
+ // }
   /*******************************/
   //console.log("editor",editor.specs);
   //editorElement.value = new PageEditor()
@@ -212,7 +220,6 @@ watch(
     if (window.$blockEditor) {
       Object.assign(window.$blockEditor, temp)
     } else {
-
       window.$blockEditor = temp
     }
   },
@@ -346,54 +353,175 @@ const router=useRouter()
 
 })*/
 
-/*onBeforeUnmount(()=>{
+onBeforeUnmount(()=>{
+  myCollection?.waitForGracefulStop()
   myCollection?.forceStop()
-})*/
-
+  //myCollection?.forceStop()
+})
+//let status=false
 async function init() {
 
-  indexedDB.deleteDatabase('blocksuite-local')
+
+
+
+ /* const request = indexedDB.open("blocksuite-local", 1);
+
+  request.onerror = function(event) {
+    console.error("Database error: ", event.target.error);
+  };
+
+  request.onsuccess = function(event) {
+    console.log("Database opened successfully");
+    const db = event.target.result;
+  };*/
+
+  //indexedDB.deleteDatabase('')
+  /*let request = indexedDB.deleteDatabase('blocksuite-local');
+  request.onsuccess = function () {
+    console.log("Database deleted successfully");
+  };
+
+  request.onerror = function (event) {
+    console.error("Error deleting database:", event.target.error);
+  };
+
+  request.onblocked = function () {
+    console.warn("Database deletion blocked. Close all connections.");
+  };*/
+
+
+
+
+  //return
+
   await new Promise((resolve, reject) => {
     setTimeout(()=>{
       resolve(true)
-    },5000)
+    },2000)
   })
-  console.log("this is init");
+  const objectId = props.objectId
+  const room = objectId
+  //params.get('id');
+  console.log("object id",objectId);
+  const edgelessId=`edgeless_${objectId}`
+  /*const dbRequest = indexedDB.open("blocksuite-local", 1);
+
+  dbRequest.onerror = function(event) {
+    console.error("Database error:");
+  };
+
+  dbRequest.onsuccess = function(event) {
+    const db = event.target.result;
+    console.log("Database connected successfully");
+
+    // حذف رکورد با استفاده از کلید
+    //deleteRecord(db, "collection", objectId);
+    //deleteRecord(db, "collection", edgelessId);
+  };
+
+// تابعی برای حذف رکورد بر اساس کلید
+  function deleteRecord(db, storeName, key) {
+    const transaction = db.transaction(storeName, "readwrite");
+    const store = transaction.objectStore(storeName);
+    const deleteRequest = store.delete(key);
+
+    deleteRequest.onsuccess = function() {
+      console.log("Record deleted successfully");
+    };
+
+    deleteRequest.onerror = function(event) {
+      console.error("Error deleting record:", event.target.error);
+    };
+  }*/
+
+
+  //return
+
+
+
+  /*await new Promise((resolve, reject) => {
+    setTimeout(()=>{
+      resolve(true)
+    },50000)
+  })*/
+
+
+
+
+  // Function to clear all records in the specified object store
+ /* function clearObjectStore(db, storeName) {
+    const transaction = db.transaction(storeName, "readwrite");
+    const store = transaction.objectStore(storeName);
+    const clearRequest = store.clear();
+
+    clearRequest.onsuccess = function() {
+      console.log("Object store cleared successfully");
+    };
+
+    clearRequest.onerror = function(event) {
+      console.error("Error clearing object store:", event.target.error);
+    };
+  }*/
+  //return
+
+
+
+
+
+  //console.log("this is init");
   /****************************************************/
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
 
   //return
-  const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
+ // const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
+  const BASE_WEBSOCKET_URL = 'wss://sence.misdc.com'
+ /* if(!window.$blockEditor.wss){
+    const { status, data, send, open, close,ws } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
+    window.$blockEditor.wss= ws.value
+  }*/
+
+
   const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
   const schema = new Schema();
   schema.register(AffineSchemas);
 
-  const params = new URLSearchParams(location.search);
+  //const params = new URLSearchParams(location.search);
   let docSources: DocCollectionOptions['docSources'] = {
     main: new IndexedDBDocSource(),
   };
   let awarenessSources: DocCollectionOptions['awarenessSources'];
-  const objectId = props.objectId
-  const room = objectId
- //params.get('id');
-  console.log("object id",objectId);
-  const edgelessId=`edgeless_${objectId}`
+
   if (room) {
     //const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
     //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=test`)
-    const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
+    //console.log("windowsssss",window.$blockEditor);
+    if(!window.$blockEditor.wss || (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)){
+      //const {  data, send, open, close,ws,status } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
+      const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
+      window.$blockEditor.wss= ws
+    }
+    const web_socket : WebSocket= window.$blockEditor.wss
+    console.log("status",web_socket.OPEN);
+    //console.log();
     //ws.close()
+    //console.log("this is ws",ws);
+    //ws.close()
+
     await new Promise((resolve, reject) => {
-      ws.addEventListener('open', resolve);
-      ws.addEventListener('error', reject);
+      //console.log("1111",web_socket.OPEN);
+      if(web_socket.readyState === WebSocket.OPEN) resolve(true)
+     // console.log("2222");
+      web_socket.addEventListener('open', resolve);
+      web_socket.addEventListener('error', reject);
+      //web_socket.ope
     })
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(ws,objectId)],
+          shadows: [new WebSocketDocSource(web_socket,objectId)],
         };
-        awarenessSources = [new WebSocketAwarenessSource(ws)];
+        awarenessSources = [new WebSocketAwarenessSource(web_socket)];
       })
       .catch(() => {
         docSources = {
@@ -442,13 +570,19 @@ async function init() {
 
 
   //const params = new URLSearchParams(location.search);
-
+  console.log("before waitForSynced");
   await myCollection.waitForSynced();
-  myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
-  const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
+  console.log("after waitForSynced");
+
+  console.log("this is find doc",myCollection.getDoc(objectId));
+  //const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
+  const shouldInit = !myCollection.getDoc(objectId)
+
   if (shouldInit) {
     myCollection.meta.initialize();
     const doc = myCollection.createDoc({ id:objectId });//'doc:home'
+    //myCollection.docSync()
+    //myCollection.
     doc.load();
     //collection.docs.
     const rootId = doc.addBlock('affine:page', {
@@ -461,13 +595,13 @@ async function init() {
   } else {
    // debugger
     // wait for data injected from provider
-    const firstPageId =
+    /*const firstPageId =
       myCollection.docs.size > 0
         ? myCollection.docs.keys().next().value
         : await new Promise<string>(resolve =>
           myCollection.slots.docAdded.once(id => resolve(id))
-        );
-    const doc = myCollection.getDoc(firstPageId);
+        );*/
+    const doc = myCollection.getDoc(objectId);
     assertExists(doc);
     doc.load();
     // wait for data injected from provider
@@ -493,6 +627,7 @@ async function init() {
     editorElement.value = new PageEditor()
   }
   console.log("this is doc",doc);
+  myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
   currentDocument.value = doc
   editorElement.value.doc =  doc
   appendTODOM(editorElement.value)
@@ -561,9 +696,6 @@ async function init() {
       return document.querySelector<EditorHost>('editor-host')?.std;
     },
   });*/
-
-
-
 
   //return editor;
 
