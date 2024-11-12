@@ -7413,27 +7413,6 @@
           ]
         },
         {
-          "file": "packages/blocks/src/root-block/widgets/date-time-picker/date-time-popover.ts",
-          "hash": "13650535182930911437",
-          "deps": [
-            "npm:lit"
-          ]
-        },
-        {
-          "file": "packages/blocks/src/root-block/widgets/date-time-picker/index.ts",
-          "hash": "3578325937656907597",
-          "deps": [
-            "npm:lit"
-          ]
-        },
-        {
-          "file": "packages/blocks/src/root-block/widgets/date-time-picker/styles.ts",
-          "hash": "11630080053318711492",
-          "deps": [
-            "npm:lit"
-          ]
-        },
-        {
           "file": "packages/blocks/src/root-block/widgets/doc-remote-selection/doc-remote-selection.ts",
           "hash": "17177682836319968077",
           "deps": [
