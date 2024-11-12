@@ -16,6 +16,7 @@ export interface DateTimeEvent {
   time: string | null;
   date: string;
   meta?: any;
+  createMode?: boolean
 }
 
 export interface AffineTextAttributes {
@@ -28,6 +29,8 @@ export interface AffineTextAttributes {
   date?: DateTimeEvent;
   // TODO return if has bug
   ignoreSyncInlineRange?: true | null;
+  // TODO return if has bug
+  createMode?: boolean
   reference?: {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
@@ -164,6 +167,7 @@ export function getAffineInlineSpecsWithReference(
           date: z.string(),
           id: z.string().optional(),
           meta: z.any().optional(),
+          createMode: z.boolean().optional(),
         })
         .optional()
         .nullable()
@@ -178,6 +182,7 @@ export function getAffineInlineSpecsWithReference(
       embed: true,
     },
     // TODO return if has bug
+    // this attr is for not change cursor position on input keyup in inline elements 
     {
       name: 'ignoreSyncInlineRange',
       schema: z.literal(true).optional().nullable().catch(undefined),

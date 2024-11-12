@@ -3,7 +3,6 @@ import type { BlockComponent } from '@blocksuite/block-std';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
-import { ref } from 'lit/directives/ref.js';
 import {
   type DeltaInsert,
   INLINE_ROOT_ATTR,
@@ -19,8 +18,6 @@ import type { AffineTextAttributes } from '../../affine-inline-specs.js';
 
 import { BLOCK_ID_ATTR } from '../../../../consts.js';
 import { defaultDateFormat, defaultTimeFormat } from './config.js';
-import { HoverController } from '../../../../components/index.js';
-import { DateTimePopover } from '../../../../../root-block/widgets/date-time-picker/date-time-popover.js';
 
 @customElement('affine-date-time')
 export class AffineDateTime extends ShadowlessElement {
@@ -31,59 +28,41 @@ export class AffineDateTime extends ShadowlessElement {
   override disconnectedCallback() {
     super.disconnectedCallback();
   }
-  // TODO check edit perve item
-  private _whenHover = new HoverController(
-    this,
-    ({ abortController }) => {
-      return {
-        template: () => {
-          const editorHost = this.std.host;
-          const popup = new DateTimePopover(
-            editorHost,
-            this.inlineEditor,
-            abortController,
-            this.selfInlineRange.index
-          );
-          popup.type = 'edit';
-          popup.delta = this.delta;
-          popup.targetInlineRange = this.selfInlineRange;
-
-          editorHost.append(popup);
-
-          return popup;
-        },
-      };
-    },
-    { enterDelay: 500 },
-    false
-  );
 
   override render() {
     //console.log('this is date time', this.delta.insert);
-    return html`<span ${ref(this._whenHover.setReference)}>
-      <span class="${Prefix}-date-time" data-event-id="${this.id}">
-        <mahdaad-date-time
-          @update=${this.selfUpdate}
-          readonly="${this.blockElement.doc.readonly}"
-          date="${this.delta.attributes?.date?.date}"
-          time="${this.delta.attributes?.date?.time}"
-          meta="${this.delta.attributes?.date?.meta}"
-        ></mahdaad-date-time>
-      </span>
+    return html`<span>
+      <mahdaad-date-time
+        class="${Prefix}-date-time" 
+        data-event-id="${this.id}"
+        create-mode="${this.delta?.attributes?.date?.createMode ?? false}"
+        @update=${this.selfUpdate}
+        @close=""
+        readonly="${this.blockElement.doc.readonly}"
+        date="${this.delta.attributes?.date?.date}"
+        time="${this.delta.attributes?.date?.time}"
+        meta="${this.delta.attributes?.date?.meta}"
+      >
+      </mahdaad-date-time>
       <v-text .str=${this.delta.insert}>${ZERO_WIDTH_NON_JOINER}</v-text>
     </span>`;
   }
 
   selfUpdate(event){
-    const date = event?.detail;
-    if (date && typeof date === 'object') {
+    const data = event?.detail;
+    if (data && data.key && data.hasOwnProperty('value')) {
       const format = this.inlineEditor.getFormat(this.selfInlineRange);
-      if (format && format.date && format.date.id)
-        Object.assign(date, { id: format.date.id });
-      this.inlineEditor.formatText(this.selfInlineRange, {
-        date,
-        ignoreSyncInlineRange: true,
-      });
+      if (format?.date?.id){
+        const date = JSON.parse(JSON.stringify(format.date));
+        const {value, key} = data
+        if (value === undefined && date[key] !== undefined)
+          delete date[key];
+        else date[key] = value
+        this.inlineEditor.formatText(this.selfInlineRange, {
+          date,
+          ignoreSyncInlineRange: true,
+        });
+      }
     }
   }
 

@@ -5,7 +5,6 @@ import { literal, unsafeStatic } from 'lit/static-html.js';
 import type { RootBlockConfig } from '../index.js';
 
 import { RootBlockSchema } from '../root-model.js';
-import { AFFINE_DATE_TIME_WIDGET } from '../widgets/date-time-picker/index.js';
 import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/drag-handle.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
@@ -36,7 +35,6 @@ export type PageRootBlockWidgetName =
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
   | typeof Mahdaad_Mention_MENU_WIDGET
   | typeof AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET
-  | typeof AFFINE_DATE_TIME_WIDGET
   | typeof MAHDAAD_FORMAT_BAR_WIDGET;
 
 export type PageRootBlockSpecType = BlockSpec<
@@ -81,7 +79,6 @@ export const PageRootBlockSpec: PageRootBlockSpecType = {
         AFFINE_VIEWPORT_OVERLAY_WIDGET
       )}`,
       [Mahdaad_Mention_MENU_WIDGET]: literal`${unsafeStatic(Mahdaad_Mention_MENU_WIDGET)}`,
-      [AFFINE_DATE_TIME_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_TIME_WIDGET)}`,
       [AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET]: literal`${unsafeStatic(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)}`,
       [MAHDAAD_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
         MAHDAAD_FORMAT_BAR_WIDGET

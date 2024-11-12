@@ -16,7 +16,6 @@ import { AFFINE_EDGELESS_AUTO_CONNECT_WIDGET } from '../widgets/edgeless-auto-co
 import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../widgets/edgeless-remote-selection/index.js';
 //import { AFFINE_EDGELESS_UR_TOOLBAR_WIDGET } from '../widgets/edgeless-undo-redo-toolbar/index.js';
 
-import { AFFINE_DATE_TIME_WIDGET } from '../widgets/date-time-picker/index.js';
 import { AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET } from '../widgets/edgeless-zoom-toolbar/index.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
 //import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
@@ -50,7 +49,6 @@ export type EdgelessRootBlockWidgetName =
   | typeof EDGELESS_ELEMENT_TOOLBAR_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
   | typeof AFFINE_EDGELESS_AUTO_CONNECT_WIDGET
-  | typeof AFFINE_DATE_TIME_WIDGET
   | typeof Mahdaad_Mention_MENU_WIDGET
   | typeof AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET
   | typeof MAHDAAD_FORMAT_BAR_WIDGET;
@@ -107,7 +105,6 @@ export const EdgelessRootBlockSpec: EdgelessRootBlockSpecType = {
       [AFFINE_EDGELESS_AUTO_CONNECT_WIDGET]: literal`${unsafeStatic(
         AFFINE_EDGELESS_AUTO_CONNECT_WIDGET
       )}`,
-      [AFFINE_DATE_TIME_WIDGET]: literal`${unsafeStatic(AFFINE_DATE_TIME_WIDGET)}`,
       [AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET]: literal`${unsafeStatic(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)}`,
       [Mahdaad_Mention_MENU_WIDGET]: literal`${unsafeStatic(Mahdaad_Mention_MENU_WIDGET)}`,
       [MAHDAAD_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(MAHDAAD_FORMAT_BAR_WIDGET)}`,
