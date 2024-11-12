@@ -10,10 +10,12 @@ import { literal, unsafeStatic } from 'lit/static-html.js';
 import type { RootBlockConfig } from '../index.js';
 
 import { RootBlockSchema } from '../root-model.js';
-import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/drag-handle.js';
 import { AFFINE_EDGELESS_AUTO_CONNECT_WIDGET } from '../widgets/edgeless-auto-connect/edgeless-auto-connect.js';
-import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../widgets/edgeless-remote-selection/index.js';
+import { MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET } from '../widgets/mahdaad-edgeless-remote-selection/index.js';
+//import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../widgets/edgeless-remote-selection/index.js';
+//import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
+import { MAHDAAD_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/mahdaad-doc-remote-selection/mahdaad-doc-remote-selection.js';
 //import { AFFINE_EDGELESS_UR_TOOLBAR_WIDGET } from '../widgets/edgeless-undo-redo-toolbar/index.js';
 
 import { AFFINE_DATE_TIME_WIDGET } from '../widgets/date-time-picker/index.js';
@@ -42,8 +44,10 @@ export type EdgelessRootBlockWidgetName =
   | typeof AFFINE_DRAG_HANDLE_WIDGET
   | typeof AFFINE_EMBED_CARD_TOOLBAR_WIDGET
   //| typeof AFFINE_FORMAT_BAR_WIDGET
-  | typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
-  | typeof AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET
+  //| typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
+  | typeof MAHDAAD_DOC_REMOTE_SELECTION_WIDGET
+  //| typeof AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET
+  | typeof MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET
   //| typeof AFFINE_EDGELESS_UR_TOOLBAR_WIDGET
   | typeof EDGELESS_ELEMENT_TOOLBAR_WIDGET
@@ -87,11 +91,17 @@ export const EdgelessRootBlockSpec: EdgelessRootBlockSpecType = {
       /* [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
         AFFINE_FORMAT_BAR_WIDGET
       )}`,*/
-      [AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+      /*[AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
         AFFINE_DOC_REMOTE_SELECTION_WIDGET
+      )}`,*/
+      [MAHDAAD_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+        MAHDAAD_DOC_REMOTE_SELECTION_WIDGET
       )}`,
-      [AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+      /*[AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
         AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET
+      )}`,*/
+      [MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+        MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET
       )}`,
       [AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET]: literal`${unsafeStatic(
         AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET

@@ -13,11 +13,11 @@ export class WebSocketDocSource implements DocSource {
     if (data.channel !== 'doc') return;
 
     //@ts-ignore
-    if (data.fromServer) {
-      this.isInit = true;
-    }
 
     if (data.not_exists) {
+      console.log('this is not existttttttttttttttttttt');
+      this.initDoc();
+      this.isInit = true;
       return;
     }
 
@@ -46,6 +46,15 @@ export class WebSocketDocSource implements DocSource {
     } else {
       this.docMap.set(docId, new Uint8Array(updates));
     }
+
+    if (data.fromServer) {
+      console.log('this is Initiiiiiiiiiiiiiiiiii');
+      if (this.docMap.get(docId) && this.docMap.get(`edgeless_${docId}`)) {
+        this.isInit = true;
+        this.initDoc();
+      }
+    }
+
     //console.log(this.docMap);
   };
 
@@ -59,7 +68,8 @@ export class WebSocketDocSource implements DocSource {
 
   constructor(
     readonly ws: WebSocket,
-    docId: string
+    docId: string,
+    private initDoc: () => {}
     //private status: boolean
   ) {
     this.ws.addEventListener('message', this._onMessage);
@@ -104,8 +114,10 @@ export class WebSocketDocSource implements DocSource {
     }
 
     const latest = this.docMap.get(docId);
+    const edge = this.docMap.get(`edgeless_${docId}`);
     assertExists(latest);
-    if (this.isInit || docId.startsWith('edgeless')) {
+    //|| docId.startsWith('edgeless')
+    if (this.isInit) {
       this.ws.send(
         JSON.stringify({
           channel: 'doc',
@@ -116,6 +128,19 @@ export class WebSocketDocSource implements DocSource {
           },
         } satisfies WebSocketMessage)
       );
+
+      if (edge) {
+        this.ws.send(
+          JSON.stringify({
+            channel: 'doc',
+            payload: {
+              type: 'update',
+              docId: `edgeless_${docId}`,
+              updates: Array.from(edge),
+            },
+          } satisfies WebSocketMessage)
+        );
+      }
     }
   }
 

@@ -45,7 +45,7 @@ import { assertExists } from "@blocksuite/global/utils";
 import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
 import type { BlockSpec, EditorHost } from "@blocksuite/block-std";*/
 import { useRouter } from "vue-router";
-import { useWebSocket } from "@vueuse/core";
+//import { useWebSocket } from "@vueuse/core";
 //import router from "@/router";
 //import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
 //import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
@@ -70,6 +70,8 @@ interface Props {
   locale?:'fa' | 'en'
   disableTools?:string[]
   objectId?:string | null
+  userId?:string | null
+  userColor?:string | null
 }
 
 
@@ -121,7 +123,15 @@ watch(currentDocument,()=>{
   }
 })
 
-
+watch([()=>props.userId,()=>props.userColor],()=>{
+  if(myCollection){
+    if(props.userId){
+      myCollection.awarenessStore.awareness.setLocalStateField('user',{user_id:props.userId,color:props.userColor})
+    }else{
+      myCollection.awarenessStore.awareness.setLocalStateField('user',{user_id:null})
+    }
+  }
+},{immediate:true})
 
 
 const emit = defineEmits<{
@@ -142,7 +152,8 @@ const schemas=computed(()=>{
 
 
 function handleClick(){
-
+  console.log("current docsss",myCollection?.docs);
+  console.log("current doc",currentDocument.value);
   /*if(myCollection){
     //myCollection.docSync.shadows=[]
   }*/
@@ -338,11 +349,11 @@ function appendTODOM(element: HTMLElement) {
   { deep: true }
 )*/
 //todo ali ghasami
-watch(()=>props.objectId,()=>{
+/*watch(()=>props.objectId,()=>{
   console.log("this is object id 22222222222222");
   //console.log("100000");
 
-})
+})*/
 
 const router=useRouter()
 /*watch(()=>router.currentRoute.value.query.id,()=>{
@@ -397,7 +408,7 @@ async function init() {
   await new Promise((resolve, reject) => {
     setTimeout(()=>{
       resolve(true)
-    },2000)
+    },1000)
   })
   const objectId = props.objectId
   const room = objectId
@@ -474,7 +485,7 @@ async function init() {
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
 
   //return
- // const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
+  //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
   const BASE_WEBSOCKET_URL = 'wss://sence.misdc.com'
  /* if(!window.$blockEditor.wss){
     const { status, data, send, open, close,ws } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
@@ -502,11 +513,83 @@ async function init() {
       window.$blockEditor.wss= ws
     }
     const web_socket : WebSocket= window.$blockEditor.wss
-    console.log("status",web_socket.OPEN);
+    //console.log("status",web_socket.OPEN);
     //console.log();
     //ws.close()
     //console.log("this is ws",ws);
     //ws.close()
+
+
+   async function myInit(){
+     console.log("start initttttt doc");
+      console.log("this is find doc",myCollection.getDoc(objectId));
+      console.log("this is block size",myCollection.getDoc(objectId)?.blockSize);
+      //const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
+      const shouldInit = !myCollection.getDoc(objectId)
+      console.log("shouldInit",shouldInit);
+      //myCollection.meta.initialize();
+      if (shouldInit) {
+        myCollection.meta.initialize();
+        const doc = myCollection.createDoc({ id:objectId });//'doc:home'
+        //myCollection.docSync()
+        //myCollection.
+        doc.load();
+        //collection.docs.
+        const rootId = doc.addBlock('affine:page', {
+          title: new Text(),
+        });
+        const noteId = doc.addBlock('affine:note', {}, rootId)
+        doc.addBlock('affine:paragraph', {}, noteId)
+        doc.addBlock('affine:surface', {}, rootId);
+        doc.resetHistory();
+      } else {
+        // debugger
+        // wait for data injected from provider
+        /*const firstPageId =
+          myCollection.docs.size > 0
+            ? myCollection.docs.keys().next().value
+            : await new Promise<string>(resolve =>
+              myCollection.slots.docAdded.once(id => resolve(id))
+            );*/
+        const doc = myCollection.getDoc(objectId);
+        console.log("this is original doc for set ",doc);
+        assertExists(doc);
+        doc.load();
+        // wait for data injected from provider
+        if (!doc.root) {
+          await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+        }
+        doc.resetHistory();
+      }
+
+      const blockCollection = myCollection.docs.values().next()
+        .value as BlockCollection;
+      assertExists(blockCollection, 'Need to create a doc first');
+      const doc = blockCollection.getDoc();
+      assertExists(doc.ready, 'Doc is not ready');
+      assertExists(doc.root, 'Doc root is not ready');
+
+      //const app = document.getElementById('app');
+      /* const app = refEditor.value;
+       if (!app) return;*/
+      if (props.isBoardView) {
+        editorElement.value = new EdgelessEditor()
+      } else {
+        editorElement.value = new PageEditor()
+      }
+      console.log("this is set  doc",doc);
+      //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
+      myCollection.awarenessStore.awareness.setLocalStateField('user',{user_id:props.userId,color:props.userColor})
+      currentDocument.value = doc
+      editorElement.value.doc =  doc
+      console.log("111111",doc.blockSize);
+      //todo ali ghasami for remove after
+      const temp= await exportData(myCollection, [currentDocument.value])
+      console.log("this is snap shoot ",temp);
+      appendTODOM(editorElement.value)
+      bindEvent(doc)
+    }
+
 
     await new Promise((resolve, reject) => {
       //console.log("1111",web_socket.OPEN);
@@ -519,7 +602,7 @@ async function init() {
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(web_socket,objectId)],
+          shadows: [new WebSocketDocSource(web_socket,objectId,myInit)],
         };
         awarenessSources = [new WebSocketAwarenessSource(web_socket)];
       })
@@ -573,11 +656,18 @@ async function init() {
   console.log("before waitForSynced");
   await myCollection.waitForSynced();
   console.log("after waitForSynced");
+  /*await new Promise((resolve, reject) => {
+    setTimeout(()=>{
+      resolve(true)
+    },5000)
+  })*/
 
-  console.log("this is find doc",myCollection.getDoc(objectId));
+  /*console.log("this is find doc",myCollection.getDoc(objectId));
+  console.log("this is block size",myCollection.getDoc(objectId)?.blockSize);
   //const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
   const shouldInit = !myCollection.getDoc(objectId)
-
+  console.log("shouldInit",shouldInit);
+  //myCollection.meta.initialize();
   if (shouldInit) {
     myCollection.meta.initialize();
     const doc = myCollection.createDoc({ id:objectId });//'doc:home'
@@ -595,13 +685,14 @@ async function init() {
   } else {
    // debugger
     // wait for data injected from provider
-    /*const firstPageId =
+    /!*const firstPageId =
       myCollection.docs.size > 0
         ? myCollection.docs.keys().next().value
         : await new Promise<string>(resolve =>
           myCollection.slots.docAdded.once(id => resolve(id))
-        );*/
+        );*!/
     const doc = myCollection.getDoc(objectId);
+    console.log("this is original doc for set ",doc);
     assertExists(doc);
     doc.load();
     // wait for data injected from provider
@@ -619,19 +710,23 @@ async function init() {
   assertExists(doc.root, 'Doc root is not ready');
 
   //const app = document.getElementById('app');
- /* const app = refEditor.value;
-  if (!app) return;*/
+ /!* const app = refEditor.value;
+  if (!app) return;*!/
   if (props.isBoardView) {
     editorElement.value = new EdgelessEditor()
   } else {
     editorElement.value = new PageEditor()
   }
-  console.log("this is doc",doc);
+  console.log("this is set  doc",doc);
   myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
   currentDocument.value = doc
   editorElement.value.doc =  doc
+  console.log("111111",doc.blockSize);
+  const temp= await exportData(myCollection, [currentDocument.value])
+  console.log("this is snap shoot ",temp);
+
   appendTODOM(editorElement.value)
-  bindEvent(doc)
+  bindEvent(doc)*/
   //const modeService = mockDocModeService(doc.id);
   //setDocModeFromUrlParams(modeService);
   //const editor = new AffineEditorContainer();
@@ -825,6 +920,7 @@ defineExpose({
   isEmpty,
   doc:currentDocument,
   checkIsEmpty
+  //collection:myCollection
 })
 </script>
 

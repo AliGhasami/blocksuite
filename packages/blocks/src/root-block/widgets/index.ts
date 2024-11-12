@@ -9,14 +9,13 @@ export {
 export { AffineCodeLanguageListWidget } from './code-language-list/index.js';
 export { AffineCodeToolbarWidget } from './code-toolbar/index.js';
 export { AffineDateTimeWidget } from './date-time-picker/index.js';
-export { AffineDocRemoteSelectionWidget } from './doc-remote-selection/doc-remote-selection.js';
 export { AffineDragHandleWidget } from './drag-handle/drag-handle.js';
 export {
   AFFINE_EDGELESS_COPILOT_WIDGET,
   EdgelessCopilotWidget,
 } from './edgeless-copilot/index.js';
 export { EdgelessCopilotToolbarEntry } from './edgeless-copilot-panel/toolbar-entry.js';
-export { EdgelessRemoteSelectionWidget } from './edgeless-remote-selection/index.js';
+//export { EdgelessRemoteSelectionWidget } from './edgeless-remote-selection/index.js';
 export { AffineEdgelessZoomToolbarWidget } from './edgeless-zoom-toolbar/index.js';
 export {
   EDGELESS_ELEMENT_TOOLBAR_WIDGET,
@@ -26,21 +25,24 @@ export {
   AFFINE_EMBED_CARD_TOOLBAR_WIDGET,
   EmbedCardToolbar,
 } from './embed-card-toolbar/embed-card-toolbar.js';
+export { AffineImageToolbarWidget } from './image-toolbar/index.js';
+export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
+export { LinkedWidgetUtils } from './linked-doc/config.js';
 /*export { toolbarDefaultConfig } from './format-bar/config.js';
 export {
   AFFINE_FORMAT_BAR_WIDGET,
   AffineFormatBarWidget,
 } from './format-bar/format-bar.js';*/
 
-export { AffineImageToolbarWidget } from './image-toolbar/index.js';
-
-export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
-export { LinkedWidgetUtils } from './linked-doc/config.js';
 export {
   // It's used in the AFFiNE!
   showImportModal,
 } from './linked-doc/import-doc/index.js';
+
 export { AffineLinkedDocWidget } from './linked-doc/index.js';
+//export { AffineDocRemoteSelectionWidget } from './doc-remote-selection/doc-remote-selection.js';
+export { MahdaadDocRemoteSelectionWidget } from './mahdaad-doc-remote-selection/mahdaad-doc-remote-selection.js';
+export { MahdaadEdgelessRemoteSelectionWidget } from './mahdaad-edgeless-remote-selection';
 export { MahdaadMentionMenuWidget } from './mahdaad-mention/index.js';
 export { AffineMahdaadObjectPickerWidget } from './mahdaad-object-picker/index.js';
 export { AffineModalWidget } from './modal/modal.js';
