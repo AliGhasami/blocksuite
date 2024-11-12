@@ -224,7 +224,9 @@ export class DeltaService<TextAttributes extends BaseTextAttributes> {
     }
 
     await this.editor.waitForUpdate();
-
+    // TODO return if has bug
+    const matchDelta = this.getCurrentInlineRangeDelta;
+    if (matchDelta?.attributes?.ignoreSyncInlineRange) syncInlineRange = false;
     if (syncInlineRange) {
       // We need to synchronize the selection immediately after rendering is completed,
       // otherwise there is a possibility of an error in the cursor position
@@ -235,6 +237,14 @@ export class DeltaService<TextAttributes extends BaseTextAttributes> {
   };
 
   constructor(readonly editor: InlineEditor<TextAttributes>) {}
+  // TODO return if has bug
+  getDeltaByInlineRange(inlineRange: InlineRange) {
+    return this.getDeltasByInlineRange(inlineRange)?.find(
+      ([_, _inlineRange]) =>
+        _inlineRange.length == inlineRange.length &&
+        _inlineRange.index == inlineRange.index
+    )?.[0];
+  }
 
   isNormalizedDeltaSelected(
     normalizedDeltaIndex: number,
@@ -262,5 +272,11 @@ export class DeltaService<TextAttributes extends BaseTextAttributes> {
 
   get deltas() {
     return this.editor.yText.toDelta() as DeltaInsert<TextAttributes>[];
+  }
+  // TODO return if has bug
+  get getCurrentInlineRangeDelta() {
+    const range = this.editor.getInlineRange();
+    if (range) return this.getDeltaByInlineRange(range);
+    return undefined;
   }
 }

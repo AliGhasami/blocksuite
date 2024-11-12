@@ -591,6 +591,7 @@ defineExpose({
   /* */
   &-date-time {
     //@apply mt-overline;
+    display: inline-block;
     color: @blue-5;
     text-decoration: underline;
   }
