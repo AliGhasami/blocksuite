@@ -264,7 +264,7 @@ export class MahdaadDocRemoteSelectionWidget extends WidgetComponent {
     //
     return html`<div>
       ${selections.flatMap(selection => {
-        console.log('11111', selection.user?.color);
+        //console.log('11111', selection.user?.color);
         const color = remoteColorManager.get(selection.id);
         if (!color) return;
         const cursorRect = this._getCursorRect(selection.selections);

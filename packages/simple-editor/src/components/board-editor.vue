@@ -1,7 +1,7 @@
 <template>
   <div>
-<!--    <Button @click="handleClick">start collabration</Button>-->
-<!--    {{ schemas.length }}-->
+<!--        <Button @click="handleClick">start collabration</Button>-->
+    <!--    {{ schemas.length }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -10,9 +10,10 @@
 
 <script setup lang="ts">
 import '@blocksuite/presets/themes/affine.css'
-import { PageEditor, EdgelessEditor } from "@blocksuite/presets";
+import { EdgelessEditor, PageEditor } from '@blocksuite/presets'
 //import { createEmptyDoc } from './helpers'
 import {
+  Block,
   type BlockCollection,
   type BlockModel,
   Doc,
@@ -20,23 +21,23 @@ import {
   type DocCollectionOptions,
   IdGeneratorType,
   Job,
-  Schema, Text
+  Schema,
+  Text
 } from "@blocksuite/store";
-import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from "vue";
-import { AffineSchemas, replaceIdMiddleware, toolsList } from "@blocksuite/blocks";
+import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
+import { AffineSchemas, replaceIdMiddleware, toolsList } from '@blocksuite/blocks'
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
-import i18next from 'i18next';
-import { initLitI18n } from 'lit-i18n';
+import i18next from 'i18next'
+import { initLitI18n } from 'lit-i18n'
 import {
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
-  //IndexedDBBlobSource,
   IndexedDBDocSource
-} from "@blocksuite/sync";
-import { WebSocketDocSource } from "@blocksuite/playground/apps/_common/sync/websocket/doc";
-import { WebSocketAwarenessSource } from "@blocksuite/playground/apps/_common/sync/websocket/awareness";
-import { assertExists } from "@blocksuite/global/utils";
+} from '@blocksuite/sync'
+import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
+import { WebSocketAwarenessSource } from '@blocksuite/playground/apps/_common/sync/websocket/awareness'
+import { assertExists } from '@blocksuite/global/utils'
 /*import {
   mockDocModeService,
   mockNotificationService,
@@ -44,7 +45,8 @@ import { assertExists } from "@blocksuite/global/utils";
 } from "@blocksuite/playground/apps/_common/mock-services";
 import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
 import type { BlockSpec, EditorHost } from "@blocksuite/block-std";*/
-import { useRouter } from "vue-router";
+//import { useRouter } from 'vue-router'
+import { get } from "lodash";
 //import { useWebSocket } from "@vueuse/core";
 //import router from "@/router";
 //import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
@@ -52,12 +54,11 @@ import { useRouter } from "vue-router";
 //import { QuickEdgelessMenu } from "@blocksuite/playground/apps/_common/components/quick-edgeless-menu";
 
 const refEditor = ref<HTMLElement | null>(null)
-const currentDocument  = ref<Doc | null>(null)
-const editorElement=ref<EdgelessEditor | PageEditor |null>(null)
-const isEmpty=ref<boolean>(false)
+const currentDocument = ref<Doc | null>(null)
+const editorElement = ref<EdgelessEditor | PageEditor | null>(null)
+const isEmpty = ref<boolean>(false)
 let myCollection: DocCollection | null = null
 /*window.$blockEditor = {
-
 }*/
 
 interface Props {
@@ -66,14 +67,14 @@ interface Props {
   uploadUrl?: string
   storageUrl?: string
   apiToken?: string
-  readonly ?:boolean,
-  locale?:'fa' | 'en'
-  disableTools?:string[]
-  objectId?:string | null
-  userId?:string | null
-  userColor?:string | null
+  readonly?: boolean
+  locale?: 'fa' | 'en'
+  disableTools?: string[]
+  objectId?: string | null
+  userId?: string | null
+  userColor?: string | null
+  isCollaboration?:boolean
 }
-
 
 type IBlockChange =
   | {
@@ -97,42 +98,53 @@ type IBlockChange =
 
 const props = withDefaults(defineProps<Props>(), {
   isBoardView: false,
-  readonly:false,
+  readonly: false,
   mentionUserList: () => [],
-  locale:'en',
-  disableTools:()=>[]
+  locale: 'en',
+  disableTools: () => [],
+  isCollaboration:false
 })
 
 i18next.use(initLitI18n).init({
   lng: props.locale ?? 'en',
   resources
-});
+})
 
-watch(()=>props.objectId,()=>{
-  if(props.objectId){
-    if(currentDocument.value){
-      myCollection?.setDocMeta(currentDocument.value.id,{object_id:props.objectId})
-      //console.log("rrrrrrrrrrrrr",props.objectId,currentDocument.value);
+watch(
+  () => props.objectId,
+  () => {
+    if (props.objectId) {
+      if (currentDocument.value) {
+        myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
+        //console.log("rrrrrrrrrrrrr",props.objectId,currentDocument.value);
+      }
     }
-  }
-},{immediate:true})
+  },
+  { immediate: true }
+)
 
-watch(currentDocument,()=>{
-  if(props.objectId){
-    myCollection?.setDocMeta(currentDocument.value.id,{object_id:props.objectId})
+watch(currentDocument, () => {
+  if (props.objectId) {
+    myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
   }
 })
 
-watch([()=>props.userId,()=>props.userColor],()=>{
-  if(myCollection){
-    if(props.userId){
-      myCollection.awarenessStore.awareness.setLocalStateField('user',{user_id:props.userId,color:props.userColor})
-    }else{
-      myCollection.awarenessStore.awareness.setLocalStateField('user',{user_id:null})
+watch(
+  [() => props.userId, () => props.userColor],
+  () => {
+    if (myCollection) {
+      if (props.userId) {
+        myCollection.awarenessStore.awareness.setLocalStateField('user', {
+          user_id: props.userId,
+          color: props.userColor
+        })
+      } else {
+        myCollection.awarenessStore.awareness.setLocalStateField('user', { user_id: null })
+      }
     }
-  }
-},{immediate:true})
-
+  },
+  { immediate: true }
+)
 
 const emit = defineEmits<{
   (e: 'change', val: IBlockChange): void
@@ -140,20 +152,20 @@ const emit = defineEmits<{
   (e: 'deleteBlock', val: IBlockChange): void
   (e: 'updateBlock', val: IBlockChange): void
   (e: 'addObjectLink', val: IBlockChange): void
-  (e: 'deleteObjectLink',val: IBlockChange): void
+  (e: 'deleteObjectLink', val: IBlockChange): void
 }>()
 
-
-
-const schemas=computed(()=>{
-  const temp=props.disableTools.map(item=> toolsList[item])
-  return AffineSchemas.filter(item=> !temp.includes(item.model.flavour))
+const schemas = computed(() => {
+  const temp = props.disableTools.map((item) => toolsList[item])
+  return AffineSchemas.filter((item) => !temp.includes(item.model.flavour))
 })
 
+function handleClick() {
 
-function handleClick(){
-  console.log("current docsss",myCollection?.docs);
-  console.log("current doc",currentDocument.value);
+  init()
+
+ /* console.log('current docsss', myCollection?.docs)
+  console.log('current doc', currentDocument.value)*/
   /*if(myCollection){
     //myCollection.docSync.shadows=[]
   }*/
@@ -184,15 +196,15 @@ function handleClick(){
     const text =  doc.Text.fromDelta(delta);
     //note
     doc.addBlock('affine:paragraph', { text },note.id );*/
- // }
+  // }
   /*******************************/
   //console.log("editor",editor.specs);
   //editorElement.value = new PageEditor()
-//  const temp= editorElement.value.specs.filter(item=> item.schema.model.flavour!='affine:mahdaad-object')
+  //  const temp= editorElement.value.specs.filter(item=> item.schema.model.flavour!='affine:mahdaad-object')
   //affine:page
-//  console.log("1111",temp);
+  //  console.log("1111",temp);
   //console.log("2222",temp);
-//  editorElement.value.specs = temp
+  //  editorElement.value.specs = temp
 
   //editorElement.value.doc=currentDocument.value
   //appendTODOM(editorElement.value)
@@ -203,29 +215,32 @@ function handleClick(){
   //console.log("1111",currentDocument.value);
   //editorElement.value.doc= currentDocument.value
   //currentDocument.value?.
- // appendTODOM(editorElement.value)
+  // appendTODOM(editorElement.value)
 }
-
 
 watch(
   () => props.isBoardView,
   () => {
-   // init()
+    // init()
   }
 )
 
-watch(()=>props.locale,()=>{
-  i18next.changeLanguage(props.locale)
-},{immediate:true})
+watch(
+  () => props.locale,
+  () => {
+    i18next.changeLanguage(props.locale)
+  },
+  { immediate: true }
+)
 
 watch(
-  () => [props.uploadUrl, props.storageUrl, props.apiToken,props.locale],
+  () => [props.uploadUrl, props.storageUrl, props.apiToken, props.locale],
   () => {
     const temp = {
       uploadUrl: props.uploadUrl ?? '',
       storageUrl: props.storageUrl ?? '',
       apiToken: props.apiToken ?? '',
-      locale:props.locale ?? 'en'
+      locale: props.locale ?? 'en'
     }
 
     if (window.$blockEditor) {
@@ -238,27 +253,76 @@ watch(
 )
 
 
-//todo ali ghasami for back
 async function getData() {
-  /*if (myCollection) {
+  if (myCollection) {
     return await exportData(myCollection, [currentDocument.value])
-  }*/
+  }
   return null
 }
 
-watch(()=>props.readonly,()=>{
-  checkReadOnly()
-},{immediate:true})
+watch(
+  () => props.readonly,
+  () => {
+    checkReadOnly()
+  },
+  { immediate: true }
+)
 
-function checkReadOnly(){
-  if(currentDocument.value){
-    currentDocument.value.awarenessStore.setReadonly(currentDocument.value.blockCollection, props.readonly);
+function checkReadOnly() {
+  if (currentDocument.value) {
+    currentDocument.value.awarenessStore.setReadonly(
+      currentDocument.value.blockCollection,
+      props.readonly
+    )
   }
 }
 
 
-async function setData(data: any,clear_history?: boolean = true) {
-  if (myCollection) {
+async function setData(data: any, clear_history?: boolean = true) {
+  console.log("this is data",data);
+  if(myCollection && currentDocument.value){
+    //debugger
+    //myCollection.
+    const doc=toRaw(unref(currentDocument.value)) //currentDocument.value as Doc
+    console.log("this is doc",doc);
+    const blocks = get(data, 'blocks.children', []);
+    const note = blocks.find(item => item.flavour == 'affine:note');
+    const noteChildren = get(note, 'children', []);
+    if (noteChildren.length > 0) {
+      //todo ali ghasami for user schemas.value
+      const schema = new Schema().register(AffineSchemas);
+      const collection = new DocCollection({ schema });
+      const job = new Job({
+        collection: collection,
+        middlewares: [replaceIdMiddleware],
+      });
+      const notes :BlockModel[] = doc.getBlocksByFlavour('affine:note');
+      //const id = doc.
+      //console.log("|1111",notes,notes[0].id);
+      let index=1
+      //doc.load()
+      if (notes.length > 0) {
+        console.log("11111",notes[0]);
+        notes[0].model.children.forEach(item=>{
+          doc.deleteBlock(item)
+        })
+        for (const item of noteChildren) {
+          await job.snapshotToBlock(item, doc,notes[0].id,index++); // parent.id, insertIndex++
+        }
+        //const parent = doc.getParent(this.model);
+       /* if (parent) {
+          const targetIndex =
+            parent.children.findIndex(({ id }) => id === this.model.id) ?? 0;
+          let insertIndex = targetIndex + 1; //place === 'before' ? targetIndex :
+
+        }*/
+      }
+    }
+    //const doc = this.model.doc;
+    ///console.log('14141444', content);
+  }
+  //old method (before collabration)
+  /*if (myCollection) {
     if (props.isBoardView) {
       editorElement.value = new EdgelessEditor()
     } else {
@@ -270,36 +334,36 @@ async function setData(data: any,clear_history?: boolean = true) {
     editorElement.value.doc = new_doc
     currentDocument.value = new_doc
     checkIsEmpty()
-    if(clear_history){
+    if (clear_history) {
       new_doc?.resetHistory()
     }
     appendTODOM(editorElement.value)
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
-  }
+  }*/
 }
 
+/**
+ * @deprecated
+ */
 function reset() {
   //init()
 }
 
 function bindEvent(doc: Doc) {
-  /*doc.slots.blockUpdated.on((a,b,c)=>{
-    console.log("this is update",a,b,c);
-  })*/
   doc.slots.blockUpdated.on((data) => {
     checkNotEmptyDocBlock(doc)
     checkIsEmpty()
     emit('change', data)
     if (data.type == 'add') {
-      if(data.flavour=='affine:mahdaad-object'){
+      if (data.flavour == 'affine:mahdaad-object') {
         emit('addObjectLink', data)
       }
       emit('addBlock', data)
     }
     if (data.type == 'delete') {
-      if(data.flavour=='affine:mahdaad-object'){
-        emit('deleteObjectLink',data)
+      if (data.flavour == 'affine:mahdaad-object') {
+        emit('deleteObjectLink', data)
       }
       emit('deleteBlock', data)
     }
@@ -309,15 +373,17 @@ function bindEvent(doc: Doc) {
 
 function checkNotEmptyDocBlock(doc: Doc) {
   const noteList = doc.getBlockByFlavour('affine:note')
-
   const note = noteList.length ? noteList[0] : null
   if (note) {
-    if(note.children.length == 0
-      ||
-      (note.children.length>0 && note.children[note.children.length-1].flavour!='affine:paragraph' )
-      ||
-      (note.children.length>0 && note.children[note.children.length-1].flavour=='affine:paragraph' &&  note.children[note.children.length-1].text?.length!=0)
-    ){
+    if (
+      note.children.length == 0 ||
+      (note.children.length > 0 &&
+        note.children[note.children.length - 1].flavour != 'affine:paragraph') ||
+      (note.children.length > 0 &&
+        note.children[note.children.length - 1].flavour == 'affine:paragraph' &&
+        note.children[note.children.length - 1].text?.length != 0)
+    ) {
+      doc.addBlock('affine:paragraph', {}, note)
       doc.addBlock('affine:paragraph', {}, note)
       /*nextTick(()=>{
       })*/
@@ -336,8 +402,6 @@ function appendTODOM(element: HTMLElement) {
   }
 }
 
-
-
 /**
  * @deprecated
  */
@@ -355,7 +419,7 @@ function appendTODOM(element: HTMLElement) {
 
 })*/
 
-const router=useRouter()
+//const router = useRouter()
 /*watch(()=>router.currentRoute.value.query.id,()=>{
   if(router.currentRoute.value.query.id){
     console.log("this is object id 111111",myCollection);
@@ -364,18 +428,14 @@ const router=useRouter()
 
 })*/
 
-onBeforeUnmount(()=>{
+onBeforeUnmount(() => {
   myCollection?.waitForGracefulStop()
   myCollection?.forceStop()
   //myCollection?.forceStop()
 })
 //let status=false
 async function init() {
-
-
-
-
- /* const request = indexedDB.open("blocksuite-local", 1);
+  /* const request = indexedDB.open("blocksuite-local", 1);
 
   request.onerror = function(event) {
     console.error("Database error: ", event.target.error);
@@ -400,21 +460,19 @@ async function init() {
     console.warn("Database deletion blocked. Close all connections.");
   };*/
 
-
-
-
   //return
-
+  //todo remove ali ghasami
   await new Promise((resolve, reject) => {
-    setTimeout(()=>{
+    setTimeout(() => {
       resolve(true)
-    },1000)
+    }, 1000)
   })
   const objectId = props.objectId
-  const room = objectId
+  const edgelessId = `edgeless_${objectId}`
+  //const room = objectId
   //params.get('id');
-  console.log("object id",objectId);
-  const edgelessId=`edgeless_${objectId}`
+  //console.log('object id', objectId)
+
   /*const dbRequest = indexedDB.open("blocksuite-local", 1);
 
   dbRequest.onerror = function(event) {
@@ -445,10 +503,7 @@ async function init() {
     };
   }*/
 
-
   //return
-
-
 
   /*await new Promise((resolve, reject) => {
     setTimeout(()=>{
@@ -456,11 +511,8 @@ async function init() {
     },50000)
   })*/
 
-
-
-
   // Function to clear all records in the specified object store
- /* function clearObjectStore(db, storeName) {
+  /* function clearObjectStore(db, storeName) {
     const transaction = db.transaction(storeName, "readwrite");
     const store = transaction.objectStore(storeName);
     const clearRequest = store.clear();
@@ -475,10 +527,6 @@ async function init() {
   }*/
   //return
 
-
-
-
-
   //console.log("this is init");
   /****************************************************/
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
@@ -487,61 +535,66 @@ async function init() {
   //return
   //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
   const BASE_WEBSOCKET_URL = 'wss://sence.misdc.com'
- /* if(!window.$blockEditor.wss){
+  /* if(!window.$blockEditor.wss){
     const { status, data, send, open, close,ws } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
     window.$blockEditor.wss= ws.value
   }*/
 
-
-  const idGenerator: IdGeneratorType = IdGeneratorType.NanoID;
-  const schema = new Schema();
-  schema.register(AffineSchemas);
+  const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
+  const schema = new Schema()
+  schema.register(schemas.value)
+  //schema.register(AffineSchemas)
 
   //const params = new URLSearchParams(location.search);
   let docSources: DocCollectionOptions['docSources'] = {
-    main: new IndexedDBDocSource(),
-  };
-  let awarenessSources: DocCollectionOptions['awarenessSources'];
+    main: new IndexedDBDocSource()
+  }
+  let awarenessSources: DocCollectionOptions['awarenessSources']
 
-  if (room) {
+  if (objectId) {
     //const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
     //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=test`)
     //console.log("windowsssss",window.$blockEditor);
-    if(!window.$blockEditor.wss || (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)){
+    if (
+      !window.$blockEditor.wss ||
+      (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)
+    ) {
       //const {  data, send, open, close,ws,status } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
-      const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
-      window.$blockEditor.wss= ws
+      window.$blockEditor.wss = new WebSocket(
+        `${BASE_WEBSOCKET_URL}?r=${objectId}&u=${Math.ceil(Math.random() * 50)}`
+      )
     }
-    const web_socket : WebSocket= window.$blockEditor.wss
+    const web_socket: WebSocket = window.$blockEditor.wss
     //console.log("status",web_socket.OPEN);
     //console.log();
     //ws.close()
     //console.log("this is ws",ws);
     //ws.close()
 
-
-   async function myInit(){
-     console.log("start initttttt doc");
-      console.log("this is find doc",myCollection.getDoc(objectId));
-      console.log("this is block size",myCollection.getDoc(objectId)?.blockSize);
+    const  InitDoc = async () =>{
+      console.log('start initttttt doc')
+      console.log('this is find doc', myCollection.getDoc(objectId))
+      //console.log('this is block size', myCollection.getDoc(objectId)?.blockSize)
       //const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
       const shouldInit = !myCollection.getDoc(objectId)
-      console.log("shouldInit",shouldInit);
+      console.log('shouldInit', shouldInit)
       //myCollection.meta.initialize();
       if (shouldInit) {
-        myCollection.meta.initialize();
-        const doc = myCollection.createDoc({ id:objectId });//'doc:home'
+        myCollection.meta.initialize()
+        const doc = myCollection.createDoc({ id: objectId }) //'doc:home'
         //myCollection.docSync()
         //myCollection.
-        doc.load();
+        doc.load()
         //collection.docs.
         const rootId = doc.addBlock('affine:page', {
-          title: new Text(),
-        });
-        const noteId = doc.addBlock('affine:note', {}, rootId)
-        doc.addBlock('affine:paragraph', {}, noteId)
-        doc.addBlock('affine:surface', {}, rootId);
-        doc.resetHistory();
+          //title: new Text()
+        })
+        doc.addBlock('affine:surface', {}, rootId)
+        if (!props.isBoardView) {
+          const noteId = doc.addBlock('affine:note', {}, rootId)
+          doc.addBlock('affine:paragraph', {}, noteId)
+        }
+        doc.resetHistory()
       } else {
         // debugger
         // wait for data injected from provider
@@ -551,23 +604,22 @@ async function init() {
             : await new Promise<string>(resolve =>
               myCollection.slots.docAdded.once(id => resolve(id))
             );*/
-        const doc = myCollection.getDoc(objectId);
-        console.log("this is original doc for set ",doc);
-        assertExists(doc);
-        doc.load();
+        const doc = myCollection.getDoc(objectId)
+        console.log('this is original doc for set ', doc)
+        assertExists(doc)
+        doc.load()
         // wait for data injected from provider
         if (!doc.root) {
-          await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+          await new Promise((resolve) => doc.slots.rootAdded.once(resolve))
         }
-        doc.resetHistory();
+        doc.resetHistory()
       }
 
-      const blockCollection = myCollection.docs.values().next()
-        .value as BlockCollection;
-      assertExists(blockCollection, 'Need to create a doc first');
-      const doc = blockCollection.getDoc();
-      assertExists(doc.ready, 'Doc is not ready');
-      assertExists(doc.root, 'Doc root is not ready');
+      const blockCollection = myCollection.docs.values().next().value as BlockCollection
+      assertExists(blockCollection, 'Need to create a doc first')
+      const doc = blockCollection.getDoc()
+      assertExists(doc.ready, 'Doc is not ready')
+      assertExists(doc.root, 'Doc root is not ready')
 
       //const app = document.getElementById('app');
       /* const app = refEditor.value;
@@ -577,45 +629,50 @@ async function init() {
       } else {
         editorElement.value = new PageEditor()
       }
-      console.log("this is set  doc",doc);
+      console.log('this is set  doc', doc)
       //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
-      myCollection.awarenessStore.awareness.setLocalStateField('user',{user_id:props.userId,color:props.userColor})
+      myCollection.awarenessStore.awareness.setLocalStateField('user', {
+        user_id: props.userId,
+        color: props.userColor
+      })
       currentDocument.value = doc
-      editorElement.value.doc =  doc
-      console.log("111111",doc.blockSize);
+      editorElement.value.doc = doc
+      checkIsEmpty()
+      //console.log('111111', doc.blockSize)
       //todo ali ghasami for remove after
-      const temp= await exportData(myCollection, [currentDocument.value])
-      console.log("this is snap shoot ",temp);
-      appendTODOM(editorElement.value)
+      const temp = await exportData(myCollection, [currentDocument.value])
+      console.log('this is snap shoot ', temp)
       bindEvent(doc)
+      appendTODOM(editorElement.value)
+      checkNotEmptyDocBlock(currentDocument.value)
+      checkReadOnly()
     }
-
 
     await new Promise((resolve, reject) => {
       //console.log("1111",web_socket.OPEN);
-      if(web_socket.readyState === WebSocket.OPEN) resolve(true)
-     // console.log("2222");
-      web_socket.addEventListener('open', resolve);
-      web_socket.addEventListener('error', reject);
+      if (web_socket.readyState === WebSocket.OPEN) resolve(true)
+      // console.log("2222");
+      web_socket.addEventListener('open', resolve)
+      web_socket.addEventListener('error', reject)
       //web_socket.ope
     })
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(web_socket,objectId,myInit)],
-        };
-        awarenessSources = [new WebSocketAwarenessSource(web_socket)];
+          shadows: [new WebSocketDocSource(web_socket, objectId, InitDoc)]
+        }
+        awarenessSources = [new WebSocketAwarenessSource(web_socket)]
       })
       .catch(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new BroadcastChannelDocSource()],
-        };
+          shadows: [new BroadcastChannelDocSource()]
+        }
         awarenessSources = [
           //new BroadcastChannelAwarenessSource('quickEdgeless'),
-          new BroadcastChannelAwarenessSource(edgelessId),
-        ];
-      });
+          new BroadcastChannelAwarenessSource(edgelessId)
+        ]
+      })
   }
 
   /*const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
@@ -638,24 +695,23 @@ async function init() {
     defaultFlags: {
       enable_synced_doc_block: true,
       enable_pie_menu: true,
-      enable_lasso_tool: true,
-     // ...flags,
-    },
-  };
-  myCollection = new DocCollection(options);
-  myCollection.start();
+      enable_lasso_tool: true
+      // ...flags,
+    }
+  }
+  myCollection = new DocCollection(options)
+  myCollection.start()
   //myCollection.
   // debug info
- /* window.collection = collection;
+  /* window.collection = collection;
   window.blockSchemas = AffineSchemas;
   window.job = new Job({ collection });
   window.Y = DocCollection.Y;*/
 
-
   //const params = new URLSearchParams(location.search);
-  console.log("before waitForSynced");
-  await myCollection.waitForSynced();
-  console.log("after waitForSynced");
+  console.log('before waitForSynced')
+  await myCollection.waitForSynced()
+  console.log('after waitForSynced')
   /*await new Promise((resolve, reject) => {
     setTimeout(()=>{
       resolve(true)
@@ -750,7 +806,6 @@ async function init() {
   editor.doc = doc;*/
   //console.log(' ===>',editor.doc);
 
-
   //editor.mode = modeService.getMode();
   /*editor.slots.docLinkClicked.on(({ docId }) => {
     const target = collection.getDoc(docId);
@@ -764,7 +819,7 @@ async function init() {
     editor.mode = modeService.getMode(newDocId);
   });*/
 
- // app.append(editor);
+  // app.append(editor);
   //await editor.updateComplete;
   //console.log(' ===>',editor.doc);
   //const leftSidePanel = new LeftSidePanel();
@@ -858,38 +913,37 @@ function setFocus() {
   }
 }
 
-function checkIsEmpty(){
-  let res=true
-  const noteList =currentDocument.value.getBlockByFlavour('affine:note')
+function checkIsEmpty() {
+  let res = true
+  const noteList = currentDocument.value.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
   if (note) {
-    const children=note.children
-    if(children.length > 1){
-      res=false
+    const children = note.children
+    if (children.length > 1) {
+      res = false
+    } else if (children.length > 0) {
+      const first = children[0]
+      if (first.flavour != 'affine:paragraph') {
+        res = false
+      } else {
+        if (first.text?.length != 0) res = false
+      }
     }
-    else if(children.length>0){
-        const first=children[0]
-        if(first.flavour!='affine:paragraph'){
-          res=false
-        }else{
-          if(first.text?.length!=0)
-            res=false
-        }
-    }
-  }else{
-    res=false
+  } else {
+    res = false
   }
-  isEmpty.value= res
-  return  res
+  isEmpty.value = res
+  return res
 }
 
-
-function handleSelectAll(event : Event) {
+function handleSelectAll(event: Event) {
   // Check if Ctrl (or Cmd on macOS) is pressed along with the 'A' key
   if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
     const target = event.target as HTMLElement
     if (!target.closest('page-editor')) {
-      const temp = document.querySelectorAll('page-editor:not(page-editor page-editor):not(.ignore-select page-editor)')
+      const temp = document.querySelectorAll(
+        'page-editor:not(page-editor page-editor):not(.ignore-select page-editor)'
+      )
       if (temp.length > 0) {
         const pageRoot = temp[temp.length - 1].querySelector('affine-page-root')
         if (pageRoot) {
@@ -901,16 +955,14 @@ function handleSelectAll(event : Event) {
   }
 }
 
-
 onMounted(async () => {
   init()
-  document.addEventListener('keydown', handleSelectAll);
+  document.addEventListener('keydown', handleSelectAll)
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
   document.removeEventListener('keydown', handleSelectAll)
 })
-
 
 defineExpose({
   getData,
@@ -918,17 +970,18 @@ defineExpose({
   setFocus,
   reset,
   isEmpty,
-  doc:currentDocument,
+  doc: currentDocument,
   checkIsEmpty
   //collection:myCollection
 })
 </script>
 
 <style lang="less">
-
 @prefix:~ 'vue-block-board-editor';
 .@{prefix} {
-  .affine-menu-action-text,.property-item-name,.select-input {
+  .affine-menu-action-text,
+  .property-item-name,
+  .select-input {
     @apply text-gray-8;
   }
 
