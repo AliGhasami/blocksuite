@@ -1,7 +1,6 @@
 <template>
   <div>
 <!--        <Button @click="handleClick">start collabration</Button>-->
-    <!--    {{ schemas.length }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -13,7 +12,6 @@ import '@blocksuite/presets/themes/affine.css'
 import { EdgelessEditor, PageEditor } from '@blocksuite/presets'
 //import { createEmptyDoc } from './helpers'
 import {
-  Block,
   type BlockCollection,
   type BlockModel,
   Doc,
@@ -22,9 +20,8 @@ import {
   IdGeneratorType,
   Job,
   Schema,
-  Text
 } from "@blocksuite/store";
-import { computed, onBeforeUnmount, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
 import { AffineSchemas, replaceIdMiddleware, toolsList } from '@blocksuite/blocks'
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
@@ -38,28 +35,13 @@ import {
 import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
 import { WebSocketAwarenessSource } from '@blocksuite/playground/apps/_common/sync/websocket/awareness'
 import { assertExists } from '@blocksuite/global/utils'
-/*import {
-  mockDocModeService,
-  mockNotificationService,
-  mockQuickSearchService
-} from "@blocksuite/playground/apps/_common/mock-services";
-import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
-import type { BlockSpec, EditorHost } from "@blocksuite/block-std";*/
-//import { useRouter } from 'vue-router'
 import { get } from "lodash";
-//import { useWebSocket } from "@vueuse/core";
-//import router from "@/router";
-//import { LeftSidePanel } from "@blocksuite/playground/apps/_common/components/left-side-panel";
-//import { DocsPanel } from "@blocksuite/playground/apps/_common/components/docs-panel";
-//import { QuickEdgelessMenu } from "@blocksuite/playground/apps/_common/components/quick-edgeless-menu";
 
 const refEditor = ref<HTMLElement | null>(null)
 const currentDocument = ref<Doc | null>(null)
 const editorElement = ref<EdgelessEditor | PageEditor | null>(null)
 const isEmpty = ref<boolean>(false)
 let myCollection: DocCollection | null = null
-/*window.$blockEditor = {
-}*/
 
 interface Props {
   isBoardView?: boolean
@@ -116,7 +98,6 @@ watch(
     if (props.objectId) {
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
-        //console.log("rrrrrrrrrrrrr",props.objectId,currentDocument.value);
       }
     }
   },
@@ -160,63 +141,8 @@ const schemas = computed(() => {
   return AffineSchemas.filter((item) => !temp.includes(item.model.flavour))
 })
 
-function handleClick() {
-
-  init()
-
- /* console.log('current docsss', myCollection?.docs)
-  console.log('current doc', currentDocument.value)*/
-  /*if(myCollection){
-    //myCollection.docSync.shadows=[]
-  }*/
-
-  /*************************/
-  //currentDocument.value?.addBlock
-  //const { doc } = window;
-  /*const rootId = doc.addBlock('affine:page', {
-    title: new doc.Text(),
-  });*/
-  //const note =  doc.addBlock('affine:note', {}, rootId);
-  /*const doc=unref(toRaw(currentDocument.value))
-  //console.log("currentDocument",currentDocument.value);
-  //console.log("this is temp",temp);
-  const noteList = doc.getBlockByFlavour('affine:note')
-  const note = noteList.length ? noteList[0] : null
-  console.log("note",note);
-  if(note){
-    const delta = [
-      { insert: ' ', attributes: { date:{
-            date: '2024/05/06',
-            time: null,
-            id: '111111',
-          } } },
-      { insert: '2', attributes: { bold: true, underline: true } },
-      { insert: '3', attributes: { bold: true, code: true } },
-    ];
-    const text =  doc.Text.fromDelta(delta);
-    //note
-    doc.addBlock('affine:paragraph', { text },note.id );*/
-  // }
-  /*******************************/
-  //console.log("editor",editor.specs);
-  //editorElement.value = new PageEditor()
-  //  const temp= editorElement.value.specs.filter(item=> item.schema.model.flavour!='affine:mahdaad-object')
-  //affine:page
-  //  console.log("1111",temp);
-  //console.log("2222",temp);
-  //  editorElement.value.specs = temp
-
-  //editorElement.value.doc=currentDocument.value
-  //appendTODOM(editorElement.value)
-  //editorElement.value?.doc.clear()
-  //editorElement.value.doc= currentDocument.value
-  //editorElement.value?.updateComplete
-  //console.log("111",editorElement.value);
-  //console.log("1111",currentDocument.value);
-  //editorElement.value.doc= currentDocument.value
-  //currentDocument.value?.
-  // appendTODOM(editorElement.value)
-}
+/*function handleClick() {
+}*/
 
 watch(
   () => props.isBoardView,
@@ -224,6 +150,12 @@ watch(
     // init()
   }
 )
+
+/*watch(()=>props.objectId,()=>{
+  debugger
+})*/
+
+
 
 watch(
   () => props.locale,
@@ -270,8 +202,9 @@ watch(
 
 function checkReadOnly() {
   if (currentDocument.value) {
-    currentDocument.value.awarenessStore.setReadonly(
-      currentDocument.value.blockCollection,
+    const doc=toRaw(unref(currentDocument.value))
+    doc.awarenessStore.setReadonly(
+      doc,
       props.readonly
     )
   }
@@ -279,6 +212,8 @@ function checkReadOnly() {
 
 
 async function setData(data: any, clear_history?: boolean = true) {
+  debugger
+  return
   console.log("this is data",data);
   if(myCollection && currentDocument.value){
     //debugger
@@ -402,159 +337,65 @@ function appendTODOM(element: HTMLElement) {
   }
 }
 
-/**
- * @deprecated
- */
-/*watch(
-  () => props.mentionUserList,
-  () => {
-    updateMentionList()
-  },
-  { deep: true }
-)*/
-//todo ali ghasami
-/*watch(()=>props.objectId,()=>{
-  console.log("this is object id 22222222222222");
-  //console.log("100000");
-
-})*/
-
-//const router = useRouter()
-/*watch(()=>router.currentRoute.value.query.id,()=>{
-  if(router.currentRoute.value.query.id){
-    console.log("this is object id 111111",myCollection);
-    init()
-  }
-
-})*/
-
-onBeforeUnmount(() => {
-  myCollection?.waitForGracefulStop()
-  myCollection?.forceStop()
-  //myCollection?.forceStop()
-})
-//let status=false
 async function init() {
-  /* const request = indexedDB.open("blocksuite-local", 1);
-
-  request.onerror = function(event) {
-    console.error("Database error: ", event.target.error);
-  };
-
-  request.onsuccess = function(event) {
-    console.log("Database opened successfully");
-    const db = event.target.result;
-  };*/
-
-  //indexedDB.deleteDatabase('')
-  /*let request = indexedDB.deleteDatabase('blocksuite-local');
-  request.onsuccess = function () {
-    console.log("Database deleted successfully");
-  };
-
-  request.onerror = function (event) {
-    console.error("Error deleting database:", event.target.error);
-  };
-
-  request.onblocked = function () {
-    console.warn("Database deletion blocked. Close all connections.");
-  };*/
-
-  //return
-  //todo remove ali ghasami
-  await new Promise((resolve, reject) => {
+  //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
+ /* await new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve(true)
     }, 1000)
-  })
-  const objectId = props.objectId
-  const edgelessId = `edgeless_${objectId}`
-  //const room = objectId
-  //params.get('id');
-  //console.log('object id', objectId)
-
-  /*const dbRequest = indexedDB.open("blocksuite-local", 1);
-
-  dbRequest.onerror = function(event) {
-    console.error("Database error:");
-  };
-
-  dbRequest.onsuccess = function(event) {
-    const db = event.target.result;
-    console.log("Database connected successfully");
-
-    // حذف رکورد با استفاده از کلید
-    //deleteRecord(db, "collection", objectId);
-    //deleteRecord(db, "collection", edgelessId);
-  };
-
-// تابعی برای حذف رکورد بر اساس کلید
-  function deleteRecord(db, storeName, key) {
-    const transaction = db.transaction(storeName, "readwrite");
-    const store = transaction.objectStore(storeName);
-    const deleteRequest = store.delete(key);
-
-    deleteRequest.onsuccess = function() {
-      console.log("Record deleted successfully");
-    };
-
-    deleteRequest.onerror = function(event) {
-      console.error("Error deleting record:", event.target.error);
-    };
-  }*/
-
-  //return
-
-  /*await new Promise((resolve, reject) => {
-    setTimeout(()=>{
-      resolve(true)
-    },50000)
   })*/
-
-  // Function to clear all records in the specified object store
-  /* function clearObjectStore(db, storeName) {
-    const transaction = db.transaction(storeName, "readwrite");
-    const store = transaction.objectStore(storeName);
-    const clearRequest = store.clear();
-
-    clearRequest.onsuccess = function() {
-      console.log("Object store cleared successfully");
-    };
-
-    clearRequest.onerror = function(event) {
-      console.error("Error clearing object store:", event.target.error);
-    };
-  }*/
-  //return
-
-  //console.log("this is init");
-  /****************************************************/
+  //if(!props.objectId) return
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
-
-  //return
   //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
-  const BASE_WEBSOCKET_URL = 'wss://sence.misdc.com'
-  /* if(!window.$blockEditor.wss){
-    const { status, data, send, open, close,ws } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
-    window.$blockEditor.wss= ws.value
-  }*/
-
-  const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
   const schema = new Schema()
   schema.register(schemas.value)
-  //schema.register(AffineSchemas)
 
-  //const params = new URLSearchParams(location.search);
-  let docSources: DocCollectionOptions['docSources'] = {
-    main: new IndexedDBDocSource()
+  const mountEditor=async ()=>{
+    const blockCollection = myCollection.docs.values().next().value as BlockCollection
+    assertExists(blockCollection, 'Need to create a doc first')
+    const doc = blockCollection.getDoc()
+    assertExists(doc.ready, 'Doc is not ready')
+    assertExists(doc.root, 'Doc root is not ready')
+
+    //const app = document.getElementById('app');
+    /* const app = refEditor.value;
+     if (!app) return;*/
+    if (props.isBoardView) {
+      editorElement.value = new EdgelessEditor()
+    } else {
+      editorElement.value = new PageEditor()
+    }
+    console.log('this is set  doc', doc)
+    //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
+    myCollection.awarenessStore.awareness.setLocalStateField('user', {
+      user_id: props.userId,
+      color: props.userColor
+    })
+    currentDocument.value = doc
+    editorElement.value.doc = doc
+    checkIsEmpty()
+    //console.log('111111', doc.blockSize)
+    //todo ali ghasami for remove after
+    //const temp = await exportData(myCollection, [currentDocument.value])
+    //console.log('this is snap shoot ', temp)
+    bindEvent(doc)
+    appendTODOM(editorElement.value)
+    checkNotEmptyDocBlock(currentDocument.value)
+    checkReadOnly()
   }
-  let awarenessSources: DocCollectionOptions['awarenessSources']
 
-  if (objectId) {
-    //const ws = new WebSocket(new URL(`/room/${room}`, BASE_WEBSOCKET_URL));
-    //const ws = new WebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=test`)
-    //console.log("windowsssss",window.$blockEditor);
+  console.log("this is object id",props.objectId);
+  if(props.isCollaboration && props.objectId){
+    const objectId = props.objectId
+    const edgelessId = `edgeless_${objectId}`
+    const BASE_WEBSOCKET_URL = 'wss://sence.misdc.com'
+    const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
+    let docSources: DocCollectionOptions['docSources'] = {
+      main: new IndexedDBDocSource()
+    }
+    let awarenessSources: DocCollectionOptions['awarenessSources']
+
     if (
       !window.$blockEditor.wss ||
       (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)
@@ -565,30 +406,18 @@ async function init() {
       )
     }
     const web_socket: WebSocket = window.$blockEditor.wss
-    //console.log("status",web_socket.OPEN);
-    //console.log();
-    //ws.close()
-    //console.log("this is ws",ws);
-    //ws.close()
 
-    const  InitDoc = async () =>{
-      console.log('start initttttt doc')
+    const  initDoc = async () =>{
+      await myCollection.waitForSynced()
+      console.log('start initttttt doc',objectId)
       console.log('this is find doc', myCollection.getDoc(objectId))
-      //console.log('this is block size', myCollection.getDoc(objectId)?.blockSize)
-      //const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
       const shouldInit = !myCollection.getDoc(objectId)
       console.log('shouldInit', shouldInit)
-      //myCollection.meta.initialize();
       if (shouldInit) {
         myCollection.meta.initialize()
         const doc = myCollection.createDoc({ id: objectId }) //'doc:home'
-        //myCollection.docSync()
-        //myCollection.
         doc.load()
-        //collection.docs.
-        const rootId = doc.addBlock('affine:page', {
-          //title: new Text()
-        })
+        const rootId = doc.addBlock('affine:page')
         doc.addBlock('affine:surface', {}, rootId)
         if (!props.isBoardView) {
           const noteId = doc.addBlock('affine:note', {}, rootId)
@@ -615,51 +444,18 @@ async function init() {
         doc.resetHistory()
       }
 
-      const blockCollection = myCollection.docs.values().next().value as BlockCollection
-      assertExists(blockCollection, 'Need to create a doc first')
-      const doc = blockCollection.getDoc()
-      assertExists(doc.ready, 'Doc is not ready')
-      assertExists(doc.root, 'Doc root is not ready')
-
-      //const app = document.getElementById('app');
-      /* const app = refEditor.value;
-       if (!app) return;*/
-      if (props.isBoardView) {
-        editorElement.value = new EdgelessEditor()
-      } else {
-        editorElement.value = new PageEditor()
-      }
-      console.log('this is set  doc', doc)
-      //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
-      myCollection.awarenessStore.awareness.setLocalStateField('user', {
-        user_id: props.userId,
-        color: props.userColor
-      })
-      currentDocument.value = doc
-      editorElement.value.doc = doc
-      checkIsEmpty()
-      //console.log('111111', doc.blockSize)
-      //todo ali ghasami for remove after
-      const temp = await exportData(myCollection, [currentDocument.value])
-      console.log('this is snap shoot ', temp)
-      bindEvent(doc)
-      appendTODOM(editorElement.value)
-      checkNotEmptyDocBlock(currentDocument.value)
-      checkReadOnly()
+      await mountEditor()
     }
 
     await new Promise((resolve, reject) => {
-      //console.log("1111",web_socket.OPEN);
       if (web_socket.readyState === WebSocket.OPEN) resolve(true)
-      // console.log("2222");
       web_socket.addEventListener('open', resolve)
       web_socket.addEventListener('error', reject)
-      //web_socket.ope
     })
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(web_socket, objectId, InitDoc)]
+          shadows: [new WebSocketDocSource(web_socket, objectId, initDoc)]
         }
         awarenessSources = [new WebSocketAwarenessSource(web_socket)]
       })
@@ -673,226 +469,46 @@ async function init() {
           new BroadcastChannelAwarenessSource(edgelessId)
         ]
       })
-  }
 
-  /*const flags: Partial<BlockSuiteFlags> = Object.fromEntries(
-    [...params.entries()]
-      .filter(([key]) => key.startsWith('enable_'))
-      .map(([k, v]) => [k, v === 'true'])
-  );*/
-
-  const options: DocCollectionOptions = {
-    //id: 'quickEdgeless',
-    id: edgelessId,
-    schema,
-    idGenerator,
-    /*blobSources: {
-      main: new IndexedDBBlobSource('quickEdgeless'),
-      //main: new IndexedDBBlobSource(edgelessId),
-    },*/
-    docSources,
-    awarenessSources,
-    defaultFlags: {
-      enable_synced_doc_block: true,
-      enable_pie_menu: true,
-      enable_lasso_tool: true
-      // ...flags,
+    const options: DocCollectionOptions = {
+      //id: 'quickEdgeless',
+      id: edgelessId,
+      schema,
+      idGenerator,
+      /*blobSources: {
+        main: new IndexedDBBlobSource('quickEdgeless'),
+        //main: new IndexedDBBlobSource(edgelessId),
+      },*/
+      docSources,
+      awarenessSources,
+      defaultFlags: {
+        enable_synced_doc_block: true,
+        enable_pie_menu: true,
+        enable_lasso_tool: true
+        // ...flags,
+      }
     }
-  }
-  myCollection = new DocCollection(options)
-  myCollection.start()
-  //myCollection.
-  // debug info
-  /* window.collection = collection;
-  window.blockSchemas = AffineSchemas;
-  window.job = new Job({ collection });
-  window.Y = DocCollection.Y;*/
-
-  //const params = new URLSearchParams(location.search);
-  console.log('before waitForSynced')
-  await myCollection.waitForSynced()
-  console.log('after waitForSynced')
-  /*await new Promise((resolve, reject) => {
-    setTimeout(()=>{
-      resolve(true)
-    },5000)
-  })*/
-
-  /*console.log("this is find doc",myCollection.getDoc(objectId));
-  console.log("this is block size",myCollection.getDoc(objectId)?.blockSize);
-  //const shouldInit = myCollection.docs.size === 0 //&& !params.get('id');
-  const shouldInit = !myCollection.getDoc(objectId)
-  console.log("shouldInit",shouldInit);
-  //myCollection.meta.initialize();
-  if (shouldInit) {
-    myCollection.meta.initialize();
-    const doc = myCollection.createDoc({ id:objectId });//'doc:home'
-    //myCollection.docSync()
-    //myCollection.
-    doc.load();
-    //collection.docs.
-    const rootId = doc.addBlock('affine:page', {
-      title: new Text(),
-    });
-    const noteId = doc.addBlock('affine:note', {}, rootId)
-    doc.addBlock('affine:paragraph', {}, noteId)
-    doc.addBlock('affine:surface', {}, rootId);
-    doc.resetHistory();
-  } else {
-   // debugger
-    // wait for data injected from provider
-    /!*const firstPageId =
-      myCollection.docs.size > 0
-        ? myCollection.docs.keys().next().value
-        : await new Promise<string>(resolve =>
-          myCollection.slots.docAdded.once(id => resolve(id))
-        );*!/
-    const doc = myCollection.getDoc(objectId);
-    console.log("this is original doc for set ",doc);
-    assertExists(doc);
-    doc.load();
-    // wait for data injected from provider
-    if (!doc.root) {
-      await new Promise(resolve => doc.slots.rootAdded.once(resolve));
+    console.log("this is init my collection");
+    myCollection = new DocCollection(options)
+    myCollection.start()
+    console.log('before waitForSynced')
+    //await myCollection.waitForSynced()
+    console.log('after waitForSynced')
+  }else{
+    myCollection = new DocCollection({schema})
+    myCollection.start()
+    myCollection.meta.initialize()
+    const doc = myCollection.createDoc()
+    doc.load()
+    const rootId = doc.addBlock('affine:page')
+    doc.addBlock('affine:surface', {}, rootId)
+    if (!props.isBoardView) {
+      const noteId = doc.addBlock('affine:note', {}, rootId)
+      doc.addBlock('affine:paragraph', {}, noteId)
     }
-    doc.resetHistory();
+    doc.resetHistory()
+    await mountEditor()
   }
-
-  const blockCollection = myCollection.docs.values().next()
-    .value as BlockCollection;
-  assertExists(blockCollection, 'Need to create a doc first');
-  const doc = blockCollection.getDoc();
-  assertExists(doc.ready, 'Doc is not ready');
-  assertExists(doc.root, 'Doc root is not ready');
-
-  //const app = document.getElementById('app');
- /!* const app = refEditor.value;
-  if (!app) return;*!/
-  if (props.isBoardView) {
-    editorElement.value = new EdgelessEditor()
-  } else {
-    editorElement.value = new PageEditor()
-  }
-  console.log("this is set  doc",doc);
-  myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
-  currentDocument.value = doc
-  editorElement.value.doc =  doc
-  console.log("111111",doc.blockSize);
-  const temp= await exportData(myCollection, [currentDocument.value])
-  console.log("this is snap shoot ",temp);
-
-  appendTODOM(editorElement.value)
-  bindEvent(doc)*/
-  //const modeService = mockDocModeService(doc.id);
-  //setDocModeFromUrlParams(modeService);
-  //const editor = new AffineEditorContainer();
-  //const specs = getExampleSpecs();
-  /*editor.pageSpecs = [...specs.pageModeSpecs].map(spec => {
-    if (spec.schema.model.flavour === 'affine:page') {
-      spec = patchPageRootSpec(
-        spec as BlockSpec<'affine:page', PageRootService>
-      );
-    }
-    return spec;
-  });
-  editor.edgelessSpecs = [...specs.edgelessModeSpecs].map(spec => {
-    if (spec.schema.model.flavour === 'affine:page') {
-      spec = patchPageRootSpec(
-        spec as BlockSpec<'affine:page', PageRootService>
-      );
-    }
-    return spec;
-  });
-  editor.doc = doc;*/
-  //console.log(' ===>',editor.doc);
-
-  //editor.mode = modeService.getMode();
-  /*editor.slots.docLinkClicked.on(({ docId }) => {
-    const target = collection.getDoc(docId);
-    if (!target) {
-      throw new Error(`Failed to jump to doc ${docId}`);
-    }
-    target.load();
-    editor.doc = target;
-  });*/
-  /*editor.slots.docUpdated.on(({ newDocId }) => {
-    editor.mode = modeService.getMode(newDocId);
-  });*/
-
-  // app.append(editor);
-  //await editor.updateComplete;
-  //console.log(' ===>',editor.doc);
-  //const leftSidePanel = new LeftSidePanel();
-  //const docsPanel = new DocsPanel();
-  //docsPanel.editor = editor;
-  /*const quickEdgelessMenu = new QuickEdgelessMenu();
-  quickEdgelessMenu.collection = doc.collection;
-  quickEdgelessMenu.editor = editor;
-  quickEdgelessMenu.leftSidePanel = leftSidePanel;
-  quickEdgelessMenu.docsPanel = docsPanel;*/
-  ///document.body.append(leftSidePanel);
-  //document.body.append(quickEdgelessMenu);
-
-  // debug info
-  /*window.editor = editor;
-  window.doc = doc;*/
-  /*Object.defineProperty(globalThis, 'host', {
-    get() {
-      return document.querySelector<EditorHost>('editor-host');
-    },
-  });
-  Object.defineProperty(globalThis, 'std', {
-    get() {
-      return document.querySelector<EditorHost>('editor-host')?.std;
-    },
-  });*/
-
-  //return editor;
-
-  /*function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
-    const setup = spec.setup;
-    const newSpec: typeof spec = {
-      ...spec,
-      setup: (slots, disposable) => {
-        setup?.(slots, disposable);
-        slots.mounted.once(({ service }) => {
-          const pageRootService = service as PageRootService;
-          pageRootService.notificationService =
-            mockNotificationService(pageRootService);
-          pageRootService.quickSearchService =
-            mockQuickSearchService(collection);
-          pageRootService.peekViewService = {
-            peek(target: unknown) {
-              alert('Peek view not implemented in playground');
-              console.log('peek', target);
-              return Promise.resolve();
-            },
-          };
-          pageRootService.docModeService = mockDocModeService(
-            pageRootService.doc.id
-          );
-        });
-      },
-    };
-
-    return newSpec;
-  }*/
-
-  /*******************************************************/
-
-  /*const { doc, collection } = createEmptyDoc(props.isBoardView,schemas.value).init()
-  myCollection = collection
-  currentDocument.value = doc
-  if (props.isBoardView) {
-    editorElement.value = new EdgelessEditor()
-  } else {
-    editorElement.value = new PageEditor()
-  }
-  editorElement.value.doc =  doc
-  checkIsEmpty()
-  appendTODOM(editorElement.value)
-  checkReadOnly()
-  bindEvent(doc)*/
 }
 
 async function exportData(collection: DocCollection, docs: any[]) {
@@ -915,7 +531,8 @@ function setFocus() {
 
 function checkIsEmpty() {
   let res = true
-  const noteList = currentDocument.value.getBlockByFlavour('affine:note')
+  const doc= toRaw(unref(currentDocument.value))
+  const noteList = doc.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
   if (note) {
     const children = note.children

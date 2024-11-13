@@ -7,13 +7,9 @@ import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private _onMessage = (event: MessageEvent<string>) => {
-    //if (!this.status) return;
     const data = JSON.parse(event.data) as WebSocketMessage;
-    //console.log('1111 data ===>', data);
     if (data.channel !== 'doc') return;
-
     //@ts-ignore
-
     if (data.not_exists) {
       console.log('this is not existttttttttttttttttttt');
       this.initDoc();
@@ -39,8 +35,6 @@ export class WebSocketDocSource implements DocSource {
 
     const { docId, updates } = data.payload;
     const update = this.docMap.get(docId);
-    //console.log(update, docId);
-    //console.log(updates);
     if (update) {
       this.docMap.set(docId, mergeUpdates([update, new Uint8Array(updates)]));
     } else {
@@ -50,12 +44,11 @@ export class WebSocketDocSource implements DocSource {
     if (data.fromServer) {
       console.log('this is Initiiiiiiiiiiiiiiiiii');
       if (this.docMap.get(docId) && this.docMap.get(`edgeless_${docId}`)) {
-        this.isInit = true;
+        console.log('has edgeless and doc');
         this.initDoc();
+        this.isInit = true;
       }
     }
-
-    //console.log(this.docMap);
   };
 
   docId: string;
@@ -90,22 +83,12 @@ export class WebSocketDocSource implements DocSource {
 
   pull(docId: string, state: Uint8Array) {
     const update = this.docMap.get(docId);
-    /* console.log(' ===>', update);
-    console.log(' ===>', docId);
-    console.log(' ===>', 4444);*/
     if (!update) return null;
-
     const diff = state.length ? diffUpdate(update, state) : update;
-    /*console.log(' ===>', {
-      data: diff,
-      state: encodeStateVectorFromUpdate(update),
-    });*/
     return { data: diff, state: encodeStateVectorFromUpdate(update) };
   }
 
   push(docId: string, data: Uint8Array) {
-    //if (!this.status) return;
-    /*console.log("1111",docId);*/
     const update = this.docMap.get(docId);
     if (update) {
       this.docMap.set(docId, mergeUpdates([update, data]));
@@ -116,7 +99,6 @@ export class WebSocketDocSource implements DocSource {
     const latest = this.docMap.get(docId);
     const edge = this.docMap.get(`edgeless_${docId}`);
     assertExists(latest);
-    //|| docId.startsWith('edgeless')
     if (this.isInit) {
       this.ws.send(
         JSON.stringify({
@@ -146,19 +128,12 @@ export class WebSocketDocSource implements DocSource {
 
   subscribe(cb: (docId: string, data: Uint8Array) => void) {
     const abortController = new AbortController();
-    //console.log(2000);
-
     this.ws.addEventListener(
       'message',
       (event: MessageEvent<string>) => {
-        //if (!this.status) return;
         const data = JSON.parse(event.data) as WebSocketMessage;
-        //console.log('data===>', data);
         if (data.channel !== 'doc' || data.payload.type !== 'update') return;
         const { docId, updates } = data.payload;
-        //console.log('DOC IDD', docId);
-        //console.log(updates);
-        //console.log(cb);
         cb(docId, new Uint8Array(updates));
       },
       { signal: abortController.signal }
