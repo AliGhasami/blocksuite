@@ -1,6 +1,7 @@
 <template>
   <div>
 <!--        <Button @click="handleClick">start collabration</Button>-->
+<!--    {{ props.objectId }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -29,9 +30,9 @@ import i18next from 'i18next'
 import { initLitI18n } from 'lit-i18n'
 import {
   BroadcastChannelAwarenessSource,
-  BroadcastChannelDocSource,
+  BroadcastChannelDocSource, dbVersion, DEFAULT_DB_NAME,
   IndexedDBDocSource
-} from '@blocksuite/sync'
+} from "@blocksuite/sync";
 import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
 import { WebSocketAwarenessSource } from '@blocksuite/playground/apps/_common/sync/websocket/awareness'
 import { assertExists } from '@blocksuite/global/utils'
@@ -45,7 +46,7 @@ let myCollection: DocCollection | null = null
 
 interface Props {
   isBoardView?: boolean
-  mentionUserList?: any[]
+  //mentionUserList?: any[]
   uploadUrl?: string
   storageUrl?: string
   apiToken?: string
@@ -56,6 +57,8 @@ interface Props {
   userId?: string | null
   userColor?: string | null
   isCollaboration?:boolean
+  websocketUrl?:string
+  data?:any
 }
 
 type IBlockChange =
@@ -81,28 +84,52 @@ type IBlockChange =
 const props = withDefaults(defineProps<Props>(), {
   isBoardView: false,
   readonly: false,
-  mentionUserList: () => [],
+  //mentionUserList: () => [],
   locale: 'en',
   disableTools: () => [],
   isCollaboration:false
 })
+
+const emit = defineEmits<{
+  (e: 'change', val: IBlockChange): void
+  (e: 'addBlock', val: IBlockChange): void
+  (e: 'deleteBlock', val: IBlockChange): void
+  (e: 'updateBlock', val: IBlockChange): void
+  (e: 'addObjectLink', val: IBlockChange): void
+  (e: 'deleteObjectLink', val: IBlockChange): void
+}>()
+
 
 i18next.use(initLitI18n).init({
   lng: props.locale ?? 'en',
   resources
 })
 
+
+const schemas = computed(() => {
+  const temp = props.disableTools.map((item) => toolsList[item])
+  return AffineSchemas.filter((item) => !temp.includes(item.model.flavour))
+})
+
+
 watch(
   () => props.objectId,
-  () => {
+  async () => {
     if (props.objectId) {
+      console.log("this is object id in watch ",props.objectId);
+     await init()
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
       }
     }
   },
-  { immediate: true }
+  //{ immediate: true }
 )
+
+/*watch(()=>{
+
+})*/
+
 
 watch(currentDocument, () => {
   if (props.objectId) {
@@ -126,35 +153,6 @@ watch(
   },
   { immediate: true }
 )
-
-const emit = defineEmits<{
-  (e: 'change', val: IBlockChange): void
-  (e: 'addBlock', val: IBlockChange): void
-  (e: 'deleteBlock', val: IBlockChange): void
-  (e: 'updateBlock', val: IBlockChange): void
-  (e: 'addObjectLink', val: IBlockChange): void
-  (e: 'deleteObjectLink', val: IBlockChange): void
-}>()
-
-const schemas = computed(() => {
-  const temp = props.disableTools.map((item) => toolsList[item])
-  return AffineSchemas.filter((item) => !temp.includes(item.model.flavour))
-})
-
-/*function handleClick() {
-}*/
-
-watch(
-  () => props.isBoardView,
-  () => {
-    // init()
-  }
-)
-
-/*watch(()=>props.objectId,()=>{
-  debugger
-})*/
-
 
 
 watch(
@@ -185,12 +183,6 @@ watch(
 )
 
 
-async function getData() {
-  if (myCollection) {
-    return await exportData(myCollection, [currentDocument.value])
-  }
-  return null
-}
 
 watch(
   () => props.readonly,
@@ -199,6 +191,16 @@ watch(
   },
   { immediate: true }
 )
+
+
+
+async function getData() {
+  if (myCollection) {
+    return await exportData(myCollection, [currentDocument.value])
+  }
+  return null
+}
+
 
 function checkReadOnly() {
   if (currentDocument.value) {
@@ -211,10 +213,171 @@ function checkReadOnly() {
 }
 
 
-async function setData(data: any, clear_history?: boolean = true) {
+function bindEvent(doc: Doc) {
+  doc.slots.blockUpdated.on((data) => {
+    checkNotEmptyDocBlock(doc)
+    checkIsEmpty()
+    emit('change', data)
+    if (data.type == 'add') {
+      if (data.flavour == 'affine:mahdaad-object') {
+        emit('addObjectLink', data)
+      }
+      emit('addBlock', data)
+    }
+    if (data.type == 'delete') {
+      if (data.flavour == 'affine:mahdaad-object') {
+        emit('deleteObjectLink', data)
+      }
+      emit('deleteBlock', data)
+    }
+    if (data.type == 'update') emit('updateBlock', data)
+  })
+}
+
+
+function checkNotEmptyDocBlock(doc: Doc) {
+  const noteList = doc.getBlockByFlavour('affine:note')
+  const note = noteList.length ? noteList[0] : null
+  if (note) {
+    if (
+      note.children.length == 0 ||
+      (note.children.length > 0 &&
+        note.children[note.children.length - 1].flavour != 'affine:paragraph') ||
+      (note.children.length > 0 &&
+        note.children[note.children.length - 1].flavour == 'affine:paragraph' &&
+        note.children[note.children.length - 1].text?.length != 0)
+    ) {
+      doc.addBlock('affine:paragraph', {}, note)
+      doc.addBlock('affine:paragraph', {}, note)
+      /*nextTick(()=>{
+      })*/
+      //doc.addBlock('affine:paragraph', {}, note)
+    }
+  }
+}
+
+function appendTODOM(element: HTMLElement) {
+  if (refEditor.value) {
+    const children = refEditor.value.children
+    if (children.length) {
+      refEditor.value.removeChild(children[0])
+    }
+    refEditor.value.appendChild(element)
+  }
+}
+
+async function exportData(collection: DocCollection, docs: any[]) {
+  const job = new Job({ collection })
+  const snapshots = await Promise.all(docs.map(job.docToSnapshot))
+  if (snapshots.length > 0) {
+    return snapshots[0]
+  }
+  return null
+}
+
+function setFocus() {
+  if (refEditor.value) {
+    const editor = (refEditor.value as HTMLElement).querySelector('rich-text')
+    if (editor && editor.inlineEditor) {
+      editor.inlineEditor.focusEnd()
+    }
+  }
+}
+
+function checkIsEmpty() {
+  let res = true
+  const doc= toRaw(unref(currentDocument.value))
+  const noteList = doc.getBlockByFlavour('affine:note')
+  const note = noteList.length ? noteList[0] : null
+  if (note) {
+    const children = note.children
+    if (children.length > 1) {
+      res = false
+    } else if (children.length > 0) {
+      const first = children[0]
+      if (first.flavour != 'affine:paragraph') {
+        res = false
+      } else {
+        if (first.text?.length != 0) res = false
+      }
+    }
+  } else {
+    res = false
+  }
+  isEmpty.value = res
+  return res
+}
+
+function handleSelectAll(event: Event) {
+  // Check if Ctrl (or Cmd on macOS) is pressed along with the 'A' key
+  if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+    const target = event.target as HTMLElement
+    if (!target.closest('page-editor')) {
+      const temp = document.querySelectorAll(
+        'page-editor:not(page-editor page-editor):not(.ignore-select page-editor)'
+      )
+      if (temp.length > 0) {
+        const pageRoot = temp[temp.length - 1].querySelector('affine-page-root')
+        if (pageRoot) {
+          event.preventDefault()
+          pageRoot.selectAllBlock()
+        }
+      }
+    }
+  }
+}
+
+
+onMounted(async () => {
+  init()
+  document.addEventListener('keydown', handleSelectAll)
+})
+
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleSelectAll)
+})
+
+
+
+defineExpose({
+  getData,
+  setData,
+  setFocus,
+  //reset,
+  isEmpty,
+  doc: currentDocument,
+  checkIsEmpty
+  //collection:myCollection
+})
+
+/************************************************************/
+
+/*function handleClick() {
+}*/
+
+watch(
+  () => props.isBoardView,
+  () => {
+    // init()
+  }
+)
+
+/*watch(()=>props.objectId,()=>{
   debugger
-  return
-  console.log("this is data",data);
+})*/
+
+
+//todo ali ghasami
+async function setData(data: any, clear_history?: boolean = true) {
+  //return
+  //console.log("2222222222222222222this is data",data);
+  //init()
+  /*if(myCollection && currentDocument.value){
+  }*/
+  //return
+
+  //method 1
   if(myCollection && currentDocument.value){
     //debugger
     //myCollection.
@@ -281,63 +444,24 @@ async function setData(data: any, clear_history?: boolean = true) {
 /**
  * @deprecated
  */
+/*
 function reset() {
+  //debugger
   //init()
 }
+*/
 
-function bindEvent(doc: Doc) {
-  doc.slots.blockUpdated.on((data) => {
-    checkNotEmptyDocBlock(doc)
-    checkIsEmpty()
-    emit('change', data)
-    if (data.type == 'add') {
-      if (data.flavour == 'affine:mahdaad-object') {
-        emit('addObjectLink', data)
-      }
-      emit('addBlock', data)
-    }
-    if (data.type == 'delete') {
-      if (data.flavour == 'affine:mahdaad-object') {
-        emit('deleteObjectLink', data)
-      }
-      emit('deleteBlock', data)
-    }
-    if (data.type == 'update') emit('updateBlock', data)
-  })
-}
 
-function checkNotEmptyDocBlock(doc: Doc) {
-  const noteList = doc.getBlockByFlavour('affine:note')
-  const note = noteList.length ? noteList[0] : null
-  if (note) {
-    if (
-      note.children.length == 0 ||
-      (note.children.length > 0 &&
-        note.children[note.children.length - 1].flavour != 'affine:paragraph') ||
-      (note.children.length > 0 &&
-        note.children[note.children.length - 1].flavour == 'affine:paragraph' &&
-        note.children[note.children.length - 1].text?.length != 0)
-    ) {
-      doc.addBlock('affine:paragraph', {}, note)
-      doc.addBlock('affine:paragraph', {}, note)
-      /*nextTick(()=>{
-      })*/
-      //doc.addBlock('affine:paragraph', {}, note)
-    }
-  }
-}
 
-function appendTODOM(element: HTMLElement) {
-  if (refEditor.value) {
-    const children = refEditor.value.children
-    if (children.length) {
-      refEditor.value.removeChild(children[0])
-    }
-    refEditor.value.appendChild(element)
-  }
-}
+
+const edgelessId=computed(()=>{
+  return `edgeless_${props.objectId}`
+})
+
+
 
 async function init() {
+  //debugger
   //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
  /* await new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -348,16 +472,105 @@ async function init() {
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
   //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
+
+
+  /********************/
+  if(props.objectId){
+
+
+    const deleteRecord=async (dbName, storeName, keyToDelete)=> {
+      try {
+        // Open the IndexedDB database
+        const db = await openDB(dbName);
+        // Start a transaction
+        const transaction = db.transaction(storeName, 'readwrite');
+        const objectStore = transaction.objectStore(storeName);
+        // Delete the record
+        await objectStore.delete(keyToDelete);
+        console.log('Record deleted successfully.');
+        // Complete the transaction
+        await transaction.complete;
+        console.log('Transaction completed.');
+        //resolve(true)
+      } catch (error) {
+        console.error('Error deleting record:', error);
+        //resolve(true)
+      }
+
+       /* return new Promise(async (resolve, reject) => {
+
+        })*/
+    }
+
+    const openDB=async (dbName)=> {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName);
+
+        request.onsuccess = (event) => resolve(event.target.result);
+        request.onerror = (event) => reject(event.target.error);
+      });
+    }
+
+
+    try {
+      await deleteRecord(DEFAULT_DB_NAME,'collection',props.objectId)
+    }catch (e) {
+      console.log("can not delete record");
+    }
+
+
+
+
+   /* const request = indexedDB.open(DEFAULT_DB_NAME, dbVersion);
+    request.onsuccess = function (event) {
+      const db = event.target.result;
+
+      // Start a transaction
+      const transaction = db.transaction('collection', 'readwrite');
+      const objectStore = transaction.objectStore('collection');
+
+      // Define the key of the record you want to delete
+      const keyToDelete = props.objectId; // Replace with the actual key
+
+      // Delete the record
+      const deleteRequest = objectStore.delete(keyToDelete);
+
+      deleteRequest.onsuccess = function () {
+        console.log('Record deleted successfully');
+      };
+
+      deleteRequest.onerror = function () {
+        console.error('Error deleting record:', deleteRequest.error);
+      };
+
+      transaction.oncomplete = function () {
+        console.log('Transaction completed.');
+      };
+
+      transaction.onerror = function (event) {
+        console.error('Transaction failed:', event.target.error);
+      };
+    };
+
+    request.onerror = function () {
+      console.error('Error opening database:', request.error);
+    };*/
+  }
+  /*******************/
+
   const schema = new Schema()
   schema.register(schemas.value)
-
+  let editorData= props.data
+  if(editorData && editorData.meta.id && props.objectId){
+    editorData.meta.id=props.objectId //temp.meta.object_id
+  }
+  console.log("this is data",editorData);
   const mountEditor=async ()=>{
     const blockCollection = myCollection.docs.values().next().value as BlockCollection
     assertExists(blockCollection, 'Need to create a doc first')
     const doc = blockCollection.getDoc()
     assertExists(doc.ready, 'Doc is not ready')
     assertExists(doc.root, 'Doc root is not ready')
-
     //const app = document.getElementById('app');
     /* const app = refEditor.value;
      if (!app) return;*/
@@ -385,45 +598,73 @@ async function init() {
     checkReadOnly()
   }
 
-  console.log("this is object id",props.objectId);
-  if(props.isCollaboration && props.objectId){
-    const objectId = props.objectId
-    const edgelessId = `edgeless_${objectId}`
-    const BASE_WEBSOCKET_URL = 'wss://sence.misdc.com'
+  //console.log("this is object id",props.objectId);
+  if(props.isCollaboration && props.objectId && props.websocketUrl){
+    console.log("100000",props.objectId);
+    //const objectId = props.objectId
+    //const edgelessId =
+    const BASE_WEBSOCKET_URL = props.websocketUrl //'wss://sence.misdc.com'
     const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
     let docSources: DocCollectionOptions['docSources'] = {
       main: new IndexedDBDocSource()
     }
     let awarenessSources: DocCollectionOptions['awarenessSources']
-
-    if (
+      //debugger
+    if (!window.$blockEditor ||
       !window.$blockEditor.wss ||
       (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)
     ) {
       //const {  data, send, open, close,ws,status } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
+      if(!window.$blockEditor){
+        window.$blockEditor={}
+      }
       window.$blockEditor.wss = new WebSocket(
-        `${BASE_WEBSOCKET_URL}?r=${objectId}&u=${Math.ceil(Math.random() * 50)}`
+        `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
       )
     }
     const web_socket: WebSocket = window.$blockEditor.wss
 
     const  initDoc = async () =>{
-      await myCollection.waitForSynced()
-      console.log('start initttttt doc',objectId)
-      console.log('this is find doc', myCollection.getDoc(objectId))
-      const shouldInit = !myCollection.getDoc(objectId)
+      //exist:boolean
+      //console.log("this is exist",exist);
+     // const id=props.objectId
+      //await myCollection.waitForSynced()
+      //console.log("2000000",objectId,);
+      console.log('start initttttt doc')
+      console.log('this is find doc', myCollection.getDoc(props.objectId))
+      const shouldInit =!myCollection.getDoc(props.objectId)
       console.log('shouldInit', shouldInit)
+
       if (shouldInit) {
+        console.log("start for import");
         myCollection.meta.initialize()
-        const doc = myCollection.createDoc({ id: objectId }) //'doc:home'
-        doc.load()
-        const rootId = doc.addBlock('affine:page')
-        doc.addBlock('affine:surface', {}, rootId)
-        if (!props.isBoardView) {
-          const noteId = doc.addBlock('affine:note', {}, rootId)
-          doc.addBlock('affine:paragraph', {}, noteId)
+        if(props.data){
+
+          //Object.assign(temp,{})
+          const job = new Job({ collection: myCollection, middlewares: [] }) //replaceIdMiddleware
+          const doc=await job.snapshotToDoc(editorData)
+          //const doc=await job.snapshotToDoc(props.data)
+          if(doc){
+            doc.load()
+            doc.resetHistory()
+          }
+
+        }else{
+           const doc = myCollection.createDoc({ id:props.objectId }) //'doc:home'
+           doc.load()
+           const rootId = doc.addBlock('affine:page')
+           doc.addBlock('affine:surface', {}, rootId)
+           if (!props.isBoardView) {
+             const noteId = doc.addBlock('affine:note', {}, rootId)
+             doc.addBlock('affine:paragraph', {}, noteId)
+           }
+           doc.resetHistory()
         }
-        doc.resetHistory()
+      /*  if(!exist){
+          debugger
+        }else{
+
+        }*/
       } else {
         // debugger
         // wait for data injected from provider
@@ -433,7 +674,7 @@ async function init() {
             : await new Promise<string>(resolve =>
               myCollection.slots.docAdded.once(id => resolve(id))
             );*/
-        const doc = myCollection.getDoc(objectId)
+        const doc = myCollection.getDoc(props.objectId)
         console.log('this is original doc for set ', doc)
         assertExists(doc)
         doc.load()
@@ -455,7 +696,7 @@ async function init() {
       .then(() => {
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(web_socket, objectId, initDoc)]
+          shadows: [new WebSocketDocSource(web_socket, props.objectId, initDoc)]
         }
         awarenessSources = [new WebSocketAwarenessSource(web_socket)]
       })
@@ -466,13 +707,13 @@ async function init() {
         }
         awarenessSources = [
           //new BroadcastChannelAwarenessSource('quickEdgeless'),
-          new BroadcastChannelAwarenessSource(edgelessId)
+          new BroadcastChannelAwarenessSource(edgelessId.value)
         ]
       })
 
     const options: DocCollectionOptions = {
       //id: 'quickEdgeless',
-      id: edgelessId,
+      id: edgelessId.value,
       schema,
       idGenerator,
       /*blobSources: {
@@ -495,102 +736,35 @@ async function init() {
     //await myCollection.waitForSynced()
     console.log('after waitForSynced')
   }else{
+    //console.log("5555555",props.data);
     myCollection = new DocCollection({schema})
     myCollection.start()
     myCollection.meta.initialize()
-    const doc = myCollection.createDoc()
-    doc.load()
-    const rootId = doc.addBlock('affine:page')
-    doc.addBlock('affine:surface', {}, rootId)
-    if (!props.isBoardView) {
-      const noteId = doc.addBlock('affine:note', {}, rootId)
-      doc.addBlock('affine:paragraph', {}, noteId)
+    if(editorData){
+      //const temp=props.data
+      //temp.meta.id=props.objectId //temp.meta.object_id
+      const job = new Job({ collection: myCollection, middlewares: [] }) //replaceIdMiddleware
+      const doc=await job.snapshotToDoc(editorData)
+      if(doc){
+        doc.load()
+        doc.resetHistory()
+      }
+    }else{
+      const doc = myCollection.createDoc()
+      doc.load()
+      const rootId = doc.addBlock('affine:page')
+      doc.addBlock('affine:surface', {}, rootId)
+      if (!props.isBoardView) {
+        const noteId = doc.addBlock('affine:note', {}, rootId)
+        doc.addBlock('affine:paragraph', {}, noteId)
+      }
+      doc.resetHistory()
     }
-    doc.resetHistory()
+    //if()
     await mountEditor()
   }
 }
 
-async function exportData(collection: DocCollection, docs: any[]) {
-  const job = new Job({ collection })
-  const snapshots = await Promise.all(docs.map(job.docToSnapshot))
-  if (snapshots.length > 0) {
-    return snapshots[0]
-  }
-  return null
-}
-
-function setFocus() {
-  if (refEditor.value) {
-    const editor = (refEditor.value as HTMLElement).querySelector('rich-text')
-    if (editor && editor.inlineEditor) {
-      editor.inlineEditor.focusEnd()
-    }
-  }
-}
-
-function checkIsEmpty() {
-  let res = true
-  const doc= toRaw(unref(currentDocument.value))
-  const noteList = doc.getBlockByFlavour('affine:note')
-  const note = noteList.length ? noteList[0] : null
-  if (note) {
-    const children = note.children
-    if (children.length > 1) {
-      res = false
-    } else if (children.length > 0) {
-      const first = children[0]
-      if (first.flavour != 'affine:paragraph') {
-        res = false
-      } else {
-        if (first.text?.length != 0) res = false
-      }
-    }
-  } else {
-    res = false
-  }
-  isEmpty.value = res
-  return res
-}
-
-function handleSelectAll(event: Event) {
-  // Check if Ctrl (or Cmd on macOS) is pressed along with the 'A' key
-  if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
-    const target = event.target as HTMLElement
-    if (!target.closest('page-editor')) {
-      const temp = document.querySelectorAll(
-        'page-editor:not(page-editor page-editor):not(.ignore-select page-editor)'
-      )
-      if (temp.length > 0) {
-        const pageRoot = temp[temp.length - 1].querySelector('affine-page-root')
-        if (pageRoot) {
-          event.preventDefault()
-          pageRoot.selectAllBlock()
-        }
-      }
-    }
-  }
-}
-
-onMounted(async () => {
-  init()
-  document.addEventListener('keydown', handleSelectAll)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleSelectAll)
-})
-
-defineExpose({
-  getData,
-  setData,
-  setFocus,
-  reset,
-  isEmpty,
-  doc: currentDocument,
-  checkIsEmpty
-  //collection:myCollection
-})
 </script>
 
 <style lang="less">

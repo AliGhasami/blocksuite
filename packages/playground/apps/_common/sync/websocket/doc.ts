@@ -11,7 +11,7 @@ export class WebSocketDocSource implements DocSource {
     if (data.channel !== 'doc') return;
     //@ts-ignore
     if (data.not_exists) {
-      console.log('this is not existttttttttttttttttttt');
+      //console.log('this is not existttttttttttttttttttt');
       this.initDoc();
       this.isInit = true;
       return;
@@ -32,6 +32,10 @@ export class WebSocketDocSource implements DocSource {
       }*/
       return;
     }
+
+    /*if (data.fromServer) {
+      return;
+    }*/
 
     const { docId, updates } = data.payload;
     const update = this.docMap.get(docId);
