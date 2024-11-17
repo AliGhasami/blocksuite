@@ -478,7 +478,7 @@ async function init() {
   if(props.objectId){
 
 
-    const deleteRecord=async (dbName, storeName, keyToDelete)=> {
+    /*const deleteRecord=async (dbName, storeName, keyToDelete)=> {
       try {
         // Open the IndexedDB database
         const db = await openDB(dbName);
@@ -497,9 +497,9 @@ async function init() {
         //resolve(true)
       }
 
-       /* return new Promise(async (resolve, reject) => {
+       /!* return new Promise(async (resolve, reject) => {
 
-        })*/
+        })*!/
     }
 
     const openDB=async (dbName)=> {
@@ -512,11 +512,11 @@ async function init() {
     }
 
 
-    try {
+   try {
       await deleteRecord(DEFAULT_DB_NAME,'collection',props.objectId)
     }catch (e) {
       console.log("can not delete record");
-    }
+    }*/
 
 
 
@@ -557,6 +557,9 @@ async function init() {
     };*/
   }
   /*******************/
+  if(!window.$blockEditor){
+    window.$blockEditor={}
+  }
 
   const schema = new Schema()
   schema.register(schemas.value)
@@ -603,14 +606,14 @@ async function init() {
     console.log("100000",props.objectId);
     //const objectId = props.objectId
     //const edgelessId =
-    const BASE_WEBSOCKET_URL = props.websocketUrl //'wss://sence.misdc.com'
+    const BASE_WEBSOCKET_URL =props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
     const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
     let docSources: DocCollectionOptions['docSources'] = {
       main: new IndexedDBDocSource()
     }
     let awarenessSources: DocCollectionOptions['awarenessSources']
-      //debugger
-    if (!window.$blockEditor ||
+    //old method
+    /*if (!window.$blockEditor ||
       !window.$blockEditor.wss ||
       (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)
     ) {
@@ -622,13 +625,26 @@ async function init() {
         `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
       )
     }
-    const web_socket: WebSocket = window.$blockEditor.wss
+    const web_socket: WebSocket = window.$blockEditor.wss*/
+    let web_socket!: WebSocket
+    if(!Object.hasOwn(window.$blockEditor,'wsMap')){
+      Object.assign(window.$blockEditor,{wsMap: new Map()})
+    }
 
+    const wsMap: Map<string,any>=window.$blockEditor.wsMap;
+    if(!wsMap.has(props.objectId) || (wsMap.has(props.objectId) && wsMap.get(props.objectId).readyState!=wsMap.get(props.objectId).OPEN) ){
+      wsMap.set(props.objectId,new WebSocket(
+        `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
+      ))
+    }
+    web_socket=wsMap.get(props.objectId)
+    console.log("this is ws map",window.$blockEditor.wsMap);
     const  initDoc = async () =>{
       //exist:boolean
       //console.log("this is exist",exist);
      // const id=props.objectId
-      //await myCollection.waitForSynced()
+      await myCollection.waitForSynced()
+      console.log('after waitForSynced')
       //console.log("2000000",objectId,);
       console.log('start initttttt doc')
       console.log('this is find doc', myCollection.getDoc(props.objectId))
@@ -734,7 +750,7 @@ async function init() {
     myCollection.start()
     console.log('before waitForSynced')
     //await myCollection.waitForSynced()
-    console.log('after waitForSynced')
+
   }else{
     //console.log("5555555",props.data);
     myCollection = new DocCollection({schema})

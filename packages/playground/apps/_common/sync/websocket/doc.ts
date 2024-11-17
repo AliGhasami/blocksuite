@@ -86,6 +86,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   pull(docId: string, state: Uint8Array) {
+    console.log('this is pull in websocket');
     const update = this.docMap.get(docId);
     if (!update) return null;
     const diff = state.length ? diffUpdate(update, state) : update;
@@ -93,6 +94,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   push(docId: string, data: Uint8Array) {
+    console.log('this is push in web socket');
     const update = this.docMap.get(docId);
     if (update) {
       this.docMap.set(docId, mergeUpdates([update, data]));
@@ -103,6 +105,7 @@ export class WebSocketDocSource implements DocSource {
     const latest = this.docMap.get(docId);
     const edge = this.docMap.get(`edgeless_${docId}`);
     assertExists(latest);
+    console.log('777777', this.isInit);
     if (this.isInit) {
       this.ws.send(
         JSON.stringify({
