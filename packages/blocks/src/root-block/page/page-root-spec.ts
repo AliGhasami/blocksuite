@@ -5,8 +5,8 @@ import { literal, unsafeStatic } from 'lit/static-html.js';
 import type { RootBlockConfig } from '../index.js';
 
 import { RootBlockSchema } from '../root-model.js';
-import { AFFINE_DATE_TIME_WIDGET } from '../widgets/date-time-picker/index.js';
-import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
+//import { AFFINE_DATE_TIME_WIDGET } from '../widgets/date-time-picker/index.js';
+//import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/drag-handle.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
 //import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';

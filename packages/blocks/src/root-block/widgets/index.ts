@@ -9,7 +9,6 @@ export {
 export { AffineCodeLanguageListWidget } from './code-language-list/index.js';
 export { AffineCodeToolbarWidget } from './code-toolbar/index.js';
 export { AffineDocRemoteSelectionWidget } from './doc-remote-selection/doc-remote-selection.js';
-export { AffineDateTimeWidget } from './date-time-picker/index.js';
 export { AffineDragHandleWidget } from './drag-handle/drag-handle.js';
 export {
   AFFINE_EDGELESS_COPILOT_WIDGET,

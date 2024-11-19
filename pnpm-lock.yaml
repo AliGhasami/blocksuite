@@ -75,7 +75,7 @@ importers:
         version: 2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3)
       '@vitest/coverage-istanbul':
         specifier: 2.0.3
-        version: 2.0.3(vitest@2.0.3)
+        version: 2.0.3(vitest@2.0.3(@types/node@20.16.6)(@vitest/browser@2.0.3)(@vitest/ui@2.0.3)(happy-dom@14.12.3)(jsdom@24.1.3(canvas@2.11.2))(less@4.2.0)(lightningcss@1.27.0)(terser@5.33.0))
       '@vitest/ui':
         specifier: 2.0.3
         version: 2.0.3(vitest@2.0.3)
@@ -417,8 +417,8 @@ importers:
         specifier: ^1.11.13
         version: 1.11.13
       dexie:
-        specifier: 4.0.7
-        version: 4.0.7
+        specifier: 4.0.10
+        version: 4.0.10
       diacritics:
         specifier: 1.3.0
         version: 1.3.0
@@ -608,7 +608,7 @@ importers:
         version: 4.0.0(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))(vue@3.5.12(typescript@5.4.5))
       '@vitest/coverage-v8':
         specifier: 1.6.0
-        version: 1.6.0(vitest@1.6.0)
+        version: 1.6.0(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))
       '@vitest/ui':
         specifier: 1.6.0
         version: 1.6.0(vitest@1.6.0)
@@ -656,7 +656,7 @@ importers:
         version: 3.1.0(@typescript-eslint/eslint-plugin@7.6.0(@typescript-eslint/parser@7.6.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
       eslint-plugin-vitest:
         specifier: 0.3.22
-        version: 0.3.22(@typescript-eslint/eslint-plugin@7.6.0(@typescript-eslint/parser@7.6.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)(vitest@1.6.0)
+        version: 0.3.22(@typescript-eslint/eslint-plugin@7.6.0(@typescript-eslint/parser@7.6.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))
       eslint-plugin-vue:
         specifier: 9.25.0
         version: 9.25.0(eslint@8.57.0)
@@ -740,7 +740,7 @@ importers:
         version: 0.20.0(vite@5.4.8(@types/node@20.14.2)(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))(workbox-build@7.1.1)(workbox-window@7.1.0)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3)(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
+        version: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
       vue-eslint-parser:
         specifier: 9.4.2
         version: 9.4.2(eslint@8.57.0)
@@ -5906,8 +5906,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dexie@4.0.7:
-    resolution: {integrity: sha512-M+Lo6rk4pekIfrc2T0o2tvVJwL6EAAM/B78DNfb8aaxFVoI1f8/rz5KTxuAnApkwqTSuxx7T5t0RKH7qprapGg==}
+  dexie@4.0.10:
+    resolution: {integrity: sha512-eM2RzuR3i+M046r2Q0Optl3pS31qTWf8aFuA7H9wnsHTwl8EPvroVLwvQene/6paAs39Tbk6fWZcn2aZaHkc/w==}
 
   diacritics@1.3.0:
     resolution: {integrity: sha512-wlwEkqcsaxvPJML+rDh/2iS824jbREk6DUMUKkEaSlxdYHeS43cClJtsWglvw2RfeXGm6ohKDqsXteJ5sP5enA==}
@@ -15456,7 +15456,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@vitest/coverage-istanbul@2.0.3(vitest@2.0.3)':
+  '@vitest/coverage-istanbul@2.0.3(vitest@2.0.3(@types/node@20.16.6)(@vitest/browser@2.0.3)(@vitest/ui@2.0.3)(happy-dom@14.12.3)(jsdom@24.1.3(canvas@2.11.2))(less@4.2.0)(lightningcss@1.27.0)(terser@5.33.0))':
     dependencies:
       '@istanbuljs/schema': 0.1.3
       debug: 4.3.6
@@ -15472,7 +15472,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@1.6.0(vitest@1.6.0)':
+  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -15487,7 +15487,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.1.0
       test-exclude: 6.0.0
-      vitest: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3)(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
+      vitest: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -15552,7 +15552,7 @@ snapshots:
       pathe: 1.1.2
       picocolors: 1.1.0
       sirv: 2.0.4
-      vitest: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3)(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
+      vitest: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
 
   '@vitest/ui@2.0.3(vitest@2.0.3)':
     dependencies:
@@ -17635,7 +17635,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dexie@4.0.7: {}
+  dexie@4.0.10: {}
 
   diacritics@1.3.0: {}
 
@@ -17989,13 +17989,13 @@ snapshots:
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.4.5))(eslint@8.57.1)(typescript@5.4.5)
 
-  eslint-plugin-vitest@0.3.22(@typescript-eslint/eslint-plugin@7.6.0(@typescript-eslint/parser@7.6.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)(vitest@1.6.0):
+  eslint-plugin-vitest@0.3.22(@typescript-eslint/eslint-plugin@7.6.0(@typescript-eslint/parser@7.6.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)(vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)):
     dependencies:
       '@typescript-eslint/utils': 6.21.0(eslint@8.57.0)(typescript@5.4.5)
       eslint: 8.57.0
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 7.6.0(@typescript-eslint/parser@7.6.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)
-      vitest: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3)(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
+      vitest: 1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -23490,7 +23490,7 @@ snapshots:
       - typescript
       - universal-cookie
 
-  vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3)(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0):
+  vitest@1.6.0(@types/node@20.14.2)(@vitest/browser@2.0.3(playwright@1.44.1)(typescript@5.4.5)(vitest@2.0.3))(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@24.1.0(canvas@2.11.2))(less@4.2.0)(lightningcss@1.25.1)(terser@5.33.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0

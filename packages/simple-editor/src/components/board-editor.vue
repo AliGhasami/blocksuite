@@ -28,6 +28,7 @@ import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next'
 import { initLitI18n } from 'lit-i18n'
+import Dexie from 'dexie'
 import {
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource, dbVersion, DEFAULT_DB_NAME,
@@ -116,7 +117,7 @@ watch(
   () => props.objectId,
   async () => {
     if (props.objectId) {
-      console.log("this is object id in watch ",props.objectId);
+      console.log("==>this is object id in watch and call init function ",props.objectId);
      await init()
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
@@ -459,8 +460,37 @@ const edgelessId=computed(()=>{
 })
 
 
+const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
+  try {
+    // Open the existing database without defining the schema
+    //const db = await Dexie.open(dbName);
+    const db = new Dexie(dbName);
+    await db.open();
+
+
+    // List available tables in the database
+    console.log("==>Available tables:", db.tables.map((table) => table.name));
+
+    // Check if the specified table exists
+    const table = db.tables.find((t) => t.name === tableName);
+    if (!table) {
+      console.log(`==>Table "${tableName}" does not exist in the database.`);
+      return;
+    }
+
+    // Delete the record by key
+    await db.table(tableName).delete(recordKey);
+    console.log(`==>Record with key ${recordKey} deleted from "${tableName}" table.`);
+  } catch (error) {
+    console.error("==>Error deleting record:", error);
+  }
+};
+
+
+
 
 async function init() {
+  console.log("==>init function");
   //debugger
   //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
  /* await new Promise((resolve, reject) => {
@@ -472,12 +502,17 @@ async function init() {
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
   //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
-
-
   /********************/
   if(props.objectId){
-
-
+    console.log("==>has object id",props.objectId);
+    try {
+      console.log("==>run delete cord with id ", props.objectId);
+      await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, "collection", props.objectId);
+      console.log("==>run delete edgeless",edgelessId.value);
+      await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, "collection", edgelessId.value);
+    }catch (e) {
+      console.log("==>error in remove recode object and edgless from collection",e);
+    }
     /*const deleteRecord=async (dbName, storeName, keyToDelete)=> {
       try {
         // Open the IndexedDB database
@@ -567,13 +602,14 @@ async function init() {
   if(editorData && editorData.meta.id && props.objectId){
     editorData.meta.id=props.objectId //temp.meta.object_id
   }
-  console.log("this is data",editorData);
+  console.log("==>data for set in editor is",editorData);
   const mountEditor=async ()=>{
+    console.log("==>start for mount editor");
     const blockCollection = myCollection.docs.values().next().value as BlockCollection
-    assertExists(blockCollection, 'Need to create a doc first')
+    assertExists(blockCollection, '==>Need to create a doc first')
     const doc = blockCollection.getDoc()
-    assertExists(doc.ready, 'Doc is not ready')
-    assertExists(doc.root, 'Doc root is not ready')
+    assertExists(doc.ready, '==>Doc is not ready')
+    assertExists(doc.root, '==>Doc root is not ready')
     //const app = document.getElementById('app');
     /* const app = refEditor.value;
      if (!app) return;*/
@@ -582,7 +618,7 @@ async function init() {
     } else {
       editorElement.value = new PageEditor()
     }
-    console.log('this is set  doc', doc)
+    console.log('==>doc for mount is', doc)
     //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
     myCollection.awarenessStore.awareness.setLocalStateField('user', {
       user_id: props.userId,
@@ -603,7 +639,8 @@ async function init() {
 
   //console.log("this is object id",props.objectId);
   if(props.isCollaboration && props.objectId && props.websocketUrl){
-    console.log("100000",props.objectId);
+    console.log("==>is collaboration mode");
+    //console.log("100000",props.objectId);
     //const objectId = props.objectId
     //const edgelessId =
     const BASE_WEBSOCKET_URL =props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
@@ -638,24 +675,26 @@ async function init() {
       ))
     }
     web_socket=wsMap.get(props.objectId)
-    console.log("this is ws map",window.$blockEditor.wsMap);
+    console.log("==>this is list web socket is",window.$blockEditor.wsMap);
+    //console.log("this is ws map",);
     const  initDoc = async () =>{
+      console.log("==>start initDoc function");
       //exist:boolean
       //console.log("this is exist",exist);
      // const id=props.objectId
+      console.log('==>before waitForSynced')
       await myCollection.waitForSynced()
-      console.log('after waitForSynced')
+      console.log('==>after waitForSynced')
       //console.log("2000000",objectId,);
-      console.log('start initttttt doc')
-      console.log('this is find doc', myCollection.getDoc(props.objectId))
+      //console.log('start initttttt doc')
+      console.log('==>find doc in collection', myCollection.getDoc(props.objectId))
       const shouldInit =!myCollection.getDoc(props.objectId)
-      console.log('shouldInit', shouldInit)
-
+      console.log('==>shouldInit', shouldInit)
       if (shouldInit) {
-        console.log("start for import");
+        console.log("==>start create empty doc and inject editorData");
         myCollection.meta.initialize()
         if(props.data){
-
+          //todo ali ghasami for inject data if has bug and client id in used
           //Object.assign(temp,{})
           const job = new Job({ collection: myCollection, middlewares: [] }) //replaceIdMiddleware
           const doc=await job.snapshotToDoc(editorData)
@@ -666,6 +705,7 @@ async function init() {
           }
 
         }else{
+          console.log("==>start create empty doc for new doc in collaboration mode");
            const doc = myCollection.createDoc({ id:props.objectId }) //'doc:home'
            doc.load()
            const rootId = doc.addBlock('affine:page')
@@ -690,8 +730,9 @@ async function init() {
             : await new Promise<string>(resolve =>
               myCollection.slots.docAdded.once(id => resolve(id))
             );*/
+        console.log("==>doc is exist and get from collection and load");
         const doc = myCollection.getDoc(props.objectId)
-        console.log('this is original doc for set ', doc)
+        //console.log('this is original doc for set ', doc)
         assertExists(doc)
         doc.load()
         // wait for data injected from provider
@@ -710,6 +751,7 @@ async function init() {
       web_socket.addEventListener('error', reject)
     })
       .then(() => {
+        console.log("==>resolve websocket");
         docSources = {
           main: new IndexedDBDocSource(),
           shadows: [new WebSocketDocSource(web_socket, props.objectId, initDoc)]
@@ -717,6 +759,7 @@ async function init() {
         awarenessSources = [new WebSocketAwarenessSource(web_socket)]
       })
       .catch(() => {
+        console.log("==>catch for open websocket and Broadcast channel");
         docSources = {
           main: new IndexedDBDocSource(),
           shadows: [new BroadcastChannelDocSource()]
@@ -745,13 +788,13 @@ async function init() {
         // ...flags,
       }
     }
-    console.log("this is init my collection");
+    console.log("==>Init collection in collaboration mode and start")
     myCollection = new DocCollection(options)
     myCollection.start()
-    console.log('before waitForSynced')
     //await myCollection.waitForSynced()
 
   }else{
+    console.log("==>not collaboration mode");
     //console.log("5555555",props.data);
     myCollection = new DocCollection({schema})
     myCollection.start()

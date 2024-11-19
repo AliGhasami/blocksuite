@@ -11,6 +11,7 @@ export class WebSocketDocSource implements DocSource {
     if (data.channel !== 'doc') return;
     //@ts-ignore
     if (data.not_exists) {
+      console.log('==>message from socket server and not doc not exists');
       //console.log('this is not existttttttttttttttttttt');
       this.initDoc();
       this.isInit = true;
@@ -46,9 +47,10 @@ export class WebSocketDocSource implements DocSource {
     }
 
     if (data.fromServer) {
-      console.log('this is Initiiiiiiiiiiiiiiiiii');
+      //console.log('this is Initiiiiiiiiiiiiiiiiii');
       if (this.docMap.get(docId) && this.docMap.get(`edgeless_${docId}`)) {
-        console.log('has edgeless and doc');
+        console.log('==>doc and collection get from server and call initDoc');
+        //console.log('has edgeless and doc');
         this.initDoc();
         this.isInit = true;
       }
@@ -86,7 +88,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   pull(docId: string, state: Uint8Array) {
-    console.log('this is pull in websocket');
+    //console.log('this is pull in websocket');
     const update = this.docMap.get(docId);
     if (!update) return null;
     const diff = state.length ? diffUpdate(update, state) : update;
@@ -94,7 +96,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   push(docId: string, data: Uint8Array) {
-    console.log('this is push in web socket');
+    //console.log('this is push in web socket');
     const update = this.docMap.get(docId);
     if (update) {
       this.docMap.set(docId, mergeUpdates([update, data]));
@@ -105,7 +107,7 @@ export class WebSocketDocSource implements DocSource {
     const latest = this.docMap.get(docId);
     const edge = this.docMap.get(`edgeless_${docId}`);
     assertExists(latest);
-    console.log('777777', this.isInit);
+    //console.log('777777', this.isInit);
     if (this.isInit) {
       this.ws.send(
         JSON.stringify({
