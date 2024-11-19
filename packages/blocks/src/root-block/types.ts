@@ -1,6 +1,7 @@
 import type { EdgelessRootBlockComponent } from './edgeless/edgeless-root-block.js';
 import type { PageRootBlockComponent } from './page/page-root-block.js';
 import type { AFFINE_DATE_TIME_WIDGET } from './widgets/date-time-picker/index.js';
+import type { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from './widgets/doc-remote-selection/doc-remote-selection.js';
 import type { AFFINE_DRAG_HANDLE_WIDGET } from './widgets/drag-handle/drag-handle.js';
 import type { AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET } from './widgets/edgeless-zoom-toolbar/index.js';
 import type { EDGELESS_ELEMENT_TOOLBAR_WIDGET } from './widgets/element-toolbar/index.js';
@@ -38,7 +39,6 @@ export type PageRootBlockWidgetName =
   //| typeof AFFINE_DOC_REMOTE_SELECTION_WIDGET
   | typeof MAHDAAD_DOC_REMOTE_SELECTION_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
-  | typeof AFFINE_DATE_TIME_WIDGET
   | typeof Mahdaad_Mention_MENU_WIDGET
   | typeof MAHDAAD_FORMAT_BAR_WIDGET;
 
@@ -59,7 +59,6 @@ export type EdgelessRootBlockWidgetName =
   | typeof AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET
   | typeof EDGELESS_ELEMENT_TOOLBAR_WIDGET
   | typeof AFFINE_VIEWPORT_OVERLAY_WIDGET
-  | typeof AFFINE_DATE_TIME_WIDGET
   | typeof Mahdaad_Mention_MENU_WIDGET
   | typeof MAHDAAD_FORMAT_BAR_WIDGET;
 
