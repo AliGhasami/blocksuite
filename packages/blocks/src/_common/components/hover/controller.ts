@@ -118,8 +118,6 @@ export class HoverController implements ReactiveController {
     console.error('setReference is not ready');
   };
 
-  private shadowDom: boolean;
-
   static globalAbortController?: AbortController;
 
   host: ReactiveElement;
@@ -134,10 +132,8 @@ export class HoverController implements ReactiveController {
   constructor(
     host: ReactiveElement,
     onHover: (options: OptionsParams) => HoverPortalOptions | null,
-    hoverOptions?: Partial<HoverOptions>,
-    shadowDom = true
+    hoverOptions?: Partial<HoverOptions>
   ) {
-    this.shadowDom = shadowDom;
     this._hoverOptions = { ...DEFAULT_HOVER_OPTIONS, ...hoverOptions };
     (this.host = host).addController(this);
     this._onHover = onHover;
@@ -197,7 +193,6 @@ export class HoverController implements ReactiveController {
       }
       this._portal = createLitPortal({
         ...portalOptions,
-        shadowDom: this.shadowDom,
         abortController: this._abortController,
       });
 
