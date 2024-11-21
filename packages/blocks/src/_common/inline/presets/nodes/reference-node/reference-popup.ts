@@ -41,6 +41,7 @@ export class ReferencePopup extends WithDisposable(LitElement) {
   static override styles = styles;
 
   private _convertToCardView() {
+    //debugger;
     const block = this.block;
     const doc = block.host.doc;
     const parent = doc.getParent(block.model);
@@ -67,6 +68,7 @@ export class ReferencePopup extends WithDisposable(LitElement) {
   }
 
   private _convertToEmbedView() {
+    //debugger;
     const block = this.block;
     const doc = block.host.doc;
     const parent = doc.getParent(block.model);

@@ -60,6 +60,7 @@ export class InlineEditor<
   private _mounted = false;
 
   private _onYTextChange = (_: Y.YTextEvent, transaction: Y.Transaction) => {
+    console.log("_onYTextChange")
     if (this.yText.toString().includes('\r')) {
       throw new BlockSuiteError(
         ErrorCode.InlineEditorError,

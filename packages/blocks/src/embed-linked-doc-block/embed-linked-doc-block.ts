@@ -158,6 +158,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<
   };
 
   covertToInline = () => {
+    //debugger;
     const { doc, pageId } = this.model;
     const parent = doc.getParent(this.model);
     assertExists(parent);

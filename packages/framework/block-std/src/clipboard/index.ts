@@ -139,12 +139,14 @@ export class Clipboard {
           workspaceId: doc.collection.id,
           pageId: doc.id,
         };
+        console.log('this is result', payload);
         const result = await adapterInstance.toSlice(
           payload,
           doc,
           parent,
           index
         );
+
         if (result) {
           return result;
         }
@@ -266,7 +268,6 @@ export class Clipboard {
   constructor(public std: BlockSuite.Std) {}
 
   private async _getClipboardItem(slice: Slice, type: string) {
-    //debugger;
     const job = this._getJob();
     const adapterItem = this._adapterMap.get(type);
     if (!adapterItem) {

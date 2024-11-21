@@ -23,6 +23,7 @@ import { HintBlockSchema } from './hint-block/hint-model.js';
 import { ImageBlockSchema } from './image-block/image-model.js';
 import { ListBlockSchema } from './list-block/list-model.js';
 import { ObjectBlockSchema } from './mahdaad-object-block/object-model.js';
+import { MahdaadWeblinkBlockSchema } from './mahdaad-weblink-block/weblink-model.js';
 import { NoteBlockSchema } from './note-block/note-model.js';
 import { ParagraphBlockSchema } from './paragraph-block/paragraph-model.js';
 import { RootBlockSchema } from './root-block/root-model.js';
@@ -55,4 +56,5 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   EdgelessTextBlockSchema,
   HintBlockSchema,
   ObjectBlockSchema,
+  MahdaadWeblinkBlockSchema,
 ];

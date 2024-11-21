@@ -58,6 +58,17 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
       return;
     }
+
+    //console.log('11111', lnk);
+    /*insertContent(this.editorHost, this.model, REFERENCE_NODE, {
+      mahdaadObjectLink: {
+        object_id: lnk.object_id,
+        link_id: lnk.link_id,
+        type: lnk.type,
+      },
+    });*/
+    //return;
+
     const temp = model.doc.addSiblingBlocks(this.model, [
       {
         flavour: 'affine:mahdaad-object',
@@ -66,8 +77,10 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     ]);
 
     //model.doc.addBlocks()
-
-    model.doc.deleteBlock(this.model);
+    //console.log('this', model.text?.length);
+    if (model.text?.length == 0) {
+      model.doc.deleteBlock(this.model);
+    }
     const next = model.doc.getNext(temp[0]);
     if (next) {
       const inline: InlineEditor | null = getInlineEditorByModel(
@@ -85,9 +98,31 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   clearTrigger() {
     // console.log('11111', this._searchText);
+    //todo fix trigger key ali ghasami dynamic
     try {
-      //todo fix trigger key ali ghasami dynamic
-      const trigger = '/template/';
+      let trigger = null;
+      switch (this.obj_type) {
+        case 'template':
+          trigger = '/template/';
+          break;
+        case 'document':
+          trigger = '/page/';
+          break;
+        case 'image':
+          trigger = '/image/';
+          break;
+        case 'weblink':
+          trigger = '/weblink/';
+          break;
+        case 'tag':
+          trigger = '/tag/';
+          break;
+        case 'file':
+          trigger = '/file/';
+          break;
+      }
+
+      //const trigger = '/template/';
       const text = this._searchText ? trigger + this._searchText : trigger;
       // console.log('this is text', text);
       cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
@@ -140,8 +175,8 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   }
 
   async insertTemplate(data: any) {
-    //debugger;
     // console.log('this is data', data);
+    debugger
     if (!data.context) return;
     const content = JSON.parse(data.context);
     ///console.log('14141444', content);
@@ -199,14 +234,13 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
               this.clearTrigger();
             }}"
             @select="${(event: CustomEvent) => {
+              this.clearTrigger();
               if (this.obj_type == 'template') {
-                this.clearTrigger();
                 this.insertTemplate(event.detail);
               } else {
                 this.addObjectLink(this.model, event.detail as ObjectLink);
                 this.abortController.abort();
               }
-              //console.log('999999');
             }}"
             @close="${() => {
               this.abortController.abort();

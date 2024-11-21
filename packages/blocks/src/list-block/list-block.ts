@@ -133,6 +133,10 @@ export class ListBlockComponent extends CaptionedBlockComponent<
       ${this.renderChildren(this.model)}
     </div>`;
 
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
     return html`
       <div class=${'affine-list-block-container'}>
         <div class=${`affine-list-rich-text-wrapper ${checked}`}>
@@ -149,8 +153,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
             .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .verticalScrollContainerGetter=${() =>
-              getViewportElement(this.host)}
+            .verticalScrollContainerGetter=${() => scrollContainer}
           ></rich-text>
         </div>
 

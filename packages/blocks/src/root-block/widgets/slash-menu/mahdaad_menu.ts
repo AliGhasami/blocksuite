@@ -2,7 +2,6 @@ import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, uuidv4 } from '@blocksuite/store';
 
 import type { RootBlockComponent } from '../../types.js';
-import type { AffineDateTimeWidget } from '../date-time-picker/index.js';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
@@ -179,6 +178,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
         date: triggerKey,
         time: null,
         id: uuidv4(),
+        createMode: true
       };
       /*{
         const triggerKey = '$';
@@ -186,18 +186,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
       }*/
       insertContent(rootComponent.host, model, REFERENCE_NODE, {
         date: temp,
-      });
-      assertExists(model.doc.root);
-      const widgetEle =
-        rootComponent.widgetComponents['affine-date-time-widget'];
-      assertExists(widgetEle);
-      // We have checked the existence of showLinkedDoc method in the showWhen
-      const dateWidget = widgetEle as AffineDateTimeWidget;
-      // Wait for range to be updated
-      setTimeout(() => {
-        const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
-        assertExists(inlineEditor);
-        dateWidget.showDateTime(inlineEditor, triggerKey);
+        ignoreSyncInlineRange: true
       });
     },
   },

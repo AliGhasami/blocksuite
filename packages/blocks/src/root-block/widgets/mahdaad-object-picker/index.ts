@@ -141,7 +141,6 @@ export const AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET =
 export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
   private _onBeforeInput = (ctx: UIEventStateContext) => {
     //console.log('1111');
-    //debugger;
     //const eventState = ctx.get('defaultState');
     //const event = eventState.event as InputEvent;
 
@@ -347,7 +346,6 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     const primaryTriggerKey = this.options.triggerKeys[0];
     inlineEditor.slots.inlineRangeApply.once(() => {
       if (this.options.convertTriggerKey && primaryTriggerKey !== matchedKey) {
-        //debugger;
         // Convert to the primary trigger key
         // e.g. [[ -> @
         const startIdxBeforeMatchKey =

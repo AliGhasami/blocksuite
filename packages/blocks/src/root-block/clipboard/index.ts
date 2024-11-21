@@ -122,7 +122,10 @@ export class PageClipboard {
   };
 
   onPagePaste: UIEventHandler = ctx => {
+    console.log('this is onPagePaste', ctx);
+    //return;
     const e = ctx.get('clipboardState').raw;
+    console.log('this is e', e);
     e.preventDefault();
     if (this._std.doc.readonly) return;
     this._std.doc.captureSync();
@@ -147,6 +150,7 @@ export class PageClipboard {
       ])
       .getBlockIndex()
       .inline((ctx, next) => {
+        console.log('this is inline', ctx, next);
         assertExists(ctx.parentBlock);
         this._std.clipboard
           .paste(

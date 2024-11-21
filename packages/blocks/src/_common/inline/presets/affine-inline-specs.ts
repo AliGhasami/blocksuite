@@ -16,6 +16,7 @@ export interface DateTimeEvent {
   time: string | null;
   date: string;
   meta?: any;
+  createMode?: boolean
 }
 
 export interface AffineTextAttributes {
@@ -26,6 +27,10 @@ export interface AffineTextAttributes {
   code?: true | null;
   link?: string | null;
   date?: DateTimeEvent;
+  // TODO return if has bug
+  ignoreSyncInlineRange?: true | null;
+  // TODO return if has bug
+  createMode?: boolean
   reference?: {
     type: 'Subpage' | 'LinkedPage';
     pageId: string;
@@ -37,6 +42,11 @@ export interface AffineTextAttributes {
   } | null;
   background?: string | null;
   color?: string | null;
+  mahdaadObjectLink?: {
+    object_id: string;
+    link_id: string | number | undefined;
+    type: string;
+  } | null;
 }
 
 export const affineInlineSpecsWithoutReference: InlineSpecs<AffineTextAttributes>[] =
@@ -133,6 +143,7 @@ export function getAffineInlineSpecsWithReference(
         .nullable()
         .catch(undefined),
       match: delta => {
+        //return false;
         return !!delta.attributes?.reference;
       },
       renderer: (delta, selected) => {
@@ -144,7 +155,7 @@ export function getAffineInlineSpecsWithReference(
       },
       embed: true,
     },
-    {
+    /*{
       name: 'link',
       schema: z.string().optional().nullable().catch(undefined),
       match: delta => {
@@ -152,6 +163,18 @@ export function getAffineInlineSpecsWithReference(
       },
       renderer: delta => {
         return html`<affine-link .delta=${delta}></affine-link>`;
+      },
+    },*/
+    {
+      name: 'link',
+      schema: z.string().optional().nullable().catch(undefined),
+      match: delta => {
+        return !!delta.attributes?.link;
+      },
+      renderer: delta => {
+        return html`<mahdaad-weblink-node
+          .delta=${delta}
+        ></mahdaad-weblink-node>`;
       },
     },
     {
@@ -162,6 +185,7 @@ export function getAffineInlineSpecsWithReference(
           date: z.string(),
           id: z.string().optional(),
           meta: z.any().optional(),
+          createMode: z.boolean().optional(),
         })
         .optional()
         .nullable()
@@ -169,6 +193,19 @@ export function getAffineInlineSpecsWithReference(
       //z.string().optional().nullable().catch(undefined)
       match: delta => {
         return !!delta.attributes?.date;
+      },
+      renderer: delta => {
+        return html`<affine-date-time .delta=${delta}></affine-date-time>`;
+      },
+      embed: true,
+    },
+    // TODO return if has bug
+    // this attr is for not change cursor position on input keyup in inline elements 
+    {
+      name: 'ignoreSyncInlineRange',
+      schema: z.literal(true).optional().nullable().catch(undefined),
+      match: delta => {
+        return !!delta.attributes?.ignoreSyncInlineRange;
       },
       renderer: delta => {
         return html`<affine-date-time .delta=${delta}></affine-date-time>`;
@@ -198,6 +235,36 @@ export function getAffineInlineSpecsWithReference(
           .selected=${selected}
           .config=${referenceNodeConfig}
         ></mahdaad-mention>`;
+      },
+      embed: true,
+    },
+    {
+      name: 'mahdaadObjectLink',
+      schema: z
+        .object({
+          //name: z.string(),
+          //user_id: z.string(),
+          //id: z.string(),
+          object_id: z.string(),
+          link_id: z.union([z.string(), z.number(), z.undefined()]),
+          //link_id: z.string(),
+          type: z.string(),
+        })
+        .optional()
+        .nullable()
+        .catch(undefined),
+      match: delta => {
+        //console.log('delta', delta);
+        //if (delta.insert == '@') return false;
+        return !!delta.attributes?.mahdaadObjectLink;
+      },
+      renderer: (delta, selected) => {
+        return html`<mahdaad-object-link-inline
+          style="display: inline-block"
+          .delta=${delta}
+          .selected=${selected}
+          .config=${referenceNodeConfig}
+        ></mahdaad-object-link-inline>`;
       },
       embed: true,
     },

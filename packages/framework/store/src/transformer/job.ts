@@ -95,6 +95,7 @@ export class Job {
       });
       const rootModel = doc.root;
       const meta = this._exportDocMeta(doc);
+
       if (!rootModel) {
         throw new BlockSuiteError(
           ErrorCode.TransformerError,
@@ -128,6 +129,7 @@ export class Job {
   sliceToSnapshot = async (
     slice: Slice
   ): Promise<SliceSnapshot | undefined> => {
+    console.log('sliceToSnapshot');
     try {
       this._slots.beforeExport.emit({
         type: 'slice',
@@ -185,6 +187,7 @@ export class Job {
   };
 
   snapshotToDoc = async (snapshot: DocSnapshot): Promise<Doc | undefined> => {
+    console.log('snapshotToDoc');
     try {
       this._slots.beforeImport.emit({
         type: 'page',
@@ -211,6 +214,7 @@ export class Job {
   };
 
   snapshotToModelData = async (snapshot: BlockSnapshot) => {
+    console.log('snapshotToModelData');
     try {
       const { children, flavour, props, id } = snapshot;
 
@@ -241,6 +245,8 @@ export class Job {
     parent?: string,
     index?: number
   ): Promise<Slice | undefined> => {
+    console.log('snapshotToSlice', snapshot);
+    //return undefined;
     try {
       this._slots.beforeImport.emit({
         type: 'slice',
@@ -294,8 +300,6 @@ export class Job {
   };
 
   constructor({ collection, middlewares = [] }: JobConfig) {
-    //console.log('8888888');
-    //debugger;
     this._collection = collection;
     this._assetsManager = new AssetsManager({ blob: collection.blobSync });
 
@@ -353,6 +357,7 @@ export class Job {
       title: docMeta.title,
       createDate: docMeta.createDate,
       tags: [], // for backward compatibility
+      object_id: docMeta.object_id,
     };
   }
 

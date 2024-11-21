@@ -136,7 +136,6 @@ export class AffineSlashMenuWidget extends WidgetComponent {
       for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS
         .triggerWords) {
         if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
-          //debugger;
           closeSlashMenu();
           return;
           //showPopover({})
@@ -149,7 +148,6 @@ export class AffineSlashMenuWidget extends WidgetComponent {
         }
       );*/
     }
-    //debugger;
     inlineEditor.slots.inlineRangeApply.once(() => {
       const rootComponent = this.block;
       if (!isRootComponent(rootComponent)) {

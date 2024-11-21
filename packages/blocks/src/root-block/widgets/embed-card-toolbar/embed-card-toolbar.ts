@@ -534,6 +534,7 @@ export class EmbedCardToolbar extends WidgetComponent<
   }
 
   private _turnIntoInlineView() {
+    //debugger;
     if (this._focusBlock && 'covertToInline' in this._focusBlock) {
       this._focusBlock.covertToInline();
       return;
