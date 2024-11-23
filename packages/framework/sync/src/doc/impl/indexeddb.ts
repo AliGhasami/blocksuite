@@ -79,7 +79,7 @@ export class IndexedDBDocSource implements DocSource {
 
   async push(docId: string, data: Uint8Array): Promise<void> {
     //debugger;
-    console.log('this is sb push ', docId, data);
+    //console.log('this is sb push ', docId, data);
     const db = await this.getDb();
     const store = db
       .transaction('collection', 'readwrite')

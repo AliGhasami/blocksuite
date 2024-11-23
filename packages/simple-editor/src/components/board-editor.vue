@@ -465,8 +465,9 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
     // Open the existing database without defining the schema
     //const db = await Dexie.open(dbName);
     const db = new Dexie(dbName);
+    console.log("==>database start open for delete record");
     await db.open();
-
+    console.log("==>database is opened for delete record");
 
     // List available tables in the database
     console.log("==>Available tables:", db.tables.map((table) => table.name));
@@ -481,6 +482,9 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
     // Delete the record by key
     await db.table(tableName).delete(recordKey);
     console.log(`==>Record with key ${recordKey} deleted from "${tableName}" table.`);
+    console.log("==>start for close database in delete record");
+    db.close()
+    console.log("==>end close database in delete record");
   } catch (error) {
     console.error("==>Error deleting record:", error);
   }

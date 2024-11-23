@@ -13,7 +13,7 @@ type AwarenessChanges = Record<'added' | 'updated' | 'removed', number[]>;
 
 export class WebSocketAwarenessSource implements AwarenessSource {
   private _onAwareness = (changes: AwarenessChanges, origin: unknown) => {
-    console.log('_onAwareness');
+    //console.log('_onAwareness');
     if (origin === 'remote') return;
 
     const changedClients = Object.values(changes).reduce((res, cur) =>
