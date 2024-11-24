@@ -2,7 +2,7 @@
   <div>
 <!--        <Button @click="handleClick">export pdf</Button>-->
 <!--    {{ props.objectId }}-->
-    <span v-if="currentDocument">{{ currentDocument.meta }}</span>
+<!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
