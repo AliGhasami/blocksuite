@@ -58,7 +58,7 @@ export class IndexedDBDocSource implements DocSource {
     state: Uint8Array
   ): Promise<{ data: Uint8Array; state?: Uint8Array | undefined } | null> {
     //debugger;
-    console.log('this is db pull ');
+    //console.log('this is db pull ');
     const db = await this.getDb();
     const store = db
       .transaction('collection', 'readonly')
@@ -106,7 +106,7 @@ export class IndexedDBDocSource implements DocSource {
 
   subscribe(cb: (docId: string, data: Uint8Array) => void) {
     //debugger;
-    console.log('this is db subsctibe');
+    //console.log('this is db subsctibe');
     function onMessage(event: MessageEvent<ChannelMessage>) {
       //debugger;
       const { type, payload } = event.data;

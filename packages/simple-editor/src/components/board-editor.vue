@@ -1,6 +1,6 @@
 <template>
   <div>
-<!--        <Button @click="handleClick">start collabration</Button>-->
+<!--        <Button @click="handleClick">export pdf</Button>-->
 <!--    {{ props.objectId }}-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
@@ -31,7 +31,7 @@ import { initLitI18n } from 'lit-i18n'
 import Dexie from 'dexie'
 import {
   BroadcastChannelAwarenessSource,
-  BroadcastChannelDocSource, dbVersion, DEFAULT_DB_NAME,
+  BroadcastChannelDocSource,  DEFAULT_DB_NAME,
   IndexedDBDocSource
 } from "@blocksuite/sync";
 import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
@@ -354,8 +354,16 @@ defineExpose({
 
 /************************************************************/
 
-/*function handleClick() {
-}*/
+function handleClick() {
+  console.log("1111",refEditor.value,currentDocument.value);
+  //const temp=(refEditor.value as HTMLElement).querySelector('editor-host')
+ /* const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
+  const service=temp.host.spec.getService('affine:page')
+  service.exportManager.exportPdf().catch(console.error);*/
+  //console.log("11111",);
+  //console.log("222",temp.host?.spec.getService('affine:page'));
+  //console.log("this is temp",temp);
+}
 
 watch(
   () => props.isBoardView,
