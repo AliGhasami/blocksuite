@@ -2,6 +2,7 @@
   <div>
 <!--        <Button @click="handleClick">export pdf</Button>-->
 <!--    {{ props.objectId }}-->
+    <span v-if="currentDocument">{{ currentDocument.meta }}</span>
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -90,7 +91,7 @@ const props = withDefaults(defineProps<Props>(), {
   disableTools: () => [],
   isCollaboration:false
 })
-
+const loading=ref(true)
 const emit = defineEmits<{
   (e: 'change', val: IBlockChange): void
   (e: 'addBlock', val: IBlockChange): void
@@ -98,14 +99,17 @@ const emit = defineEmits<{
   (e: 'updateBlock', val: IBlockChange): void
   (e: 'addObjectLink', val: IBlockChange): void
   (e: 'deleteObjectLink', val: IBlockChange): void
+  (e: 'loading', val: boolean): void
 }>()
 
+watch(loading,()=>{
+    emit('loading',loading.value)
+},{immediate:true})
 
 i18next.use(initLitI18n).init({
   lng: props.locale ?? 'en',
   resources
 })
-
 
 const schemas = computed(() => {
   const temp = props.disableTools.map((item) => toolsList[item])
@@ -221,7 +225,10 @@ function bindEvent(doc: Doc) {
     emit('change', data)
     if (data.type == 'add') {
       if (data.flavour == 'affine:mahdaad-object') {
-        emit('addObjectLink', data)
+        //console.log("this is link data",data,data.model.link_id);
+        //if(data.model && !data.model.link_id){
+          emit('addObjectLink', data)
+        //}
       }
       emit('addBlock', data)
     }
@@ -355,7 +362,7 @@ defineExpose({
 /************************************************************/
 
 function handleClick() {
-  console.log("1111",refEditor.value,currentDocument.value);
+ /// console.log("1111",refEditor.value,currentDocument.value);
   //const temp=(refEditor.value as HTMLElement).querySelector('editor-host')
  /* const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
   const service=temp.host.spec.getService('affine:page')
@@ -502,6 +509,7 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 
 
 async function init() {
+  loading.value=true
   console.log("==>init function");
   //debugger
   //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
@@ -638,6 +646,7 @@ async function init() {
     })
     currentDocument.value = doc
     editorElement.value.doc = doc
+
     checkIsEmpty()
     //console.log('111111', doc.blockSize)
     //todo ali ghasami for remove after
@@ -647,6 +656,7 @@ async function init() {
     appendTODOM(editorElement.value)
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
+    loading.value=false
   }
 
   //console.log("this is object id",props.objectId);
