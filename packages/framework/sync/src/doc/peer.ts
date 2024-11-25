@@ -65,11 +65,13 @@ export class SyncPeer {
 
   // handle updates from storage
   handleStorageUpdates = (id: string, data: Uint8Array) => {
+    //console.log(' ===>', id);
     this.state.pullUpdatesQueue.push({
       id,
       data,
     });
     this.updateSyncStatus();
+    //console.log(' ===>', this);
   };
 
   // handle subdocs changes, append new subdocs to queue, remove subdocs from queue
@@ -230,7 +232,7 @@ export class SyncPeer {
     let dispose: (() => void) | null = null;
     try {
       this.updateSyncStatus();
-
+      //console.log(' ===>', 88885);
       // start listen storage updates
       dispose = await this.source.subscribe(
         this.handleStorageUpdates,

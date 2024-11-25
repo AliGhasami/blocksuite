@@ -1,6 +1,5 @@
 import type { UserInfo } from '@blocksuite/store';
 
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
 import {
   type BaseSelection,
   BlockSelection,
@@ -8,34 +7,27 @@ import {
 } from '@blocksuite/block-std';
 import { WidgetComponent } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { computed } from '@preact/signals-core';
+import { computed } from '@lit-labs/preact-signals';
 import { css, html, nothing } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { DocRemoteSelectionConfig } from './config.js';
-
 import { RemoteColorManager } from '../../../root-block/remote-color-manager/remote-color-manager.js';
-import { cursorStyle, selectionStyle } from './utils.js';
+import { isRootComponent } from '../../../root-block/utils/guard.js';
+import { cursorStyle, filterCoveringRects, selectionStyle } from './utils.js';
 
 export interface SelectionRect {
   width: number;
   height: number;
   top: number;
   left: number;
-  transparent?: boolean;
 }
 
-export const AFFINE_DOC_REMOTE_SELECTION_WIDGET =
-  'affine-doc-remote-selection-widget';
+export const MAHDAAD_DOC_REMOTE_SELECTION_WIDGET =
+  'mahdaad-doc-remote-selection-widget';
 
-export class AffineDocRemoteSelectionWidget extends WidgetComponent {
-  // avoid being unable to select text by mouse click or drag
-  static override styles = css`
-    :host {
-      pointer-events: none;
-    }
-  `;
-
+@customElement(MAHDAAD_DOC_REMOTE_SELECTION_WIDGET)
+export class MahdaadDocRemoteSelectionWidget extends WidgetComponent {
   private _abortController = new AbortController();
 
   private _remoteColorManager: RemoteColorManager | null = null;
@@ -57,26 +49,12 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
     this.requestUpdate();
   });
 
-  private get _config(): DocRemoteSelectionConfig {
-    const config =
-      this.std.getConfig('affine:page')?.docRemoteSelectionWidget ?? {};
-
-    return {
-      blockSelectionBackgroundTransparent: block => {
-        return (
-          matchFlavours(block, [
-            'affine:code',
-            'affine:database',
-            'affine:image',
-            'affine:attachment',
-            'affine:bookmark',
-            'affine:surface-ref',
-          ]) || /affine:embed-*/.test(block.flavour)
-        );
-      },
-      ...config,
-    };
-  }
+  // avoid being unable to select text by mouse click or drag
+  static override styles = css`
+    :host {
+      pointer-events: none;
+    }
+  `;
 
   private get _container() {
     return this.offsetParent;
@@ -86,12 +64,8 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
     return this.offsetParent?.getBoundingClientRect();
   }
 
-  private get _selectionManager() {
-    return this.host.selection;
-  }
-
   private _getCursorRect(selections: BaseSelection[]): SelectionRect | null {
-    if (this.block.model.flavour !== 'affine:page') {
+    if (!isRootComponent(this.block)) {
       console.error('remote selection widget must be used in page component');
       return null;
     }
@@ -106,7 +80,9 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
     const containerRect = this._containerRect;
 
     if (textSelection) {
-      const range = this.std.range.textSelectionToRange(
+      const rangeManager = this.host.rangeManager;
+      assertExists(rangeManager);
+      const range = rangeManager.textSelectionToRange(
         this._selectionManager.create('text', {
           from: {
             blockId: textSelection.to
@@ -128,11 +104,8 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
       const container = this._container;
       const containerRect = this._containerRect;
       const rangeRects = Array.from(range.getClientRects());
-      if (rangeRects.length > 0) {
-        const rect =
-          rangeRects.length === 1
-            ? rangeRects[0]
-            : rangeRects[rangeRects.length - 1];
+      if (rangeRects.length === 1) {
+        const rect = rangeRects[0];
         return {
           width: 2,
           height: rect.height,
@@ -150,7 +123,6 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
       const block = this.host.view.getBlock(lastBlockSelection.blockId);
       if (block) {
         const rect = block.getBoundingClientRect();
-
         return {
           width: 2,
           height: rect.height,
@@ -169,7 +141,7 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
   }
 
   private _getSelectionRect(selections: BaseSelection[]): SelectionRect[] {
-    if (this.block.model.flavour !== 'affine:page') {
+    if (!isRootComponent(this.block)) {
       console.error('remote selection widget must be used in page component');
       return [];
     }
@@ -181,30 +153,60 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
       selection => selection instanceof BlockSelection
     );
 
-    if (!textSelection && !blockSelections.length) return [];
+    const container = this._container;
+    const containerRect = this._containerRect;
+    if (textSelection) {
+      const rangeManager = this.host.rangeManager;
+      assertExists(rangeManager);
+      const range = rangeManager.textSelectionToRange(textSelection);
 
-    const { selectionRects } = this.std.command.exec('getSelectionRects', {
-      textSelection,
-      blockSelections,
-    });
+      if (range) {
+        const nativeRects = Array.from(range.getClientRects());
+        const rectsWithoutFiltered = nativeRects
+          .map(rect => ({
+            width: rect.right - rect.left,
+            height: rect.bottom - rect.top,
+            top:
+              rect.top -
+              (containerRect?.top ?? 0) +
+              (container?.scrollTop ?? 0),
+            left:
+              rect.left -
+              (containerRect?.left ?? 0) +
+              (container?.scrollLeft ?? 0),
+          }))
+          .filter(rect => rect.width > 0 && rect.height > 0);
 
-    if (!selectionRects) return [];
+        return filterCoveringRects(rectsWithoutFiltered);
+      }
+    } else if (blockSelections.length > 0) {
+      return blockSelections.flatMap(blockSelection => {
+        const block = this.host.view.getBlock(blockSelection.blockId);
+        if (block) {
+          const rect = block.getBoundingClientRect();
+          return {
+            width: rect.width,
+            height: rect.height,
+            top:
+              rect.top -
+              (containerRect?.top ?? 0) +
+              (container?.scrollTop ?? 0),
+            left:
+              rect.left -
+              (containerRect?.left ?? 0) +
+              (container?.scrollLeft ?? 0),
+          };
+        }
 
-    return selectionRects.map(({ blockId, ...rect }) => {
-      if (!blockId) return rect;
+        return [];
+      });
+    }
 
-      const block = this.host.view.getBlock(blockId);
-      if (!block) return rect;
+    return [];
+  }
 
-      const isTransparent = this._config.blockSelectionBackgroundTransparent(
-        block.model
-      );
-
-      return {
-        ...rect,
-        transparent: isTransparent,
-      };
-    });
+  private get _selectionManager() {
+    return this.host.selection;
   }
 
   override connectedCallback() {
@@ -218,7 +220,7 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
       this.requestUpdate();
     });
 
-    this._remoteColorManager = new RemoteColorManager(this.std);
+    this._remoteColorManager = new RemoteColorManager(this.host);
   }
 
   override createRenderRoot() {
@@ -259,19 +261,25 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
 
     const remoteColorManager = this._remoteColorManager;
     assertExists(remoteColorManager);
+    //
     return html`<div>
       ${selections.flatMap(selection => {
+        //console.log('11111', selection.user?.color);
         const color = remoteColorManager.get(selection.id);
         if (!color) return;
         const cursorRect = this._getCursorRect(selection.selections);
-
         return selection.rects
-          .map(r => html`<div style="${selectionStyle(r, color)}"></div>`)
+          .map(
+            r =>
+              html`<div
+                style="${selectionStyle(r, selection.user?.color ?? color)}"
+              ></div>`
+          )
           .concat([
             html`
               <div
                 style="${cursorRect
-                  ? cursorStyle(cursorRect, color)
+                  ? cursorStyle(cursorRect, selection.user?.color ?? color)
                   : styleMap({
                       display: 'none',
                     })}"
@@ -289,7 +297,7 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
                       bottom: `${
                         cursorRect?.height ? cursorRect.height - 4 : 0
                       }px`,
-                      backgroundColor: color,
+                      backgroundColor: selection.user?.color ?? color,
                       color: 'white',
                       maxWidth: '160px',
                       padding: '0 3px',
@@ -304,7 +312,9 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
                       display: selection.user ? 'block' : 'none',
                     })}"
                   >
-                    ${selection.user?.name}
+                    <mahdaad-doc-selection-cursor
+                      user-id="${selection.user?.user_id}"
+                    ></mahdaad-doc-selection-cursor>
                   </div>
                 </div>
               </div>
@@ -317,6 +327,6 @@ export class AffineDocRemoteSelectionWidget extends WidgetComponent {
 
 declare global {
   interface HTMLElementTagNameMap {
-    [AFFINE_DOC_REMOTE_SELECTION_WIDGET]: AffineDocRemoteSelectionWidget;
+    [MAHDAAD_DOC_REMOTE_SELECTION_WIDGET]: MahdaadDocRemoteSelectionWidget;
   }
 }

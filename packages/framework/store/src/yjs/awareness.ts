@@ -10,6 +10,8 @@ import type { BlockCollection } from '../store/index.js';
 
 export interface UserInfo {
   name: string;
+  user_id: string | null;
+  color:string | null
 }
 
 type UserSelection = Array<Record<string, unknown>>;
