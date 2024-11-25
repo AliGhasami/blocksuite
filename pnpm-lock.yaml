@@ -404,6 +404,9 @@ importers:
       clamp:
         specifier: 1.0.1
         version: 1.0.1
+      crypto:
+        specifier: ^1.0.1
+        version: 1.0.1
       crypto-js:
         specifier: 4.2.0
         version: 4.2.0
@@ -414,11 +417,14 @@ importers:
         specifier: ^1.11.13
         version: 1.11.13
       dexie:
-        specifier: 4.0.7
-        version: 4.0.7
+        specifier: 4.0.10
+        version: 4.0.10
       diacritics:
         specifier: 1.3.0
         version: 1.3.0
+      dompurify:
+        specifier: ^3.1.4
+        version: 3.1.6
       downloadjs:
         specifier: 1.4.7
         version: 1.4.7
@@ -2179,6 +2185,10 @@ packages:
   '@dependents/detective-less@4.1.0':
     resolution: {integrity: sha512-KrkT6qO5NxqNfy68sBl6CTSoJ4SNDIS5iQArkibhlbGU4LaDukZ3q2HIkh8aUKDio6o4itU4xDR7t82Y2eP1Bg==}
     engines: {node: '>=14'}
+
+  '@directus/sdk@18.0.0':
+    resolution: {integrity: sha512-PREPeIKI1/EpvWxZHqWaRgL0HNccaauQm98sABBPMPwH3gCHfSz+sFJyugyx+MYHBiv2K5M8BCxF3MRCbAzljw==}
+    engines: {node: '>=18.0.0'}
 
   '@docsearch/css@3.6.1':
     resolution: {integrity: sha512-VtVb5DS+0hRIprU2CO6ZQjK2Zg4QU5HrDM1+ix6rT0umsYvFvatMAnf97NHZlVWDaaLlx7GRfR/7FikANiM2Fg==}
@@ -5478,6 +5488,10 @@ packages:
     resolution: {integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==}
     engines: {node: '>=8'}
 
+  crypto@1.0.1:
+    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
+    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
+
   css-functions-list@3.2.3:
     resolution: {integrity: sha512-IQOkD3hbR5KrN93MtcYuad6YPuTSUhntLHDuLEbFWE+ff2/XSZNdZG+LcbbIW5AXKg/WFIfYItIzVoHngHXZzA==}
     engines: {node: '>=12 || >=16'}
@@ -5899,8 +5913,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dexie@4.0.7:
-    resolution: {integrity: sha512-M+Lo6rk4pekIfrc2T0o2tvVJwL6EAAM/B78DNfb8aaxFVoI1f8/rz5KTxuAnApkwqTSuxx7T5t0RKH7qprapGg==}
+  dexie@4.0.10:
+    resolution: {integrity: sha512-eM2RzuR3i+M046r2Q0Optl3pS31qTWf8aFuA7H9wnsHTwl8EPvroVLwvQene/6paAs39Tbk6fWZcn2aZaHkc/w==}
 
   diacritics@1.3.0:
     resolution: {integrity: sha512-wlwEkqcsaxvPJML+rDh/2iS824jbREk6DUMUKkEaSlxdYHeS43cClJtsWglvw2RfeXGm6ohKDqsXteJ5sP5enA==}
@@ -12917,6 +12931,8 @@ snapshots:
       gonzales-pe: 4.3.0
       node-source-walk: 6.0.2
 
+  '@directus/sdk@18.0.0': {}
+
   '@docsearch/css@3.6.1': {}
 
   '@docsearch/js@3.6.1(@algolia/client-search@4.24.0)(@types/react@18.3.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.17.2)':
@@ -17196,6 +17212,8 @@ snapshots:
 
   crypto-random-string@2.0.0: {}
 
+  crypto@1.0.1: {}
+
   css-functions-list@3.2.3: {}
 
   css-line-break@2.1.0:
@@ -17626,7 +17644,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dexie@4.0.7: {}
+  dexie@4.0.10: {}
 
   diacritics@1.3.0: {}
 
