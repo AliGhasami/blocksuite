@@ -127,6 +127,7 @@
     "side-channel": "npm:@nolyfill/side-channel@^1"
   },
   "dependencies": {
-    "@size-limit/esbuild-why": "^11.1.5"
+    "@size-limit/esbuild-why": "^11.1.5",
+    "i18next": "^24.0.2"
   }
 }

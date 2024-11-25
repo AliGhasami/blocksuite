@@ -203,7 +203,6 @@ export default ({ mode }) => {
           if (['EVAL', 'SOURCEMAP_ERROR'].includes(warning.code)) {
             return;
           }
-
           defaultHandler(warning);
         },
         input: {

@@ -3,26 +3,37 @@ import type { BlockModel } from '@blocksuite/store';
 
 import { WidgetComponent } from '@blocksuite/block-std';
 import {
-  DisposableGroup,
   assertExists,
+  DisposableGroup,
   throttle,
 } from '@blocksuite/global/utils';
 //import { InlineEditor } from '@blocksuite/inline';
 import { customElement } from 'lit/decorators.js';
 
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+//import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
+
+import {
+  getInlineEditorByModel
+} from '@blocksuite/affine-components/rich-text';
+import {
+  getCurrentNativeRange,
+  getViewportElement,
+} from '@blocksuite/affine-shared/utils';
+
 //import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 import type { IObjectType } from './type.js';
 
 import { matchFlavours } from '../../../_common/utils/index.js';
+
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
-  getInlineEditorByModel,
   //getInlineEditorByModel,
-  getViewportElement,
+  //getInlineEditorByModel,
+  //getViewportElement,
 } from '../../../_common/utils/query.js';
-import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
-import { getPopperPosition } from '../../../root-block/utils/position.js';
+//import { getCurrentNativeRange } from '../../../_common/utils/selection.js';
+import { getPopperPosition } from "../../utils/position.js";
 import { MahdaadObjectPickerPopover } from './object-picker-popover.js';
 //import type { UserMention } from './types.js';
 
@@ -139,6 +150,49 @@ export const AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET =
 
 @customElement(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)
 export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
+  static DEFAULT_OPTIONS: Options = {
+    /**
+     * The first item of the trigger keys will be the primary key
+     */
+    triggerKeys: [
+      //'@',
+      //comment for support mention
+      //'@',
+    ],
+    triggerWords: [
+      {
+        word: '/File/',
+        type: 'file',
+      },
+      {
+        word: '/Page/',
+        type: 'document',
+      },
+      {
+        word: '/Image/',
+        type: 'image',
+      },
+      {
+        word: '/Weblink/',
+        type: 'weblink',
+      },
+      {
+        word: '/Tag/',
+        type: 'tag',
+      },
+      {
+        word: '/Template/',
+        type: 'template',
+      },
+    ],
+    ignoreBlockTypes: ['affine:code'],
+    /**
+     * Convert trigger key to primary key (the first item of the trigger keys)
+     */
+    convertTriggerKey: true,
+    //getMenus,
+  };
+
   private _onBeforeInput = (ctx: UIEventStateContext) => {
     //console.log('1111');
     //const eventState = ctx.get('defaultState');
@@ -218,49 +272,6 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
         });
       });
     });*/
-  };
-
-  static DEFAULT_OPTIONS: Options = {
-    /**
-     * The first item of the trigger keys will be the primary key
-     */
-    triggerKeys: [
-      //'@',
-      //comment for support mention
-      //'@',
-    ],
-    triggerWords: [
-      {
-        word: '/File/',
-        type: 'file',
-      },
-      {
-        word: '/Page/',
-        type: 'document',
-      },
-      {
-        word: '/Image/',
-        type: 'image',
-      },
-      {
-        word: '/Weblink/',
-        type: 'weblink',
-      },
-      {
-        word: '/Tag/',
-        type: 'tag',
-      },
-      {
-        word: '/Template/',
-        type: 'template',
-      },
-    ],
-    ignoreBlockTypes: ['affine:code'],
-    /**
-     * Convert trigger key to primary key (the first item of the trigger keys)
-     */
-    convertTriggerKey: true,
-    //getMenus,
   };
 
   options = AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS;

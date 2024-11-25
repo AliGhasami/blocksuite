@@ -9,16 +9,33 @@
 </template>
 
 <script setup lang="ts">
-import '@blocksuite/presets/themes/affine.css'
-import { PageEditor, EdgelessEditor } from '@blocksuite/presets'
+//import '@blocksuite/presets/themes/affine.css'
+import { PageEditor, EdgelessEditor, AffineEditorContainer } from "@blocksuite/presets";
 import { createEmptyDoc } from './helpers'
 import { type BlockModel, Doc, DocCollection, Job } from "@blocksuite/store";
 import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
-import { AffineSchemas, replaceIdMiddleware,toolsList } from "@blocksuite/blocks";
+/** @alighasami for check merge **/
+import {
+  AffineSchemas, CommunityCanvasTextFonts, DocModeExtension, FontConfigExtension, NotificationExtension,
+  OverrideThemeExtension, ParseDocUrlExtension,
+  RefNodeSlotsExtension,
+  replaceIdMiddleware,
+  SpecProvider
+} from "@blocksuite/blocks";
+//toolsList
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next';
 import { initLitI18n } from 'lit-i18n';
+import { getExampleSpecs } from "@blocksuite/playground/apps/default/specs-examples";
+import {
+  mockDocModeService, mockNotificationService,
+  mockParseDocUrlService, mockPeekViewExtension,
+  themeExtension
+} from "@blocksuite/playground/apps/_common/mock-services";
+import type { ExtensionType } from "@blocksuite/block-std";
+import { effects as blocksEffects } from "@blocksuite/blocks/effects";
+import { effects as presetsEffects } from "@blocksuite/presets/effects";
 
 const refEditor = ref<HTMLElement | null>(null)
 const currentDocument  = ref<Doc | null>(null)
@@ -103,7 +120,8 @@ const emit = defineEmits<{
 
 
 const schemas=computed(()=>{
-  const temp=props.disableTools.map(item=> toolsList[item])
+  /** @alighasami for check merge **/
+  const temp=props.disableTools //.map(item=> toolsList[item])
   return AffineSchemas.filter(item=> !temp.includes(item.model.flavour))
 })
 
@@ -298,21 +316,66 @@ function appendTODOM(element: HTMLElement) {
   },
   { deep: true }
 )*/
-
+blocksEffects();
+presetsEffects();
 function init() {
+  console.log("1111",schemas.value);
+  //return
   const { doc, collection } = createEmptyDoc(props.isBoardView,schemas.value).init()
   myCollection = collection
   currentDocument.value = doc
+
+  //return;
   if (props.isBoardView) {
     editorElement.value = new EdgelessEditor()
   } else {
     editorElement.value = new PageEditor()
   }
+
+
+ /*editorElement.value = new AffineEditorContainer();
+  const specs = getExampleSpecs();
+  const refNodeSlotsExtension = RefNodeSlotsExtension();
+  editorElement.value.pageSpecs = patchPageRootSpec([
+    refNodeSlotsExtension,
+    ...specs.pageModeSpecs,
+  ]);
+  editorElement.value.edgelessSpecs = patchPageRootSpec([
+    refNodeSlotsExtension,
+    ...specs.edgelessModeSpecs,
+  ]);
+  SpecProvider.getInstance().extendSpec('edgeless:preview', [
+    OverrideThemeExtension(themeExtension),
+  ]);*/
+
+
   editorElement.value.doc =  doc
+  //editorElement.value.mode = 'page';
+  //return
   checkIsEmpty()
   appendTODOM(editorElement.value)
   checkReadOnly()
   bindEvent(doc)
+  console.log("222222");
+  /*function patchPageRootSpec(spec: ExtensionType[]) {
+    const setEditorModeCallBack = editorElement.value.switchEditor.bind(editor);
+    const getEditorModeCallback = () => editorElement.value.mode;
+    const newSpec: typeof spec = [
+      ...spec,
+      DocModeExtension(
+        mockDocModeService(getEditorModeCallback, setEditorModeCallBack)
+      ),
+      OverrideThemeExtension(themeExtension),
+      ParseDocUrlExtension(mockParseDocUrlService(collection)),
+      NotificationExtension(mockNotificationService(editorElement.value)),
+      FontConfigExtension(CommunityCanvasTextFonts),
+      //mockPeekViewExtension(attachmentViewerPanel),
+    ];
+    return newSpec;
+  }*/
+
+
+
 }
 
 async function exportData(collection: DocCollection, docs: any[]) {
@@ -379,6 +442,10 @@ function handleSelectAll(event : Event) {
 
 onMounted(async () => {
   init()
+ /* setTimeout(()=>{
+    init()
+  },6000)*/
+  //init()
   document.addEventListener('keydown', handleSelectAll);
 })
 

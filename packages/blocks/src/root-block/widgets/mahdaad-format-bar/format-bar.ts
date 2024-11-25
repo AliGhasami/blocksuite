@@ -5,29 +5,32 @@ import type {
 } from '@blocksuite/block-std';
 
 import { WidgetComponent } from '@blocksuite/block-std';
-import { DisposableGroup, assertExists } from '@blocksuite/global/utils';
+import { assertExists, DisposableGroup } from '@blocksuite/global/utils';
 import {
-  type ReferenceElement,
   autoUpdate,
   computePosition,
   inline,
   offset,
+  type ReferenceElement,
   shift,
 } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 
-import type { AffineTextAttributes } from '../../../_common/inline/presets/affine-inline-specs.js';
+//import type { AffineTextAttributes } from '../../../_common/inline/presets/affine-inline-specs.js';
+import type { AffineTextAttributes,RichText, } from '@blocksuite/affine-components/rich-text';
 
-import '../../../_common/components/button.js';
-import {
-  HoverController,
+//import '../../../_common/components/button.js';
+
+import { HoverController } from '@blocksuite/affine-components/hover';
+import { matchFlavours } from '@blocksuite/affine-shared/utils';
+
+//import '../../../_common/components/toolbar/toolbar.js';
+/*import {
   type RichText,
-} from '../../../_common/components/index.js';
-import '../../../_common/components/toolbar/toolbar.js';
-import { matchFlavours } from '../../../_common/utils/model.js';
+} from '../../../_common/components/index.js';*/
 //import { isFormatSupported } from '../../../note-block/commands/utils.js';
-import { isRootComponent } from '../../../root-block/utils/guard.js';
+//import { isRootComponent } from '../../../root-block/utils/guard.js';
 /*import {
   type FormatBarConfigItem,
   type InlineActionConfigItem,
@@ -50,6 +53,24 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
 
   //static override styles = formatBarStyle;
   private _target: EventTarget | null = null;
+
+  private get _selectionManager() {
+    return this.host.selection;
+  }
+
+  get displayType() {
+    return this._displayType;
+  }
+
+  get nativeRange() {
+    const sl = document.getSelection();
+    if (!sl || sl.rangeCount === 0) return null;
+    return sl.getRangeAt(0);
+  }
+
+  get selectedBlocks() {
+    return this._selectedBlocks;
+  }
 
   private _calculatePlacement() {
     const rootComponent = this.block;
@@ -128,7 +149,8 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
               block.model.role === 'content'
             ) {
               this._displayType = 'text';
-              assertExists(rootComponent.host.rangeManager);
+              //assertExists(rootComponent.host.rangeManager);
+              if (!rootComponent.std.range) return;
 
               this.host.std.command
                 .chain()
@@ -182,7 +204,10 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
       };
       const viewSelection = databaseSelection.viewSelection;
       // check table selection
-      if (viewSelection.type === 'table' && !viewSelection.isEditing)
+      if (
+        viewSelection.type === 'table' &&
+        (viewSelection.selectionType !== 'area' || !viewSelection.isEditing)
+      )
         return reset();
       // check kanban selection
       if (
@@ -311,9 +336,87 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     return false;
   }
 
-  private get _selectionManager() {
-    return this.host.selection;
-  }
+  /*addBlockTypeSwitch(config: {
+    flavour: BlockSuite.Flavour;
+    icon: ParagraphActionConfigItem['icon'];
+    type?: string;
+    name?: string;
+  }) {
+    const { flavour, type, icon } = config;
+    return this.addParagraphAction({
+      id: `${flavour}/${type ?? ''}`,
+      icon,
+      flavour,
+      name: config.name ?? camelCaseToWords(type ?? flavour),
+      action: chain => {
+        chain
+          .updateBlockType({
+            flavour,
+            props: type != null ? { type } : undefined,
+          })
+          .run();
+      },
+    });
+  }*/
+
+  /*addDivider() {
+    this.configItems.push({ type: 'divider' });
+    return this;
+  }*/
+
+  /* addHighlighterDropdown() {
+    this.configItems.push({ type: 'highlighter-dropdown' });
+    return this;
+  }*/
+
+  /*addInlineAction(config: Omit<InlineActionConfigItem, 'type'>) {
+    this.configItems.push({ ...config, type: 'inline-action' });
+    return this;
+  }*/
+
+  /*addParagraphAction(config: Omit<ParagraphActionConfigItem, 'type'>) {
+    this.configItems.push({ ...config, type: 'paragraph-action' });
+    return this;
+  }*/
+
+  /*addParagraphDropdown() {
+    this.configItems.push({ type: 'paragraph-dropdown' });
+    return this;
+  }*/
+
+  /*addRawConfigItems(configItems: FormatBarConfigItem[], index?: number) {
+    if (index === undefined) {
+      this.configItems.push(...configItems);
+    } else {
+      this.configItems.splice(index, 0, ...configItems);
+    }
+    return this;
+  }*/
+
+  /*  addTextStyleToggle(config: {
+    icon: InlineActionConfigItem['icon'];
+    key: Exclude<
+      keyof AffineTextAttributes,
+      'color' | 'background' | 'reference'
+    >;
+    action: InlineActionConfigItem['action'];
+  }) {
+    const { key } = config;
+    return this.addInlineAction({
+      id: key,
+      name: camelCaseToWords(key),
+      icon: config.icon,
+      isActive: chain => {
+        const [result] = chain.isTextStyleActive({ key }).run();
+        return result;
+      },
+      action: config.action,
+      showWhen: chain => {
+        const [result] = isFormatSupported(chain).run();
+        return result;
+      },
+    });
+  }*/
 
   private _shouldDisplay() {
     const readonly = this.doc.awarenessStore.isReadonly(
@@ -425,88 +528,6 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     return 'text';
   }
 
-  /*addBlockTypeSwitch(config: {
-    flavour: BlockSuite.Flavour;
-    icon: ParagraphActionConfigItem['icon'];
-    type?: string;
-    name?: string;
-  }) {
-    const { flavour, type, icon } = config;
-    return this.addParagraphAction({
-      id: `${flavour}/${type ?? ''}`,
-      icon,
-      flavour,
-      name: config.name ?? camelCaseToWords(type ?? flavour),
-      action: chain => {
-        chain
-          .updateBlockType({
-            flavour,
-            props: type != null ? { type } : undefined,
-          })
-          .run();
-      },
-    });
-  }*/
-
-  /*addDivider() {
-    this.configItems.push({ type: 'divider' });
-    return this;
-  }*/
-
-  /* addHighlighterDropdown() {
-    this.configItems.push({ type: 'highlighter-dropdown' });
-    return this;
-  }*/
-
-  /*addInlineAction(config: Omit<InlineActionConfigItem, 'type'>) {
-    this.configItems.push({ ...config, type: 'inline-action' });
-    return this;
-  }*/
-
-  /*addParagraphAction(config: Omit<ParagraphActionConfigItem, 'type'>) {
-    this.configItems.push({ ...config, type: 'paragraph-action' });
-    return this;
-  }*/
-
-  /*addParagraphDropdown() {
-    this.configItems.push({ type: 'paragraph-dropdown' });
-    return this;
-  }*/
-
-  /*addRawConfigItems(configItems: FormatBarConfigItem[], index?: number) {
-    if (index === undefined) {
-      this.configItems.push(...configItems);
-    } else {
-      this.configItems.splice(index, 0, ...configItems);
-    }
-    return this;
-  }*/
-
-  /*  addTextStyleToggle(config: {
-    icon: InlineActionConfigItem['icon'];
-    key: Exclude<
-      keyof AffineTextAttributes,
-      'color' | 'background' | 'reference'
-    >;
-    action: InlineActionConfigItem['action'];
-  }) {
-    const { key } = config;
-    return this.addInlineAction({
-      id: key,
-      name: camelCaseToWords(key),
-      icon: config.icon,
-      isActive: chain => {
-        const [result] = chain.isTextStyleActive({ key }).run();
-        return result;
-      },
-      action: config.action,
-      showWhen: chain => {
-        const [result] = isFormatSupported(chain).run();
-        return result;
-      },
-    });
-  }*/
-
   clearConfig() {
     //this.configItems = [];
     return this;
@@ -525,7 +546,8 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     }
 
     // check if format bar widget support the host
-    if (!isRootComponent(rootComponent)) {
+    // check if format bar widget support the host
+    if (rootComponent.model.flavour !== 'affine:page') {
       console.error(
         `format bar not support rootComponent: ${rootComponent.constructor.name} but its widgets has format bar`
       );
@@ -650,20 +672,6 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
 
     this._floatDisposables = new DisposableGroup();
     this._listenFloatingElement();
-  }
-
-  get displayType() {
-    return this._displayType;
-  }
-
-  get nativeRange() {
-    const sl = document.getSelection();
-    if (!sl || sl.rangeCount === 0) return null;
-    return sl.getRangeAt(0);
-  }
-
-  get selectedBlocks() {
-    return this._selectedBlocks;
   }
 
   @state()

@@ -88,3 +88,14 @@
 [NX Daemon Server] - 2024-08-07T08:34:02.679Z - Done responding to the client handleNxWorkspaceFiles
 [NX Daemon Server] - 2024-08-07T08:34:02.679Z - Handled GET_NX_WORKSPACE_FILES. Handling time: 7. Response time: 0.
 [NX Daemon Server] - 2024-08-07T08:34:04.689Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-25T10:47:48.194Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\e474629dbedacb7546a1\d.sock
+[NX Daemon Server] - 2024-11-25T10:47:48.198Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite (native)
+[NX Daemon Server] - 2024-11-25T10:47:48.224Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-25T10:47:48.227Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-25T10:47:48.227Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-25T10:47:48.231Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-11-25T10:47:48.232Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-11-25T10:47:48.233Z - Handled FORCE_SHUTDOWN. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2024-11-25T10:47:48.233Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-25T10:47:48.234Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2024-11-25T10:47:48.236Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)

@@ -10,7 +10,8 @@
     "packages/affine/block-surface",
     "packages/affine/components",
     "packages/affine/model",
-    "packages/affine/shared"
+    "packages/affine/shared",
+    "packages/claytap"
   ],
   "plugin": ["typedoc-plugin-markdown"],
   "out": "packages/docs/api",

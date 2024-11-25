@@ -1,30 +1,32 @@
 import type { UIEventStateContext } from '@blocksuite/block-std';
 
+import {
+  getInlineEditorByModel
+} from '@blocksuite/affine-components/rich-text';
+import {
+  getCurrentNativeRange,
+  matchFlavours,
+} from '@blocksuite/affine-shared/utils';
 import { WidgetComponent } from '@blocksuite/block-std';
 import {
-  DisposableGroup,
   assertExists,
   debounce,
+  DisposableGroup,
   throttle,
 } from '@blocksuite/global/utils';
 import { customElement } from 'lit/decorators.js';
 
 import type { SlashMenuContext } from '../slash-menu/config.js';
+
 //import { SlashMenu } from './slash-menu-popover.js';
 import type { InnerSlashMenuContext } from '../slash-menu/mahdaad-slash-menu-popover.js';
 
-import {
-  getCurrentNativeRange,
-  getInlineEditorByModel,
-  matchFlavours,
-} from '../../../_common/utils/index.js';
-import { isRootComponent } from '../../utils/guard.js';
+//import { isRootComponent } from '../../utils/guard.js';
 import { getPopperPosition } from '../../utils/position.js';
 import { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import { defaultMahdaadMentionMenuConfig } from './config.js';
 import { MahdaadMenuPopover } from './menu-popover.js';
 
-export { insertContent } from '../slash-menu/utils.js';
 
 let globalAbortController = new AbortController();
 
@@ -103,6 +105,8 @@ export const Mahdaad_Mention_MENU_WIDGET = 'mahdaad-mention-menu-widget';
 
 @customElement(Mahdaad_Mention_MENU_WIDGET)
 export class MahdaadMentionMenuWidget extends WidgetComponent {
+  static DEFAULT_CONFIG = defaultMahdaadMentionMenuConfig;
+
   private _onBeforeInput = (ctx: UIEventStateContext) => {
     const eventState = ctx.get('defaultState');
     const event = eventState.event as InputEvent;
@@ -125,8 +129,8 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
     const { model } = block;
 
     if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
-
-    const paragraphService = this.host.std.spec.getService('affine:paragraph');
+    /** @alighasami for check merge **/
+    const paragraphService = this.host.std.getService('affine:paragraph');
     assertExists(paragraphService);
     if (
       !paragraphService.inlineManager.specs.some(item => item.name == 'mention')
@@ -151,9 +155,9 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
         }
       }
     }
-    inlineEditor.slots.inlineRangeApply.once(() => {
+    inlineEditor.slots.inlineRangeSync.once(() => {
       const rootComponent = this.block;
-      if (!isRootComponent(rootComponent)) {
+      if (rootComponent.model.flavour !== 'affine:page') {
         console.error('MahdaadMentionMenuWidget should be used in RootBlock');
         return;
       }
@@ -181,8 +185,6 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
       });
     });
   };
-
-  static DEFAULT_CONFIG = defaultMahdaadMentionMenuConfig;
 
   config = MahdaadMentionMenuWidget.DEFAULT_CONFIG;
 

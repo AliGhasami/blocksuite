@@ -111,7 +111,6 @@ export class Job {
       });
       const rootModel = doc.root;
       const meta = this._exportDocMeta(doc);
-
       if (!rootModel) {
         throw new BlockSuiteError(
           ErrorCode.TransformerError,
@@ -145,7 +144,6 @@ export class Job {
   sliceToSnapshot = async (
     slice: Slice
   ): Promise<SliceSnapshot | undefined> => {
-    console.log('sliceToSnapshot');
     try {
       this._slots.beforeExport.emit({
         type: 'slice',
@@ -651,21 +649,5 @@ export class Job {
 
   reset() {
     this._assetsManager.cleanup();
-  }
-
-  get adapterConfigs() {
-    return this._adapterConfigs;
-  }
-
-  get assets() {
-    return this._assetsManager.getAssets();
-  }
-
-  get assetsManager() {
-    return this._assetsManager;
-  }
-
-  get collection() {
-    return this._collection;
   }
 }

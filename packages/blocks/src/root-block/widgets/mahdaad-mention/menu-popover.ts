@@ -2,13 +2,16 @@ import type { EditorHost } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { WithDisposable } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
+//import { ShadowlessElement } from '@blocksuite/block-std';
+//import { WithDisposable } from '@blocksuite/block-std';
+import {  WithDisposable } from '@blocksuite/global/utils';
 import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+//import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
 
 import '../../../_common/components/button.js';
 import {
@@ -16,15 +19,25 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
-import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
-import { insertContent } from '../slash-menu/index.js';
+//import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+
+import {
+  insertContent,
+  REFERENCE_NODE
+} from '@blocksuite/affine-components/rich-text';
+
+//import { insertContent } from '../slash-menu/index.js';
 import { styles } from './styles.js';
 
 @customElement('mahdaad-menu-popover')
 export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
+  static override styles = styles;
+
   private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
 
-  static override styles = styles;
+  private get _query() {
+    return getQuery(this.inlineEditor, this._startIndex) || '';
+  }
 
   constructor(
     private editorHost: EditorHost,
@@ -33,10 +46,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
     private model: BlockModel
   ) {
     super();
-  }
-
-  private get _query() {
-    return getQuery(this.inlineEditor, this._startIndex) || '';
   }
 
   override connectedCallback() {
