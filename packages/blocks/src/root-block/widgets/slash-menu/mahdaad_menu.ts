@@ -191,6 +191,35 @@ export const actionsMenu: MahdaadActionMenu[] = [
     },
   },
   {
+    key: 'time',
+    action: ({ rootComponent, model }) => {
+      const date = new Date();
+      // Extract UTC time components
+      const year = date.getUTCFullYear(); // Get hours in UTC and pad with leading zero if needed
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
+      const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
+      const triggerKey = `${year}-${month}-${day}`;
+      const hour = String(date.getUTCHours()).padStart(2, '0')
+      const minute = String(date.getUTCMinutes()).padStart(2, '0')
+      const second = String(date.getUTCSeconds()).padStart(2, '0')
+      const time = `${hour}:${minute}:${second}`
+      const temp = {
+        date: triggerKey,
+        time,
+        id: uuidv4(),
+        createMode: true
+      };
+      /*{
+        const triggerKey = '$';
+        insertContent(rootComponent.host, model, triggerKey);
+      }*/
+      insertContent(rootComponent.host, model, REFERENCE_NODE, {
+        date: temp,
+        ignoreSyncInlineRange: true
+      });
+    },
+  },
+  {
     key: 'table',
     action: ({ rootComponent, model }) => {
       //return;
