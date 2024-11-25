@@ -43,8 +43,17 @@ import { get } from "lodash";
 import { effects as blocksEffects } from "@blocksuite/blocks/effects";
 import { effects as presetsEffects } from "@blocksuite/presets/effects";
 
-blocksEffects();
-presetsEffects();
+if(!window.$blockEditor){
+  window.$blockEditor={}
+}
+
+//console.log("111111",window.$blockEditor);
+if(!window.$blockEditor.is_loaded_custom_elements){
+  //console.log("22222222");
+  blocksEffects();
+  presetsEffects();
+  Object.assign(window.$blockEditor,{is_loaded_custom_elements:true})
+}
 
 const refEditor = ref<HTMLElement | null>(null)
 const currentDocument = ref<Doc | null>(null)

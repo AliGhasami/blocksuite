@@ -61,7 +61,6 @@ export class PageRootBlockComponent extends BlockComponent<
     affine-page-root {
       display: block;
       height: 100%;
-      cursor: default;
     }
 
     .affine-page-root-block-container {
@@ -74,17 +73,19 @@ export class PageRootBlockComponent extends BlockComponent<
       line-height: var(--affine-line-height);
       color: var(--affine-text-primary-color);
       font-weight: 400;
-      max-width: var(--affine-editor-width);
-      margin: 0 auto;
-
+      //max-width: var(--affine-editor-width);
+      //margin: 0 auto;
+      /* cursor: crosshair; */
+      cursor: default;
       /* Leave a place for drag-handle */
       /* Do not use prettier format this style, or it will be broken */
       /* prettier-ignore */
-      padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
+      //padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
       /* prettier-ignore */
-      padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
+      //padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
       /* prettier-ignore */
-      padding-bottom: var(--affine-editor-bottom-padding, ${DOC_BOTTOM_PADDING}px);
+      //padding-bottom: var(--affine-editor-bottom-padding, ${DOC_BOTTOM_PADDING}px);
+      padding-inline-start: 20px;
     }
 
     /* Extra small devices (phones, 640px and down) */
@@ -227,7 +228,7 @@ export class PageRootBlockComponent extends BlockComponent<
 
     this.bindHotKey({
       'Mod-a': () => {
-        const blocks = this.model.children
+        /* const blocks = this.model.children
           .filter(model => {
             if (matchFlavours(model, ['affine:note'])) {
               const note = model as NoteBlockModel;
@@ -245,7 +246,8 @@ export class PageRootBlockComponent extends BlockComponent<
               });
             });
           });
-        this.std.selection.setGroup('note', blocks);
+        this.std.selection.setGroup('note', blocks);*/
+        this.selectAllBlock();
         return true;
       },
       ArrowUp: () => {
@@ -422,6 +424,28 @@ export class PageRootBlockComponent extends BlockComponent<
       <div class="affine-page-root-block-container">${children} ${widgets}</div>
     `;
   }
+
+  selectAllBlock() {
+    const blocks = this.model.children
+      .filter(model => {
+        if (matchFlavours(model, ['affine:note'])) {
+          const note = model as NoteBlockModel;
+          if (note.displayMode === NoteDisplayMode.EdgelessOnly) return false;
+
+          return true;
+        }
+        return false;
+      })
+      .flatMap(model => {
+        return model.children.map(child => {
+          return this.std.selection.create('block', {
+            blockId: child.id,
+          });
+        });
+      });
+    this.std.selection.setGroup('note', blocks);
+  }
+
 
   @query('.affine-page-root-block-container')
   accessor rootElementContainer!: HTMLDivElement;
