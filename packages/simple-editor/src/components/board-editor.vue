@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import '@blocksuite/presets/themes/affine.css'
+//import '@blocksuite/presets/themes/affine.css'
 import { EdgelessEditor, PageEditor } from '@blocksuite/presets'
 //import { createEmptyDoc } from './helpers'
 import {
@@ -42,6 +42,9 @@ import { assertExists } from '@blocksuite/global/utils'
 import { get } from "lodash";
 import { effects as blocksEffects } from "@blocksuite/blocks/effects";
 import { effects as presetsEffects } from "@blocksuite/presets/effects";
+
+blocksEffects();
+presetsEffects();
 
 const refEditor = ref<HTMLElement | null>(null)
 const currentDocument = ref<Doc | null>(null)
