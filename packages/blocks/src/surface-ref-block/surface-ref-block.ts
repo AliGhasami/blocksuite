@@ -1,43 +1,53 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockCaptionEditor } from '@blocksuite/affine-components/caption';
+import type { Doc } from '@blocksuite/store';
 
-import { BlockComponent } from '@blocksuite/block-std';
-import { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
 import {
-  Bound,
-  type SerializedXYWH,
-  deserializeXYWH,
-} from '@blocksuite/global/utils';
-import { assertExists, noop } from '@blocksuite/global/utils';
-import { BlockViewType, type Doc } from '@blocksuite/store';
-import { type TemplateResult, css, html, nothing } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
-
-import type { BlockCaptionEditor } from '../_common/components/block-caption.js';
-import type { FrameBlockComponent } from '../frame-block/frame-block.js';
-import type { EdgelessRootPreviewBlockComponent } from '../root-block/edgeless/edgeless-root-preview-block.js';
-import type { EdgelessRootService } from '../root-block/index.js';
-import type { SurfaceRefBlockModel } from './surface-ref-model.js';
-import type { SurfaceRefBlockService } from './surface-ref-service.js';
-
-import { Peekable } from '../_common/components/peekable.js';
-import { bindContainerHotkey } from '../_common/components/rich-text/keymap/container.js';
+  type SurfaceBlockModel,
+  SurfaceElementModel,
+} from '@blocksuite/affine-block-surface';
 import {
   EdgelessModeIcon,
   FrameIcon,
   MoreDeleteIcon,
-} from '../_common/icons/index.js';
-import { requestConnectedFrame } from '../_common/utils/event.js';
-import { SpecProvider } from '../specs/index.js';
+} from '@blocksuite/affine-components/icons';
+import { Peekable } from '@blocksuite/affine-components/peek';
 import {
-  type SurfaceBlockModel,
-  SurfaceElementModel,
-} from '../surface-block/index.js';
-import './surface-ref-portal.js';
-import { SurfaceRefPortal } from './surface-ref-portal.js';
-import { noContentPlaceholder } from './utils.js';
+  FrameBlockModel,
+  GroupElementModel,
+  type SurfaceRefBlockModel,
+} from '@blocksuite/affine-model';
+import {
+  DocModeProvider,
+  EditPropsStore,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import { requestConnectedFrame } from '@blocksuite/affine-shared/utils';
+import {
+  type BaseSelection,
+  BlockStdScope,
+  type EditorHost,
+  LifeCycleWatcher,
+} from '@blocksuite/block-std';
+import { BlockComponent, BlockServiceWatcher } from '@blocksuite/block-std';
+import { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
+import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
+import {
+  Bound,
+  deserializeXYWH,
+  DisposableGroup,
+  type SerializedXYWH,
+} from '@blocksuite/global/utils';
+import { assertExists } from '@blocksuite/global/utils';
+import { css, html, nothing, type TemplateResult } from 'lit';
+import { query, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 
-noop(SurfaceRefPortal);
+import type { EdgelessRootPreviewBlockComponent } from '../root-block/edgeless/edgeless-root-preview-block.js';
+import type { SurfaceRefBlockService } from './surface-ref-service.js';
+
+import { SpecProvider } from '../_specs/index.js';
+import { EdgelessRootService } from '../root-block/index.js';
+import { noContentPlaceholder } from './utils.js';
 
 const REF_LABEL_ICON = {
   'affine:frame': FrameIcon,
@@ -55,25 +65,23 @@ const NO_CONTENT_REASON = {
   DEFAULT: 'This content was deleted on edgeless mode',
 } as Record<string, string>;
 
-@customElement('affine-surface-ref')
 @Peekable()
 export class SurfaceRefBlockComponent extends BlockComponent<
   SurfaceRefBlockModel,
   SurfaceRefBlockService
 > {
-  private _previewDoc: Doc | null = null;
-
-  private _previewSpec = SpecProvider.getInstance().getSpec('edgeless:preview');
-
-  private _referenceXYWH: SerializedXYWH | null = null;
-
-  private _referencedModel: BlockSuite.EdgelessModel | null = null;
-
   static override styles = css`
     .affine-surface-ref {
       position: relative;
       user-select: none;
       margin: 10px 0;
+      break-inside: avoid;
+    }
+
+    @media print {
+      .affine-surface-ref {
+        outline: none !important;
+      }
     }
 
     .ref-placeholder {
@@ -170,6 +178,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<
       top: 0;
       width: 100%;
       height: 100%;
+      break-inside: avoid;
     }
 
     .surface-ref-mask:hover {
@@ -228,6 +237,28 @@ export class SurfaceRefBlockComponent extends BlockComponent<
     }
   `;
 
+  private _previewDoc: Doc | null = null;
+
+  private _previewSpec = SpecProvider.getInstance().getSpec('edgeless:preview');
+
+  private _referencedModel: BlockSuite.EdgelessModel | null = null;
+
+  private _referenceXYWH: SerializedXYWH | null = null;
+
+  private _viewportEditor: EditorHost | null = null;
+
+  private get _shouldRender() {
+    return (
+      this.isConnected &&
+      // prevent surface-ref from render itself in loop
+      !this.parentComponent?.closest('affine-surface-ref')
+    );
+  }
+
+  get referenceModel() {
+    return this._referencedModel;
+  }
+
   private _deleteThis() {
     this.doc.deleteBlock(this.model);
   }
@@ -254,7 +285,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<
       requestConnectedFrame(() => {
         selection.update(selList => {
           return selList
-            .filter(sel => !sel.is('block'))
+            .filter<BaseSelection>(sel => !sel.is('block'))
             .concat(
               selection.create('text', {
                 from: {
@@ -285,19 +316,70 @@ export class SurfaceRefBlockComponent extends BlockComponent<
         | undefined) ?? null;
     this._surfaceModel = surfaceModel;
 
-    const selector = () => BlockViewType.Display;
+    const findReferencedModel = (): [
+      BlockSuite.EdgelessModel | null,
+      string,
+    ] => {
+      if (!this.model.reference) return [null, this.doc.id];
+
+      if (this.doc.getBlock(this.model.reference)) {
+        return [
+          this.doc.getBlock(this.model.reference)
+            ?.model as GfxBlockElementModel,
+          this.doc.id,
+        ];
+      }
+
+      if (this._surfaceModel?.getElementById(this.model.reference)) {
+        return [
+          this._surfaceModel.getElementById(this.model.reference),
+          this.doc.id,
+        ];
+      }
+
+      const doc = [...this.std.collection.docs.values()]
+        .map(doc => doc.getDoc())
+        .find(
+          doc =>
+            doc.getBlock(this.model.reference) ||
+            (
+              doc.getBlocksByFlavour('affine:surface')[0]
+                .model as SurfaceBlockModel
+            ).getElementById(this.model.reference)
+        );
+
+      if (doc) {
+        this._surfaceModel = doc.getBlocksByFlavour('affine:surface')[0]
+          .model as SurfaceBlockModel;
+      }
+
+      if (doc && doc.getBlock(this.model.reference)) {
+        return [
+          doc.getBlock(this.model.reference)?.model as GfxBlockElementModel,
+          doc.id,
+        ];
+      }
+
+      if (doc && doc.getBlocksByFlavour('affine:surface')[0]) {
+        return [
+          (
+            doc.getBlocksByFlavour('affine:surface')[0]
+              .model as SurfaceBlockModel
+          ).getElementById(this.model.reference),
+          doc.id,
+        ];
+      }
+
+      return [null, this.doc.id];
+    };
+
     const init = () => {
-      const referencedModel: BlockSuite.EdgelessModel =
-        (this.doc.getBlock(this.model.reference)
-          ?.model as GfxBlockElementModel) ??
-        surfaceModel?.getElementById(this.model.reference) ??
-        null;
+      const [referencedModel, docId] = findReferencedModel();
 
       this._referencedModel =
         referencedModel && referencedModel.xywh ? referencedModel : null;
-      this._previewDoc = this.doc.collection.getDoc(this.doc.id, {
+      this._previewDoc = this.doc.collection.getDoc(docId, {
         readonly: true,
-        selector,
       });
       this._referenceXYWH = this._referencedModel?.xywh ?? null;
     };
@@ -348,25 +430,79 @@ export class SurfaceRefBlockComponent extends BlockComponent<
   }
 
   private _initSpec() {
-    this._previewSpec.setup('affine:page', ({ viewConnected }) => {
-      viewConnected.once(({ component }) => {
-        const edgelessBlock = component as EdgelessRootPreviewBlockComponent;
+    const refreshViewport = this._refreshViewport.bind(this);
+    class PageViewWatcher extends BlockServiceWatcher {
+      static override readonly flavour = 'affine:page';
 
-        edgelessBlock.editorViewportSelector = 'ref-viewport';
-        edgelessBlock.service.viewport.sizeUpdated.once(() => {
-          this._refreshViewport();
-        });
-      });
-    });
+      override mounted() {
+        this.blockService.disposables.add(
+          this.blockService.specSlots.viewConnected.once(({ component }) => {
+            const edgelessBlock =
+              component as EdgelessRootPreviewBlockComponent;
 
-    // @ts-ignore
-    this._previewSpec.setup('affine:frame', ({ viewConnected }) => {
-      viewConnected.once(({ component }) => {
-        const frameBlock = component as FrameBlockComponent;
+            edgelessBlock.editorViewportSelector = 'ref-viewport';
+            refreshViewport();
+            edgelessBlock.service.viewport.sizeUpdated.once(() => {
+              refreshViewport();
+            });
+          })
+        );
+      }
+    }
+    this._previewSpec.extend([PageViewWatcher]);
 
-        frameBlock.showBorder = false;
-      });
-    });
+    const referenceId = this.model.reference;
+    const setReferenceXYWH = (xywh: typeof this._referenceXYWH) => {
+      this._referenceXYWH = xywh;
+    };
+
+    class FrameGroupViewWatcher extends LifeCycleWatcher {
+      static override readonly key = 'surface-ref-group-view-watcher';
+
+      private _disposable = new DisposableGroup();
+
+      override mounted() {
+        const edgelessService = this.std.get(EdgelessRootService);
+        const { _disposable } = this;
+
+        const referenceElement = edgelessService.getElementById(referenceId);
+        if (!referenceElement) {
+          throw new BlockSuiteError(
+            ErrorCode.MissingViewModelError,
+            `can not find element(id:${referenceElement})`
+          );
+        }
+
+        if (referenceElement instanceof FrameBlockModel) {
+          _disposable.add(
+            referenceElement.xywh$.subscribe(xywh => {
+              setReferenceXYWH(xywh);
+              refreshViewport();
+            })
+          );
+        } else if (referenceElement instanceof GroupElementModel) {
+          _disposable.add(
+            edgelessService.surface.elementUpdated.on(({ id, oldValues }) => {
+              if (
+                id === referenceId &&
+                oldValues.xywh !== referenceElement.xywh
+              ) {
+                setReferenceXYWH(referenceElement.xywh);
+                refreshViewport();
+              }
+            })
+          );
+        } else {
+          console.warn('Unsupported reference element type');
+        }
+      }
+
+      override unmounted() {
+        this._disposable.dispose();
+      }
+    }
+
+    this._previewSpec.extend([FrameGroupViewWatcher]);
   }
 
   private _refreshViewport() {
@@ -376,7 +512,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<
 
     if (!previewEditorHost) return;
 
-    const edgelessService = previewEditorHost.spec.getService(
+    const edgelessService = previewEditorHost.std.getService(
       'affine:page'
     ) as EdgelessRootService;
 
@@ -413,6 +549,13 @@ export class SurfaceRefBlockComponent extends BlockComponent<
         : referencedModel.type;
     const _previewSpec = this._previewSpec.value;
 
+    if (!this._viewportEditor) {
+      this._viewportEditor = new BlockStdScope({
+        doc: this._previewDoc!,
+        extensions: _previewSpec,
+      }).render();
+    }
+
     return html`<div class="ref-content">
       <div
         class="ref-viewport ${flavourOrType === 'affine:frame' ? 'frame' : ''}"
@@ -421,7 +564,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<
           aspectRatio: `${w} / ${h}`,
         })}
       >
-        ${this.host.renderSpecPortal(this._previewDoc!, _previewSpec)}
+        ${this._viewportEditor}
       </div>
       ${this._renderMask(referencedModel, flavourOrType)}
     </div>`;
@@ -448,18 +591,8 @@ export class SurfaceRefBlockComponent extends BlockComponent<
     </div>`;
   }
 
-  private get _shouldRender() {
-    return (
-      this.isConnected &&
-      // prevent surface-ref from render itself in loop
-      !this.parentBlock.closest('affine-surface-ref')
-    );
-  }
-
   override connectedCallback() {
     super.connectedCallback();
-
-    bindContainerHotkey(this);
 
     this.contentEditable = 'false';
 
@@ -482,10 +615,12 @@ export class SurfaceRefBlockComponent extends BlockComponent<
     const content = isEmpty
       ? this._renderRefPlaceholder(model)
       : this._renderRefContent(_referencedModel);
+    const edgelessTheme = this.std.get(ThemeProvider).edgeless$.value;
 
     return html`
       <div
         class="affine-surface-ref"
+        data-theme=${edgelessTheme}
         @click=${this._focusBlock}
         style=${styleMap({
           outline: this._focused
@@ -496,7 +631,7 @@ export class SurfaceRefBlockComponent extends BlockComponent<
         ${content}
       </div>
 
-      <block-caption-editor .block=${this}></block-caption-editor>
+      <block-caption-editor></block-caption-editor>
 
       ${Object.values(this.widgets)}
     `;
@@ -509,20 +644,15 @@ export class SurfaceRefBlockComponent extends BlockComponent<
       xywh: this._referenceXYWH,
       padding: [60, 20, 20, 20] as [number, number, number, number],
     };
-    const pageService = this.std.spec.getService('affine:page');
 
-    pageService.editPropsStore.setStorage('viewport', viewport);
-    pageService.docModeService.setMode('edgeless');
+    this.std.get(EditPropsStore).setStorage('viewport', viewport);
+    this.std.get(DocModeProvider).setEditorMode('edgeless');
   }
 
   override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
     if (_changedProperties.has('_referencedModel')) {
       this._refreshViewport();
     }
-  }
-
-  get referenceModel() {
-    return this._referencedModel;
   }
 
   @state()

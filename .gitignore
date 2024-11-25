@@ -1,6 +1,7 @@
 .DS_Store
 .idea
 .vscode/*
+.zed
 !.vscode/tasks.json
 !.vscode/settings.template.json
 !.vscode/launch.template.json
@@ -9,13 +10,13 @@ node_modules
 *.tgz
 
 # playwright
-/test-results/
-/playwright-report/
-/playwright/.cache/
+test-results/
+playwright-report/
+playwright/.cache/
 
 # code coverage
-/.nyc_output
-/.coverage
+.nyc_output
+.coverage
 
 # Build out
 dist/
@@ -31,4 +32,14 @@ next-env.d.ts
 
 __screenshots__/
 /packages/claytap/
-/packages/claytap/
+
+.nx/cache
+.nx/workspace-data
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

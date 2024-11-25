@@ -1,22 +1,27 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+/** @alighasami for check merge **/
+import {
+  Heading1Icon,
+  LinkIcon,
+  TextIcon,
+} from '@blocksuite/affine-components/icons';
+import {
+  EditPropsStore,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import { SignalWatcher } from '@blocksuite/global/utils';
+import { computed } from '@preact/signals-core';
+import { css, html, LitElement } from 'lit';
+import { state } from 'lit/decorators.js';
 
-import type { NoteTool } from '../../../controllers/tools/note-tool.js';
+import type { NoteToolOption } from '../../../gfx-tool/note-tool.js';
 
-import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../../../../_common/edgeless/note/consts.js';
-import { FileIcon } from '../../../../../_common/icons/index.js';
-import { Heading1Icon, TextIcon } from '../../../../../_common/icons/text.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { toShapeNotToAdapt } from './icon.js';
-import './note-menu.js';
 
-@customElement('edgeless-note-senior-button')
 export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
-  LitElement
+  SignalWatcher(LitElement)
 ) {
-  private _states = ['childFlavour', 'childType', 'tip'] as const;
-
   static override styles = css`
     :host,
     .edgeless-note-button {
@@ -28,7 +33,7 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
       box-sizing: border-box;
     }
 
-    .note-root {
+    .note-root[data-app-theme='light'] {
       --paper-border-color: var(--affine-pure-white);
       --paper-foriegn-color: rgba(0, 0, 0, 0.1);
       --paper-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
@@ -36,7 +41,7 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
       --icon-card-shadow: 0px 2px 4px rgba(0, 0, 0, 0.22),
         inset 0px -2px 1px rgba(0, 0, 0, 0.14);
     }
-    .note-root[data-dark='true'] {
+    .note-root[data-app-theme='dark'] {
       --paper-border-color: var(--affine-divider-color);
       --paper-foriegn-color: rgba(255, 255, 255, 0.12);
       --paper-shadow: 0px 2px 6px rgba(0, 0, 0, 0.8);
@@ -122,6 +127,17 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
     }
   `;
 
+  private _noteBg$ = computed(() => {
+    return this.edgeless.std
+      .get(ThemeProvider)
+      .generateColorProperty(
+        this.edgeless.std.get(EditPropsStore).lastProps$.value['affine:note']
+          .background
+      );
+  });
+
+  private _states = ['childFlavour', 'childType', 'tip'] as const;
+
   override enableActiveBackground = true;
 
   override type = 'affine:note' as const;
@@ -146,7 +162,7 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
       tip,
       onChange: (
         props: Partial<{
-          childFlavour: NoteTool['childFlavour'];
+          childFlavour: NoteToolOption['childFlavour'];
           childType: string | null;
           tip: string;
         }>
@@ -166,25 +182,8 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
     });
   }
 
-  override connectedCallback() {
-    super.connectedCallback();
-
-    this._noteBg =
-      this.edgeless.service.editPropsStore.getLastProps(this.type).background ??
-      DEFAULT_NOTE_BACKGROUND_COLOR;
-
-    this.disposables.add(
-      this.edgeless.service.editPropsStore.slots.lastPropsUpdated.on(
-        ({ type, props }) => {
-          if (type !== this.type) return;
-          if (props.background) this._noteBg = props.background as string;
-        }
-      )
-    );
-  }
-
   override render() {
-    const { theme, _noteBg } = this;
+    const appTheme = this.edgeless.std.get(ThemeProvider).app$.value;
 
     return html`<edgeless-toolbar-button
       class="edgeless-note-button"
@@ -193,24 +192,21 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
     >
       <div
         class="note-root"
-        data-dark=${theme === 'dark'}
+        data-app-theme=${appTheme}
         @click=${this._toggleNoteMenu}
-        style="--paper-bg: var(${_noteBg})"
+        style="--paper-bg: ${this._noteBg$.value}"
       >
         <div class="paper">${toShapeNotToAdapt}</div>
-        <div class="edgeless-toolbar-note-icon link">${FileIcon}</div>
+        <div class="edgeless-toolbar-note-icon link">${LinkIcon}</div>
         <div class="edgeless-toolbar-note-icon heading">${Heading1Icon}</div>
         <div class="edgeless-toolbar-note-icon text">${TextIcon}</div>
       </div>
     </edgeless-toolbar-button>`;
   }
 
-  @state()
-  private accessor _noteBg: string = DEFAULT_NOTE_BACKGROUND_COLOR;
-
   // TODO: better to extract these states outside of component?
   @state()
-  accessor childFlavour: NoteTool['childFlavour'] = 'affine:paragraph';
+  accessor childFlavour: NoteToolOption['childFlavour'] = 'affine:paragraph';
 
   @state()
   accessor childType = 'text';

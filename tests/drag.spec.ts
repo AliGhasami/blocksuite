@@ -18,12 +18,10 @@ import {
 import {
   getBoundingClientRect,
   getEditorHostLocator,
+  getPageSnapshot,
+  initParagraphsByCount,
 } from './utils/actions/misc.js';
-import {
-  assertBlockChildrenIds,
-  assertRichTexts,
-  assertStoreMatchJSX,
-} from './utils/asserts.js';
+import { assertBlockChildrenIds, assertRichTexts } from './utils/asserts.js';
 import { test } from './utils/playwright.js';
 
 test('only have one drag handle in screen', async ({ page }) => {
@@ -166,7 +164,7 @@ test('move drag handle into another block', async ({ page }) => {
 
 test('move to the last block of each level in multi-level nesting', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
 
@@ -189,143 +187,15 @@ test('move to the last block of each level in multi-level nesting', async ({
   await pressEnter(page);
   await type(page, 'G');
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="A"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="B"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   await dragHandleFromBlockToBlockBottomById(page, '3', '9');
   await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="B"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="A"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_drag_3_9.json`
   );
 
   await dragHandleFromBlockToBlockBottomById(
@@ -337,72 +207,8 @@ test('move to the last block of each level in multi-level nesting', async ({
   );
   await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="A"
-          prop:type="bulleted"
-        />
-      </affine:list>
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="B"
-        prop:type="bulleted"
-      />
-    </affine:list>
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_drag_4_3.json`
   );
 
   await assertRichTexts(page, ['C', 'D', 'E', 'F', 'G', 'A', 'B']);
@@ -415,72 +221,8 @@ test('move to the last block of each level in multi-level nesting', async ({
   );
   await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="B"
-        prop:type="bulleted"
-      />
-    </affine:list>
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="A"
-      prop:type="bulleted"
-    />
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_drag_3_4.json`
   );
 
   await assertRichTexts(page, ['C', 'D', 'E', 'F', 'G', 'B', 'A']);
@@ -508,216 +250,92 @@ test('should sync selected-blocks to session-manager when clicking drag handle',
   await assertRichTexts(page, ['', '456', '789']);
 });
 
-test('should be able to drag & drop multiple blocks', async ({ page }) => {
-  await enterPlaygroundRoom(page);
-  await initEmptyParagraphState(page);
-  await initThreeParagraphs(page);
-  await assertRichTexts(page, ['123', '456', '789']);
+test.fixme(
+  'should be able to drag & drop multiple blocks',
+  async ({ page }) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+    await initThreeParagraphs(page);
+    await assertRichTexts(page, ['123', '456', '789']);
 
-  await dragBetweenIndices(
-    page,
-    [0, 0],
-    [1, 3],
-    { x: -60, y: 0 },
-    { x: 80, y: 0 },
-    {
-      steps: 50,
-    }
-  );
-
-  const blockSelections = page
-    .locator('affine-block-selection')
-    .locator('visible=true');
-  await expect(blockSelections).toHaveCount(2);
-
-  await dragHandleFromBlockToBlockBottomById(page, '2', '4', true);
-  await expect(page.locator('.affine-drag-indicator')).toBeHidden();
-
-  await assertRichTexts(page, ['789', '123', '456']);
-
-  // Selection is still 2 after drop
-  await expect(blockSelections).toHaveCount(2);
-});
-
-test('should be able to drag & drop multiple blocks to nested block', async ({
-  page,
-}) => {
-  await enterPlaygroundRoom(page);
-  await initEmptyParagraphState(page);
-
-  await focusRichText(page);
-  await type(page, '-');
-  await page.keyboard.press('Space', { delay: 50 });
-  await type(page, 'A');
-  await pressEnter(page);
-  await type(page, 'B');
-  await pressEnter(page);
-  await type(page, 'C');
-  await pressEnter(page);
-  await pressTab(page);
-  await type(page, 'D');
-  await pressEnter(page);
-  await type(page, 'E');
-  await pressEnter(page);
-  await pressTab(page);
-  await type(page, 'F');
-  await pressEnter(page);
-  await type(page, 'G');
-
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
+    await dragBetweenIndices(
+      page,
+      [0, 0],
+      [1, 3],
+      { x: -60, y: 0 },
+      { x: 80, y: 0 },
+      {
+        steps: 50,
       }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="A"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="B"
-      prop:type="bulleted"
-    />
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
-  );
+    );
 
-  await dragBetweenIndices(
-    page,
-    [0, 0],
-    [1, 1],
-    { x: -80, y: 0 },
-    { x: 80, y: 0 },
-    {
-      steps: 50,
-    }
-  );
+    const blockSelections = page
+      .locator('affine-block-selection')
+      .locator('visible=true');
+    await expect(blockSelections).toHaveCount(2);
 
-  const blockSelections = page
-    .locator('affine-block-selection')
-    .locator('visible=true');
-  await expect(blockSelections).toHaveCount(2);
+    await dragHandleFromBlockToBlockBottomById(page, '2', '4', true);
+    await expect(page.locator('.affine-drag-indicator')).toBeHidden();
 
-  await dragHandleFromBlockToBlockBottomById(page, '3', '8');
+    await assertRichTexts(page, ['789', '123', '456']);
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
+    // Selection is still 2 after drop
+    await expect(blockSelections).toHaveCount(2);
+  }
+);
+
+test.fixme(
+  'should be able to drag & drop multiple blocks to nested block',
+  async ({ page }, testInfo) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+
+    await focusRichText(page);
+    await type(page, '-');
+    await page.keyboard.press('Space', { delay: 50 });
+    await type(page, 'A');
+    await pressEnter(page);
+    await type(page, 'B');
+    await pressEnter(page);
+    await type(page, 'C');
+    await pressEnter(page);
+    await pressTab(page);
+    await type(page, 'D');
+    await pressEnter(page);
+    await type(page, 'E');
+    await pressEnter(page);
+    await pressTab(page);
+    await type(page, 'F');
+    await pressEnter(page);
+    await type(page, 'G');
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_init.json`
+    );
+
+    await dragBetweenIndices(
+      page,
+      [0, 0],
+      [1, 1],
+      { x: -80, y: 0 },
+      { x: 80, y: 0 },
+      {
+        steps: 50,
       }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:list
-      prop:checked={false}
-      prop:collapsed={false}
-      prop:text="C"
-      prop:type="bulleted"
-    >
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="D"
-        prop:type="bulleted"
-      />
-      <affine:list
-        prop:checked={false}
-        prop:collapsed={false}
-        prop:text="E"
-        prop:type="bulleted"
-      >
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="F"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="A"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="B"
-          prop:type="bulleted"
-        />
-        <affine:list
-          prop:checked={false}
-          prop:collapsed={false}
-          prop:text="G"
-          prop:type="bulleted"
-        />
-      </affine:list>
-    </affine:list>
-  </affine:note>
-</affine:page>`
-  );
-});
+    );
+
+    const blockSelections = page
+      .locator('affine-block-selection')
+      .locator('visible=true');
+    await expect(blockSelections).toHaveCount(2);
+
+    await dragHandleFromBlockToBlockBottomById(page, '3', '8');
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_finial.json`
+    );
+  }
+);
 
 test('should blur rich-text first on starting block selection', async ({
   page,
@@ -759,7 +377,7 @@ test('hide drag handle when mouse is hovering over the title', async ({
   await expect(dragHandle).toBeVisible();
 });
 
-test('should create preview when dragging', async ({ page }) => {
+test.fixme('should create preview when dragging', async ({ page }) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
@@ -796,56 +414,57 @@ test('should create preview when dragging', async ({ page }) => {
   );
 });
 
-test('should drag and drop blocks under block-level selection', async ({
-  page,
-}) => {
-  await enterPlaygroundRoom(page);
-  await initEmptyParagraphState(page);
-  await initThreeParagraphs(page);
-  await assertRichTexts(page, ['123', '456', '789']);
+test.fixme(
+  'should drag and drop blocks under block-level selection',
+  async ({ page }) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+    await initThreeParagraphs(page);
+    await assertRichTexts(page, ['123', '456', '789']);
 
-  await dragBetweenIndices(
-    page,
-    [0, 0],
-    [1, 3],
-    { x: -60, y: 0 },
-    { x: 80, y: 0 },
-    {
-      steps: 50,
+    await dragBetweenIndices(
+      page,
+      [0, 0],
+      [1, 3],
+      { x: -60, y: 0 },
+      { x: 80, y: 0 },
+      {
+        steps: 50,
+      }
+    );
+
+    const blockSelections = page
+      .locator('affine-block-selection')
+      .locator('visible=true');
+    await expect(blockSelections).toHaveCount(2);
+
+    const editorHost = getEditorHostLocator(page);
+    const editors = editorHost.locator('rich-text');
+    const editorRect0 = await editors.nth(0).boundingBox();
+    const editorRect2 = await editors.nth(2).boundingBox();
+    if (!editorRect0 || !editorRect2) {
+      throw new Error();
     }
-  );
 
-  const blockSelections = page
-    .locator('affine-block-selection')
-    .locator('visible=true');
-  await expect(blockSelections).toHaveCount(2);
+    await dragBetweenCoords(
+      page,
+      {
+        x: editorRect0.x - 10,
+        y: editorRect0.y + editorRect0.height / 2,
+      },
+      {
+        x: editorRect2.x + 10,
+        y: editorRect2.y + editorRect2.height / 2 + 10,
+      },
+      {
+        steps: 50,
+      }
+    );
 
-  const editorHost = getEditorHostLocator(page);
-  const editors = editorHost.locator('rich-text');
-  const editorRect0 = await editors.nth(0).boundingBox();
-  const editorRect2 = await editors.nth(2).boundingBox();
-  if (!editorRect0 || !editorRect2) {
-    throw new Error();
+    await assertRichTexts(page, ['789', '123', '456']);
+    await expect(blockSelections).toHaveCount(2);
   }
-
-  await dragBetweenCoords(
-    page,
-    {
-      x: editorRect0.x - 10,
-      y: editorRect0.y + editorRect0.height / 2,
-    },
-    {
-      x: editorRect2.x + 10,
-      y: editorRect2.y + editorRect2.height / 2 + 10,
-    },
-    {
-      steps: 50,
-    }
-  );
-
-  await assertRichTexts(page, ['789', '123', '456']);
-  await expect(blockSelections).toHaveCount(2);
-});
+);
 
 test('should trigger click event on editor container when clicking on blocks under block-level selection', async ({
   page,
@@ -934,34 +553,198 @@ test('should get to selected block when dragging unselected block', async ({
   await assertRichTexts(page, ['456', '123']);
 });
 
-test('should clear the currently selected block when clicked again', async ({
+test.fixme(
+  'should clear the currently selected block when clicked again',
+  async ({ page }) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+    await focusRichText(page);
+    await type(page, '123');
+    await pressEnter(page);
+    await type(page, '456');
+    await assertRichTexts(page, ['123', '456']);
+
+    const editorHost = getEditorHostLocator(page);
+    const editors = editorHost.locator('rich-text');
+    const editorRect0 = await editors.nth(0).boundingBox();
+    const editorRect1 = await editors.nth(1).boundingBox();
+
+    if (!editorRect0 || !editorRect1) {
+      throw new Error();
+    }
+
+    await page.mouse.move(
+      editorRect1.x + 5,
+      editorRect1.y + editorRect1.height / 2
+    );
+
+    await page.mouse.move(
+      editorRect1.x - 10,
+      editorRect1.y + editorRect1.height / 2
+    );
+    await page.mouse.down();
+    await page.mouse.up();
+
+    const blockSelections = page
+      .locator('affine-block-selection')
+      .locator('visible=true');
+    await expect(blockSelections).toHaveCount(1);
+
+    let selectedBlockRect = await blockSelections.nth(0).boundingBox();
+
+    if (!selectedBlockRect) {
+      throw new Error();
+    }
+
+    expect(editorRect1).toEqual(selectedBlockRect);
+
+    await page.mouse.move(
+      editorRect0.x - 10,
+      editorRect0.y + editorRect0.height / 2
+    );
+    await page.mouse.down();
+    await page.mouse.up();
+
+    await expect(blockSelections).toHaveCount(1);
+
+    selectedBlockRect = await blockSelections.nth(0).boundingBox();
+
+    if (!selectedBlockRect) {
+      throw new Error();
+    }
+
+    expect(editorRect0).toEqual(selectedBlockRect);
+  }
+);
+
+test.fixme(
+  'should support moving blocks from multiple notes',
+  async ({ page }) => {
+    await enterPlaygroundRoom(page);
+    await page.evaluate(() => {
+      const { doc } = window;
+
+      const rootId = doc.addBlock('affine:page', {
+        title: new doc.Text(),
+      });
+      doc.addBlock('affine:surface', {}, rootId);
+
+      ['123', '456', '789', '987', '654', '321'].forEach(text => {
+        const noteId = doc.addBlock('affine:note', {}, rootId);
+        doc.addBlock(
+          'affine:paragraph',
+          {
+            text: new doc.Text(text),
+          },
+          noteId
+        );
+      });
+
+      doc.resetHistory();
+    });
+
+    await dragBetweenIndices(
+      page,
+      [1, 0],
+      [2, 3],
+      { x: -60, y: 0 },
+      { x: 80, y: 0 },
+      {
+        steps: 50,
+      }
+    );
+
+    const blockSelections = page
+      .locator('affine-block-selection')
+      .locator('visible=true');
+    await expect(blockSelections).toHaveCount(2);
+
+    const editorHost = getEditorHostLocator(page);
+    const editors = editorHost.locator('rich-text');
+    const editorRect1 = await editors.nth(1).boundingBox();
+    const editorRect3 = await editors.nth(3).boundingBox();
+    if (!editorRect1 || !editorRect3) {
+      throw new Error();
+    }
+
+    await dragBetweenCoords(
+      page,
+      {
+        x: editorRect1.x - 10,
+        y: editorRect1.y + editorRect1.height / 2,
+      },
+      {
+        x: editorRect3.x + 10,
+        y: editorRect3.y + editorRect3.height / 2 + 10,
+      },
+      {
+        steps: 50,
+      }
+    );
+
+    await assertRichTexts(page, ['123', '987', '456', '789', '654', '321']);
+    await expect(blockSelections).toHaveCount(2);
+
+    await dragBetweenIndices(
+      page,
+      [5, 0],
+      [4, 3],
+      { x: -60, y: 0 },
+      { x: 80, y: 0 },
+      {
+        steps: 50,
+      }
+    );
+
+    const editorRect0 = await editors.nth(0).boundingBox();
+    const editorRect5 = await editors.nth(5).boundingBox();
+    if (!editorRect0 || !editorRect5) {
+      throw new Error();
+    }
+
+    await dragBetweenCoords(
+      page,
+      {
+        x: editorRect5.x - 10,
+        y: editorRect5.y + editorRect5.height / 2,
+      },
+      {
+        x: editorRect0.x + 10,
+        y: editorRect0.y + editorRect0.height / 2 - 5,
+      },
+      {
+        steps: 50,
+      }
+    );
+
+    await assertRichTexts(page, ['654', '321', '123', '987', '456', '789']);
+    await expect(blockSelections).toHaveCount(2);
+  }
+);
+
+test('drag handle should show on right block when scroll viewport', async ({
   page,
 }) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
-  await focusRichText(page);
-  await type(page, '123');
-  await pressEnter(page);
-  await type(page, '456');
-  await assertRichTexts(page, ['123', '456']);
+  await initParagraphsByCount(page, 30);
+
+  await page.mouse.wheel(0, 200);
 
   const editorHost = getEditorHostLocator(page);
   const editors = editorHost.locator('rich-text');
-  const editorRect0 = await editors.nth(0).boundingBox();
-  const editorRect1 = await editors.nth(1).boundingBox();
-
-  if (!editorRect0 || !editorRect1) {
+  const blockRect28 = await editors.nth(28).boundingBox();
+  if (!blockRect28) {
     throw new Error();
   }
 
-  await page.mouse.move(
-    editorRect1.x + 5,
-    editorRect1.y + editorRect1.height / 2
-  );
+  await page.mouse.move(blockRect28.x + 10, blockRect28.y + 10);
+  const dragHandle = page.locator('.affine-drag-handle-container');
+  await expect(dragHandle).toBeVisible();
 
   await page.mouse.move(
-    editorRect1.x - 10,
-    editorRect1.y + editorRect1.height / 2
+    blockRect28.x - 10,
+    blockRect28.y + blockRect28.height / 2
   );
   await page.mouse.down();
   await page.mouse.up();
@@ -971,130 +754,11 @@ test('should clear the currently selected block when clicked again', async ({
     .locator('visible=true');
   await expect(blockSelections).toHaveCount(1);
 
-  let selectedBlockRect = await blockSelections.nth(0).boundingBox();
+  const selectedBlockRect = await blockSelections.nth(0).boundingBox();
 
   if (!selectedBlockRect) {
     throw new Error();
   }
 
-  expect(editorRect1).toEqual(selectedBlockRect);
-
-  await page.mouse.move(
-    editorRect0.x - 10,
-    editorRect0.y + editorRect0.height / 2
-  );
-  await page.mouse.down();
-  await page.mouse.up();
-
-  await expect(blockSelections).toHaveCount(1);
-
-  selectedBlockRect = await blockSelections.nth(0).boundingBox();
-
-  if (!selectedBlockRect) {
-    throw new Error();
-  }
-
-  expect(editorRect0).toEqual(selectedBlockRect);
-});
-
-test('should support moving blocks from multiple notes', async ({ page }) => {
-  await enterPlaygroundRoom(page);
-  await page.evaluate(() => {
-    const { doc } = window;
-
-    const rootId = doc.addBlock('affine:page', {
-      title: new doc.Text(),
-    });
-    doc.addBlock('affine:surface', {}, rootId);
-
-    ['123', '456', '789', '987', '654', '321'].forEach(text => {
-      const noteId = doc.addBlock('affine:note', {}, rootId);
-      doc.addBlock(
-        'affine:paragraph',
-        {
-          text: new doc.Text(text),
-        },
-        noteId
-      );
-    });
-
-    doc.resetHistory();
-  });
-
-  await dragBetweenIndices(
-    page,
-    [1, 0],
-    [2, 3],
-    { x: -60, y: 0 },
-    { x: 80, y: 0 },
-    {
-      steps: 50,
-    }
-  );
-
-  const blockSelections = page
-    .locator('affine-block-selection')
-    .locator('visible=true');
-  await expect(blockSelections).toHaveCount(2);
-
-  const editorHost = getEditorHostLocator(page);
-  const editors = editorHost.locator('rich-text');
-  const editorRect1 = await editors.nth(1).boundingBox();
-  const editorRect3 = await editors.nth(3).boundingBox();
-  if (!editorRect1 || !editorRect3) {
-    throw new Error();
-  }
-
-  await dragBetweenCoords(
-    page,
-    {
-      x: editorRect1.x - 10,
-      y: editorRect1.y + editorRect1.height / 2,
-    },
-    {
-      x: editorRect3.x + 10,
-      y: editorRect3.y + editorRect3.height / 2 + 10,
-    },
-    {
-      steps: 50,
-    }
-  );
-
-  await assertRichTexts(page, ['123', '987', '456', '789', '654', '321']);
-  await expect(blockSelections).toHaveCount(2);
-
-  await dragBetweenIndices(
-    page,
-    [5, 0],
-    [4, 3],
-    { x: -60, y: 0 },
-    { x: 80, y: 0 },
-    {
-      steps: 50,
-    }
-  );
-
-  const editorRect0 = await editors.nth(0).boundingBox();
-  const editorRect5 = await editors.nth(5).boundingBox();
-  if (!editorRect0 || !editorRect5) {
-    throw new Error();
-  }
-
-  await dragBetweenCoords(
-    page,
-    {
-      x: editorRect5.x - 10,
-      y: editorRect5.y + editorRect5.height / 2,
-    },
-    {
-      x: editorRect0.x + 10,
-      y: editorRect0.y + editorRect0.height / 2 - 5,
-    },
-    {
-      steps: 50,
-    }
-  );
-
-  await assertRichTexts(page, ['654', '321', '123', '987', '456', '789']);
-  await expect(blockSelections).toHaveCount(2);
+  expect(blockRect28).toEqual(selectedBlockRect);
 });

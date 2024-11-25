@@ -1,19 +1,30 @@
-import type { BlockSpec, EditorHost } from '@blocksuite/block-std';
-import type { DocModeService, PageRootService } from '@blocksuite/blocks';
-import type { BlockCollection } from '@blocksuite/store';
-import type { DocCollection } from '@blocksuite/store';
+import type { BlockCollection, DocCollection } from '@blocksuite/store';
 
 import {
+  BlockServiceWatcher,
+  type EditorHost,
+  type ExtensionType,
+} from '@blocksuite/block-std';
+import {
+  CommunityCanvasTextFonts,
+  FontConfigExtension,
+  NotificationExtension,
+  OverrideThemeExtension,
+  type PageRootService,
+  ParseDocUrlExtension,
+  RefNodeSlotsExtension,
+  RefNodeSlotsProvider,
+  SpecProvider,
+} from '@blocksuite/blocks';
+import {
   AffineFormatBarWidget,
-  EdgelessEditorBlockSpecs,
-  PageEditorBlockSpecs,
-  createDocModeService,
+  DocModeProvider,
   toolbarDefaultConfig,
 } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
 import { AffineEditorContainer, CommentPanel } from '@blocksuite/presets';
 
-import { CustomChatPanel } from '../../_common/components/custom-chat-panel.js';
+import { AttachmentViewerPanel } from '../../_common/components/attachment-viewer-panel.js';
 import { CustomFramePanel } from '../../_common/components/custom-frame-panel.js';
 import { CustomOutlinePanel } from '../../_common/components/custom-outline-panel.js';
 import { CustomOutlineViewer } from '../../_common/components/custom-outline-viewer.js';
@@ -22,16 +33,20 @@ import { DocsPanel } from '../../_common/components/docs-panel.js';
 import { LeftSidePanel } from '../../_common/components/left-side-panel.js';
 import { SidePanel } from '../../_common/components/side-panel.js';
 import {
+  mockDocModeService,
   mockNotificationService,
-  mockQuickSearchService,
-} from '../../_common/mock-services.js';
+  mockParseDocUrlService,
+  mockPeekViewExtension,
+  themeExtension,
+} from '../../_common/mock-services';
 
-function setDocModeFromUrlParams(service: DocModeService) {
+function setDocModeFromUrlParams(service: DocModeProvider, docId: string) {
   const params = new URLSearchParams(location.search);
   const paramMode = params.get('mode');
   if (paramMode) {
     const docMode = paramMode === 'page' ? 'page' : 'edgeless';
-    service.setMode(docMode);
+    service.setPrimaryMode(docMode, docId);
+    service.setEditorMode(docMode);
   }
 }
 
@@ -51,41 +66,79 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const modeService = createDocModeService(doc.id);
-  setDocModeFromUrlParams(modeService);
+  const attachmentViewerPanel = new AttachmentViewerPanel();
+
   const editor = new AffineEditorContainer();
-  editor.pageSpecs = [...PageEditorBlockSpecs].map(spec => {
-    if (spec.schema.model.flavour === 'affine:page') {
-      spec = patchPageRootSpec(
-        spec as BlockSpec<'affine:page', PageRootService>
+
+  class PatchPageServiceWatcher extends BlockServiceWatcher {
+    static override readonly flavour = 'affine:page';
+
+    override mounted() {
+      const pageRootService = this.blockService as PageRootService;
+      const onFormatBarConnected = pageRootService.specSlots.widgetConnected.on(
+        view => {
+          if (view.component instanceof AffineFormatBarWidget) {
+            configureFormatBar(view.component);
+          }
+        }
       );
+      pageRootService.disposables.add(onFormatBarConnected);
     }
-    return spec;
-  });
-  editor.edgelessSpecs = [...EdgelessEditorBlockSpecs].map(spec => {
-    if (spec.schema.model.flavour === 'affine:page') {
-      spec = patchPageRootSpec(
-        spec as BlockSpec<'affine:page', PageRootService>
-      );
-    }
-    return spec;
-  });
-  editor.mode = modeService.getMode();
+  }
+
+  const refNodeSlotsExtension = RefNodeSlotsExtension();
+  const extensions: ExtensionType[] = [
+    refNodeSlotsExtension,
+    PatchPageServiceWatcher,
+    FontConfigExtension(CommunityCanvasTextFonts),
+    ParseDocUrlExtension(mockParseDocUrlService(collection)),
+    NotificationExtension(mockNotificationService(editor)),
+    OverrideThemeExtension(themeExtension),
+    {
+      setup: di => {
+        di.override(DocModeProvider, () =>
+          mockDocModeService(getEditorModeCallback, setEditorModeCallBack)
+        );
+      },
+    },
+    mockPeekViewExtension(attachmentViewerPanel),
+  ];
+
+  const pageSpecs = SpecProvider.getInstance().getSpec('page');
+  const setEditorModeCallBack = editor.switchEditor.bind(editor);
+  const getEditorModeCallback = () => editor.mode;
+  pageSpecs.extend([...extensions]);
+  editor.pageSpecs = pageSpecs.value;
+
+  const edgelessSpecs = SpecProvider.getInstance().getSpec('edgeless');
+  edgelessSpecs.extend([...extensions]);
+  editor.edgelessSpecs = edgelessSpecs.value;
+
+  SpecProvider.getInstance().extendSpec('edgeless:preview', [
+    OverrideThemeExtension(themeExtension),
+  ]);
+
+  editor.mode = 'page';
   editor.doc = doc;
-  editor.slots.docLinkClicked.on(({ docId }) => {
-    const target = collection.getDoc(docId);
-    if (!target) {
-      throw new Error(`Failed to jump to doc ${docId}`);
-    }
-    target.load();
-    editor.doc = target;
-  });
-  editor.slots.docUpdated.on(({ newDocId }) => {
-    editor.mode = modeService.getMode(newDocId);
-  });
+  editor.std
+    .get(RefNodeSlotsProvider)
+    .docLinkClicked.on(({ pageId: docId }) => {
+      const target = collection.getDoc(docId);
+      if (!target) {
+        throw new Error(`Failed to jump to doc ${docId}`);
+      }
+      target.load();
+      editor.doc = target;
+    });
 
   app.append(editor);
   await editor.updateComplete;
+  const modeService = editor.std.provider.get(DocModeProvider);
+  editor.mode = modeService.getPrimaryMode(doc.id);
+  setDocModeFromUrlParams(modeService, doc.id);
+  editor.slots.docUpdated.on(({ newDocId }) => {
+    editor.mode = modeService.getPrimaryMode(newDocId);
+  });
 
   const outlinePanel = new CustomOutlinePanel();
   outlinePanel.editor = editor;
@@ -109,9 +162,6 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   const commentPanel = new CommentPanel();
   commentPanel.editor = editor;
 
-  const chatPanel = new CustomChatPanel();
-  chatPanel.editor = editor;
-
   const debugMenu = new DebugMenu();
   debugMenu.collection = collection;
   debugMenu.editor = editor;
@@ -122,15 +172,28 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   debugMenu.leftSidePanel = leftSidePanel;
   debugMenu.docsPanel = docsPanel;
   debugMenu.commentPanel = commentPanel;
-  debugMenu.chatPanel = chatPanel;
 
+  document.body.append(attachmentViewerPanel);
   document.body.append(outlinePanel);
   document.body.append(outlineViewer);
   document.body.append(framePanel);
   document.body.append(sidePanel);
   document.body.append(leftSidePanel);
   document.body.append(debugMenu);
-  document.body.append(chatPanel);
+
+  // for multiple editor
+  const params = new URLSearchParams(location.search);
+  const init = params.get('init');
+  if (init && init.startsWith('multiple-editor')) {
+    app.childNodes.forEach(node => {
+      if (node instanceof AffineEditorContainer) {
+        node.style.flex = '1';
+        if (init === 'multiple-editor-vertical') {
+          node.style.overflow = 'auto';
+        }
+      }
+    });
+  }
 
   // debug info
   window.editor = editor;
@@ -147,29 +210,4 @@ export async function mountDefaultDocEditor(collection: DocCollection) {
   });
 
   return editor;
-
-  function patchPageRootSpec(spec: BlockSpec<'affine:page', PageRootService>) {
-    const setup = spec.setup;
-    const newSpec: typeof spec = {
-      ...spec,
-      setup: (slots, disposable) => {
-        setup?.(slots, disposable);
-        slots.mounted.once(({ service }) => {
-          const pageRootService = service as PageRootService;
-          const onFormatBarConnected = slots.widgetConnected.on(view => {
-            if (view.component instanceof AffineFormatBarWidget) {
-              configureFormatBar(view.component);
-            }
-          });
-          disposable.add(onFormatBarConnected);
-          pageRootService.notificationService =
-            mockNotificationService(pageRootService);
-          pageRootService.quickSearchService =
-            mockQuickSearchService(collection);
-        });
-      },
-    };
-
-    return newSpec;
-  }
 }

@@ -1,18 +1,19 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import type {
+  BookmarkBlockModel,
+  ColorScheme,
+  EmbedGithubModel,
+  EmbedLinkedDocModel,
+} from '@blocksuite/affine-model';
+
+import { WithDisposable } from '@blocksuite/global/utils';
+import { css, html, LitElement } from 'lit';
+import { property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
-import type { BookmarkBlockModel } from '../../../bookmark-block/bookmark-model.js';
-import type { EmbedGithubModel } from '../../../embed-github-block/embed-github-model.js';
-import type { EmbedLinkedDocModel } from '../../../embed-linked-doc-block/embed-linked-doc-model.js';
 import type { EmbedCardStyle } from '../../types.js';
 
 import { getEmbedCardIcons } from '../../utils/url.js';
-import '../tooltip/tooltip.js';
-import './../button.js';
 
-@customElement('embed-card-style-menu')
 export class EmbedCardStyleMenu extends WithDisposable(LitElement) {
   static override styles = css`
     .embed-card-style-menu {
@@ -47,7 +48,9 @@ export class EmbedCardStyleMenu extends WithDisposable(LitElement) {
   }
 
   override render() {
-    const { EmbedCardHorizontalIcon, EmbedCardListIcon } = getEmbedCardIcons();
+    const { EmbedCardHorizontalIcon, EmbedCardListIcon } = getEmbedCardIcons(
+      this.theme
+    );
     return html`
       <div class="embed-card-style-menu">
         <div
@@ -93,6 +96,9 @@ export class EmbedCardStyleMenu extends WithDisposable(LitElement) {
 
   @property({ attribute: false })
   accessor model!: BookmarkBlockModel | EmbedGithubModel | EmbedLinkedDocModel;
+
+  @property({ attribute: false })
+  accessor theme!: ColorScheme;
 }
 
 declare global {

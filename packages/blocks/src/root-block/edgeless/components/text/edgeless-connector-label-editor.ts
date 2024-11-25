@@ -1,59 +1,33 @@
+import type { RichText } from '@blocksuite/affine-components/rich-text';
+import type { ConnectorElementModel } from '@blocksuite/affine-model';
+
+import { TextUtils } from '@blocksuite/affine-block-surface';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import { almostEqual } from '@blocksuite/affine-shared/utils';
 import {
-  RangeManager,
+  RANGE_SYNC_EXCLUDE_ATTR,
   ShadowlessElement,
-  WithDisposable,
 } from '@blocksuite/block-std';
-import { Bound, Vec } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
+import {
+  assertExists,
+  Bound,
+  Vec,
+  WithDisposable,
+} from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
 import { css, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { RichText } from '../../../../_common/components/rich-text/rich-text.js';
-import type { ConnectorElementModel } from '../../../../surface-block/index.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
-
-import '../../../../_common/components/rich-text/rich-text.js';
-import { almostEqual } from '../../../../_common/utils/math.js';
-import { getLineHeight } from '../../../../surface-block/canvas-renderer/element-renderer/text/utils.js';
 
 const HORIZONTAL_PADDING = 2;
 const VERTICAL_PADDING = 2;
 const BORDER_WIDTH = 1;
 
-@customElement('edgeless-connector-label-editor')
 export class EdgelessConnectorLabelEditor extends WithDisposable(
   ShadowlessElement
 ) {
-  private _isComposition = false;
-
-  private _keeping = false;
-
-  private _resizeObserver: ResizeObserver | null = null;
-
-  private _updateLabelRect = () => {
-    const { connector, edgeless } = this;
-    if (!connector || !edgeless) return;
-
-    const newWidth = this.inlineEditorContainer.scrollWidth;
-    const newHeight = this.inlineEditorContainer.scrollHeight;
-    const center = connector.getPointByOffsetDistance(
-      connector.labelOffset.distance
-    );
-    const bounds = Bound.fromCenter(center, newWidth, newHeight);
-    const labelXYWH = bounds.toXYWH();
-
-    if (
-      !connector.labelXYWH ||
-      labelXYWH.some((p, i) => !almostEqual(p, connector.labelXYWH![i]))
-    ) {
-      edgeless.service.updateElement(connector.id, {
-        labelXYWH,
-      });
-    }
-  };
-
   static override styles = css`
     .edgeless-connector-label-editor {
       position: absolute;
@@ -87,9 +61,46 @@ export class EdgelessConnectorLabelEditor extends WithDisposable(
     }
   `;
 
+  private _isComposition = false;
+
+  private _keeping = false;
+
+  private _resizeObserver: ResizeObserver | null = null;
+
+  private _updateLabelRect = () => {
+    const { connector, edgeless } = this;
+    if (!connector || !edgeless) return;
+
+    const newWidth = this.inlineEditorContainer.scrollWidth;
+    const newHeight = this.inlineEditorContainer.scrollHeight;
+    const center = connector.getPointByOffsetDistance(
+      connector.labelOffset.distance
+    );
+    const bounds = Bound.fromCenter(center, newWidth, newHeight);
+    const labelXYWH = bounds.toXYWH();
+
+    if (
+      !connector.labelXYWH ||
+      labelXYWH.some((p, i) => !almostEqual(p, connector.labelXYWH![i]))
+    ) {
+      edgeless.service.updateElement(connector.id, {
+        labelXYWH,
+      });
+    }
+  };
+
+  get inlineEditor() {
+    assertExists(this.richText.inlineEditor);
+    return this.richText.inlineEditor;
+  }
+
+  get inlineEditorContainer() {
+    return this.inlineEditor.rootElement;
+  }
+
   override connectedCallback() {
     super.connectedCallback();
-    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
+    this.setAttribute(RANGE_SYNC_EXCLUDE_ATTR, 'true');
   }
 
   override disconnectedCallback() {
@@ -163,7 +174,6 @@ export class EdgelessConnectorLabelEditor extends WithDisposable(
               edgeless.service.updateElement(connector.id, {
                 text: undefined,
                 labelXYWH: undefined,
-                labelStyle: undefined,
                 labelOffset: undefined,
               });
             } else if (len < text.length) {
@@ -234,7 +244,11 @@ export class EdgelessConnectorLabelEditor extends WithDisposable(
       labelConstraints: { hasMaxWidth, maxWidth },
     } = connector;
 
-    const lineHeight = getLineHeight(fontFamily, fontSize, fontWeight);
+    const lineHeight = TextUtils.getLineHeight(
+      fontFamily,
+      fontSize,
+      fontWeight
+    );
     const { translateX, translateY, zoom } = this.edgeless.service.viewport;
     const [x, y] = Vec.mul(connector.getPointByOffsetDistance(distance), zoom);
     const transformOperation = [
@@ -244,11 +258,10 @@ export class EdgelessConnectorLabelEditor extends WithDisposable(
       `scale(${zoom})`,
     ];
 
-    const isEmpty = !connector.text!.length && !this._isComposition;
-    const color = this.edgeless.surface.themeObserver.getColor(
-      labelColor,
-      '#000000'
-    );
+    const isEmpty = !connector.text?.length && !this._isComposition;
+    const color = this.edgeless.std
+      .get(ThemeProvider)
+      .generateColorProperty(labelColor, '#000000');
 
     return html`
       <div
@@ -263,7 +276,7 @@ export class EdgelessConnectorLabelEditor extends WithDisposable(
           maxWidth: hasMaxWidth
             ? `${maxWidth + BORDER_WIDTH * 2 + HORIZONTAL_PADDING * 2}px`
             : 'initial',
-          color: color.startsWith('--') ? `var(${color})` : color,
+          color,
           transform: transformOperation.join(' '),
         })}
       >
@@ -292,15 +305,6 @@ export class EdgelessConnectorLabelEditor extends WithDisposable(
 
   setKeeping(keeping: boolean) {
     this._keeping = keeping;
-  }
-
-  get inlineEditor() {
-    assertExists(this.richText.inlineEditor);
-    return this.richText.inlineEditor;
-  }
-
-  get inlineEditorContainer() {
-    return this.inlineEditor.rootElement;
   }
 
   @property({ attribute: false })

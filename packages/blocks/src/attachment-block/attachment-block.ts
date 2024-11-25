@@ -1,92 +1,94 @@
-import { Bound } from '@blocksuite/global/utils';
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
+import { HoverController } from '@blocksuite/affine-components/hover';
+import {
+  AttachmentIcon16,
+  getAttachmentFileIcons,
+} from '@blocksuite/affine-components/icons';
+import { Peekable } from '@blocksuite/affine-components/peek';
+import { toast } from '@blocksuite/affine-components/toast';
+import {
+  type AttachmentBlockModel,
+  AttachmentBlockStyles,
+} from '@blocksuite/affine-model';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import { humanFileSize } from '@blocksuite/affine-shared/utils';
 import { Slice } from '@blocksuite/store';
 import { flip, offset } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { EdgelessRootService } from '../root-block/index.js';
 import type { AttachmentBlockService } from './attachment-service.js';
 
-import {
-  CaptionedBlockComponent,
-  HoverController,
-  toast,
-} from '../_common/components/index.js';
-import { bindContainerHotkey } from '../_common/components/rich-text/keymap/container.js';
-import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
-import {
-  AttachmentIcon16,
-  getAttachmentFileIcons,
-} from '../_common/icons/index.js';
-import { ThemeObserver } from '../_common/theme/theme-observer.js';
-import { humanFileSize } from '../_common/utils/math.js';
 import { getEmbedCardIcons } from '../_common/utils/url.js';
-import {
-  type AttachmentBlockModel,
-  AttachmentBlockStyles,
-} from './attachment-model.js';
 import { AttachmentOptionsTemplate } from './components/options.js';
-import { renderEmbedView } from './embed.js';
+import { AttachmentEmbedProvider } from './embed.js';
 import { styles } from './styles.js';
 import { checkAttachmentBlob, downloadAttachmentBlob } from './utils.js';
 
-@customElement('affine-attachment')
+@Peekable()
 export class AttachmentBlockComponent extends CaptionedBlockComponent<
   AttachmentBlockModel,
   AttachmentBlockService
 > {
-  private _isDragging = false;
+  static override styles = styles;
 
-  private _isInSurface = false;
+  protected _isDragging = false;
 
-  private _isResizing = false;
+  protected _isResizing = false;
 
-  private _isSelected = false;
+  protected _isSelected = false;
 
-  private readonly _themeObserver = new ThemeObserver();
+  protected _whenHover: HoverController | null = new HoverController(
+    this,
+    ({ abortController }) => {
+      const selection = this.host.selection;
+      const textSelection = selection.find('text');
+      if (
+        !!textSelection &&
+        (!!textSelection.to || !!textSelection.from.length)
+      ) {
+        return null;
+      }
 
-  private _whenHover = new HoverController(this, ({ abortController }) => {
-    const selection = this.host.selection;
-    const textSelection = selection.find('text');
-    if (
-      !!textSelection &&
-      (!!textSelection.to || !!textSelection.from.length)
-    ) {
-      return null;
+      const blockSelections = selection.filter('block');
+      if (
+        blockSelections.length > 1 ||
+        (blockSelections.length === 1 &&
+          blockSelections[0].blockId !== this.blockId)
+      ) {
+        return null;
+      }
+
+      return {
+        template: AttachmentOptionsTemplate({
+          block: this,
+          model: this.model,
+          abortController,
+        }),
+        computePosition: {
+          referenceElement: this,
+          placement: 'top-start',
+          middleware: [flip(), offset(4)],
+          autoUpdate: true,
+        },
+      };
     }
+  );
 
-    const blockSelections = selection.filter('block');
-    if (
-      blockSelections.length > 1 ||
-      (blockSelections.length === 1 &&
-        blockSelections[0].blockId !== this.blockId)
-    ) {
-      return null;
-    }
-
-    return {
-      template: AttachmentOptionsTemplate({
-        anchor: this,
-        model: this.model,
-        showCaption: () => this.captionEditor?.show(),
-        copy: this.copy,
-        download: this.download,
-        refresh: this.refreshData,
-        abortController,
-      }),
-      computePosition: {
-        referenceElement: this,
-        placement: 'top-start',
-        middleware: [flip(), offset(4)],
-        autoUpdate: true,
-      },
-    };
+  protected containerStyleMap = styleMap({
+    position: 'relative',
+    width: '100%',
+    margin: '18px 0px',
   });
 
-  static override styles = styles;
+  convertTo = () => {
+    return this.std
+      .get(AttachmentEmbedProvider)
+      .convertTo(this.model, this.service.maxFileSize);
+  };
 
   copy = () => {
     const slice = Slice.fromModels(this.doc, [this.model]);
@@ -96,6 +98,12 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
 
   download = () => {
     downloadAttachmentBlob(this);
+  };
+
+  embedded = () => {
+    return this.std
+      .get(AttachmentEmbedProvider)
+      .embedded(this.model, this.service.maxFileSize);
   };
 
   open = () => {
@@ -109,25 +117,10 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     checkAttachmentBlob(this).catch(console.error);
   };
 
-  private get _embedView() {
-    if (this.isInSurface || !this.model.embed || !this.blobUrl) return;
-    return renderEmbedView(this.model, this.blobUrl, this.service.maxFileSize);
-  }
-
-  private _handleClick(event: MouseEvent) {
-    event.stopPropagation();
-    if (!this.isInSurface) {
-      this._selectBlock();
-    }
-  }
-
-  private _handleDoubleClick(event: MouseEvent) {
-    event.stopPropagation();
-    if (this.allowEmbed) {
-      this.open();
-    } else {
-      this.download();
-    }
+  protected get embedView() {
+    return this.std
+      .get(AttachmentEmbedProvider)
+      .render(this.model, this.blobUrl, this.service.maxFileSize);
   }
 
   private _selectBlock() {
@@ -141,14 +134,9 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    bindContainerHotkey(this);
-
     this.refreshData();
 
     this.contentEditable = 'false';
-
-    const parent = this.host.doc.getParent(this.model);
-    this._isInSurface = parent?.flavour === 'affine:surface';
 
     if (!this.model.style) {
       this.doc.withoutTransact(() => {
@@ -170,9 +158,9 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     });
 
     // Workaround for https://github.com/toeverything/blocksuite/issues/4724
-    this._themeObserver.observe(document.documentElement);
-    this._themeObserver.on(() => this.requestUpdate());
-    this.disposables.add(() => this._themeObserver.dispose());
+    this.disposables.add(
+      this.std.get(ThemeProvider).theme$.subscribe(() => this.requestUpdate())
+    );
 
     // this is required to prevent iframe from capturing pointer events
     this.disposables.add(
@@ -196,33 +184,6 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
       this._showOverlay =
         this._isResizing || this._isDragging || !this._isSelected;
     });
-
-    if (this.isInSurface) {
-      if (this.rootService) {
-        this._disposables.add(
-          this.rootService?.slots.elementResizeStart.on(() => {
-            this._isResizing = true;
-            this._showOverlay = true;
-          })
-        );
-
-        this._disposables.add(
-          this.rootService.slots.elementResizeEnd.on(() => {
-            this._isResizing = false;
-            this._showOverlay =
-              this._isResizing || this._isDragging || !this._isSelected;
-          })
-        );
-
-        this._disposables.add(
-          this.rootService.layer.slots.layerUpdated.on(() => {
-            this.requestUpdate();
-          })
-        );
-      }
-
-      this.style.position = 'absolute';
-    }
   }
 
   override disconnectedCallback() {
@@ -232,11 +193,26 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     super.disconnectedCallback();
   }
 
+  override firstUpdated() {
+    // lazy bindings
+    this.disposables.addFromEvent(this, 'click', this.onClick);
+  }
+
+  protected onClick(event: MouseEvent) {
+    // the peek view need handle shift + click
+    if (event.defaultPrevented) return;
+
+    event.stopPropagation();
+
+    this._selectBlock();
+  }
+
   override renderBlock() {
     const { name, size, style } = this.model;
     const cardStyle = style ?? AttachmentBlockStyles[1];
 
-    const { LoadingIcon } = getEmbedCardIcons();
+    const theme = this.std.get(ThemeProvider).theme;
+    const { LoadingIcon } = getEmbedCardIcons(theme);
 
     const titleIcon = this.loading ? LoadingIcon : AttachmentIcon16;
     const titleText = this.loading ? 'Loading...' : name;
@@ -245,48 +221,16 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     const fileType = name.split('.').pop() ?? '';
     const FileTypeIcon = getAttachmentFileIcons(fileType);
 
-    let containerStyleMap = styleMap({
-      position: 'relative',
-      width: '100%',
-      margin: '18px 0px',
-    });
-
-    if (this.isInSurface) {
-      const width = EMBED_CARD_WIDTH[cardStyle];
-      const height = EMBED_CARD_HEIGHT[cardStyle];
-      const bound = Bound.deserialize(
-        (this.rootService?.getElementById(this.model.id) ?? this.model).xywh
-      );
-      const scaleX = bound.w / width;
-      const scaleY = bound.h / height;
-      containerStyleMap = styleMap({
-        width: `${width}px`,
-        height: `${height}px`,
-        transform: `scale(${scaleX}, ${scaleY})`,
-        transformOrigin: '0 0',
-      });
-
-      this.style.width = `${bound.w}px`;
-      this.style.height = `${bound.h}px`;
-      this.style.left = `${bound.x}px`;
-      this.style.top = `${bound.y}px`;
-      this.style.zIndex = `${this.toZIndex()}`;
-    }
-
-    const embedView = this._embedView;
+    const embedView = this.embedView;
 
     return html`
       <div
-        ${this.isInSurface ? nothing : ref(this._whenHover.setReference)}
+        ${this._whenHover ? ref(this._whenHover.setReference) : nothing}
         class="affine-attachment-container"
-        style=${containerStyleMap}
+        style=${this.containerStyleMap}
       >
         ${embedView
-          ? html`<div
-              class="affine-attachment-embed-container"
-              @click=${this._handleClick}
-              @dblclick=${this._handleDoubleClick}
-            >
+          ? html`<div class="affine-attachment-embed-container">
               ${embedView}
 
               <div
@@ -304,8 +248,6 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
                 error: this.error,
                 unsynced: false,
               })}
-              @click=${this._handleClick}
-              @dblclick=${this._handleDoubleClick}
             >
               <div class="affine-attachment-content">
                 <div class="affine-attachment-content-title">
@@ -327,28 +269,8 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     `;
   }
 
-  toZIndex() {
-    return this.rootService?.layer.getZIndex(this.model) ?? 1;
-  }
-
-  get isInSurface() {
-    return this._isInSurface;
-  }
-
-  get rootService() {
-    const service = this.host.spec.getService(
-      'affine:page'
-    ) as EdgelessRootService;
-
-    if (!service.surface) {
-      return null;
-    }
-
-    return service;
-  }
-
   @state()
-  private accessor _showOverlay = true;
+  protected accessor _showOverlay = true;
 
   @property({ attribute: false })
   accessor allowEmbed = false;

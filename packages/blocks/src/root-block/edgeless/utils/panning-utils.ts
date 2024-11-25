@@ -1,7 +1,6 @@
 import type { PointerEventState } from '@blocksuite/block-std';
+import type { Viewport } from '@blocksuite/block-std/gfx';
 import type { IVec } from '@blocksuite/global/utils';
-
-import type { Viewport } from './viewport.js';
 
 const PANNING_DISTANCE = 30;
 
@@ -11,10 +10,8 @@ export function calPanDelta(
   edgeDistance = 20
 ): IVec | null {
   // Get viewport edge
-  const { left, top, cumulativeParentScale } = viewport;
-  let { width, height } = viewport;
-  width /= cumulativeParentScale;
-  height /= cumulativeParentScale;
+  const { left, top } = viewport;
+  const { width, height } = viewport;
   // Get pointer position
   let { x, y } = e;
   const { containerOffset } = e;

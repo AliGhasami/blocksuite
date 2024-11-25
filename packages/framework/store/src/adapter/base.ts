@@ -1,9 +1,8 @@
-import { assertEquals } from '@blocksuite/global/utils';
+import { BlockSuiteError } from '@blocksuite/global/exceptions';
 
 import type { Doc } from '../store/index.js';
 import type { AssetsManager } from '../transformer/assets.js';
-import type { Slice } from '../transformer/index.js';
-import type { DraftModel, Job } from '../transformer/index.js';
+import type { DraftModel, Job, Slice } from '../transformer/index.js';
 import type {
   BlockSnapshot,
   DocSnapshot,
@@ -49,16 +48,34 @@ export type ToSliceSnapshotPayload<Target> = {
   assets?: AssetsManager;
 };
 
+export function wrapFakeNote(snapshot: SliceSnapshot) {
+  if (snapshot.content[0]?.flavour !== 'affine:note') {
+    snapshot.content = [
+      {
+        type: 'block',
+        id: '',
+        flavour: 'affine:note',
+        props: {},
+        children: snapshot.content,
+      },
+    ];
+  }
+}
+
 export abstract class BaseAdapter<AdapterTarget = unknown> {
   job: Job;
+
+  get configs() {
+    return this.job.adapterConfigs;
+  }
 
   constructor(job: Job) {
     this.job = job;
   }
 
-  async fromBlock(mode: DraftModel) {
+  async fromBlock(model: DraftModel) {
     try {
-      const blockSnapshot = await this.job.blockToSnapshot(mode);
+      const blockSnapshot = await this.job.blockToSnapshot(model);
       if (!blockSnapshot) return;
       return await this.fromBlockSnapshot({
         snapshot: blockSnapshot,
@@ -70,6 +87,12 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
       return;
     }
   }
+
+  abstract fromBlockSnapshot(
+    payload: FromBlockSnapshotPayload
+  ):
+    | Promise<FromBlockSnapshotResult<AdapterTarget>>
+    | FromBlockSnapshotResult<AdapterTarget>;
 
   async fromDoc(doc: Doc) {
     try {
@@ -86,10 +109,17 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     }
   }
 
+  abstract fromDocSnapshot(
+    payload: FromDocSnapshotPayload
+  ):
+    | Promise<FromDocSnapshotResult<AdapterTarget>>
+    | FromDocSnapshotResult<AdapterTarget>;
+
   async fromSlice(slice: Slice) {
     try {
       const sliceSnapshot = await this.job.sliceToSnapshot(slice);
       if (!sliceSnapshot) return;
+      wrapFakeNote(sliceSnapshot);
       return await this.fromSliceSnapshot({
         snapshot: sliceSnapshot,
         assets: this.job.assetsManager,
@@ -100,6 +130,12 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
       return;
     }
   }
+
+  abstract fromSliceSnapshot(
+    payload: FromSliceSnapshotPayload
+  ):
+    | Promise<FromSliceSnapshotResult<AdapterTarget>>
+    | FromSliceSnapshotResult<AdapterTarget>;
 
   async toBlock(
     payload: ToBlockSnapshotPayload<AdapterTarget>,
@@ -118,6 +154,10 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     }
   }
 
+  abstract toBlockSnapshot(
+    payload: ToBlockSnapshotPayload<AdapterTarget>
+  ): Promise<BlockSnapshot> | BlockSnapshot;
+
   async toDoc(payload: ToDocSnapshotPayload<AdapterTarget>) {
     try {
       const snapshot = await this.toDocSnapshot(payload);
@@ -129,6 +169,10 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
       return;
     }
   }
+
+  abstract toDocSnapshot(
+    payload: ToDocSnapshotPayload<AdapterTarget>
+  ): Promise<DocSnapshot> | DocSnapshot;
 
   async toSlice(
     payload: ToSliceSnapshotPayload<AdapterTarget>,
@@ -147,36 +191,6 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
       return;
     }
   }
-
-  get configs() {
-    return this.job.adapterConfigs;
-  }
-
-  abstract fromBlockSnapshot(
-    payload: FromBlockSnapshotPayload
-  ):
-    | Promise<FromBlockSnapshotResult<AdapterTarget>>
-    | FromBlockSnapshotResult<AdapterTarget>;
-
-  abstract fromDocSnapshot(
-    payload: FromDocSnapshotPayload
-  ):
-    | Promise<FromDocSnapshotResult<AdapterTarget>>
-    | FromDocSnapshotResult<AdapterTarget>;
-
-  abstract fromSliceSnapshot(
-    payload: FromSliceSnapshotPayload
-  ):
-    | Promise<FromSliceSnapshotResult<AdapterTarget>>
-    | FromSliceSnapshotResult<AdapterTarget>;
-
-  abstract toBlockSnapshot(
-    payload: ToBlockSnapshotPayload<AdapterTarget>
-  ): Promise<BlockSnapshot> | BlockSnapshot;
-
-  abstract toDocSnapshot(
-    payload: ToDocSnapshotPayload<AdapterTarget>
-  ): Promise<DocSnapshot> | DocSnapshot;
 
   abstract toSliceSnapshot(
     payload: ToSliceSnapshotPayload<AdapterTarget>
@@ -282,7 +296,10 @@ export class ASTWalker<ONode extends object, TNode extends object | never> {
   walk = async (oNode: ONode, tNode: TNode) => {
     this.context.openNode(tNode);
     await this._visit({ node: oNode, parent: null, prop: null, index: null });
-    assertEquals(this.context.stack.length, 1, 'There are unclosed nodes');
+    if (this.context.stack.length !== 1) {
+      console.error(this.context.stack.map(n => n.node));
+      throw new BlockSuiteError(1, 'There are unclosed nodes');
+    }
     return this.context.currentNode();
   };
 

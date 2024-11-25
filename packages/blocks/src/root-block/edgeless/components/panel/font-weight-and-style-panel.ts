@@ -1,21 +1,16 @@
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { choose } from 'lit/directives/choose.js';
-import { join } from 'lit/directives/join.js';
-import { repeat } from 'lit/directives/repeat.js';
-
-import { CheckIcon } from '../../../../_common/icons/edgeless.js';
+import { TextUtils } from '@blocksuite/affine-block-surface';
+import { CheckIcon } from '@blocksuite/affine-components/icons';
 import {
   FontFamily,
   FontFamilyMap,
   FontStyle,
   FontWeight,
-} from '../../../../surface-block/consts.js';
-import {
-  getFontFaces,
-  getFontFacesByFontFamily,
-  isSameFontFamily,
-} from '../../../../surface-block/utils/font.js';
+} from '@blocksuite/affine-model';
+import { css, html, LitElement, nothing } from 'lit';
+import { property } from 'lit/decorators.js';
+import { choose } from 'lit/directives/choose.js';
+import { join } from 'lit/directives/join.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 const FONT_WEIGHT_CHOOSE: [FontWeight, () => string][] = [
   [FontWeight.Light, () => 'Light'],
@@ -23,7 +18,6 @@ const FONT_WEIGHT_CHOOSE: [FontWeight, () => string][] = [
   [FontWeight.SemiBold, () => 'Semibold'],
 ];
 
-@customElement('edgeless-font-weight-and-style-panel')
 export class EdgelessFontWeightAndStylePanel extends LitElement {
   static override styles = css`
     :host {
@@ -52,8 +46,8 @@ export class EdgelessFontWeightAndStylePanel extends LitElement {
     // Compatible with old data
     if (!(this.fontFamily in FontFamilyMap)) return false;
 
-    const fontFace = getFontFaces()
-      .filter(isSameFontFamily(this.fontFamily))
+    const fontFace = TextUtils.getFontFaces()
+      .filter(TextUtils.isSameFontFamily(this.fontFamily))
       .find(
         fontFace =>
           fontFace.weight === fontWeight && fontFace.style === fontStyle
@@ -74,10 +68,10 @@ export class EdgelessFontWeightAndStylePanel extends LitElement {
   }
 
   override render() {
-    let fontFaces = getFontFacesByFontFamily(this.fontFamily);
+    let fontFaces = TextUtils.getFontFacesByFontFamily(this.fontFamily);
     // Compatible with old data
     if (fontFaces.length === 0) {
-      fontFaces = getFontFacesByFontFamily(FontFamily.Inter);
+      fontFaces = TextUtils.getFontFacesByFontFamily(FontFamily.Inter);
     }
     const fontFacesWithNormal = fontFaces.filter(
       fontFace => fontFace.style === FontStyle.Normal

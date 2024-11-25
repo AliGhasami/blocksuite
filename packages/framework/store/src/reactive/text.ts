@@ -1,3 +1,4 @@
+/** @alighasami for check merge **/
 import type { BaseTextAttributes, DeltaInsert } from '@blocksuite/inline';
 
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
@@ -8,6 +9,7 @@ export interface OptionalAttributes {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   attributes?: Record<string, any>;
 }
+
 export type DeltaOperation = {
   insert?: string;
   delete?: number;
@@ -17,11 +19,25 @@ export type DeltaOperation = {
 export type OnTextChange = (data: Y.Text) => void;
 
 export class Text {
+  private _deltas$: Signal<DeltaOperation[]>;
+
   private _length$: Signal<number>;
 
   private _onChange?: OnTextChange;
 
   private readonly _yText: Y.Text;
+
+  get deltas$() {
+    return this._deltas$;
+  }
+
+  get length() {
+    return this._length$.value;
+  }
+
+  get yText() {
+    return this._yText;
+  }
 
   constructor(
     input?: Y.Text | string | DeltaInsert[],
@@ -35,7 +51,9 @@ export class Text {
       this._yText = new Y.Text(text);
     } else if (input instanceof Y.Text) {
       this._yText = input;
-      length = input.length;
+      if (input.doc) {
+        length = input.length;
+      }
     } else if (input instanceof Array) {
       for (const delta of input) {
         if (delta.insert) {
@@ -50,22 +68,13 @@ export class Text {
       this._yText = new Y.Text();
     }
 
-    this._length$ = signal<number>(length);
+    this._length$ = signal(length);
+    this._deltas$ = signal(this._yText.doc ? this._yText.toDelta() : []);
     this._yText.observe(() => {
       this._length$.value = this._yText.length;
-      //console.log('11111', this._yText, input);
+      this._deltas$.value = this._yText.toDelta();
       this._onChange?.(this._yText);
     });
-  }
-
-  /**
-   * @deprecated
-   * This method will lose the change observer unless you pass the onChange callback.
-   */
-  static fromDelta(delta: DeltaOperation[], onChange?: OnTextChange) {
-    const result = new Y.Text();
-    result.applyDelta(delta);
-    return new Text(result, onChange);
   }
 
   private _transact(callback: () => void) {
@@ -105,7 +114,6 @@ export class Text {
   }
 
   delete(index: number, length: number) {
-    console.log('this is delete');
     if (length === 0) {
       return;
     }
@@ -127,7 +135,6 @@ export class Text {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   format(index: number, length: number, format: any) {
-    console.log('this is format');
     if (length === 0) {
       return;
     }
@@ -147,9 +154,7 @@ export class Text {
     });
   }
 
-  //ToDo ali ghasami for text
   insert(content: string, index: number, attributes?: Record<string, unknown>) {
-    //console.log('this is inserted');
     if (!content.length) {
       return;
     }
@@ -170,7 +175,7 @@ export class Text {
   }
 
   join(other: Text) {
-    if (!other.toDelta().length) {
+    if (!other || !other.toDelta().length) {
       return;
     }
     this._transact(() => {
@@ -187,7 +192,6 @@ export class Text {
     content: string,
     attributes?: BaseTextAttributes
   ) {
-    console.log('this is replace');
     if (index < 0 || length < 0 || index + length > this._yText.length) {
       throw new BlockSuiteError(
         ErrorCode.ReactiveProxyError,
@@ -206,9 +210,7 @@ export class Text {
     });
   }
 
-  //todo ali ghasami for text
   sliceToDelta(begin: number, end?: number): DeltaOperation[] {
-    //console.log('this is slice to delta', begin, end);
     const result: DeltaOperation[] = [];
     if (end && begin >= end) {
       return result;
@@ -278,7 +280,6 @@ export class Text {
    *    right: [{insert: 'hi', ...}]
    */
   split(index: number, length = 0): Text {
-    console.log('this is split');
     if (index < 0 || length < 0 || index + length > this._yText.length) {
       throw new BlockSuiteError(
         ErrorCode.ReactiveProxyError,
@@ -334,13 +335,5 @@ export class Text {
 
   toString() {
     return this._yText?.toString() || '';
-  }
-
-  get length() {
-    return this._length$.value;
-  }
-
-  get yText() {
-    return this._yText;
   }
 }

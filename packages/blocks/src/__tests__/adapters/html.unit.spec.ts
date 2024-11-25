@@ -1,55 +1,57 @@
 import type { BlockSnapshot } from '@blocksuite/store';
 
-import { MemoryBlobCRUD } from '@blocksuite/store';
-import { AssetsManager } from '@blocksuite/store';
+import {
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NoteDisplayMode,
+} from '@blocksuite/affine-model';
+import { AssetsManager, MemoryBlobCRUD } from '@blocksuite/store';
 import { describe, expect, test } from 'vitest';
 
 import { HtmlAdapter } from '../../_common/adapters/html.js';
 import { nanoidReplacement } from '../../_common/test-utils/test-utils.js';
-import { NoteDisplayMode } from '../../_common/types.js';
 import { createJob } from '../utils/create-job.js';
 
-const template = (html: string) =>
-  `
-<!doctype html>
-<html>
-<head>
-  <style>
-    input[type='checkbox'] {
-      display: none;
-    }
-    label:before {
-      background: rgb(30, 150, 235);
-      border-radius: 3px;
-      height: 16px;
-      width: 16px;
-      display: inline-block;
-      cursor: pointer;
-    }
-    input[type='checkbox'] + label:before {
-      content: '';
-      background: rgb(30, 150, 235);
-      color: #fff;
-      font-size: 16px;
-      line-height: 16px;
-      text-align: center;
-    }
-    input[type='checkbox']:checked + label:before {
-      content: '✓';
-    }
-  </style>
-</head>
-<body>
-<div style="width: 70vw; margin: 60px auto;"><!--BlockSuiteDocTitlePlaceholder-->
-<!--HtmlTemplate-->
-</div>
-</body>
-</html>
-`
-    .replace(/\s\s+|\n/g, '')
-    .replace('<!--HtmlTemplate-->', html);
-
 describe('snapshot to html', () => {
+  const template = (html: string) =>
+    `
+  <!doctype html>
+  <html>
+  <head>
+    <style>
+      input[type='checkbox'] {
+        display: none;
+      }
+      label:before {
+        background: rgb(30, 150, 235);
+        border-radius: 3px;
+        height: 16px;
+        width: 16px;
+        display: inline-block;
+        cursor: pointer;
+      }
+      input[type='checkbox'] + label:before {
+        content: '';
+        background: rgb(30, 150, 235);
+        color: #fff;
+        font-size: 16px;
+        line-height: 16px;
+        text-align: center;
+      }
+      input[type='checkbox']:checked + label:before {
+        content: '✓';
+      }
+    </style>
+  </head>
+  <body>
+  <div style="width: 70vw; margin: 60px auto;"><!--BlockSuiteDocTitlePlaceholder-->
+  <!--HtmlTemplate-->
+  </div>
+  </body>
+  </html>
+  `
+      .replace(/\s\s+|\n/g, '')
+      .replace('<!--HtmlTemplate-->', html);
+
   test('code', async () => {
     const blockSnapshot: BlockSnapshot = {
       type: 'block',
@@ -77,7 +79,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -106,7 +108,7 @@ describe('snapshot to html', () => {
     };
 
     const html = template(
-      `<pre><code class="code-python"><span style="word-wrap: break-word; color: #AF00DB;">import</span><span style="word-wrap: break-word; color: #000000;"> this</span></code></pre>`
+      `<pre class="shiki light-plus" style="background-color:#FFFFFF;color:#000000" tabindex="0"><code><span class="line"><span style="color:#AF00DB">import</span><span style="color:#000000"> this</span></span></code></pre>`
     );
 
     const htmlAdapter = new HtmlAdapter(createJob());
@@ -143,7 +145,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -172,7 +174,7 @@ describe('snapshot to html', () => {
     };
 
     const html = template(
-      `<pre><code class="code-python"><span style="word-wrap: break-word; color: #AF00DB;">import</span><span style="word-wrap: break-word; color: #000000;"> this</span></code></pre>`
+      `<pre class="shiki light-plus" style="background-color:#FFFFFF;color:#000000" tabindex="0"><code><span class="line"><span>import this</span></span></code></pre>`
     );
 
     const htmlAdapter = new HtmlAdapter(createJob());
@@ -209,7 +211,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -238,7 +240,7 @@ describe('snapshot to html', () => {
     };
 
     const html = template(
-      `<pre><code class="code-unknown">import this</code></pre>`
+      `<pre class="shiki light-plus" style="background-color:#FFFFFF;color:#000000" tabindex="0"><code><span class="line"><span>import this</span></span></code></pre>`
     );
 
     const htmlAdapter = new HtmlAdapter(createJob());
@@ -275,7 +277,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -461,7 +463,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -569,7 +571,112 @@ describe('snapshot to html', () => {
       ],
     };
     const html = template(
-      `<div class="affine-list-block-container"><ul style=""><li>aaa</li></ul><div class="affine-block-children-container" style="padding-left: 26px;"><div class="affine-list-block-container"><ul style=""><li>bbb</li></ul><div class="affine-block-children-container" style="padding-left: 26px;"><div class="affine-list-block-container"><ul style=""><li>ccc</li></ul><div class="affine-block-children-container" style="padding-left: 26px;"></div></div></div></div><div class="affine-list-block-container"><ul style=""><li>ddd</li></ul><div class="affine-block-children-container" style="padding-left: 26px;"></div></div></div></div><div class="affine-list-block-container"><ul style=""><li>eee</li></ul><div class="affine-block-children-container" style="padding-left: 26px;"></div></div>`
+      `<ul class="bulleted-list"><li class="affine-list-block-container">aaa<ul class="bulleted-list"><li class="affine-list-block-container">bbb<ul class="bulleted-list"><li class="affine-list-block-container">ccc</li></ul></li><li class="affine-list-block-container">ddd</li></ul></li><li class="affine-list-block-container">eee</li></ul>`
+    );
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const target = await htmlAdapter.fromBlockSnapshot({
+      snapshot: blockSnapshot,
+    });
+    expect(target.file).toBe(html);
+  });
+
+  test('different list', async () => {
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'block:vu6SK6WJpW',
+      flavour: 'affine:page',
+      props: {
+        title: {
+          '$blocksuite:internal:text$': true,
+          delta: [],
+        },
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'block:Tk4gSPocAt',
+          flavour: 'affine:surface',
+          props: {
+            elements: {},
+          },
+          children: [],
+        },
+        {
+          type: 'block',
+          id: 'block:WfnS5ZDCJT',
+          flavour: 'affine:note',
+          props: {
+            xywh: '[0,0,800,95]',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
+            index: 'a0',
+            hidden: false,
+            displayMode: NoteDisplayMode.DocAndEdgeless,
+          },
+          children: [
+            {
+              type: 'block',
+              id: 'block:imiLDMKSkx',
+              flavour: 'affine:list',
+              props: {
+                type: 'bulleted',
+                text: {
+                  '$blocksuite:internal:text$': true,
+                  delta: [
+                    {
+                      insert: 'aaa',
+                    },
+                  ],
+                },
+                checked: false,
+                collapsed: false,
+              },
+              children: [],
+            },
+            {
+              type: 'block',
+              id: 'block:imiLDMKSkx',
+              flavour: 'affine:list',
+              props: {
+                type: 'todo',
+                text: {
+                  '$blocksuite:internal:text$': true,
+                  delta: [
+                    {
+                      insert: 'bbb',
+                    },
+                  ],
+                },
+                checked: false,
+                collapsed: false,
+              },
+              children: [],
+            },
+            {
+              type: 'block',
+              id: 'block:imiLDMKSkx',
+              flavour: 'affine:list',
+              props: {
+                type: 'bulleted',
+                text: {
+                  '$blocksuite:internal:text$': true,
+                  delta: [
+                    {
+                      insert: 'ccc',
+                    },
+                  ],
+                },
+                checked: false,
+                collapsed: false,
+              },
+              children: [],
+            },
+          ],
+        },
+      ],
+    };
+    const html = template(
+      `<ul class="bulleted-list"><li class="affine-list-block-container">aaa</li></ul><ul style="list-style-type: none; padding-inline-start: 18px;" class="todo-list"><li class="affine-list-block-container"><input type="checkbox"><label style="margin-right: 3px;"></label></input>bbb</li></ul><ul class="bulleted-list"><li class="affine-list-block-container">ccc</li></ul>`
     );
 
     const htmlAdapter = new HtmlAdapter(createJob());
@@ -606,7 +713,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -680,7 +787,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -754,7 +861,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -829,7 +936,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -904,7 +1011,7 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-            background: '--affine-background-secondary-color',
+            background: DEFAULT_NOTE_BACKGROUND_COLOR,
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -964,6 +1071,45 @@ describe('snapshot to html', () => {
 });
 
 describe('html to snapshot', () => {
+  const template = (html: string) =>
+    `
+  <!doctype html>
+  <html>
+  <head>
+    <style>
+      input[type='checkbox'] {
+        display: none;
+      }
+      label:before {
+        background: rgb(30, 150, 235);
+        border-radius: 3px;
+        height: 16px;
+        width: 16px;
+        display: inline-block;
+        cursor: pointer;
+      }
+      input[type='checkbox'] + label:before {
+        content: '';
+        background: rgb(30, 150, 235);
+        color: #fff;
+        font-size: 16px;
+        line-height: 16px;
+        text-align: center;
+      }
+      input[type='checkbox']:checked + label:before {
+        content: '✓';
+      }
+    </style>
+  </head>
+  <body>
+  <!--StartFragment-->
+  <!--HtmlTemplate-->
+  <!--EndFragment-->
+
+  </body>
+  </html>
+  `.replace('<!--HtmlTemplate-->', html);
+
   test('code', async () => {
     const html = template(
       `<pre><code class="code-python"><span style="word-wrap: break-word; color: #81A1C1;">import</span><span style="word-wrap: break-word; color: #D8DEE9FF;"> this</span></code></pre>`
@@ -975,7 +1121,7 @@ describe('html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1017,7 +1163,7 @@ describe('html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1127,7 +1273,7 @@ describe('html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1173,7 +1319,7 @@ describe('html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1185,6 +1331,353 @@ describe('html to snapshot', () => {
           flavour: 'affine:embed-youtube',
           props: {
             url: 'https://www.youtube.com/watch?v=QDsd0nyzwz0',
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const rawBlockSnapshot = await htmlAdapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('wrap', async () => {
+    const html = template(
+      `<p>a\n aa</p><p>b\t bb</p><p>c  cc</p><p>ddd</p><p>eee</p>`
+    );
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'a aa',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[2]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'b bb',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[3]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'c cc',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[4]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'ddd',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[5]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'eee',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const rawBlockSnapshot = await htmlAdapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('span nested in p', async () => {
+    const html = template(
+      `<p><span>aaa</span><span>bbb</span><span>ccc</span></p>`
+    );
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'aaabbbccc',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const rawBlockSnapshot = await htmlAdapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('span nested in div', async () => {
+    const html = template(
+      `<div><span>aaa</span><span>bbb</span><span>ccc</span></div>`
+    );
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'aaabbbccc',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const rawBlockSnapshot = await htmlAdapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('inline div', async () => {
+    const html = template(
+      `<span>aaa</span><a href="https://www.google.com/">bbb</a><div style="display:inline">ccc</div>`
+    );
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'aaa',
+                },
+                {
+                  insert: 'bbb',
+                  attributes: {
+                    link: 'https://www.google.com/',
+                  },
+                },
+                {
+                  insert: 'ccc',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const rawBlockSnapshot = await htmlAdapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('flex div', async () => {
+    const html = template(
+      `<div style="display:flex"><span>aaa</span><a href="https://www.google.com/">bbb</a><div>ccc</div></div>`
+    );
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'text',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'aaa',
+                },
+                {
+                  insert: 'bbb',
+                  attributes: {
+                    link: 'https://www.google.com/',
+                  },
+                },
+                {
+                  insert: 'ccc',
+                },
+              ],
+            },
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const htmlAdapter = new HtmlAdapter(createJob());
+    const rawBlockSnapshot = await htmlAdapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('span inside h1', async () => {
+    const html = template(`<h1><span>aaa</span></h1>`);
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            type: 'h1',
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'aaa',
+                },
+              ],
+            },
           },
           children: [],
         },

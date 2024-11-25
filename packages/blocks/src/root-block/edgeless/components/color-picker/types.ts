@@ -1,6 +1,6 @@
 // https://www.w3.org/TR/css-color-4/
 
-import type { ColorScheme } from '../../../../_common/theme/theme-observer.js';
+import type { ColorScheme } from '@blocksuite/affine-model';
 
 // Red, green, blue. All in the range [0, 1].
 export type Rgb = {
@@ -40,7 +40,7 @@ export type NavType = 'colors' | 'custom';
 
 export type NavTab<Type> = { type: Type; name: string };
 
-export type ModeType = `${ColorScheme}`;
+export type ModeType = 'normal' | `${ColorScheme}`;
 
 export type ModeTab<Type> = NavTab<Type> & { hsva: Hsva };
 
@@ -48,7 +48,7 @@ export type ModeRgba = { type: ModeType; rgba: Rgba };
 
 export type PickColorType = 'palette' | ModeType;
 
-export type PickColorDetail = { type: PickColorType; value: string };
+export type PickColorDetail = Partial<Record<PickColorType, string>>;
 
 export type PickColorEvent =
   | { type: 'start' | 'end' }

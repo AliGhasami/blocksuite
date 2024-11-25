@@ -1,14 +1,16 @@
 import type { EditorHost } from '@blocksuite/block-std';
+import type { DetailSlotProps } from '@blocksuite/data-view';
+import type {
+  KanbanSingleView,
+  TableSingleView,
+} from '@blocksuite/data-view/view-presets';
 
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
+import { DefaultInlineManagerExtension } from '@blocksuite/affine-components/rich-text';
+import { ShadowlessElement } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 
-import type { DetailSlotProps } from '../data-view/common/data-source/base.js';
-import type { DataViewKanbanManager } from '../data-view/view/presets/kanban/kanban-view-manager.js';
-import type { DataViewTableManager } from '../data-view/view/presets/table/table-view-manager.js';
-
-@customElement('database-datasource-block-renderer')
 export class BlockRenderer
   extends WithDisposable(ShadowlessElement)
   implements DetailSlotProps
@@ -59,15 +61,33 @@ export class BlockRenderer
     }
   `;
 
+  get attributeRenderer() {
+    return this.inlineManager.getRenderer();
+  }
+
+  get attributesSchema() {
+    return this.inlineManager.getSchema();
+  }
+
+  get inlineManager() {
+    return this.host.std.get(DefaultInlineManagerExtension.identifier);
+  }
+
+  get model() {
+    return this.host?.doc.getBlock(this.rowId)?.model;
+  }
+
+  get service() {
+    return this.host.std.getService('affine:database');
+  }
+
   override connectedCallback() {
     super.connectedCallback();
     if (this.model && this.model.text) {
       const cb = () => {
         if (this.model?.text?.length == 0) {
-          // eslint-disable-next-line wc/no-self-class
           this.classList.add('empty');
         } else {
-          // eslint-disable-next-line wc/no-self-class
           this.classList.remove('empty');
         }
       };
@@ -119,41 +139,24 @@ export class BlockRenderer
   }
 
   renderIcon() {
-    const iconColumn = this.view.header.iconColumn;
+    const iconColumn = this.view.mainProperties$.value.iconColumn;
     if (!iconColumn) {
       return;
     }
     return html` <div class="database-block-detail-header-icon">
-      ${this.view.cellGetValue(this.rowId, iconColumn)}
+      ${this.view.cellValueGet(this.rowId, iconColumn)}
     </div>`;
-  }
-
-  get attributeRenderer() {
-    return this.inlineManager.getRenderer();
-  }
-
-  get attributesSchema() {
-    return this.inlineManager.getSchema();
-  }
-
-  get inlineManager() {
-    return this.service.inlineManager;
-  }
-
-  get model() {
-    return this.host?.doc.getBlock(this.rowId)?.model;
-  }
-
-  get service() {
-    return this.host.std.spec.getService('affine:database');
   }
 
   @property({ attribute: false })
   accessor host!: EditorHost;
 
   @property({ attribute: false })
+  accessor openDoc!: (docId: string) => void;
+
+  @property({ attribute: false })
   accessor rowId!: string;
 
   @property({ attribute: false })
-  accessor view!: DataViewTableManager | DataViewKanbanManager;
+  accessor view!: TableSingleView | KanbanSingleView;
 }

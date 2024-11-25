@@ -1,18 +1,21 @@
 import type { Doc } from '@blocksuite/store';
 
+import { CommonUtils } from '@blocksuite/affine-block-surface';
+import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import {
-  type EditorHost,
-  ShadowlessElement,
-  WithDisposable,
-} from '@blocksuite/block-std';
-import {
-  type EdgelessRootBlockComponent,
+  DocModeProvider,
+  EdgelessRootService,
+  EditPropsStore,
   type FrameBlockModel,
-  generateKeyBetween,
 } from '@blocksuite/blocks';
-import { Bound, DisposableGroup } from '@blocksuite/global/utils';
-import { type PropertyValues, css, html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import {
+  Bound,
+  DisposableGroup,
+  WithDisposable,
+} from '@blocksuite/global/utils';
+import { css, html, nothing, type PropertyValues } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
+import { keyed } from 'lit/directives/keyed.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type {
@@ -22,7 +25,6 @@ import type {
   SelectEvent,
 } from '../card/frame-card.js';
 
-import '../card/frame-card.js';
 import { startDragging } from '../utils/drag.js';
 
 type FrameListItem = {
@@ -82,8 +84,9 @@ const styles = css`
 
 export const AFFINE_FRAME_PANEL_BODY = 'affine-frame-panel-body';
 
-@customElement(AFFINE_FRAME_PANEL_BODY)
 export class FramePanelBody extends WithDisposable(ShadowlessElement) {
+  static override styles = styles;
+
   private _clearDocDisposables = () => {
     this._docDisposables?.dispose();
     this._docDisposables = null;
@@ -103,7 +106,7 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
     }
 
     this._selected = [];
-    this.edgeless?.service.selection.set({
+    this._edgelessRootService?.selection.set({
       elements: this._selected,
       editing: false,
     });
@@ -131,7 +134,7 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
       this._selected = [id];
     }
 
-    this.edgeless?.service.selection.set({
+    this._edgelessRootService?.selection.set({
       elements: this._selected,
       editing: false,
     });
@@ -145,7 +148,24 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
     }));
   };
 
-  static override styles = styles;
+  get _edgelessRootService() {
+    return this.editorHost.std.getOptional(EdgelessRootService);
+  }
+
+  get frames() {
+    const frames = this.editorHost.doc
+      .getBlocksByFlavour('affine:frame')
+      .map(block => block.model as FrameBlockModel);
+    return frames.sort(this.compare);
+  }
+
+  get viewportPadding(): [number, number, number, number] {
+    return this.fitPadding
+      ? ([0, 0, 0, 0].map((val, idx) =>
+          Number.isFinite(this.fitPadding[idx]) ? this.fitPadding[idx] : val
+        ) as [number, number, number, number])
+      : [0, 0, 0, 0];
+  }
 
   private _drag(e: DragEvent) {
     if (!this._selected.length) return;
@@ -188,14 +208,11 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
       framePanelBody: this,
       frameListContainer: this.frameListContainer,
       frameElementHeight: this._frameElementHeight,
-      edgeless: this.edgeless,
-      doc: this.doc,
-      editorHost: this.editorHost,
       onDragEnd: insertIdx => {
         this._dragging = false;
         this.insertIndex = undefined;
 
-        if (insertIdx === undefined) return;
+        if (insertIdx === undefined || this._frameItems.length <= 1) return;
         this._reorderFrames(selected, framesMap, insertIdx);
       },
       onDragMove: (idx, indicatorTranslateY) => {
@@ -209,7 +226,7 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
     const { block } = e.detail;
     const bound = Bound.deserialize(block.xywh);
 
-    if (!this.edgeless) {
+    if (!this._edgelessRootService) {
       // When click frame card in page mode
       // Should switch to edgeless mode and set viewport to the frame
       const viewport = {
@@ -218,11 +235,10 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
         padding: this.viewportPadding as [number, number, number, number],
       };
 
-      const rootService = this.editorHost.spec.getService('affine:page');
-      rootService.editPropsStore.setStorage('viewport', viewport);
-      rootService.docModeService.setMode('edgeless');
+      this.editorHost.std.get(EditPropsStore).setStorage('viewport', viewport);
+      this.editorHost.std.get(DocModeProvider).setEditorMode('edgeless');
     } else {
-      this.edgeless.service.viewport.setViewportByBound(
+      this._edgelessRootService.viewport.setViewportByBound(
         bound,
         this.viewportPadding,
         true
@@ -242,16 +258,12 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
 
   private _renderFrameList() {
     const selectedFrames = new Set(this._selected);
-    const frameCards = html`${repeat(
-      this._frameItems,
-      frameItem => [frameItem.frame.id, frameItem.cardIndex].join('-'),
-      frameItem => {
-        const { frame, frameIndex, cardIndex } = frameItem;
-        return html`<affine-frame-card
+    const frameCards = html`${repeat(this._frameItems, frameItem => {
+      const { frame, frameIndex, cardIndex } = frameItem;
+      return keyed(
+        frame,
+        html`<affine-frame-card
           data-frame-id=${frame.id}
-          .edgeless=${this.edgeless}
-          .doc=${this.doc}
-          .host=${this.editorHost}
           .frame=${frame}
           .cardIndex=${cardIndex}
           .frameIndex=${frameIndex}
@@ -263,9 +275,9 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
           @select=${this._selectFrame}
           @fitview=${this._fitToElement}
           @drag=${this._drag}
-        ></affine-frame-card>`;
-      }
-    )}`;
+        ></affine-frame-card>`
+      );
+    })}`;
 
     const frameList = html` <div class="frame-list-container">
       ${this.insertIndex !== undefined
@@ -298,14 +310,14 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
       let before = frames[insertIndex - 1]?.index || null;
       const after = frames[insertIndex]?.index || null;
       selectedFrames.forEach(frame => {
-        const newIndex = generateKeyBetween(before, after);
+        const newIndex = CommonUtils.generateKeyBetween(before, after);
         frame.doc.updateBlock(frame, {
           index: newIndex,
         });
         before = newIndex;
       });
 
-      this.doc.captureSync();
+      this.editorHost.doc.captureSync();
       this._updateFrames();
     }
   }
@@ -314,8 +326,8 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
     this._clearDocDisposables();
     this._docDisposables = new DisposableGroup();
     this._docDisposables.add(
-      doc.slots.blockUpdated.on(({ flavour }) => {
-        if (flavour === 'affine:frame') {
+      doc.slots.blockUpdated.on(({ type, flavour }) => {
+        if (flavour === 'affine:frame' && type !== 'update') {
           requestAnimationFrame(() => {
             this._updateFrames();
           });
@@ -364,9 +376,6 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
   override connectedCallback() {
     super.connectedCallback();
     this._updateFrameItems();
-    if (this.edgeless) {
-      this._lastEdgelessRootId = this.edgeless.model.id;
-    }
   }
 
   override disconnectedCallback() {
@@ -387,37 +396,19 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
   }
 
   override updated(_changedProperties: PropertyValues) {
-    if (_changedProperties.has('doc') || _changedProperties.has('edgeless')) {
-      this._setDocDisposables(this.doc);
-    }
-
-    if (_changedProperties.has('edgeless') && this.edgeless) {
+    if (_changedProperties.has('editorHost') && this.editorHost) {
+      this._setDocDisposables(this.editorHost.doc);
       // after switch to edgeless mode, should update the selection
-      if (this.edgeless.model.id === this._lastEdgelessRootId) {
-        this.edgeless.service.selection.set({
+      if (this.editorHost.doc.id === this._lastEdgelessRootId) {
+        this._edgelessRootService?.selection.set({
           elements: this._selected,
           editing: false,
         });
       } else {
-        this._selected = [];
+        this._selected = this._selected.length ? [] : this._selected;
       }
-      this._lastEdgelessRootId = this.edgeless.model.id;
+      this._lastEdgelessRootId = this.editorHost.doc.id;
     }
-  }
-
-  get frames() {
-    const frames = this.doc.getBlockByFlavour(
-      'affine:frame'
-    ) as FrameBlockModel[];
-    return frames.sort(this.compare);
-  }
-
-  get viewportPadding(): [number, number, number, number] {
-    return this.fitPadding
-      ? ([0, 0, 0, 0].map((val, idx) =>
-          Number.isFinite(this.fitPadding[idx]) ? this.fitPadding[idx] : val
-        ) as [number, number, number, number])
-      : [0, 0, 0, 0];
   }
 
   @state()
@@ -428,13 +419,7 @@ export class FramePanelBody extends WithDisposable(ShadowlessElement) {
   private accessor _selected: string[] = [];
 
   @property({ attribute: false })
-  accessor doc!: Doc;
-
-  @property({ attribute: false })
   accessor domHost!: Document | HTMLElement;
-
-  @property({ attribute: false })
-  accessor edgeless: EdgelessRootBlockComponent | null = null;
 
   @property({ attribute: false })
   accessor editorHost!: EditorHost;

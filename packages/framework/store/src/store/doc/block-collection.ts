@@ -1,4 +1,5 @@
-import { Slot } from '@blocksuite/global/utils';
+import { type Disposable, Slot } from '@blocksuite/global/utils';
+import { signal } from '@preact/signals-core';
 import { uuidv4 } from 'lib0/random.js';
 import * as Y from 'yjs';
 
@@ -6,11 +7,12 @@ import type { BlockModel } from '../../schema/base.js';
 import type { IdGenerator } from '../../utils/id-generator.js';
 import type { AwarenessStore, BlockSuiteDoc } from '../../yjs/index.js';
 import type { DocCollection } from '../collection.js';
+import type { YBlock } from './index.js';
+import type { Query } from './query.js';
 
 import { Text } from '../../reactive/text.js';
 import { DocCRUD } from './crud.js';
-import { type BlockSelector, BlockViewType, type YBlock } from './index.js';
-import { Doc } from './index.js';
+import { Doc } from './doc.js';
 
 export type YBlocks = Y.Map<YBlock>;
 
@@ -30,22 +32,26 @@ type DocOptions = {
   idGenerator?: IdGenerator;
 };
 
-export const defaultBlockSelector = () => BlockViewType.Display;
-
 export type GetDocOptions = {
-  selector?: BlockSelector;
+  query?: Query;
   readonly?: boolean;
 };
 
 export class BlockCollection {
+  private _awarenessUpdateDisposable: Disposable | null = null;
+
+  private readonly _canRedo$ = signal(false);
+
+  private readonly _canUndo$ = signal(false);
+
   private readonly _collection: DocCollection;
 
   private readonly _docCRUD: DocCRUD;
 
   private _docMap = {
-    undefined: new WeakMap<BlockSelector, Doc>(),
-    true: new WeakMap<BlockSelector, Doc>(),
-    false: new WeakMap<BlockSelector, Doc>(),
+    undefined: new Map<string, Doc>(),
+    true: new Map<string, Doc>(),
+    false: new Map<string, Doc>(),
   };
 
   // doc/space container.
@@ -56,6 +62,7 @@ export class BlockCollection {
   private _history!: Y.UndoManager;
 
   private _historyObserver = () => {
+    this._updateCanUndoRedoSignals();
     this.slots.historyUpdated.emit();
   };
 
@@ -99,6 +106,17 @@ export class BlockCollection {
 
   private _shouldTransact = true;
 
+  private _updateCanUndoRedoSignals = () => {
+    const canRedo = this.readonly ? false : this._history.canRedo();
+    const canUndo = this.readonly ? false : this._history.canUndo();
+    if (this._canRedo$.peek() !== canRedo) {
+      this._canRedo$.value = canRedo;
+    }
+    if (this._canUndo$.peek() !== canUndo) {
+      this._canUndo$.value = canUndo;
+    }
+  };
+
   protected readonly _yBlocks: Y.Map<YBlock>;
 
   /**
@@ -126,6 +144,83 @@ export class BlockCollection {
         }
     >(),
   };
+
+  // So, we apply a listener at the top level for the flat structure of the current
+  get awarenessSync() {
+    return this.collection.awarenessSync;
+  }
+
+  get blobSync() {
+    return this.collection.blobSync;
+  }
+
+  get canRedo() {
+    return this._canRedo$.peek();
+  }
+
+  get canRedo$() {
+    return this._canRedo$;
+  }
+
+  get canUndo() {
+    return this._canUndo$.peek();
+  }
+
+  get canUndo$() {
+    return this._canUndo$;
+  }
+
+  get collection() {
+    return this._collection;
+  }
+
+  get crud() {
+    return this._docCRUD;
+  }
+
+  get docSync() {
+    return this.collection.docSync;
+  }
+
+  get history() {
+    return this._history;
+  }
+
+  get isEmpty() {
+    return this._yBlocks.size === 0;
+  }
+
+  get loaded() {
+    return this._loaded;
+  }
+
+  get meta() {
+    return this.collection.meta.getDocMeta(this.id);
+  }
+
+  get readonly() {
+    return this.awarenessStore.isReadonly(this);
+  }
+
+  get ready() {
+    return this._ready;
+  }
+
+  get schema() {
+    return this.collection.schema;
+  }
+
+  get spaceDoc() {
+    return this._ySpaceDoc;
+  }
+
+  get Text() {
+    return Text;
+  }
+
+  get yBlocks() {
+    return this._yBlocks;
+  }
 
   constructor({
     id,
@@ -214,10 +309,10 @@ export class BlockCollection {
     this._yBlocks.clear();
   }
 
-  clearSelector(selector: BlockSelector, readonly?: boolean) {
+  clearQuery(query: Query, readonly?: boolean) {
     const readonlyKey = this._getReadonlyKey(readonly);
 
-    this._docMap[readonlyKey].delete(selector);
+    this._docMap[readonlyKey].delete(JSON.stringify(query));
   }
 
   destroy() {
@@ -228,6 +323,7 @@ export class BlockCollection {
 
   dispose() {
     this.slots.historyUpdated.dispose();
+    this._awarenessUpdateDisposable?.dispose();
 
     if (this.ready) {
       this._yBlocks.unobserveDeep(this._handleYEvents);
@@ -239,22 +335,24 @@ export class BlockCollection {
     return this._idGenerator();
   }
 
-  getDoc({ selector = defaultBlockSelector, readonly }: GetDocOptions = {}) {
+  getDoc({ readonly, query }: GetDocOptions = {}) {
     const readonlyKey = this._getReadonlyKey(readonly);
 
-    if (this._docMap[readonlyKey].has(selector)) {
-      return this._docMap[readonlyKey].get(selector)!;
+    const key = JSON.stringify(query);
+
+    if (this._docMap[readonlyKey].has(key)) {
+      return this._docMap[readonlyKey].get(key)!;
     }
 
     const doc = new Doc({
       blockCollection: this,
       crud: this._docCRUD,
       schema: this.collection.schema,
-      selector,
       readonly,
+      query,
     });
 
-    this._docMap[readonlyKey].set(selector, doc);
+    this._docMap[readonlyKey].set(key, doc);
 
     return doc;
   }
@@ -275,6 +373,13 @@ export class BlockCollection {
     this._yBlocks.forEach((_, id) => {
       this._handleYBlockAdd(id);
     });
+
+    this._awarenessUpdateDisposable = this.awarenessStore.slots.update.on(
+      () => {
+        // change readonly state will affect the undo/redo state
+        this._updateCanUndoRedoSignals();
+      }
+    );
 
     initFn?.();
 
@@ -332,81 +437,6 @@ export class BlockCollection {
     this._shouldTransact = false;
     callback();
     this._shouldTransact = true;
-  }
-
-  get Text() {
-    return Text;
-  }
-
-  // So, we apply a listener at the top level for the flat structure of the current
-  get awarenessSync() {
-    return this.collection.awarenessSync;
-  }
-
-  get blobSync() {
-    return this.collection.blobSync;
-  }
-
-  get canRedo() {
-    if (this.readonly) {
-      return false;
-    }
-    return this._history.canRedo();
-  }
-
-  get canUndo() {
-    if (this.readonly) {
-      return false;
-    }
-    return this._history.canUndo();
-  }
-
-  get collection() {
-    return this._collection;
-  }
-
-  get crud() {
-    return this._docCRUD;
-  }
-
-  get docSync() {
-    return this.collection.docSync;
-  }
-
-  get history() {
-    return this._history;
-  }
-
-  get isEmpty() {
-    return this._yBlocks.size === 0;
-  }
-
-  get loaded() {
-    return this._loaded;
-  }
-
-  get meta() {
-    return this.collection.meta.getDocMeta(this.id);
-  }
-
-  get readonly() {
-    return this.awarenessStore.isReadonly(this);
-  }
-
-  get ready() {
-    return this._ready;
-  }
-
-  get schema() {
-    return this.collection.schema;
-  }
-
-  get spaceDoc() {
-    return this._ySpaceDoc;
-  }
-
-  get yBlocks() {
-    return this._yBlocks;
   }
 }
 

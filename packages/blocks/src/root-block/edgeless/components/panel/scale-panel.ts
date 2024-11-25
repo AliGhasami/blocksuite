@@ -1,10 +1,7 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { clamp, stopPropagation } from '@blocksuite/affine-shared/utils';
+import { css, html, LitElement } from 'lit';
+import { property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-
-import { stopPropagation } from '../../../../_common/utils/event.js';
-import { clamp } from '../../../../_common/utils/math.js';
-import '../buttons/tool-icon-button.js';
 
 const MIN_SCALE = 0;
 const MAX_SCALE = 400;
@@ -15,28 +12,7 @@ function format(scale: number) {
   return `${scale}%`;
 }
 
-@customElement('edgeless-scale-panel')
 export class EdgelessScalePanel extends LitElement {
-  private _onKeydown = (e: KeyboardEvent) => {
-    e.stopPropagation();
-
-    if (e.key === 'Enter' && !e.isComposing) {
-      e.preventDefault();
-      const input = e.target as HTMLInputElement;
-      const scale = parseInt(input.value.trim());
-      // Handle edge case where user enters a non-number
-      if (isNaN(scale)) {
-        input.value = '';
-        return;
-      }
-
-      // Handle edge case when user enters a number that is out of range
-      this._onSelect(clamp(scale, this.minScale, this.maxScale));
-      input.value = '';
-      this._onPopperClose();
-    }
-  };
-
   static override styles = css`
     :host {
       display: flex;
@@ -69,6 +45,26 @@ export class EdgelessScalePanel extends LitElement {
     }
   `;
 
+  private _onKeydown = (e: KeyboardEvent) => {
+    e.stopPropagation();
+
+    if (e.key === 'Enter' && !e.isComposing) {
+      e.preventDefault();
+      const input = e.target as HTMLInputElement;
+      const scale = parseInt(input.value.trim());
+      // Handle edge case where user enters a non-number
+      if (isNaN(scale)) {
+        input.value = '';
+        return;
+      }
+
+      // Handle edge case when user enters a number that is out of range
+      this._onSelect(clamp(scale, this.minScale, this.maxScale));
+      input.value = '';
+      this._onPopperClose();
+    }
+  };
+
   private _onPopperClose() {
     this.onPopperCose?.();
   }
@@ -82,15 +78,18 @@ export class EdgelessScalePanel extends LitElement {
       ${repeat(
         this.scaleList,
         scale => scale,
-        scale =>
-          html`<edgeless-tool-icon-button
+        scale => {
+          const classes = `scale-${scale}`;
+          return html`<edgeless-tool-icon-button
+            class=${classes}
             .iconContainerPadding=${[4, 8]}
             .activeMode=${'background'}
             .active=${this.scale === scale}
             @click=${() => this._onSelect(scale)}
           >
             ${format(scale)}
-          </edgeless-tool-icon-button>`
+          </edgeless-tool-icon-button>`;
+        }
       )}
 
       <input
@@ -104,6 +103,9 @@ export class EdgelessScalePanel extends LitElement {
         @input=${stopPropagation}
         @click=${stopPropagation}
         @pointerdown=${stopPropagation}
+        @cut=${stopPropagation}
+        @copy=${stopPropagation}
+        @paste=${stopPropagation}
       />
     `;
   }

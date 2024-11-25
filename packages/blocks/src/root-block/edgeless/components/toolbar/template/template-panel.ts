@@ -1,10 +1,23 @@
 import type { IBound } from '@blocksuite/global/utils';
 
-import { WithDisposable } from '@blocksuite/block-std';
-import { Bound } from '@blocksuite/global/utils';
+import {
+  darkToolbarStyles,
+  EditPropsStore,
+  lightToolbarStyles,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import {
+  requestConnectedFrame,
+  stopPropagation,
+} from '@blocksuite/affine-shared/utils';
+import {
+  Bound,
+  getCommonBound,
+  WithDisposable,
+} from '@blocksuite/global/utils';
 import { baseTheme } from '@toeverything/theme';
-import { LitElement, css, html, nothing, unsafeCSS } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -14,11 +27,6 @@ import type { TemplateJob } from '../../../services/template.js';
 import type { Template } from './template-type.js';
 
 import {
-  requestConnectedFrame,
-  stopPropagation,
-} from '../../../../../_common/utils/event.js';
-import { getCommonBound } from '../../../../../surface-block/utils/bound.js';
-import {
   createInsertPlaceMiddleware,
   createRegenerateIndexMiddleware,
   createStickerMiddleware,
@@ -27,14 +35,9 @@ import {
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
 import { builtInTemplates } from './builtin-templates.js';
 import { ArrowIcon, defaultPreview } from './icon.js';
-import './overlay-scrollbar.js';
-import './template-loading.js';
 import { cloneDeep } from './utils.js';
 
-@customElement('edgeless-templates-panel')
 export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
-  private _fetchJob: null | { cancel: () => void } = null;
-
   static override styles = css`
     :host {
       position: absolute;
@@ -51,6 +54,12 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
 
       display: flex;
       flex-direction: column;
+    }
+    .edgeless-templates-panel[data-app-theme='light'] {
+      ${unsafeCSS(lightToolbarStyles.join('\n'))}
+    }
+    .edgeless-templates-panel[data-app-theme='dark'] {
+      ${unsafeCSS(darkToolbarStyles.join('\n'))}
     }
 
     .search-bar {
@@ -201,6 +210,8 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
 
   static templates = builtInTemplates;
 
+  private _fetchJob: null | { cancel: () => void } = null;
+
   draggableController!: EdgelessDraggableElementController<Template>;
 
   private _closePanel() {
@@ -225,18 +236,14 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
         middlewares.push(createInsertPlaceMiddleware(currentContentBound));
       }
 
-      const idxGenerator = service.layer.createIndexGenerator(true);
+      const idxGenerator = service.layer.createIndexGenerator();
 
-      middlewares.push(
-        createRegenerateIndexMiddleware((type: string) => idxGenerator(type))
-      );
+      middlewares.push(createRegenerateIndexMiddleware(() => idxGenerator()));
     }
 
     if (type === 'sticker') {
       middlewares.push(
-        createStickerMiddleware(center, () =>
-          service.layer.generateIndex('affine:image')
-        )
+        createStickerMiddleware(center, () => service.layer.generateIndex())
       );
     }
 
@@ -276,7 +283,7 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
   }
 
   private _getLocalSelectedCategory() {
-    return this.edgeless.service.editPropsStore.getStorage('templateCache');
+    return this.edgeless.std.get(EditPropsStore).getStorage('templateCache');
   }
 
   private async _initCategory() {
@@ -351,7 +358,7 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
       }
     } finally {
       this._loadingTemplate = null;
-      this.edgeless.service.tool.setEdgelessTool({ type: 'default' });
+      this.edgeless.gfx.tool.setTool('default');
     }
   }
 
@@ -385,10 +392,9 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
     this.addEventListener('keydown', stopPropagation, false);
     this._disposables.add(() => {
       if (this._currentCategory) {
-        this.edgeless.service.editPropsStore.setStorage(
-          'templateCache',
-          this._currentCategory
-        );
+        this.edgeless.std
+          .get(EditPropsStore)
+          .setStorage('templateCache', this._currentCategory);
       }
     });
   }
@@ -412,10 +418,12 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
   override render() {
     const { _categories, _currentCategory, _templates } = this;
     const { draggingElement } = this.draggableController?.states || {};
+    const appTheme = this.edgeless.std.get(ThemeProvider).app$.value;
 
     return html`
       <div
         class="edgeless-templates-panel"
+        data-app-theme=${appTheme}
         style=${styleMap({
           opacity: this.isDragging ? '0' : '1',
           transition: 'opacity 0.2s',
@@ -427,6 +435,9 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
             type="text"
             placeholder="Search file or anything..."
             @input=${this._updateSearchKeyword}
+            @cut=${stopPropagation}
+            @copy=${stopPropagation}
+            @paste=${stopPropagation}
           />
         </div>
         <div class="template-categories">
@@ -469,6 +480,7 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
                           : html`<img
                               src="${template.preview}"
                               class="template-preview"
+                              loading="lazy"
                             />`
                         : defaultPreview;
 

@@ -1,27 +1,72 @@
+import type { RichText } from '@blocksuite/affine-components/rich-text';
+import type { TextElementModel } from '@blocksuite/affine-model';
+
+import { CommonUtils, TextUtils } from '@blocksuite/affine-block-surface';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
 import {
-  RangeManager,
+  RANGE_SYNC_EXCLUDE_ATTR,
   ShadowlessElement,
-  WithDisposable,
 } from '@blocksuite/block-std';
-import { Bound, Vec } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
+import {
+  assertExists,
+  Bound,
+  Vec,
+  WithDisposable,
+} from '@blocksuite/global/utils';
 import { css, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { RichText } from '../../../../_common/components/rich-text/rich-text.js';
-import type { TextElementModel } from '../../../../surface-block/element-model/text.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 
-import '../../../../_common/components/rich-text/rich-text.js';
-import { getLineHeight } from '../../../../surface-block/canvas-renderer/element-renderer/text/utils.js';
-import { toRadian } from '../../../../surface-block/index.js';
-import { wrapFontFamily } from '../../../../surface-block/utils/font.js';
 import { deleteElements } from '../../utils/crud.js';
 import { getSelectedRect } from '../../utils/query.js';
 
-@customElement('edgeless-text-editor')
+const { toRadian } = CommonUtils;
+
 export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
+  static BORDER_WIDTH = 1;
+
+  static PADDING_HORIZONTAL = 10;
+
+  static PADDING_VERTICAL = 6;
+
+  static PLACEHOLDER_TEXT = 'Type from here';
+
+  static override styles = css`
+    .edgeless-text-editor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 10;
+      transform-origin: left top;
+      font-kerning: none;
+      border: ${EdgelessTextEditor.BORDER_WIDTH}px solid
+        var(--affine-primary-color, #1e96eb);
+      border-radius: 4px;
+      box-shadow: 0px 0px 0px 2px rgba(30, 150, 235, 0.3);
+      padding: ${EdgelessTextEditor.PADDING_VERTICAL}px
+        ${EdgelessTextEditor.PADDING_HORIZONTAL}px;
+      overflow: visible;
+    }
+
+    .edgeless-text-editor .inline-editor {
+      white-space: pre-wrap !important;
+      outline: none;
+    }
+
+    .edgeless-text-editor .inline-editor span {
+      word-break: normal !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    .edgeless-text-editor-placeholder {
+      pointer-events: none;
+      color: var(--affine-text-disable-color);
+      white-space: nowrap;
+    }
+  `;
+
   private _isComposition = false;
 
   private _keeping = false;
@@ -99,47 +144,14 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
     });
   };
 
-  static BORDER_WIDTH = 1;
+  get inlineEditor() {
+    assertExists(this.richText.inlineEditor);
+    return this.richText.inlineEditor;
+  }
 
-  static HORIZONTAL_PADDING = 10;
-
-  static PLACEHOLDER_TEXT = 'Type from here';
-
-  static VERTICAL_PADDING = 6;
-
-  static override styles = css`
-    .edgeless-text-editor {
-      position: absolute;
-      left: 0;
-      top: 0;
-      z-index: 10;
-      transform-origin: left top;
-      font-kerning: none;
-      border: ${EdgelessTextEditor.BORDER_WIDTH}px solid
-        var(--affine-primary-color, #1e96eb);
-      border-radius: 4px;
-      box-shadow: 0px 0px 0px 2px rgba(30, 150, 235, 0.3);
-      padding: ${EdgelessTextEditor.VERTICAL_PADDING}px
-        ${EdgelessTextEditor.HORIZONTAL_PADDING}px;
-      overflow: visible;
-    }
-
-    .edgeless-text-editor .inline-editor {
-      white-space: pre-wrap !important;
-      outline: none;
-    }
-
-    .edgeless-text-editor .inline-editor span {
-      word-break: normal !important;
-      overflow-wrap: anywhere !important;
-    }
-
-    .edgeless-text-editor-placeholder {
-      pointer-events: none;
-      color: var(--affine-text-disable-color);
-      white-space: nowrap;
-    }
-  `;
+  get inlineEditorContainer() {
+    return this.inlineEditor.rootElement;
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -152,7 +164,7 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
       return;
     }
 
-    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
+    this.setAttribute(RANGE_SYNC_EXCLUDE_ATTR, 'true');
   }
 
   override firstUpdated(): void {
@@ -187,7 +199,7 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
           element.display = true;
 
           if (element.text.length === 0) {
-            deleteElements(edgeless.surface, [element]);
+            deleteElements(edgeless, [element]);
           }
 
           edgeless.service.selection.set({
@@ -225,10 +237,10 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
   }
 
   getContainerOffset() {
-    const { VERTICAL_PADDING, HORIZONTAL_PADDING, BORDER_WIDTH } =
+    const { PADDING_VERTICAL, PADDING_HORIZONTAL, BORDER_WIDTH } =
       EdgelessTextEditor;
-    return `-${HORIZONTAL_PADDING + BORDER_WIDTH}px, -${
-      VERTICAL_PADDING + BORDER_WIDTH
+    return `-${PADDING_HORIZONTAL + BORDER_WIDTH}px, -${
+      PADDING_VERTICAL + BORDER_WIDTH
     }px`;
   }
 
@@ -328,7 +340,11 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
       hasMaxWidth,
       w,
     } = this.element;
-    const lineHeight = getLineHeight(fontFamily, fontSize, fontWeight);
+    const lineHeight = TextUtils.getLineHeight(
+      fontFamily,
+      fontSize,
+      fontWeight
+    );
     const rect = getSelectedRect([this.element]);
 
     const { translateX, translateY, zoom } = this.edgeless.service.viewport;
@@ -343,21 +359,20 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
     ];
 
     const isEmpty = !text.length && !this._isComposition;
-    const color = this.edgeless.surface.themeObserver.getColor(
-      this.element.color,
-      '#000000'
-    );
+    const color = this.edgeless.std
+      .get(ThemeProvider)
+      .generateColorProperty(this.element.color, '#000000');
 
     return html`<div
       style=${styleMap({
         transform: transformOperation.join(' '),
         minWidth: hasMaxWidth ? `${rect.width}px` : 'none',
         maxWidth: hasMaxWidth ? `${w}px` : 'none',
-        fontFamily: wrapFontFamily(fontFamily),
+        fontFamily: TextUtils.wrapFontFamily(fontFamily),
         fontSize: `${fontSize}px`,
         fontWeight,
         fontStyle,
-        color: color.startsWith('--') ? `var(${color})` : color,
+        color,
         textAlign,
         lineHeight: `${lineHeight}px`,
         boxSizing: 'content-box',
@@ -373,8 +388,8 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
               position: 'absolute',
               left: 0,
               top: 0,
-              padding: `${EdgelessTextEditor.VERTICAL_PADDING}px
-        ${EdgelessTextEditor.HORIZONTAL_PADDING}px`,
+              padding: `${EdgelessTextEditor.PADDING_VERTICAL}px
+        ${EdgelessTextEditor.PADDING_HORIZONTAL}px`,
             })
           : nothing}
       ></rich-text>
@@ -388,15 +403,6 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
 
   setKeeping(keeping: boolean) {
     this._keeping = keeping;
-  }
-
-  get inlineEditor() {
-    assertExists(this.richText.inlineEditor);
-    return this.richText.inlineEditor;
-  }
-
-  get inlineEditorContainer() {
-    return this.inlineEditor.rootElement;
   }
 
   @property({ attribute: false })

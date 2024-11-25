@@ -1,39 +1,84 @@
-import type { SerializedXYWH } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
+import { Bound, type SerializedXYWH } from '@blocksuite/global/utils';
 import { nothing } from 'lit';
 
-import type { BlockService } from '../../service/index.js';
+import type { BlockService } from '../../extension/index.js';
+import type { GfxBlockElementModel } from '../../gfx/index.js';
 
+import { GfxControllerIdentifier } from '../../gfx/identifiers.js';
 import { BlockComponent } from './block-component.js';
+
+export function isGfxBlockComponent(
+  element: unknown
+): element is GfxBlockComponent {
+  return (element as GfxBlockComponent)?.[GfxElementSymbol] === true;
+}
 
 export const GfxElementSymbol = Symbol('GfxElement');
 
+function updateTransform(element: GfxBlockComponent) {
+  element.style.transformOrigin = '0 0';
+  element.style.transform = element.getCSSTransform();
+}
+
+function handleGfxConnection(instance: GfxBlockComponent) {
+  instance.style.position = 'absolute';
+
+  instance.disposables.add(
+    instance.gfx.viewport.viewportUpdated.on(() => {
+      updateTransform(instance);
+    })
+  );
+
+  instance.disposables.add(
+    instance.doc.slots.blockUpdated.on(({ type, id }) => {
+      if (id === instance.model.id && type === 'update') {
+        updateTransform(instance);
+      }
+    })
+  );
+
+  updateTransform(instance);
+}
+
 export abstract class GfxBlockComponent<
-  GfxRootService extends BlockService = BlockService,
-  Model extends BlockModel = BlockModel,
+  Model extends GfxBlockElementModel = GfxBlockElementModel,
   Service extends BlockService = BlockService,
   WidgetName extends string = string,
 > extends BlockComponent<Model, Service, WidgetName> {
   [GfxElementSymbol] = true;
 
+  get gfx() {
+    return this.std.get(GfxControllerIdentifier);
+  }
+
   override connectedCallback(): void {
     super.connectedCallback();
+    handleGfxConnection(this);
+  }
 
-    this.style.position = 'absolute';
+  getCSSTransform() {
+    const viewport = this.gfx.viewport;
+    const { translateX, translateY, zoom } = viewport;
+    const bound = Bound.deserialize(this.model.xywh);
+
+    const scaledX = bound.x * zoom;
+    const scaledY = bound.y * zoom;
+    const deltaX = scaledX - bound.x;
+    const deltaY = scaledY - bound.y;
+
+    return `translate(${translateX + deltaX}px, ${translateY + deltaY}px) scale(${zoom})`;
   }
 
   getRenderingRect() {
-    const { xywh$ } = this.model as BlockModel<{
-      xywh: SerializedXYWH;
-      index: string;
-    }>;
+    const { xywh$ } = this.model;
 
     if (!xywh$) {
       throw new BlockSuiteError(
         ErrorCode.GfxBlockElementError,
-        'Gfx block element should have `xywh` property.'
+        `Error on rendering '${this.model.flavour}': Gfx block's model should have 'xywh' property.`
       );
     }
 
@@ -62,21 +107,32 @@ export abstract class GfxBlockComponent<
     return nothing;
   }
 
+  override async scheduleUpdate() {
+    const parent = this.parentElement;
+
+    if (this.hasUpdated || !parent || !('scheduleUpdateChildren' in parent)) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      super.scheduleUpdate();
+    } else {
+      await (parent.scheduleUpdateChildren as (id: string) => Promise<void>)(
+        this.model.id
+      );
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      super.scheduleUpdate();
+    }
+  }
+
   toZIndex(): string {
-    return `${1}`;
+    return this.gfx.layer.getZIndex(this.model).toString() ?? '0';
   }
 
-  get rootService() {
-    return this.host.spec.getService(this.rootServiceFlavour) as GfxRootService;
+  updateZIndex(): void {
+    this.style.zIndex = this.toZIndex();
   }
-
-  abstract rootServiceFlavour: string;
 }
 
-// @ts-ignore
 export function toGfxBlockComponent<
-  GfxRootService extends BlockService,
-  Model extends BlockModel,
+  Model extends GfxBlockElementModel,
   Service extends BlockService,
   WidgetName extends string,
   B extends typeof BlockComponent<Model, Service, WidgetName>,
@@ -85,12 +141,26 @@ export function toGfxBlockComponent<
   return class extends CustomBlock {
     [GfxElementSymbol] = true;
 
-    rootServiceFlavour!: string;
+    get gfx() {
+      return this.std.get(GfxControllerIdentifier);
+    }
 
     override connectedCallback(): void {
       super.connectedCallback();
+      handleGfxConnection(this);
+    }
 
-      this.style.position = 'absolute';
+    getCSSTransform() {
+      const viewport = this.gfx.viewport;
+      const { translateX, translateY, zoom } = viewport;
+      const bound = Bound.deserialize(this.model.xywh);
+
+      const scaledX = bound.x * zoom;
+      const scaledY = bound.y * zoom;
+      const deltaX = scaledX - bound.x;
+      const deltaY = scaledY - bound.y;
+
+      return `translate(${translateX + deltaX}px, ${translateY + deltaY}px) scale(${zoom})`;
     }
 
     getRenderingRect(): {
@@ -108,7 +178,7 @@ export function toGfxBlockComponent<
       if (!xywh$) {
         throw new BlockSuiteError(
           ErrorCode.GfxBlockElementError,
-          'Gfx block element should have `xywh` property.'
+          `Error on rendering '${this.model.flavour}': Gfx block's model should have 'xywh' property.`
         );
       }
 
@@ -118,18 +188,6 @@ export function toGfxBlockComponent<
     }
 
     override renderBlock() {
-      const { xywh, index } = this.model as BlockModel<{
-        xywh: SerializedXYWH;
-        index: string;
-      }>;
-
-      if (!xywh || !index) {
-        throw new BlockSuiteError(
-          ErrorCode.GfxBlockElementError,
-          'Gfx block element should have `xywh` and `index` props.'
-        );
-      }
-
       const { x, y, w, h, zIndex } = this.getRenderingRect();
 
       this.style.left = `${x}px`;
@@ -149,19 +207,32 @@ export function toGfxBlockComponent<
       return super.renderBlock();
     }
 
-    toZIndex(): string {
-      return `${1}`;
+    override async scheduleUpdate() {
+      const parent = this.parentElement;
+
+      if (this.hasUpdated || !parent || !('scheduleUpdateChildren' in parent)) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        super.scheduleUpdate();
+      } else {
+        await (parent.scheduleUpdateChildren as (id: string) => Promise<void>)(
+          this.model.id
+        );
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        super.scheduleUpdate();
+      }
     }
 
-    get rootService() {
-      return this.host.spec.getService(
-        this.rootServiceFlavour
-      ) as GfxRootService;
+    toZIndex(): string {
+      return this.gfx.layer.getZIndex(this.model).toString() ?? '0';
+    }
+
+    updateZIndex(): void {
+      this.style.zIndex = this.toZIndex();
     }
   } as B & {
     new (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...args: any[]
-    ): GfxBlockComponent<GfxRootService>;
+    ): GfxBlockComponent;
   };
 }

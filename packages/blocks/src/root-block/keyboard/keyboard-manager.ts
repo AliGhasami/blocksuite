@@ -1,10 +1,9 @@
-import type { BlockSelection } from '@blocksuite/block-std';
-import type { BlockComponent } from '@blocksuite/block-std';
+import type { BlockComponent, BlockSelection } from '@blocksuite/block-std';
 
+import { matchFlavours } from '@blocksuite/affine-shared/utils';
 import { IS_MAC, IS_WINDOWS } from '@blocksuite/global/env';
 import { assertExists } from '@blocksuite/global/utils';
 
-import { matchFlavours } from '../../_common/utils/model.js';
 import {
   convertSelectedBlocksToLinkedDoc,
   getTitleFromSelectedModels,
@@ -42,6 +41,18 @@ export class PageKeyboardManager {
       }
     });
   };
+
+  private get _currentSelection() {
+    return this._selection.value;
+  }
+
+  private get _doc() {
+    return this.rootComponent.doc;
+  }
+
+  private get _selection() {
+    return this.rootComponent.host.selection;
+  }
 
   constructor(public rootComponent: BlockComponent) {
     this.rootComponent.bindHotKey(
@@ -92,6 +103,7 @@ export class PageKeyboardManager {
         types: ['block'],
         mode: 'highest',
       })
+      .draftSelectedModels()
       .run();
     const selectedModels = ctx.selectedModels?.filter(
       block =>
@@ -99,7 +111,8 @@ export class PageKeyboardManager {
         matchFlavours(doc.getParent(block), ['affine:note'])
     );
 
-    if (!selectedModels?.length) {
+    const draftedModels = ctx.draftedModels;
+    if (!selectedModels?.length || !draftedModels) {
       return;
     }
 
@@ -107,21 +120,14 @@ export class PageKeyboardManager {
     const autofill = getTitleFromSelectedModels(selectedModels);
     void promptDocTitle(rootComponent.host, autofill).then(title => {
       if (title === null) return;
-      const linkedDoc = convertSelectedBlocksToLinkedDoc(
+      convertSelectedBlocksToLinkedDoc(
+        this.rootComponent.std,
         doc,
-        selectedModels,
+        draftedModels,
         title
-      );
-      const linkedDocService = rootComponent.host.spec.getService(
-        'affine:embed-linked-doc'
-      );
-      linkedDocService.slots.linkedDocCreated.emit({ docId: linkedDoc.id });
+      ).catch(console.error);
       notifyDocCreated(rootComponent.host, doc);
     });
-  }
-
-  private get _currentSelection() {
-    return this._selection.value;
   }
 
   private _deleteBlocksBySelection(selections: BlockSelection[]) {
@@ -131,10 +137,6 @@ export class PageKeyboardManager {
         this._doc.deleteBlock(block);
       }
     });
-  }
-
-  private get _doc() {
-    return this.rootComponent.doc;
   }
 
   private _replaceBlocksBySelection(
@@ -166,9 +168,5 @@ export class PageKeyboardManager {
       blockId,
       path: blockId,
     };
-  }
-
-  private get _selection() {
-    return this.rootComponent.host.selection;
   }
 }

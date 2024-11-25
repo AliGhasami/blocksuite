@@ -1,13 +1,11 @@
-import type {
-  GroupElementModel,
-  MindmapElementModel,
-} from '@blocksuite/blocks';
+import type { MindmapElementModel } from '@blocksuite/affine-model';
 
 import {
   type EdgelessRootBlockComponent,
+  type GroupElementModel,
+  LayoutType,
   NoteDisplayMode,
 } from '@blocksuite/blocks';
-import { LayoutType } from '@blocksuite/blocks';
 import { DocCollection } from '@blocksuite/store';
 import { beforeEach, describe, expect, test } from 'vitest';
 
@@ -181,6 +179,40 @@ describe('group', () => {
     doc.undo();
     await wait();
     assertInitial();
+  });
+
+  test('empty group should have all zero xywh', () => {
+    const map = new DocCollection.Y.Map<boolean>();
+    const groupId = service.addElement('group', { children: map });
+    const group = service.getElementById(groupId) as GroupElementModel;
+
+    expect(group.x).toBe(0);
+    expect(group.y).toBe(0);
+    expect(group.w).toBe(0);
+    expect(group.h).toBe(0);
+  });
+
+  test('descendant of group should not contain itself', () => {
+    const groupIds = [1, 2, 3].map(_ => {
+      return service.addElement('group', {
+        children: new DocCollection.Y.Map<boolean>(),
+      });
+    });
+    const groups = groupIds.map(
+      id => service.getElementById(id) as GroupElementModel
+    );
+
+    groups.forEach(group => {
+      expect(group.descendantElements).toHaveLength(0);
+    });
+
+    groups[0].addChild(groups[1]);
+    groups[1].addChild(groups[2]);
+    groups[2].addChild(groups[0]);
+
+    expect(groups[0].descendantElements).toHaveLength(2);
+    expect(groups[1].descendantElements).toHaveLength(1);
+    expect(groups[2].descendantElements).toHaveLength(0);
   });
 });
 

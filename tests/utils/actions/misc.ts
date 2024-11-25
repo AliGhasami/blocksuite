@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-restricted-imports */
-import type { EditorHost } from '@block-std/view/element/lit-host.js';
-import type { CssVariableName } from '@blocks/_common/theme/css-variables.js';
-import type {
-  DatabaseBlockModel,
-  ListType,
-  RichText,
-  ThemeObserver,
-} from '@blocks/index.js';
+import type { DatabaseBlockModel, ListType, RichText } from '@blocks/index.js';
+import type { EditorHost, ExtensionType } from '@blocksuite/block-std';
+import type { BlockSuiteFlags } from '@blocksuite/global/types';
+import type { AffineEditorContainer } from '@blocksuite/presets';
 import type { InlineRange, InlineRootElement } from '@inline/index.js';
 import type { CustomFramePanel } from '@playground/apps/_common/components/custom-frame-panel.js';
 import type { CustomOutlinePanel } from '@playground/apps/_common/components/custom-outline-panel.js';
@@ -14,10 +9,9 @@ import type { CustomOutlineViewer } from '@playground/apps/_common/components/cu
 import type { DebugMenu } from '@playground/apps/_common/components/debug-menu.js';
 import type { DocsPanel } from '@playground/apps/_common/components/docs-panel.js';
 import type { ConsoleMessage, Locator, Page } from '@playwright/test';
-import type { AffineEditorContainer } from '@presets/editors/index.js';
 import type { BlockModel } from '@store/schema/index.js';
 
-import { assertExists } from '@global/utils.js';
+import { assertExists } from '@blocksuite/global/utils';
 import { expect } from '@playwright/test';
 import { uuidv4 } from '@store/utils/id-generator.js';
 import lz from 'lz-string';
@@ -25,11 +19,13 @@ import lz from 'lz-string';
 import '../declare-test-window.js';
 import { currentEditorIndex, multiEditor } from '../multiple-editor.js';
 import {
-  SHORT_KEY,
+  pressArrowRight,
   pressEnter,
   pressEscape,
   pressSpace,
   pressTab,
+  selectAllBlocksByKeyboard,
+  SHORT_KEY,
   type,
 } from './keyboard.js';
 
@@ -39,7 +35,9 @@ declare global {
   }
 }
 
-export const defaultPlaygroundURL = new URL(`http://localhost:5173/starter/`);
+export const defaultPlaygroundURL = new URL(
+  `http://localhost:${process.env.CI ? 4173 : 5173}/starter/`
+);
 
 const NEXT_FRAME_TIMEOUT = 50;
 const DEFAULT_PLAYGROUND = defaultPlaygroundURL.toString();
@@ -99,13 +97,44 @@ async function initEmptyEditor({
           const editor = document.createElement('affine-editor-container');
           editor.doc = doc;
           editor.autofocus = true;
-          editor.slots.docLinkClicked.on(({ docId }) => {
-            const newDoc = collection.getDoc(docId);
-            if (!newDoc) {
-              throw new Error(`Failed to jump to page ${docId}`);
-            }
-            editor.doc = newDoc;
-          });
+          const defaultExtensions: ExtensionType[] = [
+            ...window.$blocksuite.defaultExtensions(),
+            {
+              setup: di => {
+                di.addImpl(window.$blocksuite.identifiers.ParseDocUrlService, {
+                  parseDocUrl() {
+                    return undefined;
+                  },
+                });
+              },
+            },
+            {
+              setup: di => {
+                di.override(
+                  window.$blocksuite.identifiers.DocModeProvider,
+                  window.$blocksuite.mockServices.mockDocModeService(
+                    () => editor.mode,
+                    mode => editor.switchEditor(mode)
+                  )
+                );
+              },
+            },
+          ];
+          editor.pageSpecs = [...editor.pageSpecs, ...defaultExtensions];
+          editor.edgelessSpecs = [
+            ...editor.edgelessSpecs,
+            ...defaultExtensions,
+          ];
+
+          editor.std
+            .get(window.$blocksuite.identifiers.RefNodeSlotsProvider)
+            .docLinkClicked.on(({ pageId: docId }) => {
+              const newDoc = collection.getDoc(docId);
+              if (!newDoc) {
+                throw new Error(`Failed to jump to page ${docId}`);
+              }
+              editor.doc = newDoc;
+            });
           appRoot.append(editor);
           return editor;
         };
@@ -244,18 +273,6 @@ export function expectConsoleMessage(
     | 'timeEnd' = 'error'
 ) {
   page.on('console', (message: ConsoleMessage) => {
-    if (
-      [
-        '%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold',
-        '[vite] connected.',
-        '[vite] connecting...',
-        'Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.',
-      ].includes(message.text())
-    ) {
-      ignoredLog(message);
-      return;
-    }
-
     const sameType = message.type() === type;
     const textMatch =
       logPrefixOrRegex instanceof RegExp
@@ -286,11 +303,27 @@ export async function enterPlaygroundRoom(
   url.searchParams.set('room', room);
   url.searchParams.set('blobSource', blobSource?.join(',') || 'idb');
   await page.goto(url.toString());
-  // const readyPromise = waitForPageReady(page);
 
   // See https://github.com/microsoft/playwright/issues/5546
-  // See https://github.com/microsoft/playwright/discussions/17813
   page.on('console', message => {
+    if (
+      [
+        '',
+        // React devtools:
+        '%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold',
+        // Vite:
+        '[vite] connected.',
+        '[vite] connecting...',
+        // Figma embed:
+        'Fullscreen: Using 4GB WASM heap',
+        // Lit:
+        'Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.',
+        // Figma embed:
+        'Running frontend commit',
+      ].includes(message.text())
+    ) {
+      return;
+    }
     const ignore = isIgnoredLog(message) || !process.env.CI;
     if (!ignore) {
       expect
@@ -346,16 +379,6 @@ export async function waitNextFrame(
   frameTimeout = NEXT_FRAME_TIMEOUT
 ) {
   await page.waitForTimeout(frameTimeout);
-}
-
-export async function waitForPageReady(page: Page) {
-  await page.evaluate(async () => {
-    return new Promise<void>(resolve => {
-      window.addEventListener('blocksuite:doc-ready', () => resolve(), {
-        once: true,
-      });
-    });
-  });
 }
 
 export async function clearLog(page: Page) {
@@ -502,10 +525,10 @@ export async function initEmptyDatabaseState(page: Page, rootId?: string) {
     if (databaseService) {
       databaseService.databaseViewInitEmpty(
         model,
-        databaseService.viewPresets.tableViewConfig
+        databaseService.viewPresets.tableViewMeta.type
       );
+      databaseService.applyColumnUpdate(model);
     }
-    model.applyColumnUpdate();
 
     doc.captureSync();
     return { rootId, noteId, databaseId };
@@ -540,45 +563,43 @@ export async function initKanbanViewState(
         noteId
       );
       const model = doc.getBlockById(databaseId) as DatabaseBlockModel;
-      const database = doc.getBlockById(databaseId) as DatabaseBlockModel;
-
-      const rowIds = config.rows.map(rowText => {
-        const rowId = doc.addBlock(
-          'affine:paragraph',
-          { type: 'text', text: new doc.Text(rowText) },
-          databaseId
-        );
-        return rowId;
-      });
-      config.columns.forEach(column => {
-        const columnId = database.addColumn('end', {
-          data: {},
-          name: column.type,
-          type: column.type,
-        });
-        rowIds.forEach((rowId, index) => {
-          const value = column.value?.[index];
-          if (value !== undefined) {
-            model.updateCell(rowId, {
-              columnId,
-              value:
-                column.type === 'rich-text'
-                  ? new doc.Text(value as string)
-                  : value,
-            });
-          }
-        });
-      });
       await new Promise(resolve => setTimeout(resolve, 100));
       const databaseBlock = document.querySelector('affine-database');
       const databaseService = databaseBlock?.service;
       if (databaseService) {
+        const rowIds = config.rows.map(rowText => {
+          const rowId = doc.addBlock(
+            'affine:paragraph',
+            { type: 'text', text: new doc.Text(rowText) },
+            databaseId
+          );
+          return rowId;
+        });
+        config.columns.forEach(column => {
+          const columnId = databaseService.addColumn(model, 'end', {
+            data: {},
+            name: column.type,
+            type: column.type,
+          });
+          rowIds.forEach((rowId, index) => {
+            const value = column.value?.[index];
+            if (value !== undefined) {
+              databaseService.updateCell(model, rowId, {
+                columnId,
+                value:
+                  column.type === 'rich-text'
+                    ? new doc.Text(value as string)
+                    : value,
+              });
+            }
+          });
+        });
         databaseService.databaseViewInitEmpty(
           model,
-          databaseService.viewPresets.kanbanViewConfig
+          databaseService.viewPresets.kanbanViewMeta.type
         );
+        databaseService.applyColumnUpdate(model);
       }
-      model.applyColumnUpdate();
       doc.captureSync();
       return { rootId, noteId, databaseId };
     },
@@ -614,10 +635,10 @@ export async function initEmptyDatabaseWithParagraphState(
     if (databaseService) {
       databaseService.databaseViewInitEmpty(
         model,
-        databaseService.viewPresets.tableViewConfig
+        databaseService.viewPresets.tableViewMeta.type
       );
+      databaseService.applyColumnUpdate(model);
     }
-    model.applyColumnUpdate();
     doc.addBlock('affine:paragraph', {}, noteId);
 
     doc.captureSync();
@@ -637,7 +658,9 @@ export async function initDatabaseRowWithData(page: Page, data: string) {
   await waitNextFrame(page, 50);
   await type(page, data);
 }
-
+export const getAddRow = (page: Page): Locator => {
+  return page.locator('.data-view-table-group-add-row');
+};
 export async function initDatabaseDynamicRowWithData(
   page: Page,
   data: string,
@@ -647,9 +670,9 @@ export async function initDatabaseDynamicRowWithData(
   const editorHost = getEditorHostLocator(page);
   if (addRow) {
     await initDatabaseRow(page);
+    await waitNextFrame(page, 100);
     await pressEscape(page);
   }
-  // await focusDatabaseTitle(page);
   const lastRow = editorHost.locator('.affine-database-block-row').last();
   const cell = lastRow.locator('.database-cell').nth(index + 1);
   await cell.click();
@@ -666,14 +689,16 @@ export async function focusDatabaseTitle(page: Page) {
 
   await page.evaluate(() => {
     const dbTitle = document.querySelector(
-      'affine-database-title rich-text'
-    ) as RichText | null;
+      'affine-database-title textarea'
+    ) as HTMLTextAreaElement | null;
     if (!dbTitle) {
       throw new Error('Cannot find database title');
     }
 
-    dbTitle.inlineEditor!.focusEnd();
+    dbTitle.focus();
   });
+  await selectAllBlocksByKeyboard(page);
+  await pressArrowRight(page);
   await waitNextFrame(page);
 }
 
@@ -937,6 +962,31 @@ export async function pasteContent(
   await waitNextFrame(page);
 }
 
+export async function pasteTestImage(page: Page) {
+  await page.evaluate(async () => {
+    const imageBlob = await fetch(`${location.origin}/test-card-1.png`).then(
+      response => response.blob()
+    );
+
+    const imageFile = new File([imageBlob], 'test-card-1.png', {
+      type: 'image/png',
+    });
+
+    const e = new ClipboardEvent('paste', {
+      clipboardData: new DataTransfer(),
+    });
+
+    Object.defineProperty(e, 'target', {
+      writable: false,
+      value: document,
+    });
+
+    e.clipboardData?.items.add(imageFile);
+    document.dispatchEvent(e);
+  });
+  await waitNextFrame(page);
+}
+
 export async function getClipboardHTML(page: Page) {
   const dataInClipboard = await page.evaluate(async () => {
     function format(node: HTMLElement, level: number) {
@@ -1050,7 +1100,6 @@ export async function setSelection(
       focusOffset,
       currentEditorIndex,
     }) => {
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
       const editorHost =
         document.querySelectorAll('editor-host')[currentEditorIndex];
       const anchorRichText = editorHost.querySelector<RichText>(
@@ -1160,7 +1209,7 @@ export async function getBlockModel<Model extends BlockModel>(
   blockId: string
 ) {
   const result: BlockModel | null | undefined = await page.evaluate(blockId => {
-    return window.doc?.getBlock(blockId).model;
+    return window.doc?.getBlock(blockId)?.model;
   }, blockId);
   expect(result).not.toBeNull();
   return result as Model;
@@ -1204,14 +1253,7 @@ export function inlineEditorInnerTextToString(innerText: string): string {
 }
 
 export async function focusTitle(page: Page) {
-  // click to ensure editor is active
-  await page.mouse.move(0, 0);
-  const editor = getEditorHostLocator(page);
-  const locator = editor.locator('affine-page-root').first();
-  // need to set `force` to true when clicking on `affine-selected-blocks`
-  await locator.click({ force: true });
-  // avoid trigger double click
-  await page.waitForTimeout(500);
+  await page.locator('doc-title rich-text').click();
   await page.evaluate(i => {
     const docTitle = document.querySelectorAll('doc-title')[i];
     if (!docTitle) {
@@ -1226,7 +1268,7 @@ export async function focusTitle(page: Page) {
     }
     docTitleRichText.inlineEditor.focusEnd();
   }, currentEditorIndex);
-  await waitNextFrame(page);
+  await waitNextFrame(page, 200);
 }
 
 /**
@@ -1278,11 +1320,8 @@ export async function waitForInlineEditorStateUpdated(page: Page) {
   });
 }
 
-export async function initImageState(page: Page) {
-  // await initEmptyParagraphState(page);
-  // await focusRichText(page);
-
-  await page.evaluate(async () => {
+export async function initImageState(page: Page, prependParagraph = false) {
+  await page.evaluate(async prepend => {
     const { doc } = window;
     const rootId = doc.addBlock('affine:page', {
       title: new doc.Text(),
@@ -1298,6 +1337,9 @@ export async function initImageState(page: Page) {
     );
     const storage = pageRoot.doc.blobSync;
     const sourceId = await storage.set(imageBlob);
+    if (prepend) {
+      doc.addBlock('affine:paragraph', {}, noteId);
+    }
     const imageId = doc.addBlock(
       'affine:image',
       {
@@ -1309,7 +1351,7 @@ export async function initImageState(page: Page) {
     doc.resetHistory();
 
     return { rootId, noteId, imageId };
-  });
+  }, prependParagraph);
 
   // due to pasting img calls fetch, so we need timeout for downloading finished.
   await page.waitForTimeout(500);
@@ -1334,23 +1376,29 @@ export async function getCurrentEditorTheme(page: Page) {
   const mode = await page
     .locator('affine-editor-container')
     .first()
-    .evaluate(ele => {
-      return (ele as unknown as Element & { themeObserver: ThemeObserver })
-        .themeObserver.cssVariables?.['--affine-theme-mode'];
-    });
+    .evaluate(() =>
+      window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue('--affine-theme-mode')
+        .trim()
+    );
   return mode;
 }
 
 export async function getCurrentThemeCSSPropertyValue(
   page: Page,
-  property: CssVariableName
+  property: string
 ) {
   const value = await page
     .locator('affine-editor-container')
-    .evaluate((ele, property: CssVariableName) => {
-      return (ele as unknown as Element & { themeObserver: ThemeObserver })
-        .themeObserver.cssVariables?.[property];
-    }, property);
+    .evaluate(
+      (_, property) =>
+        window
+          .getComputedStyle(document.documentElement)
+          .getPropertyValue(property)
+          .trim(),
+      property
+    );
   return value;
 }
 
@@ -1394,31 +1442,20 @@ export async function scrollToBottom(page: Page) {
   });
 }
 
-export async function mockQuickSearch(
+export async function mockParseDocUrlService(
   page: Page,
-  mapping: Record<string, string> // query -> docId
+  mapping: Record<string, string>
 ) {
-  // mock quick search service
   await page.evaluate(mapping => {
-    window.host.std.spec.getService('affine:page').quickSearchService = {
-      searchDoc(options) {
-        return new Promise(resolve => {
-          if (!options.userInput) {
-            return resolve(null);
-          }
-
-          const docId = mapping[options.userInput];
-          if (!docId) {
-            return resolve({
-              userInput: options.userInput,
-            });
-          } else {
-            return resolve({
-              docId,
-            });
-          }
-        });
-      },
+    const parseDocUrlService = window.host.std.get(
+      window.$blocksuite.identifiers.ParseDocUrlService
+    );
+    parseDocUrlService.parseDocUrl = (url: string) => {
+      const docId = mapping[url];
+      if (docId) {
+        return { docId };
+      }
+      return;
     };
   }, mapping);
 }

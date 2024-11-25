@@ -12,17 +12,20 @@ export async function dragBetweenCoords(
     beforeMouseUp?: () => Promise<void>;
     steps?: number;
     click?: boolean;
+    button?: 'left' | 'right' | 'middle';
   }
 ) {
   const steps = options?.steps ?? 20;
+  const button: 'left' | 'right' | 'middle' = options?.button ?? 'left';
+
   const { x: x1, y: y1 } = from;
   const { x: x2, y: y2 } = to;
   options?.click && (await page.mouse.click(x1, y1));
   await page.mouse.move(x1, y1);
-  await page.mouse.down();
+  await page.mouse.down({ button });
   await page.mouse.move(x2, y2, { steps });
   await options?.beforeMouseUp?.();
-  await page.mouse.up();
+  await page.mouse.up({ button });
 }
 
 export async function dragBetweenIndices(
@@ -128,9 +131,9 @@ export async function dragHandleFromBlockToBlockBottomById(
     sourceBlock.y + sourceBlock.height / 2
   );
   await waitNextFrame(page);
-  const handle = await page
-    .locator('.affine-drag-handle-container')
-    .boundingBox();
+  const dragHandleContainer = page.locator('.affine-drag-handle-container');
+  await dragHandleContainer.hover();
+  const handle = await dragHandleContainer.boundingBox();
   if (!handle) {
     throw new Error();
   }
@@ -218,19 +221,19 @@ export async function popImageMoreMenu(page: Page) {
   await moreButton.click();
   const menu = page.locator('.image-more-popup-menu');
 
-  const turnIntoCardButton = page.locator('.menu-item', {
+  const turnIntoCardButton = page.locator('editor-menu-action', {
     hasText: 'Turn into card view',
   });
 
-  const copyButton = page.locator('.menu-item', {
+  const copyButton = page.locator('editor-menu-action', {
     hasText: 'Copy',
   });
 
-  const duplicateButton = page.locator('.menu-item', {
+  const duplicateButton = page.locator('editor-menu-action', {
     hasText: 'Duplicate',
   });
 
-  const deleteButton = page.locator('.menu-item', {
+  const deleteButton = page.locator('editor-menu-action', {
     hasText: 'Delete',
   });
 

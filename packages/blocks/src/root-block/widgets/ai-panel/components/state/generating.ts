@@ -1,17 +1,16 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { baseTheme } from '@toeverything/theme';
-import { LitElement, css, html, nothing, unsafeCSS } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-
-import type { AIPanelGeneratingConfig } from '../../type.js';
+import type { ColorScheme } from '@blocksuite/affine-model';
 
 import {
   AIStarIconWithAnimation,
   AIStopIcon,
-} from '../../../../../_common/icons/ai.js';
-import '../generating-placeholder.js';
+} from '@blocksuite/affine-components/icons';
+import { WithDisposable } from '@blocksuite/global/utils';
+import { baseTheme } from '@toeverything/theme';
+import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
+import { property } from 'lit/decorators.js';
 
-@customElement('ai-panel-generating')
+import type { AIPanelGeneratingConfig } from '../../type.js';
+
 export class AIPanelGenerating extends WithDisposable(LitElement) {
   static override styles = css`
     :host {
@@ -81,6 +80,7 @@ export class AIPanelGenerating extends WithDisposable(LitElement) {
       ${stages && stages.length > 0
         ? html`<generating-placeholder
             .height=${height}
+            .theme=${this.theme}
             .loadingProgress=${this.loadingProgress}
             .stages=${stages}
             .showHeader=${!this.withAnswer}
@@ -109,6 +109,9 @@ export class AIPanelGenerating extends WithDisposable(LitElement) {
 
   @property({ attribute: false })
   accessor stopGenerating!: () => void;
+
+  @property({ attribute: false })
+  accessor theme!: ColorScheme;
 
   @property({ attribute: false })
   accessor withAnswer!: boolean;

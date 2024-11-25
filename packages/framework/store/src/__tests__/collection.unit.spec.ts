@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-restricted-imports */
 // checkout https://vitest.dev/guide/debugging.html for debugging tests
 
 import type { Slot } from '@blocksuite/global/utils';
@@ -374,7 +373,6 @@ describe('addBlock', () => {
 
     assert.equal(root.flavour, 'affine:page');
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     doc.addBlock('affine:paragraph', {}, noteId!);
     assert.equal(root.children[0].flavour, 'affine:note');
     assert.equal(root.children[0].children[0].flavour, 'affine:paragraph');
@@ -931,34 +929,6 @@ describe('collection.exportJSX works', () => {
         </affine:note>
       </affine:page>
     `);
-  });
-});
-
-describe('collection search', () => {
-  it('search doc meta title', () => {
-    const options = createTestOptions();
-    const collection = new DocCollection(options);
-    collection.meta.initialize();
-    const doc = collection.createDoc({ id: 'doc:home' });
-    doc.load(() => {
-      const rootId = doc.addBlock('affine:page', {
-        title: new doc.Text('test123'),
-      });
-      const noteId = doc.addBlock('affine:note', {}, rootId);
-      doc.addBlock('affine:paragraph', {}, noteId);
-    });
-
-    requestIdleCallback(() => {
-      const result = collection.search('test');
-      expect(result).toMatchInlineSnapshot(`
-      Map {
-        "0" => {
-          "content": "test123",
-          "space": "doc:home",
-        },
-      }
-    `);
-    });
   });
 });
 

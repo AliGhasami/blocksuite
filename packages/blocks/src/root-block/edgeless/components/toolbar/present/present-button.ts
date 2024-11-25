@@ -1,13 +1,11 @@
-import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 
-import type { EdgelessTool } from '../../../types.js';
+import { FrameNavigatorIcon } from '@blocksuite/affine-components/icons';
+import { css, html, LitElement } from 'lit';
 
-import { FrameNavigatorIcon } from '../../../../../_common/icons/edgeless.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 
-@customElement('edgeless-present-button')
 export class EdgelessPresentButton extends QuickToolMixin(
   EdgelessToolbarToolMixin(LitElement)
 ) {
@@ -27,7 +25,7 @@ export class EdgelessPresentButton extends QuickToolMixin(
     }
   `;
 
-  override type: EdgelessTool['type'] = 'frameNavigator';
+  override type: GfxToolsFullOptionValue['type'] = 'frameNavigator';
 
   override render() {
     return html`<edgeless-tool-icon-button

@@ -1,4 +1,8 @@
 import {
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NoteDisplayMode,
+} from '@blocksuite/affine-model';
+import {
   AssetsManager,
   type BlockSnapshot,
   MemoryBlobCRUD,
@@ -7,7 +11,6 @@ import { describe, expect, test } from 'vitest';
 
 import { NotionHtmlAdapter } from '../../_common/adapters/notion-html.js';
 import { nanoidReplacement } from '../../_common/test-utils/test-utils.js';
-import { NoteDisplayMode } from '../../_common/types.js';
 import { createJob } from '../utils/create-job.js';
 
 describe('notion html to snapshot', () => {
@@ -26,7 +29,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -81,7 +84,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -196,7 +199,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -283,35 +286,33 @@ describe('notion html to snapshot', () => {
       <ul id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5" class="bulleted-list">
         <li style="list-style-type:disc">eee</li>
       </ul>
-      <ul id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5" class="to-do-list">
+      <ul id="12d088dd-6fdb-8036-bead-e3940734de95" class="to-do-list">
         <li>
           <div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">aaa</span>
           <div class="indented">
-            <ul id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5" class="to-do-list">
+            <ul id="12d088dd-6fdb-8007-8f38-d3eaaca6975f" class="to-do-list">
               <li>
                 <div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">bbb</span>
                 <div class="indented">
-                  <ul id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5" class="to-do-list">
+                  <ul id="12d088dd-6fdb-807e-8495-fca8f43a33bf" class="to-do-list">
                     <li>
-                      <div class="checkbox checkbox-off"></div> <span
-                        class="to-do-children-unchecked">ccc</span>
+                      <div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">ccc</span>
                       <div class="indented"></div>
                     </li>
                   </ul>
                 </div>
               </li>
             </ul>
-            <ul id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5" class="to-do-list">
+            <ul id="12d088dd-6fdb-8023-813a-ff842af9299c" class="to-do-list">
               <li>
-                <div class="checkbox checkbox-off"></div> <span
-                  class="to-do-children-unchecked">ddd</span>
+                <div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">ddd</span>
                 <div class="indented"></div>
               </li>
             </ul>
           </div>
         </li>
       </ul>
-      <ul id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5" class="to-do-list">
+      <ul id="12d088dd-6fdb-8049-a520-c565437969b5" class="to-do-list">
         <li>
           <div class="checkbox checkbox-on"></div> <span class="to-do-children-checked">eee</span>
           <div class="indented"></div>
@@ -364,7 +365,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -666,7 +667,7 @@ describe('notion html to snapshot', () => {
           id: 'matchesReplaceMap[16]',
           flavour: 'affine:list',
           props: {
-            type: 'toggle',
+            type: 'bulleted',
             text: {
               '$blocksuite:internal:text$': true,
               delta: [
@@ -684,7 +685,7 @@ describe('notion html to snapshot', () => {
               id: 'matchesReplaceMap[17]',
               flavour: 'affine:list',
               props: {
-                type: 'toggle',
+                type: 'bulleted',
                 text: {
                   '$blocksuite:internal:text$': true,
                   delta: [
@@ -702,7 +703,7 @@ describe('notion html to snapshot', () => {
                   id: 'matchesReplaceMap[18]',
                   flavour: 'affine:list',
                   props: {
-                    type: 'toggle',
+                    type: 'bulleted',
                     text: {
                       '$blocksuite:internal:text$': true,
                       delta: [
@@ -800,7 +801,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -838,27 +839,10 @@ describe('notion html to snapshot', () => {
               ],
             },
           },
-          children: [],
-        },
-        {
-          type: 'block',
-          id: 'matchesReplaceMap[3]',
-          flavour: 'affine:paragraph',
-          props: {
-            type: 'quote',
-            text: {
-              '$blocksuite:internal:text$': true,
-              delta: [
-                {
-                  insert: 'ccc',
-                },
-              ],
-            },
-          },
           children: [
             {
               type: 'block',
-              id: 'matchesReplaceMap[4]',
+              id: 'matchesReplaceMap[3]',
               flavour: 'affine:paragraph',
               props: {
                 type: 'quote',
@@ -866,12 +850,30 @@ describe('notion html to snapshot', () => {
                   '$blocksuite:internal:text$': true,
                   delta: [
                     {
-                      insert: 'ddd',
+                      insert: 'ccc',
                     },
                   ],
                 },
               },
-              children: [],
+              children: [
+                {
+                  type: 'block',
+                  id: 'matchesReplaceMap[4]',
+                  flavour: 'affine:paragraph',
+                  props: {
+                    type: 'quote',
+                    text: {
+                      '$blocksuite:internal:text$': true,
+                      delta: [
+                        {
+                          insert: 'ddd',
+                        },
+                      ],
+                    },
+                  },
+                  children: [],
+                },
+              ],
             },
           ],
         },
@@ -900,7 +902,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -911,12 +913,15 @@ describe('notion html to snapshot', () => {
           id: 'matchesReplaceMap[1]',
           flavour: 'affine:paragraph',
           props: {
-            type: 'text',
+            type: 'quote',
             text: {
               '$blocksuite:internal:text$': true,
               delta: [
                 {
-                  insert: '💡aaa',
+                  insert: '💡\n',
+                },
+                {
+                  insert: 'aaa',
                 },
               ],
             },
@@ -946,7 +951,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1015,7 +1020,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1064,7 +1069,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1111,7 +1116,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1155,7 +1160,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1180,6 +1185,9 @@ describe('notion html to snapshot', () => {
     const blobCRUD = new MemoryBlobCRUD();
     const key = await blobCRUD.set(new File([], 'README.pdf'));
     const assestsManager = new AssetsManager({ blob: blobCRUD });
+    assestsManager
+      .getPathBlobIdMap()
+      .set('Untitled 3d2ae962f5433a90499ddbd1c81ac507/README.pdf', key);
     await assestsManager.readFromBlob(key);
     const rawBlockSnapshot = await adapter.toBlockSnapshot({
       file: html,
@@ -1190,80 +1198,84 @@ describe('notion html to snapshot', () => {
 
   test('table', async () => {
     const html = `<div class="page-body">
-      <table class="collection-content">
-        <thead>
-          <tr>
-            <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
-                  style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
-                  class="typesTitle">
-                </svg></span>Name</th>
-            <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
-                  style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
-                  class="typesMultipleSelect">
-                </svg></span>Tags</th>
-            <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
-                  style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
-                  class="typesMultipleSelect">
-                </svg></span>Multi-select</th>
-            <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
-                  style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
-                  class="typesNumber">
-                </svg></span>Number</th>
-            <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
-                  style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
-                  class="typesStatus">
-                </svg></span>Status</th>
-            <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
-                  style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
-                  class="typesCheckbox">
-                </svg></span>Checkbox</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5">
-            <td class="cell-title"><a
-                href="https://www.notion.so/https-affine-pro-ed3d2ae962f5433a90499ddbd1c81ac5?pvs=21">https://affine.pro</a>
-            </td>
-            <td class="cell-tC]_"><span class="selected-value select-value-color-red">aaa</span></td>
-            <td class="cell-GFq@"><span class="selected-value select-value-color-gray">aaa</span><span
-                class="selected-value select-value-color-blue">bbb</span></td>
-            <td class="cell-Kruh">5</td>
-            <td class="cell-S_z"><span class="status-value">
-                <div class="status-dot"></div>Not started
-              </span></td>
-            <td class="cell-Wgk@">
-              <div class="checkbox checkbox-off"></div>
-            </td>
-          </tr>
-          <tr id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5">
-            <td class="cell-title"><a
-                href="https://www.notion.so/ed3d2ae962f5433a90499ddbd1c81ac5?pvs=21">Untitled</a></td>
-            <td class="cell-tC]_"><span class="selected-value select-value-color-green">bbb</span></td>
-            <td class="cell-GFq@"><span class="selected-value select-value-color-gray">aaa</span><span
-                class="selected-value select-value-color-brown">ccc</span></td>
-            <td class="cell-Kruh">7</td>
-            <td class="cell-S_z"><span class="status-value">
-                <div class="status-dot"></div>Not started
-              </span></td>
-            <td class="cell-Wgk@">
-              <div class="checkbox checkbox-on"></div>
-            </td>
-          </tr>
-          <tr id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5">
-            <td class="cell-title"><a
-                href="https://www.notion.so/ed3d2ae962f5433a90499ddbd1c81ac5?pvs=21">Untitled</a></td>
-            <td class="cell-tC]_"><span class="selected-value select-value-color-red">aaa</span></td>
-            <td class="cell-GFq@"><span class="selected-value select-value-color-blue">bbb</span></td>
-            <td class="cell-Kruh">9</td>
-            <td class="cell-S_z"><span class="status-value">
-                <div class="status-dot"></div>Not started
-              </span></td>
-            <td class="cell-Wgk@">
-              <div class="checkbox checkbox-off"></div>
-            </td>
-          </tr>
-        </tbody>
-      </table><br /><br />
+      <div id="11f088dd-6fdb-80d1-82fa-cbdf6e445620" class="collection-content">
+        <h4 class="collection-title">Table View</h4>
+        <table class="collection-content">
+          <thead>
+            <tr>
+              <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
+                    style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
+                    class="typesTitle">
+                  </svg></span>Name</th>
+              <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
+                    style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
+                    class="typesMultipleSelect">
+                  </svg></span>Tags</th>
+              <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
+                    style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
+                    class="typesMultipleSelect">
+                  </svg></span>Multi-select</th>
+              <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
+                    style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
+                    class="typesNumber">
+                  </svg></span>Number</th>
+              <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
+                    style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
+                    class="typesStatus">
+                  </svg></span>Status</th>
+              <th><span class="icon property-icon"><svg role="graphics-symbol" viewBox="0 0 16 16"
+                    style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0"
+                    class="typesCheckbox">
+                  </svg></span>Checkbox</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5">
+              <td class="cell-title"><a
+                  href="https://www.notion.so/https-affine-pro-ed3d2ae962f5433a90499ddbd1c81ac5?pvs=21">https://affine.pro</a>
+              </td>
+              <td class="cell-tC]_"><span class="selected-value select-value-color-red">aaa</span></td>
+              <td class="cell-GFq@"><span class="selected-value select-value-color-gray">aaa</span><span
+                  class="selected-value select-value-color-blue">bbb</span></td>
+              <td class="cell-Kruh">5</td>
+              <td class="cell-S_z"><span class="status-value">
+                  <div class="status-dot"></div>Not started
+                </span></td>
+              <td class="cell-Wgk@">
+                <div class="checkbox checkbox-off"></div>
+              </td>
+            </tr>
+            <tr id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5">
+              <td class="cell-title"><a
+                  href="https://www.notion.so/ed3d2ae962f5433a90499ddbd1c81ac5?pvs=21">Untitled</a></td>
+              <td class="cell-tC]_"><span class="selected-value select-value-color-green">bbb</span></td>
+              <td class="cell-GFq@"><span class="selected-value select-value-color-gray">aaa</span><span
+                  class="selected-value select-value-color-brown">ccc</span></td>
+              <td class="cell-Kruh">7</td>
+              <td class="cell-S_z"><span class="status-value">
+                  <div class="status-dot"></div>Not started
+                </span></td>
+              <td class="cell-Wgk@">
+                <div class="checkbox checkbox-on"></div>
+              </td>
+            </tr>
+            <tr id="ed3d2ae9-62f5-433a-9049-9ddbd1c81ac5">
+              <td class="cell-title"><a
+                  href="https://www.notion.so/ed3d2ae962f5433a90499ddbd1c81ac5?pvs=21">Untitled</a></td>
+              <td class="cell-tC]_"><span class="selected-value select-value-color-red">aaa</span></td>
+              <td class="cell-GFq@"><span class="selected-value select-value-color-blue">bbb</span></td>
+              <td class="cell-Kruh">9</td>
+              <td class="cell-S_z"><span class="status-value">
+                  <div class="status-dot"></div>Not started
+                </span></td>
+              <td class="cell-Wgk@">
+                <div class="checkbox checkbox-off"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <br /><br />
     </div>`;
 
     const blockSnapshot: BlockSnapshot = {
@@ -1272,7 +1284,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1302,7 +1314,11 @@ describe('notion html to snapshot', () => {
             ],
             title: {
               '$blocksuite:internal:text$': true,
-              delta: [],
+              delta: [
+                {
+                  insert: 'Table View',
+                },
+              ],
             },
             columns: [
               {
@@ -1547,7 +1563,7 @@ describe('notion html to snapshot', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: 'both',
@@ -1714,6 +1730,186 @@ describe('notion html to snapshot', () => {
               children: [],
             },
           ],
+        },
+      ],
+    };
+
+    const adapter = new NotionHtmlAdapter(createJob());
+    const rawBlockSnapshot = await adapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('block equation', async () => {
+    const html = `<div class="page-body">
+      <figure id="11b088dd-6fdb-804f-8299-cc84de0b4909" class="equation">
+        <div class="equation-container">
+          <annotation encoding="application/x-tex">E = mc^2</annotation>
+        </div>
+      </figure>
+  </div>`;
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:latex',
+          props: {
+            latex: 'E = mc^2',
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const adapter = new NotionHtmlAdapter(createJob());
+    const rawBlockSnapshot = await adapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('inline equation', async () => {
+    const html = `<div class="page-body">
+      <p id="121088dd-6fdb-803c-8d6e-f80b56c2eb4f" class="">inline equation
+        <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style>
+        <span data-token-index="0" contenteditable="false" class="notion-text-equation-token">
+          <annotation encoding="application/x-tex">E = mc^2</annotation>
+        </span>
+      </p>
+    </div>`;
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'inline equation',
+                },
+                {
+                  insert: ' ',
+                  attributes: {
+                    latex: 'E = mc^2',
+                  },
+                },
+              ],
+            },
+            type: 'text',
+          },
+          children: [],
+        },
+      ],
+    };
+
+    const adapter = new NotionHtmlAdapter(createJob());
+    const rawBlockSnapshot = await adapter.toBlockSnapshot({
+      file: html,
+    });
+    expect(nanoidReplacement(rawBlockSnapshot)).toEqual(blockSnapshot);
+  });
+
+  test('inline style', async () => {
+    const html = `<div class="page-body">
+      <p id="12d088dd-6fdb-80e5-97be-ebd049a327f5" class="">
+        <strong>strong</strong> <em>italic</em> <span style="border-bottom:0.05em solid">underline</span> <del>strikethrough</del> <code>code</code> 
+      </p>
+    </div>`;
+
+    const blockSnapshot: BlockSnapshot = {
+      type: 'block',
+      id: 'matchesReplaceMap[0]',
+      flavour: 'affine:note',
+      props: {
+        xywh: '[0,0,800,95]',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
+        index: 'a0',
+        hidden: false,
+        displayMode: NoteDisplayMode.DocAndEdgeless,
+      },
+      children: [
+        {
+          type: 'block',
+          id: 'matchesReplaceMap[1]',
+          flavour: 'affine:paragraph',
+          props: {
+            text: {
+              '$blocksuite:internal:text$': true,
+              delta: [
+                {
+                  insert: 'strong',
+                  attributes: {
+                    bold: true,
+                  },
+                },
+                {
+                  insert: ' ',
+                },
+                {
+                  insert: 'italic',
+                  attributes: {
+                    italic: true,
+                  },
+                },
+                {
+                  insert: ' ',
+                },
+                {
+                  insert: 'underline',
+                  attributes: {
+                    underline: true,
+                  },
+                },
+                {
+                  insert: ' ',
+                },
+                {
+                  insert: 'strikethrough',
+                  attributes: {
+                    strike: true,
+                  },
+                },
+                {
+                  insert: ' ',
+                },
+                {
+                  insert: 'code',
+                  attributes: {
+                    code: true,
+                  },
+                },
+              ],
+            },
+            type: 'text',
+          },
+          children: [],
         },
       ],
     };

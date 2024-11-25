@@ -1,12 +1,14 @@
 import type { BlockComponent, PointerEventState } from '@blocksuite/block-std';
 
-import { assertExists } from '@blocksuite/global/utils';
-
+import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import {
   getClosestBlockComponentByElement,
   getModelByElement,
-  isEdgelessPage,
-} from '../_common/utils/query.js';
+} from '@blocksuite/affine-shared/utils';
+import { assertExists } from '@blocksuite/global/utils';
+
+import type { EdgelessRootBlockComponent } from '../root-block/index.js';
+
 import { getClosestRootBlockComponent } from '../root-block/utils/query.js';
 
 export class ImageResizeManager {
@@ -25,9 +27,9 @@ export class ImageResizeManager {
     assertExists(this._imageContainer);
 
     const dragModel = getModelByElement(this._activeComponent);
-    dragModel.page.captureSync();
+    dragModel?.page.captureSync();
     const { width, height } = this._imageContainer.getBoundingClientRect();
-    dragModel.page.updateBlock(dragModel, {
+    dragModel?.page.updateBlock(dragModel, {
       width: width / this._zoom,
       height: height / this._zoom,
     });
@@ -74,8 +76,14 @@ export class ImageResizeManager {
     ) as BlockComponent;
 
     const rootComponent = getClosestRootBlockComponent(this._activeComponent);
-    if (rootComponent && isEdgelessPage(rootComponent)) {
-      this._zoom = rootComponent.service.viewport.zoom;
+    if (
+      rootComponent &&
+      rootComponent.service.std.get(DocModeProvider).getEditorMode() ===
+        'edgeless'
+    ) {
+      this._zoom = (
+        rootComponent as EdgelessRootBlockComponent
+      ).service.viewport.zoom;
     } else {
       this._zoom = 1;
     }

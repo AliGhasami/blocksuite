@@ -4,10 +4,18 @@ export interface Disposable {
   dispose: DisposeCallback;
 }
 
-export class DisposableGroup implements Disposable {
+export interface DisposableManager extends Disposable {
+  add(d: Disposable | DisposeCallback): void;
+}
+
+export class DisposableGroup implements DisposableManager {
   private _disposables: Disposable[] = [];
 
   private _disposed = false;
+
+  get disposed() {
+    return this._disposed;
+  }
 
   /**
    * Add to group to be disposed with others.
@@ -29,7 +37,6 @@ export class DisposableGroup implements Disposable {
     handler: (e: WindowEventMap[N]) => void,
     options?: boolean | AddEventListenerOptions
   ): void;
-
   addFromEvent<N extends keyof DocumentEventMap>(
     element: Document,
     eventName: N,
@@ -42,8 +49,21 @@ export class DisposableGroup implements Disposable {
     handler: (e: HTMLElementEventMap[N]) => void,
     eventOptions?: boolean | AddEventListenerOptions
   ): void;
+  addFromEvent<N extends keyof VisualViewportEventMap>(
+    element: VisualViewport,
+    eventName: N,
+    handler: (e: VisualViewportEventMap[N]) => void,
+    eventOptions?: boolean | AddEventListenerOptions
+  ): void;
+  addFromEvent<N extends keyof VirtualKeyboardEventMap>(
+    element: VirtualKeyboard,
+    eventName: N,
+    handler: (e: VirtualKeyboardEventMap[N]) => void,
+    eventOptions?: boolean | AddEventListenerOptions
+  ): void;
+
   addFromEvent(
-    target: HTMLElement | Window | Document,
+    target: HTMLElement | Window | Document | VisualViewport | VirtualKeyboard,
     type: string,
     handler: (e: Event) => void,
     eventOptions?: boolean | AddEventListenerOptions
@@ -60,10 +80,6 @@ export class DisposableGroup implements Disposable {
     disposeAll(this._disposables);
     this._disposables = [];
     this._disposed = true;
-  }
-
-  get disposed() {
-    return this._disposed;
   }
 }
 

@@ -49,11 +49,6 @@ export const BlockSchema = z.object({
     .args()
     .returns(z.custom<BaseBlockTransformer>())
     .optional(),
-  onUpgrade: z
-    .function()
-    .args(z.any(), z.number(), z.number())
-    .returns(z.void())
-    .optional(),
 });
 
 export type BlockSchemaType = z.infer<typeof BlockSchema>;
@@ -90,11 +85,6 @@ export function defineBlockSchema<
   flavour: Flavour;
   metadata: Metadata;
   props?: (internalPrimitives: InternalPrimitives) => Props;
-  onUpgrade?: (
-    data: Props,
-    previousVersion: number,
-    latestVersion: number
-  ) => void;
   toModel?: () => Model;
   transformer?: () => Transformer;
 }): {
@@ -103,11 +93,6 @@ export function defineBlockSchema<
     props: PropsGetter<Props>;
     flavour: Flavour;
   } & Metadata;
-  onUpgrade?: (
-    data: Props,
-    previousVersion: number,
-    latestVersion: number
-  ) => void;
   transformer?: () => Transformer;
 };
 
@@ -115,7 +100,6 @@ export function defineBlockSchema({
   flavour,
   props,
   metadata,
-  onUpgrade,
   toModel,
   transformer,
 }: {
@@ -127,11 +111,6 @@ export function defineBlockSchema({
     children?: string[];
   };
   props?: (internalPrimitives: InternalPrimitives) => Record<string, unknown>;
-  onUpgrade?: (
-    data: Record<string, unknown>,
-    previousVersion: number,
-    latestVersion: number
-  ) => void;
   toModel?: () => BlockModel;
   transformer?: () => BaseBlockTransformer;
 }): BlockSchemaType {
@@ -145,7 +124,6 @@ export function defineBlockSchema({
       props,
       toModel,
     },
-    onUpgrade,
     transformer,
   } satisfies z.infer<typeof BlockSchema>;
   BlockSchema.parse(schema);
@@ -179,6 +157,13 @@ export class BlockModel<
   Props extends object = object,
   PropsSignal extends object = SignaledProps<Props>,
 > extends MagicProps()<PropsSignal> {
+  private _children = signal<string[]>([]);
+
+  /**
+   * @deprecated use doc instead
+   */
+  page!: Doc;
+
   private _childModels = computed(() => {
     const value: BlockModel[] = [];
     this._children.value.map(id => {
@@ -189,8 +174,6 @@ export class BlockModel<
     });
     return value;
   });
-
-  private _children = signal<string[]>([]);
 
   private _onCreated: Disposable;
 
@@ -220,11 +203,6 @@ export class BlockModel<
   // This is used to avoid https://stackoverflow.com/questions/55886792/infer-typescript-generic-class-type
   [modelLabel]: Props = 'type_info_label' as never;
 
-  /**
-   * @deprecated use doc instead
-   */
-  page!: Doc;
-
   pop!: (prop: keyof Props & string) => void;
 
   propsUpdated = new Slot<{ key: string }>();
@@ -239,6 +217,22 @@ export class BlockModel<
   version!: number;
 
   yBlock!: YBlock;
+
+  get children() {
+    return this._childModels.value;
+  }
+
+  get doc() {
+    return this.page;
+  }
+
+  set doc(doc: Doc) {
+    this.page = doc;
+  }
+
+  get parent() {
+    return this.doc.getParent(this);
+  }
 
   constructor() {
     super();
@@ -258,11 +252,6 @@ export class BlockModel<
     });
   }
 
-  [Symbol.dispose]() {
-    this._onCreated.dispose();
-    this._onDeleted.dispose();
-  }
-
   dispose() {
     this.created.dispose();
     this.deleted.dispose();
@@ -280,15 +269,8 @@ export class BlockModel<
     return this.children[this.children.length - 1].lastChild();
   }
 
-  get children() {
-    return this._childModels.value;
-  }
-
-  get doc() {
-    return this.page;
-  }
-
-  set doc(doc: Doc) {
-    this.page = doc;
+  [Symbol.dispose]() {
+    this._onCreated.dispose();
+    this._onDeleted.dispose();
   }
 }

@@ -1,19 +1,15 @@
-import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
-
-import type { EdgelessTool } from '../../../types.js';
+import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 
 import {
   ArrowUpIcon,
   LargeFrameIcon,
-} from '../../../../../_common/icons/index.js';
-import { getTooltipWithShortcut } from '../../../components/utils.js';
-import '../../buttons/tool-icon-button.js';
-import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
-import './frame-menu.js';
+} from '@blocksuite/affine-components/icons';
+import { css, html, LitElement } from 'lit';
+import { styleMap } from 'lit/directives/style-map.js';
 
-@customElement('edgeless-frame-tool-button')
+import { getTooltipWithShortcut } from '../../../components/utils.js';
+import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
+
 export class EdgelessFrameToolButton extends QuickToolMixin(LitElement) {
   static override styles = css`
     :host {
@@ -28,7 +24,7 @@ export class EdgelessFrameToolButton extends QuickToolMixin(LitElement) {
     }
   `;
 
-  override type: EdgelessTool['type'] = 'frame';
+  override type: GfxToolsFullOptionValue['type'] = 'frame';
 
   private _toggleFrameMenu() {
     if (this.tryDisposePopper()) return;

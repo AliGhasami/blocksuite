@@ -1,25 +1,29 @@
 import type { EditorHost } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import { Vec } from '@blocksuite/global/utils';
-import { Bound } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
+import { toast } from '@blocksuite/affine-components/toast';
+import { EmbedOptionProvider } from '@blocksuite/affine-shared/services';
+import { ShadowlessElement } from '@blocksuite/block-std';
+import {
+  assertExists,
+  Bound,
+  Vec,
+  WithDisposable,
+} from '@blocksuite/global/utils';
 import { html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import type { EdgelessRootBlockComponent } from '../../../../root-block/edgeless/edgeless-root-block.js';
 import type { EmbedCardStyle } from '../../../types.js';
 
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../../../consts.js';
-import { getRootByEditorHost } from '../../../utils/query.js';
-import { isValidUrl } from '../../../utils/url.js';
-import { toast } from '../../toast.js';
+import { getRootByEditorHost, isValidUrl } from '../../../utils/index.js';
 import { embedCardModalStyles } from './styles.js';
 
-@customElement('embed-card-create-modal')
 export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
+  static override styles = embedCardModalStyles;
+
   private _onCancel = () => {
     this.remove();
   };
@@ -32,9 +36,9 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
       return;
     }
 
-    const rootService = this.host.spec.getService('affine:page');
-
-    const embedOptions = rootService.getEmbedBlockOptions(url);
+    const embedOptions = this.host.std
+      .get(EmbedOptionProvider)
+      .getEmbedBlockOptions(url);
 
     const { mode } = this.createOptions;
     if (mode === 'page') {
@@ -83,9 +87,7 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
         surface.model
       );
 
-      edgelessRoot.tools.setEdgelessTool({
-        type: 'default',
-      });
+      edgelessRoot.gfx.tool.setTool('default');
     }
     this.onConfirm();
     this.remove();
@@ -100,8 +102,6 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
       this.remove();
     }
   };
-
-  static override styles = embedCardModalStyles;
 
   private _handleInput(e: InputEvent) {
     const target = e.target as HTMLInputElement;
@@ -147,17 +147,16 @@ export class EmbedCardCreateModal extends WithDisposable(ShadowlessElement) {
         </div>
 
         <div class="embed-card-modal-row">
-          <div
+          <button
             class=${classMap({
               'embed-card-modal-button': true,
               save: true,
-              disabled: !isValidUrl(this._linkInputValue),
             })}
-            tabindex="0"
+            ?disabled=${!isValidUrl(this._linkInputValue)}
             @click=${this._onConfirm}
           >
             Confirm
-          </div>
+          </button>
         </div>
       </div>
     </div>`;

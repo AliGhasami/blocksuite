@@ -1,19 +1,16 @@
-import type { EditorHost } from '@blocksuite/block-std';
-import type { BlockModel } from '@blocksuite/store';
-
-import { assertExists } from '@blocksuite/global/utils';
-
-import type { AttachmentBlockComponent } from './attachment-block.js';
+/** @alighasami for check merge **/
 import type {
   AttachmentBlockModel,
   AttachmentBlockProps,
-} from './attachment-model.js';
+} from '@blocksuite/affine-model';
+import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockModel } from '@blocksuite/store';
 
-import { toast } from '../_common/components/toast.js';
-import { uploadFile } from '../_common/upload.js';
-import { humanFileSize } from '../_common/utils/math.js';
-import { defaultAttachmentProps } from './attachment-model.js';
-import { allowEmbed } from './embed.js';
+import { toast } from '@blocksuite/affine-components/toast';
+import { defaultAttachmentProps } from '@blocksuite/affine-model';
+import { humanFileSize } from '@blocksuite/affine-shared/utils';
+
+import type { AttachmentBlockComponent } from './attachment-block.js';
 
 export function cloneAttachmentProperties(model: AttachmentBlockModel) {
   const clonedProps = {} as AttachmentBlockProps;
@@ -51,22 +48,11 @@ async function uploadAttachmentBlob(
   }
 
   const doc = editorHost.doc;
-  //let sourceId: string | undefined;
-  const attachmentModel = doc.getBlockById(
-    blockId
-  ) as AttachmentBlockModel | null;
-  assertExists(attachmentModel);
+  let sourceId: string | undefined;
+
   try {
-    //setAttachmentUploading(blockId);
-    //sourceId = await doc.blobSync.set(blob);
-    const { data } = await uploadFile(blob);
-    //console.log('12111', data.data.storage);
-    doc.withoutTransact(() => {
-      doc.updateBlock(attachmentModel, {
-        src: data.data.storage,
-        //sourceId,
-      } satisfies Partial<AttachmentBlockProps>);
-    });
+    setAttachmentUploading(blockId);
+    sourceId = await doc.blobSync.set(blob);
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -76,7 +62,7 @@ async function uploadAttachmentBlob(
       );
     }
   } finally {
-    /*setAttachmentUploaded(blockId);
+    setAttachmentUploaded(blockId);
 
     const attachmentModel = doc.getBlockById(
       blockId
@@ -89,7 +75,7 @@ async function uploadAttachmentBlob(
       doc.updateBlock(attachmentModel, {
         sourceId,
       } satisfies Partial<AttachmentBlockProps>);
-    });*/
+    });
   }
 }
 
@@ -136,7 +122,7 @@ export async function checkAttachmentBlob(block: AttachmentBlockComponent) {
 
     block.loading = false;
     block.error = false;
-    block.allowEmbed = allowEmbed(model, block.service.maxFileSize);
+    block.allowEmbed = block.embedded();
     if (block.blobUrl) {
       URL.revokeObjectURL(block.blobUrl);
     }

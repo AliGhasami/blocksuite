@@ -1,10 +1,15 @@
-import { Bound } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
+import {
+  EditPropsStore,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import { assertExists, Bound } from '@blocksuite/global/utils';
 import {
   type ReactiveController,
   type ReactiveControllerHost,
   render,
 } from 'lit';
+
+import type { DraggableShape } from '../../shape/utils.js';
 
 import {
   type ElementDragEvent,
@@ -12,16 +17,16 @@ import {
   touchResolver,
 } from './event-resolver.js';
 import {
-  type DraggingInfo,
   createShapeDraggingOverlay,
   defaultInfo,
+  type DraggingInfo,
 } from './overlay-factory.js';
 import {
+  defaultIsValidMove,
   type EdgelessDraggableElementHost,
   type EdgelessDraggableElementOptions,
   type ElementInfo,
   type OverlayLayer,
-  defaultIsValidMove,
 } from './types.js';
 
 interface ReactiveState<T> {
@@ -97,12 +102,13 @@ export class EdgelessDraggableElementController<T>
   }
 
   private _createOverlay({ x, y }: Pick<ElementDragEvent, 'x' | 'y'>) {
-    const { info } = this;
-    const { elementInfo, elementRectOriginal, offsetPos, edgelessRect } = info;
+    const { edgeless } = this.options;
+    const { elementInfo, elementRectOriginal, offsetPos, edgelessRect } =
+      this.info;
 
     this.reset();
     this._updateState('draggingElement', elementInfo);
-    this.overlay = createShapeDraggingOverlay(info);
+    this.overlay = createShapeDraggingOverlay(this.info);
 
     const { overlay } = this;
     // init shape position with 'left' and 'top';
@@ -120,6 +126,19 @@ export class EdgelessDraggableElementController<T>
     overlay.element.style.setProperty('--translate-y', `${offsetPos.y}px`);
     overlay.transitionWrapper.style.transformOrigin = `${ox} ${oy}`;
 
+    const shapeName = (elementInfo as ElementInfo<DraggableShape>).data.name;
+    const { fillColor, strokeColor } =
+      edgeless.host.std.get(EditPropsStore).lastProps$.value[
+        `shape:${shapeName}`
+      ] || {};
+    const color = edgeless.host.std
+      .get(ThemeProvider)
+      .generateColorProperty(fillColor);
+    const stroke = edgeless.host.std
+      .get(ThemeProvider)
+      .generateColorProperty(strokeColor);
+    overlay.element.style.setProperty('color', color);
+    overlay.element.style.setProperty('stroke', stroke);
     // lifecycle hook
     this.options.onOverlayCreated?.(overlay, elementInfo);
   }

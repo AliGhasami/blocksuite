@@ -1,47 +1,43 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockStdScope } from '@blocksuite/block-std';
+
+import { EditPropsStore } from '@blocksuite/affine-shared/services';
 
 import { multiPlayersColor } from './color-picker.js';
 
 export class RemoteColorManager {
-  constructor(readonly host: EditorHost) {
-    const sessionColor =
-      this.rootService.editPropsStore.getStorage('remoteColor');
+  private get awarenessStore() {
+    return this.std.doc.collection.awarenessStore;
+  }
+
+  constructor(readonly std: BlockStdScope) {
+    const sessionColor = this.std.get(EditPropsStore).getStorage('remoteColor');
     if (sessionColor) {
-      this.awareness.awareness.setLocalStateField('color', sessionColor);
+      this.awarenessStore.awareness.setLocalStateField('color', sessionColor);
       return;
     }
 
     const pickColor = multiPlayersColor.pick();
-    this.awareness.awareness.setLocalStateField('color', pickColor);
-    this.rootService.editPropsStore.setStorage('remoteColor', pickColor);
-  }
-
-  private get awareness() {
-    return this.host.doc.collection.awarenessStore;
-  }
-
-  private get rootService() {
-    return this.host.spec.getService('affine:page');
+    this.awarenessStore.awareness.setLocalStateField('color', pickColor);
+    this.std.get(EditPropsStore).setStorage('remoteColor', pickColor);
   }
 
   get(id: number) {
-    const awarenessColor = this.awareness.getStates().get(id)?.color;
+    const awarenessColor = this.awarenessStore.getStates().get(id)?.color;
     if (awarenessColor) {
       return awarenessColor;
     }
 
-    if (id !== this.awareness.awareness.clientID) return null;
+    if (id !== this.awarenessStore.awareness.clientID) return null;
 
-    const sessionColor =
-      this.rootService.editPropsStore.getStorage('remoteColor');
+    const sessionColor = this.std.get(EditPropsStore).getStorage('remoteColor');
     if (sessionColor) {
-      this.awareness.awareness.setLocalStateField('color', sessionColor);
+      this.awarenessStore.awareness.setLocalStateField('color', sessionColor);
       return sessionColor;
     }
 
     const pickColor = multiPlayersColor.pick();
-    this.awareness.awareness.setLocalStateField('color', pickColor);
-    this.rootService.editPropsStore.setStorage('remoteColor', pickColor);
+    this.awarenessStore.awareness.setLocalStateField('color', pickColor);
+    this.std.get(EditPropsStore).setStorage('remoteColor', pickColor);
     return pickColor;
   }
 }

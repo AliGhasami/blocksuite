@@ -1,17 +1,15 @@
+import type { RootBlockModel } from '@blocksuite/affine-model';
+
 import { WidgetComponent } from '@blocksuite/block-std';
+import { effect } from '@preact/signals-core';
 import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { state } from 'lit/decorators.js';
 
 import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-import type { RootBlockModel } from '../../root-model.js';
-
-import './zoom-bar-toggle-button.js';
-import './zoom-toolbar.js';
 
 export const AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET =
   'affine-edgeless-zoom-toolbar-widget';
 
-@customElement(AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET)
 export class AffineEdgelessZoomToolbarWidget extends WidgetComponent<
   RootBlockModel,
   EdgelessRootBlockComponent
@@ -41,19 +39,31 @@ export class AffineEdgelessZoomToolbarWidget extends WidgetComponent<
     }
   `;
 
-  override firstUpdated() {
-    const {
-      disposables,
-      edgeless: { slots },
-    } = this;
-    disposables.add(
-      slots.edgelessToolUpdated.on(tool => {
-        if (tool.type !== 'frameNavigator') {
+  get edgeless() {
+    return this.block;
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.disposables.add(
+      effect(() => {
+        const currentTool = this.edgeless.gfx.tool.currentToolName$.value;
+
+        if (currentTool !== 'frameNavigator') {
           this._hide = false;
         }
         this.requestUpdate();
       })
     );
+  }
+
+  override firstUpdated() {
+    const {
+      disposables,
+      edgeless: { slots },
+    } = this;
+
     disposables.add(
       slots.navigatorSettingUpdated.on(({ hideToolbar }) => {
         if (hideToolbar !== undefined) {
@@ -74,10 +84,6 @@ export class AffineEdgelessZoomToolbarWidget extends WidgetComponent<
         .edgeless=${this.edgeless}
       ></zoom-bar-toggle-button>
     `;
-  }
-
-  get edgeless() {
-    return this.block;
   }
 
   @state()

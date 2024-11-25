@@ -1,4 +1,6 @@
-import { css } from 'lit';
+import { unsafeCSSVar } from '@blocksuite/affine-shared/theme';
+import { baseTheme } from '@toeverything/theme';
+import { css, unsafeCSS } from 'lit';
 
 import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
 
@@ -116,7 +118,7 @@ export const styles = css`
     text-overflow: ellipsis;
     color: var(--affine-text-secondary-color);
 
-    font-family: var(--affine-font-family);
+    font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
     font-size: var(--affine-font-xs);
     font-style: normal;
     font-weight: 400;
@@ -125,7 +127,7 @@ export const styles = css`
   .affine-bookmark-content-url:hover > span {
     color: var(--affine-link-color);
   }
-  .affine-bookmark-content-url:hover .open-icon {
+  .affine-bookmark-content-url:hover {
     fill: var(--affine-link-color);
   }
 
@@ -136,10 +138,10 @@ export const styles = css`
     width: 12px;
     height: 20px;
   }
-  .affine-bookmark-content-url-icon .open-icon {
+  .affine-bookmark-content-url-icon {
     height: 12px;
     width: 12px;
-    fill: var(--affine-text-secondary-color);
+    color: ${unsafeCSSVar('iconSecondary')};
   }
 
   .affine-bookmark-banner {
@@ -176,8 +178,8 @@ export const styles = css`
     .affine-bookmark-content-url > span {
       color: var(--affine-link-color);
     }
-    .affine-bookmark-content-url .open-icon {
-      fill: var(--affine-link-color);
+    .affine-bookmark-content-url .affine-bookmark-content-url-icon {
+      color: var(--affine-link-color);
     }
   }
 

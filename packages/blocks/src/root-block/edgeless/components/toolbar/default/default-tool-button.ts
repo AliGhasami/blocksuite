@@ -1,13 +1,18 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+/** @alighasami for check merge **/
+import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 
-import type { EdgelessTool } from '../../../types.js';
+import {
+  ArrowUpIcon,
+  HandIcon,
+  SelectIcon,
+} from '@blocksuite/affine-components/icons';
+import { effect } from '@preact/signals-core';
+import { css, html, LitElement } from 'lit';
+import { query } from 'lit/decorators.js';
 
-import { SelectIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
 
-@customElement('edgeless-default-tool-button')
 export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
   static override styles = css`
     .current-icon {
@@ -30,20 +35,19 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }
   `;
 
-  override type: EdgelessTool['type'][] = ['default'];
+  override type: GfxToolsFullOptionValue['type'][] = ['default', 'pan'];
 
   private _changeTool() {
-    this.setEdgelessTool({ type: 'default' });
-    /*if (this.toolbar.activePopper) {
+    if (this.toolbar.activePopper) {
       // click manually always closes the popper
       this.toolbar.activePopper.dispose();
     }
     const type = this.edgelessTool?.type;
     if (type !== 'default' && type !== 'pan') {
       if (localStorage.defaultTool === 'default') {
-        this.setEdgelessTool({ type: 'default' });
+        this.setEdgelessTool('default');
       } else if (localStorage.defaultTool === 'pan') {
-        this.setEdgelessTool({ type: 'pan', panning: false });
+        this.setEdgelessTool('pan', { panning: false });
       }
       return;
     }
@@ -51,23 +55,23 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     // wait for animation to finish
     setTimeout(() => {
       if (type === 'default') {
-        this.setEdgelessTool({ type: 'pan', panning: false });
+        this.setEdgelessTool('pan', { panning: false });
       } else if (type === 'pan') {
-        this.setEdgelessTool({ type: 'default' });
+        this.setEdgelessTool('default');
       }
       this._fadeIn();
-    }, 100);*/
+    }, 100);
   }
 
-  /*private _fadeIn() {
+  private _fadeIn() {
     this.currentIcon.style.opacity = '1';
     this.currentIcon.style.transform = `translateY(0px)`;
-  }*/
+  }
 
-  /*private _fadeOut() {
+  private _fadeOut() {
     this.currentIcon.style.opacity = '0';
     this.currentIcon.style.transform = `translateY(-5px)`;
-  }*/
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -75,9 +79,10 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
       localStorage.defaultTool = 'default';
     }
     this.disposables.add(
-      this.edgeless.slots.edgelessToolUpdated.on(({ type }) => {
-        if (type === 'default') {
-          localStorage.defaultTool = type;
+      effect(() => {
+        const tool = this.edgeless.gfx.tool.currentToolName$.value;
+        if (tool === 'default' || tool === 'pan') {
+          localStorage.defaultTool = tool;
         }
       })
     );
@@ -89,13 +94,18 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     return html`
       <edgeless-tool-icon-button
         class="edgeless-default-button ${type} ${active ? 'active' : ''}"
-        .tooltip=${getTooltipWithShortcut('Select', 'V')}
+        .tooltip=${type === 'pan'
+          ? getTooltipWithShortcut('Hand', 'H')
+          : getTooltipWithShortcut('Select', 'V')}
         .tooltipOffset=${17}
         .active=${active}
         .iconContainerPadding=${6}
         @click=${this._changeTool}
       >
-        <span class="current-icon"> ${SelectIcon} </span>
+        <span class="current-icon">
+          ${localStorage.defaultTool === 'default' ? SelectIcon : HandIcon}
+        </span>
+        <span class="arrow-up-icon">${ArrowUpIcon}</span>
       </edgeless-tool-icon-button>
     `;
   }

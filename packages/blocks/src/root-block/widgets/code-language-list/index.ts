@@ -1,20 +1,17 @@
+import type { CodeBlockModel } from '@blocksuite/affine-model';
+
+import { HoverController } from '@blocksuite/affine-components/hover';
 import { WidgetComponent } from '@blocksuite/block-std';
 import { sleep } from '@blocksuite/global/utils';
 import { offset } from '@floating-ui/dom';
-import { computed } from '@lit-labs/preact-signals';
+import { computed } from '@preact/signals-core';
 import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
 
-import type { CodeBlockModel } from '../../../code-block/code-model.js';
 import type { CodeBlockComponent } from '../../../code-block/index.js';
-
-import { HoverController } from '../../../_common/components/index.js';
-import './components/lang-button.js';
 
 export const AFFINE_CODE_LANGUAGE_LIST_WIDGET =
   'affine-code-language-list-widget';
 
-@customElement(AFFINE_CODE_LANGUAGE_LIST_WIDGET)
 export class AffineCodeLanguageListWidget extends WidgetComponent<
   CodeBlockModel,
   CodeBlockComponent

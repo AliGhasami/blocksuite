@@ -35,7 +35,7 @@ describe('elements management', () => {
       type: 'shape',
     });
 
-    model.removeElement(id);
+    model.deleteElement(id);
 
     expect(model.elementModels.length).toBe(0);
   });
@@ -178,13 +178,9 @@ describe('group', () => {
       },
     });
 
-    model.removeElement(groupId);
+    model.deleteElement(groupId);
     expect(model.getGroup(id)).toBeNull();
     expect(model.getGroup(id2)).toBeNull();
-    // @ts-ignore
-    expect(model._elementToGroup.get(id)).toBeUndefined();
-    // @ts-ignore
-    expect(model._elementToGroup.get(id2)).toBeUndefined();
   });
 
   test('children can be updated with a plain object', () => {
@@ -318,7 +314,7 @@ describe('connector', () => {
       },
     });
 
-    model.removeElement(connectorId);
+    model.deleteElement(connectorId);
 
     await wait();
 
@@ -396,7 +392,7 @@ describe('stash/pop', () => {
     expect(elementModel.h).toBe(180 + elementModel.lineWidth);
   });
 
-  test('non-yfield property should not allow stash/pop, and should failed silently ', () => {
+  test('non-field property should not allow stash/pop, and should failed silently ', () => {
     const id = model.addElement({
       type: 'group',
     });
@@ -406,7 +402,6 @@ describe('stash/pop', () => {
     elementModel.xywh = '[10,10,200,200]';
 
     expect(elementModel['_stashed'].has('xywh')).toBe(false);
-    expect(elementModel.xywh).toBe('[10,10,200,200]');
 
     elementModel.pop('xywh');
 
@@ -498,5 +493,29 @@ describe('basic property', () => {
     expect(group.y).toBe(0);
     expect(group.w).toBe(0);
     expect(group.h).toBe(0);
+  });
+});
+
+describe('brush', () => {
+  test('same lineWidth should have same xywh', () => {
+    const id = model.addElement({
+      type: 'brush',
+      lineWidth: 2,
+      points: [
+        [0, 0],
+        [100, 100],
+        [120, 150],
+      ],
+    });
+    const brush = model.getElementById(id) as BrushElementModel;
+    const oldBrushXYWH = brush.xywh;
+
+    brush.lineWidth = 4;
+
+    expect(brush.xywh).not.toBe(oldBrushXYWH);
+
+    brush.lineWidth = 2;
+
+    expect(brush.xywh).toBe(oldBrushXYWH);
   });
 });

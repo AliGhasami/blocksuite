@@ -1,43 +1,39 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-
-import type { CssVariableName } from '../../../../../_common/theme/css-variables.js';
-import type { ShapeName } from './shape-tool-element.js';
+import type { Signal } from '@preact/signals-core';
 
 import {
   GeneralStyleIcon,
   ScribbledStyleIcon,
-} from '../../../../../_common/icons/index.js';
-import { ShapeStyle } from '../../../../../surface-block/index.js';
-import '../../buttons/tool-icon-button.js';
+} from '@blocksuite/affine-components/icons';
+import {
+  DEFAULT_SHAPE_FILL_COLOR,
+  LineColor,
+  SHAPE_FILL_COLORS,
+  type ShapeFillColor,
+  type ShapeName,
+  ShapeStyle,
+  ShapeType,
+} from '@blocksuite/affine-model';
+import {
+  EditPropsStore,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
+import { computed, effect, signal } from '@preact/signals-core';
+import { css, html, LitElement } from 'lit';
+import { property } from 'lit/decorators.js';
+
+import type { EdgelessRootBlockComponent } from '../../../edgeless-root-block.js';
+
 import { type ColorEvent, isTransparent } from '../../panel/color-panel.js';
-import '../../panel/one-row-color-panel.js';
 import {
   LINE_COLOR_PREFIX,
   SHAPE_COLOR_PREFIX,
   ShapeComponentConfig,
 } from './shape-menu-config.js';
 
-@customElement('edgeless-shape-menu')
-export class EdgelessShapeMenu extends LitElement {
-  private _setShapeStyle = (shapeStyle: ShapeStyle) => {
-    this.onChange({
-      shapeStyle,
-    });
-  };
-
-  private _setStrokeColor = (strokeColor: CssVariableName) => {
-    const props: Record<string, unknown> = { strokeColor };
-    const fillColor = strokeColor.replace(
-      LINE_COLOR_PREFIX,
-      SHAPE_COLOR_PREFIX
-    );
-    const filled = !isTransparent(fillColor);
-    props.fillColor = fillColor;
-    props.filled = filled;
-    this.onChange(props);
-  };
-
+export class EdgelessShapeMenu extends SignalWatcher(
+  WithDisposable(LitElement)
+) {
   static override styles = css`
     :host {
       display: flex;
@@ -65,12 +61,77 @@ export class EdgelessShapeMenu extends LitElement {
     }
   `;
 
-  override render() {
-    const { radius, strokeColor, shapeStyle } = this;
-    let { shapeType } = this;
-    if (shapeType === 'rect' && radius > 0) {
-      shapeType = 'roundedRect';
+  private _shapeName$: Signal<ShapeName> = signal(ShapeType.Rect);
+
+  @property({ attribute: false })
+  accessor edgeless!: EdgelessRootBlockComponent;
+
+  private _props$ = computed(() => {
+    const shapeName: ShapeName = this._shapeName$.value;
+    const { shapeStyle, fillColor, strokeColor, radius } =
+      this.edgeless.std.get(EditPropsStore).lastProps$.value[
+        `shape:${shapeName}`
+      ];
+    return {
+      shapeStyle,
+      shapeName,
+      fillColor,
+      strokeColor,
+      radius,
+    };
+  });
+
+  private _setFillColor = (fillColor: ShapeFillColor) => {
+    const filled = !isTransparent(fillColor);
+    let strokeColor = fillColor.replace(
+      SHAPE_COLOR_PREFIX,
+      LINE_COLOR_PREFIX
+    ) as LineColor;
+
+    if (strokeColor.endsWith('transparent')) {
+      strokeColor = LineColor.Grey;
     }
+
+    const { shapeName } = this._props$.value;
+    this.edgeless.std
+      .get(EditPropsStore)
+      .recordLastProps(`shape:${shapeName}`, {
+        filled,
+        fillColor,
+        strokeColor,
+      });
+    this.onChange(shapeName);
+  };
+
+  private _setShapeStyle = (shapeStyle: ShapeStyle) => {
+    const { shapeName } = this._props$.value;
+    this.edgeless.std
+      .get(EditPropsStore)
+      .recordLastProps(`shape:${shapeName}`, {
+        shapeStyle,
+      });
+    this.onChange(shapeName);
+  };
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+
+    this._disposables.add(
+      effect(() => {
+        const value = this.edgeless.gfx.tool.currentToolOption$.value;
+
+        if (value && value.type === 'shape') {
+          this._shapeName$.value = value.shapeName;
+        }
+      })
+    );
+  }
+
+  override render() {
+    const { fillColor, shapeStyle, shapeName } = this._props$.value;
+    const color = this.edgeless.std
+      .get(ThemeProvider)
+      .getColorValue(fillColor, DEFAULT_SHAPE_FILL_COLOR);
 
     return html`
       <edgeless-slide-menu>
@@ -100,13 +161,13 @@ export class EdgelessShapeMenu extends LitElement {
           <menu-divider .vertical=${true}></menu-divider>
           <div class="shape-type-container">
             ${ShapeComponentConfig.map(
-              ({ name, generalIcon, scribbledIcon, tooltip, value }) => {
+              ({ name, generalIcon, scribbledIcon, tooltip }) => {
                 return html`
                   <edgeless-tool-icon-button
                     .tooltip=${tooltip}
-                    .active=${shapeType === name}
+                    .active=${shapeName === name}
                     .activeMode=${'background'}
-                    @click=${() => this.onChange(value)}
+                    @click=${() => this.onChange(name)}
                   >
                     ${shapeStyle === ShapeStyle.General
                       ? generalIcon
@@ -118,8 +179,13 @@ export class EdgelessShapeMenu extends LitElement {
           </div>
           <menu-divider .vertical=${true}></menu-divider>
           <edgeless-one-row-color-panel
-            .value=${strokeColor}
-            @select=${(e: ColorEvent) => this._setStrokeColor(e.detail)}
+            .value=${color}
+            .options=${SHAPE_FILL_COLORS}
+            .hasTransparent=${!this.edgeless.doc.awarenessStore.getFlag(
+              'enable_color_picker'
+            )}
+            @select=${(e: ColorEvent) =>
+              this._setFillColor(e.detail as ShapeFillColor)}
           ></edgeless-one-row-color-panel>
         </div>
       </edgeless-slide-menu>
@@ -127,22 +193,7 @@ export class EdgelessShapeMenu extends LitElement {
   }
 
   @property({ attribute: false })
-  accessor fillColor!: CssVariableName;
-
-  @property({ attribute: false })
-  accessor onChange!: (props: Record<string, unknown>) => void;
-
-  @property({ attribute: false })
-  accessor radius!: number;
-
-  @property({ attribute: false })
-  accessor shapeStyle!: ShapeStyle;
-
-  @property({ attribute: false })
-  accessor shapeType!: ShapeName;
-
-  @property({ attribute: false })
-  accessor strokeColor!: CssVariableName;
+  accessor onChange!: (name: ShapeName) => void;
 }
 
 declare global {

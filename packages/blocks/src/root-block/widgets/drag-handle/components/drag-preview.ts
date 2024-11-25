@@ -1,12 +1,12 @@
+import type { EditorHost } from '@blocksuite/block-std';
 import type { TemplateResult } from 'lit';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Point } from '@blocksuite/global/utils';
 import { baseTheme } from '@toeverything/theme';
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 
-@customElement('affine-drag-preview')
 export class DragPreview extends ShadowlessElement {
   offset: Point;
 
@@ -54,7 +54,7 @@ export class DragPreview extends ShadowlessElement {
   accessor onRemove: (() => void) | null = null;
 
   @property({ attribute: false })
-  accessor template: TemplateResult | null = null;
+  accessor template: TemplateResult | EditorHost | null = null;
 }
 
 declare global {

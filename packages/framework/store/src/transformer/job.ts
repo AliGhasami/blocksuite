@@ -1,8 +1,10 @@
+/** @alighasami for check merge **/
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import { Slot } from '@blocksuite/global/utils';
+import { nextTick, Slot } from '@blocksuite/global/utils';
 
 import type { BlockModel, BlockSchemaType } from '../schema/index.js';
 import type { Doc, DocCollection, DocMeta } from '../store/index.js';
+import type { DraftModel } from './draft.js';
 import type {
   BeforeExportPayload,
   BeforeImportPayload,
@@ -19,7 +21,6 @@ import type {
 
 import { AssetsManager } from './assets.js';
 import { BaseBlockTransformer } from './base.js';
-import { type DraftModel, toDraftModel } from './draft.js';
 import { Slice } from './slice.js';
 import {
   BlockSnapshotSchema,
@@ -32,6 +33,21 @@ export type JobConfig = {
   collection: DocCollection;
   middlewares?: JobMiddleware[];
 };
+
+interface FlatSnapshot {
+  snapshot: BlockSnapshot;
+  parentId?: string;
+  index?: number;
+}
+
+interface DraftBlockTreeNode {
+  draft: DraftModel;
+  snapshot: BlockSnapshot;
+  children: Array<DraftBlockTreeNode>;
+}
+
+// The number of blocks to insert in one batch
+const BATCH_SIZE = 100;
 
 export class Job {
   private readonly _adapterConfigs = new Map<string, string>();
@@ -177,7 +193,7 @@ export class Job {
     try {
       BlockSnapshotSchema.parse(snapshot);
       const model = await this._snapshotToBlock(snapshot, doc, parent, index);
-      //console.log('this is model', model);
+      if (!model) return;
       return model;
     } catch (error) {
       console.error(`Error when transforming snapshot to block:`);
@@ -187,7 +203,6 @@ export class Job {
   };
 
   snapshotToDoc = async (snapshot: DocSnapshot): Promise<Doc | undefined> => {
-    console.log('snapshotToDoc');
     try {
       this._slots.beforeImport.emit({
         type: 'page',
@@ -198,7 +213,6 @@ export class Job {
       const doc = this._collection.createDoc({ id: meta.id });
       doc.load();
       await this.snapshotToBlock(blocks, doc);
-      //console.log('10000');
       this._slots.afterImport.emit({
         type: 'page',
         snapshot,
@@ -214,7 +228,6 @@ export class Job {
   };
 
   snapshotToModelData = async (snapshot: BlockSnapshot) => {
-    console.log('snapshotToModelData');
     try {
       const { children, flavour, props, id } = snapshot;
 
@@ -245,29 +258,47 @@ export class Job {
     parent?: string,
     index?: number
   ): Promise<Slice | undefined> => {
-    console.log('snapshotToSlice', snapshot);
-    //return undefined;
+    SliceSnapshotSchema.parse(snapshot);
     try {
       this._slots.beforeImport.emit({
         type: 'slice',
         snapshot,
       });
-      SliceSnapshotSchema.parse(snapshot);
+
       const { content, pageVersion, workspaceVersion, workspaceId, pageId } =
         snapshot;
-      const contentBlocks: BlockModel[] = [];
-      for (const [i, block] of content.entries()) {
-        contentBlocks.push(
-          await this._snapshotToBlock(block, doc, parent, (index ?? 0) + i)
-        );
+
+      // Create a temporary root snapshot to encompass all content blocks
+      const tmpRootSnapshot: BlockSnapshot = {
+        id: 'temporary-root',
+        flavour: 'affine:page',
+        props: {},
+        type: 'block',
+        children: content,
+      };
+
+      for (const block of content) {
+        this._triggerBeforeImportEvent(block, parent, index);
       }
+      const flatSnapshots: FlatSnapshot[] = [];
+      this._flattenSnapshot(tmpRootSnapshot, flatSnapshots, parent, index);
+
+      const blockTree = await this._convertFlatSnapshots(flatSnapshots);
+
+      await this._insertBlockTree(blockTree.children, doc, parent, index);
+
+      const contentBlocks = blockTree.children
+        .map(tree => doc.getBlockById(tree.draft.id))
+        .filter(Boolean) as DraftModel[];
+
       const slice = new Slice({
-        content: contentBlocks.map(block => toDraftModel(block)),
+        content: contentBlocks,
         pageVersion,
         workspaceVersion,
         workspaceId,
         pageId,
       });
+
       this._slots.afterImport.emit({
         type: 'slice',
         snapshot,
@@ -298,6 +329,22 @@ export class Job {
 
     walk(snapshot.blocks);
   };
+
+  get adapterConfigs() {
+    return this._adapterConfigs;
+  }
+
+  get assets() {
+    return this._assetsManager.getAssets();
+  }
+
+  get assetsManager() {
+    return this._assetsManager;
+  }
+
+  get collection() {
+    return this._collection;
+  }
 
   constructor({ collection, middlewares = [] }: JobConfig) {
     this._collection = collection;
@@ -343,6 +390,66 @@ export class Job {
     return snapshot;
   }
 
+  private async _convertFlatSnapshots(flatSnapshots: FlatSnapshot[]) {
+    // Phase 1: Convert snapshots to draft models in series
+    // This is not time-consuming, this is faster than Promise.all
+    const draftModels = [];
+    for (const flat of flatSnapshots) {
+      const draft = await this._convertSnapshotToDraftModel(flat);
+      if (draft) {
+        draft.id = flat.snapshot.id;
+      }
+      draftModels.push({
+        draft,
+        snapshot: flat.snapshot,
+        parentId: flat.parentId,
+        index: flat.index,
+      });
+    }
+
+    // Phase 2: Filter out the models that failed to convert
+    const validDraftModels = draftModels.filter(item => !!item.draft) as {
+      draft: DraftModel;
+      snapshot: BlockSnapshot;
+      parentId?: string;
+      index?: number;
+    }[];
+
+    // Phase 3: Rebuild the block trees
+    const blockTree = this._rebuildBlockTree(validDraftModels);
+    return blockTree;
+  }
+
+  private async _convertSnapshotToDraftModel(
+    flat: FlatSnapshot
+  ): Promise<DraftModel | undefined> {
+    try {
+      const { children, flavour } = flat.snapshot;
+      const schema = this._getSchema(flavour);
+      const transformer = this._getTransformer(schema);
+      const { props } = await transformer.fromSnapshot({
+        json: {
+          id: flat.snapshot.id,
+          flavour: flat.snapshot.flavour,
+          props: flat.snapshot.props,
+        },
+        assets: this._assetsManager,
+        children,
+      });
+
+      return {
+        id: flat.snapshot.id,
+        flavour: flat.snapshot.flavour,
+        children: [],
+        ...props,
+      } as DraftModel;
+    } catch (error) {
+      console.error(`Error when transforming snapshot to model data:`);
+      console.error(error);
+      return;
+    }
+  }
+
   private _exportDocMeta(doc: Doc): DocSnapshot['meta'] {
     const docMeta = doc.meta;
 
@@ -357,8 +464,21 @@ export class Job {
       title: docMeta.title,
       createDate: docMeta.createDate,
       tags: [], // for backward compatibility
-      object_id: docMeta.object_id,
     };
+  }
+
+  private _flattenSnapshot(
+    snapshot: BlockSnapshot,
+    flatSnapshots: FlatSnapshot[],
+    parentId?: string,
+    index?: number
+  ) {
+    flatSnapshots.push({ snapshot, parentId, index });
+    if (snapshot.children) {
+      snapshot.children.forEach((child, idx) => {
+        this._flattenSnapshot(child, flatSnapshots, snapshot.id, idx);
+      });
+    }
   }
 
   private _getCollectionMeta() {
@@ -402,63 +522,131 @@ export class Job {
     return schema.transformer?.() ?? new BaseBlockTransformer();
   }
 
+  private async _insertBlockTree(
+    nodes: DraftBlockTreeNode[],
+    doc: Doc,
+    parentId?: string,
+    startIndex?: number,
+    counter: number = 0
+  ) {
+    for (let index = 0; index < nodes.length; index++) {
+      const node = nodes[index];
+      const { draft } = node;
+      const { id, flavour } = draft;
+
+      const actualIndex =
+        startIndex !== undefined ? startIndex + index : undefined;
+      doc.addBlock(flavour as BlockSuite.Flavour, draft, parentId, actualIndex);
+
+      const model = doc.getBlockById(id);
+      if (!model) {
+        throw new BlockSuiteError(
+          ErrorCode.TransformerError,
+          `Block not found by id ${id}`
+        );
+      }
+
+      this._slots.afterImport.emit({
+        type: 'block',
+        model,
+        snapshot: node.snapshot,
+      });
+
+      counter++;
+      if (counter % BATCH_SIZE === 0) {
+        await nextTick();
+      }
+
+      if (node.children.length > 0) {
+        counter = await this._insertBlockTree(
+          node.children,
+          doc,
+          id,
+          undefined,
+          counter
+        );
+      }
+    }
+
+    return counter;
+  }
+
+  private _rebuildBlockTree(
+    draftModels: {
+      draft: DraftModel;
+      snapshot: BlockSnapshot;
+      parentId?: string;
+      index?: number;
+    }[]
+  ): DraftBlockTreeNode {
+    const nodeMap = new Map<string, DraftBlockTreeNode>();
+    // First pass: create nodes and add them to the map
+    draftModels.forEach(({ draft, snapshot }) => {
+      nodeMap.set(draft.id, { draft, snapshot, children: [] });
+    });
+    const root = nodeMap.get(draftModels[0].draft.id) as DraftBlockTreeNode;
+
+    // Second pass: build the tree structure
+    draftModels.forEach(({ draft, parentId, index }) => {
+      const node = nodeMap.get(draft.id);
+      if (!node) return;
+
+      if (parentId) {
+        const parentNode = nodeMap.get(parentId);
+        if (parentNode && index !== undefined) {
+          parentNode.children[index] = node;
+        }
+      }
+    });
+
+    if (!root) {
+      throw new Error('No root node found in the tree');
+    }
+
+    return root;
+  }
+
   private async _snapshotToBlock(
     snapshot: BlockSnapshot,
     doc: Doc,
     parent?: string,
     index?: number
+  ): Promise<BlockModel | null> {
+    this._triggerBeforeImportEvent(snapshot, parent, index);
+
+    const flatSnapshots: FlatSnapshot[] = [];
+    this._flattenSnapshot(snapshot, flatSnapshots, parent, index);
+
+    const blockTree = await this._convertFlatSnapshots(flatSnapshots);
+
+    await this._insertBlockTree([blockTree], doc, parent, index);
+
+    return doc.getBlockById(snapshot.id) || null;
+  }
+
+  private _triggerBeforeImportEvent(
+    snapshot: BlockSnapshot,
+    parent?: string,
+    index?: number
   ) {
-    this._slots.beforeImport.emit({
-      type: 'block',
-      snapshot,
-      parent,
-      index,
-    });
-    const { children, flavour, props, id } = snapshot;
-    // console.log('_snapshotToBlock', snapshot);
-
-    const schema = this._getSchema(flavour);
-    const snapshotLeaf = {
-      id,
-      flavour,
-      props,
+    const traverseAndTrigger = (
+      node: BlockSnapshot,
+      parent?: string,
+      index?: number
+    ) => {
+      this._slots.beforeImport.emit({
+        type: 'block',
+        snapshot: node,
+        parent: parent,
+        index: index,
+      });
+      if (node.children) {
+        node.children.forEach((child, idx) => {
+          traverseAndTrigger(child, node.id, idx);
+        });
+      }
     };
-    const transformer = this._getTransformer(schema);
-    const modelData = await transformer.fromSnapshot({
-      json: snapshotLeaf,
-      assets: this._assetsManager,
-      children,
-    });
-    // console.log('this is modelData', modelData);
-
-    doc.addBlock(
-      modelData.flavour as BlockSuite.Flavour,
-      { ...modelData.props, id: modelData.id },
-      parent,
-      index
-    );
-
-    for (const [index, child] of children.entries()) {
-      //console.log("1111");
-      await this._snapshotToBlock(child, doc, id, index);
-    }
-
-    const model = doc.getBlockById(id);
-    if (!model) {
-      throw new BlockSuiteError(
-        ErrorCode.TransformerError,
-        `Block not found by id ${id}`
-      );
-    }
-    this._slots.afterImport.emit({
-      type: 'block',
-      snapshot,
-      model,
-      parent,
-      index,
-    });
-
-    return model;
+    traverseAndTrigger(snapshot, parent, index);
   }
 
   reset() {

@@ -1,24 +1,26 @@
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
+import { WebIcon16 } from '@blocksuite/affine-components/icons';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import { getHostName } from '@blocksuite/affine-shared/utils';
+import { ShadowlessElement } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/global/utils';
+import { OpenInNewIcon } from '@blocksuite/icons/lit';
 import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import type { BookmarkBlockComponent } from '../bookmark-block.js';
 
-import { OpenIcon, WebIcon16 } from '../../_common/icons/text.js';
-import { ThemeObserver } from '../../_common/theme/theme-observer.js';
-import { getEmbedCardIcons, getHostName } from '../../_common/utils/url.js';
+import { getEmbedCardIcons } from '../../_common/utils/url.js';
 import { styles } from '../styles.js';
 
-@customElement('bookmark-card')
 export class BookmarkCard extends WithDisposable(ShadowlessElement) {
-  private readonly _themeObserver = new ThemeObserver();
-
   static override styles = styles;
 
   private _handleClick(event: MouseEvent) {
     event.stopPropagation();
-    if (!this.bookmark.isInSurface) {
+    const model = this.bookmark.model;
+
+    if (model.parent?.flavour !== 'affine:surface') {
       this._selectBlock();
     }
   }
@@ -45,9 +47,11 @@ export class BookmarkCard extends WithDisposable(ShadowlessElement) {
       })
     );
 
-    this._themeObserver.observe(document.documentElement);
-    this._themeObserver.on(() => this.requestUpdate());
-    this.disposables.add(() => this._themeObserver.dispose());
+    this.disposables.add(
+      this.bookmark.std
+        .get(ThemeProvider)
+        .theme$.subscribe(() => this.requestUpdate())
+    );
 
     this.disposables.add(
       this.bookmark.selection.slots.changed.on(() => {
@@ -76,11 +80,12 @@ export class BookmarkCard extends WithDisposable(ShadowlessElement) {
       ? 'Loading...'
       : !title
         ? this.error
-          ? domainName ?? 'Link card'
+          ? (domainName ?? 'Link card')
           : ''
         : title;
 
-    const { LoadingIcon, EmbedCardBannerIcon } = getEmbedCardIcons();
+    const theme = this.bookmark.std.get(ThemeProvider).theme;
+    const { LoadingIcon, EmbedCardBannerIcon } = getEmbedCardIcons(theme);
 
     const titleIconType =
       !icon?.split('.').pop() || icon?.split('.').pop() === 'svg'
@@ -105,7 +110,7 @@ export class BookmarkCard extends WithDisposable(ShadowlessElement) {
         ? this.error
           ? 'Failed to retrieve link information.'
           : url
-        : description ?? '';
+        : (description ?? '');
 
     const bannerImage =
       !this.loading && image
@@ -130,7 +135,9 @@ export class BookmarkCard extends WithDisposable(ShadowlessElement) {
           </div>
           <div class="affine-bookmark-content-url" @click=${this.bookmark.open}>
             <span>${getHostName(url)}</span>
-            <div class="affine-bookmark-content-url-icon">${OpenIcon}</div>
+            <div class="affine-bookmark-content-url-icon">
+              ${OpenInNewIcon({ width: '12', height: '12' })}
+            </div>
           </div>
         </div>
         <div class="affine-bookmark-banner">${bannerImage}</div>

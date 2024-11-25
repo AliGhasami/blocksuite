@@ -1,22 +1,25 @@
-import type { BlockSpec } from '@blocksuite/block-std';
-
+import {
+  BlockViewExtension,
+  CommandExtension,
+  type ExtensionType,
+  FlavourExtension,
+} from '@blocksuite/block-std';
 import { literal } from 'lit/static-html.js';
 
-import { NoteBlockSchema } from './note-model.js';
-import { NoteBlockService } from './note-service.js';
+import { commands } from './commands/index.js';
+import { NoteBlockService, NoteDragHandleOption } from './note-service.js';
 
-export const NoteBlockSpec: BlockSpec = {
-  schema: NoteBlockSchema,
-  service: NoteBlockService,
-  view: {
-    component: literal`affine-note`,
-  },
-};
+export const NoteBlockSpec: ExtensionType[] = [
+  FlavourExtension('affine:note'),
+  NoteBlockService,
+  CommandExtension(commands),
+  BlockViewExtension('affine:note', literal`affine-note`),
+];
 
-export const EdgelessNoteBlockSpec: BlockSpec = {
-  schema: NoteBlockSchema,
-  service: NoteBlockService,
-  view: {
-    component: literal`affine-edgeless-note`,
-  },
-};
+export const EdgelessNoteBlockSpec: ExtensionType[] = [
+  FlavourExtension('affine:note'),
+  NoteBlockService,
+  CommandExtension(commands),
+  BlockViewExtension('affine:note', literal`affine-edgeless-note`),
+  NoteDragHandleOption,
+];

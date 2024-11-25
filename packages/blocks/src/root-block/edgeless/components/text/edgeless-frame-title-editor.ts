@@ -1,25 +1,52 @@
+import type { RichText } from '@blocksuite/affine-components/rich-text';
+
+import { FrameBlockModel } from '@blocksuite/affine-model';
 import {
-  RangeManager,
+  RANGE_SYNC_EXCLUDE_ATTR,
   ShadowlessElement,
-  WithDisposable,
 } from '@blocksuite/block-std';
-import { Bound } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
-import { html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { assertExists, Bound, WithDisposable } from '@blocksuite/global/utils';
+import { cssVarV2 } from '@toeverything/theme/v2';
+import { css, html, nothing } from 'lit';
+import { property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { RichText } from '../../../../_common/components/rich-text/rich-text.js';
-import type {
-  FrameBlockComponent,
-  FrameBlockModel,
-} from '../../../../frame-block/index.js';
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
 
-@customElement('edgeless-frame-title-editor')
+import {
+  AFFINE_FRAME_TITLE_WIDGET,
+  type AffineFrameTitleWidget,
+} from '../../../widgets/frame-title/index.js';
+import { frameTitleStyleVars } from '../../../widgets/frame-title/styles.js';
+
 export class EdgelessFrameTitleEditor extends WithDisposable(
   ShadowlessElement
 ) {
+  static override styles = css`
+    .frame-title-editor {
+      display: flex;
+      align-items: center;
+      transform-origin: top left;
+      border-radius: 4px;
+      width: fit-content;
+      padding: 0 4px;
+      outline: none;
+      z-index: 1;
+      border: 1px solid var(--affine-primary-color);
+      box-shadow: 0px 0px 0px 2px rgba(30, 150, 235, 0.3);
+      overflow: hidden;
+      font-family: var(--affine-font-family);
+    }
+  `;
+
+  get editorHost() {
+    return this.edgeless.host;
+  }
+
+  get inlineEditor() {
+    return this.richText?.inlineEditor;
+  }
+
   private _unmount() {
     // dispose in advance to avoid execute `this.remove()` twice
     this.disposables.dispose();
@@ -32,7 +59,7 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
 
   override connectedCallback() {
     super.connectedCallback();
-    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
+    this.setAttribute(RANGE_SYNC_EXCLUDE_ATTR, 'true');
   }
 
   override firstUpdated(): void {
@@ -40,6 +67,8 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
     assertExists(dispatcher);
     this.updateComplete
       .then(() => {
+        if (!this.inlineEditor) return;
+
         this.inlineEditor.selectAll();
 
         this.inlineEditor.slots.renderComplete.on(() => {
@@ -68,7 +97,7 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
         this.disposables.add(dispatcher.add('click', () => true));
         this.disposables.add(dispatcher.add('doubleClick', () => true));
         this.disposables.addFromEvent(
-          this.inlineEditorContainer,
+          this.inlineEditor.rootElement,
           'blur',
           () => {
             this._unmount();
@@ -85,70 +114,56 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
   }
 
   override render() {
+    const rootBlockId = this.editorHost.doc.root?.id;
+    if (!rootBlockId) return nothing;
+
     const viewport = this.edgeless.service.viewport;
     const bound = Bound.deserialize(this.frameModel.xywh);
     const [x, y] = viewport.toViewCoord(bound.x, bound.y);
-    const isInner = this.edgeless.service.layer.framesGrid.has(
+    const isInner = this.edgeless.service.gfx.grid.has(
       this.frameModel.elementBound,
       true,
       true,
-      new Set([this.frameModel])
+      model => model !== this.frameModel && model instanceof FrameBlockModel
     );
 
+    const frameTitleWidget = this.edgeless.std.view.getWidget(
+      AFFINE_FRAME_TITLE_WIDGET,
+      rootBlockId
+    ) as AffineFrameTitleWidget | null;
+
+    if (!frameTitleWidget) return nothing;
+
+    const frameTitle = frameTitleWidget.getFrameTitle(this.frameModel);
+
+    const colors = frameTitle?.colors ?? {
+      background: cssVarV2('edgeless/frame/background/white'),
+      text: 'var(--affine-text-primary-color)',
+    };
+
     const inlineEditorStyle = styleMap({
-      transformOrigin: 'top left',
-      borderRadius: '4px',
-      width: 'fit-content',
-      maxHeight: '30px',
-      lineHeight: '20px',
-      padding: '4px 10px',
-      fontSize: '14px',
+      fontSize: frameTitleStyleVars.fontSize + 'px',
       position: 'absolute',
-      left: (isInner ? x + 8 : x) + 'px',
-      top: (isInner ? y + 8 : y - 38) + 'px',
+      left: (isInner ? x + 4 : x) + 'px',
+      top: (isInner ? y + 4 : y - (frameTitleStyleVars.height + 8 / 2)) + 'px',
       minWidth: '8px',
-      fontFamily: 'var(--affine-font-family)',
-      background: isInner
-        ? 'var(--affine-white)'
-        : 'var(--affine-text-primary-color)',
-      color: isInner
-        ? 'var(--affine-text-secondary-color)'
-        : 'var(--affine-white)',
-      outline: 'none',
-      zIndex: '1',
-      border: `1px solid
-        var(--affine-primary-color)`,
-      boxShadow: `0px 0px 0px 2px rgba(30, 150, 235, 0.3)`,
+      height: frameTitleStyleVars.height + 'px',
+      background: colors.background,
+      color: colors.text,
     });
-    return html`<rich-text
-      .yText=${this.frameModel.title.yText}
-      .enableFormat=${false}
-      .enableAutoScrollHorizontally=${false}
-      style=${inlineEditorStyle}
-    ></rich-text>`;
-  }
 
-  get editorHost() {
-    return this.edgeless.host;
-  }
+    const richTextStyle = styleMap({
+      height: 'fit-content',
+    });
 
-  get frameBlock() {
-    assertExists(this.frameModel.page.root);
-    const block = this.editorHost.view.viewFromPath('block', [
-      this.frameModel.page.root.id,
-      this.frameModel.id,
-    ]) as FrameBlockComponent | null;
-    assertExists(block);
-    return block;
-  }
-
-  get inlineEditor() {
-    assertExists(this.richText.inlineEditor);
-    return this.richText.inlineEditor;
-  }
-
-  get inlineEditorContainer() {
-    return this.inlineEditor.rootElement;
+    return html`<div class="frame-title-editor" style=${inlineEditorStyle}>
+      <rich-text
+        .yText=${this.frameModel.title.yText}
+        .enableFormat=${false}
+        .enableAutoScrollHorizontally=${false}
+        style=${richTextStyle}
+      ></rich-text>
+    </div>`;
   }
 
   @property({ attribute: false })
@@ -158,7 +173,7 @@ export class EdgelessFrameTitleEditor extends WithDisposable(
   accessor frameModel!: FrameBlockModel;
 
   @query('rich-text')
-  accessor richText!: RichText;
+  accessor richText: RichText | null = null;
 }
 
 declare global {

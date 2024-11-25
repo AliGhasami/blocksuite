@@ -1,35 +1,29 @@
-import { Bound } from '@blocksuite/global/utils';
-import { html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
+/** @alighasami for check merge **/
+import type { ImageBlockModel } from '@blocksuite/affine-model';
 
-import type { ImageBlockEdgelessComponent } from './components/edgeless-image-block.js';
-import type { AffineImageCard } from './components/image-card.js';
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
+import { Peekable } from '@blocksuite/affine-components/peek';
+import { html } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { when } from 'lit/directives/when.js';
+
+import type { ImageBlockFallbackCard } from './components/image-block-fallback.js';
 import type { ImageBlockPageComponent } from './components/page-image-block.js';
-import type { ImageBlockModel } from './image-model.js';
 import type { ImageBlockService } from './image-service.js';
 
-import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
-import { Peekable } from '../_common/components/index.js';
-import './components/edgeless-image-block.js';
-import './components/image-card.js';
-import './components/page-image-block.js';
 import {
   copyImageBlob,
   downloadImageBlob,
   fetchImageBlob,
-  resetImageSize,
   turnImageIntoCardView,
 } from './utils.js';
 
-@customElement('affine-image')
 @Peekable()
 export class ImageBlockComponent extends CaptionedBlockComponent<
   ImageBlockModel,
   ImageBlockService
 > {
-  private _isInSurface = false;
-
   convertToCardView = () => {
     turnImageIntoCardView(this).catch(console.error);
   };
@@ -44,39 +38,18 @@ export class ImageBlockComponent extends CaptionedBlockComponent<
 
   refreshData = () => {
     this.retryCount = 0;
-    fetchImageBlob(this)
-      .then(() => {
-        // add width, height to model to show scale percent
-        const { width, height } = this.model;
-        if (this.isInSurface && !width && !height) {
-          this.resetImageSize();
-        }
-      })
-      .catch(console.error);
+    fetchImageBlob(this).catch(console.error);
   };
 
-  resetImageSize = () => {
-    resetImageSize(this).catch(console.error);
-  };
+  get resizableImg() {
+    return this.pageImage?.resizeImg;
+  }
 
   private _handleClick(event: MouseEvent) {
     // the peek view need handle shift + click
-    if (event.shiftKey) return;
+    if (event.defaultPrevented) return;
 
     event.stopPropagation();
-    if (!this.isInSurface) {
-      this._selectBlock();
-    }
-  }
-
-  private get _imageElement() {
-    const imageElement = this.isInSurface
-      ? this._edgelessImage
-      : this._pageImage;
-    return imageElement;
-  }
-
-  private _selectBlock() {
     const selectionManager = this.host.selection;
     const blockSelection = selectionManager.create('block', {
       blockId: this.blockId,
@@ -87,27 +60,13 @@ export class ImageBlockComponent extends CaptionedBlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    //this.refreshData();
-
+    this.refreshData();
     this.contentEditable = 'false';
-
-    const parent = this.host.doc.getParent(this.model);
-    this._isInSurface = parent?.flavour === 'affine:surface';
-
-    this.blockContainerStyles = this._isInSurface
-      ? undefined
-      : { margin: '18px 0' };
-
     this.model.propsUpdated.on(({ key }) => {
       if (key === 'sourceId') {
-        //this.refreshData();
+        this.refreshData();
       }
     });
-
-    if (this._isInSurface) {
-      this.style.position = 'absolute';
-      this.style.transformOrigin = 'center';
-    }
   }
 
   override disconnectedCallback() {
@@ -117,71 +76,38 @@ export class ImageBlockComponent extends CaptionedBlockComponent<
     super.disconnectedCallback();
   }
 
+  override firstUpdated() {
+    // lazy bindings
+    this.disposables.addFromEvent(this, 'click', this._handleClick);
+  }
+
   override renderBlock() {
     const containerStyleMap = styleMap({
       position: 'relative',
       width: '100%',
     });
 
-    if (this.isInSurface) {
-      const { xywh, rotate } = this.model;
-      const bound = Bound.deserialize(xywh);
-
-      this.style.left = `${bound.x}px`;
-      this.style.top = `${bound.y}px`;
-      this.style.width = `${bound.w}px`;
-      this.style.height = `${bound.h}px`;
-      this.style.transform = `rotate(${rotate}deg)`;
-    }
-
     return html`
-      <div
-        class="affine-image-container"
-        style=${containerStyleMap}
-        @click=${this._handleClick}
-      >
-        ${this.loading || this.error
-          ? html`<affine-image-block-card
-              .block=${this}
-            ></affine-image-block-card>`
-          : this.isInSurface
-            ? html`<affine-edgeless-image
-                .url=${this.src}
-                @error=${(_: CustomEvent<Error>) => {
-                  this.error = true;
-                }}
-              ></affine-edgeless-image>`
-            : html`<affine-page-image .block=${this}></affine-page-image>`}
+      <div class="affine-image-container" style=${containerStyleMap}>
+        ${when(
+          this.loading || this.error,
+          () =>
+            html`<affine-image-fallback-card
+              .error=${this.error}
+              .loading=${this.loading}
+              .mode=${'page'}
+            ></affine-image-fallback-card>`,
+          () => html`<affine-page-image .block=${this}></affine-page-image>`
+        )}
       </div>
 
-      ${this.isInSurface ? nothing : Object.values(this.widgets)}
+      ${Object.values(this.widgets)}
     `;
   }
 
   override updated() {
-    this._imageCard?.requestUpdate();
+    this.fallbackCard?.requestUpdate();
   }
-
-  get imageCard() {
-    return this._imageCard;
-  }
-
-  get isInSurface() {
-    return this._isInSurface;
-  }
-
-  get resizeImg() {
-    return this._imageElement?.resizeImg;
-  }
-
-  @query('affine-edgeless-image')
-  private accessor _edgelessImage: ImageBlockEdgelessComponent | null = null;
-
-  @query('affine-image-block-card')
-  private accessor _imageCard: AffineImageCard | null = null;
-
-  @query('affine-page-image')
-  private accessor _pageImage: ImageBlockPageComponent | null = null;
 
   @property({ attribute: false })
   accessor blob: Blob | undefined = undefined;
@@ -189,11 +115,16 @@ export class ImageBlockComponent extends CaptionedBlockComponent<
   @property({ attribute: false })
   accessor blobUrl: string | undefined = undefined;
 
+  override accessor blockContainerStyles = { margin: '18px 0' };
+
   @property({ attribute: false })
   accessor downloading = false;
 
   @property({ attribute: false })
   accessor error = false;
+
+  @query('affine-image-fallback-card')
+  accessor fallbackCard: ImageBlockFallbackCard | null = null;
 
   @state()
   accessor lastSourceId!: string;
@@ -201,10 +132,15 @@ export class ImageBlockComponent extends CaptionedBlockComponent<
   @property({ attribute: false })
   accessor loading = false;
 
+  @query('affine-page-image')
+  private accessor pageImage: ImageBlockPageComponent | null = null;
+
   @property({ attribute: false })
   accessor retryCount = 0;
 
   override accessor useCaptionEditor = true;
+
+  override accessor useZeroWidth = true;
 }
 
 declare global {

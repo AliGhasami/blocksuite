@@ -1,13 +1,26 @@
-import type { PageRootService } from '@blocksuite/blocks';
+import type {
+  PeekOptions,
+  PeekViewService,
+} from '@blocksuite/affine-components/peek';
+import type { AffineEditorContainer } from '@blocksuite/presets';
+import type { TemplateResult } from 'lit';
 
+import { PeekViewExtension } from '@blocksuite/affine-components/peek';
+import { BlockComponent } from '@blocksuite/block-std';
 import {
+  ColorScheme,
   type DocMode,
-  type DocModeService,
+  type DocModeProvider,
+  matchFlavours,
   type NotificationService,
-  type QuickSearchService,
+  type ParseDocUrlService,
+  type ThemeExtension,
   toast,
 } from '@blocksuite/blocks';
 import { type DocCollection, Slot } from '@blocksuite/store';
+import { signal } from '@preact/signals-core';
+
+import type { AttachmentViewerPanel } from './components/attachment-viewer-panel.js';
 
 function getModeFromStorage() {
   const mapJson = localStorage.getItem('playground:docMode');
@@ -27,17 +40,15 @@ export function removeModeFromStorage(docId: string) {
   saveModeToStorage(modeMap);
 }
 
-const DEFAULT_MODE = 'page';
+const DEFAULT_MODE: DocMode = 'page';
 const slotMap = new Map<string, Slot<DocMode>>();
-export function mockDocModeService(curDocId: string) {
-  const docModeService: DocModeService = {
-    setMode: (mode: DocMode, docId: string = curDocId) => {
-      const modeMap = getModeFromStorage();
-      modeMap.set(docId, mode);
-      saveModeToStorage(modeMap);
-      slotMap.get(docId)?.emit(mode);
-    },
-    getMode: (docId: string = curDocId) => {
+
+export function mockDocModeService(
+  getEditorModeCallback: () => DocMode,
+  setEditorModeCallback: (mode: DocMode) => void
+) {
+  const docModeService: DocModeProvider = {
+    getPrimaryMode: (docId: string) => {
       try {
         const modeMap = getModeFromStorage();
         return modeMap.get(docId) ?? DEFAULT_MODE;
@@ -45,29 +56,38 @@ export function mockDocModeService(curDocId: string) {
         return DEFAULT_MODE;
       }
     },
-    toggleMode: (docId: string = curDocId) => {
-      const mode =
-        docModeService.getMode(docId) === 'page' ? 'edgeless' : 'page';
-      docModeService.setMode(mode, docId);
-      return mode;
-    },
-    onModeChange: (
-      handler: (mode: DocMode) => void,
-      docId: string = curDocId
-    ) => {
+    onPrimaryModeChange: (handler: (mode: DocMode) => void, docId: string) => {
       if (!slotMap.get(docId)) {
         slotMap.set(docId, new Slot());
       }
       return slotMap.get(docId)!.on(handler);
     },
+    getEditorMode: () => {
+      return getEditorModeCallback();
+    },
+    setEditorMode: (mode: DocMode) => {
+      setEditorModeCallback(mode);
+    },
+    setPrimaryMode: (mode: DocMode, docId: string) => {
+      const modeMap = getModeFromStorage();
+      modeMap.set(docId, mode);
+      saveModeToStorage(modeMap);
+      slotMap.get(docId)?.emit(mode);
+    },
+    togglePrimaryMode: (docId: string) => {
+      const mode =
+        docModeService.getPrimaryMode(docId) === 'page' ? 'edgeless' : 'page';
+      docModeService.setPrimaryMode(mode, docId);
+      return mode;
+    },
   };
   return docModeService;
 }
 
-export function mockNotificationService(service: PageRootService) {
+export function mockNotificationService(editor: AffineEditorContainer) {
   const notificationService: NotificationService = {
     toast: (message, options) => {
-      toast(service.host, message, options?.duration);
+      toast(editor.host!, message, options?.duration);
     },
     confirm: notification => {
       return Promise.resolve(confirm(notification.title.toString()));
@@ -85,15 +105,11 @@ export function mockNotificationService(service: PageRootService) {
   return notificationService;
 }
 
-export function mockQuickSearchService(collection: DocCollection) {
-  const quickSearchService: QuickSearchService = {
-    async searchDoc({ userInput }) {
-      if (!userInput) {
-        return null;
-      }
-      if (URL.canParse(userInput)) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const path = new URL(userInput).pathname;
+export function mockParseDocUrlService(collection: DocCollection) {
+  const parseDocUrlService: ParseDocUrlService = {
+    parseDocUrl: (url: string) => {
+      if (url && URL.canParse(url)) {
+        const path = new URL(url).pathname;
         const item =
           path.length > 1
             ? [...collection.docs.values()].find(doc => {
@@ -105,21 +121,63 @@ export function mockQuickSearchService(collection: DocCollection) {
             docId: item.id,
           };
         }
-        return {
-          userInput: userInput,
-        };
       }
-      const doc = [...collection.docs.values()].find(
-        v => v.meta?.title === userInput
-      );
-      if (doc) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return {
-          docId: doc.id,
-        };
-      }
-      return null;
+      return;
     },
   };
-  return quickSearchService;
+  return parseDocUrlService;
+}
+
+export class MockEdgelessTheme {
+  theme$ = signal(ColorScheme.Light);
+
+  setTheme(theme: ColorScheme) {
+    this.theme$.value = theme;
+  }
+
+  toggleTheme() {
+    const theme =
+      this.theme$.value === ColorScheme.Dark
+        ? ColorScheme.Light
+        : ColorScheme.Dark;
+    this.theme$.value = theme;
+  }
+}
+
+export const mockEdgelessTheme = new MockEdgelessTheme();
+
+export const themeExtension: ThemeExtension = {
+  getEdgelessTheme() {
+    return mockEdgelessTheme.theme$;
+  },
+};
+
+export function mockPeekViewExtension(
+  attachmentViewerPanel: AttachmentViewerPanel
+) {
+  return PeekViewExtension({
+    peek(
+      element: {
+        target: HTMLElement;
+        docId: string;
+        blockIds?: string[];
+        template?: TemplateResult;
+      },
+      options?: PeekOptions
+    ) {
+      const { target } = element;
+
+      if (target instanceof BlockComponent) {
+        if (matchFlavours(target.model, ['affine:attachment'])) {
+          attachmentViewerPanel.open(target.model);
+          return Promise.resolve();
+        }
+      }
+
+      alert('Peek view not implemented in playground');
+      console.log('peek', element, options);
+
+      return Promise.resolve();
+    },
+  } satisfies PeekViewService);
 }

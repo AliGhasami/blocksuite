@@ -1,11 +1,16 @@
-import { type Page, expect } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { switchEditorMode } from 'utils/actions/edgeless.js';
 import { getLinkedDocPopover } from 'utils/actions/linked-doc.js';
 
-import { addNewPage, switchToPage } from './utils/actions/click.js';
+import {
+  addNewPage,
+  getDebugMenu,
+  switchToPage,
+} from './utils/actions/click.js';
 import { dragBetweenIndices, dragBlockToPoint } from './utils/actions/drag.js';
 import {
   copyByKeyboard,
+  cutByKeyboard,
   pasteByKeyboard,
   pressArrowLeft,
   pressArrowRight,
@@ -13,6 +18,7 @@ import {
   pressEnter,
   redoByKeyboard,
   selectAllByKeyboard,
+  SHORT_KEY,
   type,
   undoByKeyboard,
 } from './utils/actions/keyboard.js';
@@ -24,6 +30,7 @@ import {
   getPageSnapshot,
   initEmptyEdgelessState,
   initEmptyParagraphState,
+  setInlineRangeInSelectedRichText,
   waitNextFrame,
 } from './utils/actions/misc.js';
 import {
@@ -59,7 +66,7 @@ async function createAndConvertToEmbedLinkedDoc(page: Page) {
 }
 
 test.describe('multiple page', () => {
-  test('should create and switch page work', async ({ page }) => {
+  test('should create and switch page work', async ({ page }, testInfo) => {
     await enterPlaygroundRoom(page);
     await initEmptyParagraphState(page);
     await focusTitle(page);
@@ -68,33 +75,9 @@ test.describe('multiple page', () => {
     await type(page, 'page0');
     await assertRichTexts(page, ['page0']);
 
-    const page1Snapshot = `
-<affine:page
-  prop:title="title0"
->
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:paragraph
-      prop:text="page0"
-      prop:type="text"
-    />
-  </affine:note>
-</affine:page>`;
-    await assertStoreMatchJSX(page, page1Snapshot);
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_init.json`
+    );
 
     const { id } = await addNewPage(page);
     await switchToPage(page, id);
@@ -104,44 +87,15 @@ test.describe('multiple page', () => {
     await type(page, 'page1');
     await assertRichTexts(page, ['page1']);
 
-    await assertStoreMatchJSX(
-      page,
-      `
-<affine:page
-  prop:title="title1"
->
-  <affine:surface />
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:paragraph
-      prop:text="page1"
-      prop:type="text"
-    />
-  </affine:note>
-</affine:page>`
-    );
-
     await switchToPage(page);
-    await assertStoreMatchJSX(page, page1Snapshot);
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_final.json`
+    );
   });
 });
 
 test.describe('reference node', () => {
-  test('linked page popover can show and hide correctly', async ({ page }) => {
+  test('linked doc popover can show and hide correctly', async ({ page }) => {
     await enterPlaygroundRoom(page);
     const { paragraphId } = await initEmptyParagraphState(page);
     await focusRichText(page);
@@ -164,6 +118,23 @@ test.describe('reference node', () => {
     await type(page, '@');
     await expect(linkedDocPopover).toBeVisible();
     await assertRichTexts(page, ['@@']);
+    await pressBackspace(page);
+    await expect(linkedDocPopover).toBeHidden();
+  });
+
+  test('linked doc popover should not show when the current content is @xx and pressing backspace', async ({
+    page,
+  }) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+    await focusRichText(page);
+    await type(page, '@');
+    await page.keyboard.press('Escape');
+    await type(page, 'a');
+
+    const { linkedDocPopover } = getLinkedDocPopover(page);
+    await expect(linkedDocPopover).toBeHidden();
+
     await pressBackspace(page);
     await expect(linkedDocPopover).toBeHidden();
   });
@@ -209,7 +180,7 @@ test.describe('reference node', () => {
     );
   });
 
-  test('should reference node can be seleted', async ({ page }) => {
+  test('should reference node can be selected', async ({ page }) => {
     await enterPlaygroundRoom(page);
     await initEmptyParagraphState(page);
     await addNewPage(page);
@@ -478,7 +449,7 @@ test.describe('reference node', () => {
     await assertReferenceText('titl1');
   });
 
-  test('can create linked page and jump', async ({ page }) => {
+  test('can create linked page and jump', async ({ page }, testInfo) => {
     await enterPlaygroundRoom(page);
     await initEmptyParagraphState(page);
     await focusTitle(page);
@@ -490,34 +461,8 @@ test.describe('reference node', () => {
     await linkedNode.click();
 
     await assertTitle(page, 'page1');
-    await assertStoreMatchJSX(
-      page,
-      `
-<affine:page
-  prop:title="page1"
->
-  <affine:surface />
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:paragraph
-      prop:type="text"
-    />
-  </affine:note>
-</affine:page>`
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_init.json`
     );
     await focusRichText(page);
     await type(page, '@page0');
@@ -525,46 +470,8 @@ test.describe('reference node', () => {
     const refNode = await findRefNode('page0');
     await refNode.click();
     await assertTitle(page, 'page0');
-    await assertStoreMatchJSX(
-      page,
-      `
-<affine:page
-  prop:title="page0"
->
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:paragraph
-      prop:text={
-        <>
-          <text
-            insert=" "
-            reference={
-              Object {
-                "pageId": "3",
-                "type": "LinkedPage",
-              }
-            }
-          />
-        </>
-      }
-      prop:type="text"
-    />
-  </affine:note>
-</affine:page>`
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_final.json`
     );
   });
 
@@ -673,6 +580,90 @@ test.describe('linked page popover', () => {
     await assertExistRefText('page2');
   });
 
+  test('should paste query works', async ({ page }) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+
+    await (async () => {
+      for (let index = 0; index < 3; index++) {
+        const newPage = await addNewPage(page);
+        await switchToPage(page, newPage.id);
+        await focusTitle(page);
+        await type(page, 'page' + index);
+      }
+    })();
+
+    await switchToPage(page);
+    await getDebugMenu(page).pagesBtn.click();
+    await focusRichText(page);
+    await type(page, 'e2');
+    await setInlineRangeInSelectedRichText(page, 0, 2);
+    await cutByKeyboard(page);
+
+    const { pageBtn, linkedDocPopover } = getLinkedDocPopover(page);
+    await type(page, '@');
+    await expect(linkedDocPopover).toBeVisible();
+    await expect(pageBtn).toHaveText([
+      'page0',
+      'page1',
+      'page2',
+      'Create "Untitled" doc',
+      'Import',
+    ]);
+
+    await page.keyboard.press(`${SHORT_KEY}+v`);
+    await expect(linkedDocPopover).toBeVisible();
+    await expect(pageBtn).toHaveText(['page2', 'Create "e2" doc', 'Import']);
+  });
+
+  test('should multiple paste query not works', async ({ page }) => {
+    await enterPlaygroundRoom(page);
+    await initEmptyParagraphState(page);
+
+    await (async () => {
+      for (let index = 0; index < 3; index++) {
+        const newPage = await addNewPage(page);
+        await switchToPage(page, newPage.id);
+        await focusTitle(page);
+        await type(page, 'page' + index);
+      }
+    })();
+
+    await switchToPage(page);
+    await getDebugMenu(page).pagesBtn.click();
+    await focusRichText(page);
+    await type(page, 'pa');
+    await pressEnter(page);
+    await type(page, 'ge');
+    await pressEnter(page);
+    await type(page, '2');
+
+    await selectAllByKeyboard(page);
+    await waitNextFrame(page, 200);
+    await selectAllByKeyboard(page);
+    await waitNextFrame(page, 200);
+    await selectAllByKeyboard(page);
+    await waitNextFrame(page, 200);
+    await cutByKeyboard(page);
+    const note = page.locator('affine-note');
+    await note.click({ force: true, position: { x: 100, y: 100 } });
+    await waitNextFrame(page, 200);
+
+    const { pageBtn, linkedDocPopover } = getLinkedDocPopover(page);
+    await type(page, '@');
+    await expect(linkedDocPopover).toBeVisible();
+    await expect(pageBtn).toHaveText([
+      'page0',
+      'page1',
+      'page2',
+      'Create "Untitled" doc',
+      'Import',
+    ]);
+
+    await page.keyboard.press(`${SHORT_KEY}+v`);
+    await expect(linkedDocPopover).not.toBeVisible();
+  });
+
   test('should more docs works', async ({ page }) => {
     await enterPlaygroundRoom(page);
     await initEmptyParagraphState(page);
@@ -687,6 +678,7 @@ test.describe('linked page popover', () => {
     })();
 
     await switchToPage(page);
+    await getDebugMenu(page).pagesBtn.click();
     await focusRichText(page);
     await type(page, '@');
 

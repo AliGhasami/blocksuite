@@ -1,8 +1,7 @@
-import type { ZodTypeDef, z } from 'zod';
+import type { z, ZodTypeDef } from 'zod';
 
 import type { InlineEditor } from '../inline-editor.js';
-import type { AttributeRenderer } from '../types.js';
-import type { InlineRange } from '../types.js';
+import type { AttributeRenderer, InlineRange } from '../types.js';
 import type { BaseTextAttributes } from '../utils/index.js';
 
 import {
@@ -22,11 +21,18 @@ export class AttributeService<TextAttributes extends BaseTextAttributes> {
   getFormat = (inlineRange: InlineRange, loose = false): TextAttributes => {
     const deltas = this.editor.deltaService
       .getDeltasByInlineRange(inlineRange)
-      .filter(
-        ([_, position]) =>
-          position.index + position.length > inlineRange.index &&
-          position.index <= inlineRange.index + inlineRange.length
-      );
+      .filter(([_, position]) => {
+        const deltaStart = position.index;
+        const deltaEnd = position.index + position.length;
+        const inlineStart = inlineRange.index;
+        const inlineEnd = inlineRange.index + inlineRange.length;
+
+        if (inlineStart === inlineEnd) {
+          return deltaStart < inlineStart && inlineStart <= deltaEnd;
+        } else {
+          return deltaEnd > inlineStart && deltaStart <= inlineEnd;
+        }
+      });
     const maybeAttributesList = deltas.map(([delta]) => delta.attributes);
     if (loose) {
       return maybeAttributesList.reduce(
@@ -70,7 +76,7 @@ export class AttributeService<TextAttributes extends BaseTextAttributes> {
     }
     return Object.fromEntries(
       // filter out undefined values
-      Object.entries(attributeResult.data).filter(([_, v]) => v || v === null)
+      Object.entries(attributeResult.data).filter(([_, v]) => v !== undefined)
     ) as TextAttributes;
   };
 
@@ -92,8 +98,6 @@ export class AttributeService<TextAttributes extends BaseTextAttributes> {
     this._marks = marks;
   };
 
-  constructor(readonly editor: InlineEditor<TextAttributes>) {}
-
   get attributeRenderer() {
     return this._attributeRenderer;
   }
@@ -101,4 +105,6 @@ export class AttributeService<TextAttributes extends BaseTextAttributes> {
   get marks() {
     return this._marks;
   }
+
+  constructor(readonly editor: InlineEditor<TextAttributes>) {}
 }

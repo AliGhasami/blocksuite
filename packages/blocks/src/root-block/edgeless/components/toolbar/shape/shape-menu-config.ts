@@ -1,7 +1,5 @@
 import type { TemplateResult } from 'lit';
 
-import type { ShapeTool } from '../../../controllers/tools/shape-tool.js';
-
 import {
   DiamondIcon,
   EllipseIcon,
@@ -13,61 +11,47 @@ import {
   ScribbledTriangleIcon,
   SquareIcon,
   TriangleIcon,
-} from '../../../../../_common/icons/index.js';
-import { ShapeType } from '../../../../../surface-block/index.js';
+} from '@blocksuite/affine-components/icons';
+import { ShapeType } from '@blocksuite/affine-model';
 
-const { Rect, Ellipse, Triangle, Diamond } = ShapeType;
+import type { ShapeToolOption } from '../../../gfx-tool/shape-tool.js';
 
 type Config = {
-  name: ShapeTool['shapeType'];
+  name: ShapeToolOption['shapeName'];
   generalIcon: TemplateResult<1>;
   scribbledIcon: TemplateResult<1>;
   tooltip: string;
   disabled: boolean;
-  value: Record<string, unknown>;
 };
 
 export const ShapeComponentConfig: Config[] = [
   {
-    name: Rect,
+    name: ShapeType.Rect,
     generalIcon: SquareIcon,
     scribbledIcon: ScribbledSquareIcon,
     tooltip: 'Square',
     disabled: false,
-    value: {
-      shapeType: Rect,
-      radius: 0,
-    },
   },
   {
-    name: Ellipse,
+    name: ShapeType.Ellipse,
     generalIcon: EllipseIcon,
     scribbledIcon: ScribbledEllipseIcon,
     tooltip: 'Ellipse',
     disabled: false,
-    value: {
-      shapeType: Ellipse,
-    },
   },
   {
-    name: Diamond,
+    name: ShapeType.Diamond,
     generalIcon: DiamondIcon,
     scribbledIcon: ScribbledDiamondIcon,
     tooltip: 'Diamond',
     disabled: false,
-    value: {
-      shapeType: Diamond,
-    },
   },
   {
-    name: Triangle,
+    name: ShapeType.Triangle,
     generalIcon: TriangleIcon,
     scribbledIcon: ScribbledTriangleIcon,
     tooltip: 'Triangle',
     disabled: false,
-    value: {
-      shapeType: Triangle,
-    },
   },
   {
     name: 'roundedRect',
@@ -75,10 +59,6 @@ export const ShapeComponentConfig: Config[] = [
     scribbledIcon: ScribbledRoundedRectangleIcon,
     tooltip: 'Rounded rectangle',
     disabled: false,
-    value: {
-      shapeType: Rect,
-      radius: 0.1,
-    },
   },
 ];
 

@@ -1,15 +1,13 @@
-import { LineWidth } from '../../../_common/types.js';
 import {
   DEFAULT_ROUGHNESS,
+  LineColor,
+  LineWidth,
+  ShapeFillColor,
   StrokeStyle,
-} from '../../../surface-block/consts.js';
+} from '@blocksuite/affine-model';
 
-export const NOTE_MIN_WIDTH = 364;
-export const NOTE_MIN_HEIGHT = 78;
-export const NOTE_INIT_HEIGHT = 91;
+export const BOOKMARK_MIN_WIDTH = 450;
 
-export const DEFAULT_NOTE_WIDTH = 448;
-export const DEFAULT_NOTE_HEIGHT = 72;
 export const DEFAULT_NOTE_OFFSET_X = 30;
 export const DEFAULT_NOTE_OFFSET_Y = 40;
 export const NOTE_OVERLAY_OFFSET_X = 6;
@@ -54,6 +52,11 @@ export const SurfaceColor = '#6046FE';
 export const NoteColor = '#1E96EB';
 export const BlendColor = '#7D91FF';
 
-export const SHAPE_TEXT_COLOR_PURE_WHITE = '--affine-palette-line-white';
-export const SHAPE_TEXT_COLOR_PURE_BLACK = '--affine-palette-line-black';
-export const SHAPE_FILL_COLOR_BLACK = '--affine-palette-shape-black';
+export const SHAPE_TEXT_COLOR_PURE_WHITE = LineColor.White;
+export const SHAPE_TEXT_COLOR_PURE_BLACK = LineColor.Black;
+export const SHAPE_FILL_COLOR_BLACK = ShapeFillColor.Black;
+
+export const AI_CHAT_BLOCK_MIN_WIDTH = 260;
+export const AI_CHAT_BLOCK_MIN_HEIGHT = 160;
+export const AI_CHAT_BLOCK_MAX_WIDTH = 320;
+export const AI_CHAT_BLOCK_MAX_HEIGHT = 300;

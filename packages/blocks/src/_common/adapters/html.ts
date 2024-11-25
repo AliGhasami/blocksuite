@@ -1,59 +1,49 @@
+import type { AffineTextAttributes } from '@blocksuite/affine-components/rich-text';
 import type { DeltaInsert } from '@blocksuite/inline';
-import type {
-  FromBlockSnapshotPayload,
-  FromBlockSnapshotResult,
-  FromDocSnapshotPayload,
-  FromDocSnapshotResult,
-  FromSliceSnapshotPayload,
-  FromSliceSnapshotResult,
-  ToBlockSnapshotPayload,
-  ToDocSnapshotPayload,
-} from '@blocksuite/store';
-import type {
-  BlockSnapshot,
-  DocSnapshot,
-  SliceSnapshot,
-} from '@blocksuite/store';
-import type { ElementContent, Root, Text } from 'hast';
+import type { Element, Root } from 'hast';
 
+import {
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NoteDisplayMode,
+} from '@blocksuite/affine-model';
+import { getFilenameFromContentDisposition } from '@blocksuite/affine-shared/utils';
 import { sha } from '@blocksuite/global/utils';
 import {
   type AssetsManager,
+  ASTWalker,
+  BaseAdapter,
+  type BlockSnapshot,
   BlockSnapshotSchema,
+  type DocSnapshot,
+  type FromBlockSnapshotPayload,
+  type FromBlockSnapshotResult,
+  type FromDocSnapshotPayload,
+  type FromDocSnapshotResult,
+  type FromSliceSnapshotPayload,
+  type FromSliceSnapshotResult,
   getAssetName,
   nanoid,
+  type SliceSnapshot,
+  type ToBlockSnapshotPayload,
+  type ToDocSnapshotPayload,
 } from '@blocksuite/store';
-import { ASTWalker, BaseAdapter } from '@blocksuite/store';
+import { collapseWhiteSpace } from 'collapse-white-space';
 import rehypeParse from 'rehype-parse';
 import rehypeStringify from 'rehype-stringify';
-import {
-  type BundledLanguage,
-  type ThemedToken,
-  bundledLanguagesInfo,
-} from 'shiki';
+import { bundledLanguagesInfo, codeToHast } from 'shiki';
 import { unified } from 'unified';
 
-import type { AffineTextAttributes } from '../inline/presets/affine-inline-specs.js';
-
-import { isPlaintext } from '../../code-block/utils/code-languages.js';
-import { DARK_THEME, LIGHT_THEME } from '../../code-block/utils/consts.js';
-import { getHighLighter } from '../../code-block/utils/high-lighter.js';
 import {
-  highlightCache,
-  type highlightCacheKey,
-} from '../../code-block/utils/highlight-cache.js';
-import { NoteDisplayMode } from '../types.js';
-import { getFilenameFromContentDisposition } from '../utils/header-value-parser.js';
-import {
-  type HtmlAST,
   hastFlatNodes,
   hastGetElementChildren,
   hastGetTextChildren,
   hastGetTextChildrenOnlyAst,
   hastGetTextContent,
+  hastIsParagraphLike,
   hastQuerySelector,
+  type HtmlAST,
 } from './hast.js';
-import { fetchImage, fetchable, mergeDeltas } from './utils.js';
+import { fetchable, fetchImage, isNullish, mergeDeltas } from './utils.js';
 
 export type Html = string;
 
@@ -145,96 +135,13 @@ export class HtmlAdapter extends BaseAdapter<Html> {
     });
   };
 
-  private _deltaToHighlightHasts = async (
-    deltas: DeltaInsert[],
-    rawLang: unknown
-  ) => {
-    deltas = deltas.reduce((acc, cur) => {
-      return mergeDeltas(acc, cur, { force: true });
-    }, [] as DeltaInsert<object>[]);
-    if (!deltas.length) {
-      return [
-        {
-          type: 'element',
-          tagName: 'span',
-          children: [
-            {
-              type: 'text',
-              value: '',
-            },
-          ],
-        },
-      ] as ElementContent[];
-    }
-
-    const delta = deltas[0];
-    if (typeof rawLang == 'string') {
-      rawLang = rawLang.toLowerCase();
-    }
-    if (
-      !rawLang ||
-      typeof rawLang !== 'string' ||
-      isPlaintext(rawLang) ||
-      // The rawLang should not be 'Text' here
-      rawLang === 'Text' ||
-      !bundledLanguagesInfo.map(({ id }) => id).includes(rawLang as string)
-    ) {
-      return [
-        {
-          type: 'text',
-          value: delta.insert,
-        } as Text,
-      ];
-    }
-    const lang = rawLang as BundledLanguage;
-
-    const highlighter = await getHighLighter({
-      langs: [lang],
-      themes: [LIGHT_THEME, DARK_THEME],
-    });
-    const cacheKey: highlightCacheKey = `${delta.insert}-${rawLang}-light`;
-    const cache = highlightCache.get(cacheKey);
-
-    let tokens: Omit<ThemedToken, 'offset'>[];
-    if (cache) {
-      tokens = cache;
-    } else {
-      tokens = highlighter.codeToTokensBase(delta.insert, { lang }).reduce(
-        (acc, cur, index) => {
-          if (index === 0) {
-            return cur;
-          }
-
-          return [...acc, { content: '\n', color: 'inherit' }, ...cur];
-        },
-        [] as Omit<ThemedToken, 'offset'>[]
-      );
-      highlightCache.set(cacheKey, tokens);
-    }
-
-    return tokens.map(token => {
-      return {
-        type: 'element',
-        tagName: 'span',
-        properties: {
-          style: `word-wrap: break-word; color: ${token.color};`,
-        },
-        children: [
-          {
-            type: 'text',
-            value: token.content,
-          },
-        ],
-      } as ElementContent;
-    });
-  };
-
   private _hastToDelta = (
     ast: HtmlAST,
     option: {
       trim?: boolean;
+      pre?: boolean;
       pageMap?: Map<string, string>;
-    } = { trim: true }
+    } = { trim: true, pre: false }
   ): DeltaInsert<object>[] => {
     return this._hastToDeltaSpreaded(ast, option).reduce((acc, cur) => {
       return mergeDeltas(acc, cur);
@@ -245,21 +152,26 @@ export class HtmlAdapter extends BaseAdapter<Html> {
     ast: HtmlAST,
     option: {
       trim?: boolean;
-    } = { trim: true }
+      pre?: boolean;
+    } = { trim: true, pre: false }
   ): DeltaInsert<object>[] => {
     if (option.trim === undefined) {
       option.trim = true;
     }
     switch (ast.type) {
       case 'text': {
+        if (option.pre) {
+          return [{ insert: ast.value }];
+        }
         if (option.trim) {
-          if (ast.value.trim()) {
-            return [{ insert: ast.value.trim() }];
+          const value = collapseWhiteSpace(ast.value, { trim: option.trim });
+          if (value) {
+            return [{ insert: value }];
           }
           return [];
         }
         if (ast.value) {
-          return [{ insert: ast.value }];
+          return [{ insert: collapseWhiteSpace(ast.value) }];
         }
         return [];
       }
@@ -388,12 +300,17 @@ export class HtmlAdapter extends BaseAdapter<Html> {
           if (imageURL) {
             let blobId = '';
             if (!fetchable(imageURL)) {
-              assets.getAssets().forEach((_value, key) => {
-                const attachmentName = getAssetName(assets.getAssets(), key);
-                if (decodeURIComponent(imageURL).includes(attachmentName)) {
+              const imageURLSplit = imageURL.split('/');
+              while (imageURLSplit.length > 0) {
+                const key = assets
+                  .getPathBlobIdMap()
+                  .get(decodeURIComponent(imageURLSplit.join('/')));
+                if (key) {
                   blobId = key;
+                  break;
                 }
-              });
+                imageURLSplit.shift();
+              }
             } else {
               try {
                 const res = await fetchImage(
@@ -471,7 +388,10 @@ export class HtmlAdapter extends BaseAdapter<Html> {
                   language: codeLang ?? 'Plain Text',
                   text: {
                     '$blocksuite:internal:text$': true,
-                    delta: this._hastToDelta(codeText, { trim: false }),
+                    delta: this._hastToDelta(codeText, {
+                      trim: false,
+                      pre: true,
+                    }),
                   },
                 },
                 children: [],
@@ -517,30 +437,9 @@ export class HtmlAdapter extends BaseAdapter<Html> {
         case 'span':
         case 'footer': {
           if (
-            // Check if it is a paragraph like div
             o.parent?.node.type === 'element' &&
-            o.parent.node.tagName !== 'li' &&
-            (hastGetElementChildren(o.node).every(child =>
-              [
-                'a',
-                'b',
-                'bdi',
-                'bdo',
-                'br',
-                'code',
-                'del',
-                'em',
-                'i',
-                'ins',
-                'mark',
-                'span',
-                'strong',
-                'u',
-              ].includes(child.tagName)
-            ) ||
-              o.node.children
-                .map(child => child.type)
-                .every(type => type === 'text'))
+            !['li', 'p'].includes(o.parent.node.tagName) &&
+            hastIsParagraphLike(o.node)
           ) {
             context
               .openNode(
@@ -684,6 +583,7 @@ export class HtmlAdapter extends BaseAdapter<Html> {
               'children'
             )
             .closeNode();
+          context.skipAllChildren();
           break;
         }
         case 'iframe': {
@@ -784,6 +684,7 @@ export class HtmlAdapter extends BaseAdapter<Html> {
       const text = (o.node.props.text ?? { delta: [] }) as {
         delta: DeltaInsert[];
       };
+      const currentTNode = context.currentNode();
       switch (o.node.flavour) {
         case 'affine:page': {
           context
@@ -875,35 +776,26 @@ export class HtmlAdapter extends BaseAdapter<Html> {
           break;
         }
         case 'affine:code': {
-          if (typeof o.node.props.language == 'string') {
-            o.node.props.language = o.node.props.language.toLowerCase();
-          }
-          context
-            .openNode(
-              {
-                type: 'element',
-                tagName: 'pre',
-                properties: {},
-                children: [],
-              },
-              'children'
-            )
-            .openNode(
-              {
-                type: 'element',
-                tagName: 'code',
-                properties: {
-                  className: [`code-${o.node.props.language}`],
-                },
-                children: await this._deltaToHighlightHasts(
-                  text.delta,
-                  o.node.props.language
-                ),
-              },
-              'children'
-            )
-            .closeNode()
-            .closeNode();
+          const rawLang = o.node.props.language as string | null;
+          const matchedLang = rawLang
+            ? (bundledLanguagesInfo.find(
+                info =>
+                  info.id === rawLang ||
+                  info.name === rawLang ||
+                  info.aliases?.includes(rawLang)
+              )?.id ?? 'text')
+            : 'text';
+
+          // @ts-ignore
+          const text = o.node.props.text.delta as DeltaInsert[];
+          const code = text.map(delta => delta.insert).join('');
+          const hast = await codeToHast(code, {
+            lang: matchedLang,
+            theme: 'light-plus',
+          });
+
+          // @ts-ignore
+          context.openNode(hast, 'children').closeNode();
           break;
         }
         case 'affine:paragraph': {
@@ -1040,32 +932,6 @@ export class HtmlAdapter extends BaseAdapter<Html> {
           break;
         }
         case 'affine:list': {
-          context
-            .openNode(
-              {
-                type: 'element',
-                tagName: 'div',
-                properties: {
-                  className: ['affine-list-block-container'],
-                },
-                children: [],
-              },
-              'children'
-            )
-            .openNode(
-              {
-                type: 'element',
-                tagName: o.node.props.type === 'numbered' ? 'ol' : 'ul',
-                properties: {
-                  style:
-                    o.node.props.type === 'todo'
-                      ? 'list-style-type: none;'
-                      : '',
-                },
-                children: [],
-              },
-              'children'
-            );
           const liChildren = this._deltaToHast(text.delta);
           if (o.node.props.type === 'todo') {
             liChildren.unshift({
@@ -1079,36 +945,62 @@ export class HtmlAdapter extends BaseAdapter<Html> {
                 {
                   type: 'element',
                   tagName: 'label',
-                  properties: {},
+                  properties: {
+                    style: 'margin-right: 3px;',
+                  },
                   children: [],
                 },
               ],
             });
           }
-          context
-            .openNode(
+          // check if the list is of the same type
+          if (
+            context.getNodeContext('affine:list:parent') === o.parent &&
+            currentTNode.type === 'element' &&
+            currentTNode.tagName ===
+              (o.node.props.type === 'numbered' ? 'ol' : 'ul') &&
+            !(
+              Array.isArray(currentTNode.properties.className) &&
+              currentTNode.properties.className.includes('todo-list')
+            ) ===
+              isNullish(
+                o.node.props.type === 'todo'
+                  ? (o.node.props.checked as boolean)
+                  : undefined
+              )
+          ) {
+            // if true, add the list item to the list
+          } else {
+            // if false, create a new list
+            context.openNode(
               {
                 type: 'element',
-                tagName: 'li',
-                properties: {},
-                children: liChildren,
-              },
-              'children'
-            )
-            .closeNode()
-            .closeNode()
-            .openNode(
-              {
-                type: 'element',
-                tagName: 'div',
+                tagName: o.node.props.type === 'numbered' ? 'ol' : 'ul',
                 properties: {
-                  className: ['affine-block-children-container'],
-                  style: 'padding-left: 26px;',
+                  style:
+                    o.node.props.type === 'todo'
+                      ? 'list-style-type: none; padding-inline-start: 18px;'
+                      : null,
+                  className: [o.node.props.type + '-list'],
                 },
                 children: [],
               },
               'children'
             );
+            context.setNodeContext('affine:list:parent', o.parent);
+          }
+
+          context.openNode(
+            {
+              type: 'element',
+              tagName: 'li',
+              properties: {
+                className: ['affine-list-block-container'],
+              },
+              children: liChildren,
+            },
+            'children'
+          );
           break;
         }
         case 'affine:divider': {
@@ -1133,10 +1025,10 @@ export class HtmlAdapter extends BaseAdapter<Html> {
           await assets.readFromBlob(blobId);
           const blob = assets.getAssets().get(blobId);
           assetsIds.push(blobId);
-          const blobName = getAssetName(assets.getAssets(), blobId);
           if (!blob) {
             break;
           }
+          const blobName = getAssetName(assets.getAssets(), blobId);
           const isScaledImage = o.node.props.width && o.node.props.height;
           const widthStyle = isScaledImage
             ? {
@@ -1188,7 +1080,34 @@ export class HtmlAdapter extends BaseAdapter<Html> {
           break;
         }
         case 'affine:list': {
-          context.closeNode().closeNode();
+          const currentTNode = context.currentNode() as Element;
+          const previousTNode = context.previousNode() as Element;
+          if (
+            context.getPreviousNodeContext('affine:list:parent') === o.parent &&
+            currentTNode.tagName === 'li' &&
+            previousTNode.tagName ===
+              (o.node.props.type === 'numbered' ? 'ol' : 'ul') &&
+            !(
+              Array.isArray(previousTNode.properties.className) &&
+              previousTNode.properties.className.includes('todo-list')
+            ) ===
+              isNullish(
+                o.node.props.type === 'todo'
+                  ? (o.node.props.checked as boolean)
+                  : undefined
+              )
+          ) {
+            context.closeNode();
+            if (
+              o.next?.flavour !== 'affine:list' ||
+              o.next.props.type !== o.node.props.type
+            ) {
+              // If the next node is not a list or different type of list, close the list
+              context.closeNode();
+            }
+          } else {
+            context.closeNode().closeNode();
+          }
           break;
         }
       }
@@ -1276,7 +1195,7 @@ export class HtmlAdapter extends BaseAdapter<Html> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1301,7 +1220,7 @@ export class HtmlAdapter extends BaseAdapter<Html> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1361,7 +1280,7 @@ export class HtmlAdapter extends BaseAdapter<Html> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,

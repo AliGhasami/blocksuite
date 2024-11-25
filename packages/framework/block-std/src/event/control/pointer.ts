@@ -1,10 +1,15 @@
+import { IS_IPAD } from '@blocksuite/global/env';
+
 import type { UIEventDispatcher } from '../dispatcher.js';
 
 import { UIEventState, UIEventStateContext } from '../base.js';
-import { MultiPointerEventState } from '../state/index.js';
-import { PointerEventState } from '../state/index.js';
+import {
+  DndEventState,
+  MultiPointerEventState,
+  PointerEventState,
+} from '../state/index.js';
 import { EventScopeSourceType, EventSourceState } from '../state/source.js';
-import { isFarEnough } from '../utils.js';
+import { center, isFarEnough } from '../utils.js';
 
 type PointerId = typeof PointerEvent.prototype.pointerId;
 
@@ -23,11 +28,11 @@ function createContext(
 }
 
 abstract class PointerControllerBase {
-  constructor(protected _dispatcher: UIEventDispatcher) {}
-
   protected get _rect() {
     return this._dispatcher.host.getBoundingClientRect();
   }
+
+  constructor(protected _dispatcher: UIEventDispatcher) {}
 
   abstract listen(): void;
 }
@@ -150,7 +155,6 @@ class ClickController extends PointerControllerBase {
     const context = createContext(event, state);
 
     const run = () => {
-      this._dispatcher.run('pointerUp', context);
       this._dispatcher.run('click', context);
       if (this._pointerDownCount === 2) {
         this._dispatcher.run('doubleClick', context);
@@ -173,6 +177,8 @@ class ClickController extends PointerControllerBase {
 
 class DragController extends PointerControllerBase {
   private _down = (event: PointerEvent) => {
+    if (this._nativeDragging) return;
+
     if (!event.isPrimary) {
       if (this._dragging && this._lastPointerState) {
         this._up(this._lastPointerState.raw);
@@ -222,7 +228,11 @@ class DragController extends PointerControllerBase {
 
     this._lastPointerState = state;
 
-    if (!this._dragging && isFarEnough(event, this._startPointerState.raw)) {
+    if (
+      !this._nativeDragging &&
+      !this._dragging &&
+      isFarEnough(event, this._startPointerState.raw)
+    ) {
       this._dragging = true;
       this._dispatcher.run('dragStart', createContext(event, start));
     }
@@ -230,6 +240,44 @@ class DragController extends PointerControllerBase {
     if (this._dragging) {
       this._dispatcher.run('dragMove', createContext(event, state));
     }
+  };
+
+  private _nativeDragEnd = (event: DragEvent) => {
+    this._nativeDragging = false;
+    const dndEventState = new DndEventState({ event });
+    this._dispatcher.run(
+      'nativeDragEnd',
+      this._createContext(event, dndEventState)
+    );
+  };
+
+  private _nativeDragging = false;
+
+  private _nativeDragMove = (event: DragEvent) => {
+    const dndEventState = new DndEventState({ event });
+    this._dispatcher.run(
+      'nativeDragMove',
+      this._createContext(event, dndEventState)
+    );
+  };
+
+  private _nativeDragStart = (event: DragEvent) => {
+    this._reset();
+    this._nativeDragging = true;
+    const dndEventState = new DndEventState({ event });
+    this._dispatcher.run(
+      'nativeDragStart',
+      this._createContext(event, dndEventState)
+    );
+  };
+
+  private _nativeDrop = (event: DragEvent) => {
+    this._reset();
+    const dndEventState = new DndEventState({ event });
+    this._dispatcher.run(
+      'nativeDrop',
+      this._createContext(event, dndEventState)
+    );
   };
 
   private _reset = () => {
@@ -268,13 +316,46 @@ class DragController extends PointerControllerBase {
     this._reset();
   };
 
+  // https://mikepk.com/2020/10/iOS-safari-scribble-bug/
+  private _applyScribblePatch() {
+    if (!IS_IPAD) return;
+
+    const { host, disposables } = this._dispatcher;
+    disposables.addFromEvent(host, 'touchmove', (event: TouchEvent) => {
+      if (
+        this._dragging &&
+        this._startPointerState &&
+        this._startPointerState.raw.pointerType === 'pen'
+      ) {
+        event.preventDefault();
+      }
+    });
+  }
+
+  private _createContext(event: Event, dndState: DndEventState) {
+    return UIEventStateContext.from(
+      new UIEventState(event),
+      new EventSourceState({
+        event,
+        sourceType: EventScopeSourceType.Target,
+      }),
+      dndState
+    );
+  }
+
   listen() {
     const { host, disposables } = this._dispatcher;
     disposables.addFromEvent(host, 'pointerdown', this._down);
+    this._applyScribblePatch();
+
+    disposables.addFromEvent(host, 'dragstart', this._nativeDragStart);
+    disposables.addFromEvent(host, 'dragend', this._nativeDragEnd);
+    disposables.addFromEvent(host, 'drag', this._nativeDragMove);
+    disposables.addFromEvent(host, 'drop', this._nativeDrop);
   }
 }
 
-class PinchController extends PointerControllerBase {
+abstract class DualDragControllerBase extends PointerControllerBase {
   private _down = (event: PointerEvent) => {
     // Another pointer down
     if (
@@ -359,17 +440,19 @@ class PinchController extends PointerControllerBase {
       last: last2,
     });
 
+    if (!isFarEnough(state1.delta, state2.delta)) return;
+
     const multiPointerState = new MultiPointerEventState(event, [
       state1,
       state2,
     ]);
 
+    this._handleMove(event, multiPointerState);
+
     this._lastPointerStates = {
       primary: state1.raw.isPrimary ? state1 : state2,
       secondary: state1.raw.isPrimary ? state2 : state1,
     };
-
-    this._dispatcher.run('pinch', createContext(event, multiPointerState));
   };
 
   private _reset = () => {
@@ -401,6 +484,11 @@ class PinchController extends PointerControllerBase {
     }
   };
 
+  abstract _handleMove(
+    event: PointerEvent,
+    state: MultiPointerEventState
+  ): void;
+
   override listen(): void {
     const { host, disposables } = this._dispatcher;
     disposables.addFromEvent(host, 'pointerdown', this._down);
@@ -410,15 +498,45 @@ class PinchController extends PointerControllerBase {
   }
 }
 
+class PinchController extends DualDragControllerBase {
+  override _handleMove(event: PointerEvent, state: MultiPointerEventState) {
+    if (event.pointerType !== 'touch') return;
+
+    // the changes of distance between two pointers is not far enough
+    if (!isFarEnough(state.pointers[0].delta, state.pointers[1].delta)) return;
+
+    this._dispatcher.run('pinch', createContext(event, state));
+  }
+}
+
+class PanController extends DualDragControllerBase {
+  override _handleMove(event: PointerEvent, state: MultiPointerEventState) {
+    if (event.pointerType !== 'touch') return;
+
+    //  current center,          last center   = center move vector
+    // 0.5 * (a + da + b + db) - 0.5 * (a + b) = 0.5 * (da + db)
+    const centerMoveVec = center(
+      state.pointers[0].delta,
+      state.pointers[1].delta
+    );
+
+    // the center move distance is not far enough
+    if (!isFarEnough({ x: 0, y: 0 }, centerMoveVec)) return;
+
+    this._dispatcher.run('pan', createContext(event, state));
+  }
+}
+
 export class PointerControl {
   private controllers: PointerControllerBase[];
 
-  constructor(_dispatcher: UIEventDispatcher) {
+  constructor(dispatcher: UIEventDispatcher) {
     this.controllers = [
-      new PointerEventForward(_dispatcher),
-      new ClickController(_dispatcher),
-      new DragController(_dispatcher),
-      new PinchController(_dispatcher),
+      new PointerEventForward(dispatcher),
+      new ClickController(dispatcher),
+      new DragController(dispatcher),
+      new PanController(dispatcher),
+      new PinchController(dispatcher),
     ];
   }
 

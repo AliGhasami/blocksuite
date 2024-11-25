@@ -1,18 +1,17 @@
+import type {
+  FrameBlockModel,
+  ParagraphBlockModel,
+} from '@blocksuite/affine-model';
+import type { DeltaInsert } from '@blocksuite/inline';
 import type { BlockModel } from '@blocksuite/store';
 import type { TemplateResult } from 'lit';
 
-import { Slice, Text } from '@blocksuite/store';
-
-import type { DataViewBlockComponent } from '../../../data-view-block/index.js';
-import type { FrameBlockModel } from '../../../frame-block/frame-model.js';
-import type { ParagraphBlockModel } from '../../../paragraph-block/index.js';
-import type { RootBlockComponent } from '../../types.js';
-import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
-
-import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/embed-card-create-modal.js';
-import { toast } from '../../../_common/components/toast.js';
-import { textConversionConfigs } from '../../../_common/configs/text-conversion.js';
-import { textFormatConfigs } from '../../../_common/configs/text-format/config.js';
+import {
+  FigmaIcon,
+  GithubIcon,
+  LoomIcon,
+  YoutubeIcon,
+} from '@blocksuite/affine-block-embed';
 import {
   ArrowDownBigIcon,
   ArrowUpBigIcon,
@@ -24,45 +23,43 @@ import {
   FrameIcon,
   HeadingIcon,
   ImageIcon20,
-  LinkIcon,
   LinkedDocIcon,
+  LinkIcon,
   NewDocIcon,
   NowIcon,
-  PasteIcon,
   TodayIcon,
   TomorrowIcon,
   YesterdayIcon,
-} from '../../../_common/icons/index.js';
-import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+} from '@blocksuite/affine-components/icons';
+import {
+  getInlineEditorByModel,
+  insertContent,
+  REFERENCE_NODE,
+  textFormatConfigs,
+} from '@blocksuite/affine-components/rich-text';
+import { toast } from '@blocksuite/affine-components/toast';
 import {
   createDefaultDoc,
-  getBlockComponentByPath,
-  getImageFilesFromLocal,
-  getInlineEditorByModel,
-  matchFlavours,
   openFileOrFiles,
-} from '../../../_common/utils/index.js';
-import { clearMarksOnDiscontinuousInput } from '../../../_common/utils/inline-editor.js';
+} from '@blocksuite/affine-shared/utils';
+import { viewPresets } from '@blocksuite/data-view/view-presets';
+import { assertType } from '@blocksuite/global/utils';
+import { DualLinkIcon, GroupingIcon, TeXIcon } from '@blocksuite/icons/lit';
+import { Slice, Text } from '@blocksuite/store';
+
+import type { DataViewBlockComponent } from '../../../data-view-block/index.js';
+import type { RootBlockComponent } from '../../types.js';
+import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
+
+import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/embed-card-create-modal.js';
+import { textConversionConfigs } from '../../../_common/configs/text-conversion.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
-import { GroupingIcon } from '../../../database-block/data-view/common/icons/index.js';
-import { viewPresets } from '../../../database-block/data-view/index.js';
-import { FigmaIcon } from '../../../embed-figma-block/styles.js';
-import { GithubIcon } from '../../../embed-github-block/styles.js';
-import { LoomIcon } from '../../../embed-loom-block/styles.js';
-import { YoutubeIcon } from '../../../embed-youtube-block/styles.js';
-import { addSiblingImageBlock } from '../../../image-block/utils.js';
-import { NoteBlockModel } from '../../../note-block/note-model.js';
-import { onModelTextUpdated } from '../../../root-block/utils/index.js';
-import { CanvasElementType } from '../../../surface-block/index.js';
 import { getSurfaceBlock } from '../../../surface-ref-block/utils.js';
+import { formatDate, formatTime } from '../../utils/misc.js';
 import { type SlashMenuTooltip, slashMenuToolTips } from './tooltips/index.js';
 import {
   createConversionItem,
-  createDatabaseBlockInNextLine,
-  formatDate,
-  formatTime,
-  insertContent,
-  insideDatabase,
+  createTextFormatItem,
   insideEdgelessText,
   tryRemoveEmptyLine,
 } from './utils.js';
@@ -122,7 +119,7 @@ export type SlashMenuContext = {
 };
 
 export const defaultSlashMenuConfig: SlashMenuConfig = {
-  triggerKeys: ['/', '、'],
+  triggerKeys: ['/'],
   ignoreBlockTypes: ['affine:code'],
   maxHeight: 344,
   tooltipTimeout: 800,
@@ -144,44 +141,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
     },
     ...textConversionConfigs
       .filter(i => i.flavour === 'affine:code')
-      .map<SlashMenuActionItem>(config => ({
-        ...createConversionItem(config),
-        showWhen: ({ model }) =>
-          model.doc.schema.flavourSchemaMap.has(config.flavour) &&
-          !insideDatabase(model),
-        action: ({ rootComponent }) => {
-          const { flavour, type } = config;
-          rootComponent.host.std.command
-            .chain()
-            .updateBlockType({
-              flavour,
-              props: { type },
-            })
-            .inline((ctx, next) => {
-              const newModels = ctx.updatedBlocks;
-              if (!newModels) return false;
-
-              // Reset selection if the target is code block
-              if (flavour === 'affine:code') {
-                if (newModels.length !== 1) {
-                  console.error(
-                    "Failed to reset selection! New model length isn't 1"
-                  );
-                  return false;
-                }
-                const codeModel = newModels[0];
-                onModelTextUpdated(rootComponent.host, codeModel, richText => {
-                  const inlineEditor = richText.inlineEditor;
-                  if (!inlineEditor) return;
-                  inlineEditor.focusEnd();
-                }).catch(console.error);
-              }
-
-              return next();
-            })
-            .run();
-        },
-      })),
+      .map<SlashMenuActionItem>(createConversionItem),
 
     ...textConversionConfigs
       .filter(i => i.type && ['divider', 'quote'].includes(i.type))
@@ -189,9 +149,25 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
         ...createConversionItem(config),
         showWhen: ({ model }) =>
           model.doc.schema.flavourSchemaMap.has(config.flavour) &&
-          !insideDatabase(model) &&
           !insideEdgelessText(model),
       })),
+
+    {
+      name: 'Inline equation',
+      description: 'Create a equation block.',
+      icon: TeXIcon({
+        width: '20',
+        height: '20',
+      }),
+      alias: ['inlineMath, inlineEquation', 'inlineLatex'],
+      action: ({ rootComponent }) => {
+        rootComponent.std.command
+          .chain()
+          .getTextSelection()
+          .insertInlineLatex()
+          .run();
+      },
+    },
 
     // ---------------------------------------------------------
     { groupName: 'List' },
@@ -203,40 +179,21 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
     { groupName: 'Style' },
     ...textFormatConfigs
       .filter(i => !['Code', 'Link'].includes(i.name))
-      .map<SlashMenuActionItem>(({ name, icon, id }) => ({
-        name,
-        icon,
-        tooltip: slashMenuToolTips[name],
-        action: ({ rootComponent, model }) => {
-          if (!model.text) {
-            return;
-          }
-          const len = model.text.length;
-          if (!len) {
-            const inlineEditor = getInlineEditorByModel(
-              rootComponent.host,
-              model
-            );
-            if (!inlineEditor) return;
-            inlineEditor.setMarks({
-              [id]: true,
-            });
-            clearMarksOnDiscontinuousInput(inlineEditor);
-            return;
-          }
-          model.text.format(0, len, {
-            [id]: true,
-          });
-        },
-      })),
+      .map<SlashMenuActionItem>(createTextFormatItem),
 
     // ---------------------------------------------------------
-    { groupName: 'Page' },
+    {
+      groupName: 'Page',
+      showWhen: ({ model }) =>
+        model.doc.schema.flavourSchemaMap.has('affine:embed-linked-doc'),
+    },
     {
       name: 'New Doc',
       description: 'Start a new document.',
       icon: NewDocIcon,
       tooltip: slashMenuToolTips['New Doc'],
+      showWhen: ({ model }) =>
+        model.doc.schema.flavourSchemaMap.has('affine:embed-linked-doc'),
       action: ({ rootComponent, model }) => {
         const newDoc = createDefaultDoc(rootComponent.doc.collection);
         insertContent(rootComponent.host, model, REFERENCE_NODE, {
@@ -253,35 +210,34 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       icon: LinkedDocIcon,
       tooltip: slashMenuToolTips['Linked Doc'],
       alias: ['dual link'],
-      showWhen: ({ rootComponent }) => {
-        const linkedDocWidgetEle =
-          rootComponent.widgetComponents['affine-linked-doc-widget'];
-        if (!linkedDocWidgetEle) return false;
-        if (!('showLinkedDocPopover' in linkedDocWidgetEle)) {
-          console.warn(
-            'You may not have correctly implemented the linkedDoc widget! "showLinkedDoc(model)" method not found on widget'
-          );
-          return false;
-        }
-        return true;
+      showWhen: ({ rootComponent, model }) => {
+        const { std } = rootComponent;
+        const linkedDocWidget = std.view.getWidget(
+          'affine-linked-doc-widget',
+          rootComponent.model.id
+        );
+        if (!linkedDocWidget) return false;
+
+        return model.doc.schema.flavourSchemaMap.has('affine:embed-linked-doc');
       },
       action: ({ model, rootComponent }) => {
-        const triggerKey = '@';
+        const { std } = rootComponent;
+
+        const linkedDocWidget = std.view.getWidget(
+          'affine-linked-doc-widget',
+          rootComponent.model.id
+        );
+        if (!linkedDocWidget) return;
+        assertType<AffineLinkedDocWidget>(linkedDocWidget);
+
+        const triggerKey = linkedDocWidget.config.triggerKeys[0];
+
         insertContent(rootComponent.host, model, triggerKey);
-        if (!model.doc.root) return;
-        const widgetEle =
-          rootComponent.widgetComponents['affine-linked-doc-widget'];
-        if (!widgetEle) return;
-        // We have checked the existence of showLinkedDoc method in the showWhen
-        const linkedDocWidget = widgetEle as AffineLinkedDocWidget;
+
+        const inlineEditor = getInlineEditorByModel(rootComponent.host, model);
         // Wait for range to be updated
-        setTimeout(() => {
-          const inlineEditor = getInlineEditorByModel(
-            rootComponent.host,
-            model
-          );
-          if (!inlineEditor) return;
-          linkedDocWidget.showLinkedDocPopover(inlineEditor, triggerKey);
+        inlineEditor?.slots.inlineRangeSync.once(() => {
+          linkedDocWidget.show();
         });
       },
     },
@@ -294,27 +250,15 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       icon: ImageIcon20,
       tooltip: slashMenuToolTips['Image'],
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:image') &&
-        !insideDatabase(model),
-      action: async ({ rootComponent, model }) => {
-        const parent = rootComponent.doc.getParent(model);
-        if (!parent) {
-          return;
-        }
+        model.doc.schema.flavourSchemaMap.has('affine:image'),
+      action: async ({ rootComponent }) => {
+        const [success, ctx] = rootComponent.std.command
+          .chain()
+          .getSelectedModels()
+          .insertImages({ removeEmptyLine: true })
+          .run();
 
-        const imageFiles = await getImageFilesFromLocal();
-        if (!imageFiles.length) return;
-
-        const imageService = rootComponent.host.spec.getService('affine:image');
-        const maxFileSize = imageService.maxFileSize;
-
-        addSiblingImageBlock(
-          rootComponent.host,
-          imageFiles,
-          maxFileSize,
-          model
-        );
-        tryRemoveEmptyLine(model);
+        if (success) await ctx.insertedImageIds;
       },
     },
     {
@@ -323,8 +267,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       icon: LinkIcon,
       tooltip: slashMenuToolTips['Link'],
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:bookmark') &&
-        !insideDatabase(model),
+        model.doc.schema.flavourSchemaMap.has('affine:bookmark'),
       action: async ({ rootComponent, model }) => {
         const parentModel = rootComponent.doc.getParent(model);
         if (!parentModel) {
@@ -347,14 +290,13 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       tooltip: slashMenuToolTips['Attachment'],
       alias: ['file'],
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:attachment') &&
-        !insideDatabase(model),
+        model.doc.schema.flavourSchemaMap.has('affine:attachment'),
       action: async ({ rootComponent, model }) => {
         const file = await openFileOrFiles();
         if (!file) return;
 
         const attachmentService =
-          rootComponent.host.spec.getService('affine:attachment');
+          rootComponent.std.getService('affine:attachment');
         if (!attachmentService) return;
         const maxFileSize = attachmentService.maxFileSize;
 
@@ -373,8 +315,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       icon: YoutubeIcon,
       tooltip: slashMenuToolTips['YouTube'],
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:embed-youtube') &&
-        !insideDatabase(model),
+        model.doc.schema.flavourSchemaMap.has('affine:embed-youtube'),
       action: async ({ rootComponent, model }) => {
         const parentModel = rootComponent.doc.getParent(model);
         if (!parentModel) {
@@ -396,8 +337,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       icon: GithubIcon,
       tooltip: slashMenuToolTips['Github'],
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:embed-github') &&
-        !insideDatabase(model),
+        model.doc.schema.flavourSchemaMap.has('affine:embed-github'),
       action: async ({ rootComponent, model }) => {
         const parentModel = rootComponent.doc.getParent(model);
         if (!parentModel) {
@@ -421,8 +361,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       icon: FigmaIcon,
       tooltip: slashMenuToolTips['Figma'],
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:embed-figma') &&
-        !insideDatabase(model),
+        model.doc.schema.flavourSchemaMap.has('affine:embed-figma'),
       action: async ({ rootComponent, model }) => {
         const parentModel = rootComponent.doc.getParent(model);
         if (!parentModel) {
@@ -443,8 +382,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       name: 'Loom',
       icon: LoomIcon,
       showWhen: ({ model }) =>
-        model.doc.schema.flavourSchemaMap.has('affine:embed-loom') &&
-        !insideDatabase(model),
+        model.doc.schema.flavourSchemaMap.has('affine:embed-loom'),
       action: async ({ rootComponent, model }) => {
         const parentModel = rootComponent.doc.getParent(model);
         if (!parentModel) {
@@ -461,80 +399,72 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       },
     },
 
-    // TODO-slash: Linear
+    {
+      name: 'Equation',
+      description: 'Create a equation block.',
+      icon: TeXIcon({
+        width: '20',
+        height: '20',
+      }),
+      alias: ['mathBlock, equationBlock', 'latexBlock'],
+      action: ({ rootComponent }) => {
+        rootComponent.std.command
+          .chain()
+          .getSelectedModels()
+          .insertLatexBlock({
+            place: 'after',
+            removeEmptyLine: true,
+          })
+          .run();
+      },
+    },
 
-    // TODO-slash: Group & Frame explorer
+    // TODO(@L-Sun): Linear
 
     // ---------------------------------------------------------
     ({ model, rootComponent }) => {
       const { doc } = rootComponent;
 
       const surfaceModel = getSurfaceBlock(doc);
-      const noteModel = doc.getParent(model);
-      if (!(noteModel instanceof NoteBlockModel)) return [];
-
       if (!surfaceModel) return [];
+
+      const parent = doc.getParent(model);
+      if (!parent) return [];
 
       const frameModels = doc
         .getBlocksByFlavour('affine:frame')
-        .map(block => block.model) as FrameBlockModel[];
+        .map(block => block.model as FrameBlockModel);
 
       const frameItems = frameModels.map<SlashMenuActionItem>(frameModel => ({
         name: 'Frame: ' + frameModel.title,
         icon: FrameIcon,
-        showWhen: () => !insideDatabase(model),
-        action: () => {
-          const insertIdx = noteModel.children.indexOf(model);
-          const surfaceRefProps = {
-            flavour: 'affine:surface-ref',
-            reference: frameModel.id,
-            refFlavour: 'affine:frame',
-          };
-
-          doc.addSiblingBlocks(
-            model,
-            [surfaceRefProps],
-            insertIdx === 0 ? 'before' : 'after'
-          );
-
-          if (
-            matchFlavours(model, ['affine:paragraph']) &&
-            model.text.length === 0
-          ) {
-            doc.deleteBlock(model);
-          }
+        action: ({ rootComponent }) => {
+          rootComponent.std.command
+            .chain()
+            .getSelectedModels()
+            .insertSurfaceRefBlock({
+              reference: frameModel.id,
+              place: 'after',
+              removeEmptyLine: true,
+            })
+            .run();
         },
       }));
 
-      const groupElements = Array.from(
-        surfaceModel.elements.getValue()?.values() ?? []
-      ).filter(element => element.get('type') === CanvasElementType.GROUP);
-
-      const groupItems = groupElements.map(element => ({
-        name: 'Group: ' + element.get('title'),
-        icon: GroupingIcon,
+      const groupElements = surfaceModel.getElementsByType('group');
+      const groupItems = groupElements.map(group => ({
+        name: 'Group: ' + group.title.toString(),
+        icon: GroupingIcon(),
         action: () => {
-          const { doc } = rootComponent;
-          const noteModel = doc.getParent(model) as NoteBlockModel;
-          const insertIdx = noteModel.children.indexOf(model);
-          const surfaceRefProps = {
-            flavour: 'affine:surface-ref',
-            reference: element.get('id'),
-            refFlavour: 'group',
-          };
-
-          doc.addSiblingBlocks(
-            model,
-            [surfaceRefProps],
-            insertIdx === 0 ? 'before' : 'after'
-          );
-
-          if (
-            matchFlavours(model, ['affine:paragraph']) &&
-            model.text.length === 0
-          ) {
-            doc.deleteBlock(model);
-          }
+          rootComponent.std.command
+            .chain()
+            .getSelectedModels()
+            .insertSurfaceRefBlock({
+              reference: group.id,
+              place: 'after',
+              removeEmptyLine: true,
+            })
+            .run();
         },
       }));
 
@@ -615,22 +545,17 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       tooltip: slashMenuToolTips['Table View'],
       showWhen: ({ model }) =>
         model.doc.schema.flavourSchemaMap.has('affine:database') &&
-        !insideDatabase(model) &&
         !insideEdgelessText(model),
-      action: ({ rootComponent, model }) => {
-        const id = createDatabaseBlockInNextLine(model);
-        if (!id) {
-          return;
-        }
-        const service = rootComponent.std.spec.getService('affine:database');
-        service.initDatabaseBlock(
-          rootComponent.doc,
-          model,
-          id,
-          viewPresets.tableViewConfig,
-          false
-        );
-        tryRemoveEmptyLine(model);
+      action: ({ rootComponent }) => {
+        rootComponent.std.command
+          .chain()
+          .getSelectedModels()
+          .insertDatabaseBlock({
+            viewType: viewPresets.tableViewMeta.type,
+            place: 'after',
+            removeEmptyLine: true,
+          })
+          .run();
       },
     },
     {
@@ -640,7 +565,6 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       tooltip: slashMenuToolTips['Todo'],
       showWhen: ({ model }) =>
         model.doc.schema.flavourSchemaMap.has('affine:database') &&
-        !insideDatabase(model) &&
         !insideEdgelessText(model) &&
         !!model.doc.awarenessStore.getFlag('enable_block_query'),
 
@@ -657,11 +581,10 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
         const dataViewModel = rootComponent.doc.getBlock(id)!;
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         Promise.resolve().then(() => {
-          const dataView = getBlockComponentByPath(
-            rootComponent.host,
-            dataViewModel.model.id
-          ) as DataViewBlockComponent;
-          dataView.viewSource.viewAdd('table');
+          const dataView = rootComponent.std.view.getBlock(
+            dataViewModel.id
+          ) as DataViewBlockComponent | null;
+          dataView?.dataSource.viewManager.viewAdd('table');
         });
         tryRemoveEmptyLine(model);
       },
@@ -674,22 +597,17 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
       tooltip: slashMenuToolTips['Kanban View'],
       showWhen: ({ model }) =>
         model.doc.schema.flavourSchemaMap.has('affine:database') &&
-        !insideDatabase(model) &&
         !insideEdgelessText(model),
-      action: ({ model, rootComponent }) => {
-        const id = createDatabaseBlockInNextLine(model);
-        if (!id) {
-          return;
-        }
-        const service = rootComponent.std.spec.getService('affine:database');
-        service.initDatabaseBlock(
-          rootComponent.doc,
-          model,
-          id,
-          viewPresets.kanbanViewConfig,
-          false
-        );
-        tryRemoveEmptyLine(model);
+      action: ({ rootComponent }) => {
+        rootComponent.std.command
+          .chain()
+          .getSelectedModels()
+          .insertDatabaseBlock({
+            viewType: viewPresets.kanbanViewMeta.type,
+            place: 'after',
+            removeEmptyLine: true,
+          })
+          .run();
       },
     },
 
@@ -730,7 +648,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
     {
       name: 'Copy',
       description: 'Copy this line to clipboard.',
-      icon: PasteIcon,
+      icon: CopyIcon,
       tooltip: slashMenuToolTips['Copy'],
       action: ({ rootComponent, model }) => {
         const slice = Slice.fromModels(rootComponent.std.doc, [model]);
@@ -748,7 +666,7 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
     {
       name: 'Duplicate',
       description: 'Create a duplicate of this line.',
-      icon: CopyIcon,
+      icon: DualLinkIcon({ width: '20', height: '20' }),
       tooltip: slashMenuToolTips['Copy'],
       action: ({ rootComponent, model }) => {
         if (!model.text || !(model.text instanceof Text)) {
@@ -772,7 +690,9 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
           model.flavour as never,
           {
             type: (model as ParagraphBlockModel).type,
-            text: rootComponent.doc.Text.fromDelta(model.text.toDelta()),
+            text: new rootComponent.doc.Text(
+              model.text.toDelta() as DeltaInsert[]
+            ),
             // @ts-expect-error
             checked: model.checked,
           },

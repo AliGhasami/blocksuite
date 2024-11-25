@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/** @alighasami for check merge **/
 import { ShadowlessElement } from '@blocksuite/block-std';
 import {
   type AttributeRenderer,
   type BaseTextAttributes,
-  type DeltaInsert,
+  baseTextAttributes,
+  createInlineKeyDownHandler,
   InlineEditor,
   KEYBOARD_ALLOW_DEFAULT,
   ZERO_WIDTH_NON_JOINER,
-  baseTextAttributes,
-  createInlineKeyDownHandler,
 } from '@blocksuite/inline';
+import { effects } from '@blocksuite/inline/effects';
+import { effect } from '@preact/signals-core';
 import '@shoelace-style/shoelace';
 import { css, html, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
@@ -18,6 +19,8 @@ import * as Y from 'yjs';
 import { z } from 'zod';
 
 import { markdownMatches } from './markdown.js';
+
+effects();
 
 function inlineTextStyles(
   props: BaseTextAttributes
@@ -52,10 +55,7 @@ function inlineTextStyles(
   });
 }
 
-const attributeRenderer: AttributeRenderer = (
-  delta: DeltaInsert,
-  selected: boolean
-) => {
+const attributeRenderer: AttributeRenderer = ({ delta, selected }) => {
   // @ts-ignore
   if (delta.attributes?.embed) {
     return html`<span
@@ -157,26 +157,21 @@ export class TestRichText extends ShadowlessElement {
     this.addEventListener('keydown', keydownHandler);
 
     this.inlineEditor.slots.textChange.on(() => {
-      //debugger;
       const el = this.querySelector('.y-text');
       if (el) {
         const text = this.inlineEditor.yText.toDelta();
-        console.log('this is text in textChange', text);
         const span = document.createElement('span');
         span.innerHTML = JSON.stringify(text);
         el.replaceChildren(span);
       }
     });
-    this.inlineEditor.slots.inlineRangeUpdate.on(() => {
+    effect(() => {
+      const inlineRange = this.inlineEditor.inlineRange$.value;
       const el = this.querySelector('.v-range');
-      if (el) {
-        const inlineRange = this.inlineEditor.getInlineRange();
-        console.log('this isinlineRange', inlineRange);
-        if (inlineRange) {
-          const span = document.createElement('span');
-          span.innerHTML = JSON.stringify(inlineRange);
-          el.replaceChildren(span);
-        }
+      if (el && inlineRange) {
+        const span = document.createElement('span');
+        span.innerHTML = JSON.stringify(inlineRange);
+        el.replaceChildren(span);
       }
     });
   }
@@ -239,7 +234,6 @@ const yDocA = new Y.Doc();
 const yDocB = new Y.Doc();
 
 yDocA.on('update', update => {
-  //console.log('this is update ', update);
   Y.applyUpdate(yDocB, update);
 });
 
@@ -404,6 +398,14 @@ export class TestPage extends ShadowlessElement {
       overflow-y: scroll;
     }
   `;
+
+  private _editorA: InlineEditor | null = null;
+
+  private _editorB: InlineEditor | null = null;
+
+  private _undoManagerA: Y.UndoManager | null = null;
+
+  private _undoManagerB: Y.UndoManager | null = null;
 
   override firstUpdated() {
     const textA = yDocA.getText(TEXT_ID);

@@ -1,23 +1,26 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+/** @alighasami for check merge **/
+import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
+
+import { AttachmentIcon, LinkIcon } from '@blocksuite/affine-components/icons';
+import { TelemetryProvider } from '@blocksuite/affine-shared/services';
+import { effect } from '@preact/signals-core';
+import { css, html, LitElement } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { NoteTool } from '../../../controllers/tools/note-tool.js';
-import type { EdgelessTool } from '../../../types.js';
+import type { NoteToolOption } from '../../../gfx-tool/note-tool.js';
 
-import { AttachmentIcon } from '../../../../../_common/icons/text.js';
 import {
-  type NoteChildrenFlavour,
   getImageFilesFromLocal,
+  type NoteChildrenFlavour,
   openFileOrFiles,
 } from '../../../../../_common/utils/index.js';
 import { ImageIcon } from '../../../../../image-block/styles.js';
-import '../../buttons/tool-icon-button.js';
-import '../common/slide-menu.js';
+import { addAttachments, addImages } from '../../../utils/common.js';
+import { getTooltipWithShortcut } from '../../utils.js';
 import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
 import { NOTE_MENU_ITEMS } from './note-menu-config.js';
 
-@customElement('edgeless-note-menu')
 export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
   static override styles = css`
     :host {
@@ -50,45 +53,38 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
     }
   `;
 
-  override type: EdgelessTool['type'] = 'affine:note';
+  override type: GfxToolsFullOptionValue['type'] = 'affine:note';
 
   private async _addImages() {
     this._imageLoading = true;
     const imageFiles = await getImageFilesFromLocal();
-    const ids = await this.edgeless.addImages(imageFiles);
+    const ids = await addImages(this.edgeless.std, imageFiles);
     this._imageLoading = false;
-    this.edgeless.service.tool.setEdgelessTool(
-      { type: 'default' },
-      { elements: ids, editing: false }
-    );
+    this.edgeless.gfx.tool.setTool('default');
+    this.edgeless.gfx.selection.set({ elements: ids });
   }
 
-  /*private _onHandleLinkButtonClick() {
+  private _onHandleLinkButtonClick() {
     const { insertedLinkType } = this.edgeless.service.std.command.exec(
       'insertLinkByQuickSearch'
     );
 
     insertedLinkType
       ?.then(type => {
-        if (type) {
-          this.edgeless.service.telemetryService?.track('CanvasElementAdded', {
+        const flavour = type?.flavour;
+        if (!flavour) return;
+
+        this.edgeless.std
+          .getOptional(TelemetryProvider)
+          ?.track('CanvasElementAdded', {
             control: 'toolbar:general',
             page: 'whiteboard editor',
             module: 'toolbar',
-            type: type.flavour.split(':')[1],
+            type: flavour.split(':')[1],
           });
-          if (type.isNewDoc) {
-            this.edgeless.service.telemetryService?.track('DocCreated', {
-              control: 'toolbar:general',
-              page: 'whiteboard editor',
-              module: 'edgeless toolbar',
-              type: type.flavour.split(':')[1],
-            });
-          }
-        }
       })
       .catch(console.error);
-  }*/
+  }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
@@ -96,8 +92,10 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
 
   override firstUpdated() {
     this.disposables.add(
-      this.edgeless.slots.edgelessToolUpdated.on(tool => {
-        if (tool.type !== 'affine:note') return;
+      effect(() => {
+        const tool = this.edgeless.gfx.tool.currentToolOption$.value;
+
+        if (tool?.type !== 'affine:note') return;
         this.childFlavour = tool.childFlavour;
         this.childType = tool.childType;
         this.tip = tool.tip;
@@ -107,21 +105,11 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
 
   override render() {
     const { childType } = this;
-    // TODO: hidden feature
-    // <edgeless-tool-icon-button
-    //   .activeMode=${'background'}
-    //   .tooltip=${getTooltipWithShortcut('Link', '@')}
-    //   @click=${() => {
-    //     this._onHandleLinkButtonClick();
-    //   }}
-    // >
-    //   ${LinkIcon}
-    // </edgeless-tool-icon-button>
 
     return html`
       <edgeless-slide-menu>
-        <!-- add to edgeless -->
-        <!-- <div class="menu-content">
+        <div class="menu-content">
+          <!-- add to edgeless -->
           <div class="button-group-container">
             <edgeless-tool-icon-button
               .activeMode=${'background'}
@@ -130,7 +118,17 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               .disabled=${this._imageLoading}
             >
               ${ImageIcon}
-            </edgeless-tool-icon-button> 
+            </edgeless-tool-icon-button>
+
+            <edgeless-tool-icon-button
+              .activeMode=${'background'}
+              .tooltip=${getTooltipWithShortcut('Link', '@')}
+              @click=${() => {
+                this._onHandleLinkButtonClick();
+              }}
+            >
+              ${LinkIcon}
+            </edgeless-tool-icon-button>
 
             <edgeless-tool-icon-button
               .activeMode=${'background'}
@@ -138,25 +136,24 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
               @click=${async () => {
                 const file = await openFileOrFiles();
                 if (!file) return;
-                await this.edgeless.addAttachments([file]);
-                this.edgeless.service.tool.setEdgelessTool({ type: 'default' });
-                this.edgeless.service.telemetryService?.track(
-                  'CanvasElementAdded',
-                  {
+                await addAttachments(this.edgeless.std, [file]);
+                this.edgeless.gfx.tool.setTool('default');
+                this.edgeless.std
+                  .getOptional(TelemetryProvider)
+                  ?.track('CanvasElementAdded', {
                     control: 'toolbar:general',
                     page: 'whiteboard editor',
                     module: 'toolbar',
                     segment: 'toolbar',
                     type: 'attachment',
-                  }
-                );
+                  });
               }}
             >
               ${AttachmentIcon}
-            </edgeless-tool-icon-button> 
-          </div> -->
+            </edgeless-tool-icon-button>
+          </div>
 
-          <!--<div class="divider"></div> -->
+          <div class="divider"></div>
 
           <!-- add to note -->
           <div class="button-group-container">
@@ -197,7 +194,7 @@ export class EdgelessNoteMenu extends EdgelessToolbarToolMixin(LitElement) {
   @property({ attribute: false })
   accessor onChange!: (
     props: Partial<{
-      childFlavour: NoteTool['childFlavour'];
+      childFlavour: NoteToolOption['childFlavour'];
       childType: string | null;
       tip: string;
     }>

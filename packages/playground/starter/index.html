@@ -30,6 +30,15 @@
         margin-top: 78px;
       }
 
+      :root .tp-dfwv {
+        position: fixed;
+        overflow: scroll;
+
+        top: 0;
+        bottom: 0;
+        right: 0;
+      }
+
       @media print {
         doc-title {
           margin-top: 0px;
@@ -39,7 +48,6 @@
   </head>
 
   <body>
-    <script type="module" src="../polyfill/intl-segmenter.ts"></script>
     <script type="module" src="../apps/starter/main.ts"></script>
     <div id="app">
       <div id="inspector"></div>

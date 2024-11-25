@@ -1,117 +1,55 @@
-import { RangeManager } from '@blocksuite/block-std';
-import { Slice, Slot } from '@blocksuite/store';
-import { css, nothing, unsafeCSS } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { html } from 'lit/static-html.js';
-
-import type { DataSource } from '../database-block/data-view/common/data-source/base.js';
-import type { NoteBlockComponent } from '../note-block/index.js';
-import type { DataViewBlockModel } from './data-view-model.js';
-
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import {
-  CaptionedBlockComponent,
+  menu,
   popMenu,
-} from '../_common/components/index.js';
+  popupTargetFromElement,
+} from '@blocksuite/affine-components/context-menu';
 import {
   CopyIcon,
   DeleteIcon,
   MoreHorizontalIcon,
-} from '../_common/icons/index.js';
-import { dataViewCommonStyle } from '../database-block/data-view/common/css-variable.js';
+} from '@blocksuite/affine-components/icons';
+import { PeekViewProvider } from '@blocksuite/affine-components/peek';
+import { toast } from '@blocksuite/affine-components/toast';
 import {
+  NotificationProvider,
+  type TelemetryEventMap,
+  TelemetryProvider,
+} from '@blocksuite/affine-shared/services';
+import { RANGE_SYNC_EXCLUDE_ATTR } from '@blocksuite/block-std';
+import {
+  createRecordDetail,
+  createUniComponentFromWebComponent,
+  DatabaseSelection,
+  type DataSource,
   DataView,
+  dataViewCommonStyle,
   type DataViewProps,
   type DataViewSelection,
   type DataViewWidget,
   type DataViewWidgetProps,
-  DatabaseSelection,
-  type ViewSource,
   defineUniComponent,
   renderUniLit,
-  widgetPresets,
-} from '../database-block/data-view/index.js';
+  uniMap,
+} from '@blocksuite/data-view';
+import { widgetPresets } from '@blocksuite/data-view/widget-presets';
+import { Slice } from '@blocksuite/store';
+import { computed, signal } from '@preact/signals-core';
+import { css, nothing, unsafeCSS } from 'lit';
+import { html } from 'lit/static-html.js';
+
+import type { NoteBlockComponent } from '../note-block/index.js';
+import type { DataViewBlockModel } from './data-view-model.js';
+
+import { BlockRenderer } from '../database-block/detail-panel/block-renderer.js';
+import { NoteRenderer } from '../database-block/detail-panel/note-renderer.js';
 import {
-  type AffineInnerModalWidget,
   EdgelessRootBlockComponent,
+  type RootService,
 } from '../root-block/index.js';
-import { AFFINE_INNER_MODAL_WIDGET } from '../root-block/widgets/inner-modal/inner-modal.js';
 import { BlockQueryDataSource } from './data-source.js';
-import { BlockQueryViewSource } from './view-source.js';
 
-@customElement('affine-data-view')
 export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBlockModel> {
-  _bindHotkey: DataViewProps['bindHotkey'] = hotkeys => {
-    return {
-      dispose: this.host.event.bindHotkey(hotkeys, {
-        path: this.topContenteditableElement?.path ?? this.path,
-      }),
-    };
-  };
-
-  private _clickDatabaseOps = (e: MouseEvent) => {
-    popMenu(e.currentTarget as HTMLElement, {
-      options: {
-        input: {
-          initValue: this.model.title,
-          placeholder: 'Untitled',
-          onComplete: text => {
-            this.model.title = text;
-          },
-        },
-        items: [
-          {
-            type: 'action',
-            icon: CopyIcon,
-            name: 'Copy',
-            select: () => {
-              const slice = Slice.fromModels(this.doc, [this.model]);
-              this.std.clipboard.copySlice(slice).catch(console.error);
-            },
-          },
-          // {
-          //   type: 'action',
-          //   icon: DuplicateIcon,
-          //   name: 'Duplicate',
-          //   select: () => {
-          //   },
-          // },
-          {
-            type: 'group',
-            name: '',
-            children: () => [
-              {
-                type: 'action',
-                icon: DeleteIcon,
-                class: 'delete-item',
-                name: 'Delete Database',
-                select: () => {
-                  this.model.children.slice().forEach(block => {
-                    this.doc.deleteBlock(block);
-                  });
-                  this.doc.deleteBlock(this.model);
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
-  };
-
-  private _dataSource?: DataSource;
-
-  _handleEvent: DataViewProps['handleEvent'] = (name, handler) => {
-    return {
-      dispose: this.host.event.add(name, handler, {
-        path: this.path,
-      }),
-    };
-  };
-
-  private _viewSource?: ViewSource;
-
-  private dataView = new DataView();
-
   static override styles = css`
     ${unsafeCSS(dataViewCommonStyle('affine-database'))}
     affine-database {
@@ -128,7 +66,6 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
     }
 
     .database-ops {
-      margin-top: 4px;
       padding: 2px;
       border-radius: 4px;
       display: flex;
@@ -144,10 +81,82 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
     .database-ops:hover {
       background-color: var(--affine-hover-color);
     }
+
+    @media print {
+      .database-ops {
+        display: none;
+      }
+
+      .database-header-bar {
+        display: none !important;
+      }
+    }
   `;
 
+  private _clickDatabaseOps = (e: MouseEvent) => {
+    popMenu(popupTargetFromElement(e.currentTarget as HTMLElement), {
+      options: {
+        items: [
+          menu.input({
+            initialValue: this.model.title,
+            placeholder: 'Untitled',
+            onChange: text => {
+              this.model.title = text;
+            },
+          }),
+          menu.action({
+            prefix: CopyIcon,
+            name: 'Copy',
+            select: () => {
+              const slice = Slice.fromModels(this.doc, [this.model]);
+              this.std.clipboard.copySlice(slice).catch(console.error);
+            },
+          }),
+          menu.group({
+            name: '',
+            items: [
+              menu.action({
+                prefix: DeleteIcon,
+                class: {
+                  'delete-item': true,
+                },
+                name: 'Delete Database',
+                select: () => {
+                  this.model.children.slice().forEach(block => {
+                    this.doc.deleteBlock(block);
+                  });
+                  this.doc.deleteBlock(this.model);
+                },
+              }),
+            ],
+          }),
+        ],
+      },
+    });
+  };
+
+  private _dataSource?: DataSource;
+
+  private dataView = new DataView();
+
+  _bindHotkey: DataViewProps['bindHotkey'] = hotkeys => {
+    return {
+      dispose: this.host.event.bindHotkey(hotkeys, {
+        blockId: this.topContenteditableElement?.blockId ?? this.blockId,
+      }),
+    };
+  };
+
+  _handleEvent: DataViewProps['handleEvent'] = (name, handler) => {
+    return {
+      dispose: this.host.event.add(name, handler, {
+        blockId: this.blockId,
+      }),
+    };
+  };
+
   getRootService = () => {
-    return this.std.spec.getService('affine:page');
+    return this.std.getService<RootService>('affine:page');
   };
 
   headerWidget: DataViewWidget = defineUniComponent(
@@ -160,19 +169,30 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
           </div>
           <div
             style="display:flex;align-items:center;justify-content: space-between;gap: 12px"
+            class="database-header-bar"
           >
             <div style="flex:1">
               ${renderUniLit(widgetPresets.viewBar, props)}
             </div>
             ${renderUniLit(this.toolsWidget, props)}
           </div>
-          ${renderUniLit(widgetPresets.filterBar, props)}
+          ${renderUniLit(widgetPresets.quickSettingBar, props)}
         </div>
       `;
     }
   );
 
-  selectionUpdated = new Slot<DataViewSelection | undefined>();
+  selection$ = computed(() => {
+    const databaseSelection = this.selection.value.find(
+      (selection): selection is DatabaseSelection => {
+        if (selection.blockId !== this.blockId) {
+          return false;
+        }
+        return selection instanceof DatabaseSelection;
+      }
+    );
+    return databaseSelection?.viewSelection;
+  });
 
   setSelection = (selection: DataViewSelection | undefined) => {
     this.selection.setGroup(
@@ -191,80 +211,16 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
   toolsWidget: DataViewWidget = widgetPresets.createTools({
     table: [
       widgetPresets.tools.filter,
-      widgetPresets.tools.expand,
       widgetPresets.tools.search,
       widgetPresets.tools.viewOptions,
       widgetPresets.tools.tableAddRow,
     ],
     kanban: [
       widgetPresets.tools.filter,
-      widgetPresets.tools.expand,
       widgetPresets.tools.search,
       widgetPresets.tools.viewOptions,
     ],
   });
-
-  private renderDatabaseOps() {
-    if (this.doc.readonly) {
-      return nothing;
-    }
-    return html` <div class="database-ops" @click="${this._clickDatabaseOps}">
-      ${MoreHorizontalIcon}
-    </div>`;
-  }
-
-  override connectedCallback() {
-    super.connectedCallback();
-
-    this.setAttribute(RangeManager.rangeSyncExcludeAttr, 'true');
-
-    this._disposables.add(
-      this.selection.slots.changed.on(selections => {
-        const databaseSelection = selections.find(
-          (selection): selection is DatabaseSelection => {
-            if (selection.blockId !== this.blockId) {
-              return false;
-            }
-            return selection instanceof DatabaseSelection;
-          }
-        );
-        this.selectionUpdated.emit(databaseSelection?.viewSelection);
-      })
-    );
-    this._disposables.add(
-      this.model.propsUpdated.on(data => {
-        if (data.key === 'views') {
-          this.viewSource.checkViewDataUpdate();
-        }
-      })
-    );
-  }
-
-  override renderBlock() {
-    const peekViewService = this.getRootService().peekViewService;
-    return html`
-      <div contenteditable="false" style="position: relative">
-        ${this.dataView.render({
-          bindHotkey: this._bindHotkey,
-          handleEvent: this._handleEvent,
-          getFlag: this.getFlag,
-          selectionUpdated: this.selectionUpdated,
-          setSelection: this.setSelection,
-          dataSource: this.dataSource,
-          viewSource: this.viewSource,
-          headerWidget: this.headerWidget,
-          std: this.std,
-          detailPanelConfig: {
-            openDetailPanel: peekViewService
-              ? async (target, template) =>
-                  peekViewService.peek(target, template)
-              : undefined,
-            target: () => this.innerModalWidget.target,
-          },
-        })}
-      </div>
-    `;
-  }
 
   get dataSource(): DataSource {
     if (!this._dataSource) {
@@ -273,18 +229,6 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
       });
     }
     return this._dataSource;
-  }
-
-  get getFlag() {
-    return this.host.doc.awarenessStore.getFlag.bind(
-      this.host.doc.awarenessStore
-    );
-  }
-
-  get innerModalWidget() {
-    return this.rootComponent?.widgetComponents[
-      AFFINE_INNER_MODAL_WIDGET
-    ] as AffineInnerModalWidget;
   }
 
   override get topContenteditableElement() {
@@ -299,11 +243,84 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
     return this.dataView.expose;
   }
 
-  get viewSource(): ViewSource {
-    if (!this._viewSource) {
-      this._viewSource = new BlockQueryViewSource(this.model);
+  private renderDatabaseOps() {
+    if (this.doc.readonly) {
+      return nothing;
     }
-    return this._viewSource;
+    return html` <div class="database-ops" @click="${this._clickDatabaseOps}">
+      ${MoreHorizontalIcon}
+    </div>`;
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.setAttribute(RANGE_SYNC_EXCLUDE_ATTR, 'true');
+  }
+
+  override renderBlock() {
+    const peekViewService = this.std.getOptional(PeekViewProvider);
+    const telemetryService = this.std.getOptional(TelemetryProvider);
+    return html`
+      <div contenteditable="false" style="position: relative">
+        ${this.dataView.render({
+          virtualPadding$: signal(0),
+          bindHotkey: this._bindHotkey,
+          handleEvent: this._handleEvent,
+          selection$: this.selection$,
+          setSelection: this.setSelection,
+          dataSource: this.dataSource,
+          headerWidget: this.headerWidget,
+          clipboard: this.std.clipboard,
+          notification: {
+            toast: message => {
+              const notification = this.std.getOptional(NotificationProvider);
+              if (notification) {
+                notification.toast(message);
+              } else {
+                toast(this.host, message);
+              }
+            },
+          },
+          eventTrace: (key, params) => {
+            telemetryService?.track(key, {
+              ...(params as TelemetryEventMap[typeof key]),
+              blockId: this.blockId,
+            });
+          },
+          detailPanelConfig: {
+            openDetailPanel: (target, data) => {
+              if (peekViewService) {
+                const template = createRecordDetail({
+                  ...data,
+                  openDoc: () => {},
+                  detail: {
+                    header: uniMap(
+                      createUniComponentFromWebComponent(BlockRenderer),
+                      props => ({
+                        ...props,
+                        host: this.host,
+                      })
+                    ),
+                    note: uniMap(
+                      createUniComponentFromWebComponent(NoteRenderer),
+                      props => ({
+                        ...props,
+                        model: this.model,
+                        host: this.host,
+                      })
+                    ),
+                  },
+                });
+                return peekViewService.peek({ target, template });
+              } else {
+                return Promise.resolve();
+              }
+            },
+          },
+        })}
+      </div>
+    `;
   }
 }
 

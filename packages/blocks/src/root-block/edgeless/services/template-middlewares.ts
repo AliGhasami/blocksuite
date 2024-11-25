@@ -1,13 +1,10 @@
-import type { BlockSnapshot, SnapshotReturn } from '@blocksuite/store';
+import type { ConnectorElementModel } from '@blocksuite/affine-model';
+import type { BlockSnapshot, SnapshotNode } from '@blocksuite/store';
 
-import { Bound } from '@blocksuite/global/utils';
-import { assertExists, assertType } from '@blocksuite/global/utils';
+import { CommonUtils, sortIndex } from '@blocksuite/affine-block-surface';
+import { assertExists, assertType, Bound } from '@blocksuite/global/utils';
 
-import type { ConnectorElementModel } from '../../../surface-block/index.js';
 import type { SlotBlockPayload, TemplateJob } from './template.js';
-
-import { generateElementId } from '../../../surface-block/utils/index.js';
-import { sortIndex } from '../../../surface-block/utils/sort.js';
 
 export const replaceIdMiddleware = (job: TemplateJob) => {
   const regeneratedIdMap = new Map<string, string>();
@@ -33,12 +30,12 @@ export const replaceIdMiddleware = (job: TemplateJob) => {
     blockJson.id = newId;
 
     data.parent = data.parent
-      ? regeneratedIdMap.get(data.parent) ?? data.parent
+      ? (regeneratedIdMap.get(data.parent) ?? data.parent)
       : undefined;
 
     if (blockJson.flavour === 'affine:surface-ref') {
       assertType<
-        SnapshotReturn<{
+        SnapshotNode<{
           reference: string;
         }>
       >(blockJson);
@@ -54,7 +51,7 @@ export const replaceIdMiddleware = (job: TemplateJob) => {
       Object.entries(
         blockJson.props.elements as Record<string, Record<string, unknown>>
       ).forEach(([id, val]) => {
-        const newId = generateElementId();
+        const newId = CommonUtils.generateElementId();
 
         regeneratedIdMap.set(id, newId);
         val.id = newId;
@@ -230,7 +227,7 @@ export const createStickerMiddleware = (
 };
 
 export const createRegenerateIndexMiddleware = (
-  generateIndex: (type: string) => string
+  generateIndex: () => string
 ) => {
   return (job: TemplateJob) => {
     job.slots.beforeInsert.on(blockData => {
@@ -312,11 +309,11 @@ export const createRegenerateIndexMiddleware = (
       frameList.sort((a, b) => sortIndex(a, b, groupIndexMap));
 
       frameList.forEach(index => {
-        indexMap.set(index.id, generateIndex('affine:frame'));
+        indexMap.set(index.id, generateIndex());
       });
 
       indexList.forEach(index => {
-        indexMap.set(index.id, generateIndex(index.flavour));
+        indexMap.set(index.id, generateIndex());
       });
     };
     const resetIndex = (blockJson: BlockSnapshot) => {

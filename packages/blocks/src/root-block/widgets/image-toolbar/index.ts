@@ -1,20 +1,24 @@
+import type {
+  AdvancedMenuItem,
+  MenuItemGroup,
+} from '@blocksuite/affine-components/toolbar';
+import type { ImageBlockModel } from '@blocksuite/affine-model';
+
+import { HoverController } from '@blocksuite/affine-components/hover';
+import { cloneGroups } from '@blocksuite/affine-components/toolbar';
 import { WidgetComponent } from '@blocksuite/block-std';
 import { limitShift, shift } from '@floating-ui/dom';
 import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
 
 import type { ImageBlockComponent } from '../../../image-block/image-block.js';
-import type { ImageBlockModel } from '../../../image-block/index.js';
-import type { ImageConfigItem, MoreMenuConfigItem } from './type.js';
 
-import { HoverController } from '../../../_common/components/hover/controller.js';
 import { PAGE_HEADER_HEIGHT } from '../../../_common/consts.js';
-import './components/image-toolbar.js';
-import { commonConfig, moreMenuConfig } from './config.js';
+import { getMoreMenuConfig } from '../../configs/toolbar.js';
+import { MORE_GROUPS, PRIMARY_GROUPS } from './config.js';
+import { ImageToolbarContext } from './context.js';
 
 export const AFFINE_IMAGE_TOOLBAR_WIDGET = 'affine-image-toolbar-widget';
 
-@customElement(AFFINE_IMAGE_TOOLBAR_WIDGET)
 export class AffineImageToolbarWidget extends WidgetComponent<
   ImageBlockModel,
   ImageBlockComponent
@@ -48,17 +52,19 @@ export class AffineImageToolbarWidget extends WidgetComponent<
           return null;
         }
 
-        const imageContainer = imageBlock.resizeImg ?? imageBlock.imageCard;
+        const imageContainer =
+          imageBlock.resizableImg ?? imageBlock.fallbackCard;
         if (!imageContainer) {
           return null;
         }
 
+        const context = new ImageToolbarContext(imageBlock, abortController);
+
         return {
           template: html`<affine-image-toolbar
-            .blockComponent=${imageBlock}
-            .abortController=${abortController}
-            .config=${this.config}
-            .moreMenuConfig=${this.moreMenuConfig}
+            .context=${context}
+            .primaryGroups=${this.primaryGroups}
+            .moreGroups=${this.moreGroups}
             .onActiveStatusChange=${(active: boolean) => {
               this._isActivated = active;
               if (!active && !this._hoverController?.isHovering) {
@@ -67,6 +73,10 @@ export class AffineImageToolbarWidget extends WidgetComponent<
             }}
           ></affine-image-toolbar>`,
           container: this.block,
+          // stacking-context(editor-host)
+          portalStyles: {
+            zIndex: 'var(--affine-z-index-popover)',
+          },
           computePosition: {
             referenceElement: imageContainer,
             placement: 'right-start',
@@ -98,47 +108,56 @@ export class AffineImageToolbarWidget extends WidgetComponent<
     };
   };
 
-  addConfigItems = (item: ImageConfigItem[], index?: number) => {
+  addMoreItems = (
+    items: AdvancedMenuItem<ImageToolbarContext>[],
+    index?: number,
+    type?: string
+  ) => {
+    let group;
+    if (type) {
+      group = this.moreGroups.find(g => g.type === type);
+    }
+    if (!group) {
+      group = this.moreGroups[0];
+    }
+
     if (index === undefined) {
-      this.config.push(...item);
+      group.items.push(...items);
       return this;
     }
 
-    this.config.splice(index, 0, ...item);
+    group.items.splice(index, 0, ...items);
     return this;
   };
 
-  addMoreMenuItems = (item: MoreMenuConfigItem[], index?: number) => {
+  addPrimaryItems = (
+    items: AdvancedMenuItem<ImageToolbarContext>[],
+    index?: number
+  ) => {
     if (index === undefined) {
-      this.moreMenuConfig.push(...item);
+      this.primaryGroups[0].items.push(...items);
       return this;
     }
 
-    this.moreMenuConfig.splice(index, 0, ...item);
+    this.primaryGroups[0].items.splice(index, 0, ...items);
     return this;
   };
 
-  buildDefaultConfig = () => {
-    this.clearConfig()
-      .addConfigItems(commonConfig)
-      .addMoreMenuItems(moreMenuConfig);
-    return this;
-  };
+  /*
+   * Caches the more menu items.
+   * Currently only supports configuring more menu.
+   */
+  moreGroups: MenuItemGroup<ImageToolbarContext>[] = cloneGroups(MORE_GROUPS);
 
-  clearConfig = () => {
-    this.config = [];
-    this.moreMenuConfig = [];
-    return this;
-  };
-
-  config: ImageConfigItem[] = [];
-
-  moreMenuConfig: MoreMenuConfigItem[] = [];
+  primaryGroups: MenuItemGroup<ImageToolbarContext>[] =
+    cloneGroups(PRIMARY_GROUPS);
 
   override firstUpdated() {
-    if (!this.config.length || !this.moreMenuConfig.length) {
-      this.buildDefaultConfig();
+    if (this.doc.getParent(this.model.id)?.flavour === 'affine:surface') {
+      return;
     }
+
+    this.moreGroups = getMoreMenuConfig(this.std).configure(this.moreGroups);
     this._setHoverController();
   }
 }

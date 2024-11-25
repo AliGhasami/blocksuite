@@ -1,4 +1,4 @@
-import { sleep } from '@global/utils/index.js';
+import { sleep } from '@blocksuite/global/utils';
 import { expect } from '@playwright/test';
 
 import {
@@ -251,8 +251,8 @@ test.skip('polygonal lasso should complete selection when clicking the last poin
     const edgeless = document.querySelector('affine-edgeless-root');
     if (!edgeless) throw new Error('Missing edgless root block');
 
-    const curController = edgeless.tools.currentController;
-    if (curController.tool.type !== 'lasso')
+    const curController = edgeless.gfx.tool.currentTool$.peek();
+    if (curController?.toolName !== 'lasso')
       throw new Error('expected lasso tool controller');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (curController as any)['_isSelecting'];

@@ -1,41 +1,48 @@
+import type { AffineTextAttributes } from '@blocksuite/affine-components/rich-text';
 import type { DeltaInsert } from '@blocksuite/inline/types';
-import type {
-  FromBlockSnapshotPayload,
-  FromBlockSnapshotResult,
-  FromDocSnapshotPayload,
-  FromDocSnapshotResult,
-  FromSliceSnapshotPayload,
-  FromSliceSnapshotResult,
-  ToBlockSnapshotPayload,
-  ToDocSnapshotPayload,
-} from '@blocksuite/store';
 import type { Heading, Root, RootContentMap, TableRow } from 'mdast';
 
+import {
+  type Column,
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NoteDisplayMode,
+  type SerializedCells,
+} from '@blocksuite/affine-model';
+import { getFilenameFromContentDisposition } from '@blocksuite/affine-shared/utils';
 import { assertExists, sha } from '@blocksuite/global/utils';
 import {
-  ASTWalker,
   type AssetsManager,
+  ASTWalker,
   BaseAdapter,
   type BlockSnapshot,
   BlockSnapshotSchema,
   type DocSnapshot,
-  type SliceSnapshot,
+  type FromBlockSnapshotPayload,
+  type FromBlockSnapshotResult,
+  type FromDocSnapshotPayload,
+  type FromDocSnapshotResult,
+  type FromSliceSnapshotPayload,
+  type FromSliceSnapshotResult,
   getAssetName,
   nanoid,
+  type SliceSnapshot,
+  type ToBlockSnapshotPayload,
+  type ToDocSnapshotPayload,
 } from '@blocksuite/store';
 import { format } from 'date-fns/format';
+import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
 import { unified } from 'unified';
 
-import type { SerializedCells } from '../../database-block/database-model.js';
-import type { Column } from '../../database-block/types.js';
-import type { AffineTextAttributes } from '../inline/presets/affine-inline-specs.js';
-
-import { NoteDisplayMode } from '../types.js';
-import { getFilenameFromContentDisposition } from '../utils/header-value-parser.js';
 import { remarkGfm } from './gfm.js';
-import { createText, fetchImage, fetchable, isNullish } from './utils.js';
+import {
+  createText,
+  fetchable,
+  fetchImage,
+  isNullish,
+  toURLSearchParams,
+} from './utils.js';
 
 export type Markdown = string;
 
@@ -244,13 +251,17 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
             break;
           }
           if (!fetchable(o.node.url)) {
-            const imageURL = o.node.url;
-            assets.getAssets().forEach((_value, key) => {
-              const imageName = getAssetName(assets.getAssets(), key);
-              if (decodeURIComponent(imageURL).includes(imageName)) {
+            const imageURLSplit = o.node.url.split('/');
+            while (imageURLSplit.length > 0) {
+              const key = assets
+                .getPathBlobIdMap()
+                .get(decodeURIComponent(imageURLSplit.join('/')));
+              if (key) {
                 blobId = key;
+                break;
               }
-            });
+              imageURLSplit.shift();
+            }
           } else {
             const res = await fetchImage(
               o.node.url,
@@ -386,6 +397,23 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
           context.skipAllChildren();
           break;
         }
+        case 'math': {
+          context
+            .openNode(
+              {
+                type: 'block',
+                id: nanoid(),
+                flavour: 'affine:latex',
+                props: {
+                  latex: o.node.value as string,
+                },
+                children: [],
+              },
+              'children'
+            )
+            .closeNode();
+          break;
+        }
       }
     });
     walker.setLeave((o, context) => {
@@ -498,8 +526,6 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
         }
         case 'affine:list': {
           // check if the list is of the same type
-          // if true, add the list item to the list
-          // if false, create a new list
           if (
             context.getNodeContext('affine:list:parent') === o.parent &&
             currentTNode.type === 'list' &&
@@ -511,28 +537,9 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
                   : undefined
               )
           ) {
-            context
-              .openNode(
-                {
-                  type: 'listItem',
-                  checked:
-                    o.node.props.type === 'todo'
-                      ? (o.node.props.checked as boolean)
-                      : undefined,
-                  spread: false,
-                  children: [],
-                },
-                'children'
-              )
-              .openNode(
-                {
-                  type: 'paragraph',
-                  children: this._deltaToMdAST(text.delta),
-                },
-                'children'
-              )
-              .closeNode();
+            // if true, add the list item to the list
           } else {
+            // if false, create a new list
             context
               .openNode(
                 {
@@ -543,28 +550,29 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
                 },
                 'children'
               )
-              .setNodeContext('affine:list:parent', o.parent)
-              .openNode(
-                {
-                  type: 'listItem',
-                  checked:
-                    o.node.props.type === 'todo'
-                      ? (o.node.props.checked as boolean)
-                      : undefined,
-                  spread: false,
-                  children: [],
-                },
-                'children'
-              )
-              .openNode(
-                {
-                  type: 'paragraph',
-                  children: this._deltaToMdAST(text.delta),
-                },
-                'children'
-              )
-              .closeNode();
+              .setNodeContext('affine:list:parent', o.parent);
           }
+          context
+            .openNode(
+              {
+                type: 'listItem',
+                checked:
+                  o.node.props.type === 'todo'
+                    ? (o.node.props.checked as boolean)
+                    : undefined,
+                spread: false,
+                children: [],
+              },
+              'children'
+            )
+            .openNode(
+              {
+                type: 'paragraph',
+                children: this._deltaToMdAST(text.delta),
+              },
+              'children'
+            )
+            .closeNode();
           break;
         }
         case 'affine:divider': {
@@ -586,10 +594,10 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
           await assets.readFromBlob(blobId);
           const blob = assets.getAssets().get(blobId);
           assetsIds.push(blobId);
-          const blobName = getAssetName(assets.getAssets(), blobId);
           if (!blob) {
             break;
           }
+          const blobName = getAssetName(assets.getAssets(), blobId);
           context
             .openNode(
               {
@@ -780,6 +788,50 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
 
           break;
         }
+        case 'affine:embed-linked-doc': {
+          // Parse as link
+          if (!o.node.props.pageId) {
+            break;
+          }
+          const title =
+            this.configs.get('title:' + o.node.props.pageId) ?? 'untitled';
+          const { mode, blockIds, elementIds } = o.node.props;
+          const baseUrl = this.configs.get('docLinkBaseUrl') ?? '';
+          const search = toURLSearchParams({
+            mode: mode as string,
+            blockIds: blockIds as string[],
+            elementIds: elementIds as string[],
+          });
+          const query = search?.size ? `?${search.toString()}` : '';
+          const url = baseUrl
+            ? `${baseUrl}/${o.node.props.pageId}${query}`
+            : '';
+          context
+            .openNode(
+              {
+                type: 'paragraph',
+                children: [],
+              },
+              'children'
+            )
+            .openNode(
+              {
+                type: 'link',
+                url,
+                title: o.node.props.caption as string | null,
+                children: [
+                  {
+                    type: 'text',
+                    value: title,
+                  },
+                ],
+              },
+              'children'
+            )
+            .closeNode()
+            .closeNode();
+          break;
+        }
         case 'affine:embed-loom':
         case 'affine:embed-github':
         case 'affine:embed-youtube':
@@ -817,6 +869,17 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
             .closeNode();
           break;
         }
+        case 'affine:latex': {
+          context
+            .openNode(
+              {
+                type: 'math',
+                value: o.node.props.latex as string,
+              },
+              'children'
+            )
+            .closeNode();
+        }
       }
     });
     walker.setLeave((o, context) => {
@@ -844,8 +907,11 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
               )
           ) {
             context.closeNode();
-            if (o.next?.flavour !== 'affine:list') {
-              // If the next node is not a list, close the list
+            if (
+              o.next?.flavour !== 'affine:list' ||
+              o.next.props.type !== o.node.props.type
+            ) {
+              // If the next node is not a list or different type of list, close the list
               context.closeNode();
             }
           } else {
@@ -874,6 +940,7 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
       .use(remarkStringify, {
         resourceLink: true,
       })
+      .use(remarkMath)
       .stringify(ast)
       .replace(/&#x20;\n/g, ' \n');
   }
@@ -896,12 +963,24 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
         const title = this.configs.get(
           'title:' + delta.attributes.reference.pageId
         );
-        if (typeof title === 'string') {
-          mdast = {
-            type: 'text',
-            value: title,
-          };
-        }
+        const { mode, blockIds, elementIds } =
+          delta.attributes?.reference.params ?? {};
+        const baseUrl = this.configs.get('docLinkBaseUrl') ?? '';
+        const search = toURLSearchParams({ mode, blockIds, elementIds });
+        const query = search?.size ? `?${search.toString()}` : '';
+        const url = baseUrl
+          ? `${baseUrl}/${delta.attributes.reference.pageId}${query}`
+          : '';
+        mdast = {
+          type: 'link',
+          url,
+          children: [
+            {
+              type: 'text',
+              value: title ?? '',
+            },
+          ],
+        };
       }
       if (delta.attributes?.code) {
         mdast = {
@@ -941,15 +1020,25 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
           };
         }
       }
+      if (delta.attributes?.latex) {
+        mdast = {
+          type: 'inlineMath',
+          value: delta.attributes.latex as string,
+        };
+      }
       return mdast;
     });
   }
 
   private _markdownToAst(markdown: Markdown) {
-    return unified().use(remarkParse).use(remarkGfm).parse(markdown);
+    return unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkMath)
+      .parse(markdown);
   }
 
-  private _mdastToDelta(ast: MarkdownAST): DeltaInsert[] {
+  private _mdastToDelta(ast: MarkdownAST): DeltaInsert<AffineTextAttributes>[] {
     switch (ast.type) {
       case 'text': {
         return [{ insert: ast.value }];
@@ -982,6 +1071,42 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
         );
       }
       case 'link': {
+        const baseUrl = this.configs.get('docLinkBaseUrl') ?? '';
+        if (baseUrl && ast.url.startsWith(baseUrl)) {
+          const path = ast.url.substring(baseUrl.length);
+          //    ^ - /{pageId}?mode={mode}&blockIds={blockIds}&elementIds={elementIds}
+          const match = path.match(/^\/([^?]+)(\?.*)?$/);
+          if (match) {
+            const pageId = match?.[1];
+            const search = match?.[2];
+            const searchParams = search
+              ? new URLSearchParams(search)
+              : undefined;
+            const mode = searchParams?.get('mode');
+            const blockIds = searchParams?.get('blockIds')?.split(',');
+            const elementIds = searchParams?.get('elementIds')?.split(',');
+
+            return [
+              {
+                insert: ' ',
+                attributes: {
+                  reference: {
+                    type: 'LinkedPage',
+                    pageId,
+                    params: {
+                      mode:
+                        mode && ['edgeless', 'page'].includes(mode)
+                          ? (mode as 'edgeless' | 'page')
+                          : undefined,
+                      blockIds,
+                      elementIds,
+                    },
+                  },
+                },
+              },
+            ];
+          }
+        }
         return ast.children.flatMap(child =>
           this._mdastToDelta(child).map(delta => {
             delta.attributes = { ...delta.attributes, link: ast.url };
@@ -991,6 +1116,9 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
       }
       case 'list': {
         return [];
+      }
+      case 'inlineMath': {
+        return [{ insert: ' ', attributes: { latex: ast.value } }];
       }
     }
     return 'children' in ast
@@ -1070,7 +1198,7 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1094,7 +1222,7 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1153,7 +1281,7 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
         if (line.trimStart().startsWith('-')) {
           return line;
         }
-        const trimmedLine = line.trimStart();
+        let trimmedLine = line.trimStart();
         if (!codeFence && trimmedLine.startsWith('```')) {
           codeFence = trimmedLine.substring(
             0,
@@ -1184,6 +1312,25 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
         if (codeFence) {
           return line;
         }
+
+        trimmedLine = trimmedLine.trimEnd();
+        if (!trimmedLine.startsWith('<') && !trimmedLine.endsWith('>')) {
+          // check if it is a url link and wrap it with the angle brackets
+          // sometimes the url includes emphasis `_` that will break URL parsing
+          //
+          // eg. /MuawcBMT1Mzvoar09-_66?mode=page&blockIds=rL2_GXbtLU2SsJVfCSmh_
+          // https://www.markdownguide.org/basic-syntax/#urls-and-email-addresses
+          try {
+            const valid =
+              URL.canParse?.(trimmedLine) ?? Boolean(new URL(trimmedLine));
+            if (valid) {
+              return `<${trimmedLine}>`;
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }
+
         return line.replace(/^ /, '&#x20;');
       })
       .join('\n');
@@ -1194,16 +1341,16 @@ export class MarkdownAdapter extends BaseAdapter<Markdown> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
       },
       children: [],
-    };
+    } as BlockSnapshot;
     const contentSlice = (await this._traverseMarkdown(
       markdownAst,
-      blockSnapshotRoot as BlockSnapshot,
+      blockSnapshotRoot,
       payload.assets
     )) as BlockSnapshot;
     if (contentSlice.children.length === 0) {

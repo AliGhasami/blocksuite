@@ -1,16 +1,17 @@
 import type { EditorHost } from '@blocksuite/block-std';
 
-import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import {
+  AIDoneIcon,
+  CopyIcon,
+  WarningIcon,
+} from '@blocksuite/affine-components/icons';
+import { NotificationProvider } from '@blocksuite/affine-shared/services';
+import { WithDisposable } from '@blocksuite/global/utils';
+import { css, html, LitElement, nothing } from 'lit';
+import { property, state } from 'lit/decorators.js';
 
 import type { CopyConfig } from '../type.js';
 
-import { AIDoneIcon } from '../../../../_common/icons/ai.js';
-import { WarningIcon } from '../../../../_common/icons/misc.js';
-import { CopyIcon } from '../../../../_common/icons/text.js';
-
-@customElement('ai-finish-tip')
 export class AIFinishTip extends WithDisposable(LitElement) {
   static override styles = css`
     .finish-tip {
@@ -76,10 +77,9 @@ export class AIFinishTip extends WithDisposable(LitElement) {
                   @click=${async () => {
                     this.copied = !!(await this.copy?.onCopy());
                     if (this.copied) {
-                      const rootService =
-                        this.host.spec.getService('affine:page');
-                      const { notificationService } = rootService;
-                      notificationService?.toast('Copied to clipboard');
+                      this.host.std
+                        .getOptional(NotificationProvider)
+                        ?.toast('Copied to clipboard');
                     }
                   }}
                 >

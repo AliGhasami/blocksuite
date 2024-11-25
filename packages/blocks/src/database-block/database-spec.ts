@@ -1,14 +1,21 @@
-import type { BlockSpec } from '@blocksuite/block-std';
-
+import {
+  BlockViewExtension,
+  CommandExtension,
+  type ExtensionType,
+  FlavourExtension,
+} from '@blocksuite/block-std';
+import { DatabaseSelectionExtension } from '@blocksuite/data-view';
 import { literal } from 'lit/static-html.js';
 
-import { DatabaseBlockSchema } from './database-model.js';
+import { commands } from './commands.js';
+import { DatabaseDragHandleOption } from './config.js';
 import { DatabaseBlockService } from './database-service.js';
 
-export const DatabaseBlockSpec: BlockSpec = {
-  schema: DatabaseBlockSchema,
-  service: DatabaseBlockService,
-  view: {
-    component: literal`affine-database`,
-  },
-};
+export const DatabaseBlockSpec: ExtensionType[] = [
+  FlavourExtension('affine:database'),
+  DatabaseBlockService,
+  CommandExtension(commands),
+  BlockViewExtension('affine:database', literal`affine-database`),
+  DatabaseDragHandleOption,
+  DatabaseSelectionExtension,
+];

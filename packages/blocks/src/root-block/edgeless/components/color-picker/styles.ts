@@ -1,6 +1,5 @@
+import { FONT_SM, FONT_XS } from '@blocksuite/affine-shared/styles';
 import { css } from 'lit';
-
-import { FONT_SM, FONT_XS } from '../../../../_common/styles.js';
 
 export const COLOR_PICKER_STYLE = css`
   :host {
@@ -41,7 +40,7 @@ export const COLOR_PICKER_STYLE = css`
 
   nav button[active] {
     color: var(--affine-text-primary-color, #121212);
-    background: var(--affine-white);
+    background: var(--affine-background-primary-color);
     box-shadow: var(--affine-shadow-1);
     pointer-events: none;
   }
@@ -78,7 +77,7 @@ export const COLOR_PICKER_STYLE = css`
 
     ${FONT_XS};
     font-weight: 400;
-    color: var(--affine-text-primary-color);
+    color: #8e8d91;
   }
   .modes .mode.light button {
     background: white;
@@ -96,7 +95,7 @@ export const COLOR_PICKER_STYLE = css`
   }
   .modes .mode button[active] {
     pointer-events: none;
-    outline: 2px solid var(--affine-brand-color);
+    outline: 2px solid var(--affine-brand-color, #1e96eb);
   }
 
   .content {
@@ -115,7 +114,7 @@ export const COLOR_PICKER_STYLE = css`
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 4px;
+    border-radius: 8px;
   }
   .color-palette-wrapper::after {
     content: '';
@@ -126,7 +125,7 @@ export const COLOR_PICKER_STYLE = css`
     bottom: 0;
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 8px;
     overflow: hidden;
     pointer-events: none;
   }
@@ -256,7 +255,7 @@ export const COLOR_PICKER_STYLE = css`
     gap: 4px;
     border-radius: 8px;
     border: 1px solid var(--affine-border-color);
-    background: var(--affine-white-30);
+    background: var(--affine-background-tertiary-color);
     box-sizing: border-box;
   }
 
@@ -264,7 +263,7 @@ export const COLOR_PICKER_STYLE = css`
     width: 134px;
   }
 
-  .field.opacity {
+  .field.alpha {
     width: 56px;
     gap: 0;
   }

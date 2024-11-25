@@ -1,32 +1,80 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { BlockStdScope, EditorHost } from '@blocksuite/block-std';
+import type { InlineRange } from '@blocksuite/inline';
 import type { TemplateResult } from 'lit';
 
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
-
-import { toast } from '../../../_common/components/toast.js';
 import {
   ImportIcon,
   LinkedDocIcon,
   LinkedEdgelessIcon,
   NewDocIcon,
-} from '../../../_common/icons/index.js';
-import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
-import { createDefaultDoc } from '../../../_common/utils/init.js';
-import { isFuzzyMatch } from '../../../_common/utils/string.js';
+} from '@blocksuite/affine-components/icons';
+import {
+  type AffineInlineEditor,
+  insertLinkedNode,
+} from '@blocksuite/affine-components/rich-text';
+import { toast } from '@blocksuite/affine-components/toast';
+import {
+  DocModeProvider,
+  TelemetryProvider,
+} from '@blocksuite/affine-shared/services';
+import {
+  createDefaultDoc,
+  isFuzzyMatch,
+  type Signal,
+} from '@blocksuite/affine-shared/utils';
+
 import { showImportModal } from './import-doc/index.js';
+
+export interface LinkedWidgetConfig {
+  /**
+   * The first item of the trigger keys will be the primary key
+   * e.g. @, [[
+   */
+  triggerKeys: [string, ...string[]];
+  /**
+   * Convert trigger key to primary key (the first item of the trigger keys)
+   * [[ -> @
+   */
+  convertTriggerKey: boolean;
+  ignoreBlockTypes: (keyof BlockSuite.BlockModels)[];
+  getMenus: (
+    query: string,
+    abort: () => void,
+    editorHost: EditorHost,
+    inlineEditor: AffineInlineEditor,
+    abortSignal: AbortSignal
+  ) => Promise<LinkedMenuGroup[]> | LinkedMenuGroup[];
+
+  mobile: {
+    useScreenHeight?: boolean;
+    /**
+     * The linked doc menu widget will scroll the container to make sure the input cursor is visible in viewport.
+     * It accepts a selector string, HTMLElement or Window
+     *
+     * @default getViewportElement(editorHost) this is the scrollable container in playground
+     */
+    scrollContainer?: string | HTMLElement | Window;
+    /**
+     * The offset between the top of viewport and the input cursor
+     *
+     * @default 46 The height of header in playground
+     */
+    scrollTopOffset?: number | (() => number);
+  };
+}
 
 export type LinkedMenuItem = {
   key: string;
-  name: string;
+  name: string | TemplateResult<1>;
   icon: TemplateResult<1>;
-  // suffix?: TemplateResult<1>;
+  suffix?: string | TemplateResult<1>;
   // disabled?: boolean;
   action: () => Promise<void> | void;
 };
 
 export type LinkedMenuGroup = {
   name: string;
-  items: LinkedMenuItem[];
+  items: LinkedMenuItem[] | Signal<LinkedMenuItem[]>;
   styles?: string;
   // maximum quantity displayed by default
   maxDisplay?: number;
@@ -34,27 +82,17 @@ export type LinkedMenuGroup = {
   overflowText?: string;
 };
 
+export type LinkedDocContext = {
+  std: BlockStdScope;
+  inlineEditor: AffineInlineEditor;
+  startRange: InlineRange;
+  triggerKey: string;
+  config: LinkedWidgetConfig;
+  close: () => void;
+};
+
 const DEFAULT_DOC_NAME = 'Untitled';
 const DISPLAY_NAME_LENGTH = 8;
-
-export function insertLinkedNode({
-  inlineEditor,
-  docId,
-}: {
-  inlineEditor: AffineInlineEditor;
-  docId: string;
-}) {
-  if (!inlineEditor) return;
-  const inlineRange = inlineEditor.getInlineRange();
-  if (!inlineRange) return;
-  inlineEditor.insertText(inlineRange, REFERENCE_NODE, {
-    reference: { type: 'LinkedPage', pageId: docId },
-  });
-  inlineEditor.setInlineRange({
-    index: inlineRange.index + 1,
-    length: 0,
-  });
-}
 
 export function createLinkedDocMenuGroup(
   query: string,
@@ -63,7 +101,6 @@ export function createLinkedDocMenuGroup(
   inlineEditor: AffineInlineEditor
 ) {
   const doc = editorHost.doc;
-  const { docModeService } = editorHost.std.spec.getService('affine:page');
   const { docMetas } = doc.collection.meta;
   const filteredDocList = docMetas
     .filter(({ id }) => id !== doc.id)
@@ -76,7 +113,8 @@ export function createLinkedDocMenuGroup(
       key: doc.id,
       name: doc.title || DEFAULT_DOC_NAME,
       icon:
-        docModeService.getMode(doc.id) === 'edgeless'
+        editorHost.std.get(DocModeProvider).getPrimaryMode(doc.id) ===
+        'edgeless'
           ? LinkedEdgelessIcon
           : LinkedDocIcon,
       action: () => {
@@ -85,9 +123,9 @@ export function createLinkedDocMenuGroup(
           inlineEditor,
           docId: doc.id,
         });
-        editorHost.spec
-          .getService('affine:page')
-          .telemetryService?.track('LinkedDocCreated', {
+        editorHost.std
+          .getOptional(TelemetryProvider)
+          ?.track('LinkedDocCreated', {
             control: 'linked doc',
             module: 'inline @',
             type: 'doc',
@@ -130,7 +168,7 @@ export function createNewDocMenuGroup(
             docId: newDoc.id,
           });
           const telemetryService =
-            editorHost.spec.getService('affine:page').telemetryService;
+            editorHost.std.getOptional(TelemetryProvider);
           telemetryService?.track('LinkedDocCreated', {
             control: 'new doc',
             module: 'inline @',

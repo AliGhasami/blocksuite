@@ -1,3 +1,4 @@
+/** @alighasami for check merge **/
 export {
   AFFINE_AI_PANEL_WIDGET,
   AffineAIPanelWidget,
@@ -25,23 +26,26 @@ export {
   AFFINE_EMBED_CARD_TOOLBAR_WIDGET,
   EmbedCardToolbar,
 } from './embed-card-toolbar/embed-card-toolbar.js';
-/*export { toolbarDefaultConfig } from './format-bar/config.js';
+export { toolbarDefaultConfig } from './format-bar/config.js';
 export {
   AFFINE_FORMAT_BAR_WIDGET,
   AffineFormatBarWidget,
-} from './format-bar/format-bar.js';*/
-
+} from './format-bar/format-bar.js';
+export { AffineFrameTitleWidget } from './frame-title/index.js';
 export { AffineImageToolbarWidget } from './image-toolbar/index.js';
-
 export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
-export { LinkedWidgetUtils } from './linked-doc/config.js';
+export * from './keyboard-toolbar/index.js';
+export {
+  type LinkedMenuGroup,
+  type LinkedMenuItem,
+  type LinkedWidgetConfig,
+  LinkedWidgetUtils,
+} from './linked-doc/config.js';
 export {
   // It's used in the AFFiNE!
   showImportModal,
 } from './linked-doc/import-doc/index.js';
 export { AffineLinkedDocWidget } from './linked-doc/index.js';
-export { MahdaadMentionMenuWidget } from './mahdaad-mention/index.js';
-export { AffineMahdaadObjectPickerWidget } from './mahdaad-object-picker/index.js';
 export { AffineModalWidget } from './modal/modal.js';
 export { AffinePageDraggingAreaWidget } from './page-dragging-area/page-dragging-area.js';
 export { AffinePieMenuWidget } from './pie-menu/index.js';
@@ -53,7 +57,5 @@ export {
   type AffineSlashMenuItemGenerator,
   AffineSlashMenuWidget,
   type AffineSlashSubMenu,
-  insertContent,
 } from './slash-menu/index.js';
-
 export { AffineSurfaceRefToolbar } from './surface-ref-toolbar/surface-ref-toolbar.js';

@@ -1,32 +1,4 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { Bound } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
-import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { join } from 'lit/directives/join.js';
-import { type Ref, createRef, ref } from 'lit/directives/ref.js';
-import { when } from 'lit/directives/when.js';
-
-import type { EditorMenuButton } from '../../../_common/components/toolbar/menu-button.js';
-import type { CssVariableName } from '../../../_common/theme/css-variables.js';
-import type { ColorScheme } from '../../../_common/theme/theme-observer.js';
-import type { NoteBlockModel } from '../../../note-block/note-model.js';
-import type { StrokeStyle } from '../../../surface-block/index.js';
-import type {
-  EdgelessColorPickerButton,
-  PickColorEvent,
-} from '../../edgeless/components/color-picker/index.js';
-import type { ColorEvent } from '../../edgeless/components/panel/color-panel.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-
-import '../../../_common/components/toolbar/icon-button.js';
-import '../../../_common/components/toolbar/menu-button.js';
-import '../../../_common/components/toolbar/separator.js';
-import { renderToolbarSeparator } from '../../../_common/components/toolbar/separator.js';
-import {
-  DEFAULT_NOTE_BACKGROUND_COLOR,
-  NOTE_BACKGROUND_COLORS,
-} from '../../../_common/edgeless/note/consts.js';
+/** @alighasami for check merge **/
 import {
   ExpandIcon,
   LineStyleIcon,
@@ -35,24 +7,49 @@ import {
   ScissorsIcon,
   ShrinkIcon,
   SmallArrowDownIcon,
-} from '../../../_common/icons/index.js';
-import { NoteDisplayMode } from '../../../_common/types.js';
-import { countBy, maxBy } from '../../../_common/utils/iterable.js';
-import { matchFlavours } from '../../../_common/utils/model.js';
-import '../../edgeless/components/color-picker/index.js';
+} from '@blocksuite/affine-components/icons';
+import {
+  type EditorMenuButton,
+  renderToolbarSeparator,
+} from '@blocksuite/affine-components/toolbar';
+import {
+  type ColorScheme,
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NOTE_BACKGROUND_COLORS,
+  type NoteBlockModel,
+  NoteDisplayMode,
+  type StrokeStyle,
+} from '@blocksuite/affine-model';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import {
+  assertExists,
+  Bound,
+  countBy,
+  maxBy,
+  WithDisposable,
+} from '@blocksuite/global/utils';
+import { html, LitElement, nothing, type TemplateResult } from 'lit';
+import { property, query } from 'lit/decorators.js';
+import { join } from 'lit/directives/join.js';
+import { createRef, type Ref, ref } from 'lit/directives/ref.js';
+import { when } from 'lit/directives/when.js';
+
+import type {
+  EdgelessColorPickerButton,
+  PickColorEvent,
+} from '../../edgeless/components/color-picker/index.js';
+import type { ColorEvent } from '../../edgeless/components/panel/color-panel.js';
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+
 import {
   packColor,
   packColorsWithColorScheme,
 } from '../../edgeless/components/color-picker/utils.js';
-import '../../edgeless/components/panel/color-panel.js';
 import {
   type LineStyleEvent,
   LineStylesPanel,
 } from '../../edgeless/components/panel/line-styles-panel.js';
-import '../../edgeless/components/panel/note-display-mode-panel.js';
-import '../../edgeless/components/panel/note-shadow-panel.js';
-import '../../edgeless/components/panel/scale-panel.js';
-import '../../edgeless/components/panel/size-panel.js';
 import { getTooltipWithShortcut } from '../../edgeless/components/utils.js';
 
 const SIZE_LIST = [
@@ -75,20 +72,25 @@ function getMostCommonBackground(
 ): string | null {
   const colors = countBy(elements, (ele: NoteBlockModel) => {
     return typeof ele.background === 'object'
-      ? ele.background[colorScheme] ?? ele.background.normal ?? null
+      ? (ele.background[colorScheme] ?? ele.background.normal ?? null)
       : ele.background;
   });
   const max = maxBy(Object.entries(colors), ([_k, count]) => count);
   return max ? (max[0] as string) : null;
 }
 
-@customElement('edgeless-change-note-button')
 export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
-  private _setBorderRadius = (size: number) => {
+  private _setBorderRadius = (borderRadius: number) => {
     this.notes.forEach(note => {
-      this.doc.updateBlock(note, () => {
-        note.edgeless.style.borderRadius = size;
-      });
+      const props = {
+        edgeless: {
+          style: {
+            ...note.edgeless.style,
+            borderRadius,
+          },
+        },
+      };
+      this.edgeless.service.updateElement(note.id, props);
     });
   };
 
@@ -109,12 +111,9 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
 
   pickColor = (event: PickColorEvent) => {
     if (event.type === 'pick') {
-      const { type, value } = event.detail;
-      this.notes.forEach(ele => {
-        this.doc.updateBlock(
-          ele,
-          packColor(type, 'background', value, ele.background)
-        );
+      this.notes.forEach(element => {
+        const props = packColor('background', { ...event.detail });
+        this.edgeless.service.updateElement(element.id, props);
       });
       return;
     }
@@ -123,6 +122,14 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
       ele[event.type === 'start' ? 'stash' : 'pop']('background')
     );
   };
+
+  private get _advancedVisibilityEnabled() {
+    return this.doc.awarenessStore.getFlag('enable_advanced_block_visibility');
+  }
+
+  private get doc() {
+    return this.edgeless.doc;
+  }
 
   private _getScaleLabel(scale: number) {
     return Math.round(scale * 100) + '%';
@@ -135,13 +142,10 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     this.edgeless.slots.toggleNoteSlicer.emit();
   }
 
-  private _setBackground(background: CssVariableName) {
-    this.notes.forEach(note => {
-      this.doc.updateBlock(note, { background });
+  private _setBackground(background: string) {
+    this.notes.forEach(element => {
+      this.edgeless.service.updateElement(element.id, { background });
     });
-    this.edgeless.service.editPropsStore.recordLastProps('affine:note', {
-      background,
-    } as Record<string, unknown>);
   }
 
   private _setCollapse() {
@@ -171,7 +175,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
       return;
     }
 
-    this.doc.updateBlock(note, { displayMode: newMode });
+    this.edgeless.service.updateElement(note.id, { displayMode: newMode });
 
     const noteParent = this.doc.getParent(note);
     assertExists(noteParent);
@@ -198,25 +202,43 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
 
   private _setShadowType(shadowType: string) {
     this.notes.forEach(note => {
-      this.doc.updateBlock(note, () => {
-        note.edgeless.style.shadowType = shadowType;
-      });
+      const props = {
+        edgeless: {
+          style: {
+            ...note.edgeless.style,
+            shadowType,
+          },
+        },
+      };
+      this.edgeless.service.updateElement(note.id, props);
     });
   }
 
   private _setStrokeStyle(borderStyle: StrokeStyle) {
     this.notes.forEach(note => {
-      this.doc.updateBlock(note, () => {
-        note.edgeless.style.borderStyle = borderStyle;
-      });
+      const props = {
+        edgeless: {
+          style: {
+            ...note.edgeless.style,
+            borderStyle,
+          },
+        },
+      };
+      this.edgeless.service.updateElement(note.id, props);
     });
   }
 
   private _setStrokeWidth(borderSize: number) {
     this.notes.forEach(note => {
-      this.doc.updateBlock(note, () => {
-        note.edgeless.style.borderSize = borderSize;
-      });
+      const props = {
+        edgeless: {
+          style: {
+            ...note.edgeless.style,
+            borderSize,
+          },
+        },
+      };
+      this.edgeless.service.updateElement(note.id, props);
     });
   }
 
@@ -228,10 +250,6 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     if (type === 'lineStyle') {
       this._setStrokeStyle(value);
     }
-  }
-
-  private get doc() {
-    return this.edgeless.doc;
   }
 
   override render() {
@@ -250,11 +268,9 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
     const currentMode = DisplayModeMap[displayMode];
     const onlyOne = len === 1;
     const isDocOnly = displayMode === NoteDisplayMode.DocOnly;
-
+    const theme = this.edgeless.std.get(ThemeProvider).theme;
     const buttons = [
-      // TODO: hidden feature
-      // onlyOne
-      false
+      onlyOne && this._advancedVisibilityEnabled
         ? html`
             <span class="display-mode-button-label">Show in</span>
             <editor-menu-button
@@ -321,10 +337,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
               >
                 <edgeless-color-panel
                   .value=${background}
-                  .options=${[
-                    '--affine-palette-transparent',
-                    ...NOTE_BACKGROUND_COLORS,
-                  ]}
+                  .options=${NOTE_BACKGROUND_COLORS}
                   @select=${(e: ColorEvent) => this._setBackground(e.detail)}
                 >
                 </edgeless-color-panel>
@@ -347,6 +360,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
               `}
             >
               <edgeless-note-shadow-panel
+                .theme=${theme}
                 .value=${shadowType}
                 .background=${background}
                 .onSelect=${(value: string) => this._setShadowType(value)}
@@ -393,7 +407,7 @@ export class EdgelessChangeNoteButton extends WithDisposable(LitElement) {
             </editor-menu-button>
           `,
 
-      onlyOne
+      onlyOne && this._advancedVisibilityEnabled
         ? html`
             <editor-icon-button
               aria-label="Slicer"

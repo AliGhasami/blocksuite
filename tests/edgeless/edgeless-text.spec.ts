@@ -1,22 +1,28 @@
-import type { EdgelessTextBlockComponent } from '@blocks/edgeless-text/edgeless-text-block.js';
+import type { EdgelessTextBlockComponent } from '@blocks/edgeless-text-block/edgeless-text-block.js';
 
-import { Bound } from '@global/utils/bound.js';
-import { type Page, expect } from '@playwright/test';
+import { Bound } from '@blocksuite/global/utils';
+import { expect, type Page } from '@playwright/test';
 
 import {
+  autoFit,
   captureHistory,
+  cutByKeyboard,
   dragBetweenIndices,
   enterPlaygroundRoom,
   getEdgelessSelectedRect,
+  getPageSnapshot,
   initEmptyEdgelessState,
+  pasteByKeyboard,
   pressArrowLeft,
   pressArrowRight,
   pressArrowUp,
   pressBackspace,
   pressEnter,
   pressEscape,
+  selectAllByKeyboard,
   setEdgelessTool,
   switchEditorMode,
+  toViewCoord,
   type,
   undoByKeyboard,
   waitNextFrame,
@@ -31,7 +37,11 @@ import {
 import { test } from '../utils/playwright.js';
 import { getFormatBar } from '../utils/query.js';
 
-async function assertEdgelessTextRect(page: Page, id: string, bound: Bound) {
+async function assertEdgelessTextModelRect(
+  page: Page,
+  id: string,
+  bound: Bound
+) {
   const realXYWH = await page.evaluate(id => {
     const block = window.host.view.getBlock(id) as EdgelessTextBlockComponent;
     return block?.model.xywh;
@@ -60,6 +70,10 @@ test.describe('edgeless text block', () => {
       delay: 100,
     });
     await waitNextFrame(page);
+
+    // https://github.com/toeverything/blocksuite/pull/8574
+    await pressBackspace(page);
+
     await type(page, 'aaa');
     await pressEnter(page);
     await type(page, 'bbb');
@@ -140,23 +154,36 @@ test.describe('edgeless text block', () => {
 
   test('edgeless text width auto-adjusting', async ({ page }) => {
     await setEdgelessTool(page, 'default');
-    await page.mouse.dblclick(130, 140, {
+    const point = await toViewCoord(page, [0, 0]);
+    await page.mouse.dblclick(point[0], point[1], {
       delay: 100,
     });
     await waitNextFrame(page);
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 50, 56));
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 50, 26));
 
-    await type(page, 'aaaaaa');
-    await waitNextFrame(page, 200);
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 71, 56));
+    await type(page, 'aaaaaaaaaa');
+    await waitNextFrame(page, 1000);
+    // just width changed
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 83, 26));
 
     await type(page, '\nbbb');
-    // width not changed
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 71, 90));
-    await type(page, '\nccccccc');
+    // width not changed, height changed
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 83, 50));
+    await type(page, '\ncccccccccccccccc');
 
-    // width changed
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 79, 124));
+    // width and height changed
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 131, 74));
+
+    // blur, max width set to true
+    await page.mouse.click(point[0] - 50, point[1], {
+      delay: 100,
+    });
+    await page.mouse.dblclick(point[0], point[1], {
+      delay: 100,
+    });
+    await type(page, 'dddddddddddddddddddd');
+    // width not changed, height changed
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 131, 98));
   });
 
   test('edgeless text width fixed when drag moving', async ({ page }) => {
@@ -201,10 +228,21 @@ test.describe('edgeless text block', () => {
       delay: 100,
     });
     await waitNextFrame(page);
-    const block = page.locator('affine-edgeless-text[data-block-id="4"]');
+    let block = page.locator('affine-edgeless-text[data-block-id="4"]');
     expect(await block.isVisible()).toBe(true);
     await page.mouse.click(0, 0);
     expect(await block.isVisible()).toBe(false);
+
+    block = page.locator('affine-edgeless-text[data-block-id="6"]');
+    expect(await block.isVisible()).not.toBe(true);
+    await page.mouse.dblclick(130, 140, {
+      delay: 100,
+    });
+    expect(await block.isVisible()).toBe(true);
+    await type(page, '\na');
+    expect(await block.isVisible()).toBe(true);
+    await page.mouse.click(0, 0);
+    expect(await block.isVisible()).not.toBe(false);
   });
 
   test('edgeless text should maintain selection when deleting across multiple lines', async ({
@@ -251,26 +289,28 @@ test.describe('edgeless text block', () => {
     await assertBlockTextContent(page, 5, 'b');
   });
 
-  test('edgeless text max width', async ({ page }) => {
+  // FIXME(@flrande): This test fails randomly on CI
+  test.fixme('edgeless text max width', async ({ page }) => {
     await setEdgelessTool(page, 'default');
-    await page.mouse.dblclick(130, 140, {
+    const point = await toViewCoord(page, [0, 0]);
+    await page.mouse.dblclick(point[0], point[1], {
       delay: 100,
     });
     await waitNextFrame(page);
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 50, 56));
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 50, 56));
 
     await type(page, 'aaaaaa');
     await waitNextFrame(page);
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 71, 56));
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 71, 56));
     await type(page, 'bbb');
     await waitNextFrame(page, 200);
     // height not changed
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 98, 56));
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 98, 56));
 
     // blur
     await page.mouse.click(0, 0);
     // select text element
-    await page.mouse.click(130, 140);
+    await page.mouse.click(point[0] + 10, point[1] + 10);
 
     let selectedRect = await getEdgelessSelectedRect(page);
 
@@ -290,7 +330,7 @@ test.describe('edgeless text block', () => {
       }
     );
     await page.mouse.up();
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 128, 56));
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 128, 56));
     selectedRect = await getEdgelessSelectedRect(page);
     let textRect = await page
       .locator('affine-edgeless-text[data-block-id="4"]')
@@ -316,7 +356,7 @@ test.describe('edgeless text block', () => {
     );
     await page.mouse.up();
     // height changed
-    await assertEdgelessTextRect(page, '4', new Bound(25, -287.5, 83, 80));
+    await assertEdgelessTextModelRect(page, '4', new Bound(-25, -25, 83, 80));
     selectedRect = await getEdgelessSelectedRect(page);
     textRect = await page
       .locator('affine-edgeless-text[data-block-id="4"]')
@@ -327,4 +367,230 @@ test.describe('edgeless text block', () => {
     expect(selectedRect.x).toBeCloseTo(textRect!.x);
     expect(selectedRect.y).toBeCloseTo(textRect!.y);
   });
+
+  test('min width limit for embed block', async ({ page }, testInfo) => {
+    await setEdgelessTool(page, 'default');
+    const point = await toViewCoord(page, [0, 0]);
+    await page.mouse.dblclick(point[0], point[1], {
+      delay: 100,
+    });
+    await waitNextFrame(page);
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_init.json`
+    );
+
+    await type(page, '@');
+    await pressEnter(page);
+    await waitNextFrame(page, 200);
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_add_linked_doc.json`
+    );
+
+    await page.locator('affine-reference').hover();
+    await page.getByLabel('Switch view').click();
+    await page.getByTestId('link-to-card').click();
+    await autoFit(page);
+
+    await waitNextFrame(page);
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_link_to_card.json`
+    );
+
+    // blur
+    await page.mouse.click(0, 0);
+    // select text element
+    await page.mouse.click(point[0] + 10, point[1] + 10);
+    await waitNextFrame(page, 200);
+    const selectedRect0 = await getEdgelessSelectedRect(page);
+
+    // from right to left
+    await page.mouse.move(
+      selectedRect0.x + selectedRect0.width,
+      selectedRect0.y + selectedRect0.height / 2
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      selectedRect0.x,
+      selectedRect0.y + selectedRect0.height / 2,
+      {
+        steps: 10,
+      }
+    );
+    await page.mouse.up();
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_link_to_card_min_width.json`
+    );
+
+    const selectedRect1 = await getEdgelessSelectedRect(page);
+    // from left to right
+    await page.mouse.move(
+      selectedRect1.x + selectedRect1.width,
+      selectedRect1.y + selectedRect1.height / 2
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      selectedRect0.x + selectedRect0.width + 45,
+      selectedRect1.y + selectedRect1.height / 2,
+      {
+        steps: 10,
+      }
+    );
+    await page.mouse.up();
+
+    expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+      `${testInfo.title}_drag.json`
+    );
+  });
+
+  test('cut edgeless text', async ({ page }) => {
+    await setEdgelessTool(page, 'default');
+    await page.mouse.dblclick(130, 140, {
+      delay: 100,
+    });
+    await waitNextFrame(page);
+    await type(page, 'aaaa\nbbbb\ncccc');
+
+    const edgelessText = page.locator('affine-edgeless-text');
+    const paragraph = page.locator('affine-edgeless-text affine-paragraph');
+
+    expect(await edgelessText.count()).toBe(1);
+    expect(await paragraph.count()).toBe(3);
+
+    await page.mouse.click(50, 50, {
+      delay: 100,
+    });
+    await waitNextFrame(page);
+    await page.mouse.click(130, 140, {
+      delay: 100,
+    });
+    await cutByKeyboard(page);
+    expect(await edgelessText.count()).toBe(0);
+    expect(await paragraph.count()).toBe(0);
+
+    await pasteByKeyboard(page);
+    expect(await edgelessText.count()).toBe(1);
+    expect(await paragraph.count()).toBe(3);
+  });
+
+  test('latex in edgeless text', async ({ page }) => {
+    await setEdgelessTool(page, 'default');
+    await page.mouse.dblclick(130, 140, {
+      delay: 100,
+    });
+    await waitNextFrame(page);
+    await type(page, '$$bbb$$ ');
+    await assertRichTextInlineDeltas(
+      page,
+      [
+        {
+          insert: ' ',
+          attributes: {
+            latex: 'bbb',
+          },
+        },
+      ],
+      1
+    );
+
+    await page.locator('affine-latex-node').click();
+    await waitNextFrame(page);
+    await type(page, 'ccc');
+    await assertRichTextInlineDeltas(
+      page,
+      [
+        {
+          insert: ' ',
+          attributes: {
+            latex: 'bbbccc',
+          },
+        },
+      ],
+      1
+    );
+
+    await page.locator('.latex-editor-hint').click();
+    await type(page, 'sss');
+    await assertRichTextInlineDeltas(
+      page,
+      [
+        {
+          insert: ' ',
+          attributes: {
+            latex: 'bbbccc',
+          },
+        },
+      ],
+      1
+    );
+    await page.locator('latex-editor-unit').click();
+    await selectAllByKeyboard(page);
+    await type(page, 'sss');
+    await assertRichTextInlineDeltas(
+      page,
+      [
+        {
+          insert: ' ',
+          attributes: {
+            latex: 'sss',
+          },
+        },
+      ],
+      1
+    );
+  });
+});
+
+test('press backspace at the start of first line when edgeless text exist', async ({
+  page,
+}, testInfo) => {
+  await enterPlaygroundRoom(page, {
+    flags: {
+      enable_edgeless_text: true,
+    },
+  });
+  await page.evaluate(() => {
+    const { doc } = window;
+    const rootId = doc.addBlock('affine:page', {
+      title: new doc.Text(),
+    });
+    doc.addBlock('affine:surface', {}, rootId);
+    doc.addBlock('affine:note', {}, rootId);
+
+    // do not add paragraph block
+
+    doc.resetHistory();
+  });
+  await switchEditorMode(page);
+
+  await setEdgelessTool(page, 'default');
+  const point = await toViewCoord(page, [0, 0]);
+  await page.mouse.dblclick(point[0], point[1], {
+    delay: 100,
+  });
+  await waitNextFrame(page);
+  await type(page, 'aaa');
+
+  await switchEditorMode(page);
+
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_note_empty.json`
+  );
+
+  await page.locator('.affine-page-root-block-container').click();
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_note_not_empty.json`
+  );
+
+  await type(page, 'bbb');
+  await pressArrowLeft(page, 3);
+  await pressBackspace(page);
+  await waitNextFrame(page);
+
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_finial.json`
+  );
 });

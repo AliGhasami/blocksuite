@@ -3,30 +3,28 @@ import { type Disposable, Slot } from '@blocksuite/global/utils';
 import { signal } from '@preact/signals-core';
 
 import type { BlockModel, Schema } from '../../schema/index.js';
+import type { DraftModel } from '../../transformer/index.js';
 import type { BlockOptions } from './block/index.js';
 import type { BlockCollection, BlockProps } from './block-collection.js';
 import type { DocCRUD } from './crud.js';
 
 import { syncBlockProps } from '../../utils/utils.js';
 import { Block } from './block/index.js';
-
-export enum BlockViewType {
-  Bypass = 'bypass',
-  Display = 'display',
-  Hidden = 'hidden',
-}
-
-export type BlockSelector = (block: Block, doc: Doc) => BlockViewType;
+import { type Query, runQuery } from './query.js';
 
 type DocOptions = {
   schema: Schema;
   blockCollection: BlockCollection;
   crud: DocCRUD;
-  selector: BlockSelector;
   readonly?: boolean;
+  query?: Query;
 };
 
 export class Doc {
+  private _runQuery = (block: Block) => {
+    runQuery(this._query, block);
+  };
+
   protected readonly _blockCollection: BlockCollection;
 
   protected readonly _blocks = signal<Record<string, Block>>({});
@@ -35,11 +33,14 @@ export class Doc {
 
   protected readonly _disposeBlockUpdated: Disposable;
 
+  protected readonly _query: Query = {
+    match: [],
+    mode: 'loose',
+  };
+
   protected readonly _readonly?: boolean;
 
   protected readonly _schema: Schema;
-
-  protected readonly _selector: BlockSelector;
 
   readonly slots: BlockCollection['slots'] & {
     /** This is always triggered after `doc.load` is called. */
@@ -75,13 +76,197 @@ export class Doc {
     >;
   };
 
-  constructor({
-    schema,
-    blockCollection,
-    crud,
-    selector,
-    readonly,
-  }: DocOptions) {
+  updateBlock: {
+    <T extends Partial<BlockProps>>(model: BlockModel, props: T): void;
+    (model: BlockModel, callback: () => void): void;
+  } = (
+    model: BlockModel,
+    callBackOrProps: (() => void) | Partial<BlockProps>
+  ) => {
+    if (this.readonly) {
+      console.error('cannot modify data in readonly mode');
+      return;
+    }
+
+    const isCallback = typeof callBackOrProps === 'function';
+
+    if (!isCallback) {
+      const parent = this.getParent(model);
+      this.schema.validate(
+        model.flavour,
+        parent?.flavour,
+        callBackOrProps.children?.map(child => child.flavour)
+      );
+    }
+
+    const yBlock = this._yBlocks.get(model.id);
+    if (!yBlock) {
+      throw new BlockSuiteError(
+        ErrorCode.ModelCRUDError,
+        `updating block: ${model.id} not found`
+      );
+    }
+
+    const block = this.getBlock(model.id);
+    if (!block) return;
+
+    this.transact(() => {
+      if (isCallback) {
+        callBackOrProps();
+        this._runQuery(block);
+        return;
+      }
+
+      if (callBackOrProps.children) {
+        this._crud.updateBlockChildren(
+          model.id,
+          callBackOrProps.children.map(child => child.id)
+        );
+      }
+
+      const schema = this.schema.flavourSchemaMap.get(model.flavour);
+      if (!schema) {
+        throw new BlockSuiteError(
+          ErrorCode.ModelCRUDError,
+          `schema for flavour: ${model.flavour} not found`
+        );
+      }
+      syncBlockProps(schema, model, yBlock, callBackOrProps);
+      this._runQuery(block);
+      return;
+    });
+  };
+
+  private get _yBlocks() {
+    return this._blockCollection.yBlocks;
+  }
+
+  get awarenessStore() {
+    return this._blockCollection.awarenessStore;
+  }
+
+  get awarenessSync() {
+    return this.collection.awarenessSync;
+  }
+
+  get blobSync() {
+    return this.collection.blobSync;
+  }
+
+  get blockCollection() {
+    return this._blockCollection;
+  }
+
+  get blocks() {
+    return this._blocks;
+  }
+
+  get blockSize() {
+    return Object.values(this._blocks.peek()).length;
+  }
+
+  get canRedo() {
+    return this._blockCollection.canRedo;
+  }
+
+  get canUndo() {
+    return this._blockCollection.canUndo;
+  }
+
+  get captureSync() {
+    return this._blockCollection.captureSync.bind(this._blockCollection);
+  }
+
+  get clear() {
+    return this._blockCollection.clear.bind(this._blockCollection);
+  }
+
+  get collection() {
+    return this._blockCollection.collection;
+  }
+
+  get docSync() {
+    return this.collection.docSync;
+  }
+
+  get generateBlockId() {
+    return this._blockCollection.generateBlockId.bind(this._blockCollection);
+  }
+
+  get history() {
+    return this._blockCollection.history;
+  }
+
+  get id() {
+    return this._blockCollection.id;
+  }
+
+  get isEmpty() {
+    return Object.values(this._blocks.peek()).length === 0;
+  }
+
+  get loaded() {
+    return this._blockCollection.loaded;
+  }
+
+  get meta() {
+    return this._blockCollection.meta;
+  }
+
+  get readonly() {
+    if (this._blockCollection.readonly) {
+      return true;
+    }
+    return this._readonly === true;
+  }
+
+  get ready() {
+    return this._blockCollection.ready;
+  }
+
+  get redo() {
+    return this._blockCollection.redo.bind(this._blockCollection);
+  }
+
+  get resetHistory() {
+    return this._blockCollection.resetHistory.bind(this._blockCollection);
+  }
+
+  get root() {
+    const rootId = this._crud.root;
+    if (!rootId) return null;
+    return this.getBlock(rootId)?.model ?? null;
+  }
+
+  get rootDoc() {
+    return this._blockCollection.rootDoc;
+  }
+
+  get schema() {
+    return this._schema;
+  }
+
+  get spaceDoc() {
+    return this._blockCollection.spaceDoc;
+  }
+
+  get Text() {
+    return this._blockCollection.Text;
+  }
+
+  get transact() {
+    return this._blockCollection.transact.bind(this._blockCollection);
+  }
+
+  get undo() {
+    return this._blockCollection.undo.bind(this._blockCollection);
+  }
+
+  get withoutTransact() {
+    return this._blockCollection.withoutTransact.bind(this._blockCollection);
+  }
+
+  constructor({ schema, blockCollection, crud, readonly, query }: DocOptions) {
     this._blockCollection = blockCollection;
 
     this.slots = {
@@ -95,8 +280,10 @@ export class Doc {
 
     this._crud = crud;
     this._schema = schema;
-    this._selector = selector;
     this._readonly = readonly;
+    if (query) {
+      this._query = query;
+    }
 
     this._yBlocks.forEach((_, id) => {
       if (id in this._blocks.peek()) {
@@ -163,9 +350,9 @@ export class Doc {
           });
         },
       };
-      const block = new Block(this._schema, yBlock, this, options);
 
-      block.blockViewType = this._selector(block, this);
+      const block = new Block(this._schema, yBlock, this, options);
+      this._runQuery(block);
 
       this._blocks.value = {
         ...this._blocks.value,
@@ -216,10 +403,6 @@ export class Doc {
       console.error('An error occurred while removing block:');
       console.error(e);
     }
-  }
-
-  private get _yBlocks() {
-    return this._blockCollection.yBlocks;
   }
 
   addBlock<Key extends BlockSuite.Flavour>(
@@ -325,7 +508,7 @@ export class Doc {
   }
 
   deleteBlock(
-    model: BlockModel,
+    model: DraftModel,
     options: {
       bringChildrenTo?: BlockModel;
       deleteChildren?: boolean;
@@ -363,11 +546,11 @@ export class Doc {
     this.slots.rootDeleted.dispose();
   }
 
-  getBlock(id: string) {
+  getBlock(id: string): Block | undefined {
     return this._blocks.peek()[id];
   }
 
-  getBlock$(id: string) {
+  getBlock$(id: string): Block | undefined {
     return this._blocks.value[id];
   }
 
@@ -484,187 +667,5 @@ export class Doc {
         shouldInsertBeforeSibling
       );
     });
-  }
-
-  updateBlock<T extends Partial<BlockProps>>(model: BlockModel, props: T): void;
-
-  updateBlock(model: BlockModel, callback: () => void): void;
-
-  updateBlock(
-    model: BlockModel,
-    callBackOrProps: (() => void) | Partial<BlockProps>
-  ): void {
-    if (this.readonly) {
-      console.error('cannot modify data in readonly mode');
-      return;
-    }
-
-    const isCallback = typeof callBackOrProps === 'function';
-
-    if (!isCallback) {
-      const parent = this.getParent(model);
-      this.schema.validate(
-        model.flavour,
-        parent?.flavour,
-        callBackOrProps.children?.map(child => child.flavour)
-      );
-    }
-
-    const yBlock = this._yBlocks.get(model.id);
-    if (!yBlock) {
-      throw new BlockSuiteError(
-        ErrorCode.ModelCRUDError,
-        `updating block: ${model.id} not found`
-      );
-    }
-
-    this.transact(() => {
-      if (isCallback) {
-        callBackOrProps();
-        return;
-      }
-
-      if (callBackOrProps.children) {
-        this._crud.updateBlockChildren(
-          model.id,
-          callBackOrProps.children.map(child => child.id)
-        );
-      }
-
-      const schema = this.schema.flavourSchemaMap.get(model.flavour);
-      if (!schema) {
-        throw new BlockSuiteError(
-          ErrorCode.ModelCRUDError,
-          `schema for flavour: ${model.flavour} not found`
-        );
-      }
-      syncBlockProps(schema, model, yBlock, callBackOrProps);
-      return;
-    });
-  }
-
-  get Text() {
-    return this._blockCollection.Text;
-  }
-
-  get awarenessStore() {
-    return this._blockCollection.awarenessStore;
-  }
-
-  get awarenessSync() {
-    return this.collection.awarenessSync;
-  }
-
-  get blobSync() {
-    return this.collection.blobSync;
-  }
-
-  get blockCollection() {
-    return this._blockCollection;
-  }
-
-  get blockSize() {
-    return Object.values(this._blocks.peek()).length;
-  }
-
-  get blocks() {
-    return this._blocks;
-  }
-
-  get canRedo() {
-    return this._blockCollection.canRedo;
-  }
-
-  get canUndo() {
-    return this._blockCollection.canUndo;
-  }
-
-  get captureSync() {
-    return this._blockCollection.captureSync.bind(this._blockCollection);
-  }
-
-  get clear() {
-    return this._blockCollection.clear.bind(this._blockCollection);
-  }
-
-  get collection() {
-    return this._blockCollection.collection;
-  }
-
-  get docSync() {
-    return this.collection.docSync;
-  }
-
-  get generateBlockId() {
-    return this._blockCollection.generateBlockId.bind(this._blockCollection);
-  }
-
-  get history() {
-    return this._blockCollection.history;
-  }
-
-  get id() {
-    return this._blockCollection.id;
-  }
-
-  get isEmpty() {
-    return Object.values(this._blocks.peek()).length === 0;
-  }
-
-  get loaded() {
-    return this._blockCollection.loaded;
-  }
-
-  get meta() {
-    return this._blockCollection.meta;
-  }
-
-  get readonly() {
-    if (this._blockCollection.readonly) {
-      return true;
-    }
-    return this._readonly === true;
-  }
-
-  get ready() {
-    return this._blockCollection.ready;
-  }
-
-  get redo() {
-    return this._blockCollection.redo.bind(this._blockCollection);
-  }
-
-  get resetHistory() {
-    return this._blockCollection.resetHistory.bind(this._blockCollection);
-  }
-
-  get root() {
-    const rootId = this._crud.root;
-    if (!rootId) return null;
-    return this.getBlock(rootId)?.model ?? null;
-  }
-
-  get rootDoc() {
-    return this._blockCollection.rootDoc;
-  }
-
-  get schema() {
-    return this._schema;
-  }
-
-  get spaceDoc() {
-    return this._blockCollection.spaceDoc;
-  }
-
-  get transact() {
-    return this._blockCollection.transact.bind(this._blockCollection);
-  }
-
-  get undo() {
-    return this._blockCollection.undo.bind(this._blockCollection);
-  }
-
-  get withoutTransact() {
-    return this._blockCollection.withoutTransact.bind(this._blockCollection);
   }
 }

@@ -1,23 +1,22 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { baseTheme } from '@toeverything/theme';
-import {
-  LitElement,
-  type PropertyValues,
-  css,
-  html,
-  nothing,
-  unsafeCSS,
-} from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-
 import {
   DarkLoadingIcon,
   LightLoadingIcon,
-} from '../../../../_common/icons/text.js';
-import { getThemeMode } from '../../../../_common/utils/query.js';
+} from '@blocksuite/affine-components/icons';
+import { ColorScheme } from '@blocksuite/affine-model';
+import { unsafeCSSVar } from '@blocksuite/affine-shared/theme';
+import { WithDisposable } from '@blocksuite/global/utils';
+import { baseTheme } from '@toeverything/theme';
+import {
+  css,
+  html,
+  LitElement,
+  nothing,
+  type PropertyValues,
+  unsafeCSS,
+} from 'lit';
+import { property } from 'lit/decorators.js';
 
-@customElement('generating-placeholder')
-class GeneratingPlaceholder extends WithDisposable(LitElement) {
+export class GeneratingPlaceholder extends WithDisposable(LitElement) {
   static override styles = css`
     :host {
       display: flex;
@@ -30,7 +29,7 @@ class GeneratingPlaceholder extends WithDisposable(LitElement) {
 
     .generating-header {
       width: 100%;
-      font-size: var(--affine-font-xs);
+      font-size: ${unsafeCSSVar('fontXs')};
       font-style: normal;
       font-weight: 500;
       line-height: 20px;
@@ -39,7 +38,7 @@ class GeneratingPlaceholder extends WithDisposable(LitElement) {
 
     .generating-header,
     .loading-progress {
-      color: var(--affine-text-secondary-color);
+      color: ${unsafeCSSVar('textSecondaryColor')};
       font-family: ${unsafeCSS(baseTheme.fontSansFamily)};
     }
 
@@ -51,9 +50,9 @@ class GeneratingPlaceholder extends WithDisposable(LitElement) {
       box-sizing: border-box;
       width: 100%;
       border-radius: 4px;
-      border: 2px solid var(--affine-primary-color, #1e96eb);
-      background: var(--affine-blue-50, #effaff);
-      color: var(--affine-brand-color);
+      border: 2px solid ${unsafeCSSVar('primaryColor')};
+      background: ${unsafeCSSVar('blue50')};
+      color: ${unsafeCSSVar('brandColor')};
       gap: 4px;
     }
 
@@ -78,20 +77,19 @@ class GeneratingPlaceholder extends WithDisposable(LitElement) {
     }
 
     .loading-text {
-      font-size: var(--affine-font-base);
+      font-size: ${unsafeCSSVar('fontBase')};
       height: 24px;
       line-height: 24px;
     }
 
     .loading-stage {
-      font-size: var(--affine-font-xs);
+      font-size: ${unsafeCSSVar('fontXs')};
       height: 20px;
       line-height: 20px;
     }
   `;
 
   protected override render() {
-    const theme = getThemeMode();
     const loadingText = this.stages[this.loadingProgress - 1] || '';
 
     return html`<style>
@@ -104,7 +102,9 @@ class GeneratingPlaceholder extends WithDisposable(LitElement) {
         : nothing}
       <div class="generating-body">
         <div class="generating-icon">
-          ${theme === 'light' ? LightLoadingIcon : DarkLoadingIcon}
+          ${this.theme === ColorScheme.Light
+            ? DarkLoadingIcon
+            : LightLoadingIcon}
         </div>
         <div class="loading-progress">
           <div class="loading-text">${loadingText}</div>
@@ -135,6 +135,9 @@ class GeneratingPlaceholder extends WithDisposable(LitElement) {
 
   @property({ attribute: false })
   accessor stages!: string[];
+
+  @property({ attribute: false })
+  accessor theme!: ColorScheme;
 }
 
 declare global {

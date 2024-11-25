@@ -72,18 +72,41 @@ function isDepInclude(
 const chunkGroups = {
   framework: [
     require.resolve('@blocksuite/block-std'),
+    require.resolve('@blocksuite/block-std/gfx'),
     require.resolve('@blocksuite/global'),
     require.resolve('@blocksuite/global/utils'),
     require.resolve('@blocksuite/global/env'),
     require.resolve('@blocksuite/global/exceptions'),
+    require.resolve('@blocksuite/global/di'),
     require.resolve('@blocksuite/inline'),
     require.resolve('@blocksuite/store'),
     require.resolve('@blocksuite/sync'),
   ],
+  components: [
+    require.resolve('@blocksuite/affine-components/icons'),
+    require.resolve('@blocksuite/affine-components/peek'),
+    require.resolve('@blocksuite/affine-components/portal'),
+    require.resolve('@blocksuite/affine-components/hover'),
+    require.resolve('@blocksuite/affine-components/toolbar'),
+    require.resolve('@blocksuite/affine-components/toast'),
+    require.resolve('@blocksuite/affine-components/rich-text'),
+    require.resolve('@blocksuite/affine-components/caption'),
+    require.resolve('@blocksuite/affine-components/context-menu'),
+    require.resolve('@blocksuite/affine-components/date-picker'),
+    require.resolve('@blocksuite/affine-components/drag-indicator'),
+  ],
+  affine: [
+    require.resolve('@blocksuite/affine-shared'),
+    require.resolve('@blocksuite/affine-model'),
+    require.resolve('@blocksuite/affine-block-list'),
+    require.resolve('@blocksuite/affine-block-paragraph'),
+    require.resolve('@blocksuite/affine-block-surface'),
+    require.resolve('@blocksuite/data-view'),
+  ],
   datefns: [path.dirname(require.resolve('date-fns'))],
   dompurify: [path.dirname(require.resolve('dompurify'))],
   shiki: [path.dirname(require.resolve('@shikijs/core'))],
-  dotLottie: [path.dirname(require.resolve('@dotlottie/player-component'))],
+  dotLottie: [path.dirname(require.resolve('@lottiefiles/dotlottie-wc'))],
   unified: [
     path.dirname(require.resolve('unified')),
     path.dirname(require.resolve('rehype-parse')),
@@ -100,16 +123,38 @@ const chunkGroups = {
     path.dirname(require.resolve('micromark-extension-gfm-task-list-item')),
     path.dirname(require.resolve('micromark-util-combine-extensions')),
   ],
-  ai: [
-    path.dirname(require.resolve('@fal-ai/serverless-client')),
-    path.dirname(require.resolve('openai')),
-  ],
   blocks: [
     require.resolve('@blocksuite/blocks'),
     require.resolve('@blocksuite/blocks/schemas'),
   ],
   presets: [require.resolve('@blocksuite/presets')],
+  common: [
+    require.resolve('@blocksuite/icons/lit'),
+    require.resolve('@toeverything/theme'),
+    require.resolve('@toeverything/y-indexeddb'),
+    require.resolve('@preact/signals-core'),
+    require.resolve('@lit/context'),
+    require.resolve('lit'),
+    require.resolve('zod'),
+    require.resolve('minimatch'),
+    require.resolve('nanoid'),
+    require.resolve('yjs'),
+  ],
 };
+
+const clearSiteDataPlugin = () =>
+  ({
+    name: 'clear-site-data',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url === '/Clear-Site-Data') {
+          res.statusCode = 200;
+          res.setHeader('Clear-Site-Data', '"*"');
+        }
+        next();
+      });
+    },
+  }) as Plugin;
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
@@ -140,12 +185,16 @@ export default ({ mode }) => {
           forceBuildInstrument: true,
         }),
       wasm(),
+      clearSiteDataPlugin(),
     ],
     esbuild: {
       target: 'es2018',
     },
+    resolve: {
+      extensions: ['.ts', '.js'],
+    },
     build: {
-      target: 'ES2022',
+      target: 'es2022',
       sourcemap: true,
       rollupOptions: {
         cache: false,
@@ -181,12 +230,8 @@ export default ({ mode }) => {
             'examples/multiple-editors/edgeless-edgeless/index.html'
           ),
           'examples/inline': resolve(__dirname, 'examples/inline/index.html'),
-          'examples/store': resolve(__dirname, 'examples/store/index.html'),
-          'examples/provider': resolve(
-            __dirname,
-            'examples/provider/index.html'
-          ),
         },
+        treeshake: true,
         output: {
           sourcemapIgnoreList: relativeSourcePath => {
             const normalizedPath = path.normalize(relativeSourcePath);

@@ -14,7 +14,7 @@ import {
   NumberedListIcon,
   QuoteIcon,
   TextIcon,
-} from '../icons/index.js';
+} from '@blocksuite/affine-components/icons';
 
 /**
  * Text primitive entries used in slash menu and format bar,
@@ -130,7 +130,7 @@ export const textConversionConfigs: TextConversionConfig[] = [
     flavour: 'affine:divider',
     type: 'divider',
     name: 'Divider',
-    description: 'Insert a line to separate sections.',
+    description: 'Visually separate content.',
     hotkey: [`Mod-Alt-d`, `Mod-Shift-d`],
     icon: DividerIcon,
   },

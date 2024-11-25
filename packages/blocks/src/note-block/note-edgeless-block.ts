@@ -1,39 +1,39 @@
+import type { NoteBlockModel } from '@blocksuite/affine-model';
 import type { BlockComponent, EditorHost } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
 
+import { MoreIndicatorIcon } from '@blocksuite/affine-components/icons';
 import {
-  ShadowlessElement,
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NoteDisplayMode,
+  StrokeStyle,
+} from '@blocksuite/affine-model';
+import { EDGELESS_BLOCK_CHILD_PADDING } from '@blocksuite/affine-shared/consts';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import {
+  getClosestBlockComponentByPoint,
+  handleNativeRangeAtPoint,
+  matchFlavours,
+  stopPropagation,
+} from '@blocksuite/affine-shared/utils';
+import { ShadowlessElement, toGfxBlockComponent } from '@blocksuite/block-std';
+import {
+  almostEqual,
+  Bound,
+  clamp,
+  Point,
   WithDisposable,
-  toGfxBlockComponent,
-} from '@blocksuite/block-std';
-import { Point } from '@blocksuite/global/utils';
-import { Bound, almostEqual, clamp } from '@blocksuite/global/utils';
+} from '@blocksuite/global/utils';
 import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { EdgelessRootService } from '../root-block/index.js';
-import type { NoteBlockModel } from './note-model.js';
 
-import { EDGELESS_BLOCK_CHILD_PADDING } from '../_common/consts.js';
-import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../_common/edgeless/note/consts.js';
-import { MoreIndicatorIcon } from '../_common/icons/edgeless.js';
-import { NoteDisplayMode } from '../_common/types.js';
-import { matchFlavours } from '../_common/utils/model.js';
-import { getClosestBlockComponentByPoint } from '../_common/utils/query.js';
-import { handleNativeRangeAtPoint } from '../_common/utils/selection.js';
-import { StrokeStyle } from '../surface-block/consts.js';
 import { NoteBlockComponent } from './note-block.js';
 
-@customElement('edgeless-note-mask')
 export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
-  static override styles = css`
-    .affine-note-mask:hover {
-      background-color: var(--affine-hover-color);
-    }
-  `;
-
   protected override firstUpdated() {
     const maskDOM = this.renderRoot!.querySelector('.affine-note-mask');
     const observer = new ResizeObserver(entries => {
@@ -50,6 +50,7 @@ export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
           bound.h = height;
           this.model.stash('xywh');
           this.model.xywh = bound.serialize();
+          this.model.pop('xywh');
         }
       }
     });
@@ -57,24 +58,21 @@ export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
     observer.observe(maskDOM!);
 
     this._disposables.add(() => {
-      // check if model still exist
-      if (this.model.doc.getBlockById(this.model.id)) {
-        this.model.pop('xywh');
-      }
       observer.disconnect();
     });
   }
 
   override render() {
+    const extra = this.editing ? ACTIVE_NOTE_EXTRA_PADDING : 0;
     return html`
       <div
         class="affine-note-mask"
         style=${styleMap({
           position: 'absolute',
-          top: '0',
-          left: '0',
-          bottom: '0',
-          right: '0',
+          top: `${-extra}px`,
+          left: `${-extra}px`,
+          bottom: `${-extra}px`,
+          right: `${-extra}px`,
           zIndex: '1',
           pointerEvents: this.display ? 'auto' : 'none',
           borderRadius: `${
@@ -89,6 +87,9 @@ export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
   accessor display!: boolean;
 
   @property({ attribute: false })
+  accessor editing!: boolean;
+
+  @property({ attribute: false })
   accessor host!: EditorHost;
 
   @property({ attribute: false })
@@ -100,7 +101,6 @@ export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
 
 const ACTIVE_NOTE_EXTRA_PADDING = 20;
 
-@customElement('affine-edgeless-note')
 export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
   NoteBlockComponent
 ) {
@@ -129,12 +129,6 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
       display: none;
     }
 
-    .edgeless-note-container:has(.edgeless-note-collapse-button:hover) {
-      .affine-note-mask {
-        background-color: var(--affine-hover-color);
-      }
-    }
-
     .edgeless-note-container:has(.affine-embed-synced-doc-container.editing)
       > .note-background {
       left: ${-ACTIVE_NOTE_EXTRA_PADDING}px !important;
@@ -149,7 +143,17 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     }
   `;
 
-  override rootServiceFlavour = 'affine:page';
+  private get _isShowCollapsedContent() {
+    return this.model.edgeless.collapse && (this._isResizing || this._isHover);
+  }
+
+  get _zoom() {
+    return this.gfx.viewport.zoom;
+  }
+
+  get rootService() {
+    return this.std.getService('affine:page') as EdgelessRootService;
+  }
 
   private _collapsedContent() {
     if (!this._isShowCollapsedContent) {
@@ -157,14 +161,19 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     }
 
     const { xywh, edgeless } = this.model;
+    const { borderSize } = edgeless.style;
 
+    const extraPadding = this._editing ? ACTIVE_NOTE_EXTRA_PADDING : 0;
+    const extraBorder = this._editing ? borderSize : 0;
     const bound = Bound.deserialize(xywh);
     const scale = edgeless.scale ?? 1;
-    const width = bound.w / scale;
+    const width = bound.w / scale + extraPadding * 2 + extraBorder;
     const height = bound.h / scale;
 
-    const rect = this.getBoundingClientRect();
-    const zoom = this.rootService.viewport.zoom;
+    const rect = this._notePageContent?.getBoundingClientRect();
+    if (!rect) return nothing;
+
+    const zoom = this.gfx.viewport.zoom;
     this._noteFullHeight =
       rect.height / scale / zoom + 2 * EDGELESS_BLOCK_CHILD_PADDING;
 
@@ -178,8 +187,8 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
           width: `${width}px`,
           height: `${this._noteFullHeight - height}px`,
           position: 'absolute',
-          left: '0px',
-          top: `${height}px`,
+          left: `${-(extraPadding + extraBorder / 2)}px`,
+          top: `${height + extraPadding + extraBorder / 2}px`,
           background: 'var(--affine-white)',
           opacity: 0.5,
           pointerEvents: 'none',
@@ -216,10 +225,6 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     ) {
       this._isHover = true;
     }
-  }
-
-  private get _isShowCollapsedContent() {
-    return this.model.edgeless.collapse && (this._isResizing || this._isHover);
   }
 
   private _leaved() {
@@ -305,10 +310,6 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     }
   }
 
-  get _zoom() {
-    return this.rootService.viewport.zoom;
-  }
-
   override connectedCallback(): void {
     super.connectedCallback();
 
@@ -322,11 +323,6 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
         } else {
           this._editing = false;
         }
-      })
-    );
-    this._disposables.add(
-      this.rootService.layer.slots.layerUpdated.on(() => {
-        this.requestUpdate();
       })
     );
   }
@@ -350,14 +346,17 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     );
 
     const observer = new MutationObserver(() => {
-      const rect = this.getBoundingClientRect();
-      const zoom = this.rootService.viewport.zoom;
+      const rect = this._notePageContent?.getBoundingClientRect();
+      if (!rect) return;
+      const zoom = this.gfx.viewport.zoom;
       const scale = this.model.edgeless.scale ?? 1;
       this._noteFullHeight =
         rect.height / scale / zoom + 2 * EDGELESS_BLOCK_CHILD_PADDING;
     });
-    observer.observe(this, { childList: true, subtree: true });
-    _disposables.add(() => observer.disconnect());
+    if (this._notePageContent) {
+      observer.observe(this, { childList: true, subtree: true });
+      _disposables.add(() => observer.disconnect());
+    }
   }
 
   override getRenderingRect() {
@@ -405,19 +404,9 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
     };
 
     const extra = this._editing ? ACTIVE_NOTE_EXTRA_PADDING : 0;
-    let backgroundColor = `${DEFAULT_NOTE_BACKGROUND_COLOR}`;
-
-    // The root service may not be initialized when switching page mode
-    if (this.rootService) {
-      backgroundColor = this.rootService.themeObserver.generateColorProperty(
-        model.background,
-        backgroundColor
-      );
-    } else if (typeof model.background === 'string') {
-      backgroundColor = model.background.startsWith('--')
-        ? `var(${model.background})`
-        : model.background;
-    }
+    const backgroundColor = this.std
+      .get(ThemeProvider)
+      .generateColorProperty(model.background, DEFAULT_NOTE_BACKGROUND_COLOR);
 
     const backgroundStyle = {
       position: 'absolute',
@@ -461,7 +450,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
         <div
           class="note-background"
           style=${styleMap(backgroundStyle)}
-          @pointerdown=${(e: MouseEvent) => e.stopPropagation()}
+          @pointerdown=${stopPropagation}
           @click=${this._handleClickAtBackground}
         ></div>
 
@@ -483,8 +472,11 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
                 flip: isCollapseArrowUp,
                 hide: this._isSelected,
               })}"
-              @mousedown=${(e: MouseEvent) => e.stopPropagation()}
-              @mouseup=${(e: MouseEvent) => e.stopPropagation()}
+              style=${styleMap({
+                bottom: this._editing ? `${-extra}px` : '0',
+              })}
+              @mousedown=${stopPropagation}
+              @mouseup=${stopPropagation}
               @click=${this._setCollapse}
             >
               ${MoreIndicatorIcon}
@@ -496,19 +488,11 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
           .model=${this.model}
           .display=${!this._editing}
           .host=${this.host}
-          .zoom=${this.rootService?.viewport.zoom ?? 1}
+          .zoom=${this.gfx.viewport.zoom ?? 1}
+          .editing=${this._editing}
         ></edgeless-note-mask>
       </div>
     `;
-  }
-
-  override toZIndex() {
-    // FIXME: weird empty rootService
-    return this.rootService?.layer.getZIndex(this.model).toString() ?? '0';
-  }
-
-  override get rootService() {
-    return super.rootService as EdgelessRootService;
   }
 
   @state()
@@ -525,4 +509,13 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
 
   @state()
   private accessor _noteFullHeight = 0;
+
+  @query('.edgeless-note-page-content .affine-note-block-container')
+  private accessor _notePageContent: HTMLElement | null = null;
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'affine-edgeless-note': EdgelessNoteBlockComponent;
+  }
 }

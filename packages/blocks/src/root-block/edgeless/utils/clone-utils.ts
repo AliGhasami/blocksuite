@@ -1,47 +1,49 @@
+import type {
+  FrameBlockProps,
+  NodeDetail,
+  SerializedConnectorElement,
+  SerializedGroupElement,
+  SerializedMindmapElement,
+} from '@blocksuite/affine-model';
 import type { BlockStdScope } from '@blocksuite/block-std';
 
-import { type BlockSnapshot, Job } from '@blocksuite/store';
-
-import type { SerializedConnectorElement } from '../../../surface-block/element-model/connector.js';
-import type { SerializedGroupElement } from '../../../surface-block/element-model/group.js';
-import type { SerializedMindmapElement } from '../../../surface-block/element-model/mindmap.js';
-import type { NodeDetail } from '../../../surface-block/element-model/utils/mindmap/layout.js';
-import type { EdgelessFrameManager } from '../frame-manager.js';
-
-import { groupBy } from '../../../_common/utils/iterable.js';
-import {
-  type SerializedElement,
-  SurfaceGroupLikeModel,
-} from '../../../surface-block/element-model/base.js';
 import {
   ConnectorElementModel,
   GroupElementModel,
   MindmapElementModel,
-} from '../../../surface-block/index.js';
-import { EdgelessBlockModel } from '../edgeless-block-model.js';
-import { isFrameBlock } from '../utils/query.js';
+} from '@blocksuite/affine-model';
+import {
+  getTopElements,
+  type GfxModel,
+  isGfxGroupCompatibleModel,
+  type SerializedElement,
+} from '@blocksuite/block-std/gfx';
+import { type BlockSnapshot, Job } from '@blocksuite/store';
 
-export function getCloneElements(
-  elements: BlockSuite.EdgelessModel[],
-  frame: EdgelessFrameManager
-) {
-  const set = new Set<BlockSuite.EdgelessModel>();
+import { GfxBlockModel } from '../block-model.js';
+
+/**
+ * return all elements in the tree of the elements
+ */
+export function getSortedCloneElements(elements: GfxModel[]) {
+  const set = new Set<GfxModel>();
   elements.forEach(element => {
+    // this element subtree has been added
+    if (set.has(element)) return;
+
     set.add(element);
-    if (isFrameBlock(element)) {
-      frame.getElementsInFrame(element).forEach(ele => set.add(ele));
-    } else if (element instanceof SurfaceGroupLikeModel) {
-      const children = element.childElements;
-      getCloneElements(children, frame).forEach(ele => set.add(ele));
+    if (isGfxGroupCompatibleModel(element)) {
+      element.descendantElements.map(descendant => set.add(descendant));
     }
   });
-  return Array.from(set);
+  return sortEdgelessElements([...set]);
 }
 
 export async function prepareCloneData(
-  elements: BlockSuite.EdgelessModel[],
+  elements: GfxModel[],
   std: BlockStdScope
 ) {
+  elements = sortEdgelessElements(elements);
   const job = new Job({
     collection: std.collection,
   });
@@ -55,11 +57,11 @@ export async function prepareCloneData(
 }
 
 export async function serializeElement(
-  element: BlockSuite.EdgelessModel,
-  elements: BlockSuite.EdgelessModel[],
+  element: GfxModel,
+  elements: GfxModel[],
   job: Job
 ) {
-  if (element instanceof EdgelessBlockModel) {
+  if (element instanceof GfxBlockModel) {
     const snapshot = await job.blockToSnapshot(element);
     if (!snapshot) {
       return;
@@ -74,7 +76,7 @@ export async function serializeElement(
 
 export function serializeConnector(
   connector: ConnectorElementModel,
-  elements: BlockSuite.EdgelessModel[]
+  elements: GfxModel[]
 ) {
   const sourceId = connector.source?.id;
   const targetId = connector.target?.id;
@@ -98,25 +100,40 @@ export function serializeConnector(
  * @param elements edgeless model list
  * @returns sorted edgeless model list
  */
-export function sortEdgelessElements(elements: BlockSuite.EdgelessModel[]) {
-  const result = groupBy(elements, element => {
-    if (element instanceof ConnectorElementModel) {
-      return 'connector';
+export function sortEdgelessElements(elements: GfxModel[]) {
+  // Since each element has a parent-child relationship, and from-to connector relationship
+  // the child element must be added before the parent element
+  // and the connected elements must be added before the connector element
+  // To achieve this, we do a post-order traversal of the tree
+
+  if (elements.length === 0) return [];
+  const result: GfxModel[] = [];
+
+  const topElements = getTopElements(elements);
+
+  // the connector element must be added after the connected elements
+  const moveConnectorToEnd = (elements: GfxModel[]) => {
+    const connectors = elements.filter(
+      element => element instanceof ConnectorElementModel
+    );
+    const rest = elements.filter(
+      element => !(element instanceof ConnectorElementModel)
+    );
+    return [...rest, ...connectors];
+  };
+
+  const traverse = (element: GfxModel) => {
+    if (isGfxGroupCompatibleModel(element)) {
+      moveConnectorToEnd(element.childElements).forEach(child =>
+        traverse(child)
+      );
     }
-    if (element instanceof GroupElementModel) {
-      return 'group';
-    }
-    if (element instanceof MindmapElementModel) {
-      return 'mindmap';
-    }
-    return 'default';
-  });
-  return [
-    ...(result.default ?? []),
-    ...(result.connector ?? []),
-    ...(result.group ?? []),
-    ...(result.mindmap ?? []),
-  ];
+    result.push(element);
+  };
+
+  moveConnectorToEnd(topElements).forEach(element => traverse(element));
+
+  return result;
 }
 
 /**
@@ -158,6 +175,26 @@ export function mapGroupIds(
     }
     props.children = newMap;
   }
+  return props;
+}
+
+/**
+ * map frame children ids
+ * @param props frame block props
+ * @param ids old element id to new element id map
+ * @returns updated frame block props
+ */
+export function mapFrameIds(props: FrameBlockProps, ids: Map<string, string>) {
+  const oldChildIds = [
+    ...(props.childElementIds ? Object.keys(props.childElementIds) : []),
+  ];
+  const newChildIds: Record<string, boolean> = {};
+  oldChildIds.forEach(oldId => {
+    const newIds = ids.get(oldId);
+    if (newIds) newChildIds[newIds] = true;
+  });
+  props.childElementIds = newChildIds;
+
   return props;
 }
 

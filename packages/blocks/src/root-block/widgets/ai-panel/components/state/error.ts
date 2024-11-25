@@ -1,9 +1,9 @@
 import type { EditorHost } from '@blocksuite/block-std';
 
-import { WithDisposable } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { baseTheme } from '@toeverything/theme';
-import { LitElement, css, html, nothing, unsafeCSS } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
+import { property } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 
 import type { AIPanelErrorConfig, CopyConfig } from '../../type.js';
@@ -13,22 +13,8 @@ import {
   type AIItemGroupConfig,
 } from '../../../../../_common/components/index.js';
 import { filterAIItemGroup } from '../../utils.js';
-import '../finish-tip.js';
 
-@customElement('ai-panel-error')
 export class AIPanelError extends WithDisposable(LitElement) {
-  private _getResponseGroup = () => {
-    let responseGroup: AIItemGroupConfig[] = [];
-    const errorType = this.config.error?.type;
-    if (errorType && errorType !== AIErrorType.GeneralNetworkError) {
-      return responseGroup;
-    }
-
-    responseGroup = filterAIItemGroup(this.host, this.config.responses);
-
-    return responseGroup;
-  };
-
   static override styles = css`
     :host {
       width: 100%;
@@ -143,6 +129,18 @@ export class AIPanelError extends WithDisposable(LitElement) {
     }
   `;
 
+  private _getResponseGroup = () => {
+    let responseGroup: AIItemGroupConfig[] = [];
+    const errorType = this.config.error?.type;
+    if (errorType && errorType !== AIErrorType.GeneralNetworkError) {
+      return responseGroup;
+    }
+
+    responseGroup = filterAIItemGroup(this.host, this.config.responses);
+
+    return responseGroup;
+  };
+
   override render() {
     const responseGroup = this._getResponseGroup();
     const errorTemplate = choose(
@@ -184,15 +182,32 @@ export class AIPanelError extends WithDisposable(LitElement) {
         ],
       ],
       // default error handler
-      () => html`
-        <div class="error-info">
-          An error occurred. Please try again later. If this issue persists,
-          please let us know at
-          <a href="mailto:support@toeverything.info">
-            support@toeverything.info
-          </a>
-        </div>
-      `
+      () => {
+        const tip = this.config.error?.message;
+        const error = tip
+          ? html`<span class="error-tip"
+              >An error occurred<affine-tooltip
+                tip-position="bottom-start"
+                .arrow=${false}
+                >${tip}</affine-tooltip
+              ></span
+            >`
+          : 'An error occurred';
+        return html`
+          <style>
+            .error-tip {
+              text-decoration: underline;
+            }
+          </style>
+          <div class="error-info">
+            ${error}. Please try again later. If this issue persists, please let
+            us know at
+            <a href="mailto:support@toeverything.info">
+              support@toeverything.info
+            </a>
+          </div>
+        `;
+      }
     );
 
     return html`

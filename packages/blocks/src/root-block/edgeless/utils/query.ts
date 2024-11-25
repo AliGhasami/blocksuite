@@ -1,50 +1,60 @@
+import type {
+  GfxModel,
+  GfxPrimitiveElementModel,
+  GfxToolsFullOptionValue,
+  Viewport,
+} from '@blocksuite/block-std/gfx';
 import type { PointLocation } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { deserializeXYWH } from '@blocksuite/global/utils';
-import { Bound } from '@blocksuite/global/utils';
-
-import type { EmbedBlockModel } from '../../../_common/embed-block-helper/embed-block-model.js';
-import type { Connectable } from '../../../_common/utils/index.js';
-import type { AttachmentBlockModel } from '../../../attachment-block/index.js';
-import type { BookmarkBlockModel } from '../../../bookmark-block/bookmark-model.js';
-import type { EdgelessTextBlockModel } from '../../../edgeless-text/edgeless-text-model.js';
-import type { EmbedFigmaModel } from '../../../embed-figma-block/embed-figma-model.js';
-import type { EmbedGithubModel } from '../../../embed-github-block/index.js';
-import type { EmbedHtmlModel } from '../../../embed-html-block/index.js';
-import type { EmbedLinkedDocModel } from '../../../embed-linked-doc-block/embed-linked-doc-model.js';
-import type { EmbedLoomModel } from '../../../embed-loom-block/embed-loom-model.js';
-import type { EmbedSyncedDocModel } from '../../../embed-synced-doc-block/embed-synced-doc-model.js';
-import type { EmbedYoutubeModel } from '../../../embed-youtube-block/embed-youtube-model.js';
-import type { FrameBlockModel } from '../../../frame-block/index.js';
-import type { ImageBlockModel } from '../../../image-block/index.js';
-import type { NoteBlockModel } from '../../../note-block/index.js';
-import type { Viewport } from '../../../root-block/edgeless/utils/viewport.js';
-import type { EdgelessBlockModel } from '../edgeless-block-model.js';
-import type { EdgelessTool } from '../types.js';
-
 import {
   type CanvasElementWithText,
-  ConnectorElementModel,
+  CommonUtils,
   GRID_GAP_MAX,
   GRID_GAP_MIN,
+} from '@blocksuite/affine-block-surface';
+import {
+  type AttachmentBlockModel,
+  type BookmarkBlockModel,
+  ConnectorElementModel,
+  type EdgelessTextBlockModel,
+  type EmbedBlockModel,
+  type EmbedFigmaModel,
+  type EmbedGithubModel,
+  type EmbedHtmlModel,
+  type EmbedLinkedDocModel,
+  type EmbedLoomModel,
+  type EmbedSyncedDocModel,
+  type EmbedYoutubeModel,
+  type FrameBlockModel,
+  type ImageBlockModel,
   MindmapElementModel,
+  type NoteBlockModel,
   ShapeElementModel,
   TextElementModel,
-  clamp,
-  getQuadBoundsWithRotation,
-} from '../../../surface-block/index.js';
+} from '@blocksuite/affine-model';
+import {
+  Bound,
+  deserializeXYWH,
+  getQuadBoundWithRotation,
+} from '@blocksuite/global/utils';
+
+import type { Connectable } from '../../../_common/utils/index.js';
+import type { GfxBlockModel } from '../block-model.js';
+
 import { getElementsWithoutGroup } from './group.js';
 
+const { clamp } = CommonUtils;
+
 export function isMindmapNode(
-  element: EdgelessBlockModel | BlockSuite.EdgelessModel | null
+  element: GfxBlockModel | BlockSuite.EdgelessModel | null
 ) {
   return element?.group instanceof MindmapElementModel;
 }
 
 export function isTopLevelBlock(
-  selectable: BlockModel | BlockSuite.EdgelessModel | BlockModel | null
-): selectable is EdgelessBlockModel {
+  selectable: BlockModel | BlockSuite.EdgelessModel | null
+): selectable is GfxBlockModel {
   return !!selectable && 'flavour' in selectable;
 }
 
@@ -64,12 +74,8 @@ export function isEdgelessTextBlock(
   );
 }
 
-export function isFrameBlock(
-  element: BlockModel | BlockSuite.EdgelessModel | null
-): element is FrameBlockModel {
-  return (
-    !!element && 'flavour' in element && element.flavour === 'affine:frame'
-  );
+export function isFrameBlock(element: unknown): element is FrameBlockModel {
+  return !!element && (element as BlockModel).flavour === 'affine:frame';
 }
 
 export function isImageBlock(
@@ -101,6 +107,23 @@ export function isEmbeddedBlock(
 ): element is EmbedBlockModel {
   return (
     !!element && 'flavour' in element && /affine:embed-*/.test(element.flavour)
+  );
+}
+
+/**
+ * TODO: Remove this function after the edgeless refactor completed
+ * This function is used to check if the block is an AI chat block for edgeless selected rect
+ * Should not be used in the future
+ * Related issue: https://linear.app/affine-design/issue/BS-1009/
+ * @deprecated
+ */
+export function isAIChatBlock(
+  element: BlockModel | BlockSuite.EdgelessModel | null
+) {
+  return (
+    !!element &&
+    'flavour' in element &&
+    element.flavour === 'affine:embed-ai-chat'
   );
 }
 
@@ -181,8 +204,8 @@ export function isEmbedHtmlBlock(
 }
 
 export function isCanvasElement(
-  selectable: BlockSuite.EdgelessModel | null
-): selectable is BlockSuite.SurfaceModel {
+  selectable: GfxModel | BlockModel | null
+): selectable is GfxPrimitiveElementModel {
   return !isTopLevelBlock(selectable);
 }
 
@@ -207,7 +230,10 @@ export function getSelectionBoxBound(viewport: Viewport, bound: Bound) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-export function getCursorMode(edgelessTool: EdgelessTool) {
+export function getCursorMode(edgelessTool: GfxToolsFullOptionValue | null) {
+  if (!edgelessTool) {
+    return 'default';
+  }
   switch (edgelessTool.type) {
     case 'default':
       return 'default';
@@ -253,7 +279,7 @@ export function getSelectedRect(selected: BlockSuite.EdgelessModel[]): DOMRect {
     (bounds, selectable, index) => {
       const rotate = isTopLevelBlock(selectable) ? 0 : selectable.rotate;
       const [x, y, w, h] = deserializeXYWH(selectable.xywh);
-      let { left, top, right, bottom } = getQuadBoundsWithRotation({
+      let { left, top, right, bottom } = getQuadBoundWithRotation({
         x,
         y,
         w,

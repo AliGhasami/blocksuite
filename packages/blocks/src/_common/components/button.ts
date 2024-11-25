@@ -1,6 +1,14 @@
 import { baseTheme } from '@toeverything/theme';
-import { LitElement, css, html, nothing, unsafeCSS } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { cssVarV2 } from '@toeverything/theme/v2';
+import {
+  css,
+  html,
+  LitElement,
+  nothing,
+  type TemplateResult,
+  unsafeCSS,
+} from 'lit';
+import { property, query } from 'lit/decorators.js';
 
 /**
  * Default size is 32px, you can override it by setting `size` property.
@@ -21,13 +29,12 @@ import { customElement, property } from 'lit/decorators.js';
  * </icon-button>`
  * ```
  */
-@customElement('icon-button')
 export class IconButton extends LitElement {
   static override styles = css`
     :host {
       box-sizing: border-box;
       display: flex;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       border: none;
       width: var(--button-width);
@@ -42,8 +49,11 @@ export class IconButton extends LitElement {
       padding: 4px;
     }
 
-    :host(:hover) {
-      background: var(--affine-hover-color);
+    // This media query can detect if the device has a hover capability
+    @media (hover: hover) {
+      :host(:hover) {
+        background: var(--affine-hover-color);
+      }
     }
 
     :host(:active) {
@@ -95,6 +105,7 @@ export class IconButton extends LitElement {
         var(--textColor-textSecondaryColor, #8e8d91)
       );
       line-height: var(--affine-line-height);
+      white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
       margin-top: -2px;
@@ -165,14 +176,14 @@ export class IconButton extends LitElement {
   override render() {
     if (this.hidden) return nothing;
     if (this.disabled) {
-      const disabledColor = 'var(--affine-text-disable-color)';
+      const disabledColor = cssVarV2('icon/disable');
       this.style.setProperty('--svg-icon-color', disabledColor);
       this.dataset.testDisabled = 'true';
     } else {
       this.dataset.testDisabled = 'false';
       const iconColor = this.active
-        ? 'var(--affine-primary-color)'
-        : 'var(--affine-icon-color)';
+        ? cssVarV2('icon/activated')
+        : cssVarV2('icon/primary');
       this.style.setProperty('--svg-icon-color', iconColor);
     }
 
@@ -190,7 +201,7 @@ export class IconButton extends LitElement {
         ? html`<div class="text-container">${text}${subText}</div>`
         : nothing;
 
-    return html` <slot></slot>
+    return html`<slot></slot>
       ${textContainer}
       <slot name="suffix"></slot>`;
   }
@@ -212,10 +223,13 @@ export class IconButton extends LitElement {
   accessor size: string | number | null = null;
 
   @property()
-  accessor subText: string | null = null;
+  accessor subText: string | TemplateResult<1> | null = null;
 
   @property()
-  accessor text: string | null = null;
+  accessor text: string | TemplateResult<1> | null = null;
+
+  @query('.text-container .text')
+  accessor textElement: HTMLDivElement | null = null;
 
   @property()
   accessor width: string | number | null = null;

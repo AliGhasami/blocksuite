@@ -1,21 +1,16 @@
-import type { BlockService } from '@blocksuite/block-std';
-import type { EditorHost } from '@blocksuite/block-std';
+import type { DragIndicator } from '@blocksuite/affine-components/drag-indicator';
+import type { BlockService, EditorHost } from '@blocksuite/block-std';
 import type { IVec } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { Point } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
-
-import type { DragIndicator } from './drag-indicator.js';
-
 import {
-  type DropResult,
-  calcDropTarget,
   getClosestBlockComponentByPoint,
-  getModelByBlockComponent,
   isInsidePageEditor,
   matchFlavours,
-} from '../../_common/utils/index.js';
+} from '@blocksuite/affine-shared/utils';
+import { assertExists, Point } from '@blocksuite/global/utils';
+
+import { calcDropTarget, type DropResult } from '../../_common/utils/index.js';
 
 export type onDropProps = {
   files: File[];
@@ -35,9 +30,9 @@ export type FileDropOptions = {
 };
 
 export class FileDropManager {
-  private _blockService: BlockService;
-
   private static _dropResult: DropResult | null = null;
+
+  private _blockService: BlockService;
 
   private _fileDropOptions: FileDropOptions;
 
@@ -91,7 +86,7 @@ export class FileDropManager {
 
     let result: DropResult | null = null;
     if (element) {
-      const model = getModelByBlockComponent(element);
+      const model = element.model;
       const parent = this.doc.getParent(model);
       if (!matchFlavours(parent, ['affine:surface'])) {
         result = calcDropTarget(point, model, element);
@@ -105,29 +100,6 @@ export class FileDropManager {
       this._indicator.rect = null;
     }
   };
-
-  constructor(blockService: BlockService, fileDropOptions: FileDropOptions) {
-    this._blockService = blockService;
-    this._fileDropOptions = fileDropOptions;
-
-    this._indicator = document.querySelector(
-      'affine-drag-indicator'
-    ) as DragIndicator;
-    if (!this._indicator) {
-      this._indicator = document.createElement(
-        'affine-drag-indicator'
-      ) as DragIndicator;
-      document.body.append(this._indicator);
-    }
-
-    if (fileDropOptions.onDrop) {
-      this._blockService.disposables.addFromEvent(
-        this._blockService.std.host,
-        'drop',
-        this._onDrop
-      );
-    }
-  }
 
   get doc() {
     return this._blockService.doc;
@@ -175,5 +147,28 @@ export class FileDropManager {
       FileDropManager._dropResult.type !== 'before'
       ? 'after'
       : 'before';
+  }
+
+  constructor(blockService: BlockService, fileDropOptions: FileDropOptions) {
+    this._blockService = blockService;
+    this._fileDropOptions = fileDropOptions;
+
+    this._indicator = document.querySelector(
+      'affine-drag-indicator'
+    ) as DragIndicator;
+    if (!this._indicator) {
+      this._indicator = document.createElement(
+        'affine-drag-indicator'
+      ) as DragIndicator;
+      document.body.append(this._indicator);
+    }
+
+    if (fileDropOptions.onDrop) {
+      this._blockService.disposables.addFromEvent(
+        this._blockService.std.host,
+        'drop',
+        this._onDrop
+      );
+    }
   }
 }

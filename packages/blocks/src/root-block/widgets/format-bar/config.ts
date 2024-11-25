@@ -1,19 +1,10 @@
+import type { MenuItemGroup } from '@blocksuite/affine-components/toolbar';
 import type {
   Chain,
   CommandKeyToData,
   InitCommandCtx,
 } from '@blocksuite/block-std';
 
-import { assertExists } from '@blocksuite/global/utils';
-import { Slice } from '@blocksuite/store';
-import { type TemplateResult, html } from 'lit';
-
-import type { AffineFormatBarWidget } from './format-bar.js';
-
-import { toast } from '../../../_common/components/index.js';
-import { createSimplePortal } from '../../../_common/components/portal.js';
-import { renderActions } from '../../../_common/components/toolbar/utils.js';
-import { DATABASE_CONVERT_WHITE_LIST } from '../../../_common/configs/quick-action/database-convert-view.js';
 import {
   BoldIcon,
   BulletedListIcon,
@@ -30,21 +21,34 @@ import {
   Heading5Icon,
   Heading6Icon,
   ItalicIcon,
-  LinkIcon,
   LinkedDocIcon,
+  LinkIcon,
   MoreVerticalIcon,
   NumberedListIcon,
   QuoteIcon,
   StrikethroughIcon,
   TextIcon,
   UnderlineIcon,
-} from '../../../_common/icons/index.js';
+} from '@blocksuite/affine-components/icons';
+import { toast } from '@blocksuite/affine-components/toast';
+import { renderGroups } from '@blocksuite/affine-components/toolbar';
+import { TelemetryProvider } from '@blocksuite/affine-shared/services';
+import { tableViewMeta } from '@blocksuite/data-view/view-presets';
+import { assertExists } from '@blocksuite/global/utils';
+import { Slice } from '@blocksuite/store';
+import { html, type TemplateResult } from 'lit';
+
+import type { AffineFormatBarWidget } from './format-bar.js';
+
 import {
   convertSelectedBlocksToLinkedDoc,
   getTitleFromSelectedModels,
   notifyDocCreated,
   promptDocTitle,
 } from '../../../_common/utils/render-linked-doc.js';
+import { convertToDatabase } from '../../../database-block/data-source.js';
+import { DATABASE_CONVERT_WHITE_LIST } from '../../../database-block/utils/block-utils.js';
+import { FormatBarContext } from './context.js';
 
 export type DividerConfigItem = {
   type: 'divider';
@@ -138,15 +142,11 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
     .addDivider()
     .addInlineAction({
       id: 'convert-to-database',
-      name: 'Create Database',
+      name: 'Create Table',
       icon: DatabaseTableViewIcon20,
       isActive: () => false,
       action: () => {
-        createSimplePortal({
-          template: html`<database-convert-view
-            .host=${toolbar.host}
-          ></database-convert-view>`,
-        });
+        convertToDatabase(toolbar.host, tableViewMeta.type);
       },
       showWhen: chain => {
         const middleware = (count = 0) => {
@@ -201,44 +201,37 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
             types: ['block', 'text'],
             mode: 'highest',
           })
+          .draftSelectedModels()
           .run();
-        const { selectedModels } = ctx;
-        assertExists(selectedModels);
-        if (!selectedModels.length) return;
+        const { draftedModels, selectedModels } = ctx;
+        if (!selectedModels?.length || !draftedModels) return;
 
         const host = formatBar.host;
         host.selection.clear();
 
         const doc = host.doc;
         const autofill = getTitleFromSelectedModels(selectedModels);
-        void promptDocTitle(host, autofill).then(title => {
+        void promptDocTitle(host, autofill).then(async title => {
           if (title === null) return;
-          const linkedDoc = convertSelectedBlocksToLinkedDoc(
+          await convertSelectedBlocksToLinkedDoc(
+            host.std,
             doc,
-            selectedModels,
+            draftedModels,
             title
           );
-          const linkedDocService = host.spec.getService(
-            'affine:embed-linked-doc'
-          );
-          linkedDocService.slots.linkedDocCreated.emit({ docId: linkedDoc.id });
           notifyDocCreated(host, doc);
-          host.spec
-            .getService('affine:page')
-            .telemetryService?.track('DocCreated', {
-              control: 'create linked doc',
-              page: 'doc editor',
-              module: 'format toolbar',
-              type: 'embed-linked-doc',
-            });
-          host.spec
-            .getService('affine:page')
-            .telemetryService?.track('LinkedDocCreated', {
-              control: 'create linked doc',
-              page: 'doc editor',
-              module: 'format toolbar',
-              type: 'embed-linked-doc',
-            });
+          host.std.getOptional(TelemetryProvider)?.track('DocCreated', {
+            control: 'create linked doc',
+            page: 'doc editor',
+            module: 'format toolbar',
+            type: 'embed-linked-doc',
+          });
+          host.std.getOptional(TelemetryProvider)?.track('LinkedDocCreated', {
+            control: 'create linked doc',
+            page: 'doc editor',
+            module: 'format toolbar',
+            type: 'embed-linked-doc',
+          });
         });
       },
       showWhen: chain => {
@@ -325,21 +318,22 @@ export function toolbarDefaultConfig(toolbar: AffineFormatBarWidget) {
     });
 }
 
-export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
-  const actions = [
-    [
+export const BUILT_IN_GROUPS: MenuItemGroup<FormatBarContext>[] = [
+  {
+    type: 'clipboard',
+    items: [
       {
         type: 'copy',
-        name: 'Copy',
+        label: 'Copy',
         icon: CopyIcon,
-        disabled: toolbar.doc.readonly,
-        handler: () => {
-          toolbar.std.command
+        disabled: c => c.doc.readonly,
+        action: c => {
+          c.std.command
             .chain()
             .getSelectedModels()
             .with({
               onCopy: () => {
-                toast(toolbar.host, 'Copied to clipboard');
+                toast(c.host, 'Copied to clipboard');
               },
             })
             .draftSelectedModels()
@@ -349,12 +343,12 @@ export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
       },
       {
         type: 'duplicate',
-        name: 'Duplicate',
+        label: 'Duplicate',
         icon: DuplicateIcon,
-        disabled: toolbar.doc.readonly,
-        handler: () => {
-          toolbar.std.doc.captureSync();
-          toolbar.std.command
+        disabled: c => c.doc.readonly,
+        action: c => {
+          c.doc.captureSync();
+          c.std.command
             .chain()
             .try(cmd => [
               cmd
@@ -385,15 +379,16 @@ export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
                 return next();
               }
 
-              assertExists(ctx.parentBlock);
-
-              toolbar.std.clipboard
-                .duplicateSlice(
-                  Slice.fromModels(ctx.std.doc, ctx.draftedModels),
-                  ctx.std.doc,
-                  ctx.parentBlock?.model.id,
-                  ctx.blockIndex ? ctx.blockIndex + 1 : undefined
-                )
+              ctx.draftedModels
+                .then(models => {
+                  const slice = Slice.fromModels(ctx.std.doc, models);
+                  return ctx.std.clipboard.duplicateSlice(
+                    slice,
+                    ctx.std.doc,
+                    ctx.parentBlock?.model.id,
+                    ctx.blockIndex ? ctx.blockIndex + 1 : 1
+                  );
+                })
                 .catch(console.error);
 
               return next();
@@ -402,15 +397,18 @@ export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
         },
       },
     ],
-    [
+  },
+  {
+    type: 'delete',
+    items: [
       {
         type: 'delete',
-        name: 'Delete',
+        label: 'Delete',
         icon: DeleteIcon,
-        disabled: toolbar.doc.readonly,
-        handler: () => {
+        disabled: c => c.doc.readonly,
+        action: c => {
           // remove text
-          const [result] = toolbar.std.command
+          const [result] = c.std.command
             .chain()
             .getTextSelection()
             .deleteText()
@@ -421,7 +419,7 @@ export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
           }
 
           // remove blocks
-          toolbar.std.command
+          c.std.command
             .chain()
             .tryAll(chain => [
               chain.getBlockSelections(),
@@ -431,24 +429,27 @@ export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
             .deleteSelectedModels()
             .run();
 
-          toolbar.reset();
+          c.toolbar.reset();
         },
       },
     ],
-  ];
+  },
+];
+
+export function toolbarMoreButton(toolbar: AffineFormatBarWidget) {
+  const context = new FormatBarContext(toolbar);
+  const actions = renderGroups(toolbar.moreGroups, context);
 
   return html`
     <editor-menu-button
-      .contentPadding=${'8px'}
-      .button=${html`
+      .contentPadding="${'8px'}"
+      .button="${html`
         <editor-icon-button aria-label="More" .tooltip=${'More'}>
           ${MoreVerticalIcon}
         </editor-icon-button>
-      `}
+      `}"
     >
-      <div data-size="large" data-orientation="vertical">
-        ${renderActions(actions)}
-      </div>
+      <div data-size="large" data-orientation="vertical">${actions}</div>
     </editor-menu-button>
   `;
 }

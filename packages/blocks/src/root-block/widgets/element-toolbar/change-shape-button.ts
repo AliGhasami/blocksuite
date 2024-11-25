@@ -1,50 +1,50 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, type TemplateResult, css, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { cache } from 'lit/directives/cache.js';
-import { choose } from 'lit/directives/choose.js';
-import { join } from 'lit/directives/join.js';
-import { styleMap } from 'lit/directives/style-map.js';
-import { when } from 'lit/directives/when.js';
+import type {
+  ColorScheme,
+  ShapeElementModel,
+  ShapeProps,
+} from '@blocksuite/affine-model';
 
-import type { CssVariableName } from '../../../_common/theme/css-variables.js';
-import type { ColorScheme } from '../../../_common/theme/theme-observer.js';
-import type { ShapeProps } from '../../../surface-block/element-model/shape.js';
-import type { EdgelessColorPickerButton } from '../../edgeless/components/color-picker/button.js';
-import type { PickColorEvent } from '../../edgeless/components/color-picker/types.js';
-import type { EdgelessShapePanel } from '../../edgeless/components/panel/shape-panel.js';
-import type { ShapeTool } from '../../edgeless/controllers/tools/shape-tool.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-
-import '../../../_common/components/toolbar/icon-button.js';
-import '../../../_common/components/toolbar/menu-button.js';
-import { renderToolbarSeparator } from '../../../_common/components/toolbar/separator.js';
 import {
   AddTextIcon,
   ChangeShapeIcon,
   GeneralStyleIcon,
   ScribbledStyleIcon,
   SmallArrowDownIcon,
-} from '../../../_common/icons/index.js';
-import { LineWidth } from '../../../_common/types.js';
-import { countBy, maxBy } from '../../../_common/utils/iterable.js';
-import { FontFamily } from '../../../surface-block/consts.js';
+} from '@blocksuite/affine-components/icons';
+import { renderToolbarSeparator } from '@blocksuite/affine-components/toolbar';
 import {
-  FILL_COLORS,
-  STROKE_COLORS,
-  ShapeType,
-} from '../../../surface-block/elements/shape/consts.js';
-import {
-  type ShapeElementModel,
+  DEFAULT_SHAPE_FILL_COLOR,
+  DEFAULT_SHAPE_STROKE_COLOR,
+  FontFamily,
+  getShapeName,
+  getShapeRadius,
+  getShapeType,
+  LineWidth,
+  MindmapElementModel,
+  SHAPE_FILL_COLORS,
+  SHAPE_STROKE_COLORS,
   ShapeStyle,
   StrokeStyle,
-} from '../../../surface-block/index.js';
-import '../../edgeless/components/color-picker/index.js';
+} from '@blocksuite/affine-model';
+import { countBy, maxBy, WithDisposable } from '@blocksuite/global/utils';
+import { css, html, LitElement, nothing, type TemplateResult } from 'lit';
+import { property, query } from 'lit/decorators.js';
+import { cache } from 'lit/directives/cache.js';
+import { choose } from 'lit/directives/choose.js';
+import { join } from 'lit/directives/join.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { when } from 'lit/directives/when.js';
+
+import type { EdgelessColorPickerButton } from '../../edgeless/components/color-picker/button.js';
+import type { PickColorEvent } from '../../edgeless/components/color-picker/types.js';
+import type { EdgelessShapePanel } from '../../edgeless/components/panel/shape-panel.js';
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+import type { ShapeToolOption } from '../../edgeless/gfx-tool/shape-tool.js';
+
 import {
   packColor,
   packColorsWithColorScheme,
 } from '../../edgeless/components/color-picker/utils.js';
-import '../../edgeless/components/panel/color-panel.js';
 import {
   type ColorEvent,
   GET_DEFAULT_LINE_COLOR,
@@ -54,16 +54,12 @@ import {
   type LineStyleEvent,
   LineStylesPanel,
 } from '../../edgeless/components/panel/line-styles-panel.js';
-import '../../edgeless/components/panel/shape-panel.js';
-import '../../edgeless/components/panel/shape-style-panel.js';
-import '../../edgeless/components/panel/stroke-style-panel.js';
 import {
   SHAPE_FILL_COLOR_BLACK,
   SHAPE_TEXT_COLOR_PURE_BLACK,
   SHAPE_TEXT_COLOR_PURE_WHITE,
 } from '../../edgeless/utils/consts.js';
 import { mountShapeTextEditor } from '../../edgeless/utils/text.js';
-import './change-text-menu.js';
 
 const changeShapeButtonStyles = [
   css`
@@ -98,7 +94,7 @@ function getMostCommonFillColor(
   const colors = countBy(elements, (ele: ShapeElementModel) => {
     if (ele.filled) {
       return typeof ele.fillColor === 'object'
-        ? ele.fillColor[colorScheme] ?? ele.fillColor.normal ?? null
+        ? (ele.fillColor[colorScheme] ?? ele.fillColor.normal ?? null)
         : ele.fillColor;
     }
     return '--affine-palette-transparent';
@@ -113,7 +109,7 @@ function getMostCommonStrokeColor(
 ): string | null {
   const colors = countBy(elements, (ele: ShapeElementModel) => {
     return typeof ele.strokeColor === 'object'
-      ? ele.strokeColor[colorScheme] ?? ele.strokeColor.normal ?? null
+      ? (ele.strokeColor[colorScheme] ?? ele.strokeColor.normal ?? null)
       : ele.strokeColor;
   });
   const max = maxBy(Object.entries(colors), ([_k, count]) => count);
@@ -122,14 +118,12 @@ function getMostCommonStrokeColor(
 
 function getMostCommonShape(
   elements: ShapeElementModel[]
-): ShapeTool['shapeType'] | null {
+): ShapeToolOption['shapeName'] | null {
   const shapeTypes = countBy(elements, (ele: ShapeElementModel) => {
-    return ele.shapeType === 'rect' && ele.radius
-      ? 'roundedRect'
-      : ele.shapeType;
+    return getShapeName(ele.shapeType, ele.radius);
   });
   const max = maxBy(Object.entries(shapeTypes), ([_k, count]) => count);
-  return max ? (max[0] as ShapeTool['shapeType']) : null;
+  return max ? (max[0] as ShapeToolOption['shapeName']) : null;
 }
 
 function getMostCommonLineSize(elements: ShapeElementModel[]): LineWidth {
@@ -156,21 +150,25 @@ function getMostCommonShapeStyle(elements: ShapeElementModel[]): ShapeStyle {
   return max ? (max[0] as ShapeStyle) : ShapeStyle.Scribbled;
 }
 
-@customElement('edgeless-change-shape-button')
 export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
   static override styles = [changeShapeButtonStyles];
+
+  get service() {
+    return this.edgeless.service;
+  }
 
   #pickColor<K extends keyof Pick<ShapeProps, 'fillColor' | 'strokeColor'>>(
     key: K
   ) {
     return (event: PickColorEvent) => {
       if (event.type === 'pick') {
-        const { type, value } = event.detail;
         this.elements.forEach(ele => {
-          this.service.updateElement(
-            ele.id,
-            packColor(type, key, value, ele[key])
-          );
+          const props = packColor(key, { ...event.detail });
+          // If `filled` can be set separately, this logic can be removed
+          if (key === 'fillColor' && !ele.filled) {
+            Object.assign(props, { filled: true });
+          }
+          this.service.updateElement(ele.id, props);
         });
         return;
       }
@@ -185,12 +183,13 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     mountShapeTextEditor(this.elements[0], this.edgeless);
   }
 
-  private _getTextColor(fillColor: CssVariableName) {
+  private _getTextColor(fillColor: string) {
+    const colorScheme = this.edgeless.surface.renderer.getColorScheme();
     // When the shape is filled with black color, the text color should be white.
     // When the shape is transparent, the text color should be set according to the theme.
     // Otherwise, the text color should be black.
     const textColor = isTransparent(fillColor)
-      ? GET_DEFAULT_LINE_COLOR()
+      ? GET_DEFAULT_LINE_COLOR(colorScheme)
       : fillColor === SHAPE_FILL_COLOR_BLACK
         ? SHAPE_TEXT_COLOR_PURE_WHITE
         : SHAPE_TEXT_COLOR_PURE_BLACK;
@@ -198,7 +197,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     return textColor;
   }
 
-  private _setShapeFillColor(fillColor: CssVariableName) {
+  private _setShapeFillColor(fillColor: string) {
     const filled = !isTransparent(fillColor);
     const color = this._getTextColor(fillColor);
     this.elements.forEach(ele =>
@@ -206,7 +205,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     );
   }
 
-  private _setShapeStrokeColor(strokeColor: CssVariableName) {
+  private _setShapeStrokeColor(strokeColor: string) {
     this.elements.forEach(ele =>
       this.service.updateElement(ele.id, { strokeColor })
     );
@@ -257,15 +256,13 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     const _disposables = this._disposables;
 
     _disposables.add(
-      this._shapePanel.slots.select.on(shapeType => {
-        const updatedProps =
-          shapeType === 'roundedRect'
-            ? ({ shapeType: ShapeType.Rect, radius: 0.1 } as const)
-            : { shapeType, radius: 0 };
-
+      this._shapePanel.slots.select.on(shapeName => {
         this.edgeless.doc.captureSync();
         this.elements.forEach(element => {
-          this.service.updateElement(element.id, updatedProps);
+          this.service.updateElement(element.id, {
+            shapeType: getShapeType(shapeName),
+            radius: getShapeRadius(shapeName),
+          });
         });
       })
     );
@@ -276,9 +273,10 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     const elements = this.elements;
     const selectedShape = getMostCommonShape(elements);
     const selectedFillColor =
-      getMostCommonFillColor(elements, colorScheme) ?? FILL_COLORS[0];
+      getMostCommonFillColor(elements, colorScheme) ?? DEFAULT_SHAPE_FILL_COLOR;
     const selectedStrokeColor =
-      getMostCommonStrokeColor(elements, colorScheme) ?? STROKE_COLORS[0];
+      getMostCommonStrokeColor(elements, colorScheme) ??
+      DEFAULT_SHAPE_STROKE_COLOR;
     const selectedLineSize = getMostCommonLineSize(elements) ?? LineWidth.Four;
     const selectedLineStyle =
       getMostCommonLineStyle(elements) ?? StrokeStyle.Solid;
@@ -344,7 +342,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
                 .color=${selectedFillColor}
                 .colors=${colors}
                 .colorType=${type}
-                .palettes=${FILL_COLORS}
+                .palettes=${SHAPE_FILL_COLORS}
               >
               </edgeless-color-picker-button>
             `;
@@ -367,7 +365,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
                 role="listbox"
                 aria-label="Fill colors"
                 .value=${selectedFillColor}
-                .options=${['--affine-palette-transparent', ...FILL_COLORS]}
+                .options=${SHAPE_FILL_COLORS}
                 @select=${(e: ColorEvent) => this._setShapeFillColor(e.detail)}
               >
               </edgeless-color-panel>
@@ -392,7 +390,7 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
                 .color=${selectedStrokeColor}
                 .colors=${colors}
                 .colorType=${type}
-                .palettes=${STROKE_COLORS}
+                .palettes=${SHAPE_STROKE_COLORS}
                 .hollowCircle=${true}
               >
                 <div
@@ -482,10 +480,6 @@ export class EdgelessChangeShapeButton extends WithDisposable(LitElement) {
     );
   }
 
-  get service() {
-    return this.edgeless.service;
-  }
-
   @query('edgeless-shape-panel')
   private accessor _shapePanel!: EdgelessShapePanel;
 
@@ -513,7 +507,7 @@ export function renderChangeShapeButton(
   elements?: ShapeElementModel[]
 ) {
   if (!elements?.length) return nothing;
-  if (elements.some(e => edgeless.service.surface.isInMindmap(e.id)))
+  if (elements.some(e => e.group instanceof MindmapElementModel))
     return nothing;
 
   return html`

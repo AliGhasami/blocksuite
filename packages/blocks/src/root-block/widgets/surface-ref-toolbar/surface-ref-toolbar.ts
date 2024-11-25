@@ -1,51 +1,49 @@
-import { WidgetComponent } from '@blocksuite/block-std';
-import { offset, shift } from '@floating-ui/dom';
-import { html, nothing } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { join } from 'lit/directives/join.js';
-import { repeat } from 'lit/directives/repeat.js';
+import type { SurfaceRefBlockModel } from '@blocksuite/affine-model';
 
-import type {
-  SurfaceRefBlockComponent,
-  SurfaceRefBlockModel,
-} from '../../../surface-ref-block/index.js';
-import type { EdgelessRootPreviewBlockComponent } from '../../edgeless/edgeless-root-preview-block.js';
-
-import { HoverController } from '../../../_common/components/hover/controller.js';
-import { isPeekable, peek } from '../../../_common/components/peekable.js';
-import { toast } from '../../../_common/components/toast.js';
-import '../../../_common/components/toolbar/icon-button.js';
-import { renderToolbarSeparator } from '../../../_common/components/toolbar/separator.js';
-import '../../../_common/components/toolbar/toolbar.js';
-import '../../../_common/components/toolbar/menu-button.js';
-import {
-  type Action,
-  renderActions,
-} from '../../../_common/components/toolbar/utils.js';
-import { PAGE_HEADER_HEIGHT } from '../../../_common/consts.js';
-import {
-  EdgelessModeIcon,
-  MoreVerticalIcon,
-  SmallArrowDownIcon,
-} from '../../../_common/icons/edgeless.js';
+import { HoverController } from '@blocksuite/affine-components/hover';
 import {
   CaptionIcon,
   CenterPeekIcon,
-  CopyIcon,
-  DeleteIcon,
-  DownloadIcon,
+  EdgelessModeIcon,
+  MoreVerticalIcon,
   OpenIcon,
-} from '../../../_common/icons/text.js';
-import { downloadBlob } from '../../../_common/utils/filesys.js';
-import { edgelessToBlob, writeImageBlobToClipboard } from './utils.js';
+  SmallArrowDownIcon,
+} from '@blocksuite/affine-components/icons';
+import { isPeekable, peek } from '@blocksuite/affine-components/peek';
+import {
+  cloneGroups,
+  type MenuItem,
+  type MenuItemGroup,
+  renderGroups,
+  renderToolbarSeparator,
+} from '@blocksuite/affine-components/toolbar';
+import { WidgetComponent } from '@blocksuite/block-std';
+import { offset, shift } from '@floating-ui/dom';
+import { html, nothing } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { join } from 'lit/directives/join.js';
+import { repeat } from 'lit/directives/repeat.js';
+
+import type { SurfaceRefBlockComponent } from '../../../surface-ref-block/index.js';
+
+import { PAGE_HEADER_HEIGHT } from '../../../_common/consts.js';
+import { getMoreMenuConfig } from '../../configs/toolbar.js';
+import { BUILT_IN_GROUPS } from './config.js';
+import { SurfaceRefToolbarContext } from './context.js';
 
 export const AFFINE_SURFACE_REF_TOOLBAR = 'affine-surface-ref-toolbar';
 
-@customElement(AFFINE_SURFACE_REF_TOOLBAR)
 export class AffineSurfaceRefToolbar extends WidgetComponent<
   SurfaceRefBlockModel,
   SurfaceRefBlockComponent
 > {
+  /*
+   * Caches the more menu items.
+   * Currently only supports configuring more menu.
+   */
+  moreGroups: MenuItemGroup<SurfaceRefToolbarContext>[] =
+    cloneGroups(BUILT_IN_GROUPS);
+
   private _hoverController = new HoverController(
     this,
     ({ abortController }) => {
@@ -71,9 +69,8 @@ export class AffineSurfaceRefToolbar extends WidgetComponent<
 
       return {
         template: SurfaceRefToolbarOptions({
-          block: this.block,
-          model: this.block.model,
-          abortController,
+          context: new SurfaceRefToolbarContext(this.block, abortController),
+          groups: this.moreGroups,
         }),
         computePosition: {
           referenceElement: this.block,
@@ -101,6 +98,7 @@ export class AffineSurfaceRefToolbar extends WidgetComponent<
   override connectedCallback() {
     super.connectedCallback();
 
+    this.moreGroups = getMoreMenuConfig(this.std).configure(this.moreGroups);
     this._hoverController.setReference(this.block);
   }
 }
@@ -111,117 +109,38 @@ declare global {
   }
 }
 
-function SurfaceRefToolbarOptions(options: {
-  block: SurfaceRefBlockComponent;
-  model: SurfaceRefBlockModel;
-  abortController: AbortController;
+function SurfaceRefToolbarOptions({
+  context,
+  groups,
+}: {
+  context: SurfaceRefToolbarContext;
+  groups: MenuItemGroup<SurfaceRefToolbarContext>[];
 }) {
-  const { block, model, abortController } = options;
-  const readonly = model.doc.readonly;
-  const hasValidReference = !!block.referenceModel;
+  const { blockComponent, abortController } = context;
+  const readonly = blockComponent.model.doc.readonly;
+  const hasValidReference = !!blockComponent.referenceModel;
 
-  const openMenuActions: Action[] = [];
+  const openMenuActions: MenuItem[] = [];
   if (hasValidReference) {
     openMenuActions.push({
-      name: 'Open in edgeless',
+      type: 'open-in-edgeless',
+      label: 'Open in edgeless',
       icon: EdgelessModeIcon,
-      handler: () => block.viewInEdgeless(),
+      action: () => blockComponent.viewInEdgeless(),
       disabled: readonly,
     });
 
-    if (isPeekable(block)) {
+    if (isPeekable(blockComponent)) {
       openMenuActions.push({
-        name: 'Open in center peek',
+        type: 'open-in-center-peek',
+        label: 'Open in center peek',
         icon: CenterPeekIcon,
-        handler: () => peek(block),
+        action: () => peek(blockComponent),
       });
     }
   }
 
-  const moreMenuActions: Action[][] = [
-    hasValidReference
-      ? [
-          {
-            type: 'copy',
-            name: 'Copy',
-            icon: CopyIcon,
-            handler: () => {
-              if (!block.referenceModel || !block.doc.root) return;
-
-              const editor = block.previewEditor;
-              const edgelessRootElement = editor?.view.getBlock(
-                block.doc.root.id
-              );
-              const surfaceRenderer = (
-                edgelessRootElement as EdgelessRootPreviewBlockComponent
-              )?.surface?.renderer;
-
-              edgelessToBlob(block.host, {
-                surfaceRefBlock: block,
-                surfaceRenderer,
-                edgelessElement:
-                  block.referenceModel as BlockSuite.EdgelessModel,
-              })
-                .then(blob => {
-                  return writeImageBlobToClipboard(blob);
-                })
-                .then(() => {
-                  toast(block.host, 'Copied image to clipboard');
-                })
-                .catch(err => {
-                  console.error(err);
-                });
-            },
-          },
-          {
-            type: 'download',
-            name: 'Download',
-            icon: DownloadIcon,
-            handler: () => {
-              if (!block.referenceModel || !block.doc.root) return;
-
-              const referencedModel = block.referenceModel;
-              const editor = block.previewEditor;
-              const edgelessRootElement = editor?.view.getBlock(
-                block.doc.root.id
-              );
-              const surfaceRenderer = (
-                edgelessRootElement as EdgelessRootPreviewBlockComponent
-              )?.surface?.renderer;
-
-              edgelessToBlob(block.host, {
-                surfaceRefBlock: block,
-                surfaceRenderer,
-                edgelessElement: referencedModel,
-              })
-                .then(blob => {
-                  const fileName =
-                    'title' in referencedModel
-                      ? referencedModel.title?.toString() ?? 'Edgeless Content'
-                      : 'Edgeless Content';
-
-                  downloadBlob(blob, fileName);
-                })
-                .catch(err => {
-                  console.error(err);
-                });
-            },
-          },
-        ]
-      : [],
-    [
-      {
-        type: 'delete',
-        name: 'Delete',
-        icon: DeleteIcon,
-        disabled: readonly,
-        handler: () => {
-          model.doc.deleteBlock(model);
-          abortController.abort();
-        },
-      },
-    ],
-  ];
+  const moreMenuActions = renderGroups(groups, context);
 
   const buttons = [
     openMenuActions.length
@@ -241,14 +160,14 @@ function SurfaceRefToolbarOptions(options: {
             <div data-size="large" data-orientation="vertical">
               ${repeat(
                 openMenuActions,
-                button => button.name,
-                ({ name, icon, handler, disabled }) => html`
+                button => button.label,
+                ({ label, icon, action, disabled }) => html`
                   <editor-menu-action
-                    aria-label=${name}
+                    aria-label=${ifDefined(label)}
                     ?disabled=${disabled}
-                    @click=${handler}
+                    @click=${action}
                   >
-                    ${icon}<span class="label">${name}</span>
+                    ${icon}<span class="label">${label}</span>
                   </editor-menu-action>
                 `
               )}
@@ -262,9 +181,10 @@ function SurfaceRefToolbarOptions(options: {
       : html`
           <editor-icon-button
             aria-label="Caption"
+            .tooltip=${'Add Caption'}
             @click=${() => {
               abortController.abort();
-              block.captionElement.show();
+              blockComponent.captionElement.show();
             }}
           >
             ${CaptionIcon}
@@ -281,7 +201,7 @@ function SurfaceRefToolbarOptions(options: {
         `}
       >
         <div data-size="large" data-orientation="vertical">
-          ${renderActions(moreMenuActions)}
+          ${moreMenuActions}
         </div>
       </editor-menu-button>
     `,

@@ -1,29 +1,15 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import type { FrameBlockModel } from '@blocksuite/affine-model';
 
-import type { FrameBlockModel } from '../../../../../frame-block/frame-model.js';
+import { NavigatorSettingsIcon } from '@blocksuite/affine-components/icons';
+import { EditPropsStore } from '@blocksuite/affine-shared/services';
+import { createButtonPopper } from '@blocksuite/affine-shared/utils';
+import { WithDisposable } from '@blocksuite/global/utils';
+import { css, html, LitElement, nothing } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
+
 import type { EdgelessRootBlockComponent } from '../../../edgeless-root-block.js';
 
-import '../../../../../_common/components/toggle-switch.js';
-import { NavigatorSettingsIcon } from '../../../../../_common/icons/edgeless.js';
-import { createButtonPopper } from '../../../../../_common/utils/button-popper.js';
-import '../../buttons/tool-icon-button.js';
-import './frame-order-menu.js';
-
-@customElement('edgeless-navigator-setting-button')
 export class EdgelessNavigatorSettingButton extends WithDisposable(LitElement) {
-  private _navigatorSettingPopper?: ReturnType<
-    typeof createButtonPopper
-  > | null = null;
-
-  private _onBlackBackgroundChange = (checked: boolean) => {
-    this.blackBackground = checked;
-    this.edgeless.slots.navigatorSettingUpdated.emit({
-      blackBackground: this.blackBackground,
-    });
-  };
-
   static override styles = css`
     .navigator-setting-menu {
       display: none;
@@ -83,10 +69,21 @@ export class EdgelessNavigatorSettingButton extends WithDisposable(LitElement) {
     }
   `;
 
+  private _navigatorSettingPopper?: ReturnType<
+    typeof createButtonPopper
+  > | null = null;
+
+  private _onBlackBackgroundChange = (checked: boolean) => {
+    this.blackBackground = checked;
+    this.edgeless.slots.navigatorSettingUpdated.emit({
+      blackBackground: this.blackBackground,
+    });
+  };
+
   private _tryRestoreSettings() {
-    const blackBackground = this.edgeless.service.editPropsStore.getStorage(
-      'presentBlackBackground'
-    );
+    const blackBackground = this.edgeless.std
+      .get(EditPropsStore)
+      .getStorage('presentBlackBackground');
     this.blackBackground = blackBackground ?? true;
   }
 

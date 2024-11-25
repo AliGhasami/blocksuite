@@ -1,26 +1,26 @@
+/** @alighasami for check merge **/
+import type { NoteBlockModel, RootBlockModel } from '@blocksuite/affine-model';
+import type { Viewport } from '@blocksuite/affine-shared/types';
 import type { PointerEventState } from '@blocksuite/block-std';
 import type { BlockModel, Text } from '@blocksuite/store';
 
-import { BlockComponent } from '@blocksuite/block-std';
-import { css, html } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-
-import type { NoteBlockModel } from '../../note-block/index.js';
-import type { PageRootBlockWidgetName } from '../index.js';
-import type { RootBlockModel } from '../root-model.js';
-import type { PageRootService } from './page-root-service.js';
-
+import { focusTextModel } from '@blocksuite/affine-components/rich-text';
+import { NoteDisplayMode } from '@blocksuite/affine-model';
 import {
-  NoteDisplayMode,
-  type Viewport,
-  asyncFocusRichText,
-  buildPath,
   focusTitle,
   getDocTitleInlineEditor,
+  getScrollContainer,
   matchFlavours,
-} from '../../_common/utils/index.js';
-import { getScrollContainer } from '../../_common/utils/scroll-container.js';
+} from '@blocksuite/affine-shared/utils';
+import { BlockComponent } from '@blocksuite/block-std';
+import { css, html } from 'lit';
+import { query } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
+
+import type { PageRootBlockWidgetName } from '../index.js';
+import type { PageRootService } from './page-root-service.js';
+
+import { buildPath } from '../../_common/utils/index.js';
 import { PageClipboard } from '../clipboard/index.js';
 import { PageKeyboardManager } from '../keyboard/keyboard-manager.js';
 
@@ -47,14 +47,11 @@ function testClickOnBlankArea(
   return false;
 }
 
-@customElement('affine-page-root')
 export class PageRootBlockComponent extends BlockComponent<
   RootBlockModel,
   PageRootService,
   PageRootBlockWidgetName
 > {
-  private _viewportElement: HTMLDivElement | null = null;
-
   static override styles = css`
     editor-host:has(> affine-page-root, * > affine-page-root) {
       display: block;
@@ -64,6 +61,7 @@ export class PageRootBlockComponent extends BlockComponent<
     affine-page-root {
       display: block;
       height: 100%;
+      cursor: default;
     }
 
     .affine-page-root-block-container {
@@ -76,19 +74,17 @@ export class PageRootBlockComponent extends BlockComponent<
       line-height: var(--affine-line-height);
       color: var(--affine-text-primary-color);
       font-weight: 400;
-      //max-width: var(--affine-editor-width);
-      //margin: 0 auto;
-      /* cursor: crosshair; */
-      cursor: default;
+      max-width: var(--affine-editor-width);
+      margin: 0 auto;
+
       /* Leave a place for drag-handle */
       /* Do not use prettier format this style, or it will be broken */
       /* prettier-ignore */
-      //padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
+      padding-left: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
       /* prettier-ignore */
-      //padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
+      padding-right: var(--affine-editor-side-padding, ${DOC_BLOCK_CHILD_PADDING}px);
       /* prettier-ignore */
-      //padding-bottom: var(--affine-editor-bottom-padding, ${DOC_BOTTOM_PADDING}px);
-      padding-inline-start: 20px;
+      padding-bottom: var(--affine-editor-bottom-padding, ${DOC_BOTTOM_PADDING}px);
     }
 
     /* Extra small devices (phones, 640px and down) */
@@ -110,6 +106,8 @@ export class PageRootBlockComponent extends BlockComponent<
     }
   `;
 
+  private _viewportElement: HTMLDivElement | null = null;
+
   clipboardController = new PageClipboard(this);
 
   focusFirstParagraph = () => {
@@ -118,7 +116,7 @@ export class PageRootBlockComponent extends BlockComponent<
       matchFlavours(block, ['affine:paragraph', 'affine:list', 'affine:code'])
     );
     if (firstText) {
-      asyncFocusRichText(this.host, firstText.id)?.catch(console.error);
+      focusTextModel(this.std, firstText.id);
     } else {
       const newFirstParagraphId = this.doc.addBlock(
         'affine:paragraph',
@@ -126,7 +124,7 @@ export class PageRootBlockComponent extends BlockComponent<
         defaultNote,
         0
       );
-      asyncFocusRichText(this.host, newFirstParagraphId)?.catch(console.error);
+      focusTextModel(this.std, newFirstParagraphId);
     }
   };
 
@@ -139,8 +137,49 @@ export class PageRootBlockComponent extends BlockComponent<
       this._getDefaultNoteBlock(),
       0
     );
-    asyncFocusRichText(this.host, newFirstParagraphId)?.catch(console.error);
+    focusTextModel(this.std, newFirstParagraphId);
   };
+
+  get rootScrollContainer() {
+    return getScrollContainer(this);
+  }
+
+  get slots() {
+    return this.service.slots;
+  }
+
+  get viewport(): Viewport | null {
+    if (!this.viewportElement) {
+      return null;
+    }
+    const {
+      scrollLeft,
+      scrollTop,
+      scrollWidth,
+      scrollHeight,
+      clientWidth,
+      clientHeight,
+    } = this.viewportElement;
+    const { top, left } = this.viewportElement.getBoundingClientRect();
+    return {
+      top,
+      left,
+      scrollLeft,
+      scrollTop,
+      scrollWidth,
+      scrollHeight,
+      clientWidth,
+      clientHeight,
+    };
+  }
+
+  get viewportElement(): HTMLDivElement | null {
+    if (this._viewportElement) return this._viewportElement;
+    this._viewportElement = this.host.closest(
+      '.affine-page-viewport'
+    ) as HTMLDivElement | null;
+    return this._viewportElement;
+  }
 
   private _createDefaultNoteBlock() {
     const { doc } = this;
@@ -186,13 +225,9 @@ export class PageRootBlockComponent extends BlockComponent<
 
     this.keyboardManager = new PageKeyboardManager(this);
 
-    //dispatchEvent()
-    //this.doc.slots.blockUpdated.
-    //this.disposables.add(this.in);
-
     this.bindHotKey({
       'Mod-a': () => {
-        /* const blocks = this.model.children
+        const blocks = this.model.children
           .filter(model => {
             if (matchFlavours(model, ['affine:note'])) {
               const note = model as NoteBlockModel;
@@ -210,8 +245,7 @@ export class PageRootBlockComponent extends BlockComponent<
               });
             });
           });
-        this.std.selection.setGroup('note', blocks);*/
-        this.selectAllBlock();
+        this.std.selection.setGroup('note', blocks);
         return true;
       },
       ArrowUp: () => {
@@ -243,9 +277,9 @@ export class PageRootBlockComponent extends BlockComponent<
         const index = notes.indexOf(prevNote);
         if (index !== 0) return;
 
-        const range = this.host.rangeManager?.value;
+        const range = this.std.range.value;
         requestAnimationFrame(() => {
-          const currentRange = this.host.rangeManager?.value;
+          const currentRange = this.std.range.value;
 
           if (!range || !currentRange) return;
 
@@ -315,17 +349,7 @@ export class PageRootBlockComponent extends BlockComponent<
         const last = lastNote.children.at(-1);
         if (
           !last ||
-          !last.text ||
-          matchFlavours(last, [
-            'affine:code',
-            'affine:divider',
-            'affine:image',
-            'affine:database',
-            'affine:bookmark',
-            'affine:attachment',
-            'affine:surface-ref',
-          ]) ||
-          /affine:embed-*/.test(last.flavour)
+          !(matchFlavours(last, ['affine:paragraph']) && last.text.length === 0)
         ) {
           if (readonly) return;
           const paragraphId = this.doc.addBlock(
@@ -379,91 +403,24 @@ export class PageRootBlockComponent extends BlockComponent<
   }
 
   override renderBlock() {
-    const content = html`${repeat(
-      this.model.children.filter(child => {
-        const isNote = matchFlavours(child, ['affine:note']);
-        const note = child as NoteBlockModel;
-        const displayOnEdgeless =
-          !!note.displayMode &&
-          note.displayMode === NoteDisplayMode.EdgelessOnly;
-        // Should remove deprecated `hidden` property in the future
-        return !(isNote && displayOnEdgeless);
-      }),
-      child => child.id,
-      child => this.host.renderModel(child)
-    )}`;
-
     const widgets = html`${repeat(
       Object.entries(this.widgets),
       ([id]) => id,
       ([_, widget]) => widget
     )}`;
 
+    const children = this.renderChildren(this.model, child => {
+      const isNote = matchFlavours(child, ['affine:note']);
+      const note = child as NoteBlockModel;
+      const displayOnEdgeless =
+        !!note.displayMode && note.displayMode === NoteDisplayMode.EdgelessOnly;
+      // Should remove deprecated `hidden` property in the future
+      return !(isNote && displayOnEdgeless);
+    });
+
     return html`
-      <div class="affine-page-root-block-container">${content} ${widgets}</div>
+      <div class="affine-page-root-block-container">${children} ${widgets}</div>
     `;
-  }
-
-  selectAllBlock() {
-    const blocks = this.model.children
-      .filter(model => {
-        if (matchFlavours(model, ['affine:note'])) {
-          const note = model as NoteBlockModel;
-          if (note.displayMode === NoteDisplayMode.EdgelessOnly) return false;
-
-          return true;
-        }
-        return false;
-      })
-      .flatMap(model => {
-        return model.children.map(child => {
-          return this.std.selection.create('block', {
-            blockId: child.id,
-          });
-        });
-      });
-    this.std.selection.setGroup('note', blocks);
-  }
-
-  get rootScrollContainer() {
-    return getScrollContainer(this);
-  }
-
-  get slots() {
-    return this.service.slots;
-  }
-
-  get viewport(): Viewport | null {
-    if (!this.viewportElement) {
-      return null;
-    }
-    const {
-      scrollLeft,
-      scrollTop,
-      scrollWidth,
-      scrollHeight,
-      clientWidth,
-      clientHeight,
-    } = this.viewportElement;
-    const { top, left } = this.viewportElement.getBoundingClientRect();
-    return {
-      top,
-      left,
-      scrollLeft,
-      scrollTop,
-      scrollWidth,
-      scrollHeight,
-      clientWidth,
-      clientHeight,
-    };
-  }
-
-  get viewportElement(): HTMLDivElement | null {
-    if (this._viewportElement) return this._viewportElement;
-    this._viewportElement = this.host.closest(
-      '.affine-page-viewport'
-    ) as HTMLDivElement | null;
-    return this._viewportElement;
   }
 
   @query('.affine-page-root-block-container')

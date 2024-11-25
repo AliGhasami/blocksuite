@@ -1,14 +1,15 @@
-import type { UIEventHandler } from '@blocksuite/block-std';
-import type { BlockComponent } from '@blocksuite/block-std';
+/** @alighasami for check merge **/
+import type { BlockComponent, UIEventHandler } from '@blocksuite/block-std';
 import type { BlockSnapshot, Doc } from '@blocksuite/store';
 
-import { DisposableGroup, assertExists } from '@blocksuite/global/utils';
+import { DisposableGroup } from '@blocksuite/global/utils';
 
 import {
   AttachmentAdapter,
   HtmlAdapter,
   ImageAdapter,
   MixTextAdapter,
+  NotionTextAdapter,
 } from '../../_common/adapters/index.js';
 import {
   defaultImageProxyMiddleware,
@@ -35,6 +36,11 @@ export class PageClipboard {
       ClipboardAdapter.MIME,
       ClipboardAdapter,
       100
+    );
+    this._std.clipboard.registerAdapter(
+      'text/_notion-text-production',
+      NotionTextAdapter,
+      95
     );
     this._std.clipboard.registerAdapter('text/html', HtmlAdapter, 90);
     [
@@ -82,22 +88,19 @@ export class PageClipboard {
 
   host: BlockComponent;
 
-  onBlockSnapshotPaste = (
+  onBlockSnapshotPaste = async (
     snapshot: BlockSnapshot,
     doc: Doc,
     parent?: string,
     index?: number
   ) => {
-    this._std.command
-      .chain()
-      .inline((_ctx, next) => {
-        this._std.clipboard
-          .pasteBlockSnapshot(snapshot, doc, parent, index)
-          .catch(console.error);
-
-        return next();
-      })
-      .run();
+    const block = await this._std.clipboard.pasteBlockSnapshot(
+      snapshot,
+      doc,
+      parent,
+      index
+    );
+    return block?.id ?? null;
   };
 
   onPageCopy: UIEventHandler = ctx => {
@@ -110,6 +113,7 @@ export class PageClipboard {
   onPageCut: UIEventHandler = ctx => {
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
+
     this._copySelected(() => {
       this._std.command
         .chain()
@@ -122,36 +126,56 @@ export class PageClipboard {
   };
 
   onPagePaste: UIEventHandler = ctx => {
-    console.log('this is onPagePaste', ctx);
-    //return;
     const e = ctx.get('clipboardState').raw;
-    console.log('this is e', e);
     e.preventDefault();
-    if (this._std.doc.readonly) return;
+
     this._std.doc.captureSync();
     this._std.command
       .chain()
       .try(cmd => [
+        cmd.getTextSelection().deleteText(),
+        cmd
+          .getSelectedModels()
+          .clearAndSelectFirstModel()
+          .retainFirstModel()
+          .deleteSelectedModels(),
+      ])
+      .try(cmd => [
         cmd.getTextSelection().inline<'currentSelectionPath'>((ctx, next) => {
           const textSelection = ctx.currentTextSelection;
-          assertExists(textSelection);
-          const end = textSelection.to ?? textSelection.from;
-          next({ currentSelectionPath: end.blockId });
+          if (!textSelection) {
+            return;
+          }
+          next({ currentSelectionPath: textSelection.from.blockId });
         }),
         cmd.getBlockSelections().inline<'currentSelectionPath'>((ctx, next) => {
           const currentBlockSelections = ctx.currentBlockSelections;
-          assertExists(currentBlockSelections);
+          if (!currentBlockSelections) {
+            return;
+          }
           const blockSelection = currentBlockSelections.at(-1);
           if (!blockSelection) {
             return;
           }
           next({ currentSelectionPath: blockSelection.blockId });
         }),
+        cmd.getImageSelections().inline<'currentSelectionPath'>((ctx, next) => {
+          const currentImageSelections = ctx.currentImageSelections;
+          if (!currentImageSelections) {
+            return;
+          }
+          const imageSelection = currentImageSelections.at(-1);
+          if (!imageSelection) {
+            return;
+          }
+          next({ currentSelectionPath: imageSelection.blockId });
+        }),
       ])
       .getBlockIndex()
       .inline((ctx, next) => {
-        console.log('this is inline', ctx, next);
-        assertExists(ctx.parentBlock);
+        if (!ctx.parentBlock) {
+          return;
+        }
         this._std.clipboard
           .paste(
             e,
@@ -166,22 +190,24 @@ export class PageClipboard {
       .run();
   };
 
-  constructor(host: BlockComponent) {
-    this.host = host;
-  }
-
   private get _std() {
     return this.host.std;
+  }
+
+  constructor(host: BlockComponent) {
+    this.host = host;
   }
 
   hostConnected() {
     if (this._disposables.disposed) {
       this._disposables = new DisposableGroup();
     }
-    this.host.handleEvent('copy', this.onPageCopy);
-    this.host.handleEvent('paste', this.onPagePaste);
-    this.host.handleEvent('cut', this.onPageCut);
-    this._init();
+    if (navigator.clipboard) {
+      this.host.handleEvent('copy', this.onPageCopy);
+      this.host.handleEvent('paste', this.onPagePaste);
+      this.host.handleEvent('cut', this.onPageCut);
+      this._init();
+    }
   }
 
   hostDisconnected() {

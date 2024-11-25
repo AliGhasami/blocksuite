@@ -1,25 +1,23 @@
+import type { CanvasRenderer } from '@blocksuite/affine-block-surface';
 import type { EditorHost } from '@blocksuite/block-std';
 
-import { Bound } from '@blocksuite/global/utils';
-import { assertExists } from '@blocksuite/global/utils';
+import { assertExists, Bound } from '@blocksuite/global/utils';
 
-import type { Renderer } from '../../../surface-block/canvas-renderer/renderer.js';
 import type { SurfaceRefBlockComponent } from '../../../surface-ref-block/surface-ref-block.js';
 
-import { blockComponentGetter } from '../../../_common/utils/query.js';
+import { ExportManager } from '../../../_common/export-manager/export-manager.js';
 import { isTopLevelBlock } from '../../../root-block/edgeless/utils/query.js';
 
 export const edgelessToBlob = async (
   host: EditorHost,
   options: {
     surfaceRefBlock: SurfaceRefBlockComponent;
-    surfaceRenderer: Renderer;
+    surfaceRenderer: CanvasRenderer;
     edgelessElement: BlockSuite.EdgelessModel;
   }
 ): Promise<Blob> => {
-  const { edgelessElement, surfaceRefBlock } = options;
-  const rootService = host.spec.getService('affine:page');
-  const exportManager = rootService.exportManager;
+  const { edgelessElement } = options;
+  const exportManager = host.std.get(ExportManager);
   const bound = Bound.deserialize(edgelessElement.xywh);
   const isBlock = isTopLevelBlock(edgelessElement);
 
@@ -27,7 +25,6 @@ export const edgelessToBlob = async (
     .edgelessToCanvas(
       options.surfaceRenderer,
       bound,
-      model => blockComponentGetter(model, surfaceRefBlock.host.view),
       undefined,
       isBlock ? [edgelessElement] : undefined,
       isBlock ? undefined : [edgelessElement],

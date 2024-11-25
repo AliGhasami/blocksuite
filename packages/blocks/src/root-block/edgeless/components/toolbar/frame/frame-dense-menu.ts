@@ -1,31 +1,31 @@
-import type { Menu } from '../../../../../_common/components/index.js';
+import { menu } from '@blocksuite/affine-components/context-menu';
+import { FrameIcon } from '@blocksuite/affine-components/icons';
+
 import type { DenseMenuBuilder } from '../common/type.js';
 
-import { FrameIcon } from '../../../../../_common/icons/edgeless.js';
 import { FrameConfig } from './config.js';
-import { createFrame } from './service.js';
 
-export const buildFrameDenseMenu: DenseMenuBuilder = edgeless => ({
-  type: 'sub-menu',
-  name: 'Frame',
-  icon: FrameIcon,
-  select: () => edgeless.tools.setEdgelessTool({ type: 'frame' }),
-  isSelected: edgeless.tools.edgelessTool.type === 'frame',
-  options: {
-    items: [
-      {
-        type: 'action',
-        name: 'Custom',
-        select: () => edgeless.tools.setEdgelessTool({ type: 'frame' }),
-      },
-      ...FrameConfig.map(
-        config =>
-          ({
-            type: 'action',
+export const buildFrameDenseMenu: DenseMenuBuilder = edgeless =>
+  menu.subMenu({
+    name: 'Frame',
+    prefix: FrameIcon,
+    select: () => edgeless.gfx.tool.setTool({ type: 'frame' }),
+    isSelected: edgeless.gfx.tool.currentToolName$.peek() === 'frame',
+    options: {
+      items: [
+        menu.action({
+          name: 'Custom',
+          select: () => edgeless.gfx.tool.setTool({ type: 'frame' }),
+        }),
+        ...FrameConfig.map(config =>
+          menu.action({
             name: `Slide ${config.name}`,
-            select: () => createFrame(edgeless, config.wh),
-          }) satisfies Menu
-      ),
-    ],
-  },
-});
+            select: () => {
+              edgeless.gfx.tool.setTool('default');
+              edgeless.service.frame.createFrameOnViewportCenter(config.wh);
+            },
+          })
+        ),
+      ],
+    },
+  });

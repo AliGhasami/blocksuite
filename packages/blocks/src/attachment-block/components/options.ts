@@ -1,122 +1,134 @@
+/** @alighasami for check merge **/
+import {
+  CaptionIcon,
+  DownloadIcon,
+  EditIcon,
+  MoreVerticalIcon,
+  SmallArrowDownIcon,
+} from '@blocksuite/affine-components/icons';
+import { createLitPortal } from '@blocksuite/affine-components/portal';
+import {
+  cloneGroups,
+  renderGroups,
+  renderToolbarSeparator,
+} from '@blocksuite/affine-components/toolbar';
+import {
+  type AttachmentBlockModel,
+  defaultAttachmentProps,
+} from '@blocksuite/affine-model';
+import {
+  EMBED_CARD_HEIGHT,
+  EMBED_CARD_WIDTH,
+} from '@blocksuite/affine-shared/consts';
+import { Bound } from '@blocksuite/global/utils';
 import { flip, offset } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { join } from 'lit/directives/join.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 import type { AttachmentBlockComponent } from '../attachment-block.js';
-import type { AttachmentBlockModel } from '../attachment-model.js';
 
-import { createLitPortal } from '../../_common/components/portal.js';
-import '../../_common/components/toolbar/icon-button.js';
-import '../../_common/components/toolbar/menu-button.js';
-import '../../_common/components/toolbar/separator.js';
-import { renderToolbarSeparator } from '../../_common/components/toolbar/separator.js';
-import '../../_common/components/toolbar/toolbar.js';
-import { renderActions } from '../../_common/components/toolbar/utils.js';
-import {
-  CaptionIcon,
-  CopyIcon,
-  DeleteIcon,
-  DuplicateIcon,
-  EditIcon,
-  MoreVerticalIcon,
-  // ViewIcon,
-} from '../../_common/icons/index.js';
-import { cloneAttachmentProperties } from '../utils.js';
+import { getMoreMenuConfig } from '../../root-block/configs/toolbar.js';
+import { BUILT_IN_GROUPS } from './config.js';
+import { AttachmentToolbarMoreMenuContext } from './context.js';
 import { RenameModal } from './rename-model.js';
 import { styles } from './styles.js';
 
-export function AttachmentOptionsTemplate({
-  anchor,
-  model,
-  showCaption,
-  copy,
-  //download,
-  //refresh,
-  abortController,
+export function attachmentViewToggleMenu({
+  block,
+  callback,
 }: {
-  anchor: AttachmentBlockComponent;
-  model: AttachmentBlockModel;
-  copy: () => void;
-  download: () => void;
-  refresh: () => void;
-  showCaption: () => void;
-  abortController: AbortController;
+  block: AttachmentBlockComponent;
+  callback?: () => void;
 }) {
-  //const disableEmbed = !allowEmbed(model, anchor.service.maxFileSize);
+  const model = block.model;
   const readonly = model.doc.readonly;
-  //const viewType = model.embed ? 'embed' : 'card';
-
-  /*const viewActions = [
+  const embedded = model.embed;
+  const viewType = embedded ? 'embed' : 'card';
+  const viewActions = [
     {
       type: 'card',
-      name: 'Card view',
-      disabled: readonly || !model.embed,
-      handler: () => {
-        model.doc.updateBlock(model, { embed: false });
-        abortController.abort();
+      label: 'Card view',
+      disabled: readonly || !embedded,
+      action: () => {
+        const style = defaultAttachmentProps.style!;
+        const width = EMBED_CARD_WIDTH[style];
+        const height = EMBED_CARD_HEIGHT[style];
+        const bound = Bound.deserialize(model.xywh);
+        bound.w = width;
+        bound.h = height;
+        model.doc.updateBlock(model, {
+          style,
+          embed: false,
+          xywh: bound.serialize(),
+        });
+        callback?.();
       },
     },
     {
       type: 'embed',
-      name: 'Embed view',
-      disabled: readonly || disableEmbed,
-      handler: () => {
-        convertToEmbed(model, anchor.service.maxFileSize);
-        abortController.abort();
+      label: 'Embed view',
+      disabled: readonly || embedded || !block.embedded(),
+      action: () => {
+        block.convertTo();
+        callback?.();
       },
     },
-  ];*/
+  ];
 
-  const moreActions = renderActions([
-    [
-      {
-        type: 'copy',
-        name: 'Copy',
-        icon: CopyIcon,
-        disabled: readonly,
-        handler: copy,
-      },
-      {
-        type: 'duplicate',
-        name: 'Duplicate',
-        icon: DuplicateIcon,
-        disabled: readonly,
-        handler: () => {
-          const prop: { flavour: 'affine:attachment' } = {
-            flavour: 'affine:attachment',
-            ...cloneAttachmentProperties(model),
-          };
-          model.doc.addSiblingBlocks(model, [prop]);
-        },
-      },
-      /* {
-        type: 'reload',
-        name: 'Reload',
-        icon: RefreshIcon,
-        disabled: readonly,
-        handler: refresh,
-      },*/
-      /*{
-        type: 'download',
-        name: 'Download',
-        icon: DownloadIcon,
-        disabled: readonly,
-        handler: download,
-      },*/
-    ],
-    [
-      {
-        type: 'delete',
-        name: 'Delete',
-        icon: DeleteIcon,
-        disabled: readonly,
-        handler: () => {
-          model.doc.deleteBlock(model);
-          abortController.abort();
-        },
-      },
-    ],
-  ]);
+  return html`
+    <editor-menu-button
+      .contentPadding=${'8px'}
+      .button=${html`
+        <editor-icon-button
+          aria-label="Switch view"
+          .justify=${'space-between'}
+          .labelHeight=${'20px'}
+          .iconContainerWidth=${'110px'}
+        >
+          <div class="label">
+            <span style="text-transform: capitalize">${viewType}</span>
+            view
+          </div>
+          ${SmallArrowDownIcon}
+        </editor-icon-button>
+      `}
+    >
+      <div data-size="small" data-orientation="vertical">
+        ${repeat(
+          viewActions,
+          button => button.type,
+          ({ type, label, action, disabled }) => html`
+            <editor-menu-action
+              data-testid=${`link-to-${type}`}
+              ?data-selected=${type === viewType}
+              ?disabled=${disabled}
+              @click=${action}
+            >
+              ${label}
+            </editor-menu-action>
+          `
+        )}
+      </div>
+    </editor-menu-button>
+  `;
+}
+
+export function AttachmentOptionsTemplate({
+  block,
+  model,
+  abortController,
+}: {
+  block: AttachmentBlockComponent;
+  model: AttachmentBlockModel;
+  abortController: AbortController;
+}) {
+  const std = block.std;
+  const editorHost = block.host;
+  const readonly = model.doc.readonly;
+  const context = new AttachmentToolbarMoreMenuContext(block, abortController);
+  const groups = getMoreMenuConfig(std).configure(cloneGroups(BUILT_IN_GROUPS));
+  const moreMenuActions = renderGroups(groups, context);
 
   const buttons = [
     // preview
@@ -137,12 +149,12 @@ export function AttachmentOptionsTemplate({
               const renameAbortController = new AbortController();
               createLitPortal({
                 template: RenameModal({
-                  editorHost: anchor.host,
                   model,
+                  editorHost,
                   abortController: renameAbortController,
                 }),
                 computePosition: {
-                  referenceElement: anchor,
+                  referenceElement: block,
                   placement: 'top-start',
                   middleware: [flip(), offset(4)],
                   // It has a overlay mask, so we don't need to update the position.
@@ -156,52 +168,22 @@ export function AttachmentOptionsTemplate({
           </editor-icon-button>
         `,
 
-    ,
-    /*html`
-      <editor-menu-button
-        .contentPadding=${'8px'}
-        .button=${html`
-          <editor-icon-button
-            aria-label="Switch view"
-            .justify=${'space-between'}
-            .labelHeight=${'20px'}
-            .iconContainerWidth=${'110px'}
-          >
-            <div class="label">
-              <span style="text-transform: capitalize">${viewType}</span>
-              view
-            </div>
-            ${SmallArrowDownIcon}
-          </editor-icon-button>
-        `}
-      >
-        <div data-size="small" data-orientation="vertical">
-          ${repeat(
-            viewActions,
-            button => button.type,
-            ({ type, name, handler }) => html`
-              <editor-menu-action
-                data-testid=${`link-to-${type}`}
-                ?data-selected=${type === viewType}
-                @click=${handler}
-              >
-                ${name}
-              </editor-menu-action>
-            `
-          )}
-        </div>
-      </editor-menu-button>
-    `*/ /*readonly
+    attachmentViewToggleMenu({
+      block,
+      callback: () => abortController.abort(),
+    }),
+
+    readonly
       ? nothing
       : html`
           <editor-icon-button
             aria-label="Download"
             .tooltip=${'Download'}
-            @click=${download}
+            @click=${() => block.download()}
           >
             ${DownloadIcon}
           </editor-icon-button>
-        `,*/
+        `,
 
     readonly
       ? nothing
@@ -209,7 +191,7 @@ export function AttachmentOptionsTemplate({
           <editor-icon-button
             aria-label="Caption"
             .tooltip=${'Caption'}
-            @click=${showCaption}
+            @click=${() => block.captionEditor?.show()}
           >
             ${CaptionIcon}
           </editor-icon-button>
@@ -224,7 +206,9 @@ export function AttachmentOptionsTemplate({
           </editor-icon-button>
         `}
       >
-        <div data-size="large" data-orientation="vertical">${moreActions}</div>
+        <div data-size="large" data-orientation="vertical">
+          ${moreMenuActions}
+        </div>
       </editor-menu-button>
     `,
   ];

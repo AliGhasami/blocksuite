@@ -1,54 +1,60 @@
+import type {
+  Connection,
+  ConnectorElementModel,
+  NoteBlockModel,
+  ShapeType,
+} from '@blocksuite/affine-model';
 import type { Bound, IVec } from '@blocksuite/global/utils';
 
-import { WithDisposable } from '@blocksuite/block-std';
-import { Vec } from '@blocksuite/global/utils';
-import { DisposableGroup, assertExists } from '@blocksuite/global/utils';
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
-import { styleMap } from 'lit/directives/style-map.js';
-
-import type { NoteBlockModel } from '../../../../note-block/index.js';
-import type { ConnectorElementModel } from '../../../../surface-block/element-model/connector.js';
-import type { ShapeType } from '../../../../surface-block/element-model/shape.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
-import type { SelectedRect } from '../rects/edgeless-selected-rect.js';
-
-import { DEFAULT_NOTE_BACKGROUND_COLOR } from '../../../../_common/edgeless/note/consts.js';
+import {
+  CanvasElementType,
+  type ConnectionOverlay,
+  Overlay,
+  OverlayIdentifier,
+  type RoughCanvas,
+} from '@blocksuite/affine-block-surface';
+import { ConnectorPathGenerator } from '@blocksuite/affine-block-surface';
 import {
   AutoCompleteArrowIcon,
   MindMapChildIcon,
   MindMapSiblingIcon,
   NoteAutoCompleteIcon,
-} from '../../../../_common/icons/index.js';
-import { handleNativeRangeAtPoint } from '../../../../_common/utils/index.js';
+} from '@blocksuite/affine-components/icons';
 import {
-  type Connection,
-  ConnectorMode,
-} from '../../../../surface-block/element-model/connector.js';
-import { MindmapElementModel } from '../../../../surface-block/element-model/mindmap.js';
-import { shapeMethods } from '../../../../surface-block/element-model/shape.js';
-import { LayoutType } from '../../../../surface-block/element-model/utils/mindmap/layout.js';
-import { DEFAULT_SHAPE_STROKE_COLOR } from '../../../../surface-block/elements/shape/consts.js';
-import { ShapeElementModel } from '../../../../surface-block/index.js';
+  DEFAULT_NOTE_HEIGHT,
+  DEFAULT_SHAPE_STROKE_COLOR,
+  LayoutType,
+  MindmapElementModel,
+  ShapeElementModel,
+  shapeMethods,
+} from '@blocksuite/affine-model';
+import { handleNativeRangeAtPoint } from '@blocksuite/affine-shared/utils';
+import { type BlockStdScope, stdContext } from '@blocksuite/block-std';
+import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
 import {
-  CanvasElementType,
-  Overlay,
-  type RoughCanvas,
-} from '../../../../surface-block/index.js';
-import { ConnectorPathGenerator } from '../../../../surface-block/managers/connector-manager.js';
-import { NOTE_INIT_HEIGHT } from '../../utils/consts.js';
+  assertExists,
+  DisposableGroup,
+  Vec,
+  WithDisposable,
+} from '@blocksuite/global/utils';
+import { consume } from '@lit/context';
+import { css, html, LitElement, nothing } from 'lit';
+import { property, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
+
+import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
+import type { SelectedRect } from '../rects/edgeless-selected-rect.js';
+
 import { isNoteBlock } from '../../utils/query.js';
 import { mountShapeTextEditor } from '../../utils/text.js';
-import { DEFAULT_CONNECTOR_COLOR } from '../panel/color-panel.js';
-import './auto-complete-panel.js';
 import { EdgelessAutoCompletePanel } from './auto-complete-panel.js';
 import {
-  Direction,
-  MAIN_GAP,
   createEdgelessElement,
+  Direction,
   getPosition,
   isShape,
+  MAIN_GAP,
   nextBound,
 } from './utils.js';
 
@@ -76,71 +82,7 @@ class AutoCompleteOverlay extends Overlay {
   }
 }
 
-@customElement('edgeless-auto-complete')
 export class EdgelessAutoComplete extends WithDisposable(LitElement) {
-  private _autoCompleteOverlay: AutoCompleteOverlay = new AutoCompleteOverlay();
-
-  private _onPointerDown = (e: PointerEvent, type: Direction) => {
-    const { service } = this.edgeless;
-    const viewportRect = service.viewport.boundingClientRect;
-    const start = service.viewport.toModelCoord(
-      e.clientX - viewportRect.left,
-      e.clientY - viewportRect.top
-    );
-
-    if (!this.edgeless.dispatcher) return;
-
-    let connector: ConnectorElementModel | null;
-
-    this._disposables.addFromEvent(document, 'pointermove', e => {
-      const point = service.viewport.toModelCoord(
-        e.clientX - viewportRect.left,
-        e.clientY - viewportRect.top
-      );
-      if (Vec.dist(start, point) > 8 && !this._isMoving) {
-        if (!this.canShowAutoComplete) return;
-        this._isMoving = true;
-        const { startPosition } = getPosition(type);
-        connector = this._addConnector(
-          {
-            id: this.current.id,
-            position: startPosition,
-          },
-          {
-            position: point,
-          }
-        );
-      }
-      if (this._isMoving) {
-        assertExists(connector);
-        const otherSideId = connector.source.id;
-
-        connector.target = this._surface.overlays.connector.renderConnector(
-          point,
-          otherSideId ? [otherSideId] : []
-        );
-      }
-    });
-
-    this._disposables.addFromEvent(document, 'pointerup', e => {
-      if (!this._isMoving) {
-        this._generateElementOnClick(type);
-      } else if (connector && !connector.target.id) {
-        this.edgeless.service.selection.clear();
-        this._createAutoCompletePanel(e, connector);
-      }
-
-      this._isMoving = false;
-      this._surface.overlays.connector.clear();
-      this._disposables.dispose();
-      this._disposables = new DisposableGroup();
-    });
-  };
-
-  private _pathGenerator!: ConnectorPathGenerator;
-
-  private _timer: ReturnType<typeof setTimeout> | null = null;
-
   static override styles = css`
     .edgeless-auto-complete-container {
       position: absolute;
@@ -216,58 +158,102 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     }
   `;
 
+  private _autoCompleteOverlay!: AutoCompleteOverlay;
+
+  private _onPointerDown = (e: PointerEvent, type: Direction) => {
+    const { service } = this.edgeless;
+    const viewportRect = service.viewport.boundingClientRect;
+    const start = service.viewport.toModelCoord(
+      e.clientX - viewportRect.left,
+      e.clientY - viewportRect.top
+    );
+
+    if (!this.edgeless.dispatcher) return;
+
+    let connector: ConnectorElementModel | null;
+
+    this._disposables.addFromEvent(document, 'pointermove', e => {
+      const point = service.viewport.toModelCoord(
+        e.clientX - viewportRect.left,
+        e.clientY - viewportRect.top
+      );
+      if (Vec.dist(start, point) > 8 && !this._isMoving) {
+        if (!this.canShowAutoComplete) return;
+        this._isMoving = true;
+        const { startPosition } = getPosition(type);
+        connector = this._addConnector(
+          {
+            id: this.current.id,
+            position: startPosition,
+          },
+          {
+            position: point,
+          }
+        );
+      }
+      if (this._isMoving) {
+        assertExists(connector);
+        const otherSideId = connector.source.id;
+
+        connector.target = this.connectionOverlay.renderConnector(
+          point,
+          otherSideId ? [otherSideId] : []
+        );
+      }
+    });
+
+    this._disposables.addFromEvent(document, 'pointerup', e => {
+      if (!this._isMoving) {
+        this._generateElementOnClick(type);
+      } else if (connector && !connector.target.id) {
+        this.edgeless.service.selection.clear();
+        this._createAutoCompletePanel(e, connector);
+      }
+
+      this._isMoving = false;
+      this.connectionOverlay.clear();
+      this._disposables.dispose();
+      this._disposables = new DisposableGroup();
+    });
+  };
+
+  private _pathGenerator!: ConnectorPathGenerator;
+
+  private _timer: ReturnType<typeof setTimeout> | null = null;
+
+  get canShowAutoComplete() {
+    const { current } = this;
+    return isShape(current) || isNoteBlock(current);
+  }
+
+  get connectionOverlay() {
+    return this.std.get(OverlayIdentifier('connection')) as ConnectionOverlay;
+  }
+
   private _addConnector(source: Connection, target: Connection) {
-    const { current, edgeless } = this;
-
-    let color = '';
-    if (isShape(current)) {
-      color = edgeless.surface.themeObserver.getColor(
-        current.strokeColor,
-        DEFAULT_SHAPE_STROKE_COLOR
-      );
-    } else {
-      const tmpColor = edgeless.surface.themeObserver.getColor(
-        current.background,
-        DEFAULT_NOTE_BACKGROUND_COLOR
-      );
-      let tag = tmpColor.split('-').pop();
-      if (!tag || tag === 'gray') tag = 'grey';
-      color = `--affine-palette-line-${tag}`;
-    }
-
-    const stroke = getComputedStyle(edgeless).getPropertyValue(color)
-      ? color
-      : DEFAULT_CONNECTOR_COLOR;
-
+    const { edgeless } = this;
     const id = edgeless.service.addElement(CanvasElementType.CONNECTOR, {
-      mode: ConnectorMode.Orthogonal,
-      strokeWidth: 2,
-      stroke,
       source,
       target,
     });
     return edgeless.service.getElementById(id) as ConnectorElementModel;
   }
 
-  private _addMindmapNode(
-    direction: LayoutType.LEFT | LayoutType.RIGHT,
-    target: 'sibling' | 'child'
-  ) {
+  private _addMindmapNode(target: 'sibling' | 'child') {
     const mindmap = this.current.group;
 
     if (!(mindmap instanceof MindmapElementModel)) return;
 
     const parentNode =
       target === 'sibling'
-        ? mindmap.getParentNode(this.current.id) ?? this.current
+        ? (mindmap.getParentNode(this.current.id) ?? this.current)
         : this.current;
 
     const newNode = mindmap.addNode(
       parentNode.id,
       target === 'sibling' ? this.current.id : undefined,
       undefined,
-      undefined,
-      direction
+      undefined
     );
 
     requestAnimationFrame(() => {
@@ -380,7 +366,7 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
       assertExists(model);
       const [x, y] = service.viewport.toViewCoord(
         bound.center[0],
-        bound.y + NOTE_INIT_HEIGHT / 2
+        bound.y + DEFAULT_NOTE_HEIGHT / 2
       );
       requestAnimationFrame(() => {
         handleNativeRangeAtPoint(x, y);
@@ -452,6 +438,14 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     }
 
     return result;
+  }
+
+  private _initOverlay() {
+    const { surface } = this.edgeless;
+    this._autoCompleteOverlay = new AutoCompleteOverlay(
+      this.std.get(GfxControllerIdentifier)
+    );
+    surface.renderer.addOverlay(this._autoCompleteOverlay);
   }
 
   private _renderArrow() {
@@ -602,7 +596,7 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
         <div
           class="edgeless-auto-complete-arrow"
           @pointerdown=${() => {
-            this._addMindmapNode(layout, target);
+            this._addMindmapNode(target);
           }}
         >
           ${icon}
@@ -618,9 +612,8 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     targetType: ShapeType
   ) {
     const { surface } = this.edgeless;
-    surface.renderer.addOverlay(this._autoCompleteOverlay);
 
-    this._autoCompleteOverlay.stroke = surface.renderer.getColor(
+    this._autoCompleteOverlay.stroke = surface.renderer.getColorValue(
       current.strokeColor,
       DEFAULT_SHAPE_STROKE_COLOR,
       true
@@ -632,15 +625,12 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     surface.refresh();
   }
 
-  private get _surface() {
-    return this.edgeless.surface;
-  }
-
   override connectedCallback(): void {
     super.connectedCallback();
     this._pathGenerator = new ConnectorPathGenerator({
       getElementById: id => this.edgeless.service.getElementById(id),
     });
+    this._initOverlay();
   }
 
   override firstUpdated() {
@@ -656,15 +646,17 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     _disposables.add(() => this.removeOverlay());
 
     _disposables.add(
-      edgeless.host.event.add('pointerMove', () => {
-        const state = edgeless.tools.getHoverState();
+      edgeless.host.event.add('pointerMove', ctx => {
+        const evt = ctx.get('pointerState');
+        const [x, y] = edgeless.gfx.viewport.toModelCoord(evt.x, evt.y);
+        const elm = edgeless.gfx.getElementByPoint(x, y);
 
-        if (!state) {
+        if (!elm) {
           this._isHover = false;
           return;
         }
 
-        this._isHover = state.content === this.current ? true : false;
+        this._isHover = elm === this.current ? true : false;
       })
     );
 
@@ -705,11 +697,6 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
     </div>`;
   }
 
-  get canShowAutoComplete() {
-    const { current } = this;
-    return isShape(current) || isNoteBlock(current);
-  }
-
   @state()
   private accessor _isHover = true;
 
@@ -724,6 +711,11 @@ export class EdgelessAutoComplete extends WithDisposable(LitElement) {
 
   @property({ attribute: false })
   accessor selectedRect!: SelectedRect;
+
+  @consume({
+    context: stdContext,
+  })
+  accessor std!: BlockStdScope;
 }
 
 declare global {

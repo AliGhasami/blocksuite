@@ -5,22 +5,32 @@ export class ASTWalkerContext<TNode extends object> {
 
   private _globalContext: Record<string, unknown> = Object.create(null);
 
-  _skip = false;
-
-  _skipChildrenNum = 0;
-
   private _stack: {
     node: TNode;
     prop: Keyof<TNode>;
     context: Record<string, unknown>;
   }[] = [];
 
+  _skip = false;
+
+  _skipChildrenNum = 0;
+
   setDefaultProp = (parentProp: Keyof<TNode>) => {
     this._defaultProp = parentProp;
   };
 
+  get stack() {
+    return this._stack;
+  }
+
   private current() {
     return this._stack[this._stack.length - 1];
+  }
+
+  cleanGlobalContextStack(key: string) {
+    if (this._globalContext[key] instanceof Array) {
+      this._globalContext[key] = [];
+    }
   }
 
   closeNode() {
@@ -105,9 +115,5 @@ export class ASTWalkerContext<TNode extends object> {
 
   skipChildren(num = 1) {
     this._skipChildrenNum = num;
-  }
-
-  get stack() {
-    return this._stack;
   }
 }

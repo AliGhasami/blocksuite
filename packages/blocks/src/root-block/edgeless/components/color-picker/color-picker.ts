@@ -1,12 +1,8 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import {
-  SignalWatcher,
-  batch,
-  computed,
-  signal,
-} from '@lit-labs/preact-signals';
-import { LitElement, html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { on, once, stopPropagation } from '@blocksuite/affine-shared/utils';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
+import { batch, computed, signal } from '@preact/signals-core';
+import { html, LitElement } from 'lit';
+import { property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -24,7 +20,6 @@ import type {
   Rgb,
 } from './types.js';
 
-import { on, once, stopPropagation } from '../../../../_common/utils/event.js';
 import { AREA_CIRCLE_R, MATCHERS, SLIDER_CIRCLE_R } from './consts.js';
 import { COLOR_PICKER_STYLE } from './styles.js';
 import {
@@ -32,14 +27,15 @@ import {
   clamp,
   defaultHsva,
   eq,
+  hsvaToHex8,
   hsvaToRgba,
   linearGradientAt,
   parseHexToHsva,
   renderCanvas,
-  rgbToHex,
-  rgbToHsv,
   rgbaToHex8,
   rgbaToHsva,
+  rgbToHex,
+  rgbToHsv,
 } from './utils.js';
 
 const TABS: NavTab<NavType>[] = [
@@ -47,17 +43,26 @@ const TABS: NavTab<NavType>[] = [
   { type: 'custom', name: 'Custom' },
 ];
 
-@customElement('edgeless-color-picker')
 export class EdgelessColorPicker extends SignalWatcher(
   WithDisposable(LitElement)
 ) {
+  static override styles = COLOR_PICKER_STYLE;
+
   #alphaRect = new DOMRect();
 
   #editAlpha = (e: InputEvent) => {
-    const value = Number((e.target as HTMLInputElement).value.trim());
-    const alpha = clamp(0, value, 100);
+    const target = e.target as HTMLInputElement;
+    const orignalValue = target.value;
+    let value = orignalValue.trim().replace(/[^0-9]/, '');
+
+    const alpha = clamp(0, Number(value), 100);
     const a = bound01(alpha, 100);
     const hsva = this.hsva$.peek();
+
+    value = `${alpha}`;
+    if (orignalValue !== value) {
+      target.value = value;
+    }
 
     if (hsva.a === a) return;
 
@@ -73,26 +78,29 @@ export class EdgelessColorPicker extends SignalWatcher(
     const target = e.target as HTMLInputElement;
 
     if (e.key === 'Enter') {
-      const value = target.value.trim().replace(MATCHERS.other, '');
+      const orignalValue = target.value;
+      let value = orignalValue.trim().replace(MATCHERS.other, '');
       let matched;
       if (
         (matched = value.match(MATCHERS.hex3)) ||
         (matched = value.match(MATCHERS.hex6))
       ) {
-        const { h, s, v } = parseHexToHsva(matched[1]);
-        const hsv = { h, s, v };
-
         const oldHsva = this.hsva$.peek();
-
-        if (eq(hsv, oldHsva)) return;
-
+        const hsv = parseHexToHsva(matched[1]);
         const newHsva = { ...oldHsva, ...hsv };
+
+        value = rgbToHex(hsvaToRgba(newHsva));
+        if (orignalValue !== value) {
+          target.value = value;
+        }
+
+        if (eq(newHsva, oldHsva)) return;
 
         this.#setControlsPos(newHsva);
 
         this.#pick();
       } else {
-        target.value = this.hex6WithoutHash;
+        target.value = this.hex6WithoutHash$.peek();
       }
     }
   };
@@ -101,15 +109,18 @@ export class EdgelessColorPicker extends SignalWatcher(
 
   #paletteRect = new DOMRect();
 
-  static override styles = COLOR_PICKER_STYLE;
-
   #pick() {
     const hsva = this.hsva$.peek();
     const type = this.modeType$.peek();
-    const rgba = hsvaToRgba(hsva);
-    const value = rgbaToHex8(rgba);
+    const detail = { [type]: hsvaToHex8(hsva) };
 
-    this.pick?.({ type: 'pick', detail: { type, value } });
+    if (type !== 'normal') {
+      const another = type === 'light' ? 'dark' : 'light';
+      const { hsva } = this[`${another}$`].peek();
+      detail[another] = hsvaToHex8(hsva);
+    }
+
+    this.pick?.({ type: 'pick', detail });
   }
 
   #pickEnd() {
@@ -261,28 +272,31 @@ export class EdgelessColorPicker extends SignalWatcher(
         }, 110);
       }
 
-      const update = (x: number, y: number, scrolled = false) => {
+      const update = (x: number, y: number) => {
         if (!picked) return;
 
-        x = x === 0 ? 0 : x < 0 ? 1 : -1;
-        y = y === 0 ? 0 : y < 0 ? 1 : -1;
+        const absX = Math.abs(x);
+        const absY = Math.abs(y);
 
-        if (isInHue && y !== 0) {
-          scrolled = true;
-          this.#setHuePosWithWheel(y);
+        x = Math.sign(x);
+        y = Math.sign(y);
+
+        if (Math.hypot(x, y) === 0) return;
+
+        x *= Math.max(1, Math.log10(absX)) * -1;
+        y *= Math.max(1, Math.log10(absY)) * -1;
+
+        if (isInHue) {
+          this.#setHuePosWithWheel(x | y);
         }
 
-        if (isInAlpha && y !== 0) {
-          scrolled = true;
-          this.#setAlphaPosWithWheel(y);
+        if (isInAlpha) {
+          this.#setAlphaPosWithWheel(x | y);
         }
 
-        if (isInPalette && (x !== 0 || y !== 0)) {
-          scrolled = true;
+        if (isInPalette) {
           this.#setPalettePosWithWheel(x, y);
         }
-
-        if (!scrolled) return;
 
         this.#pick();
       };
@@ -371,62 +385,6 @@ export class EdgelessColorPicker extends SignalWatcher(
     });
     this.disposables.addFromEvent(this, 'click', stopPropagation);
 
-    this.disposables.add(
-      this.hsva$.subscribe((hsva: Hsva) => {
-        const type = this.modeType$.peek();
-        const mode = this.modes$.value.find(mode => mode.type === type);
-
-        if (mode) {
-          mode.hsva = { ...hsva };
-        }
-      })
-    );
-
-    this.disposables.add(
-      this.huePosX$.subscribe((x: number) => {
-        const { width } = this.#hueRect;
-        const rgb = linearGradientAt(bound01(x, width));
-
-        // Updates palette canvas
-        renderCanvas(this.canvas, rgb);
-
-        this.hue$.value = rgb;
-      })
-    );
-
-    this.disposables.add(
-      this.hue$.subscribe((rgb: Rgb) => {
-        const hsva = this.hsva$.peek();
-
-        hsva.h = rgbToHsv(rgb).h;
-
-        this.hsva$.value = { ...hsva };
-      })
-    );
-
-    this.disposables.add(
-      this.alphaPosX$.subscribe((x: number) => {
-        const hsva = this.hsva$.peek();
-        const { width } = this.#alphaRect;
-
-        hsva.a = bound01(x, width);
-
-        this.hsva$.value = { ...hsva };
-      })
-    );
-
-    this.disposables.add(
-      this.palettePos$.subscribe(({ x, y }: Point) => {
-        const hsva = this.hsva$.peek();
-        const { width, height } = this.#paletteRect;
-
-        hsva.s = bound01(x, width);
-        hsva.v = bound01(height - y, height);
-
-        this.hsva$.value = { ...hsva };
-      })
-    );
-
     const batches: (() => void)[] = [];
     const { type, modes } = this.colors;
 
@@ -459,6 +417,63 @@ export class EdgelessColorPicker extends SignalWatcher(
     this.#setRects();
 
     batch(() => batches.forEach(fn => fn()));
+
+    this.updateComplete
+      .then(() => {
+        this.disposables.add(
+          this.hsva$.subscribe((hsva: Hsva) => {
+            const type = this.modeType$.peek();
+            const mode = this.modes$.value.find(mode => mode.type === type);
+
+            if (mode) {
+              mode.hsva = { ...hsva };
+            }
+          })
+        );
+
+        this.disposables.add(
+          this.huePosX$.subscribe((x: number) => {
+            const { width } = this.#hueRect;
+            const rgb = linearGradientAt(bound01(x, width));
+
+            // Updates palette canvas
+            renderCanvas(this.canvas, rgb);
+
+            this.hue$.value = rgb;
+          })
+        );
+
+        this.disposables.add(
+          this.hue$.subscribe((rgb: Rgb) => {
+            const hsva = this.hsva$.peek();
+            const h = rgbToHsv(rgb).h;
+
+            this.hsva$.value = { ...hsva, h };
+          })
+        );
+
+        this.disposables.add(
+          this.alphaPosX$.subscribe((x: number) => {
+            const hsva = this.hsva$.peek();
+            const { width } = this.#alphaRect;
+            const a = bound01(x, width);
+
+            this.hsva$.value = { ...hsva, a };
+          })
+        );
+
+        this.disposables.add(
+          this.palettePos$.subscribe(({ x, y }: Point) => {
+            const hsva = this.hsva$.peek();
+            const { width, height } = this.#paletteRect;
+            const s = bound01(x, width);
+            const v = bound01(height - y, height);
+
+            this.hsva$.value = { ...hsva, s, v };
+          })
+        );
+      })
+      .catch(console.error);
   }
 
   override render() {
@@ -487,7 +502,7 @@ export class EdgelessColorPicker extends SignalWatcher(
           ({ type, name, hsva }) => html`
             <div
               class="${classMap({ mode: true, [type]: true })}"
-              style=${styleMap({ '--c': rgbaToHex8(hsvaToRgba(hsva)) })}
+              style=${styleMap({ '--c': hsvaToHex8(hsva) })}
             >
               <button
                 ?active=${this.modeType$.value === type}
@@ -502,16 +517,25 @@ export class EdgelessColorPicker extends SignalWatcher(
       </div>
 
       <div class="content">
-        <div class="color-palette-wrapper" style=${this.paletteStyle$.value}>
+        <div
+          class="color-palette-wrapper"
+          style=${styleMap(this.paletteStyle$.value)}
+        >
           <canvas></canvas>
           <div class="color-circle"></div>
           <div class="color-palette"></div>
         </div>
-        <div class="color-slider-wrapper hue" style=${this.hueStyle$.value}>
+        <div
+          class="color-slider-wrapper hue"
+          style=${styleMap(this.hueStyle$.value)}
+        >
           <div class="color-circle"></div>
           <div class="color-slider"></div>
         </div>
-        <div class="color-slider-wrapper alpha" style=${this.alphaStyle$.value}>
+        <div
+          class="color-slider-wrapper alpha"
+          style=${styleMap(this.alphaStyle$.value)}
+        >
           <div class="color-circle"></div>
           <div class="color-slider"></div>
         </div>
@@ -525,17 +549,23 @@ export class EdgelessColorPicker extends SignalWatcher(
             spellcheck="false"
             minlength="1"
             maxlength="6"
-            .value=${live(this.hex6WithoutHash)}
+            .value=${live(this.hex6WithoutHash$.value)}
             @keydown=${this.#editHex}
+            @cut=${stopPropagation}
+            @copy=${stopPropagation}
+            @paste=${stopPropagation}
           />
         </label>
-        <label class="field opacity">
+        <label class="field alpha">
           <input
             type="number"
             min="0"
             max="100"
-            .value=${live(this.alpha100)}
+            .value=${live(this.alpha100$.value)}
             @input=${this.#editAlpha}
+            @cut=${stopPropagation}
+            @copy=${stopPropagation}
+            @paste=${stopPropagation}
           />
           <span>%</span>
         </label>
@@ -544,13 +574,9 @@ export class EdgelessColorPicker extends SignalWatcher(
   }
 
   // 0-100
-  get alpha100() {
-    return `${Math.round(this.hsva$.value.a * 100)}`;
-  }
-
-  get hex6WithoutHash() {
-    return this.hex6$.value.substring(1);
-  }
+  accessor alpha100$ = computed(
+    () => `${Math.round(this.hsva$.value.a * 100)}`
+  );
 
   @query('.color-slider-wrapper.alpha .color-slider')
   accessor alphaControl!: HTMLDivElement;
@@ -561,13 +587,13 @@ export class EdgelessColorPicker extends SignalWatcher(
     const x = this.alphaPosX$.value;
     const rgba = this.rgba$.value;
     const hex = `#${rgbToHex(rgba)}`;
-    return styleMap({
+    return {
       '--o': rgba.a,
       '--s': `${hex}00`,
       '--c': `${hex}ff`,
       '--x': `${x}px`,
       '--r': `${SLIDER_CIRCLE_R}px`,
-    });
+    };
   });
 
   @query('canvas')
@@ -580,6 +606,9 @@ export class EdgelessColorPicker extends SignalWatcher(
 
   // #ffffff
   accessor hex6$ = computed(() => this.hex8$.value.substring(0, 7));
+
+  // ffffff
+  accessor hex6WithoutHash$ = computed(() => this.hex6$.value.substring(1));
 
   // #ffffffff
   accessor hex8$ = computed(() => rgbaToHex8(this.rgba$.value));
@@ -596,11 +625,11 @@ export class EdgelessColorPicker extends SignalWatcher(
   accessor hueStyle$ = computed(() => {
     const x = this.huePosX$.value;
     const rgb = this.hue$.value;
-    return styleMap({
+    return {
       '--x': `${x}px`,
       '--c': `#${rgbToHex(rgb)}`,
       '--r': `${SLIDER_CIRCLE_R}px`,
-    });
+    };
   });
 
   accessor light$ = computed<ModeTab<ModeType>>(() => this.modes$.value[1]);
@@ -610,13 +639,13 @@ export class EdgelessColorPicker extends SignalWatcher(
     return this.modes$.value.find(mode => mode.type === modeType)!;
   });
 
-  accessor modeType$ = signal<ModeType>('normal');
-
   accessor modes$ = signal<ModeTab<ModeType>[]>([
     { type: 'normal', name: 'Normal', hsva: defaultHsva() },
     { type: 'light', name: 'Light', hsva: defaultHsva() },
     { type: 'dark', name: 'Dark', hsva: defaultHsva() },
   ]);
+
+  accessor modeType$ = signal<ModeType>('normal');
 
   accessor navType$ = signal<NavType>('colors');
 
@@ -628,12 +657,12 @@ export class EdgelessColorPicker extends SignalWatcher(
   accessor paletteStyle$ = computed(() => {
     const { x, y } = this.palettePos$.value;
     const c = this.hex6$.value;
-    return styleMap({
+    return {
       '--c': c,
       '--x': `${x}px`,
       '--y': `${y}px`,
       '--r': `${AREA_CIRCLE_R}px`,
-    });
+    };
   });
 
   @property({ attribute: false })

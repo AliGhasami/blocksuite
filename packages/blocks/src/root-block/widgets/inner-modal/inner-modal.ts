@@ -1,9 +1,9 @@
 import { WidgetComponent } from '@blocksuite/block-std';
 import {
-  type FloatingElement,
-  type ReferenceElement,
   autoUpdate,
   computePosition,
+  type FloatingElement,
+  type ReferenceElement,
   size,
 } from '@floating-ui/dom';
 import { nothing } from 'lit';
@@ -12,6 +12,13 @@ export const AFFINE_INNER_MODAL_WIDGET = 'affine-inner-modal-widget';
 
 export class AffineInnerModalWidget extends WidgetComponent {
   private _getTarget?: () => ReferenceElement;
+
+  get target(): ReferenceElement {
+    if (this._getTarget) {
+      return this._getTarget();
+    }
+    return document.body;
+  }
 
   open(
     modal: FloatingElement,
@@ -47,13 +54,6 @@ export class AffineInnerModalWidget extends WidgetComponent {
 
   setTarget(fn: () => ReferenceElement) {
     this._getTarget = fn;
-  }
-
-  get target(): ReferenceElement {
-    if (this._getTarget) {
-      return this._getTarget();
-    }
-    return document.body;
   }
 }
 

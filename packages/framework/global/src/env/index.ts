@@ -1,3 +1,4 @@
+/** @alighasami for check merge **/
 const agent = globalThis.navigator?.userAgent ?? '';
 const platform = globalThis.navigator?.platform;
 
@@ -19,9 +20,13 @@ export const IS_IOS =
 
 export const IS_MAC = /Mac/i.test(platform);
 
+export const IS_IPAD =
+  /iPad/i.test(platform) ||
+  /iPad/i.test(agent) ||
+  (/Macintosh/i.test(agent) && globalThis.navigator?.maxTouchPoints > 2);
+
 export const IS_WINDOWS = /Win/.test(platform);
 
-export const REQUEST_IDLE_CALLBACK_ENABLED =
-  'requestIdleCallback' in globalThis;
+export const IS_MOBILE = IS_IOS || IS_IPAD || IS_ANDROID;
 
 export const Prefix = 'vue-block-board-editor';

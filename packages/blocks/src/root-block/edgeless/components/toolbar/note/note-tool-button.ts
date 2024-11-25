@@ -1,24 +1,19 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
+
+import { ArrowUpIcon, NoteIcon } from '@blocksuite/affine-components/icons';
+import { effect } from '@preact/signals-core';
+import { css, html, LitElement } from 'lit';
+import { state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { NoteTool } from '../../../controllers/tools/note-tool.js';
-import type { EdgelessTool } from '../../../types.js';
+import type { NoteToolOption } from '../../../gfx-tool/note-tool.js';
 import type { EdgelessNoteMenu } from './note-menu.js';
 
-import { ArrowUpIcon, NoteIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../../components/utils.js';
-import '../../buttons/tool-icon-button.js';
-import { type MenuPopper, createPopper } from '../common/create-popper.js';
+import { createPopper, type MenuPopper } from '../common/create-popper.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
-import './note-menu.js';
 
-@customElement('edgeless-note-tool-button')
 export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
-  private _noteMenu: MenuPopper<EdgelessNoteMenu> | null = null;
-
-  private _states = ['childFlavour', 'childType', 'tip'] as const;
-
   static override styles = css`
     :host {
       display: flex;
@@ -32,7 +27,11 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
     }
   `;
 
-  override type: EdgelessTool['type'] = 'affine:note';
+  private _noteMenu: MenuPopper<EdgelessNoteMenu> | null = null;
+
+  private _states = ['childFlavour', 'childType', 'tip'] as const;
+
+  override type: GfxToolsFullOptionValue['type'] = 'affine:note';
 
   private _disposeMenu() {
     this._noteMenu?.dispose();
@@ -46,8 +45,7 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
       this.requestUpdate();
       this.tryDisposePopper();
     } else {
-      this.edgeless.tools.setEdgelessTool({
-        type: 'affine:note',
+      this.edgeless.gfx.tool.setTool('affine:note', {
         childFlavour: this.childFlavour,
         childType: this.childType,
         tip: this.tip,
@@ -65,7 +63,7 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
       this._noteMenu.element.tip = this.tip;
       this._noteMenu.element.onChange = (
         props: Partial<{
-          childFlavour: NoteTool['childFlavour'];
+          childFlavour: NoteToolOption['childFlavour'];
           childType: string | null;
           tip: string;
         }>
@@ -75,8 +73,7 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
             Object.assign(this, { [key]: props[key] });
           }
         });
-        this.edgeless.tools.setEdgelessTool({
-          type: 'affine:note',
+        this.edgeless.gfx.tool.setTool('affine:note', {
           childFlavour: this.childFlavour,
           childType: this.childType,
           tip: this.tip,
@@ -88,8 +85,9 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
   override connectedCallback() {
     super.connectedCallback();
     this._disposables.add(
-      this.edgeless.slots.edgelessToolUpdated.on(newTool => {
-        if (newTool.type !== 'affine:note') {
+      effect(() => {
+        const value = this.edgeless.gfx.tool.currentToolName$.value;
+        if (value !== 'affine:note') {
           this._disposeMenu();
         }
       })
@@ -146,7 +144,7 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
   }
 
   @state()
-  accessor childFlavour: NoteTool['childFlavour'] = 'affine:paragraph';
+  accessor childFlavour: NoteToolOption['childFlavour'] = 'affine:paragraph';
 
   @state()
   accessor childType = 'text';

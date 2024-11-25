@@ -1,177 +1,172 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { NoteDisplayMode } from '@blocksuite/blocks';
-import { noop } from '@blocksuite/global/utils';
-import { SignalWatcher, signal } from '@lit-labs/preact-signals';
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { PropTypes, requiredProperties } from '@blocksuite/block-std';
+import { NoteDisplayMode, scrollbarStyle } from '@blocksuite/blocks';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
+import { signal } from '@preact/signals-core';
+import { css, html, LitElement, nothing } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type { AffineEditorContainer } from '../../editors/editor-container.js';
 
 import { TocIcon } from '../_common/icons.js';
-import { observeActiveHeading } from './utils/heading-highlight.js';
 import { getHeadingBlocksFromDoc } from './utils/query.js';
+import {
+  observeActiveHeadingDuringScroll,
+  scrollToBlockWithHighlight,
+} from './utils/scroll.js';
 
 export const AFFINE_OUTLINE_VIEWER = 'affine-outline-viewer';
 
-@customElement(AFFINE_OUTLINE_VIEWER)
+@requiredProperties({
+  editor: PropTypes.object,
+})
 export class OutlineViewer extends SignalWatcher(WithDisposable(LitElement)) {
-  private _activeHeadingId$ = signal<string | null>(null);
-
   static override styles = css`
+    :host {
+      display: flex;
+    }
     .outline-viewer-root {
-      position: relative;
+      --duration: 120ms;
+      --timing: cubic-bezier(0.42, 0, 0.58, 1);
+
+      max-height: 100%;
+      box-sizing: border-box;
+      display: flex;
     }
 
-    .outline-heading-indicator-container {
-      display: inline-flex;
+    .outline-viewer-indicators-container {
+      position: absolute;
+      top: 0;
+      right: 0;
+      max-height: 100%;
+      display: flex;
       flex-direction: column;
       align-items: flex-end;
-      flex-shrink: 0;
-      gap: 16px;
+      overflow-y: hidden;
     }
 
-    .outline-heading-indicator {
+    .outline-viewer-indicator-wrapper {
+      flex: 1 1 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .outline-viewer-indicator {
       width: 20px;
       height: 2px;
-      flex-shrink: 0;
-
       border-radius: 1px;
+      overflow: hidden;
       background: var(--affine-black-10, rgba(0, 0, 0, 0.1));
     }
 
-    .outline-heading-indicator[active] {
+    .outline-viewer-indicator.active {
       width: 24px;
-      height: 2px;
-
-      border-radius: 1px;
-      background: var(--affine-black-80, rgba(0, 0, 0, 0.8));
+      background: var(--affine-text-primary-color);
     }
 
-    .outline-viewer-container {
-      position: absolute;
-      top: 0px;
-      right: 0px;
-      width: 0px;
-      box-sizing: border-box;
-      overflow-x: hidden;
-      background: var(--affine-background-overlay-panel-color, #fbfbfc);
-      box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.14);
-      border-radius: var(--8, 8px);
-
-      transition: width 0.3s;
-    }
-
-    .outline-viewer-container.show {
-      width: 200px;
-      border: 0.5px solid var(--affine-border-color, #e3e2e4);
-    }
-
-    .outline-viewer-inner-container {
+    .outline-viewer-panel {
+      position: relative;
       display: flex;
+      width: 0px;
+      max-height: 100%;
       box-sizing: border-box;
-      width: 200px;
-      padding: 8px;
-      padding-right: 8px;
       flex-direction: column;
       align-items: flex-start;
+
+      border-radius: 8px;
+      border-width: 0px;
+      border-style: solid;
+      border-color: var(--affine-border-color);
+      background: var(--affine-background-overlay-panel-color);
+      box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.14);
+
+      overflow-y: auto;
+
+      opacity: 0;
+      transform: translateX(0px);
+      transition:
+        width 0s var(--duration),
+        padding 0s var(--duration),
+        border-width 0s var(--duration),
+        transform var(--duration) var(--timing),
+        opacity var(--duration) var(--timing);
     }
 
-    .outline-viewer-header-container {
+    ${scrollbarStyle('.outline-viewer-panel')}
+
+    .outline-viewer-header {
       display: flex;
       padding: 6px;
       align-items: center;
       gap: 4px;
       align-self: stretch;
+
+      span {
+        flex: 1;
+        overflow: hidden;
+        color: var(--affine-text-secondary-color);
+        text-overflow: ellipsis;
+
+        font-family: var(--affine-font-family);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+      }
     }
 
-    .outline-viewer-header-label {
-      flex: 1;
-      overflow: hidden;
-      color: var(--affine-text-secondary-color, #8e8d91);
-      text-overflow: ellipsis;
-
-      font-family: Inter;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 20px;
+    .outline-viewer-item {
+      display: flex;
+      align-items: center;
+      align-self: stretch;
     }
 
-    .outline-viewer-body {
-      flex-grow: 1;
-      width: 100%;
+    .outline-viewer-root:hover {
+      .outline-viewer-indicators-container {
+        visibility: hidden;
+      }
 
-      overflow-y: scroll;
+      .outline-viewer-panel {
+        width: 200px;
+        border-width: 1px;
+        padding: 8px 4px 8px 8px;
+        opacity: 1;
+        transform: translateX(-10px);
+        transition:
+          transform var(--duration) var(--timing),
+          opacity var(--duration) var(--timing);
+      }
     }
   `;
 
-  private _renderIndicators() {
-    const headingBlocks = getHeadingBlocksFromDoc(
-      this.editor.doc,
-      [NoteDisplayMode.DocAndEdgeless, NoteDisplayMode.DocOnly],
-      true
+  private _activeHeadingId$ = signal<string | null>(null);
+
+  private _highlightMaskDisposable = () => {};
+
+  private _lockActiveHeadingId = false;
+
+  private _scrollPanel = () => {
+    this._activeItem?.scrollIntoView({
+      behavior: 'instant',
+      block: 'center',
+    });
+  };
+
+  private async _scrollToBlock(blockId: string) {
+    this._lockActiveHeadingId = true;
+    this._activeHeadingId$.value = blockId;
+    this._highlightMaskDisposable = await scrollToBlockWithHighlight(
+      this.editor,
+      blockId
     );
-
-    return html`<div
-      class="outline-heading-indicator-container"
-      ?hidden=${this._showViewer}
-    >
-      ${repeat(
-        headingBlocks,
-        block => block.id,
-        ({ id }) =>
-          html`<div
-            class="outline-heading-indicator"
-            ?active=${this._activeHeadingId$.value === id}
-          ></div>`
-      )}
-    </div>`;
-  }
-
-  private _renderViewer() {
-    if (!this.editor) return nothing;
-
-    return html` <div
-      class=${classMap({
-        'outline-viewer-container': true,
-        show: this._showViewer,
-      })}
-    >
-      <div class="outline-viewer-inner-container">
-        <div class="outline-viewer-header-container">
-          <span class="outline-viewer-header-label">Table of Contents</span>
-          <edgeless-tool-icon-button
-            .tooltip=${'Open in sidebar'}
-            .tipPosition=${'top-end'}
-            .activeMode=${'background'}
-            @click=${this._toggleOutlinePanel}
-          >
-            ${TocIcon}
-          </edgeless-tool-icon-button>
-        </div>
-        <affine-outline-panel-body
-          class="outline-viewer-body"
-          .doc=${this.editor.doc}
-          .fitPadding=${[0, 0, 0, 0]}
-          .edgeless=${null}
-          .editorHost=${this.editor.host}
-          .mode=${'page'}
-          .activeHeadingId=${this._activeHeadingId$.value}
-          .showPreviewIcon=${false}
-          .enableNotesSorting=${false}
-          .toggleNotesSorting=${noop}
-          .noticeVisible=${false}
-          .setNoticeVisibility=${noop}
-        >
-        </affine-outline-panel-body>
-      </div>
-    </div>`;
+    this._lockActiveHeadingId = false;
   }
 
   private _toggleOutlinePanel() {
     if (this.toggleOutlinePanel) {
+      this._showViewer = false;
       this.toggleOutlinePanel();
     }
   }
@@ -180,25 +175,103 @@ export class OutlineViewer extends SignalWatcher(WithDisposable(LitElement)) {
     super.connectedCallback();
 
     this.disposables.add(
-      observeActiveHeading(() => this.editor.host, this._activeHeadingId$)
+      observeActiveHeadingDuringScroll(
+        () => this.editor,
+        newHeadingId => {
+          if (this._lockActiveHeadingId) return;
+          this._activeHeadingId$.value = newHeadingId;
+        }
+      )
     );
   }
 
-  override render() {
-    if (!this.editor || this.editor.mode === 'edgeless') return nothing;
-
-    return html`<div
-      class="outline-viewer-root"
-      @mouseenter=${() => {
-        this._showViewer = true;
-      }}
-      @mouseleave=${() => {
-        this._showViewer = false;
-      }}
-    >
-      ${this._renderIndicators()}${this._renderViewer()}
-    </div>`;
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this._highlightMaskDisposable();
   }
+
+  override render() {
+    if (this.editor.doc.root === null || this.editor.mode === 'edgeless')
+      return nothing;
+
+    const headingBlocks = getHeadingBlocksFromDoc(
+      this.editor.doc,
+      [NoteDisplayMode.DocAndEdgeless, NoteDisplayMode.DocOnly],
+      true
+    );
+
+    if (headingBlocks.length === 0) return nothing;
+
+    const items = [
+      ...(this.editor.doc.meta?.title !== '' ? [this.editor.doc.root] : []),
+      ...headingBlocks,
+    ];
+
+    const toggleOutlinePanelButton =
+      this.toggleOutlinePanel !== null
+        ? html`<edgeless-tool-icon-button
+            .tooltip=${'Open in sidebar'}
+            .tipPosition=${'top-end'}
+            .activeMode=${'background'}
+            @click=${this._toggleOutlinePanel}
+            data-testid="toggle-outline-panel-button"
+          >
+            ${TocIcon}
+          </edgeless-tool-icon-button>`
+        : nothing;
+
+    return html`
+      <div class="outline-viewer-root" @mouseenter=${this._scrollPanel}>
+        <div class="outline-viewer-indicators-container">
+          ${repeat(
+            items,
+            block => block.id,
+            block =>
+              html`<div class="outline-viewer-indicator-wrapper">
+                <div
+                  class=${classMap({
+                    'outline-viewer-indicator': true,
+                    active: this._activeHeadingId$.value === block.id,
+                  })}
+                ></div>
+              </div>`
+          )}
+        </div>
+        <div class="outline-viewer-panel">
+          <div class="outline-viewer-item outline-viewer-header">
+            <span>Table of Contents</span>
+            ${toggleOutlinePanelButton}
+          </div>
+          ${repeat(
+            items,
+            block => block.id,
+            block => {
+              return html`<div
+                class=${classMap({
+                  'outline-viewer-item': true,
+                  active: this._activeHeadingId$.value === block.id,
+                })}
+              >
+                <affine-outline-block-preview
+                  class=${classMap({
+                    active: this._activeHeadingId$.value === block.id,
+                  })}
+                  .block=${block}
+                  @click=${() => {
+                    this._scrollToBlock(block.id).catch(console.error);
+                  }}
+                >
+                </affine-outline-block-preview>
+              </div>`;
+            }
+          )}
+        </div>
+      </div>
+    `;
+  }
+
+  @query('.outline-viewer-item.active')
+  private accessor _activeItem: HTMLElement | null = null;
 
   @state()
   private accessor _showViewer: boolean = false;

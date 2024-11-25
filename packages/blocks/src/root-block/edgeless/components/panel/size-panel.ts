@@ -1,11 +1,8 @@
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { CheckIcon } from '@blocksuite/affine-components/icons';
+import { clamp, stopPropagation } from '@blocksuite/affine-shared/utils';
+import { css, html, LitElement, nothing } from 'lit';
+import { property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-
-import { CheckIcon } from '../../../../_common/icons/edgeless.js';
-import { stopPropagation } from '../../../../_common/utils/event.js';
-import { clamp } from '../../../../_common/utils/math.js';
-import '../buttons/tool-icon-button.js';
 
 const MIN_SIZE = 1;
 const MAX_SIZE = 200;
@@ -15,28 +12,7 @@ type SizeItem = {
   value: number;
 };
 
-@customElement('edgeless-size-panel')
 export class EdgelessSizePanel extends LitElement {
-  private _onKeydown = (e: KeyboardEvent) => {
-    e.stopPropagation();
-
-    if (e.key === 'Enter' && !e.isComposing) {
-      e.preventDefault();
-      const input = e.target as HTMLInputElement;
-      const size = parseInt(input.value.trim());
-      // Handle edge case where user enters a non-number
-      if (isNaN(size)) {
-        input.value = '';
-        return;
-      }
-
-      // Handle edge case when user enters a number that is out of range
-      this._onSelect(clamp(size, this.minSize, this.maxSize));
-      input.value = '';
-      this._onPopperClose();
-    }
-  };
-
   static override styles = css`
     :host {
       display: flex;
@@ -77,6 +53,26 @@ export class EdgelessSizePanel extends LitElement {
       margin-top: 4px;
     }
   `;
+
+  private _onKeydown = (e: KeyboardEvent) => {
+    e.stopPropagation();
+
+    if (e.key === 'Enter' && !e.isComposing) {
+      e.preventDefault();
+      const input = e.target as HTMLInputElement;
+      const size = parseInt(input.value.trim());
+      // Handle edge case where user enters a non-number
+      if (isNaN(size)) {
+        input.value = '';
+        return;
+      }
+
+      // Handle edge case when user enters a number that is out of range
+      this._onSelect(clamp(size, this.minSize, this.maxSize));
+      input.value = '';
+      this._onPopperClose();
+    }
+  };
 
   renderItemWithCheck = ({ name, value }: SizeItem) => {
     const active = this.size === value;
@@ -128,6 +124,9 @@ export class EdgelessSizePanel extends LitElement {
         @input=${stopPropagation}
         @click=${stopPropagation}
         @pointerdown=${stopPropagation}
+        @cut=${stopPropagation}
+        @copy=${stopPropagation}
+        @paste=${stopPropagation}
       />
     `;
   }

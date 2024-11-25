@@ -1,26 +1,27 @@
-import { Bound } from '@blocksuite/global/utils';
-import { html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
+import type { BookmarkBlockModel } from '@blocksuite/affine-model';
 
-import type { EdgelessRootService } from '../root-block/index.js';
-import type { BookmarkBlockModel } from './bookmark-model.js';
+import {
+  CaptionedBlockComponent,
+  SelectedStyle,
+} from '@blocksuite/affine-components/caption';
+import { DocModeProvider } from '@blocksuite/affine-shared/services';
+import { html } from 'lit';
+import { property, query } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { type StyleInfo, styleMap } from 'lit/directives/style-map.js';
+
 import type { BookmarkBlockService } from './bookmark-service.js';
 
-import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
-import { bindContainerHotkey } from '../_common/components/rich-text/keymap/container.js';
-import { EMBED_CARD_HEIGHT, EMBED_CARD_WIDTH } from '../_common/consts.js';
-import './components/bookmark-card.js';
+import { BOOKMARK_MIN_WIDTH } from '../root-block/edgeless/utils/consts.js';
 import { refreshBookmarkUrlData } from './utils.js';
 
-@customElement('affine-bookmark')
 export class BookmarkBlockComponent extends CaptionedBlockComponent<
   BookmarkBlockModel,
   BookmarkBlockService
 > {
   private _fetchAbortController?: AbortController;
 
-  private _isInSurface = false;
+  protected containerStyleMap!: ReturnType<typeof styleMap>;
 
   open = () => {
     let link = this.model.url;
@@ -39,18 +40,18 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    bindContainerHotkey(this);
+    const mode = this.std.get(DocModeProvider).getEditorMode();
+    const miniWidth = `${BOOKMARK_MIN_WIDTH}px`;
+
+    this.containerStyleMap = styleMap({
+      position: 'relative',
+      width: '100%',
+      ...(mode === 'edgeless' ? { miniWidth } : {}),
+    });
 
     this._fetchAbortController = new AbortController();
 
     this.contentEditable = 'false';
-
-    const parent = this.host.doc.getParent(this.model);
-    this._isInSurface = parent?.flavour === 'affine:surface';
-
-    this.blockContainerStyles = this._isInSurface
-      ? undefined
-      : { margin: '18px 0' };
 
     if (!this.model.description && !this.model.title) {
       this.refreshData();
@@ -63,16 +64,6 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
         }
       })
     );
-
-    if (this._isInSurface) {
-      this.rootService &&
-        this._disposables.add(
-          this.rootService.layer.slots.layerUpdated.on(() => {
-            this.requestUpdate();
-          })
-        );
-      this.style.position = 'absolute';
-    }
   }
 
   override disconnectedCallback(): void {
@@ -81,39 +72,15 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
   }
 
   override renderBlock() {
-    const { style } = this.model;
-
-    let containerStyleMap = styleMap({
-      position: 'relative',
-      width: '100%',
-      minWidth: '450px',
-    });
-
-    if (this.isInSurface) {
-      const width = EMBED_CARD_WIDTH[style];
-      const height = EMBED_CARD_HEIGHT[style];
-      const bound = Bound.deserialize(
-        (this.rootService?.getElementById(this.model.id) ?? this.model).xywh
-      );
-      const scaleX = bound.w / width;
-      const scaleY = bound.h / height;
-
-      containerStyleMap = styleMap({
-        width: `100%`,
-        height: `100%`,
-        transform: `scale(${scaleX}, ${scaleY})`,
-        transformOrigin: '0 0',
-      });
-
-      this.style.left = `${bound.x}px`;
-      this.style.top = `${bound.y}px`;
-      this.style.width = `${width}px`;
-      this.style.height = `${height}px`;
-      this.style.zIndex = `${this.toZIndex()}`;
-    }
-
+    const selected = !!this.selected?.is('block');
     return html`
-      <div class="affine-bookmark-container" style=${containerStyleMap}>
+      <div
+        class=${classMap({
+          'affine-bookmark-container': true,
+          'selected-style': selected,
+        })}
+        style=${this.containerStyleMap}
+      >
         <bookmark-card
           .bookmark=${this}
           .loading=${this.loading}
@@ -123,25 +90,9 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
     `;
   }
 
-  toZIndex() {
-    return this.rootService?.layer.getZIndex(this.model) ?? 1;
-  }
-
-  get isInSurface() {
-    return this._isInSurface;
-  }
-
-  get rootService() {
-    const edgelessService = this.host.spec.getService(
-      'affine:page'
-    ) as EdgelessRootService;
-
-    if (!edgelessService.surface) {
-      return null;
-    }
-
-    return edgelessService;
-  }
+  protected override accessor blockContainerStyles: StyleInfo = {
+    margin: '18px 0',
+  };
 
   @query('bookmark-card')
   accessor bookmarkCard!: HTMLElement;
@@ -152,7 +103,11 @@ export class BookmarkBlockComponent extends CaptionedBlockComponent<
   @property({ attribute: false })
   accessor loading = false;
 
+  override accessor selectedStyle = SelectedStyle.Border;
+
   override accessor useCaptionEditor = true;
+
+  override accessor useZeroWidth = true;
 }
 
 declare global {

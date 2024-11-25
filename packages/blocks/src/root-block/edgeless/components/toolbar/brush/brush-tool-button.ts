@@ -1,9 +1,4 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
-
-import type { LastProps } from '../../../../../surface-block/managers/edit-session.js';
-
+/** @alighasami for check merge **/
 import {
   ArrowUpIcon,
   PenTablerIcon,
@@ -12,16 +7,23 @@ import { LineWidth } from '../../../../../_common/utils/index.js';
 import '../../buttons/toolbar-button.js';
 import { DEFAULT_BRUSH_COLOR } from '../../panel/color-panel.js';
 import { getTooltipWithShortcut } from '../../utils.js';
+  EdgelessPenDarkIcon,
+  EdgelessPenLightIcon,
+} from '@blocksuite/affine-components/icons';
 import {
-  applyLastProps,
-  observeLastProps,
-} from '../common/observe-last-props.js';
-import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
-import './brush-menu.js';
+  EditPropsStore,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import { SignalWatcher } from '@blocksuite/global/utils';
+import { computed } from '@preact/signals-core';
+import { css, html, LitElement } from 'lit';
+import { styleMap } from 'lit/directives/style-map.js';
 
-@customElement('edgeless-brush-tool-button')
+import { getTooltipWithShortcut } from '../../utils.js';
+import { EdgelessToolbarToolMixin } from '../mixins/tool.mixin.js';
+
 export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
-  LitElement
+  SignalWatcher(LitElement)
 ) {
   static override styles = css`
     :host {
@@ -56,46 +58,43 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
     //}
   `;
 
+  private _color$ = computed(() => {
+    const theme = this.edgeless.std.get(ThemeProvider).theme$.value;
+    return this.edgeless.std
+      .get(ThemeProvider)
+      .generateColorProperty(
+        this.edgeless.std.get(EditPropsStore).lastProps$.value.brush.color,
+        undefined,
+        theme
+      );
+  });
+
   override enableActiveBackground = true;
 
   override type = 'brush' as const;
 
   private _toggleBrushMenu() {
     if (this.tryDisposePopper()) return;
-    !this.active && this.setEdgelessTool({ type: this.type });
+    !this.active && this.setEdgelessTool(this.type);
     const menu = this.createPopper('edgeless-brush-menu', this);
     Object.assign(menu.element, {
       edgeless: this.edgeless,
       onChange: (props: Record<string, unknown>) => {
-        this.edgeless.service.editPropsStore.recordLastProps('brush', props);
-        this.setEdgelessTool({ type: 'brush' });
+        this.edgeless.std.get(EditPropsStore).recordLastProps('brush', props);
+        this.setEdgelessTool('brush');
       },
     });
-    this.updateMenu();
-  }
-
-  override connectedCallback() {
-    super.connectedCallback();
-    const { edgeless, states, statesKeys } = this;
-    applyLastProps(edgeless.service, 'brush', statesKeys, states);
-
-    this.disposables.add(
-      observeLastProps(
-        edgeless.service,
-        'brush',
-        statesKeys,
-        states,
-        updates => {
-          this.states = { ...this.states, ...updates };
-        }
-      )
-    );
   }
 
   override render() {
     const { active, theme } = this;
     // const icon = theme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
     const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
+    const { active } = this;
+    const appTheme = this.edgeless.std.get(ThemeProvider).app$.value;
+    const icon =
+      appTheme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
+    const color = this._color$.value;
 
     return html`
       <edgeless-tool-icon-button
@@ -107,36 +106,18 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
         @click=${() => {
           this._toggleBrushMenu();
         }}
+        .withHover=${true}
+        @click=${() => this._toggleBrushMenu()}
       >
         ${PenTablerIcon}
         <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
           ${ArrowUpIcon}
         </span>
       </edgeless-tool-icon-button>
+        <div style=${styleMap({ color })} class="pen-wrapper">${icon}</div>
+      </edgeless-toolbar-button>
     `;
   }
-
-  updateMenu() {
-    const { popper } = this;
-    if (!popper) return;
-    Object.assign(popper.element, this.states);
-  }
-
-  override updated(changedProperties: Map<string, unknown>) {
-    if (changedProperties.has('states') && this.popper) {
-      this.updateMenu();
-    }
-  }
-
-  get statesKeys() {
-    return Object.keys(this.states) as (keyof LastProps['brush'])[];
-  }
-
-  @state()
-  accessor states: LastProps['brush'] = {
-    color: DEFAULT_BRUSH_COLOR,
-    lineWidth: LineWidth.Four,
-  };
 }
 
 declare global {

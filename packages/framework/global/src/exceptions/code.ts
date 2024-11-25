@@ -18,9 +18,13 @@ export enum ErrorCode {
   GfxBlockElementError,
   MissingViewModelError,
   DatabaseBlockError,
+  ParsingError,
+  UserAbortError,
+  ExecutionError,
 
   // Fatal error should be greater than 10000
   DefaultFatalError = 10000,
   NoRootModelError,
+  NoSurfaceModelError,
   NoneSupportedSSRError,
 }

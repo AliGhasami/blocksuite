@@ -5,10 +5,6 @@ import { NATIVE_UNIQ_IDENTIFIER } from '../consts.js';
 export type OnBoxedChange = (data: unknown) => void;
 
 export class Boxed<T = unknown> {
-  private readonly _map: Y.Map<T>;
-
-  private _onChange?: OnBoxedChange;
-
   static from = <T>(map: Y.Map<T>, onChange?: OnBoxedChange): Boxed<T> => {
     return new Boxed<T>(map.get('value') as T, onChange);
   };
@@ -19,6 +15,10 @@ export class Boxed<T = unknown> {
     );
   };
 
+  private readonly _map: Y.Map<T>;
+
+  private _onChange?: OnBoxedChange;
+
   getValue = () => {
     return this._map.get('value');
   };
@@ -27,10 +27,15 @@ export class Boxed<T = unknown> {
     return this._map.set('value', value);
   };
 
+  get yMap() {
+    return this._map;
+  }
+
   constructor(value: T, onChange?: OnBoxedChange) {
     this._onChange = onChange;
     if (
       value instanceof Y.Map &&
+      value.doc &&
       value.get('type') === NATIVE_UNIQ_IDENTIFIER
     ) {
       this._map = value;
@@ -46,9 +51,5 @@ export class Boxed<T = unknown> {
 
   bind(onChange: OnBoxedChange) {
     this._onChange = onChange;
-  }
-
-  get yMap() {
-    return this._map;
   }
 }

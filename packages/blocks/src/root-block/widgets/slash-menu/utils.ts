@@ -1,10 +1,10 @@
-import type { EditorHost } from '@blocksuite/block-std';
+import type { TextFormatConfig } from '@blocksuite/affine-components/rich-text';
 import type { BlockModel } from '@blocksuite/store';
 
+import { isInsideBlockByFlavour } from '@blocksuite/affine-shared/utils';
 import { assertType } from '@blocksuite/global/utils';
 
 import type { TextConversionConfig } from '../../../_common/configs/text-conversion.js';
-import type { AffineTextAttributes } from '../../../_common/inline/presets/affine-inline-specs.js';
 import type {
   SlashMenuActionItem,
   SlashMenuContext,
@@ -16,8 +16,6 @@ import type {
 } from './config.js';
 import type { ClayTapSlashMenu } from './mahdaad_menu.js';
 
-import { isInsideBlockByFlavour } from '../../../_common/utils/index.js';
-import { getInlineEditorByModel } from '../../../_common/utils/query.js';
 import { slashMenuToolTips } from './tooltips/index.js';
 
 export function isGroupDivider(
@@ -85,74 +83,12 @@ export function getFirstNotDividerItem(
   return firstItem ?? null;
 }
 
-export function insertContent(
-  editorHost: EditorHost,
-  model: BlockModel,
-  text: string,
-  attributes?: AffineTextAttributes
-) {
-  if (!model.text) {
-    console.error("Can't insert text! Text not found");
-    return;
-  }
-  const inlineEditor = getInlineEditorByModel(editorHost, model);
-  if (!inlineEditor) {
-    console.error("Can't insert text! Inline editor not found");
-    return;
-  }
-  const inlineRange = inlineEditor.getInlineRange();
-  const index = inlineRange ? inlineRange.index : model.text.length;
-  model.text.insert(text, index, attributes as Record<string, unknown>);
-  // Update the caret to the end of the inserted text
-  inlineEditor.setInlineRange({
-    index: index + text.length,
-    length: 0,
-  });
-}
-
-export function formatDate(date: Date) {
-  // yyyy-mm-dd
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const strTime = `${year}-${month}-${day}`;
-  return strTime;
-}
-
-export function formatTime(date: Date) {
-  // mm-dd hh:mm
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const strTime = `${month}-${day} ${hours}:${minutes}`;
-  return strTime;
-}
-
-export function insideDatabase(model: BlockModel) {
-  return isInsideBlockByFlavour(model.doc, model, 'affine:database');
-}
-
 export function insideEdgelessText(model: BlockModel) {
   return isInsideBlockByFlavour(model.doc, model, 'affine:edgeless-text');
 }
 
-export function createDatabaseBlockInNextLine(model: BlockModel) {
-  let parent = model.doc.getParent(model);
-  while (parent && parent.flavour !== 'affine:note') {
-    model = parent;
-    parent = model.doc.getParent(parent);
-  }
-  if (!parent) {
-    return;
-  }
-  const index = parent.children.indexOf(model);
-
-  return model.doc.addBlock('affine:database', {}, parent, index + 1);
-}
-
 export function tryRemoveEmptyLine(model: BlockModel) {
-  if (!model.text?.length) {
+  if (model.text?.length === 0) {
     model.doc.deleteBlock(model);
   }
 }
@@ -168,14 +104,44 @@ export function createConversionItem(
     tooltip: slashMenuToolTips[name],
     showWhen: ({ model }) => model.doc.schema.flavourSchemaMap.has(flavour),
     action: ({ rootComponent }) => {
-      rootComponent.host.std.command
+      rootComponent.std.command
         .chain()
         .updateBlockType({
           flavour,
           props: { type },
         })
-        .inline((ctx, next) => (ctx.updatedBlocks ? next() : false))
         .run();
+    },
+  };
+}
+
+export function createTextFormatItem(
+  config: TextFormatConfig
+): SlashMenuActionItem {
+  const { name, icon, id, action } = config;
+  return {
+    name,
+    icon,
+    tooltip: slashMenuToolTips[name],
+    action: ({ rootComponent, model }) => {
+      const { std, host } = rootComponent;
+
+      if (model.text?.length !== 0) {
+        std.command
+          .chain()
+          .formatBlock({
+            blockSelections: [
+              std.selection.create('block', {
+                blockId: model.id,
+              }),
+            ],
+            styles: { [id]: true },
+          })
+          .run();
+      } else {
+        // like format bar when the line is empty
+        action(host);
+      }
     },
   };
 }

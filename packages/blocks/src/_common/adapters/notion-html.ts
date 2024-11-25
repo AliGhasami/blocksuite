@@ -1,39 +1,42 @@
 import type { DeltaInsert } from '@blocksuite/inline';
-import type {
-  FromBlockSnapshotPayload,
-  FromBlockSnapshotResult,
-  FromDocSnapshotPayload,
-  FromDocSnapshotResult,
-  FromSliceSnapshotPayload,
-  FromSliceSnapshotResult,
-} from '@blocksuite/store';
 
+import {
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  NoteDisplayMode,
+} from '@blocksuite/affine-model';
+import { getFilenameFromContentDisposition } from '@blocksuite/affine-shared/utils';
+import { getTagColor } from '@blocksuite/data-view';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import { isEqual, sha } from '@blocksuite/global/utils';
 import {
-  ASTWalker,
   type AssetsManager,
+  ASTWalker,
   BaseAdapter,
   type BlockSnapshot,
   type DocSnapshot,
-  type SliceSnapshot,
+  type FromBlockSnapshotPayload,
+  type FromBlockSnapshotResult,
+  type FromDocSnapshotPayload,
+  type FromDocSnapshotResult,
+  type FromSliceSnapshotPayload,
+  type FromSliceSnapshotResult,
   getAssetName,
   nanoid,
+  type SliceSnapshot,
 } from '@blocksuite/store';
+import { collapseWhiteSpace } from 'collapse-white-space';
 import rehypeParse from 'rehype-parse';
 import { unified } from 'unified';
 
-import { getTagColor } from '../../database-block/data-view/utils/tags/colors.js';
-import { NoteDisplayMode } from '../types.js';
-import { getFilenameFromContentDisposition } from '../utils/header-value-parser.js';
 import {
-  type HtmlAST,
   hastGetElementChildren,
+  hastGetInlineOnlyElementAST,
   hastGetTextChildrenOnlyAst,
   hastGetTextContent,
   hastQuerySelector,
+  type HtmlAST,
 } from './hast.js';
-import { createText, fetchImage, fetchable, isText } from './utils.js';
+import { createText, fetchable, fetchImage, isText } from './utils.js';
 
 export type NotionHtml = string;
 
@@ -65,6 +68,12 @@ const ColumnClassMap: Record<string, string> = {
   typesTitle: 'title',
 };
 
+const NotionInlineEquationToken = 'notion-text-equation-token';
+const NotionUnderlineStyleToken = 'border-bottom:0.05em solid';
+const NotionCheckboxToken = '.checkbox';
+const NotionDatabaseToken = '.collection-content';
+const NotionDatabaseTitleToken = '.collection-title';
+
 type BlocksuiteTableColumn = {
   type: string;
   name: string;
@@ -91,8 +100,10 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
     ast: HtmlAST,
     option: {
       trim?: boolean;
+      pre?: boolean;
+      removeLastBr?: boolean;
       pageMap?: Map<string, string>;
-    } = { trim: true }
+    } = { trim: true, pre: false, removeLastBr: true }
   ): DeltaInsert<object>[] => {
     return this._hastToDeltaSpreaded(ast, option).reduce((acc, cur) => {
       if (acc.length === 0) {
@@ -115,32 +126,62 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
     ast: HtmlAST,
     option: {
       trim?: boolean;
+      pre?: boolean;
+      removeLastBr?: boolean;
       pageMap?: Map<string, string>;
-    } = { trim: true }
+    } = { trim: true, pre: false, removeLastBr: true }
   ): DeltaInsert<object>[] => {
     if (option.trim === undefined) {
       option.trim = true;
     }
     switch (ast.type) {
       case 'text': {
+        if (option.pre || ast.value === ' ') {
+          return [{ insert: ast.value }];
+        }
         if (option.trim) {
-          if (ast.value.trim()) {
-            return [{ insert: ast.value.trim() }];
+          const value = collapseWhiteSpace(ast.value, { trim: option.trim });
+          if (value) {
+            return [{ insert: value }];
           }
           return [];
         }
         if (ast.value) {
-          return [{ insert: ast.value }];
+          return [{ insert: collapseWhiteSpace(ast.value) }];
         }
         return [];
       }
       case 'element': {
         switch (ast.tagName) {
           case 'ol':
-          case 'ul': {
+          case 'ul':
+          case 'style': {
             return [];
           }
           case 'span': {
+            if (
+              Array.isArray(ast.properties?.className) &&
+              ast.properties?.className.includes(NotionInlineEquationToken)
+            ) {
+              const latex = hastGetTextContent(
+                hastQuerySelector(ast, 'annotation')
+              );
+              return [{ insert: ' ', attributes: { latex } }];
+            }
+
+            // Add underline style detection
+            if (
+              typeof ast.properties?.style === 'string' &&
+              ast.properties?.style?.includes(NotionUnderlineStyleToken)
+            ) {
+              return ast.children.flatMap(child =>
+                this._hastToDeltaSpreaded(child, option).map(delta => {
+                  delta.attributes = { ...delta.attributes, underline: true };
+                  return delta;
+                })
+              );
+            }
+
             return ast.children.flatMap(child =>
               this._hastToDeltaSpreaded(child, option)
             );
@@ -217,6 +258,9 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
               })
             );
           }
+          case 'br': {
+            return [{ insert: '\n' }];
+          }
           case 'mark': {
             // TODO: add support for highlight
             return ast.children.flatMap(child =>
@@ -226,12 +270,35 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
               })
             );
           }
+          case 'li': {
+            if (hastQuerySelector(ast, NotionCheckboxToken)) {
+              // Should ignore the children of to do list which is the checkbox and the space following it
+              const checkBox = hastQuerySelector(ast, NotionCheckboxToken);
+              const checkBoxIndex = ast.children.findIndex(
+                child => child === checkBox
+              );
+              return ast.children
+                .slice(checkBoxIndex + 2)
+                .flatMap(child => this._hastToDeltaSpreaded(child, option));
+            }
+          }
         }
       }
     }
-    return 'children' in ast
-      ? ast.children.flatMap(child => this._hastToDeltaSpreaded(child, option))
-      : [];
+    const result =
+      'children' in ast
+        ? ast.children.flatMap(child =>
+            this._hastToDeltaSpreaded(child, option)
+          )
+        : [];
+
+    if (option.removeLastBr && result.length > 0) {
+      const lastItem = result[result.length - 1];
+      if (lastItem.insert === '\n') {
+        result.pop();
+      }
+    }
+    return result;
   };
 
   private _traverseNotionHtml = async (
@@ -269,12 +336,17 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
           if (imageURL) {
             let blobId = '';
             if (!fetchable(imageURL)) {
-              assets.getAssets().forEach((_value, key) => {
-                const attachmentName = getAssetName(assets.getAssets(), key);
-                if (decodeURIComponent(imageURL).includes(attachmentName)) {
+              const imageURLSplit = imageURL.split('/');
+              while (imageURLSplit.length > 0) {
+                const key = assets
+                  .getPathBlobIdMap()
+                  .get(decodeURIComponent(imageURLSplit.join('/')));
+                if (key) {
                   blobId = key;
+                  break;
                 }
-              });
+                imageURLSplit.shift();
+              }
             } else {
               const res = await fetchImage(
                 imageURL,
@@ -338,7 +410,10 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                   language: 'Plain Text',
                   text: {
                     '$blocksuite:internal:text$': true,
-                    delta: this._hastToDelta(codeText, { trim: false }),
+                    delta: this._hastToDelta(codeText, {
+                      trim: false,
+                      pre: true,
+                    }),
                   },
                 },
                 children: [],
@@ -351,27 +426,25 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
         }
         case 'blockquote': {
           context.setGlobalContext('hast:blockquote', true);
-          context
-            .openNode(
-              {
-                type: 'block',
-                id: nanoid(),
-                flavour: 'affine:paragraph',
-                props: {
-                  type: 'quote',
-                  text: {
-                    '$blocksuite:internal:text$': true,
-                    delta: this._hastToDelta(
-                      hastGetTextChildrenOnlyAst(o.node),
-                      { pageMap }
-                    ),
-                  },
+          context.openNode(
+            {
+              type: 'block',
+              id: nanoid(),
+              flavour: 'affine:paragraph',
+              props: {
+                type: 'quote',
+                text: {
+                  '$blocksuite:internal:text$': true,
+                  delta: this._hastToDelta(
+                    hastGetInlineOnlyElementAST(o.node),
+                    { pageMap, removeLastBr: true }
+                  ),
                 },
-                children: [],
               },
-              'children'
-            )
-            .closeNode();
+              children: [],
+            },
+            'children'
+          );
           break;
         }
         case 'p': {
@@ -406,6 +479,9 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
         case 'h4':
         case 'h5':
         case 'h6': {
+          if (hastQuerySelector(o.node, NotionDatabaseTitleToken)) {
+            break;
+          }
           context
             .openNode(
               {
@@ -444,7 +520,9 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
         }
         case 'li': {
           const firstElementChild = hastGetElementChildren(o.node)[0];
-          const listType = context.getNodeContext('hast:list:type');
+          const notionListType = context.getNodeContext('hast:list:type');
+          const listType =
+            notionListType === 'toggle' ? 'bulleted' : notionListType;
           context.openNode(
             {
               type: 'block',
@@ -455,7 +533,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                 text: {
                   '$blocksuite:internal:text$': true,
                   delta:
-                    listType !== 'toggle'
+                    notionListType !== 'toggle'
                       ? this._hastToDelta(o.node, { pageMap })
                       : this._hastToDelta(
                           hastQuerySelector(o.node, 'summary') ?? o.node,
@@ -463,7 +541,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                         ),
                 },
                 checked:
-                  listType === 'todo'
+                  notionListType === 'todo'
                     ? firstElementChild &&
                       Array.isArray(firstElementChild.properties?.className) &&
                       firstElementChild.properties.className.includes(
@@ -471,7 +549,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                       )
                     : false,
                 collapsed:
-                  listType === 'toggle'
+                  notionListType === 'toggle'
                     ? firstElementChild &&
                       firstElementChild.tagName === 'details' &&
                       firstElementChild.properties.open === undefined
@@ -522,8 +600,35 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
             context.skipAllChildren();
             break;
           }
+          // Notion equation
+          if (hastQuerySelector(o.node, '.equation-container')) {
+            const latex = hastGetTextContent(
+              hastQuerySelector(o.node, 'annotation')
+            );
+            context
+              .openNode(
+                {
+                  type: 'block',
+                  id: nanoid(),
+                  flavour: 'affine:latex',
+                  props: {
+                    latex,
+                  },
+                  children: [],
+                },
+                'children'
+              )
+              .closeNode();
+            context.skipAllChildren();
+            break;
+          }
           // Notion callout
           if (hastQuerySelector(o.node, '.callout')) {
+            const firstElementChild = hastGetElementChildren(o.node)[0];
+            const secondElementChild = hastGetElementChildren(o.node)[1];
+
+            const iconSpan = hastQuerySelector(firstElementChild, '.icon');
+            const iconText = iconSpan ? hastGetTextContent(iconSpan) : '';
             context
               .openNode(
                 {
@@ -531,10 +636,13 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                   id: nanoid(),
                   flavour: 'affine:paragraph',
                   props: {
-                    type: 'text',
+                    type: 'quote',
                     text: {
                       '$blocksuite:internal:text$': true,
-                      delta: this._hastToDelta(o.node, { pageMap }),
+                      delta: [
+                        { insert: iconText + '\n' },
+                        ...this._hastToDelta(secondElementChild, { pageMap }),
+                      ],
                     },
                   },
                   children: [],
@@ -597,12 +705,17 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
           if (imageURL) {
             let blobId = '';
             if (!fetchable(imageURL)) {
-              assets.getAssets().forEach((_value, key) => {
-                const attachmentName = getAssetName(assets.getAssets(), key);
-                if (decodeURIComponent(imageURL).includes(attachmentName)) {
+              const imageURLSplit = imageURL.split('/');
+              while (imageURLSplit.length > 0) {
+                const key = assets
+                  .getPathBlobIdMap()
+                  .get(decodeURIComponent(imageURLSplit.join('/')));
+                if (key) {
                   blobId = key;
+                  break;
                 }
-              });
+                imageURLSplit.shift();
+              }
             } else {
               const res = await fetchImage(
                 imageURL,
@@ -660,15 +773,23 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
             let type = '';
             let size = 0;
             if (!fetchable(embededURL)) {
-              assets.getAssets().forEach((value, key) => {
-                const embededName = getAssetName(assets.getAssets(), key);
-                if (decodeURIComponent(embededURL).includes(embededName)) {
+              const embededURLSplit = embededURL.split('/');
+              while (embededURLSplit.length > 0) {
+                const key = assets
+                  .getPathBlobIdMap()
+                  .get(decodeURIComponent(embededURLSplit.join('/')));
+                if (key) {
                   blobId = key;
-                  name = embededName;
-                  size = value.size;
-                  type = value.type;
+                  break;
                 }
-              });
+                embededURLSplit.shift();
+              }
+              const value = assets.getAssets().get(blobId);
+              if (value) {
+                name = getAssetName(assets.getAssets(), blobId);
+                size = value.size;
+                type = value.type;
+              }
             } else {
               const res = await fetch(embededURL).catch(error => {
                 console.warn('Error fetching embed:', error);
@@ -722,7 +843,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
           const columnTypeClass = hastQuerySelector(o.node, 'svg')?.properties
             ?.className;
           const columnType = Array.isArray(columnTypeClass)
-            ? ColumnClassMap[columnTypeClass[0]] ?? 'rich-text'
+            ? (ColumnClassMap[columnTypeClass[0]] ?? 'rich-text')
             : 'rich-text';
           context.pushGlobalContextStack<BlocksuiteTableColumn>(
             'hast:table:column',
@@ -917,6 +1038,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
           break;
         }
         case 'blockquote': {
+          context.closeNode();
           context.setGlobalContext('hast:blockquote', false);
           break;
         }
@@ -965,6 +1087,15 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
               cells[children.at(i)?.id ?? nanoid()] = row;
             });
           context.setGlobalContextStack('hast:table:cells', []);
+          let databaseTitle = '';
+          if (
+            o.parent?.node.type === 'element' &&
+            hastQuerySelector(o.parent.node, NotionDatabaseToken)
+          ) {
+            databaseTitle = hastGetTextContent(
+              hastQuerySelector(o.parent.node, NotionDatabaseTitleToken)
+            );
+          }
           context.openNode(
             {
               type: 'block',
@@ -992,7 +1123,13 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
                 ],
                 title: {
                   '$blocksuite:internal:text$': true,
-                  delta: [],
+                  delta: databaseTitle
+                    ? [
+                        {
+                          insert: databaseTitle,
+                        },
+                      ]
+                    : [],
                 },
                 columns,
                 cells,
@@ -1005,6 +1142,9 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
             context.openNode(child, 'children').closeNode();
           });
           context.closeNode();
+          context.cleanGlobalContextStack('hast:table:column');
+          context.cleanGlobalContextStack('hast:table:rows');
+          context.cleanGlobalContextStack('hast:table:children');
           break;
         }
         case 'th': {
@@ -1057,7 +1197,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1088,7 +1228,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1099,7 +1239,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
       type: 'page',
       meta: {
         id: payload.pageId ?? nanoid(),
-        title: hastGetTextContent(titleAst, 'Untitled'),
+        title: hastGetTextContent(titleAst, ''),
         createDate: Date.now(),
         tags: [],
       },
@@ -1113,7 +1253,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
             delta: this._hastToDelta(
               titleAst ?? {
                 type: 'text',
-                value: 'Untitled',
+                value: '',
               }
             ),
           },
@@ -1149,7 +1289,7 @@ export class NotionHtmlAdapter extends BaseAdapter<NotionHtml> {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-        background: '--affine-background-secondary-color',
+        background: DEFAULT_NOTE_BACKGROUND_COLOR,
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,

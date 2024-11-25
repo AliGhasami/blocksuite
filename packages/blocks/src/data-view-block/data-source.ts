@@ -1,25 +1,22 @@
+import type { Column } from '@blocksuite/affine-model';
 import type { EditorHost } from '@blocksuite/block-std';
-import type { Block } from '@blocksuite/store';
-import type { Doc } from '@blocksuite/store';
+import type { Block, Doc } from '@blocksuite/store';
 
-import { type Disposable, Slot, assertExists } from '@blocksuite/global/utils';
+import {
+  insertPositionToIndex,
+  type InsertToPosition,
+} from '@blocksuite/affine-shared/utils';
+import { DataSourceBase, type PropertyMetaConfig } from '@blocksuite/data-view';
+import { propertyPresets } from '@blocksuite/data-view/property-presets';
+import { assertExists, Slot } from '@blocksuite/global/utils';
 
-import type { Column } from '../database-block/index.js';
 import type { BlockMeta } from './block-meta/base.js';
 import type { DataViewBlockModel } from './data-view-model.js';
 
-import { databaseBlockAllColumnMap } from '../database-block/columns/index.js';
 import {
-  BaseDataSource,
-  type ColumnConfig,
-  type ColumnMeta,
-  type DetailSlots,
-  type InsertToPosition,
-  columnPresets,
-  createUniComponentFromWebComponent,
-  insertPositionToIndex,
-} from '../database-block/data-view/index.js';
-import { BlockRenderer } from '../database-block/detail-panel/block-renderer.js';
+  databaseBlockAllPropertyMap,
+  databasePropertyConverts,
+} from '../database-block/properties/index.js';
 import { blockMetaMap } from './block-meta/index.js';
 import { queryBlockAllColumnMap, queryBlockColumns } from './columns/index.js';
 
@@ -27,9 +24,10 @@ export type BlockQueryDataSourceConfig = {
   type: keyof typeof blockMetaMap;
 };
 
-export class BlockQueryDataSource extends BaseDataSource {
+// @ts-ignore
+export class BlockQueryDataSource extends DataSourceBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private columnMetaMap = new Map<string, ColumnMeta<any, any, any>>();
+  private columnMetaMap = new Map<string, PropertyMetaConfig<any, any, any>>();
 
   private meta: BlockMeta;
 
@@ -41,6 +39,29 @@ export class BlockQueryDataSource extends BaseDataSource {
     update: new Slot(),
   };
 
+  private get blocks() {
+    return [...this.blockMap.values()];
+  }
+
+  get properties(): string[] {
+    return [
+      ...this.meta.properties.map(v => v.key),
+      ...this.block.columns.map(v => v.id),
+    ];
+  }
+
+  get propertyMetas(): PropertyMetaConfig[] {
+    return queryBlockColumns as PropertyMetaConfig[];
+  }
+
+  get rows(): string[] {
+    return this.blocks.map(v => v.id);
+  }
+
+  get workspace() {
+    return this.host.doc.collection;
+  }
+
   constructor(
     private host: EditorHost,
     private block: DataViewBlockModel,
@@ -49,7 +70,7 @@ export class BlockQueryDataSource extends BaseDataSource {
     super();
     this.meta = blockMetaMap[config.type];
     for (const property of this.meta.properties) {
-      this.columnMetaMap.set(property.columnMeta.type, property.columnMeta);
+      this.columnMetaMap.set(property.metaConfig.type, property.metaConfig);
     }
     for (const collection of this.workspace.docs.values()) {
       for (const block of Object.values(collection.getDoc().blocks.peek())) {
@@ -72,10 +93,6 @@ export class BlockQueryDataSource extends BaseDataSource {
     });
   }
 
-  private get blocks() {
-    return [...this.blockMap.values()];
-  }
-
   private getProperty(propertyId: string) {
     const property = this.meta.properties.find(v => v.key === propertyId);
     assertExists(property, `property ${propertyId} not found`);
@@ -90,7 +107,7 @@ export class BlockQueryDataSource extends BaseDataSource {
     return `Column ${i}`;
   }
 
-  cellChangeValue(rowId: string, propertyId: string, value: unknown): void {
+  cellValueChange(rowId: string, propertyId: string, value: unknown): void {
     const viewColumn = this.getViewColumn(propertyId);
     if (viewColumn) {
       this.block.cells[rowId] = {
@@ -107,7 +124,7 @@ export class BlockQueryDataSource extends BaseDataSource {
     }
   }
 
-  cellGetValue(rowId: string, propertyId: string): unknown {
+  cellValueGet(rowId: string, propertyId: string): unknown {
     const viewColumn = this.getViewColumn(propertyId);
     if (viewColumn) {
       return this.block.cells[rowId]?.[propertyId];
@@ -117,15 +134,6 @@ export class BlockQueryDataSource extends BaseDataSource {
       return this.getProperty(propertyId)?.get(block.model);
     }
     return;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getPropertyMeta(type: string): ColumnMeta<any, any, any> {
-    const meta = this.columnMetaMap.get(type);
-    if (meta) {
-      return meta;
-    }
-    return queryBlockAllColumnMap[type];
   }
 
   getViewColumn(id: string) {
@@ -149,29 +157,15 @@ export class BlockQueryDataSource extends BaseDataSource {
     );
   }
 
-  override onCellUpdate(
-    rowId: string,
-    propertyId: string,
-    callback: () => void
-  ): Disposable {
-    const viewColumn = this.getViewColumn(propertyId);
-    if (viewColumn) {
-      return this.block.propsUpdated.on(callback);
-    }
-    const block = this.blockMap.get(rowId);
-    assertExists(block, `block ${rowId} not found`);
-    return this.getProperty(propertyId).updated(block.model, callback);
-  }
-
   propertyAdd(
     insertToPosition: InsertToPosition,
     type: string | undefined
   ): string {
     const doc = this.block.doc;
     doc.captureSync();
-    const column = databaseBlockAllColumnMap[
-      type ?? columnPresets.multiSelectColumnConfig.type
-    ].model.create(this.newColumnName());
+    const column = databaseBlockAllPropertyMap[
+      type ?? propertyPresets.multiSelectPropertyConfig.type
+    ].create(this.newColumnName());
 
     const id = doc.generateBlockId();
     if (this.block.columns.some(v => v.id === id)) {
@@ -191,48 +185,22 @@ export class BlockQueryDataSource extends BaseDataSource {
     return id;
   }
 
-  propertyChangeData(propertyId: string, data: Record<string, unknown>): void {
+  propertyDataGet(propertyId: string): Record<string, unknown> {
+    const viewColumn = this.getViewColumn(propertyId);
+    if (viewColumn) {
+      return viewColumn.data;
+    }
+    const property = this.getProperty(propertyId);
+    return (
+      property.getColumnData?.(this.blocks[0].model) ??
+      property.metaConfig.config.defaultData()
+    );
+  }
+
+  propertyDataSet(propertyId: string, data: Record<string, unknown>): void {
     const viewColumn = this.getViewColumn(propertyId);
     if (viewColumn) {
       viewColumn.data = data;
-    }
-  }
-
-  propertyChangeName(propertyId: string, name: string): void {
-    const viewColumn = this.getViewColumn(propertyId);
-    if (viewColumn) {
-      viewColumn.name = name;
-    }
-  }
-
-  propertyChangeType(propertyId: string, toType: string): void {
-    const viewColumn = this.getViewColumn(propertyId);
-    if (viewColumn) {
-      const currentType = viewColumn.type;
-      const currentData = viewColumn.data;
-      const rows = this.rows;
-      const currentCells = rows.map(rowId =>
-        this.cellGetValue(rowId, propertyId)
-      );
-      const result = databaseBlockAllColumnMap[currentType].model?.convertCell(
-        toType,
-        currentData,
-        currentCells
-      ) ?? {
-        column: databaseBlockAllColumnMap[toType].model.defaultData(),
-        cells: currentCells.map(() => undefined),
-      };
-      this.block.doc.captureSync();
-      viewColumn.type = toType;
-      viewColumn.data = result.column;
-      currentCells.forEach((value, i) => {
-        if (value != null || result.cells[i] != null) {
-          this.block.cells[rows[i]] = {
-            ...this.block.cells[rows[i]],
-            [propertyId]: result.cells[i],
-          };
-        }
-      });
     }
   }
 
@@ -247,26 +215,15 @@ export class BlockQueryDataSource extends BaseDataSource {
     throw new Error('Method not implemented.');
   }
 
-  propertyGetData(propertyId: string): Record<string, unknown> {
-    const viewColumn = this.getViewColumn(propertyId);
-    if (viewColumn) {
-      return viewColumn.data;
+  propertyMetaGet(type: string): PropertyMetaConfig {
+    const meta = this.columnMetaMap.get(type);
+    if (meta) {
+      return meta;
     }
-    const property = this.getProperty(propertyId);
-    return (
-      property.getColumnData?.(this.blocks[0].model) ??
-      property.columnMeta.model.defaultData()
-    );
+    return queryBlockAllColumnMap[type];
   }
 
-  override propertyGetDefaultWidth(propertyId: string): number {
-    if (this.propertyGetType(propertyId) === 'title') {
-      return 260;
-    }
-    return super.propertyGetDefaultWidth(propertyId);
-  }
-
-  propertyGetName(propertyId: string): string {
+  propertyNameGet(propertyId: string): string {
     const viewColumn = this.getViewColumn(propertyId);
     if (viewColumn) {
       return viewColumn.name;
@@ -277,7 +234,14 @@ export class BlockQueryDataSource extends BaseDataSource {
     return this.getProperty(propertyId)?.name ?? '';
   }
 
-  override propertyGetReadonly(propertyId: string): boolean {
+  propertyNameSet(propertyId: string, name: string): void {
+    const viewColumn = this.getViewColumn(propertyId);
+    if (viewColumn) {
+      viewColumn.name = name;
+    }
+  }
+
+  override propertyReadonlyGet(propertyId: string): boolean {
     const viewColumn = this.getViewColumn(propertyId);
     if (viewColumn) {
       return false;
@@ -286,7 +250,7 @@ export class BlockQueryDataSource extends BaseDataSource {
     return this.getProperty(propertyId)?.set == null;
   }
 
-  propertyGetType(propertyId: string): string {
+  propertyTypeGet(propertyId: string): string {
     const viewColumn = this.getViewColumn(propertyId);
     if (viewColumn) {
       return viewColumn.type;
@@ -294,7 +258,42 @@ export class BlockQueryDataSource extends BaseDataSource {
     if (propertyId === 'type') {
       return 'image';
     }
-    return this.getProperty(propertyId).columnMeta.type;
+    return this.getProperty(propertyId).metaConfig.type;
+  }
+
+  propertyTypeSet(propertyId: string, toType: string): void {
+    const viewColumn = this.getViewColumn(propertyId);
+    if (viewColumn) {
+      const currentType = viewColumn.type;
+      const currentData = viewColumn.data;
+      const rows = this.rows$.value;
+      const currentCells = rows.map(rowId =>
+        this.cellValueGet(rowId, propertyId)
+      );
+      const convertFunction = databasePropertyConverts.find(
+        v => v.from === currentType && v.to === toType
+      )?.convert;
+      const result = convertFunction?.(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        currentData as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        currentCells as any
+      ) ?? {
+        property: databaseBlockAllPropertyMap[toType].config.defaultData(),
+        cells: currentCells.map(() => undefined),
+      };
+      this.block.doc.captureSync();
+      viewColumn.type = toType;
+      viewColumn.data = result.property;
+      currentCells.forEach((value, i) => {
+        if (value != null || result.cells[i] != null) {
+          this.block.cells[rows[i]] = {
+            ...this.block.cells[rows[i]],
+            [propertyId]: result.cells[i],
+          };
+        }
+      });
+    }
   }
 
   rowAdd(_insertPosition: InsertToPosition | number): string {
@@ -306,31 +305,4 @@ export class BlockQueryDataSource extends BaseDataSource {
   }
 
   rowMove(_rowId: string, _position: InsertToPosition): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get addPropertyConfigList(): ColumnConfig<any, any, any>[] {
-    return queryBlockColumns.map(v => v.model);
-  }
-
-  override get detailSlots(): DetailSlots {
-    return {
-      ...super.detailSlots,
-      header: createUniComponentFromWebComponent(BlockRenderer),
-    };
-  }
-
-  get properties(): string[] {
-    return [
-      ...this.meta.properties.map(v => v.key),
-      ...this.block.columns.map(v => v.id),
-    ];
-  }
-
-  get rows(): string[] {
-    return this.blocks.map(v => v.id);
-  }
-
-  get workspace() {
-    return this.host.doc.collection;
-  }
 }

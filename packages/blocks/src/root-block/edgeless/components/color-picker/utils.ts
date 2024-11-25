@@ -1,11 +1,12 @@
 // https://www.w3.org/TR/css-color-4/
 
-import type { ColorScheme } from '../../../../_common/theme/theme-observer.js';
-import type { CustomColor } from '../../../../surface-block/consts.js';
+import type { Color, ColorScheme } from '@blocksuite/affine-model';
+
 import type {
   Hsv,
   Hsva,
   ModeType,
+  PickColorDetail,
   PickColorType,
   Point,
   Rgb,
@@ -132,7 +133,7 @@ export const hsvaToRgba = (hsva: Hsva): Rgba => ({
   a: hsva.a,
 });
 
-// Converts an RGB color to hex
+// Converts a RGB color to hex
 export const rgbToHex = ({ r, g, b }: Rgb) =>
   [r, g, b]
     .map(n => n * 255)
@@ -142,7 +143,7 @@ export const rgbToHex = ({ r, g, b }: Rgb) =>
 
 // Converts an RGBA color to CSS's hex8 string
 export const rgbaToHex8 = ({ r, g, b, a }: Rgba) => {
-  const hex = [r, g, b, a ?? 1]
+  const hex = [r, g, b, a]
     .map(n => n * 255)
     .map(Math.round)
     .map(n => n.toString(16).padStart(2, '0'))
@@ -150,9 +151,8 @@ export const rgbaToHex8 = ({ r, g, b, a }: Rgba) => {
   return `#${hex}`;
 };
 
-// Converts an HSV color to CSS's `rgba`
-export const hsvToHex8 = (color: Hsv, a = 1) =>
-  rgbaToHex8({ ...hsvToRgb(color), a });
+// Converts an HSVA color to CSS's hex8 string
+export const hsvaToHex8 = (hsva: Hsva) => rgbaToHex8(hsvaToRgba(hsva));
 
 // Parses an hex string to RGBA.
 export const parseHexToRgba = (hex: string) => {
@@ -166,23 +166,15 @@ export const parseHexToRgba = (hex: string) => {
   if (len === 3 || len === 4) {
     arr = hex.split('').map(s => s.repeat(2));
   } else if (len === 6 || len === 8) {
-    const tmp = [0, 0, 0];
-    if (len === 8) tmp.push(0);
-    arr = tmp.map((n, i) => n + i * 2).map(n => hex.substring(n, n + 2));
+    arr = Array.from<number>({ length: len / 2 })
+      .fill(0)
+      .map((n, i) => n + i * 2)
+      .map(n => hex.substring(n, n + 2));
   }
 
-  if (arr.length === 3 && len % 3 === 0) {
-    arr.push('ff');
-  }
-
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  let a = 1;
-
-  if (arr.length === 4) {
-    [r, g, b, a] = arr.map(s => parseInt(s, 16)).map(n => bound01(n, 255));
-  }
+  const [r, g, b, a = 1] = arr
+    .map(s => parseInt(s, 16))
+    .map(n => bound01(n, 255));
 
   return { r, g, b, a };
 };
@@ -220,81 +212,70 @@ export const renderCanvas = (canvas: HTMLCanvasElement, rgb: Rgb) => {
 
 // Drops alpha value
 export const keepColor = (color: string) =>
-  color.length > 7 ? color.substring(0, 7) : color;
+  color.length > 7 && !color.endsWith('transparent')
+    ? color.substring(0, 7)
+    : color;
+
+export const parseStringToRgba = (value: string) => {
+  value = value.trim();
+
+  // Compatible old format: `--affine-palette-transparent`
+  if (value.endsWith('transparent')) {
+    return { r: 1, g: 1, b: 1, a: 0 };
+  }
+
+  if (value.startsWith('#')) {
+    return parseHexToRgba(value);
+  }
+
+  if (value.startsWith('rgb')) {
+    const [r, g, b, a = 1] = value
+      .replace(/^rgba?/, '')
+      .replace(/\(|\)/, '')
+      .split(',')
+      .map(s => parseFloat(s.trim()))
+      // In CSS, the alpha is already in the range [0, 1]
+      .map((n, i) => bound01(n, i === 3 ? 1 : 255));
+
+    return { r, g, b, a };
+  }
+
+  return { r: 0, g: 0, b: 0, a: 1 };
+};
 
 // Preprocess Color
 export const preprocessColor = (style: CSSStyleDeclaration) => {
   return ({ type, value }: { type: ModeType; value: string }) => {
     if (value.startsWith('--')) {
-      value = style.getPropertyValue(value);
+      // Compatible old format: `--affine-palette-transparent`
+      value = value.endsWith('transparent')
+        ? 'transparent'
+        : style.getPropertyValue(value);
     }
 
-    if (value.startsWith('#')) {
-      const rgba = parseHexToRgba(value);
-      return { type, rgba };
-    }
-
-    const rgba: Rgba = { r: 0, g: 0, b: 0, a: 1 };
-
-    if (value.startsWith('rgb')) {
-      const [r, g, b, a] = value
-        .replace(/^rgba?/, '')
-        .replace(/\(|\)/, '')
-        .split(',')
-        .map(s => parseFloat(s.trim()))
-        .map(n => bound01(n, 255));
-
-      rgba.r = r;
-      rgba.g = g;
-      rgba.b = b;
-      rgba.a = a ?? 1;
-    }
+    const rgba = parseStringToRgba(value);
 
     return { type, rgba };
   };
 };
 
 /**
- * Packs to generate a color object with picking type and an old color
+ * Packs to generate an object with a field name and picked color detail
  *
- * @param type - The pick color event type
- * @param key - The field name in the model
- * @param value - The color value
- * @param oldColor
- * @returns object
+ * @param key - The model's field name
+ * @param detail - The picked color detail
+ * @returns An object
  *
  * @example
+ *
  * ```json
- * { 'fillColor': '#fff' }
- * { 'fillColor': { normal: '#fff' }}
- * { 'fillColor': { light: '#fff', 'dark': '#00f' }}
+ * { 'fillColor': '--affine-palette-shape-yellow' }
+ * { 'fillColor': { normal: '#ffffffff' }}
+ * { 'fillColor': { light: '#fff000ff', 'dark': '#0000fff00' }}
  * ```
  */
-export const packColor = (
-  type: PickColorType,
-  key: string,
-  value: string,
-  oldColor?: string | CustomColor
-) => {
-  if (type === 'palette') {
-    return { [key]: value };
-  }
-
-  let color = { [type]: value };
-
-  if (type !== 'normal') {
-    if (typeof oldColor === 'object') {
-      delete oldColor.normal;
-      color = { ...oldColor, ...color };
-    }
-
-    // makes sure light/dark exist at the same time
-    if (Object.keys(color).length === 1) {
-      color[type === 'light' ? 'dark' : 'light'] = value;
-    }
-  }
-
-  return { [key]: color };
+export const packColor = (key: string, detail: PickColorDetail) => {
+  return { [key]: detail.palette ?? detail };
 };
 
 /**
@@ -308,7 +289,7 @@ export const packColor = (
 export const packColorsWithColorScheme = (
   colorScheme: ColorScheme,
   value: string,
-  oldColor: string | CustomColor
+  oldColor: Color
 ) => {
   const colors: { type: ModeType; value: string }[] = [
     { type: 'normal', value },

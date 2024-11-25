@@ -1,17 +1,11 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { DisposableGroup } from '@blocksuite/global/utils';
-import { SignalWatcher, signal } from '@lit-labs/preact-signals';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
 import { baseTheme } from '@toeverything/theme';
-import { LitElement, type PropertyValues, css, html, unsafeCSS } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, LitElement, unsafeCSS } from 'lit';
+import { property, state } from 'lit/decorators.js';
 
 import type { AffineEditorContainer } from '../../editors/editor-container.js';
 
-import './body/outline-notice.js';
-import './body/outline-panel-body.js';
 import { type OutlineSettingsDataType, outlineSettingsKey } from './config.js';
-import './header/outline-panel-header.js';
-import { observeActiveHeading } from './utils/heading-highlight.js';
 
 const styles = css`
   :host {
@@ -59,11 +53,8 @@ const styles = css`
 
 export const AFFINE_OUTLINE_PANEL = 'affine-outline-panel';
 
-@customElement(AFFINE_OUTLINE_PANEL)
 export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
-  private _activeHeadingId$ = signal<string | null>(null);
-
-  private _editorDisposables: DisposableGroup | null = null;
+  static override styles = styles;
 
   private _setNoticeVisibility = (visibility: boolean) => {
     this._noticeVisible = visibility;
@@ -84,11 +75,20 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
     this._updateAndSaveSettings({ showIcons: on });
   };
 
-  static override styles = styles;
+  get doc() {
+    return this.editor.doc;
+  }
 
-  private _clearEditorDisposables() {
-    this._editorDisposables?.dispose();
-    this._editorDisposables = null;
+  get edgeless() {
+    return this.editor.querySelector('affine-edgeless-root');
+  }
+
+  get host() {
+    return this.editor.host;
+  }
+
+  get mode() {
+    return this.editor.mode;
   }
 
   private _loadSettingsFromLocalStorage() {
@@ -104,29 +104,6 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
     localStorage.setItem(outlineSettingsKey, JSON.stringify(this._settings));
   }
 
-  private _setEditorDisposables() {
-    this._clearEditorDisposables();
-    this._editorDisposables = new DisposableGroup();
-    this._editorDisposables.add(
-      this.editor.slots.editorModeSwitched.on(() => {
-        this.editor.updateComplete
-          .then(() => {
-            this.requestUpdate();
-          })
-          .catch(console.error);
-      })
-    );
-    this._editorDisposables.add(
-      this.editor.slots.docUpdated.on(() => {
-        this.editor.updateComplete
-          .then(() => {
-            this.requestUpdate();
-          })
-          .catch(console.error);
-      })
-    );
-  }
-
   private _updateAndSaveSettings(
     newSettings: Partial<OutlineSettingsDataType>
   ) {
@@ -137,14 +114,6 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
   override connectedCallback() {
     super.connectedCallback();
     this._loadSettingsFromLocalStorage();
-    this.disposables.add(
-      observeActiveHeading(() => this.host, this._activeHeadingId$)
-    );
-  }
-
-  override disconnectedCallback() {
-    super.disconnectedCallback();
-    this._clearEditorDisposables();
   }
 
   override render() {
@@ -163,8 +132,7 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
           .doc=${this.doc}
           .fitPadding=${this.fitPadding}
           .edgeless=${this.edgeless}
-          .editorHost=${this.host}
-          .activeHeadingId=${this._activeHeadingId$.value}
+          .editor=${this.editor}
           .mode=${this.mode}
           .showPreviewIcon=${this._showPreviewIcon}
           .enableNotesSorting=${this._enableNotesSorting}
@@ -180,28 +148,6 @@ export class OutlinePanel extends SignalWatcher(WithDisposable(LitElement)) {
         ></affine-outline-notice>
       </div>
     `;
-  }
-
-  override updated(_changedProperties: PropertyValues) {
-    if (_changedProperties.has('editor')) {
-      this._setEditorDisposables();
-    }
-  }
-
-  get doc() {
-    return this.editor.doc;
-  }
-
-  get edgeless() {
-    return this.editor.querySelector('affine-edgeless-root');
-  }
-
-  get host() {
-    return this.editor.host;
-  }
-
-  get mode() {
-    return this.editor.mode;
   }
 
   @state()

@@ -1,3 +1,5 @@
+import type { DeltaInsert } from '@inline/types.js';
+
 import { expect } from '@playwright/test';
 
 import {
@@ -10,6 +12,7 @@ import {
   focusTitle,
   getBoundingBox,
   getEditorHostLocator,
+  getPageSnapshot,
   getSelectionRect,
   initEmptyParagraphState,
   initImageState,
@@ -41,7 +44,6 @@ import {
   assertRichImage,
   assertRichTextInlineRange,
   assertRichTexts,
-  assertStoreMatchJSX,
 } from './utils/asserts.js';
 import { test } from './utils/playwright.js';
 import { getFormatBar } from './utils/query.js';
@@ -69,7 +71,7 @@ test('should format quick bar show when select text', async ({ page }) => {
 
   const noteEl = page.locator('affine-note');
   const { x, y } = await getBoundingBox(noteEl);
-  await page.mouse.click(x, y);
+  await page.mouse.click(x + 100, y + 20);
   await expect(formatBar).not.toBeVisible();
 });
 
@@ -181,9 +183,11 @@ test('should format quick bar hide when type text', async ({ page }) => {
   await expect(formatBar).not.toBeVisible();
 });
 
-test('should format quick bar be able to format text', async ({ page }) => {
+test('should format quick bar be able to format text', async ({
+  page,
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
   // drag only the `456` paragraph
   await dragBetweenIndices(page, [1, 0], [1, 3]);
@@ -210,51 +214,10 @@ test('should format quick bar be able to format text', async ({ page }) => {
   await expect(strikeBtn).toHaveAttribute('active', '');
   await expect(codeBtn).toHaveAttribute('active', '');
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          code={true}
-          insert="456"
-          italic={true}
-          strike={true}
-          underline={true}
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
+
   await boldBtn.click();
   await underlineBtn.click();
   await codeBtn.click();
@@ -268,55 +231,16 @@ test('should format quick bar be able to format text', async ({ page }) => {
   await expect(strikeBtn).toHaveAttribute('active', '');
   await expect(codeBtn).not.toHaveAttribute('active', '');
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          insert="456"
-          italic={true}
-          strike={true}
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_finial.json`
   );
 });
 
 test('should format quick bar be able to change background color', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
   // select `456` paragraph by dragging
   await dragBetweenIndices(page, [1, 0], [1, 3]);
@@ -335,46 +259,8 @@ test('should format quick bar be able to change background color', async ({
     'var(--affine-text-highlight-foreground-red)'
   );
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          color="var(--affine-text-highlight-foreground-red)"
-          insert="456"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   // select `123` paragraph by ctrl + a
@@ -383,106 +269,23 @@ test('should format quick bar be able to change background color', async ({
   // use last used color
   await highlight.highlightBtn.click();
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          color="var(--affine-text-highlight-foreground-red)"
-          insert="123"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          color="var(--affine-text-highlight-foreground-red)"
-          insert="456"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_select_all.json`
   );
 
   await expect(highlight.defaultColorBtn).toBeVisible();
   await highlight.defaultColorBtn.click();
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          color="var(--affine-text-highlight-foreground-red)"
-          insert="456"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_default_color.json`
   );
 });
 
 test('should format quick bar be able to format text when select multiple line', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
   await dragBetweenIndices(page, [0, 0], [2, 3]);
 
@@ -492,103 +295,22 @@ test('should format quick bar be able to format text when select multiple line',
 
   // The bold button should be active after click
   await expect(boldBtn).toHaveAttribute('active', '');
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="123"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="456"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="789"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   await boldBtn.click();
   await expect(boldBtn).not.toHaveAttribute('active', '');
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="456"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_finial.json`
   );
 });
 
-test('should format quick bar be able to link text', async ({ page }) => {
+test('should format quick bar be able to link text', async ({
+  page,
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
   // drag only the `456` paragraph
   await dragBetweenIndices(page, [1, 0], [1, 3]);
@@ -603,46 +325,8 @@ test('should format quick bar be able to link text', async ({ page }) => {
   await type(page, 'https://www.example.com');
   await pressEnter(page);
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          insert="456"
-          link="https://www.example.com"
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   // FIXME: remove this
@@ -653,47 +337,17 @@ test('should format quick bar be able to link text', async ({ page }) => {
   await linkBtn.click();
   await waitNextFrame(page);
   await expect(linkBtn).not.toHaveAttribute('active', '');
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="456"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_finial.json`
   );
 });
 
 test('should format quick bar be able to change to heading paragraph type', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
   // drag only the `456` paragraph
   await dragBetweenIndices(page, [0, 0], [0, 3]);
@@ -704,116 +358,22 @@ test('should format quick bar be able to change to heading paragraph type', asyn
   await expect(h1Btn).toBeVisible();
   await h1Btn.click();
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="h1"
-  />
-  <affine:paragraph
-    prop:text="456"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   await bulletedBtn.click();
   await openParagraphMenu();
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:list
-    prop:checked={false}
-    prop:collapsed={false}
-    prop:text="123"
-    prop:type="bulleted"
-  />
-  <affine:paragraph
-    prop:text="456"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_bulleted.json`
   );
 
   const { textBtn } = getFormatBar(page);
   await textBtn.click();
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="456"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_finial.json`
   );
   await page.waitForTimeout(10);
   // The paragraph button should prevent selection after click
@@ -953,9 +513,9 @@ test('should format quick bar action status updated while undo', async ({
 
 test('should format quick bar work in single block selection', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
 
   await dragBetweenIndices(
@@ -992,48 +552,8 @@ test('should format quick bar work in single block selection', async ({
 
   await expect(blockSelections).toHaveCount(1);
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="456"
-          italic={true}
-          underline={true}
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}.json`
   );
 
   const noteEl = page.locator('affine-note');
@@ -1044,9 +564,9 @@ test('should format quick bar work in single block selection', async ({
 
 test('should format quick bar work in multiple block selection', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
 
   await dragBetweenIndices(
@@ -1081,63 +601,8 @@ test('should format quick bar work in multiple block selection', async ({
 
   await expect(blockSelections).toHaveCount(3);
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="123"
-          underline={true}
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="456"
-          underline={true}
-        />
-      </>
-    }
-    prop:type="text"
-  />
-  <affine:paragraph
-    prop:text={
-      <>
-        <text
-          bold={true}
-          insert="789"
-          underline={true}
-        />
-      </>
-    }
-    prop:type="text"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}.json`
   );
 
   const noteEl = page.locator('affine-note');
@@ -1148,9 +613,9 @@ test('should format quick bar work in multiple block selection', async ({
 
 test('should format quick bar with block selection works when update block type', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
 
   await dragBetweenIndices(
@@ -1172,82 +637,14 @@ test('should format quick bar with block selection works when update block type'
   await formatBarController.bulletedBtn.click();
   await expect(blockSelections).toHaveCount(3);
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:list
-    prop:checked={false}
-    prop:collapsed={false}
-    prop:text="123"
-    prop:type="bulleted"
-  />
-  <affine:list
-    prop:checked={false}
-    prop:collapsed={false}
-    prop:text="456"
-    prop:type="bulleted"
-  />
-  <affine:list
-    prop:checked={false}
-    prop:collapsed={false}
-    prop:text="789"
-    prop:type="bulleted"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_init.json`
   );
 
   await expect(formatBarController.formatBar).toBeVisible();
   await formatBarController.h1Btn.click();
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:paragraph
-    prop:text="123"
-    prop:type="h1"
-  />
-  <affine:paragraph
-    prop:text="456"
-    prop:type="h1"
-  />
-  <affine:paragraph
-    prop:text="789"
-    prop:type="h1"
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_final.json`
   );
   await expect(formatBarController.formatBar).toBeVisible();
   await expect(blockSelections).toHaveCount(3);
@@ -1260,9 +657,9 @@ test('should format quick bar with block selection works when update block type'
 
 test('should format quick bar show after convert to code block', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
-  const { noteId } = await initEmptyParagraphState(page);
+  await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
   const formatBarController = getFormatBar(page);
   await dragBetweenIndices(
@@ -1273,37 +670,12 @@ test('should format quick bar show after convert to code block', async ({
     { x: 0, y: 0 }
   );
   await expect(formatBarController.formatBar).toBeVisible();
-  await formatBarController.assertBoundingBox(251, 343);
+  await expect(formatBarController.formatBar).toBeInViewport();
 
   await formatBarController.openParagraphMenu();
   await formatBarController.codeBlockBtn.click();
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:note
-  prop:background="--affine-note-background-blue"
-  prop:displayMode="both"
-  prop:edgeless={
-    Object {
-      "style": Object {
-        "borderRadius": 0,
-        "borderSize": 4,
-        "borderStyle": "none",
-        "shadowType": "--affine-note-shadow-sticker",
-      },
-    }
-  }
-  prop:hidden={false}
-  prop:index="a0"
->
-  <affine:code
-    prop:caption=""
-    prop:language="Plain Text"
-    prop:text="123\n456\n789"
-    prop:wrap={false}
-  />
-</affine:note>`,
-    noteId
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}.json`
   );
 });
 
@@ -1352,7 +724,7 @@ test('should format bar style active correctly', async ({ page }) => {
       { insert: '2', attributes: { bold: true, underline: true } },
       { insert: '3', attributes: { bold: true, code: true } },
     ];
-    const text = doc.Text.fromDelta(delta);
+    const text = new doc.Text(delta as DeltaInsert[]);
     doc.addBlock('affine:paragraph', { text }, note);
   });
 
@@ -1438,8 +810,6 @@ test('should convert to database work', async ({ page }) => {
   );
   const databaseAction = page.getByTestId('convert-to-database');
   await databaseAction.click();
-  const tableView = page.locator('.modal-view-item.table');
-  await tableView.click();
   const database = page.locator('affine-database');
   await expect(database).toBeVisible();
   const rows = page.locator('.affine-database-block-row');
@@ -1508,7 +878,7 @@ test('should update the format quick bar state when there is a change in keyboar
       { insert: '2', attributes: { bold: true } },
       { insert: '3', attributes: { bold: false } },
     ];
-    const text = doc.Text.fromDelta(delta);
+    const text = new doc.Text(delta as DeltaInsert[]);
     doc.addBlock('affine:paragraph', { text }, note);
   });
   await focusTitle(page);
@@ -1559,7 +929,7 @@ test('selecting image should not show format bar', async ({ page }) => {
 
 test('create linked doc from block selection with format bar', async ({
   page,
-}) => {
+}, testInfo) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
   await initThreeParagraphs(page);
@@ -1593,42 +963,8 @@ test('create linked doc from block selection with format bar', async ({
   );
   await waitNextFrame(page, 200);
 
-  await assertStoreMatchJSX(
-    page,
-    `
-<affine:page>
-  <affine:surface />
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:paragraph
-      prop:text="123"
-      prop:type="text"
-    >
-      <affine:paragraph
-        prop:text="456"
-        prop:type="text"
-      />
-    </affine:paragraph>
-    <affine:paragraph
-      prop:text="789"
-      prop:type="text"
-    />
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}.json`
   );
 });
 

@@ -1,18 +1,32 @@
+import type { GfxController, GfxToolsMap } from '@blocksuite/block-std/gfx';
 import type { XYWH } from '@blocksuite/global/utils';
 
-import { Bound } from '@blocksuite/global/utils';
-import { DisposableGroup, Slot, noop } from '@blocksuite/global/utils';
-
-import type { CssVariableName } from '../../../_common/theme/css-variables.js';
-import type { ShapeStyle } from '../../../surface-block/element-model/shape.js';
-import type { EdgelessRootBlockComponent } from '../edgeless-root-block.js';
-
-import { shapeMethods } from '../../../surface-block/element-model/shape.js';
 import {
   type Options,
   Overlay,
   type RoughCanvas,
-} from '../../../surface-block/index.js';
+  type SurfaceBlockComponent,
+} from '@blocksuite/affine-block-surface';
+import {
+  type Color,
+  DEFAULT_NOTE_BACKGROUND_COLOR,
+  DEFAULT_SHAPE_FILL_COLOR,
+  DEFAULT_SHAPE_STROKE_COLOR,
+  shapeMethods,
+  type ShapeStyle,
+} from '@blocksuite/affine-model';
+import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import {
+  assertType,
+  Bound,
+  DisposableGroup,
+  noop,
+  Slot,
+} from '@blocksuite/global/utils';
+import { effect } from '@preact/signals-core';
+
+import type { ShapeTool } from '../gfx-tool/shape-tool.js';
+
 import {
   NOTE_OVERLAY_CORNER_RADIUS,
   NOTE_OVERLAY_HEIGHT,
@@ -216,9 +230,7 @@ export class ShapeFactory {
 }
 
 class ToolOverlay extends Overlay {
-  protected disposables!: DisposableGroup;
-
-  protected edgeless: EdgelessRootBlockComponent;
+  protected disposables = new DisposableGroup();
 
   globalAlpha: number;
 
@@ -226,23 +238,18 @@ class ToolOverlay extends Overlay {
 
   y: number;
 
-  constructor(edgeless: EdgelessRootBlockComponent) {
-    super();
+  constructor(gfx: GfxController) {
+    super(gfx);
     this.x = 0;
     this.y = 0;
     this.globalAlpha = 0;
-    this.edgeless = edgeless;
-    this.disposables = new DisposableGroup();
+    this.gfx = gfx;
     this.disposables.add(
-      this.edgeless.service.viewport.viewportUpdated.on(() => {
+      this.gfx.viewport.viewportUpdated.on(() => {
         // when viewport is updated, we should keep the overlay in the same position
         // to get last mouse position and convert it to model coordinates
-        const lastX = this.edgeless.tools.lastMousePos.x;
-        const lastY = this.edgeless.tools.lastMousePos.y;
-        const [x, y] = this.edgeless.service.viewport.toModelCoord(
-          lastX,
-          lastY
-        );
+        const pos = this.gfx.tool.lastMousePos$.value;
+        const [x, y] = this.gfx.viewport.toModelCoord(pos.x, pos.y);
         this.x = x;
         this.y = y;
       })
@@ -253,16 +260,8 @@ class ToolOverlay extends Overlay {
     this.disposables.dispose();
   }
 
-  isTransparent(color: string): boolean {
-    return color.includes('transparent');
-  }
-
   render(_ctx: CanvasRenderingContext2D, _rc: RoughCanvas): void {
     noop();
-  }
-
-  get computedStyle() {
-    return getComputedStyle(this.edgeless);
   }
 }
 
@@ -270,16 +269,16 @@ export class ShapeOverlay extends ToolOverlay {
   shape: Shape;
 
   constructor(
-    edgeless: EdgelessRootBlockComponent,
+    gfx: GfxController,
     type: string,
     options: Options,
     style: {
       shapeStyle: ShapeStyle;
-      fillColor: string;
-      strokeColor: string;
+      fillColor: Color;
+      strokeColor: Color;
     }
   ) {
-    super(edgeless);
+    super(gfx);
     const xywh = [
       this.x,
       this.y,
@@ -287,54 +286,50 @@ export class ShapeOverlay extends ToolOverlay {
       SHAPE_OVERLAY_HEIGHT,
     ] as XYWH;
     const { shapeStyle, fillColor, strokeColor } = style;
-    options.fill = this._getRealFillColor(fillColor);
-    options.stroke = this._getRealStrokeColor(strokeColor);
+    const fill = this.gfx.std
+      .get(ThemeProvider)
+      .getColorValue(fillColor, DEFAULT_SHAPE_FILL_COLOR, true);
+    const stroke = this.gfx.std
+      .get(ThemeProvider)
+      .getColorValue(strokeColor, DEFAULT_SHAPE_STROKE_COLOR, true);
+
+    options.fill = fill;
+    options.stroke = stroke;
+
     this.shape = ShapeFactory.createShape(xywh, type, options, shapeStyle);
     this.disposables.add(
-      this.edgeless.slots.edgelessToolUpdated.on(edgelessTool => {
-        if (edgelessTool.type !== 'shape') return;
-        const shapeType = edgelessTool.shapeType;
+      effect(() => {
+        const currentTool = this.gfx.tool.currentTool$.value;
+
+        if (currentTool?.toolName !== 'shape') return;
+
+        assertType<ShapeTool>(currentTool);
+
+        const { shapeName } = currentTool.activatedOption;
         const newOptions = {
           ...options,
-          stroke: this._getRealStrokeColor(strokeColor),
-          fill: this._getRealFillColor(fillColor),
         };
 
         let { x, y } = this;
-        if (shapeType === 'roundedRect' || shapeType === 'rect') {
+        if (shapeName === 'roundedRect' || shapeName === 'rect') {
           x += SHAPE_OVERLAY_OFFSET_X;
           y += SHAPE_OVERLAY_OFFSET_Y;
         }
         const w =
-          shapeType === 'roundedRect'
+          shapeName === 'roundedRect'
             ? SHAPE_OVERLAY_WIDTH + 40
             : SHAPE_OVERLAY_WIDTH;
         const xywh = [x, y, w, SHAPE_OVERLAY_HEIGHT] as XYWH;
         this.shape = ShapeFactory.createShape(
           xywh,
-          shapeType,
+          shapeName,
           newOptions,
           shapeStyle
         );
-        this.edgeless.surface.refresh();
+
+        (this.gfx.surfaceComponent as SurfaceBlockComponent).refresh();
       })
     );
-  }
-
-  private _getRealFillColor(color: string) {
-    const realFillColor = this.computedStyle.getPropertyValue(color as string);
-    if (!this.isTransparent(color)) return realFillColor;
-
-    return 'transparent';
-  }
-
-  private _getRealStrokeColor(color: string) {
-    const realStrokeColor = this.computedStyle.getPropertyValue(
-      color as string
-    );
-    if (!this.isTransparent(color)) return realStrokeColor;
-
-    return 'transparent';
   }
 
   override render(ctx: CanvasRenderingContext2D, rc: RoughCanvas): void {
@@ -358,19 +353,20 @@ export class NoteOverlay extends ToolOverlay {
 
   text = '';
 
-  constructor(
-    edgeless: EdgelessRootBlockComponent,
-    background: CssVariableName
-  ) {
-    super(edgeless);
+  constructor(gfx: GfxController, background: Color) {
+    super(gfx);
     this.globalAlpha = 0;
-    this.backgroundColor = this._getRealBackgroundColor(background);
+    this.backgroundColor = gfx.std
+      .get(ThemeProvider)
+      .getColorValue(background, DEFAULT_NOTE_BACKGROUND_COLOR, true);
     this.disposables.add(
-      this.edgeless.slots.edgelessToolUpdated.on(edgelessTool => {
+      effect(() => {
         // when change note child type, update overlay text
-        if (edgelessTool.type !== 'affine:note') return;
-        this.text = this._getOverlayText(edgelessTool.tip);
-        this.edgeless.surface.refresh();
+        if (this.gfx.tool.currentToolName$.value !== 'affine:note') return;
+        const tool =
+          this.gfx.tool.currentTool$.peek() as GfxToolsMap['affine:note'];
+        this.text = this._getOverlayText(tool.activatedOption.tip);
+        (this.gfx.surfaceComponent as SurfaceBlockComponent).refresh();
       })
     );
   }
@@ -379,20 +375,13 @@ export class NoteOverlay extends ToolOverlay {
     return text[0].toUpperCase() + text.slice(1);
   }
 
-  private _getRealBackgroundColor(color: CssVariableName) {
-    const realStrokeColor = this.computedStyle.getPropertyValue(color);
-    if (!this.isTransparent(color)) return realStrokeColor;
-
-    return 'transparent';
-  }
-
   override render(ctx: CanvasRenderingContext2D): void {
     ctx.globalAlpha = this.globalAlpha;
     const overlayX = this.x + NOTE_OVERLAY_OFFSET_X;
     const overlayY = this.y + NOTE_OVERLAY_OFFSET_Y;
-    // Get real color from css variable
-    const computedStyle = getComputedStyle(this.edgeless);
-    ctx.strokeStyle = computedStyle.getPropertyValue(NOTE_OVERLAY_STOKE_COLOR);
+    ctx.strokeStyle = this.gfx.std
+      .get(ThemeProvider)
+      .getCssVariableColor(NOTE_OVERLAY_STOKE_COLOR);
     // Draw the overlay rectangle
     ctx.fillStyle = this.backgroundColor;
     ctx.lineWidth = 4;
@@ -440,7 +429,9 @@ export class NoteOverlay extends ToolOverlay {
     ctx.fill();
 
     // Draw the overlay text
-    ctx.fillStyle = computedStyle.getPropertyValue(NOTE_OVERLAY_TEXT_COLOR);
+    ctx.fillStyle = this.gfx.std
+      .get(ThemeProvider)
+      .getCssVariableColor(NOTE_OVERLAY_TEXT_COLOR);
     let fontSize = 16;
     ctx.font = `${fontSize}px Arial`;
     ctx.textAlign = 'left';
@@ -466,11 +457,8 @@ export class DraggingNoteOverlay extends NoteOverlay {
 
   width: number;
 
-  constructor(
-    edgeless: EdgelessRootBlockComponent,
-    background: CssVariableName
-  ) {
-    super(edgeless, background);
+  constructor(gfx: GfxController, background: Color) {
+    super(gfx, background);
     this.slots = {
       draggingNoteUpdated: new Slot<{
         xywh: XYWH;
@@ -481,7 +469,7 @@ export class DraggingNoteOverlay extends NoteOverlay {
     this.disposables.add(
       this.slots.draggingNoteUpdated.on(({ xywh }) => {
         [this.x, this.y, this.width, this.height] = xywh;
-        this.edgeless.surface.refresh();
+        (this.gfx.surfaceComponent as SurfaceBlockComponent).refresh();
       })
     );
   }

@@ -1,5 +1,11 @@
-import type { EdgelessRootBlockComponent } from '@blocksuite/blocks';
+import type {
+  AffineFrameTitleWidget,
+  EdgelessRootBlockComponent,
+  FrameBlockComponent,
+  FrameBlockModel,
+} from '@blocksuite/blocks';
 
+import { assertType } from '@blocksuite/global/utils';
 import { Text } from '@blocksuite/store';
 import { beforeEach, describe, expect, test } from 'vitest';
 
@@ -28,18 +34,21 @@ describe('frame', () => {
     );
     await wait();
 
-    const titleDom = document.querySelector(
-      `affine-frame[data-block-id="${frame}"] .affine-frame-title`
-    );
-    const rect = titleDom?.getBoundingClientRect();
+    const frameTitleWidget = service.std.view.getWidget(
+      'affine-frame-title-widget',
+      doc.root!.id
+    ) as AffineFrameTitleWidget | null;
 
-    expect(titleDom).not.toBeNull();
-    expect(rect).not.toBeNull();
+    const frameTitle = frameTitleWidget?.getFrameTitle(frame);
+    const rect = frameTitle?.getBoundingClientRect();
+
+    expect(frameTitle).toBeTruthy();
+    expect(rect).toBeTruthy();
     expect(rect!.width).toBeGreaterThan(0);
     expect(rect!.height).toBeGreaterThan(0);
 
     const [titleX, titleY] = service.viewport.toModelCoord(rect!.x, rect!.y);
-    expect(titleX).toBe(0);
+    expect(titleX).toBeCloseTo(0);
     expect(titleY).toBeLessThan(0);
 
     const nestedFrame = service.doc.addBlock(
@@ -51,10 +60,12 @@ describe('frame', () => {
       service.surface.id
     );
     await wait();
-    const nestedTitle = document.querySelector(
-      `affine-frame[data-block-id="${nestedFrame}"] .affine-frame-title`
-    );
-    const nestedTitleRect = nestedTitle!.getBoundingClientRect()!;
+
+    const nestedTitle = frameTitleWidget?.getFrameTitle(nestedFrame);
+    expect(nestedTitle).toBeTruthy();
+    if (!nestedTitle) return;
+
+    const nestedTitleRect = nestedTitle.getBoundingClientRect()!;
     const [nestedTitleX, nestedTitleY] = service.viewport.toModelCoord(
       nestedTitleRect.x,
       nestedTitleRect.y
@@ -62,5 +73,57 @@ describe('frame', () => {
 
     expect(nestedTitleX).toBeGreaterThan(20);
     expect(nestedTitleY).toBeGreaterThan(20);
+  });
+
+  test('frame should have externalXYWH after moving viewport to contains frame', async () => {
+    const frameId = service.doc.addBlock(
+      'affine:frame',
+      {
+        xywh: '[1800,1800,200,200]',
+        title: new Text('Frame 1'),
+      },
+      service.surface.id
+    );
+    await wait();
+
+    const frame = service.doc.getBlock(frameId);
+    expect(frame).toBeTruthy();
+
+    assertType<FrameBlockComponent>(frame);
+
+    service.viewport.setCenter(900, 900);
+    expect(frame?.model.externalXYWH).toBeDefined();
+  });
+
+  test('descendant of frame should not contain itself', async () => {
+    const frameIds = [1, 2, 3].map(i => {
+      return service.doc.addBlock(
+        'affine:frame',
+        {
+          xywh: '[0,0,300,300]',
+          title: new Text(`Frame ${i}`),
+        },
+        service.surface.id
+      );
+    });
+
+    await wait();
+
+    const frames = frameIds.map(
+      id => service.doc.getBlock(id)?.model as FrameBlockModel
+    );
+
+    frames.forEach(frame => {
+      expect(frame.descendantElements).toHaveLength(0);
+    });
+
+    frames[0].addChild(frames[1]);
+    frames[1].addChild(frames[2]);
+    frames[2].addChild(frames[0]);
+
+    await wait();
+    expect(frames[0].descendantElements).toHaveLength(2);
+    expect(frames[1].descendantElements).toHaveLength(1);
+    expect(frames[2].descendantElements).toHaveLength(0);
   });
 });

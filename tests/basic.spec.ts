@@ -1,3 +1,5 @@
+import type { DeltaInsert } from '@inline/types.js';
+
 import { expect } from '@playwright/test';
 
 import {
@@ -10,6 +12,7 @@ import {
   focusTitle,
   getCurrentEditorTheme,
   getCurrentHTMLTheme,
+  getPageSnapshot,
   initEmptyEdgelessState,
   initEmptyParagraphState,
   pressArrowLeft,
@@ -35,15 +38,13 @@ import {
   assertEmpty,
   assertRichTextInlineDeltas,
   assertRichTexts,
-  assertStore,
-  assertStoreMatchJSX,
   assertText,
   assertTitle,
-  defaultStore,
 } from './utils/asserts.js';
-import './utils/declare-test-window.js';
 import { scoped, test } from './utils/playwright.js';
 import { getFormatBar } from './utils/query.js';
+
+const BASIC_DEFAULT_SNAPSHOT = 'basic test default';
 
 test(scoped`basic input`, async ({ page }) => {
   await enterPlaygroundRoom(page);
@@ -52,7 +53,9 @@ test(scoped`basic input`, async ({ page }) => {
   await type(page, 'hello');
 
   await test.expect(page).toHaveTitle(/BlockSuite/);
-  await assertStore(page, defaultStore);
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${BASIC_DEFAULT_SNAPSHOT}.json`
+  );
   await assertText(page, 'hello');
 });
 
@@ -76,7 +79,7 @@ test(scoped`basic init with external text`, async ({ page }) => {
     doc.addBlock(
       'affine:paragraph',
       {
-        text: doc.Text.fromDelta(delta),
+        text: new doc.Text(delta as DeltaInsert[]),
       },
       note
     );
@@ -129,8 +132,12 @@ test(
     await assertText(pageB, 'hello');
     await Promise.all([
       assertText(pageA, 'hello'),
-      assertStore(pageA, defaultStore),
-      assertStore(pageB, defaultStore),
+      expect(await getPageSnapshot(pageA, true)).toMatchSnapshot(
+        `${BASIC_DEFAULT_SNAPSHOT}.json`
+      ),
+      expect(await getPageSnapshot(pageB, true)).toMatchSnapshot(
+        `${BASIC_DEFAULT_SNAPSHOT}.json`
+      ),
       assertBlockChildrenIds(pageA, '0', ['1']),
       assertBlockChildrenIds(pageB, '0', ['1']),
     ]);
@@ -160,8 +167,12 @@ test(scoped`A first open, B first edit`, async ({ context, page: pageA }) => {
   await assertText(pageA, 'hello');
   await assertText(pageB, 'hello');
   await Promise.all([
-    assertStore(pageA, defaultStore),
-    assertStore(pageB, defaultStore),
+    expect(await getPageSnapshot(pageA, true)).toMatchSnapshot(
+      `${BASIC_DEFAULT_SNAPSHOT}.json`
+    ),
+    expect(await getPageSnapshot(pageB, true)).toMatchSnapshot(
+      `${BASIC_DEFAULT_SNAPSHOT}.json`
+    ),
   ]);
 });
 
@@ -411,63 +422,26 @@ test('when no note block, click editing area auto add a new note block', async (
   await page.locator('affine-edgeless-note').click({ force: true });
   await pressBackspace(page);
   await switchEditorMode(page);
-  let note = await page.evaluate(() => {
+  const edgelessNote = await page.evaluate(() => {
     return document.querySelector('affine-edgeless-note');
   });
-  expect(note).toBeNull();
+  expect(edgelessNote).toBeNull();
   await click(page, { x: 200, y: 280 });
 
-  note = await page.evaluate(() => {
+  const pageNote = await page.evaluate(() => {
     return document.querySelector('affine-note');
   });
-  expect(note).not.toBeNull();
+  expect(pageNote).not.toBeNull();
 });
 
-test(scoped`automatic identify url text`, async ({ page }) => {
+test(scoped`automatic identify url text`, async ({ page }, testInfo) => {
   await enterPlaygroundRoom(page);
   await initEmptyParagraphState(page);
   await focusRichText(page);
   await type(page, 'abc https://google.com ');
 
-  await assertStoreMatchJSX(
-    page,
-    /*xml*/ `
-<affine:page>
-  <affine:note
-    prop:background="--affine-note-background-blue"
-    prop:displayMode="both"
-    prop:edgeless={
-      Object {
-        "style": Object {
-          "borderRadius": 0,
-          "borderSize": 4,
-          "borderStyle": "none",
-          "shadowType": "--affine-note-shadow-sticker",
-        },
-      }
-    }
-    prop:hidden={false}
-    prop:index="a0"
-  >
-    <affine:paragraph
-      prop:text={
-        <>
-          <text
-            insert="abc "
-          />
-          <text
-            insert="https://google.com"
-            link="https://google.com"
-          />
-          <text
-            insert=" "
-          />
-        </>
-      }
-      prop:type="text"
-    />
-  </affine:note>
-</affine:page>`
+  expect(await getPageSnapshot(page, true)).toMatchSnapshot(
+    `${testInfo.title}_final.json`
   );
 });
 

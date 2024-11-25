@@ -1,55 +1,60 @@
-import type { InlineRange } from '@blocksuite/inline';
 import type { Text } from '@blocksuite/store';
 
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
+import { ShadowlessElement } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { css, html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
 
-import type { RichText } from '../../../_common/components/index.js';
 import type { DatabaseBlockComponent } from '../../database-block.js';
 
-import { getViewportElement } from '../../../_common/utils/query.js';
-
-@customElement('affine-database-title')
 export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
-  private _onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.isComposing) {
-      // prevent insert v-line
-      event.preventDefault();
-      // insert new row
-      this.onPressEnterKey?.();
-      return;
-    }
-  };
-
   static override styles = css`
     .affine-database-title {
       position: relative;
       flex: 1;
-    }
-
-    .database-title {
-      font-size: 20px;
-      font-weight: 600;
-      line-height: 28px;
-      color: var(--affine-text-primary-color);
       font-family: inherit;
-      /* overflow-x: scroll; */
+      font-size: 20px;
+      line-height: 28px;
+      font-weight: 600;
+      color: var(--affine-text-primary-color);
       overflow: hidden;
-      cursor: text;
     }
 
-    .database-title [data-v-text='true'] {
-      display: block;
-      word-break: break-all !important;
+    .affine-database-title textarea {
+      font-size: inherit;
+      line-height: inherit;
+      font-weight: inherit;
+      letter-spacing: inherit;
+      font-family: inherit;
+      border: none;
+      background-color: transparent;
+      padding: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      outline: none;
+      resize: none;
+      scrollbar-width: none;
     }
 
-    .database-title.ellipsis [data-v-text='true'] {
-      white-space: nowrap !important;
+    .affine-database-title .text {
+      user-select: none;
+      opacity: 0;
+    }
+
+    .affine-database-title[data-title-focus='false'] textarea {
+      opacity: 0;
+    }
+
+    .affine-database-title[data-title-focus='false'] .text {
       text-overflow: ellipsis;
       overflow: hidden;
+      white-space: nowrap;
+      opacity: 1;
     }
 
     .affine-database-title [data-title-empty='true']::before {
@@ -64,99 +69,98 @@ export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
     }
   `;
 
-  override firstUpdated() {
-    // for title placeholder
-    this.titleText.yText.observe(() => {
-      this.requestUpdate();
-    });
+  private compositionEnd = () => {
+    this.titleText.replace(0, this.titleText.length, this.input.value);
+  };
 
-    this.updateComplete
-      .then(() => {
-        this.disposables.add(
-          this.inlineEditor.slots.keydown.on(this._onKeyDown)
-        );
+  private onBlur = () => {
+    this.isFocus = false;
+  };
 
-        this.disposables.add(
-          this.inlineEditor.slots.inputting.on(() => {
-            this.isComposing = this.inlineEditor.isComposing;
-          })
-        );
+  private onFocus = () => {
+    this.isFocus = true;
+    if (this.database?.viewSelection$?.value) {
+      this.database?.setSelection(undefined);
+    }
+  };
 
-        let beforeInlineRange: InlineRange | null = null;
-        this.disposables.add(
-          this.inlineEditor.slots.inlineRangeUpdate.on(([inlineRange]) => {
-            if (inlineRange) {
-              if (!beforeInlineRange) {
-                this.isActive = true;
-              }
-            } else {
-              if (beforeInlineRange) {
-                this.isActive = false;
-              }
-            }
-            beforeInlineRange = inlineRange;
-          })
-        );
-      })
-      .catch(console.error);
+  private onInput = (e: InputEvent) => {
+    this.text = this.input.value;
+    if (!e.isComposing) {
+      this.titleText.replace(0, this.titleText.length, this.input.value);
+    }
+  };
+
+  private onKeyDown = (event: KeyboardEvent) => {
+    event.stopPropagation();
+    if (event.key === 'Enter' && !event.isComposing) {
+      event.preventDefault();
+      this.onPressEnterKey?.();
+      return;
+    }
+  };
+
+  updateText = () => {
+    if (!this.isFocus) {
+      this.input.value = this.titleText.toString();
+      this.text = this.input.value;
+    }
+  };
+
+  get database() {
+    return this.closest<DatabaseBlockComponent>('affine-database');
   }
 
-  override async getUpdateComplete(): Promise<boolean> {
-    const result = await super.getUpdateComplete();
-    await this.richText?.updateComplete;
-    return result;
+  override connectedCallback() {
+    super.connectedCallback();
+    requestAnimationFrame(() => {
+      this.updateText();
+    });
+    this.titleText.yText.observe(this.updateText);
+    this.disposables.add(() => {
+      this.titleText.yText.unobserve(this.updateText);
+    });
   }
 
   override render() {
-    const isEmpty =
-      (!this.titleText || !this.titleText.length) && !this.isComposing;
+    const isEmpty = !this.text;
 
     const classList = classMap({
-      'database-title': true,
-      ellipsis: !this.isActive,
+      'affine-database-title': true,
+      ellipsis: !this.isFocus,
     });
-
-    return html`<div class="affine-database-title">
-      <rich-text
-        .yText=${this.titleText.yText}
-        .inlineEventSource=${this.topContenteditableElement}
-        .undoManager=${this.topContenteditableElement?.doc.history}
-        .enableFormat=${false}
-        .readonly=${this.readonly}
-        .verticalScrollContainerGetter=${() =>
-          this.topContenteditableElement?.host
-            ? getViewportElement(this.topContenteditableElement.host)
-            : null}
-        class="${classList}"
-        data-title-empty="${isEmpty}"
-        data-title-focus="${this.isActive}"
+    const untitledStyle = styleMap({
+      height: isEmpty ? 'auto' : 0,
+      opacity: isEmpty && !this.isFocus ? 1 : 0,
+    });
+    return html` <div
+      class="${classList}"
+      data-title-empty="${isEmpty}"
+      data-title-focus="${this.isFocus}"
+    >
+      <div class="text" style="${untitledStyle}">Untitled</div>
+      <div class="text">${this.text}</div>
+      <textarea
+        .disabled="${this.readonly}"
+        @input="${this.onInput}"
+        @keydown="${this.onKeyDown}"
+        @focus="${this.onFocus}"
+        @blur="${this.onBlur}"
+        @compositionend="${this.compositionEnd}"
         data-block-is-database-title="true"
         title="${this.titleText.toString()}"
-      ></rich-text>
-      <div class="database-title" style="float:left;height: 0;">Untitled</div>
+      ></textarea>
     </div>`;
   }
 
-  get inlineEditor() {
-    assertExists(this.richText.inlineEditor);
-    return this.richText.inlineEditor;
-  }
-
-  get inlineEditorContainer() {
-    return this.inlineEditor.rootElement;
-  }
-
-  get topContenteditableElement() {
-    const databaseBlock =
-      this.closest<DatabaseBlockComponent>('affine-database');
-    return databaseBlock?.topContenteditableElement;
-  }
-
-  @state()
-  private accessor isActive = false;
+  @query('textarea')
+  private accessor input!: HTMLTextAreaElement;
 
   @state()
   accessor isComposing = false;
+
+  @state()
+  private accessor isFocus = false;
 
   @property({ attribute: false })
   accessor onPressEnterKey: (() => void) | undefined = undefined;
@@ -164,8 +168,8 @@ export class DatabaseTitle extends WithDisposable(ShadowlessElement) {
   @property({ attribute: false })
   accessor readonly!: boolean;
 
-  @query('rich-text')
-  private accessor richText!: RichText;
+  @state()
+  private accessor text = '';
 
   @property({ attribute: false })
   accessor titleText!: Text;

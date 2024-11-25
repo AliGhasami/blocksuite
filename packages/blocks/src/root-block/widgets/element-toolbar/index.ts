@@ -1,48 +1,57 @@
-import { WidgetComponent } from '@blocksuite/block-std';
-import { type TemplateResult, css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { join } from 'lit/directives/join.js';
+import type {
+  AttachmentBlockModel,
+  BookmarkBlockModel,
+  BrushElementModel,
+  ConnectorElementModel,
+  EdgelessTextBlockModel,
+  EmbedFigmaModel,
+  EmbedGithubModel,
+  EmbedHtmlModel,
+  EmbedLinkedDocModel,
+  EmbedLoomModel,
+  EmbedSyncedDocModel,
+  EmbedYoutubeModel,
+  FrameBlockModel,
+  ImageBlockModel,
+  MindmapElementModel,
+  NoteBlockModel,
+  RootBlockModel,
+  TextElementModel,
+} from '@blocksuite/affine-model';
 
-import type { AttachmentBlockModel } from '../../../attachment-block/attachment-model.js';
-import type { BookmarkBlockModel } from '../../../bookmark-block/bookmark-model.js';
-import type { EdgelessTextBlockModel } from '../../../edgeless-text/edgeless-text-model.js';
-import type { EmbedFigmaModel } from '../../../embed-figma-block/embed-figma-model.js';
-import type { EmbedGithubModel } from '../../../embed-github-block/embed-github-model.js';
-import type { EmbedHtmlModel } from '../../../embed-html-block/embed-html-model.js';
-import type { EmbedLinkedDocModel } from '../../../embed-linked-doc-block/embed-linked-doc-model.js';
-import type { EmbedLoomModel } from '../../../embed-loom-block/embed-loom-model.js';
-import type { EmbedSyncedDocModel } from '../../../embed-synced-doc-block/embed-synced-doc-model.js';
-import type { EmbedYoutubeModel } from '../../../embed-youtube-block/embed-youtube-model.js';
-import type { FrameBlockModel } from '../../../frame-block/frame-model.js';
-import type { ImageBlockModel } from '../../../image-block/image-model.js';
-import type { NoteBlockModel } from '../../../note-block/note-model.js';
-import type { MindmapElementModel } from '../../../surface-block/element-model/mindmap.js';
-import type { ConnectorToolController } from '../../edgeless/controllers/tools/connector-tool.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-import type { RootBlockModel } from '../../root-model.js';
-
-import '../../../_common/components/toolbar/icon-button.js';
-import '../../../_common/components/toolbar/menu-button.js';
-import { renderToolbarSeparator } from '../../../_common/components/toolbar/separator.js';
-import '../../../_common/components/toolbar/toolbar.js';
-import { ConnectorCWithArrowIcon } from '../../../_common/icons/edgeless.js';
+import { CommonUtils } from '@blocksuite/affine-block-surface';
+import { ConnectorCWithArrowIcon } from '@blocksuite/affine-components/icons';
 import {
-  atLeastNMatches,
-  groupBy,
-  pickValues,
-} from '../../../_common/utils/iterable.js';
+  cloneGroups,
+  type MenuItemGroup,
+  renderToolbarSeparator,
+} from '@blocksuite/affine-components/toolbar';
 import {
   ConnectorMode,
   GroupElementModel,
-} from '../../../surface-block/index.js';
+  ShapeElementModel,
+} from '@blocksuite/affine-model';
 import {
-  type BrushElementModel,
-  type ConnectorElementModel,
-  type ShapeElementModel,
-  type TextElementModel,
-  clamp,
-} from '../../../surface-block/index.js';
-import { edgelessElementsBound } from '../../edgeless/utils/bound-utils.js';
+  darkToolbarStyles,
+  lightToolbarStyles,
+  ThemeProvider,
+} from '@blocksuite/affine-shared/services';
+import { requestConnectedFrame } from '@blocksuite/affine-shared/utils';
+import { WidgetComponent } from '@blocksuite/block-std';
+import {
+  atLeastNMatches,
+  getCommonBoundWithRotation,
+  groupBy,
+  pickValues,
+} from '@blocksuite/global/utils';
+import { css, html, nothing, type TemplateResult, unsafeCSS } from 'lit';
+import { property, state } from 'lit/decorators.js';
+import { join } from 'lit/directives/join.js';
+
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+import type { ElementToolbarMoreMenuContext } from './more-menu/context.js';
+
+import { getMoreMenuConfig } from '../../configs/toolbar.js';
 import {
   isAttachmentBlock,
   isBookmarkBlock,
@@ -67,7 +76,7 @@ import { renderMindmapButton } from './change-mindmap-button.js';
 import { renderNoteButton } from './change-note-button.js';
 import { renderChangeShapeButton } from './change-shape-button.js';
 import { renderChangeTextButton } from './change-text-button.js';
-import './more-button.js';
+import { BUILT_IN_GROUPS } from './more-menu/config.js';
 import { renderReleaseFromGroupButton } from './release-from-group-button.js';
 
 type CategorizedElements = {
@@ -100,11 +109,27 @@ type CustomEntry = {
 export const EDGELESS_ELEMENT_TOOLBAR_WIDGET =
   'edgeless-element-toolbar-widget';
 
-@customElement(EDGELESS_ELEMENT_TOOLBAR_WIDGET)
 export class EdgelessElementToolbarWidget extends WidgetComponent<
   RootBlockModel,
   EdgelessRootBlockComponent
 > {
+  static override styles = css`
+    :host {
+      position: absolute;
+      z-index: 3;
+      transform: translateZ(0);
+      will-change: transform;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    editor-toolbar[data-app-theme='light'] {
+      ${unsafeCSS(lightToolbarStyles.join('\n'))}
+    }
+    editor-toolbar[data-app-theme='dark'] {
+      ${unsafeCSS(darkToolbarStyles.join('\n'))}
+    }
+  `;
+
   private _quickConnect = ({ x, y }: MouseEvent) => {
     const element = this.selection.selectedElements[0];
     const point = this.edgeless.service.viewport.toViewCoordFromClientCoord([
@@ -112,14 +137,11 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
       y,
     ]);
     this.edgeless.doc.captureSync();
-    this.edgeless.tools.setEdgelessTool({
-      type: 'connector',
+    this.edgeless.gfx.tool.setTool('connector', {
       mode: ConnectorMode.Curve,
     });
 
-    const ctc = this.edgeless.tools.controllers[
-      'connector'
-    ] as ConnectorToolController;
+    const ctc = this.edgeless.gfx.tool.get('connector');
     ctc.quickConnect(point, element);
   };
 
@@ -132,16 +154,28 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
     }
   };
 
-  static override styles = css`
-    :host {
-      position: absolute;
-      z-index: 3;
-      transform: translateZ(0);
-      will-change: transform;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-  `;
+  /*
+   * Caches the more menu items.
+   * Currently only supports configuring more menu.
+   */
+  moreGroups: MenuItemGroup<ElementToolbarMoreMenuContext>[] =
+    cloneGroups(BUILT_IN_GROUPS);
+
+  get edgeless() {
+    return this.block as EdgelessRootBlockComponent;
+  }
+
+  get selection() {
+    return this.edgeless.service.selection;
+  }
+
+  get slots() {
+    return this.edgeless.slots;
+  }
+
+  get surface() {
+    return this.edgeless.surface;
+  }
 
   private _groupSelected(): CategorizedElements {
     const result = groupBy(this.selection.selectedElements, model => {
@@ -173,34 +207,52 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
       return;
     }
 
-    const bound = edgelessElementsBound(selection.selectedElements);
+    const bound = getCommonBoundWithRotation(elements);
 
     const { width, height } = viewport;
     const [x, y] = viewport.toViewCoord(bound.x, bound.y);
-    const [right, bottom] = viewport.toViewCoord(bound.maxX, bound.maxY);
 
-    let left, top;
-    if (x >= width || right <= 0 || y >= height || bottom <= 0) {
-      left = x;
-      top = y;
+    let left = x;
+    let top = y;
 
-      this.style.transform = `translate3d(${left}px, ${top}px, 0)`;
-      return;
-    }
-
-    let offset = 70;
-    if (this.selection.selectedElements.some(ele => isFrameBlock(ele))) {
-      offset += 10;
+    let offset = 37 + 12;
+    // frame, group, shape
+    let hasFrame = false;
+    let hasGroup = false;
+    if (
+      (hasFrame = elements.some(ele => isFrameBlock(ele))) ||
+      (hasGroup = elements.some(ele => ele instanceof GroupElementModel))
+    ) {
+      offset += 16 + 4;
+      if (hasFrame) {
+        offset += 8;
+      }
+    } else if (
+      elements.length === 1 &&
+      elements[0] instanceof ShapeElementModel
+    ) {
+      offset += 22 + 4;
     }
 
     top = y - offset;
-    top < 0 && (top = y + bound.h * viewport.zoom + offset);
+    if (top < 0) {
+      top = y + bound.h * viewport.zoom + offset - 37;
+      if (hasFrame || hasGroup) {
+        top -= 16 + 4;
+        if (hasFrame) {
+          top -= 8;
+        }
+      }
+    }
 
-    left = clamp(x, 10, width - 10);
-    top = clamp(top, 10, height - 150);
+    requestConnectedFrame(() => {
+      const rect = this.getBoundingClientRect();
 
-    this.style.transform = `translate3d(${left}px, ${top}px, 0)`;
-    this.selectedIds = selection.selectedIds;
+      left = CommonUtils.clamp(x, 10, width - rect.width - 10);
+      top = CommonUtils.clamp(top, 10, height - rect.height - 150);
+
+      this.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+    }, this);
   }
 
   private _renderQuickConnectButton() {
@@ -221,6 +273,8 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
   protected override firstUpdated() {
     const { _disposables, edgeless } = this;
 
+    this.moreGroups = getMoreMenuConfig(this.std).configure(this.moreGroups);
+
     _disposables.add(
       edgeless.service.viewport.viewportUpdated.on(() => {
         this._recalculatePosition();
@@ -236,8 +290,9 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
         ) {
           this.toolbarVisible = false;
         } else {
-          this.toolbarVisible = true;
+          this.selectedIds = this.selection.selectedIds;
           this._recalculatePosition();
+          this.toolbarVisible = true;
         }
       })
     );
@@ -278,6 +333,16 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
     _disposables.add(
       edgeless.slots.readonlyUpdated.on(() => this.requestUpdate())
     );
+
+    this.updateComplete
+      .then(() => {
+        _disposables.add(
+          this.std
+            .get(ThemeProvider)
+            .theme$.subscribe(() => this.requestUpdate())
+        );
+      })
+      .catch(console.error);
   }
 
   registerEntry(entry: CustomEntry) {
@@ -364,34 +429,20 @@ export class EdgelessElementToolbarWidget extends WidgetComponent<
       <edgeless-more-button
         .elements=${selectedElements}
         .edgeless=${edgeless}
+        .groups=${this.moreGroups}
         .vertical=${true}
       ></edgeless-more-button>
     `);
 
+    const appTheme = this.std.get(ThemeProvider).app$.value;
     return html`
-      <editor-toolbar>
+      <editor-toolbar data-app-theme=${appTheme}>
         ${join(
           buttons.filter(b => b !== nothing),
           renderToolbarSeparator
         )}
       </editor-toolbar>
     `;
-  }
-
-  get edgeless() {
-    return this.block as EdgelessRootBlockComponent;
-  }
-
-  get selection() {
-    return this.edgeless.service.selection;
-  }
-
-  get slots() {
-    return this.edgeless.slots;
-  }
-
-  get surface() {
-    return this.edgeless.surface;
   }
 
   @state()

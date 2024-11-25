@@ -26,6 +26,7 @@ export function createPopper<T extends keyof HTMLElementTagNameMap>(
     /** transition duration in ms */
     duration?: number;
     onDispose?: () => void;
+    setProps?: (ele: HTMLElementTagNameMap[T]) => void;
   }
 ) {
   const duration = options?.duration ?? 230;
@@ -44,6 +45,7 @@ export function createPopper<T extends keyof HTMLElementTagNameMap>(
 
   const clipWrapper = document.createElement('div');
   const menu = document.createElement(tagName);
+  options?.setProps?.(menu);
   assertExists(reference.shadowRoot);
   clipWrapper.append(menu);
   reference.shadowRoot.append(clipWrapper);
@@ -83,7 +85,7 @@ export function createPopper<T extends keyof HTMLElementTagNameMap>(
 
   const popper: MenuPopper<HTMLElementTagNameMap[T]> = {
     element: menu,
-    dispose: function () {
+    dispose: () => {
       // apply leave transition
       animateLeave(menu);
       menu.addEventListener('transitionend', remove, { once: true });

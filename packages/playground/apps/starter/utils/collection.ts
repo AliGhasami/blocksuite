@@ -1,8 +1,9 @@
-import type { BlockCollection } from '@blocksuite/store';
+import type { BlockSuiteFlags } from '@blocksuite/global/types';
 
 import { AffineSchemas, TestUtils } from '@blocksuite/blocks';
 import { assertExists } from '@blocksuite/global/utils';
 import {
+  type BlockCollection,
   DocCollection,
   type DocCollectionOptions,
   IdGeneratorType,
@@ -68,6 +69,10 @@ export function createStarterDocCollection() {
       enable_pie_menu: true,
       enable_lasso_tool: true,
       enable_edgeless_text: true,
+      enable_color_picker: true,
+      enable_mind_map_import: true,
+      enable_advanced_block_visibility: true,
+      enable_shape_shadow_blur: false,
       ...flags,
     },
     awarenessSources: [new BroadcastChannelAwarenessSource(id)],

@@ -1,36 +1,22 @@
-import { type TemplateResult, html } from 'lit';
+/** @alighasami for check merge **/
+import type { MenuConfig } from '@blocksuite/affine-components/context-menu';
+import type { GfxToolsMap } from '@blocksuite/block-std/gfx';
 
-import type { Menu } from '../../../../_common/components/index.js';
+import { html, type TemplateResult } from 'lit';
+
 import type { EdgelessRootBlockComponent } from '../../edgeless-root-block.js';
-import type { EdgelessTool } from '../../types.js';
 
-import './brush/brush-tool-button.js';
 import { buildConnectorDenseMenu } from './connector/connector-dense-menu.js';
-import './default/default-tool-button.js';
-import './default/pan-tool-button.js';
-// import './lasso/lasso-tool-button.js';
-import './connector/connector-tool-button.js';
-import './eraser/eraser-tool-button.js';
 import { buildFrameDenseMenu } from './frame/frame-dense-menu.js';
-import './frame/frame-tool-button.js';
-import './link/link-tool-button.js';
-import './mindmap/mindmap-tool-button.js';
-// import './image/image-tool-button.js';
-import './note/note-senior-button.js';
-// import './present/present-button.js';
-import './note/note-tool-button.js';
-import './shape/shape-tool-button.js';
-import './text/text-tool-button.js';
-import './template/template-tool-button.js';
+import { buildLinkDenseMenu } from './link/link-dense-menu.js';
 
 export interface QuickTool {
-  type?: EdgelessTool['type'];
+  type?: keyof GfxToolsMap;
   content: TemplateResult;
-
   /**
    * if not configured, the tool will not be shown in dense mode
    */
-  menu?: Menu;
+  menu?: MenuConfig;
 }
 export interface SeniorTool {
   /**
@@ -57,15 +43,6 @@ export const getQuickTools = ({
     content: html`<edgeless-default-tool-button
       .edgeless=${edgeless}
     ></edgeless-default-tool-button>`,
-    // menu: will never show because the first tool will never hide
-  });
-
-  // 🔧 Hands / Pointer
-  quickTools.push({
-    type: 'pan',
-    content: html`<edgeless-pan-tool-button
-      .edgeless=${edgeless}
-    ></edgeless-pan-tool-button>`,
     // menu: will never show because the first tool will never hide
   });
 
@@ -119,14 +96,14 @@ export const getQuickTools = ({
   //     `,
   //   });
   // }
-  // TODO: hidden feature
+
   // Link
-  // quickTools.push({
-  //   content: html`<edgeless-link-tool-button
-  //     .edgeless=${edgeless}
-  //   ></edgeless-link-tool-button>`,
-  //   menu: buildLinkDenseMenu(edgeless),
-  // });
+  quickTools.push({
+    content: html`<edgeless-link-tool-button
+      .edgeless=${edgeless}
+    ></edgeless-link-tool-button>`,
+    menu: buildLinkDenseMenu(edgeless),
+  });
   return quickTools;
 };
 
@@ -141,31 +118,25 @@ export const getSeniorTools = ({
   const tools: SeniorTool[] = [];
 
   if (!doc.readonly) {
-    // tools.push({
-    //   name: 'Note',
-    //   content: html`<edgeless-note-senior-button .edgeless=${edgeless}>
-    //   </edgeless-note-senior-button>`,
-    // });
     tools.push({
       name: 'Note',
-      content: html`<edgeless-note-tool-button .edgeless=${edgeless}>
-      </edgeless-note-tool-button>`,
+      content: html`<edgeless-note-senior-button .edgeless=${edgeless}>
+      </edgeless-note-senior-button>`,
     });
   }
 
   // Brush / Eraser
   tools.push({
     name: 'Pen',
-    content: html`<edgeless-brush-tool-button
-      .edgeless=${edgeless}
-    ></edgeless-brush-tool-button>`,
-  });
+    content: html`<div class="brush-and-eraser">
+      <edgeless-brush-tool-button
+        .edgeless=${edgeless}
+      ></edgeless-brush-tool-button>
 
-  tools.push({
-    name: 'Eraser',
-    content: html` <edgeless-eraser-tool-button
-      .edgeless=${edgeless}
-    ></edgeless-eraser-tool-button>`,
+      <edgeless-eraser-tool-button
+        .edgeless=${edgeless}
+      ></edgeless-eraser-tool-button>
+    </div> `,
   });
 
   // Shape
@@ -185,26 +156,12 @@ export const getSeniorTools = ({
     ></edgeless-mindmap-tool-button>`,
   });
 
-  // Text
-  tools.push({
-    name: 'Text',
-    content: html`<edgeless-text-tool-button .edgeless=${edgeless}>
-    </edgeless-text-tool-button>`,
-  });
-
-  // // Image
-  // tools.push({
-  //   content: html`<edgeless-image-tool-button
-  //     .edgeless=${edgeless}
-  //   ></edgeless-image-tool-button>`,
-  // });
-  // TODO: hidden feature
   // Template
-  // tools.push({
-  //   name: 'Template',
-  //   content: html`<edgeless-template-button .edgeless=${edgeless}>
-  //   </edgeless-template-button>`,
-  // });
+  tools.push({
+    name: 'Template',
+    content: html`<edgeless-template-button .edgeless=${edgeless}>
+    </edgeless-template-button>`,
+  });
 
   return tools;
 };

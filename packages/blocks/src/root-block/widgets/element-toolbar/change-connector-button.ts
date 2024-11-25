@@ -1,27 +1,3 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { choose } from 'lit/directives/choose.js';
-import { join } from 'lit/directives/join.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { styleMap } from 'lit/directives/style-map.js';
-import { when } from 'lit/directives/when.js';
-
-import type { CssVariableName } from '../../../_common/theme/css-variables.js';
-import type { ColorScheme } from '../../../_common/theme/theme-observer.js';
-import type {
-  ConnectorElementProps,
-  ConnectorLabelProps,
-} from '../../../surface-block/element-model/connector.js';
-import type { PointStyle } from '../../../surface-block/index.js';
-import type { EdgelessColorPickerButton } from '../../edgeless/components/color-picker/button.js';
-import type { PickColorEvent } from '../../edgeless/components/color-picker/types.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-
-import '../../../_common/components/toolbar/icon-button.js';
-import '../../../_common/components/toolbar/menu-button.js';
-import '../../../_common/components/toolbar/separator.js';
-import { renderToolbarSeparator } from '../../../_common/components/toolbar/separator.js';
 import {
   AddTextIcon,
   ConnectorCWithArrowIcon,
@@ -40,34 +16,46 @@ import {
   RearEndpointTriangleIcon,
   ScribbledStyleIcon,
   SmallArrowDownIcon,
-} from '../../../_common/icons/index.js';
-import { LineWidth } from '../../../_common/types.js';
-import { countBy, maxBy } from '../../../_common/utils/iterable.js';
+} from '@blocksuite/affine-components/icons';
+import { renderToolbarSeparator } from '@blocksuite/affine-components/toolbar';
 import {
+  type ColorScheme,
   type ConnectorElementModel,
+  type ConnectorElementProps,
   ConnectorEndpoint,
+  type ConnectorLabelProps,
   ConnectorMode,
   DEFAULT_FRONT_END_POINT_STYLE,
   DEFAULT_REAR_END_POINT_STYLE,
-  StrokeStyle,
-} from '../../../surface-block/index.js';
+  PointStyle,
+} from '@blocksuite/affine-model';
+import { LINE_COLORS, LineWidth, StrokeStyle } from '@blocksuite/affine-model';
+import { countBy, maxBy, WithDisposable } from '@blocksuite/global/utils';
+import { html, LitElement, nothing, type TemplateResult } from 'lit';
+import { property, query } from 'lit/decorators.js';
+import { choose } from 'lit/directives/choose.js';
+import { join } from 'lit/directives/join.js';
+import { repeat } from 'lit/directives/repeat.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { when } from 'lit/directives/when.js';
+
+import type { EdgelessColorPickerButton } from '../../edgeless/components/color-picker/button.js';
+import type { PickColorEvent } from '../../edgeless/components/color-picker/types.js';
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
+
 import {
   packColor,
   packColorsWithColorScheme,
 } from '../../edgeless/components/color-picker/utils.js';
-import '../../edgeless/components/panel/color-panel.js';
 import {
   type ColorEvent,
   GET_DEFAULT_LINE_COLOR,
-  LINE_COLORS,
 } from '../../edgeless/components/panel/color-panel.js';
 import {
   type LineStyleEvent,
   LineStylesPanel,
 } from '../../edgeless/components/panel/line-styles-panel.js';
-import '../../edgeless/components/panel/stroke-style-panel.js';
 import { mountConnectorLabelEditor } from '../../edgeless/utils/text.js';
-import './change-text-menu.js';
 
 function getMostCommonColor(
   elements: ConnectorElementModel[],
@@ -75,7 +63,7 @@ function getMostCommonColor(
 ): string | null {
   const colors = countBy(elements, (ele: ConnectorElementModel) => {
     return typeof ele.stroke === 'object'
-      ? ele.stroke[colorScheme] ?? ele.stroke.normal ?? null
+      ? (ele.stroke[colorScheme] ?? ele.stroke.normal ?? null)
       : ele.stroke;
   });
   const max = maxBy(Object.entries(colors), ([_k, count]) => count);
@@ -164,46 +152,46 @@ const STYLE_CHOOSE: [boolean, () => TemplateResult<1>][] = [
 
 const FRONT_ENDPOINT_STYLE_LIST: EndpointStyle[] = [
   {
-    value: 'None',
+    value: PointStyle.None,
     icon: ConnectorEndpointNoneIcon,
   },
   {
-    value: 'Arrow',
+    value: PointStyle.Arrow,
     icon: FrontEndpointArrowIcon,
   },
   {
-    value: 'Triangle',
+    value: PointStyle.Triangle,
     icon: FrontEndpointTriangleIcon,
   },
   {
-    value: 'Circle',
+    value: PointStyle.Circle,
     icon: FrontEndpointCircleIcon,
   },
   {
-    value: 'Diamond',
+    value: PointStyle.Diamond,
     icon: FrontEndpointDiamondIcon,
   },
 ] as const;
 
 const REAR_ENDPOINT_STYLE_LIST: EndpointStyle[] = [
   {
-    value: 'Diamond',
+    value: PointStyle.Diamond,
     icon: RearEndpointDiamondIcon,
   },
   {
-    value: 'Circle',
+    value: PointStyle.Circle,
     icon: RearEndpointCircleIcon,
   },
   {
-    value: 'Triangle',
+    value: PointStyle.Triangle,
     icon: RearEndpointTriangleIcon,
   },
   {
-    value: 'Arrow',
+    value: PointStyle.Arrow,
     icon: RearEndpointArrowIcon,
   },
   {
-    value: 'None',
+    value: PointStyle.None,
     icon: ConnectorEndpointNoneIcon,
   },
 ] as const;
@@ -232,17 +220,15 @@ const MODE_CHOOSE: [ConnectorMode, () => TemplateResult<1>][] = [
   [ConnectorMode.Straight, () => ConnectorLWithArrowIcon],
 ] as const;
 
-@customElement('edgeless-change-connector-button')
 export class EdgelessChangeConnectorButton extends WithDisposable(LitElement) {
   pickColor = (event: PickColorEvent) => {
     if (event.type === 'pick') {
-      const { type, value } = event.detail;
-      this.elements.forEach(ele => {
+      this.elements.forEach(ele =>
         this.service.updateElement(
           ele.id,
-          packColor(type, 'stroke', value, ele.stroke)
-        );
-      });
+          packColor('stroke', { ...event.detail })
+        )
+      );
       return;
     }
 
@@ -250,6 +236,14 @@ export class EdgelessChangeConnectorButton extends WithDisposable(LitElement) {
       ele[event.type === 'start' ? 'stash' : 'pop']('stroke')
     );
   };
+
+  get doc() {
+    return this.edgeless.doc;
+  }
+
+  get service() {
+    return this.edgeless.service;
+  }
 
   private _addLabel() {
     mountConnectorLabelEditor(this.elements[0], this.edgeless);
@@ -276,7 +270,7 @@ export class EdgelessChangeConnectorButton extends WithDisposable(LitElement) {
     );
   }
 
-  private _setConnectorColor(stroke: CssVariableName) {
+  private _setConnectorColor(stroke: string) {
     this._setConnectorProp('stroke', stroke);
   }
 
@@ -340,7 +334,8 @@ export class EdgelessChangeConnectorButton extends WithDisposable(LitElement) {
     const colorScheme = this.edgeless.surface.renderer.getColorScheme();
     const elements = this.elements;
     const selectedColor =
-      getMostCommonColor(elements, colorScheme) ?? GET_DEFAULT_LINE_COLOR();
+      getMostCommonColor(elements, colorScheme) ??
+      GET_DEFAULT_LINE_COLOR(colorScheme);
     const selectedMode = getMostCommonMode(elements);
     const selectedLineSize = getMostCommonLineWidth(elements) ?? LineWidth.Four;
     const selectedRough = getMostCommonRough(elements);
@@ -414,7 +409,6 @@ export class EdgelessChangeConnectorButton extends WithDisposable(LitElement) {
               `}
             >
               <stroke-style-panel
-                .options=${['--affine-palette-transparent', ...LINE_COLORS]}
                 .strokeWidth=${selectedLineSize}
                 .strokeStyle=${selectedLineStyle}
                 .strokeColor=${selectedColor}
@@ -603,14 +597,6 @@ export class EdgelessChangeConnectorButton extends WithDisposable(LitElement) {
       ].filter(button => button !== nothing),
       renderToolbarSeparator
     );
-  }
-
-  get doc() {
-    return this.edgeless.doc;
-  }
-
-  get service() {
-    return this.edgeless.service;
   }
 
   @property({ attribute: false })

@@ -1,3 +1,5 @@
+import type { BlockSuiteFlags } from '@blocksuite/global/types';
+
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import { type Logger, NoopLogger, Slot } from '@blocksuite/global/utils';
 import {
@@ -10,13 +12,14 @@ import {
   MemoryBlobSource,
   NoopDocSource,
 } from '@blocksuite/sync';
-import { merge } from 'merge';
+import clonedeep from 'lodash.clonedeep';
+import merge from 'lodash.merge';
 import { Awareness } from 'y-protocols/awareness.js';
 import * as Y from 'yjs';
 
 import type { Schema } from '../schema/index.js';
 import type { IdGenerator } from '../utils/id-generator.js';
-import type { BlockSelector, Doc } from './doc/index.js';
+import type { Doc, Query } from './doc/index.js';
 import type { IdGeneratorType } from './id.js';
 
 import {
@@ -24,7 +27,7 @@ import {
   BlockSuiteDoc,
   type RawAwarenessState,
 } from '../yjs/index.js';
-import { DocCollectionAddonType, indexer, test } from './addon/index.js';
+import { DocCollectionAddonType, test } from './addon/index.js';
 import { BlockCollection, type GetDocOptions } from './doc/block-collection.js';
 import { pickIdGenerator } from './id.js';
 import { DocCollectionMeta, type DocMeta } from './meta.js';
@@ -44,24 +47,27 @@ export type DocCollectionOptions = {
     shadows?: BlobSource[];
   };
   awarenessSources?: AwarenessSource[];
-  disableSearchIndex?: boolean;
-  disableBacklinkIndex?: boolean;
 };
 
 const FLAGS_PRESET = {
   enable_synced_doc_block: false,
   enable_pie_menu: false,
   enable_database_number_formatting: false,
-  enable_database_statistics: false,
   enable_database_attachment_note: false,
+  enable_database_full_width: false,
   enable_legacy_validation: true,
-  enable_expand_database_block: false,
   enable_block_query: false,
   enable_lasso_tool: false,
   enable_edgeless_text: true,
   enable_ai_onboarding: false,
   enable_ai_chat_block: false,
   enable_color_picker: false,
+  enable_mind_map_import: false,
+  enable_advanced_block_visibility: false,
+  enable_shape_shadow_blur: false,
+  enable_new_dnd: false,
+  enable_mobile_keyboard_toolbar: false,
+  enable_mobile_linked_doc_menu: false,
   readonly: {},
 } satisfies BlockSuiteFlags;
 
@@ -69,12 +75,11 @@ export interface StackItem {
   meta: Map<'cursor-location' | 'selection-state', unknown>;
 }
 
-@indexer
 @test
 export class DocCollection extends DocCollectionAddonType {
-  protected readonly _schema: Schema;
-
   static Y = Y;
+
+  protected readonly _schema: Schema;
 
   readonly awarenessStore: AwarenessStore;
 
@@ -98,7 +103,30 @@ export class DocCollection extends DocCollectionAddonType {
     docAdded: new Slot<string>(),
     docUpdated: new Slot(),
     docRemoved: new Slot<string>(),
+    docCreated: new Slot<string>(),
   };
+
+  get docs() {
+    return this.blockCollections;
+  }
+
+  get isEmpty() {
+    if (this.doc.store.clients.size === 0) return true;
+
+    let flag = false;
+    if (this.doc.store.clients.size === 1) {
+      const items = Array.from(this.doc.store.clients.values())[0];
+      // workspaceVersion and pageVersion were set when the collection is initialized
+      if (items.length <= 2) {
+        flag = true;
+      }
+    }
+    return flag;
+  }
+
+  get schema() {
+    return this._schema;
+  }
 
   constructor({
     id,
@@ -121,7 +149,7 @@ export class DocCollection extends DocCollectionAddonType {
     this.doc = new BlockSuiteDoc({ guid: id });
     this.awarenessStore = new AwarenessStore(
       new Awareness<RawAwarenessState>(this.doc),
-      merge(true, FLAGS_PRESET, defaultFlags)
+      merge(clonedeep(FLAGS_PRESET), defaultFlags)
     );
 
     this.awarenessSync = new AwarenessEngine(
@@ -187,8 +215,8 @@ export class DocCollection extends DocCollectionAddonType {
    * If the `init` parameter is passed, a `surface`, `note`, and `paragraph` block
    * will be created in the doc simultaneously.
    */
-  createDoc(options: { id?: string; selector?: BlockSelector } = {}) {
-    const { id: docId = this.idGenerator(), selector } = options;
+  createDoc(options: { id?: string; query?: Query } = {}) {
+    const { id: docId = this.idGenerator(), query } = options;
     if (this._hasDoc(docId)) {
       throw new BlockSuiteError(
         ErrorCode.DocCollectionError,
@@ -203,7 +231,8 @@ export class DocCollection extends DocCollectionAddonType {
       tags: [],
       object_id: null,
     });
-    return this.getDoc(docId, { selector }) as Doc;
+    this.slots.docCreated.emit(docId);
+    return this.getDoc(docId, { query }) as Doc;
   }
 
   /**
@@ -270,27 +299,5 @@ export class DocCollection extends DocCollectionAddonType {
 
   waitForSynced() {
     return this.docSync.waitForSynced();
-  }
-
-  get docs() {
-    return this.blockCollections;
-  }
-
-  get isEmpty() {
-    if (this.doc.store.clients.size === 0) return true;
-
-    let flag = false;
-    if (this.doc.store.clients.size === 1) {
-      const items = Array.from(this.doc.store.clients.values())[0];
-      // workspaceVersion and pageVersion were set when the collection is initialized
-      if (items.length <= 2) {
-        flag = true;
-      }
-    }
-    return flag;
-  }
-
-  get schema() {
-    return this._schema;
   }
 }

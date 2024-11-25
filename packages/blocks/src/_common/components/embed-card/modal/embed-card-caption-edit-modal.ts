@@ -1,17 +1,13 @@
 import type { BlockModel } from '@blocksuite/store';
 
-import {
-  type BlockComponent,
-  ShadowlessElement,
-  WithDisposable,
-} from '@blocksuite/block-std';
+import { type BlockComponent, ShadowlessElement } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import { embedCardModalStyles } from './styles.js';
 
-@customElement('embed-card-caption-edit-modal')
 export class EmbedCardEditCaptionEditModal extends WithDisposable(
   ShadowlessElement
 ) {
@@ -69,16 +65,15 @@ export class EmbedCardEditCaptionEditModal extends WithDisposable(
             ></textarea>
           </div>
           <div class="embed-card-modal-row">
-            <div
+            <button
               class=${classMap({
                 'embed-card-modal-button': true,
                 save: true,
               })}
-              tabindex="0"
               @click=${() => this._onSave()}
             >
               Save
-            </div>
+            </button>
           </div>
         </div>
       </div>

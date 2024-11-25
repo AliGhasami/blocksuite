@@ -1,16 +1,15 @@
-import { WithDisposable } from '@blocksuite/block-std';
+import { ArrowRightSmallIcon } from '@blocksuite/affine-components/icons';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { consume } from '@lit/context';
-import { LitElement, css, html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { css, html, LitElement } from 'lit';
+import { property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import { ArrowRightSmallIcon } from '../../../../../_common/icons/index.js';
 import {
   type EdgelessToolbarSlots,
   edgelessToolbarSlotsContext,
 } from '../context.js';
 
-@customElement('edgeless-slide-menu')
 export class EdgelessSlideMenu extends WithDisposable(LitElement) {
   static override styles = css`
     :host {

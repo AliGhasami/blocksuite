@@ -1,17 +1,19 @@
-import type { PointLocation } from '@blocksuite/global/utils';
-import type { IVec } from '@blocksuite/global/utils';
-
+import { CommonUtils } from '@blocksuite/affine-block-surface';
+import { NOTE_MIN_WIDTH } from '@blocksuite/affine-model';
+import {
+  assertExists,
+  getQuadBoundWithRotation,
+  type IPoint,
+  type IVec,
+  type PointLocation,
+} from '@blocksuite/global/utils';
 import { Bound } from '@blocksuite/global/utils';
-import { type IPoint, assertExists } from '@blocksuite/global/utils';
 
 import type { SelectableProps } from '../../utils/query.js';
 
-import {
-  getQuadBoundsWithRotation,
-  rotatePoints,
-} from '../../../../surface-block/index.js';
-import { NOTE_MIN_WIDTH } from '../../utils/consts.js';
 import { HandleDirection, type ResizeMode } from './resize-handles.js';
+
+const { rotatePoints } = CommonUtils;
 
 // 15deg
 const SHIFT_LOCKING_ANGLE = Math.PI / 12;
@@ -51,6 +53,8 @@ export class HandleResizeManager {
 
   private _dragDirection: HandleDirection = HandleDirection.Left;
 
+  private _dragging = false;
+
   private _dragPos: {
     start: { x: number; y: number };
     end: { x: number; y: number };
@@ -58,8 +62,6 @@ export class HandleResizeManager {
     start: { x: 0, y: 0 },
     end: { x: 0, y: 0 },
   };
-
-  private _dragging = false;
 
   private _locked = false;
 
@@ -163,6 +165,30 @@ export class HandleResizeManager {
     document.addEventListener('pointermove', _onPointerMove);
     document.addEventListener('pointerup', _onPointerUp);
   };
+
+  get bounds() {
+    return this._bounds;
+  }
+
+  get currentRect() {
+    return this._currentRect;
+  }
+
+  get dragDirection() {
+    return this._dragDirection;
+  }
+
+  get dragging() {
+    return this._dragging;
+  }
+
+  get originalRect() {
+    return this._originalRect;
+  }
+
+  get rotation() {
+    return this._rotation;
+  }
 
   constructor(
     onDragStart: DragStartHandler,
@@ -533,7 +559,7 @@ export class HandleResizeManager {
 
         // TODO: determine if it is a note
         if (rotate) {
-          const { width } = getQuadBoundsWithRotation({ x, y, w, h, rotate });
+          const { width } = getQuadBoundWithRotation({ x, y, w, h, rotate });
           const hrw = width / 2;
 
           center.y = cy;
@@ -679,29 +705,5 @@ export class HandleResizeManager {
       this._aspectRatio = originalRect.width / originalRect.height;
       this._currentRect = DOMRect.fromRect(originalRect);
     }
-  }
-
-  get bounds() {
-    return this._bounds;
-  }
-
-  get currentRect() {
-    return this._currentRect;
-  }
-
-  get dragDirection() {
-    return this._dragDirection;
-  }
-
-  get dragging() {
-    return this._dragging;
-  }
-
-  get originalRect() {
-    return this._originalRect;
-  }
-
-  get rotation() {
-    return this._rotation;
   }
 }

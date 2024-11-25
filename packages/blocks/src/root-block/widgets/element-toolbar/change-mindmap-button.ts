@@ -1,17 +1,8 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { LitElement, type TemplateResult, css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { join } from 'lit/directives/join.js';
-import { repeat } from 'lit/directives/repeat.js';
+import type {
+  MindmapElementModel,
+  ShapeElementModel,
+} from '@blocksuite/affine-model';
 
-import type { MindmapElementModel } from '../../../surface-block/element-model/mindmap.js';
-import type { ShapeElementModel } from '../../../surface-block/element-model/shape.js';
-import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
-
-import '../../../_common/components/toolbar/icon-button.js';
-import '../../../_common/components/toolbar/menu-button.js';
-import '../../../_common/components/toolbar/separator.js';
-import { renderToolbarSeparator } from '../../../_common/components/toolbar/separator.js';
 import {
   MindmapBalanceLayoutIcon,
   MindmapLeftLayoutIcon,
@@ -22,10 +13,17 @@ import {
   MindmapStyleThree,
   MindmapStyleTwo,
   SmallArrowDownIcon,
-} from '../../../_common/icons/edgeless.js';
-import { countBy, maxBy } from '../../../_common/utils/iterable.js';
-import { LayoutType } from '../../../surface-block/element-model/utils/mindmap/layout.js';
-import { MindmapStyle } from '../../../surface-block/element-model/utils/mindmap/style.js';
+} from '@blocksuite/affine-components/icons';
+import { renderToolbarSeparator } from '@blocksuite/affine-components/toolbar';
+import { LayoutType, MindmapStyle } from '@blocksuite/affine-model';
+import { EditPropsStore } from '@blocksuite/affine-shared/services';
+import { countBy, maxBy, WithDisposable } from '@blocksuite/global/utils';
+import { css, html, LitElement, nothing, type TemplateResult } from 'lit';
+import { property, state } from 'lit/decorators.js';
+import { join } from 'lit/directives/join.js';
+import { repeat } from 'lit/directives/repeat.js';
+
+import type { EdgelessRootBlockComponent } from '../../edgeless/edgeless-root-block.js';
 
 const MINDMAP_STYLE_LIST = [
   {
@@ -70,8 +68,7 @@ const MINDMAP_LAYOUT_LIST: LayoutItem[] = [
   },
 ] as const;
 
-@customElement('edgeless-change-mindmap-style-panel')
-class EdgelessChangeMindmapStylePanel extends LitElement {
+export class EdgelessChangeMindmapStylePanel extends LitElement {
   static override styles = css`
     :host {
       display: flex;
@@ -120,8 +117,7 @@ class EdgelessChangeMindmapStylePanel extends LitElement {
   accessor onSelect!: (style: MindmapStyle) => void;
 }
 
-@customElement('edgeless-change-mindmap-layout-panel')
-class EdgelessChangeMindmapLayoutPanel extends LitElement {
+export class EdgelessChangeMindmapLayoutPanel extends LitElement {
   static override styles = css`
     :host {
       display: flex;
@@ -158,9 +154,11 @@ class EdgelessChangeMindmapLayoutPanel extends LitElement {
   accessor onSelect!: (style: LayoutType) => void;
 }
 
-@customElement('edgeless-change-mindmap-button')
 export class EdgelessChangeMindmapButton extends WithDisposable(LitElement) {
   private _updateLayoutType = (layoutType: LayoutType) => {
+    this.edgeless.std.get(EditPropsStore).recordLastProps('mindmap', {
+      layoutType,
+    });
     this.elements.forEach(element => {
       element.layoutType = layoutType;
       element.layout();
@@ -169,8 +167,24 @@ export class EdgelessChangeMindmapButton extends WithDisposable(LitElement) {
   };
 
   private _updateStyle = (style: MindmapStyle) => {
+    this.edgeless.std.get(EditPropsStore).recordLastProps('mindmap', { style });
     this._mindmaps.forEach(element => (element.style = style));
   };
+
+  private get _mindmaps() {
+    const mindmaps = new Set<MindmapElementModel>();
+
+    return this.elements.reduce((_, el) => {
+      mindmaps.add(el);
+
+      return mindmaps;
+    }, mindmaps);
+  }
+
+  get layout() {
+    const layoutType = this.layoutType ?? this._getCommonLayoutType();
+    return MINDMAP_LAYOUT_LIST.find(item => item.value === layoutType)!;
+  }
 
   private _getCommonLayoutType() {
     const values = countBy(this.elements, element => element.layoutType);
@@ -190,16 +204,6 @@ export class EdgelessChangeMindmapButton extends WithDisposable(LitElement) {
       (this.nodes[0].group as MindmapElementModel).tree.element !==
         this.nodes[0]
     );
-  }
-
-  private get _mindmaps() {
-    const mindmaps = new Set<MindmapElementModel>();
-
-    return this.elements.reduce((_, el) => {
-      mindmaps.add(el);
-
-      return mindmaps;
-    }, mindmaps);
   }
 
   override render() {
@@ -244,11 +248,6 @@ export class EdgelessChangeMindmapButton extends WithDisposable(LitElement) {
     );
   }
 
-  get layout() {
-    const layoutType = this.layoutType ?? this._getCommonLayoutType();
-    return MINDMAP_LAYOUT_LIST.find(item => item.value === layoutType)!;
-  }
-
   @property({ attribute: false })
   accessor edgeless!: EdgelessRootBlockComponent;
 
@@ -277,7 +276,7 @@ export function renderMindmapButton(
 
     const group = edgeless.service.surface.getGroup(e.id);
 
-    if (group?.type === 'mindmap') {
+    if (group && 'type' in group && group.type === 'mindmap') {
       mindmaps.push(group as MindmapElementModel);
     }
   });

@@ -1,15 +1,13 @@
+import { ShapeStyle } from '@blocksuite/affine-model';
 import { Slot } from '@blocksuite/global/utils';
-import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, LitElement } from 'lit';
+import { property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { ShapeTool } from '../../controllers/tools/shape-tool.js';
+import type { ShapeTool } from '../../gfx-tool/shape-tool.js';
 
-import { ShapeStyle } from '../../../../surface-block/index.js';
-import '../buttons/tool-icon-button.js';
 import { ShapeComponentConfig } from '../toolbar/shape/shape-menu-config.js';
 
-@customElement('edgeless-shape-panel')
 export class EdgelessShapePanel extends LitElement {
   static override styles = css`
     :host {
@@ -21,10 +19,10 @@ export class EdgelessShapePanel extends LitElement {
   `;
 
   slots = {
-    select: new Slot<ShapeTool['shapeType']>(),
+    select: new Slot<ShapeTool['activatedOption']['shapeName']>(),
   };
 
-  private _onSelect(value: ShapeTool['shapeType']) {
+  private _onSelect(value: ShapeTool['activatedOption']['shapeName']) {
     this.selectedShape = value;
     this.slots.select.emit(value);
   }
@@ -57,7 +55,10 @@ export class EdgelessShapePanel extends LitElement {
   }
 
   @property({ attribute: false })
-  accessor selectedShape: ShapeTool['shapeType'] | null | undefined = undefined;
+  accessor selectedShape:
+    | ShapeTool['activatedOption']['shapeName']
+    | null
+    | undefined = undefined;
 
   @property({ attribute: false })
   accessor shapeStyle: ShapeStyle = ShapeStyle.Scribbled;

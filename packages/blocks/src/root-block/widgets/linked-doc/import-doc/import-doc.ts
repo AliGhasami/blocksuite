@@ -1,18 +1,5 @@
-import { WithDisposable } from '@blocksuite/block-std';
-import { sha } from '@blocksuite/global/utils';
-import {
-  type DocCollection,
-  type JobMiddleware,
-  extMimeMap,
-} from '@blocksuite/store';
-import { Job } from '@blocksuite/store';
-import JSZip from 'jszip';
-import { LitElement, type PropertyValues, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import type { DocCollection } from '@blocksuite/store';
 
-import { MarkdownAdapter } from '../../../../_common/adapters/markdown.js';
-import { NotionHtmlAdapter } from '../../../../_common/adapters/notion-html.js';
-import '../../../../_common/components/loader.js';
 import {
   CloseIcon,
   ExportToHTMLIcon,
@@ -20,8 +7,14 @@ import {
   HelpIcon,
   NewIcon,
   NotionIcon,
-} from '../../../../_common/icons/index.js';
-import { defaultImageProxyMiddleware } from '../../../../_common/transformers/middlewares.js';
+} from '@blocksuite/affine-components/icons';
+import { WithDisposable } from '@blocksuite/global/utils';
+import { html, LitElement, type PropertyValues } from 'lit';
+import { query, state } from 'lit/decorators.js';
+
+import { HtmlTransformer } from '../../../../_common/transformers/html.js';
+import { MarkdownTransformer } from '../../../../_common/transformers/markdown.js';
+import { NotionHtmlTransformer } from '../../../../_common/transformers/notion-html.js';
 import { openFileOrFiles } from '../../../../_common/utils/index.js';
 import { styles } from './styles.js';
 
@@ -34,154 +27,6 @@ export type OnFailHandler = (message: string) => void;
 
 const SHOW_LOADING_SIZE = 1024 * 200;
 
-export async function importMarkDown(
-  collection: DocCollection,
-  text: string,
-  fileName?: string
-) {
-  const fileNameMiddleware: JobMiddleware = ({ slots }) => {
-    slots.beforeImport.on(payload => {
-      if (payload.type !== 'page') {
-        return;
-      }
-      if (!fileName) {
-        return;
-      }
-      payload.snapshot.meta.title = fileName;
-      payload.snapshot.blocks.props.title = {
-        '$blocksuite:internal:text$': true,
-        delta: [
-          {
-            insert: fileName,
-          },
-        ],
-      };
-    });
-  };
-  const job = new Job({
-    collection,
-    middlewares: [defaultImageProxyMiddleware, fileNameMiddleware],
-  });
-  const mdAdapter = new MarkdownAdapter(job);
-  const page = await mdAdapter.toDoc({
-    file: text,
-    assets: job.assetsManager,
-  });
-  if (!page) {
-    return;
-  }
-  return page.id;
-}
-
-export async function importHtml(collection: DocCollection, text: string) {
-  const job = new Job({
-    collection,
-    middlewares: [defaultImageProxyMiddleware],
-  });
-  const htmlAdapter = new NotionHtmlAdapter(job);
-  const snapshot = await htmlAdapter.toDocSnapshot({
-    file: text,
-    assets: job.assetsManager,
-  });
-  const page = await job.snapshotToDoc(snapshot);
-  if (!page) {
-    return;
-  }
-  return page.id;
-}
-
-export async function importNotion(collection: DocCollection, file: File) {
-  const pageIds: string[] = [];
-  let isWorkspaceFile = false;
-  let hasMarkdown = false;
-  const parseZipFile = async (file: File | Blob) => {
-    const zip = new JSZip();
-    const zipFile = await zip.loadAsync(file);
-    const pageMap = new Map<string, string>();
-    const files = Object.keys(zipFile.files);
-    const promises: Promise<void>[] = [];
-    const pendingAssets = new Map<string, Blob>();
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.startsWith('__MACOSX/')) continue;
-
-      const lastSplitIndex = file.lastIndexOf('/');
-
-      const fileName = file.substring(lastSplitIndex + 1);
-      if (fileName.endsWith('.md')) {
-        hasMarkdown = true;
-        continue;
-      }
-      if (fileName.endsWith('.html')) {
-        if (file.endsWith('/index.html')) {
-          isWorkspaceFile = true;
-          continue;
-        }
-        if (lastSplitIndex !== -1) {
-          const text = await zipFile.files[file].async('text');
-          const doc = new DOMParser().parseFromString(text, 'text/html');
-          const pageBody = doc.querySelector('.page-body');
-          if (pageBody && pageBody.children.length == 0) {
-            // Skip empty pages
-            continue;
-          }
-        }
-        pageMap.set(file, collection.idGenerator());
-        continue;
-      }
-      if (i === 0 && fileName.endsWith('.csv')) {
-        window.open(
-          'https://affine.pro/blog/import-your-data-from-notion-into-affine',
-          '_blank'
-        );
-        continue;
-      }
-      if (fileName.endsWith('.zip')) {
-        const innerZipFile = await zipFile.file(fileName)?.async('blob');
-        if (innerZipFile) {
-          promises.push(...(await parseZipFile(innerZipFile)));
-        }
-        continue;
-      }
-      const blob = await zipFile.files[file].async('blob');
-      const ext = file.split('.').at(-1) ?? '';
-      const mime = extMimeMap.get(ext) ?? '';
-      pendingAssets.set(
-        await sha(await blob.arrayBuffer()),
-        new File([blob], fileName, { type: mime })
-      );
-    }
-    const pagePromises = Array.from(pageMap.keys()).map(async file => {
-      const job = new Job({
-        collection: collection,
-        middlewares: [defaultImageProxyMiddleware],
-      });
-      const htmlAdapter = new NotionHtmlAdapter(job);
-      const assets = job.assetsManager.getAssets();
-      for (const [key, value] of pendingAssets.entries()) {
-        if (!assets.has(key)) {
-          assets.set(key, value);
-        }
-      }
-      const page = await htmlAdapter.toDoc({
-        file: await zipFile.files[file].async('text'),
-        pageId: pageMap.get(file),
-        pageMap,
-        assets: job.assetsManager,
-      });
-      if (page) {
-        pageIds.push(page.id);
-      }
-    });
-    promises.push(...pagePromises);
-    return promises;
-  };
-  const allPromises = await parseZipFile(file);
-  await Promise.all(allPromises.flat());
-  return { pageIds, isWorkspaceFile, hasMarkdown };
-}
-
-@customElement('import-doc')
 export class ImportDoc extends WithDisposable(LitElement) {
   static override styles = styles;
 
@@ -210,13 +55,18 @@ export class ImportDoc extends WithDisposable(LitElement) {
     for (const file of files) {
       const text = await file.text();
       const needLoading = file.size > SHOW_LOADING_SIZE;
+      const fileName = file.name.split('.').slice(0, -1).join('.');
       if (needLoading) {
         this.hidden = false;
         this._loading = true;
       } else {
         this.abortController.abort();
       }
-      const pageId = await importHtml(this.collection, text);
+      const pageId = await HtmlTransformer.importHTMLToDoc({
+        collection: this.collection,
+        html: text,
+        fileName,
+      });
       needLoading && this.abortController.abort();
       if (pageId) {
         pageIds.push(pageId);
@@ -242,7 +92,11 @@ export class ImportDoc extends WithDisposable(LitElement) {
       } else {
         this.abortController.abort();
       }
-      const pageId = await importMarkDown(this.collection, text, fileName);
+      const pageId = await MarkdownTransformer.importMarkdownToDoc({
+        collection: this.collection,
+        markdown: text,
+        fileName,
+      });
       needLoading && this.abortController.abort();
       if (pageId) {
         pageIds.push(pageId);
@@ -254,27 +108,18 @@ export class ImportDoc extends WithDisposable(LitElement) {
   private async _importNotion() {
     const file = await openFileOrFiles({ acceptType: 'Zip' });
     if (!file) return;
-    // Calc size
-    let totalSize = 0;
-    const zip = new JSZip();
-    const zipFile = await zip.loadAsync(file);
-    const fileArray = Object.values(zipFile.files);
-    for (const file of fileArray) {
-      if (file.dir) continue;
-      const fileContent = await file.async('uint8array');
-      totalSize += fileContent.length;
-    }
-    const needLoading = totalSize > SHOW_LOADING_SIZE;
+    const needLoading = file.size > SHOW_LOADING_SIZE;
     if (needLoading) {
       this.hidden = false;
       this._loading = true;
     } else {
       this.abortController.abort();
     }
-    const { pageIds, isWorkspaceFile, hasMarkdown } = await importNotion(
-      this.collection,
-      file
-    );
+    const { entryId, pageIds, isWorkspaceFile, hasMarkdown } =
+      await NotionHtmlTransformer.importNotionZip({
+        collection: this.collection,
+        imported: file,
+      });
     needLoading && this.abortController.abort();
     if (hasMarkdown) {
       this._onFail(
@@ -282,7 +127,7 @@ export class ImportDoc extends WithDisposable(LitElement) {
       );
       return;
     }
-    this._onImportSuccess([pageIds[0]], {
+    this._onImportSuccess([entryId], {
       isWorkspaceFile,
       importedCount: pageIds.length,
     });

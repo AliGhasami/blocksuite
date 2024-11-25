@@ -1,20 +1,16 @@
 import type { BlockComponent } from '@blocksuite/block-std';
-import type { Point } from '@blocksuite/global/utils';
 import type { BlockModel } from '@blocksuite/store';
 
-import { assertExists } from '@blocksuite/global/utils';
+import {
+  getClosestBlockComponentByElement,
+  getRectByBlockComponent,
+  matchFlavours,
+} from '@blocksuite/affine-shared/utils';
+import { type Point, Rect } from '@blocksuite/global/utils';
 
 import type { EditingState } from '../types.js';
 
-import { matchFlavours } from './model.js';
-import {
-  DropFlags,
-  getClosestBlockComponentByElement,
-  getDropRectByPoint,
-  getModelByBlockComponent,
-  getRectByBlockComponent,
-} from './query.js';
-import { Rect } from './rect.js';
+import { DropFlags, getDropRectByPoint } from './query.js';
 
 /**
  * A dropping type.
@@ -39,15 +35,14 @@ export function calcDropTarget(
   flavour: string | null = null // for block-hub
 ): DropResult | null {
   const schema = model.doc.getSchemaByFlavour('affine:database');
-  assertExists(schema);
-  const children = schema.model.children ?? [];
+  const children = schema?.model.children ?? [];
 
   let shouldAppendToDatabase = true;
 
   if (children.length) {
     if (draggingElements.length) {
       shouldAppendToDatabase = draggingElements
-        .map(getModelByBlockComponent)
+        .map(el => el.model)
         .every(m => children.includes(m.flavour));
     } else if (flavour) {
       shouldAppendToDatabase = children.includes(flavour);
@@ -58,7 +53,7 @@ export function calcDropTarget(
     const databaseBlockComponent = element.closest('affine-database');
     if (databaseBlockComponent) {
       element = databaseBlockComponent;
-      model = getModelByBlockComponent(element);
+      model = databaseBlockComponent.model;
     }
   }
 

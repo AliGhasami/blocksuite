@@ -1,42 +1,38 @@
-import type { BlockSelection } from '@blocksuite/block-std';
-import type { BlockComponent } from '@blocksuite/block-std';
+import type { BlockSelection, BlockStdScope } from '@blocksuite/block-std';
 
-import { assertExists } from '@blocksuite/global/utils';
+const getSelection = (std: BlockStdScope) => std.selection;
 
-const getSelection = (blockComponent: BlockComponent) =>
-  blockComponent.host.selection;
-
-function getBlockSelectionBySide(block: BlockComponent, tail: boolean) {
-  const selection = getSelection(block);
+function getBlockSelectionBySide(std: BlockStdScope, tail: boolean) {
+  const selection = getSelection(std);
   const selections = selection.filter('block');
   const sel = selections.at(tail ? -1 : 0) as BlockSelection | undefined;
   return sel ?? null;
 }
 
-function getTextSelection(block: BlockComponent) {
-  const selection = getSelection(block);
+function getTextSelection(std: BlockStdScope) {
+  const selection = getSelection(std);
   return selection.find('text');
 }
 
-const pathToBlock = (block: BlockComponent, blockId: string) =>
-  block.host.view.getBlock(blockId);
+const pathToBlock = (std: BlockStdScope, blockId: string) =>
+  std.view.getBlock(blockId);
 
 interface MoveBlockConfig {
   name: string;
   hotkey: string[];
-  action: (block: BlockComponent) => void;
+  action: (std: BlockStdScope) => void;
 }
 
 export const moveBlockConfigs: MoveBlockConfig[] = [
   {
     name: 'Move Up',
     hotkey: ['Mod-Alt-ArrowUp', 'Mod-Shift-ArrowUp'],
-    action: block => {
-      const doc = block.doc;
-      const textSelection = getTextSelection(block);
+    action: std => {
+      const doc = std.doc;
+      const textSelection = getTextSelection(std);
       if (textSelection) {
         const currentModel = pathToBlock(
-          block,
+          std,
           textSelection.from.blockId
         )?.model;
         if (!currentModel) return;
@@ -44,27 +40,25 @@ export const moveBlockConfigs: MoveBlockConfig[] = [
         const previousSiblingModel = doc.getPrev(currentModel);
         if (!previousSiblingModel) return;
 
-        const parentModel = block.doc.getParent(previousSiblingModel);
+        const parentModel = std.doc.getParent(previousSiblingModel);
         if (!parentModel) return;
 
-        block.doc.moveBlocks(
+        std.doc.moveBlocks(
           [currentModel],
           parentModel,
           previousSiblingModel,
           true
         );
-        block.updateComplete
+        std.host.updateComplete
           .then(() => {
-            const rangeManager = block.host.rangeManager;
-            assertExists(rangeManager);
-            rangeManager.syncTextSelectionToRange(textSelection);
+            std.range.syncTextSelectionToRange(textSelection);
           })
           .catch(console.error);
         return true;
       }
-      const blockSelection = getBlockSelectionBySide(block, true);
+      const blockSelection = getBlockSelectionBySide(std, true);
       if (blockSelection) {
-        const currentModel = pathToBlock(block, blockSelection.blockId)?.model;
+        const currentModel = pathToBlock(std, blockSelection.blockId)?.model;
         if (!currentModel) return;
 
         const previousSiblingModel = doc.getPrev(currentModel);
@@ -87,12 +81,12 @@ export const moveBlockConfigs: MoveBlockConfig[] = [
   {
     name: 'Move Down',
     hotkey: ['Mod-Alt-ArrowDown', 'Mod-Shift-ArrowDown'],
-    action: block => {
-      const doc = block.doc;
-      const textSelection = getTextSelection(block);
+    action: std => {
+      const doc = std.doc;
+      const textSelection = getTextSelection(std);
       if (textSelection) {
         const currentModel = pathToBlock(
-          block,
+          std,
           textSelection.from.blockId
         )?.model;
         if (!currentModel) return;
@@ -104,19 +98,16 @@ export const moveBlockConfigs: MoveBlockConfig[] = [
         if (!parentModel) return;
 
         doc.moveBlocks([currentModel], parentModel, nextSiblingModel, false);
-        block.updateComplete
+        std.host.updateComplete
           .then(() => {
-            // `textSelection` will not change so we need wo sync it manually
-            const rangeManager = block.host.rangeManager;
-            assertExists(rangeManager);
-            rangeManager.syncTextSelectionToRange(textSelection);
+            std.range.syncTextSelectionToRange(textSelection);
           })
           .catch(console.error);
         return true;
       }
-      const blockSelection = getBlockSelectionBySide(block, true);
+      const blockSelection = getBlockSelectionBySide(std, true);
       if (blockSelection) {
-        const currentModel = pathToBlock(block, blockSelection.blockId)?.model;
+        const currentModel = pathToBlock(std, blockSelection.blockId)?.model;
         if (!currentModel) return;
 
         const nextSiblingModel = doc.getNext(currentModel);
