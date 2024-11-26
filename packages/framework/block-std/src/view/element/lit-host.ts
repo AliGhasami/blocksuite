@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 /* eslint-disable lit/binding-positions, lit/no-invalid-html */
 
 import {

@@ -2,7 +2,7 @@ import type { EditorHost } from '@blocksuite/block-std';
 import type { InlineEditor } from '@blocksuite/inline';
 
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { WithDisposable } from '@blocksuite/block-std';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { Prefix } from '@blocksuite/global/env';
 import { type BlockModel, DocCollection, Job, Schema } from '@blocksuite/store';
 import { html } from 'lit';
@@ -10,7 +10,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { get } from 'lodash';
 
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
+import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
 import type { Options } from './index.js';
 import type { IObjectType } from './type.js';
 
@@ -21,7 +21,7 @@ import {
   getQuery,
 } from '../../../_common/components/utils.js';
 import { replaceIdMiddleware } from '../../../_common/transformers/index.js';
-import { getInlineEditorByModel } from '../../../_common/utils/index.js';
+import { getInlineEditorByModel } from '@blocksuite/affine-components/rich-text';
 import { AffineSchemas } from '../../../schemas.js';
 import { styles } from './styles.js';
 export interface ObjectLink {

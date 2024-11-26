@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** Ok-alighasami for check merge **/
 import type { Doc } from '@blocksuite/store';
 
 import {
@@ -34,12 +34,13 @@ export class PageEditor extends SignalWatcher(
     }
 
     .affine-page-viewport {
+      z-index: 10;
       position: relative;
       height: 100%;
       overflow-x: hidden;
       overflow-y: auto;
-      container-name: viewport;
-      container-type: inline-size;
+      /* container-name: viewport;
+      container-type: inline-size;*/
     }
 
     .page-editor-container {

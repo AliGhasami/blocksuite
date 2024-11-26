@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import { ShadowlessElement } from '@blocksuite/block-std';
 import {
   type AttributeRenderer,
@@ -362,14 +362,6 @@ export class CustomToolbar extends ShadowlessElement {
 
 @customElement('test-page')
 export class TestPage extends ShadowlessElement {
-  private _editorA: InlineEditor | null = null;
-
-  private _editorB: InlineEditor | null = null;
-
-  private _undoManagerA: Y.UndoManager | null = null;
-
-  private _undoManagerB: Y.UndoManager | null = null;
-
   static override styles = css`
     .container {
       display: grid;
@@ -401,9 +393,17 @@ export class TestPage extends ShadowlessElement {
 
   private _editorA: InlineEditor | null = null;
 
+  private _editorA: InlineEditor | null = null;
+
+  private _editorB: InlineEditor | null = null;
+
   private _editorB: InlineEditor | null = null;
 
   private _undoManagerA: Y.UndoManager | null = null;
+
+  private _undoManagerA: Y.UndoManager | null = null;
+
+  private _undoManagerB: Y.UndoManager | null = null;
 
   private _undoManagerB: Y.UndoManager | null = null;
 

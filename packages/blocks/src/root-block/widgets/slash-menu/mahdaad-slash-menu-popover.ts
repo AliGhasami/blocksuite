@@ -1,10 +1,12 @@
-import { ShadowlessElement, WithDisposable } from '@blocksuite/block-std';
+import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
+
+import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
+import { WithDisposable } from '@blocksuite/global/utils';
 import { html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { AffineInlineEditor } from '../../../_common/inline/presets/affine-inline-specs.js';
 import type {
   SlashMenuActionItem,
   SlashMenuContext,
@@ -17,7 +19,7 @@ import {
   getQuery,
 } from '../../../_common/components/utils.js';
 import { toolsList } from '../../../_common/mahdaad/toolsList.js';
-import { type MahdaadActionMenu, actionsMenu } from './mahdaad_menu.js';
+import { actionsMenu, type MahdaadActionMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
 
 export type InnerSlashMenuContext = SlashMenuContext & {
@@ -25,8 +27,10 @@ export type InnerSlashMenuContext = SlashMenuContext & {
   onClickItem: (item: SlashMenuActionItem) => void;
 };
 
-@customElement('affine-slash-menu')
+//@customElement('affine-slash-menu')
 export class SlashMenu extends WithDisposable(ShadowlessElement) {
+  static override styles = styles;
+
   private _handleClickItem = (item: MahdaadActionMenu) => {
     // Need to remove the search string
     // We must to do clean the slash string before we do the action
@@ -44,21 +48,23 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   private slashMenuID = 'mahdaad-claytap-slash-menu';
 
-  static override styles = styles;
-
   updatePosition = (position: { x: string; y: string; height: number }) => {
     this._position = position;
   };
+
+  private get _query() {
+    return getQuery(this.inlineEditor, this._startIndex) || '';
+  }
+
+  get host() {
+    return this.context.rootComponent.host;
+  }
 
   constructor(
     private inlineEditor: AffineInlineEditor,
     private abortController = new AbortController()
   ) {
     super();
-  }
-
-  private get _query() {
-    return getQuery(this.inlineEditor, this._startIndex) || '';
   }
 
   _toolsList() {
@@ -191,10 +197,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
           }}"
         ></mahdaad-slash-menu>
       </div>`;
-  }
-
-  get host() {
-    return this.context.rootComponent.host;
   }
 
   @state()

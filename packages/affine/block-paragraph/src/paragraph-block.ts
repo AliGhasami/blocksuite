@@ -21,13 +21,14 @@ import { query } from 'lit/decorators.js';
 
 import type { ParagraphBlockService } from './paragraph-service.js';
 
-import { paragraphBlockStyles } from './styles.js';
+import {mahdaadParagraphBlockStyles } from './styles.js';
 
 export class ParagraphBlockComponent extends CaptionedBlockComponent<
   ParagraphBlockModel,
   ParagraphBlockService
 > {
-  static override styles = paragraphBlockStyles;
+  //static override styles = paragraphBlockStyles;
+  static override styles =mahdaadParagraphBlockStyles ;
 
   private _composing = signal(false);
 
@@ -84,6 +85,13 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     return this.rootComponent;
   }
 
+  checkIsEmptyAndNotFocus() {
+    const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
+    const paragraphList = note.length ? note[0].model.children : [];
+    return paragraphList.length == 1
+  }
+
+
   override connectedCallback() {
     super.connectedCallback();
     this.handleEvent(
@@ -111,6 +119,14 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
         }
         const textSelection = this.host.selection.find('text');
         const isCollapsed = textSelection?.isCollapsed() ?? false;
+
+
+        if(this.checkIsEmptyAndNotFocus()) {
+          this._displayPlaceholder.value = true;
+          return;
+        }
+
+
         if (!this.selected || !isCollapsed) {
           this._displayPlaceholder.value = false;
           return;
@@ -118,6 +134,11 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
         this.updateComplete
           .then(() => {
+            if(this.checkIsEmptyAndNotFocus()) {
+              this._displayPlaceholder.value = true;
+              return;
+            }
+
             if (
               (this.inlineEditor?.yTextLength ?? 0) > 0 ||
               this._isInDatabase()
@@ -148,9 +169,20 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ${this.renderChildren(this.model)}
     </div>`;
 
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    /*console.log('this is temp', temp);
+    console.log(
+      '10000',
+      this.doc.root?.id,
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );*/
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
+
     return html`
       <div class="affine-paragraph-block-container">
-        <div class="affine-paragraph-rich-text-wrapper ${type$.value}">
+        <div class="affine-paragraph-rich-text-wrapper claytap-${type$.value}">
           <rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
@@ -163,8 +195,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .verticalScrollContainerGetter=${() =>
-              getViewportElement(this.host)}
+            .verticalScrollContainerGetter=${() => scrollContainer}
+           
           ></rich-text>
           ${this.inEdgelessText
             ? nothing

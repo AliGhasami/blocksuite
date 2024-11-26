@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 const agent = globalThis.navigator?.userAgent ?? '';
 const platform = globalThis.navigator?.platform;
 

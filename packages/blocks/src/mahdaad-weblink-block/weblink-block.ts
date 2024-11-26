@@ -1,3 +1,4 @@
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 /// <reference types="vite/client" />
 import { assertExists } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
@@ -6,8 +7,6 @@ import { customElement } from 'lit/decorators.js';
 
 import type { ObjectLink } from '../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
 import type { MahdaadWeblinkBlockModel } from './weblink-model.js';
-
-import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
 
 @customElement('affine-mahdaad-weblink-block')
 export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<MahdaadWeblinkBlockModel> {

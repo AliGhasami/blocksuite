@@ -1,3 +1,6 @@
+import {
+  getCurrentNativeRange,
+} from '@blocksuite/affine-shared/utils';
 import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, uuidv4 } from '@blocksuite/store';
 
@@ -5,12 +8,10 @@ import type { RootBlockComponent } from '../../types.js';
 
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
-  getCurrentNativeRange,
-  getInlineEditorByModel,
   openFileOrFiles,
 } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
-import { viewPresets } from '../../../database-block/index.js';
+//import { viewPresets } from '../../../database-block/index.js';
 import { onModelTextUpdated } from '../../utils/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
@@ -18,13 +19,21 @@ import type { DirectiveResult } from 'lit/directive.js';
 //import { format, formatISO } from 'date-fns';
 //import link_to_page from './icons/link_to_page.svg?raw';
 
+import {
+  getInlineEditorByModel,
+  insertContent,
+  REFERENCE_NODE
+} from '@blocksuite/affine-components/rich-text';
+
+import type { DataViewBlockComponent } from "../../../data-view-block/index.js";
 import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
-import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
+//import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { closeMentionMenu, showMentionMenu } from '../mahdaad-mention/index.js';
+
 /*import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
@@ -40,7 +49,7 @@ import bread_crumb from './icons/bread_crumb.svg?raw';*/
 //import table_view from './icons/table_view.svg?raw';
 //import tabler_files from './icons/tabler_files.svg?raw';
 //import video from './icons/video.svg?raw';
-import { insertContent, tryRemoveEmptyLine } from './utils.js';
+import { tryRemoveEmptyLine } from './utils.js';
 export interface ClayTapSlashMenuGroup {
   groupName: DirectiveResult;
   children: ClayTapSlashMenu[];
@@ -193,7 +202,25 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'table',
     action: ({ rootComponent, model }) => {
-      //return;
+      const parent = rootComponent.doc.getParent(model);
+      if (!parent) return;
+      const index = parent.children.indexOf(model);
+      const id = rootComponent.doc.addBlock(
+        'affine:data-view',
+        {},
+        rootComponent.doc.getParent(model),
+        index + 1
+      );
+      const dataViewModel = rootComponent.doc.getBlock(id)!;
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      Promise.resolve().then(() => {
+        const dataView = rootComponent.std.view.getBlock(
+          dataViewModel.id
+        ) as DataViewBlockComponent | null;
+        dataView?.dataSource.viewManager.viewAdd('table');
+      });
+      tryRemoveEmptyLine(model);
+     /* //return;
       const parent = rootComponent.doc.getParent(model);
       assertExists(parent);
       const index = parent.children.indexOf(model);
@@ -211,7 +238,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
         id,
         viewPresets.tableViewConfig,
         false
-      );
+      );*/
       tryRemoveEmptyLine(model);
     },
   },

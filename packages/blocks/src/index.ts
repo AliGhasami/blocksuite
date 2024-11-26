@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./effects.ts" />
 import { deserializeXYWH, Point } from '@blocksuite/global/utils';
@@ -30,7 +30,9 @@ export * from './edgeless-text-block/index.js';
 export * from './frame-block/index.js';
 export * from './image-block/index.js';
 export * from './latex-block/index.js';
+export * from './mahdaad-weblink-block/index.js';
 export * from './note-block/index.js';
+import './mahdaad-object-block/index.js';
 export { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
 export type {
   Template,

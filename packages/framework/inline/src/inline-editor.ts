@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import { signal, type Signal } from '@preact/signals-core';
 /* eslint-disable @stylistic/ts/lines-between-class-members */
 /* eslint-disable perfectionist/sort-classes */

@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import type { NoteBlockModel, RootBlockModel } from '@blocksuite/affine-model';
 import type { Viewport } from '@blocksuite/affine-shared/types';
 import type { PointerEventState } from '@blocksuite/block-std';

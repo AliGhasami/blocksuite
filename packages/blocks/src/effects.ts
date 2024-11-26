@@ -197,14 +197,14 @@ import {
   AFFINE_AI_PANEL_WIDGET,
   AFFINE_EDGELESS_COPILOT_WIDGET,
   AFFINE_EMBED_CARD_TOOLBAR_WIDGET,
-  AFFINE_FORMAT_BAR_WIDGET,
+  //AFFINE_FORMAT_BAR_WIDGET,
   AffineAIPanelWidget,
   AffineCodeLanguageListWidget,
   AffineCodeToolbarWidget,
   AffineDocRemoteSelectionWidget,
   AffineDragHandleWidget,
   AffineEdgelessZoomToolbarWidget,
-  AffineFormatBarWidget,
+  //AffineFormatBarWidget,
   AffineImageToolbarWidget,
   AffineInnerModalWidget,
   AffineModalWidget,
@@ -288,10 +288,13 @@ import { AFFINE_PIE_MENU_WIDGET } from './root-block/widgets/pie-menu/index.js';
 import { PieMenu } from './root-block/widgets/pie-menu/menu.js';
 import { PieNode } from './root-block/widgets/pie-menu/node.js';
 import { AFFINE_SLASH_MENU_WIDGET } from './root-block/widgets/slash-menu/index.js';
-import {
+/*import {
   InnerSlashMenu,
   SlashMenu,
-} from './root-block/widgets/slash-menu/slash-menu-popover.js';
+} from './root-block/widgets/slash-menu/slash-menu-popover.js';*/
+import {
+  SlashMenu,
+} from './root-block/widgets/slash-menu/mahdaad-slash-menu-popover.js';
 import { AFFINE_SURFACE_REF_TOOLBAR } from './root-block/widgets/surface-ref-toolbar/surface-ref-toolbar.js';
 import {
   AFFINE_VIEWPORT_OVERLAY_WIDGET,
@@ -412,7 +415,7 @@ export function effects() {
   customElements.define('pie-node-center', PieNodeCenter);
   customElements.define('pie-center-rotator', PieCenterRotator);
   customElements.define('affine-slash-menu', SlashMenu);
-  customElements.define('inner-slash-menu', InnerSlashMenu);
+  //customElements.define('inner-slash-menu', InnerSlashMenu);
   customElements.define('generating-placeholder', GeneratingPlaceholder);
   customElements.define('ai-finish-tip', AIFinishTip);
   customElements.define('ai-panel-divider', AIPanelDivider);
@@ -679,7 +682,7 @@ export function effects() {
     AFFINE_EDGELESS_AUTO_CONNECT_WIDGET,
     EdgelessAutoConnectWidget
   );
-  customElements.define(AFFINE_FORMAT_BAR_WIDGET, AffineFormatBarWidget);
+  //customElements.define(AFFINE_FORMAT_BAR_WIDGET, AffineFormatBarWidget);
 }
 
 declare global {

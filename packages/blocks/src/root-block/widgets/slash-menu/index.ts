@@ -32,7 +32,10 @@ import {
   type SlashMenuStaticConfig,
   type SlashSubMenu,
 } from './config.js';
-import { SlashMenu } from './slash-menu-popover.js';
+//import { SlashMenu } from './slash-menu-popover.js';
+import {
+  SlashMenu,
+} from './mahdaad-slash-menu-popover.js';
 import { filterEnabledSlashMenuItems } from './utils.js';
 
 export type AffineSlashMenuContext = SlashMenuContext;

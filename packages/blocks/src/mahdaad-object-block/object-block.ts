@@ -6,8 +6,12 @@ import { customElement } from 'lit/decorators.js';
 
 import type { ObjectBlockModel } from './object-model.js';
 
-import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
-import { REFERENCE_NODE } from '../_common/inline/presets/nodes/consts.js';
+//import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
+import {
+  REFERENCE_NODE,
+} from '@blocksuite/affine-components/rich-text';
+
 import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
 import { objectBlockStyles } from './styles.js';
 

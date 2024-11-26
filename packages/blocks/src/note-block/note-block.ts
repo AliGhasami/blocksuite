@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import type { NoteBlockModel } from '@blocksuite/affine-model';
 
 import { BlockComponent } from '@blocksuite/block-std';

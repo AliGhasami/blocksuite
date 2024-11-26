@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import {
   DocModeService,
   EmbedOptionService,
@@ -24,10 +24,13 @@ import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../widgets/edgeless-rem
 import { AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET } from '../widgets/edgeless-zoom-toolbar/index.js';
 import { EDGELESS_ELEMENT_TOOLBAR_WIDGET } from '../widgets/element-toolbar/index.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
-import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
+//import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { AFFINE_FRAME_TITLE_WIDGET } from '../widgets/frame-title/index.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
-import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
+import { MAHDAAD_FORMAT_BAR_WIDGET } from '../widgets/mahdaad-format-bar/format-bar.js';
+import { Mahdaad_Mention_MENU_WIDGET } from '../widgets/mahdaad-mention/index.js';
+//import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
+import { AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET } from '../widgets/mahdaad-object-picker/index.js';
 import { AFFINE_MODAL_WIDGET } from '../widgets/modal/modal.js';
 import { AFFINE_PIE_MENU_WIDGET } from '../widgets/pie-menu/index.js';
 import { AFFINE_SLASH_MENU_WIDGET } from '../widgets/slash-menu/index.js';
@@ -46,18 +49,18 @@ export const edgelessRootWidgetViewMap = {
   [AFFINE_SLASH_MENU_WIDGET]: literal`${unsafeStatic(
     AFFINE_SLASH_MENU_WIDGET
   )}`,
-  [AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
+ /* [AFFINE_LINKED_DOC_WIDGET]: literal`${unsafeStatic(
     AFFINE_LINKED_DOC_WIDGET
-  )}`,
+  )}`,*/
   [AFFINE_DRAG_HANDLE_WIDGET]: literal`${unsafeStatic(
     AFFINE_DRAG_HANDLE_WIDGET
   )}`,
   [AFFINE_EMBED_CARD_TOOLBAR_WIDGET]: literal`${unsafeStatic(
     AFFINE_EMBED_CARD_TOOLBAR_WIDGET
   )}`,
-  [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
+/*  [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
     AFFINE_FORMAT_BAR_WIDGET
-  )}`,
+  )}`,*/
   [AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
     AFFINE_DOC_REMOTE_SELECTION_WIDGET
   )}`,
@@ -81,6 +84,9 @@ export const edgelessRootWidgetViewMap = {
   [EDGELESS_NAVIGATOR_BLACK_BACKGROUND_WIDGET]: literal`${unsafeStatic(EDGELESS_NAVIGATOR_BLACK_BACKGROUND_WIDGET)}`,
   [EDGELESS_SELECTED_RECT_WIDGET]: literal`${unsafeStatic(EDGELESS_SELECTED_RECT_WIDGET)}`,
   [EDGELESS_TOOLBAR_WIDGET]: literal`${unsafeStatic(EDGELESS_TOOLBAR_WIDGET)}`,
+  [AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET]: literal`${unsafeStatic(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)}`,
+  [Mahdaad_Mention_MENU_WIDGET]: literal`${unsafeStatic(Mahdaad_Mention_MENU_WIDGET)}`,
+  [MAHDAAD_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(MAHDAAD_FORMAT_BAR_WIDGET)}`,
 };
 
 const EdgelessCommonExtension: ExtensionType[] = [

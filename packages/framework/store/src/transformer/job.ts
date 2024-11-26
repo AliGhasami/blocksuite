@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import { nextTick, Slot } from '@blocksuite/global/utils';
 
@@ -191,6 +191,7 @@ export class Job {
     try {
       BlockSnapshotSchema.parse(snapshot);
       const model = await this._snapshotToBlock(snapshot, doc, parent, index);
+      console.log("not exist model in job");
       if (!model) return;
       return model;
     } catch (error) {
@@ -462,6 +463,7 @@ export class Job {
       title: docMeta.title,
       createDate: docMeta.createDate,
       tags: [], // for backward compatibility
+      object_id: docMeta.object_id,
     };
   }
 
