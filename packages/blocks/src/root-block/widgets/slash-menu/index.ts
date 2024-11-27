@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import type { UIEventStateContext } from '@blocksuite/block-std';
 
 import {
@@ -22,6 +22,7 @@ import { InlineEditor } from '@blocksuite/inline';
 import type { RootBlockComponent } from '../../types.js';
 
 import { getPopperPosition } from '../../utils/position.js';
+import { AffineMahdaadObjectPickerWidget } from "../mahdaad-object-picker/index.js";
 import {
   defaultSlashMenuConfig,
   type SlashMenuActionItem,
@@ -172,6 +173,18 @@ export class AffineSlashMenuWidget extends WidgetComponent {
       const text = leafStart.textContent
         ? leafStart.textContent.slice(0, offsetStart)
         : '';
+
+      if (text) {
+        for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS
+          .triggerWords) {
+          if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
+            closeSlashMenu();
+            return;
+          }
+        }
+      }
+
+
 
       const matchedKey = this.config.triggerKeys.find(triggerKey =>
         text.endsWith(triggerKey)

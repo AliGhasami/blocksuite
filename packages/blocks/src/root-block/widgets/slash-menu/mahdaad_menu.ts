@@ -192,6 +192,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
         const triggerKey = '$';
         insertContent(rootComponent.host, model, triggerKey);
       }*/
+      console.log("111111",temp);
       insertContent(rootComponent.host, model, REFERENCE_NODE, {
         date: temp,
         ignoreSyncInlineRange: true

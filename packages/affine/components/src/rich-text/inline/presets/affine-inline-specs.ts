@@ -250,6 +250,7 @@ export const MahdaadDateTimeSpecExtension = InlineSpecExtension({
     return !!delta.attributes?.ignoreSyncInlineRange;
   },
   renderer: ({ delta }) => {
+    console.log("22222",delta);
     return html`<mahdaad-date-time-inline .delta=${delta}></mahdaad-date-time-inline>`;
   },
   embed:true

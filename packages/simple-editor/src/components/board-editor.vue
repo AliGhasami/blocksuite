@@ -272,7 +272,7 @@ function checkNotEmptyDocBlock(doc: Doc) {
         note.children[note.children.length - 1].text?.length != 0)
     ) {
       doc.addBlock('affine:paragraph', {}, note)
-      doc.addBlock('affine:paragraph', {}, note)
+      //doc.addBlock('affine:paragraph', {}, note)
       /*nextTick(()=>{
       })*/
       //doc.addBlock('affine:paragraph', {}, note)

@@ -33,10 +33,14 @@ import { styles } from './styles.js';
 export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
   static override styles = styles;
 
-  private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
+  //private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
+  //private _startRange = this.inlineEditor.getInlineRange();
+
+  private _startRange = this.inlineEditor.getInlineRange();
 
   private get _query() {
-    return getQuery(this.inlineEditor, this._startIndex) || '';
+    //return getQuery(this.inlineEditor, this._startIndex) || '';
+    return getQuery(this.inlineEditor, this._startRange) || '';
   }
 
   constructor(
@@ -70,14 +74,37 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
         next();
       },
       onInput: () => {
-        this._searchText = this._query;
+        setTimeout(()=>{
+          // console.log("22222",this._query);
+          this._searchText = this._query;
+        },50)
+
       },
       onDelete: () => {
-        this._searchText = this._query;
+       /* this._searchText = this._query;
         const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
         if (curIndex == this._startIndex - 1) {
           this.abortController.abort();
+        }*/
+
+        setTimeout(()=>{
+          //console.log("22222",this._query);
+          this._searchText = this._query;
+        },50)
+        //const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+        const curRange = this.inlineEditor.getInlineRange();
+        if (!this._startRange || !curRange) {
+          return;
         }
+        /*if (curIndex < this._startIndex) {
+          this.abortController.abort();
+        }*/
+        //console.log("1111",curRange.index);
+        //console.log("22222",this._startRange.index);
+        if (curRange.index - 1 < this._startRange.index) {
+          this.abortController.abort();
+        }
+
       },
       onMove: () => {},
       onConfirm: () => {
@@ -119,6 +146,7 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
                 this.inlineEditor,
                 this.triggerKey + this._searchText
               );
+              //return
               //console.log('this is insert content');
               insertContent(this.editorHost, this.model, REFERENCE_NODE, {
                 mention: {

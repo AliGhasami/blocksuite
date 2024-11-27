@@ -1,29 +1,30 @@
 import type { UIEventStateContext } from '@blocksuite/block-std';
 
 import {
+  type AffineInlineEditor,
   getInlineEditorByModel
-} from '@blocksuite/affine-components/rich-text';
+} from "@blocksuite/affine-components/rich-text";
 import {
   getCurrentNativeRange,
   matchFlavours,
 } from '@blocksuite/affine-shared/utils';
 import { WidgetComponent } from '@blocksuite/block-std';
 import {
-  assertExists,
+  assertExists, assertType,
   debounce,
   DisposableGroup,
-  throttle,
-} from '@blocksuite/global/utils';
+  throttle
+} from "@blocksuite/global/utils";
+import { InlineEditor } from "@blocksuite/inline";
 import { customElement } from 'lit/decorators.js';
 
-import type { SlashMenuContext } from '../slash-menu/config.js';
-
+import type { RootBlockComponent } from "../../types.js";
+import type { SlashMenuContext } from "../slash-menu/config.js";
 //import { SlashMenu } from './slash-menu-popover.js';
 import type { InnerSlashMenuContext } from '../slash-menu/mahdaad-slash-menu-popover.js';
 
 //import { isRootComponent } from '../../utils/guard.js';
 import { getPopperPosition } from '../../utils/position.js';
-import { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import { defaultMahdaadMentionMenuConfig } from './config.js';
 import { MahdaadMenuPopover } from './menu-popover.js';
 
@@ -107,7 +108,103 @@ export const Mahdaad_Mention_MENU_WIDGET = 'mahdaad-mention-menu-widget';
 export class MahdaadMentionMenuWidget extends WidgetComponent {
   static DEFAULT_CONFIG = defaultMahdaadMentionMenuConfig;
 
-  private _onBeforeInput = (ctx: UIEventStateContext) => {
+  private _getInlineEditor = (evt: KeyboardEvent | CompositionEvent) => {
+    if (evt.target instanceof HTMLElement) {
+      const editor = (
+        evt.target.closest('.inline-editor') as {
+          inlineEditor?: AffineInlineEditor;
+        }
+      )?.inlineEditor;
+      if (editor instanceof InlineEditor) {
+        return editor;
+      }
+    }
+
+    const textSelection = this.host.selection.find('text');
+    if (!textSelection) return;
+
+    const model = this.host.doc.getBlock(textSelection.blockId)?.model;
+    if (!model) return;
+
+    return getInlineEditorByModel(this.host, model);
+  };
+
+  private _handleInput = (
+    inlineEditor: InlineEditor,
+    isCompositionEnd: boolean
+  ) => {
+    const inlineRangeApplyCallback = (callback: () => void) => {
+      // the inline ranged updated in compositionEnd event before this event callback
+      if (isCompositionEnd) callback();
+      else inlineEditor.slots.inlineRangeSync.once(callback);
+    };
+
+    const rootComponent = this.block;
+    if (rootComponent.model.flavour !== 'affine:page') {
+      console.error('SlashMenuWidget should be used in RootBlock');
+      return;
+    }
+    assertType<RootBlockComponent>(rootComponent);
+
+    inlineRangeApplyCallback(() => {
+      const textSelection = this.host.selection.find('text');
+      if (!textSelection) return;
+
+      const model = this.host.doc.getBlock(textSelection.blockId)?.model;
+      if (!model) return;
+
+      if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
+
+      const inlineRange = inlineEditor.getInlineRange();
+      if (!inlineRange) return;
+
+      const textPoint = inlineEditor.getTextPoint(inlineRange.index);
+      if (!textPoint) return;
+
+      const [leafStart, offsetStart] = textPoint;
+
+      const text = leafStart.textContent
+        ? leafStart.textContent.slice(0, offsetStart)
+        : '';
+
+      const matchedKey = this.config.triggerKeys.find(triggerKey =>
+        text.endsWith(triggerKey)
+      );
+      if (!matchedKey) return;
+
+     /* const config: SlashMenuStaticConfig = {
+        ...this.config,
+        items: filterEnabledSlashMenuItems(this.config.items, {
+          model,
+          rootComponent,
+        }),
+      };*/
+      //console.log("77777",text);
+      //closeSlashMenu();
+      closeMentionMenu();
+      const curRange = getCurrentNativeRange();
+      if (!curRange) return;
+      showMentionMenu({
+        context: { model, rootComponent: rootComponent },
+        range: curRange,
+        triggerKey:text,
+        //config,
+      });
+
+     /* showSlashMenu({
+        context: {
+          model,
+          rootComponent,
+        },
+        triggerKey: matchedKey,
+        config,
+      });*/
+    });
+  };
+
+  //old method
+  /*private _onBeforeInput = (ctx: UIEventStateContext) => {
+    //debugger
     const eventState = ctx.get('defaultState');
     const event = eventState.event as InputEvent;
 
@@ -120,27 +217,27 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
     //console.log('30000', this.doc.getBlocksByFlavour('affine:paragraph'));
     //const service = this.std.spec.getService(this.model.flavour);
     //this.console.log('3333', service?.inlineManager);
-    /*console.log(
+    /!*console.log(
       '55555',
       this.host.querySelector('affine-paragraph')?.inlineManager
-    );*/
+    );*!/
 
     assertExists(block);
     const { model } = block;
 
     if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
-    /** @alighasami for check merge **/
-    /*const paragraphService = this.host.std.getService('affine:paragraph');
+    /!** @alighasami for check merge **!/
+    /!*const paragraphService = this.host.std.getService('affine:paragraph');
     assertExists(paragraphService);
     if (
       !paragraphService.inlineManager.specs.some(item => item.name == 'mention')
     ) {
       return;
-    }*/
-    /*console.log(
+    }*!/
+    /!*console.log(
       '99999',
       this.host.std.spec.getService('affine:paragraph')?.inlineManager
-    );*/
+    );*!/
 
     const inlineEditor = getInlineEditorByModel(this.host, model);
     //console.log('111', inlineEditor);
@@ -162,13 +259,13 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
         return;
       }
 
-      /*const config: SlashMenuStaticConfig = {
+      /!*const config: SlashMenuStaticConfig = {
         ...this.config,
         /!*items: filterEnabledSlashMenuItems(this.config.items, {
           model,
           rootComponent: rootComponent,
         }),*!/
-      };*/
+      };*!/
 
       // Wait for dom update, see this case https://github.com/toeverything/blocksuite/issues/2611
       requestAnimationFrame(() => {
@@ -184,9 +281,52 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
         });
       });
     });
+  };*/
+
+
+  private _onCompositionEnd = (ctx: UIEventStateContext) => {
+    const event = ctx.get('defaultState').event as CompositionEvent;
+
+    if (
+      !this.config.triggerKeys.some(triggerKey =>
+        triggerKey.includes(event.data)
+      )
+    )
+      return;
+
+    const inlineEditor = this._getInlineEditor(event);
+    if (!inlineEditor) return;
+
+    this._handleInput(inlineEditor, true);
   };
 
+  private _onKeyDown = (ctx: UIEventStateContext) => {
+    const eventState = ctx.get('keyboardState');
+    const event = eventState.raw;
+
+    const key = event.key;
+
+    // check event is not composing
+    if (
+      key === undefined || // in mac os, the key may be undefined
+      key === 'Process' ||
+      event.isComposing
+    )
+      return;
+
+    if (!this.config.triggerKeys.some(triggerKey => triggerKey.includes(key)))
+      return;
+
+    const inlineEditor = this._getInlineEditor(event);
+    if (!inlineEditor) return;
+
+    this._handleInput(inlineEditor, false);
+  };
+
+
+
   config = MahdaadMentionMenuWidget.DEFAULT_CONFIG;
+
 
   override connectedCallback() {
     super.connectedCallback();
@@ -194,7 +334,9 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
       console.error('Trigger key of slash menu should not be empty string');
       return;
     }
-    this.handleEvent('beforeInput', this._onBeforeInput);
+    //this.handleEvent('beforeInput', this._onBeforeInput);
+    this.handleEvent('keyDown', this._onKeyDown);
+    this.handleEvent('compositionEnd', this._onCompositionEnd);
   }
 }
 

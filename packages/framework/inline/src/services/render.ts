@@ -77,7 +77,7 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
     return this._rendering;
   }
   // render current deltas to VLines
-  render = () => {
+  render = (syncInlineRange = true) => {
     if (!this.editor.mounted) return;
 
     this._rendering = true;
@@ -151,8 +151,15 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
       .waitForUpdate()
       .then(() => {
         this._rendering = false;
+        const matchDelta = this.getCurrentInlineRangeDelta;
+        if (matchDelta?.attributes?.ignoreSyncInlineRange) syncInlineRange = false;
+        if (syncInlineRange) {
+          // We need to synchronize the selection immediately after rendering is completed,
+          // otherwise there is a possibility of an error in the cursor position
+          this.editor.rangeService.syncInlineRange();
+        }
         this.editor.slots.renderComplete.emit();
-        this.editor.syncInlineRange();
+        //this.editor.syncInlineRange();
       })
       .catch(console.error);
   };
