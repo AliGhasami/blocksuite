@@ -14,6 +14,12 @@
 14 - remove play animation in check list - toggle
 15 - check full when document is readonly
 16 - check full dark mode - all block and content 
-17 -
+17 - drag handler and fix style drag handler
+18 - clayboard tools menu full check 
+19- check all inline - (mention - date time - object inline - link )
+20- full check old save data on stage and production
+21- check date time inline for edit in text input event title and edit mode when hover and check (ignoreSyncInlineRange in inline)
+22- 
+
 
 

@@ -130,13 +130,13 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
 
     if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
     /** @alighasami for check merge **/
-    const paragraphService = this.host.std.getService('affine:paragraph');
+    /*const paragraphService = this.host.std.getService('affine:paragraph');
     assertExists(paragraphService);
     if (
       !paragraphService.inlineManager.specs.some(item => item.name == 'mention')
     ) {
       return;
-    }
+    }*/
     /*console.log(
       '99999',
       this.host.std.spec.getService('affine:paragraph')?.inlineManager

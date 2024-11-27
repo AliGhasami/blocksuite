@@ -4,7 +4,7 @@ import type { BaseSelection, BlockComponent } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
-import { playCheckAnimation } from '@blocksuite/affine-components/icons';
+//import { playCheckAnimation } from '@blocksuite/affine-components/icons';
 import {
   DefaultInlineManagerExtension,
   type RichText,
@@ -61,7 +61,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
       if (this.model.checked) {
         const checkEl = this.querySelector('.affine-list-block__todo-prefix');
         if (checkEl) {
-          playCheckAnimation(checkEl).catch(console.error);
+          //playCheckAnimation(checkEl).catch(console.error);
         }
       }
       return;
@@ -157,6 +157,12 @@ export class ListBlockComponent extends CaptionedBlockComponent<
       ${this.renderChildren(this.model)}
     </div>`;
 
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
+
+
     return html`
       <div class=${'affine-list-block-container'}>
         <div
@@ -197,8 +203,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
             .inlineRangeProvider=${this._inlineRangeProvider}
             .enableClipboard=${false}
             .enableUndoRedo=${false}
-            .verticalScrollContainerGetter=${() =>
-              getViewportElement(this.host)}
+            .verticalScrollContainerGetter=${() => scrollContainer}
           ></rich-text>
         </div>
 

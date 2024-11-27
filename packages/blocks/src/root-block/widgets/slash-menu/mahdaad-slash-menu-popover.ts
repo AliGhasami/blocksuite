@@ -40,11 +40,20 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       this.context.model,
       this.triggerKey + this._query
     );
-    item.action(this.context)?.catch(console.error);
-    this.abortController.abort();
+    //item.action(this.context)?.catch(console.error);
+    //this.abortController.abort();
+
+    this.inlineEditor
+      .waitForUpdate()
+      .then(() => {
+        item.action(this.context)?.catch(console.error);
+        this.abortController.abort();
+      })
+      .catch(console.error);
   };
 
-  private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
+  //private _startIndex = this.inlineEditor?.getInlineRange()?.index ?? 0;
+  private _startRange = this.inlineEditor.getInlineRange();
 
   private slashMenuID = 'mahdaad-claytap-slash-menu';
 
@@ -53,7 +62,8 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
   };
 
   private get _query() {
-    return getQuery(this.inlineEditor, this._startIndex) || '';
+    //return getQuery(this.inlineEditor, this._startIndex) || '';
+    return getQuery(this.inlineEditor, this._startRange) || '';
   }
 
   get host() {
@@ -147,17 +157,38 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
         next();
       },
       onInput: () => {
-        this._searchText = this._query;
+        //this._searchText = this._query;
+        setTimeout(()=>{
+         // console.log("22222",this._query);
+          this._searchText = this._query;
+        },50)
       },
       onDelete: () => {
-        this._searchText = this._query;
-        const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
-        if (curIndex < this._startIndex) {
+        //this._searchText = this._query;
+        setTimeout(()=>{
+          //console.log("22222",this._query);
+          this._searchText = this._query;
+        },50)
+        //const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+        const curRange = this.inlineEditor.getInlineRange();
+        if (!this._startRange || !curRange) {
+          return;
+        }
+        /*if (curIndex < this._startIndex) {
+          this.abortController.abort();
+        }*/
+        //console.log("1111",curRange.index);
+        //console.log("22222",this._startRange.index);
+        if (curRange.index - 1 < this._startRange.index) {
           this.abortController.abort();
         }
       },
       onAbort: () => this.abortController.abort(),
     });
+
+
+  //  this._searchText = this._query;
+
   }
 
   override render() {
@@ -170,11 +201,14 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       : {
           visibility: 'hidden',
         };
+
+   // console.log("10000",this._searchText);
+
     return html`${html` <div
         class="overlay-mask"
         @click="${() => this.abortController.abort()}"
       ></div>`}
-
+      
       <div
         id="${this.slashMenuID}"
         class="vue-block-board-editor-popover  ${Prefix}-slash-menu"
@@ -185,6 +219,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
           .tools-list="${this._toolsList()}"
           .inline-editor="${this.inlineEditor}"
           @select="${(event: CustomEvent) => {
+            //console.log("11111",event);
             const key = event.detail;
             const item = actionsMenu.find(i => i.key == key);
             if (item) {

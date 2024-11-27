@@ -1,8 +1,8 @@
 import type { DirectiveResult } from 'lit/directive.js';
 
-import { type StyleMapDirective, styleMap } from 'lit/directives/style-map.js';
+import { styleMap, type StyleMapDirective } from 'lit/directives/style-map.js';
 
-import type { SelectionRect } from './mahdaad-doc-remote-selection.js';
+import type { SelectionRect } from './doc-remote-selection.js';
 
 export function selectionStyle(
   rect: SelectionRect,
@@ -14,7 +14,7 @@ export function selectionStyle(
     height: `${rect.height}px`,
     top: `${rect.top}px`,
     left: `${rect.left}px`,
-    backgroundColor: color,
+    backgroundColor: rect.transparent ? 'transparent' : color,
     pointerEvent: 'none',
     opacity: '20%',
     borderRadius: '3px',

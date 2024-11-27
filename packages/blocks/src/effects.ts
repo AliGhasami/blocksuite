@@ -202,7 +202,7 @@ import {
   AffineAIPanelWidget,
   AffineCodeLanguageListWidget,
   AffineCodeToolbarWidget,
-  AffineDocRemoteSelectionWidget,
+  //AffineDocRemoteSelectionWidget,
   AffineDragHandleWidget,
   AffineEdgelessZoomToolbarWidget,
   //AffineFormatBarWidget,
@@ -217,10 +217,11 @@ import {
   EdgelessCopilotToolbarEntry,
   EdgelessCopilotWidget,
   EdgelessElementToolbarWidget,
-  EdgelessRemoteSelectionWidget,
   EdgelessRootBlockComponent,
   EmbedCardToolbar,
   FramePreview,
+  MahdaadDocRemoteSelectionWidget,
+  MahdaadEdgelessRemoteSelectionWidget,
   PageRootBlockComponent,
   PreviewRootBlockComponent,
   type RootBlockConfig,
@@ -239,7 +240,7 @@ import { LanguageListButton } from './root-block/widgets/code-language-list/comp
 import { AFFINE_CODE_LANGUAGE_LIST_WIDGET } from './root-block/widgets/code-language-list/index.js';
 import { AffineCodeToolbar } from './root-block/widgets/code-toolbar/components/code-toolbar.js';
 import { AFFINE_CODE_TOOLBAR_WIDGET } from './root-block/widgets/code-toolbar/index.js';
-import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from './root-block/widgets/doc-remote-selection/index.js';
+//import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from './root-block/widgets/doc-remote-selection/index.js';
 import { DragPreview } from './root-block/widgets/drag-handle/components/drag-preview.js';
 import { DropIndicator } from './root-block/widgets/drag-handle/components/drop-indicator.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from './root-block/widgets/drag-handle/consts.js';
@@ -248,7 +249,7 @@ import {
   EdgelessAutoConnectWidget,
 } from './root-block/widgets/edgeless-auto-connect/edgeless-auto-connect.js';
 import { EdgelessCopilotPanel } from './root-block/widgets/edgeless-copilot-panel/index.js';
-import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from './root-block/widgets/edgeless-remote-selection/index.js';
+//import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from './root-block/widgets/edgeless-remote-selection/index.js';
 import { AFFINE_EDGELESS_ZOOM_TOOLBAR_WIDGET } from './root-block/widgets/edgeless-zoom-toolbar/index.js';
 import { ZoomBarToggleButton } from './root-block/widgets/edgeless-zoom-toolbar/zoom-bar-toggle-button.js';
 import { EdgelessZoomToolbar } from './root-block/widgets/edgeless-zoom-toolbar/zoom-toolbar.js';
@@ -278,6 +279,8 @@ import { AFFINE_IMAGE_TOOLBAR_WIDGET } from './root-block/widgets/image-toolbar/
 import { AFFINE_INNER_MODAL_WIDGET } from './root-block/widgets/inner-modal/inner-modal.js';
 import { effects as widgetMobileToolbarEffects } from './root-block/widgets/keyboard-toolbar/effects.js';
 import { effects as widgetLinkedDocEffects } from './root-block/widgets/linked-doc/effects.js';
+import { MAHDAAD_DOC_REMOTE_SELECTION_WIDGET  } from './root-block/widgets/mahdaad-doc-remote-selection/mahdaad-doc-remote-selection.js';
+import { MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET } from './root-block/widgets/mahdaad-edgeless-remote-selection/index.js';
 import { AffineCustomModal } from './root-block/widgets/modal/custom-modal.js';
 import { AFFINE_MODAL_WIDGET } from './root-block/widgets/modal/modal.js';
 import { AFFINE_PAGE_DRAGGING_AREA_WIDGET } from './root-block/widgets/page-dragging-area/page-dragging-area.js';
@@ -644,9 +647,13 @@ export function effects() {
   customElements.define(AFFINE_CODE_TOOLBAR_WIDGET, AffineCodeToolbarWidget);
   customElements.define(AFFINE_EMBED_CARD_TOOLBAR_WIDGET, EmbedCardToolbar);
   customElements.define(AFFINE_INNER_MODAL_WIDGET, AffineInnerModalWidget);
-  customElements.define(
+ /* customElements.define(
     AFFINE_DOC_REMOTE_SELECTION_WIDGET,
     AffineDocRemoteSelectionWidget
+  );*/
+   customElements.define(
+     MAHDAAD_DOC_REMOTE_SELECTION_WIDGET,
+    MahdaadDocRemoteSelectionWidget
   );
   customElements.define(AFFINE_MODAL_WIDGET, AffineModalWidget);
   customElements.define(
@@ -667,9 +674,13 @@ export function effects() {
     AFFINE_CODE_LANGUAGE_LIST_WIDGET,
     AffineCodeLanguageListWidget
   );
-  customElements.define(
+  /*customElements.define(
     AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET,
     EdgelessRemoteSelectionWidget
+  );*/
+  customElements.define(
+    MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET,
+    MahdaadEdgelessRemoteSelectionWidget
   );
   customElements.define(
     AFFINE_VIEWPORT_OVERLAY_WIDGET,

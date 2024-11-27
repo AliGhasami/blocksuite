@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import type { ParagraphBlockModel } from '@blocksuite/affine-model';
 import type { BlockComponent } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
@@ -113,40 +113,40 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     this.disposables.add(
       effect(() => {
         const composing = this._composing.value;
+
+        let showPlaceHolder=true
+
         if (composing || this.doc.readonly) {
-          this._displayPlaceholder.value = false;
-          return;
+          showPlaceHolder=false
+          //this._displayPlaceholder.value = false;
+          //return;
         }
         const textSelection = this.host.selection.find('text');
         const isCollapsed = textSelection?.isCollapsed() ?? false;
 
-
-        if(this.checkIsEmptyAndNotFocus()) {
-          this._displayPlaceholder.value = true;
-          return;
-        }
-
-
         if (!this.selected || !isCollapsed) {
-          this._displayPlaceholder.value = false;
-          return;
+          showPlaceHolder=false
+          //this._displayPlaceholder.value = false;
+          //return;
         }
 
         this.updateComplete
           .then(() => {
-            if(this.checkIsEmptyAndNotFocus()) {
-              this._displayPlaceholder.value = true;
-              return;
-            }
-
             if (
               (this.inlineEditor?.yTextLength ?? 0) > 0 ||
               this._isInDatabase()
             ) {
-              this._displayPlaceholder.value = false;
-              return;
+              showPlaceHolder=false
+              //this._displayPlaceholder.value = false;
+              //return;
             }
-            this._displayPlaceholder.value = true;
+
+            if(!showPlaceHolder && this.checkIsEmptyAndNotFocus()) {
+              showPlaceHolder = true
+            }
+
+            //this._displayPlaceholder.value = true;
+            this._displayPlaceholder.value = showPlaceHolder;
             return;
           })
           .catch(console.error);

@@ -17,7 +17,7 @@ import { literal, unsafeStatic } from 'lit/static-html.js';
 
 import { ExportManagerExtension } from '../../_common/export-manager/export-manager.js';
 import { commands } from '../commands/index.js';
-import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
+//import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/consts.js';
 import { AFFINE_EDGELESS_AUTO_CONNECT_WIDGET } from '../widgets/edgeless-auto-connect/edgeless-auto-connect.js';
 import { AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET } from '../widgets/edgeless-remote-selection/index.js';
@@ -27,6 +27,7 @@ import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/
 //import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { AFFINE_FRAME_TITLE_WIDGET } from '../widgets/frame-title/index.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
+import { MAHDAAD_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/mahdaad-doc-remote-selection/mahdaad-doc-remote-selection.js';
 import { MAHDAAD_FORMAT_BAR_WIDGET } from '../widgets/mahdaad-format-bar/format-bar.js';
 import { Mahdaad_Mention_MENU_WIDGET } from '../widgets/mahdaad-mention/index.js';
 //import { AFFINE_LINKED_DOC_WIDGET } from '../widgets/linked-doc/index.js';
@@ -61,8 +62,11 @@ export const edgelessRootWidgetViewMap = {
 /*  [AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
     AFFINE_FORMAT_BAR_WIDGET
   )}`,*/
-  [AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+ /* [AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
     AFFINE_DOC_REMOTE_SELECTION_WIDGET
+  )}`,*/
+  [MAHDAAD_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+    MAHDAAD_DOC_REMOTE_SELECTION_WIDGET
   )}`,
   [AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
     AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET

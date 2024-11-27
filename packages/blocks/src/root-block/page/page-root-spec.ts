@@ -16,11 +16,12 @@ import { literal, unsafeStatic } from 'lit/static-html.js';
 
 import { ExportManagerExtension } from '../../_common/export-manager/export-manager.js';
 import { commands } from '../commands/index.js';
-import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../widgets/drag-handle/consts.js';
 import { AFFINE_EMBED_CARD_TOOLBAR_WIDGET } from '../widgets/embed-card-toolbar/embed-card-toolbar.js';
 import { AFFINE_INNER_MODAL_WIDGET } from '../widgets/inner-modal/inner-modal.js';
 import { AFFINE_KEYBOARD_TOOLBAR_WIDGET } from '../widgets/keyboard-toolbar/index.js';
+//import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/doc-remote-selection/doc-remote-selection.js';
+import { MAHDAAD_DOC_REMOTE_SELECTION_WIDGET } from '../widgets/mahdaad-doc-remote-selection/mahdaad-doc-remote-selection.js';
 //import { AFFINE_FORMAT_BAR_WIDGET } from '../widgets/format-bar/format-bar.js';
 import { MAHDAAD_FORMAT_BAR_WIDGET } from '../widgets/mahdaad-format-bar/format-bar.js';
 import { Mahdaad_Mention_MENU_WIDGET } from '../widgets/mahdaad-mention/index.js';
@@ -51,8 +52,11 @@ export const pageRootWidgetViewMap = {
   /*[AFFINE_FORMAT_BAR_WIDGET]: literal`${unsafeStatic(
     AFFINE_FORMAT_BAR_WIDGET
   )}`,*/
-  [AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+  /*[AFFINE_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
     AFFINE_DOC_REMOTE_SELECTION_WIDGET
+  )}`,*/
+  [MAHDAAD_DOC_REMOTE_SELECTION_WIDGET]: literal`${unsafeStatic(
+    MAHDAAD_DOC_REMOTE_SELECTION_WIDGET
   )}`,
   [AFFINE_PAGE_DRAGGING_AREA_WIDGET]: literal`${unsafeStatic(
     AFFINE_PAGE_DRAGGING_AREA_WIDGET

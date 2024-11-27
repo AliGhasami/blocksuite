@@ -26,14 +26,14 @@ export {
   AFFINE_EMBED_CARD_TOOLBAR_WIDGET,
   EmbedCardToolbar,
 } from './embed-card-toolbar/embed-card-toolbar.js';
+export { AffineImageToolbarWidget } from './image-toolbar/index.js';
+export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
 /*export { toolbarDefaultConfig } from './format-bar/config.js';
 export {
   AFFINE_FORMAT_BAR_WIDGET,
   AffineFormatBarWidget,
 } from './format-bar/format-bar.js';*/
 
-export { AffineImageToolbarWidget } from './image-toolbar/index.js';
-export { AffineInnerModalWidget } from './inner-modal/inner-modal.js';
 export * from './keyboard-toolbar/index.js';
 export {
   type LinkedMenuGroup,
@@ -46,6 +46,8 @@ export {
   showImportModal,
 } from './linked-doc/import-doc/index.js';
 export { AffineLinkedDocWidget } from './linked-doc/index.js';
+export { MahdaadDocRemoteSelectionWidget } from './mahdaad-doc-remote-selection/mahdaad-doc-remote-selection.js';
+export { MahdaadEdgelessRemoteSelectionWidget } from './mahdaad-edgeless-remote-selection/index.js';
 export { MahdaadMentionMenuWidget } from './mahdaad-mention/index.js';
 export { AffineMahdaadObjectPickerWidget } from './mahdaad-object-picker/index.js';
 export { AffineModalWidget } from './modal/modal.js';

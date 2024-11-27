@@ -10,10 +10,13 @@ import {
   ItalicInlineSpecExtension,
   LatexInlineSpecExtension,
   LinkInlineSpecExtension,
+  MahdaadDateTimeSpecExtension,
+  MahdaadMentionSpecExtension,
+  MahdaadObjectLinkSpecExtension,
   MarkdownExtensions,
   ReferenceInlineSpecExtension,
   StrikeInlineSpecExtension,
-  UnderlineInlineSpecExtension,
+  UnderlineInlineSpecExtension
 } from './inline/index.js';
 import { LatexEditorInlineManagerExtension } from './inline/presets/nodes/latex-node/latex-editor-menu.js';
 
@@ -30,6 +33,9 @@ export const DefaultInlineManagerExtension = InlineManagerExtension({
     LatexInlineSpecExtension.identifier,
     ReferenceInlineSpecExtension.identifier,
     LinkInlineSpecExtension.identifier,
+    MahdaadMentionSpecExtension.identifier,
+    MahdaadObjectLinkSpecExtension.identifier,
+    MahdaadDateTimeSpecExtension.identifier,
   ],
 });
 

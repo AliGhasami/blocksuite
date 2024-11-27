@@ -10,6 +10,15 @@ import type {
 import type { Y } from '@blocksuite/store';
 import type { ZodTypeAny } from 'zod';
 
+
+export interface DateTimeEvent {
+  id?: string;
+  time: string | null;
+  date: string;
+  meta?: any;
+  createMode?: boolean
+}
+
 export interface AffineTextAttributes {
   bold?: true | null;
   italic?: true | null;
@@ -25,6 +34,21 @@ export interface AffineTextAttributes {
   background?: string | null;
   color?: string | null;
   latex?: string | null;
+  mention?: {
+    user_id: string;
+    //name: string;
+    id: string;
+  } | null;
+  mahdaadObjectLink?: {
+    object_id: string;
+    link_id: string | number | undefined;
+    type: string;
+  } | null;
+  date?: DateTimeEvent;
+  // TODO return if has bug
+  ignoreSyncInlineRange?: true | null;
+  // TODO return if has bug
+  createMode?: boolean
 }
 
 export type InlineSpecs<

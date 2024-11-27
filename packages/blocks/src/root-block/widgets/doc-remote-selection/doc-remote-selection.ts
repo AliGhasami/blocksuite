@@ -1,6 +1,6 @@
 import type { UserInfo } from '@blocksuite/store';
 
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
+import { matchFlavours } from "@blocksuite/affine-shared/utils";
 import {
   type BaseSelection,
   BlockSelection,
@@ -8,8 +8,9 @@ import {
 } from '@blocksuite/block-std';
 import { WidgetComponent } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-import { computed } from '@preact/signals-core';
+import { computed } from '@lit-labs/preact-signals';
 import { css, html, nothing } from 'lit';
+//import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { DocRemoteSelectionConfig } from './config.js';

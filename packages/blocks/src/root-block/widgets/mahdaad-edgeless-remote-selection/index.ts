@@ -1,18 +1,18 @@
+import type { RootBlockModel } from '@blocksuite/affine-model';
 import type { UserInfo } from '@blocksuite/store';
 
+import { RemoteCursor } from '@blocksuite/affine-components/icons';
+import { requestThrottledConnectedFrame } from '@blocksuite/affine-shared/utils';
 import { WidgetComponent } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
+import { assertExists, pickValues } from '@blocksuite/global/utils';
+//import { assertExists } from '@blocksuite/global/utils';
 import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { EdgelessRootBlockComponent } from '../../../root-block/edgeless/edgeless-root-block.js';
-import type { RootBlockModel } from '../../root-model.js';
 
-import { RemoteCursor } from '../../../_common/icons/edgeless.js';
-import { requestThrottledConnectFrame } from '../../../_common/utils/event.js';
-import { pickValues } from '../../../_common/utils/iterable.js';
 import {
   getSelectedRect,
   isTopLevelBlock,
@@ -22,11 +22,67 @@ import { RemoteColorManager } from '../../../root-block/remote-color-manager/rem
 export const MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET =
   'mahdaad-edgeless-remote-selection-widget';
 
-@customElement(MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET)
+//@customElement(MAHDAAD_EDGELESS_REMOTE_SELECTION_WIDGET)
 export class MahdaadEdgelessRemoteSelectionWidget extends WidgetComponent<
   RootBlockModel,
   EdgelessRootBlockComponent
 > {
+  static override styles = css`
+    :host {
+      pointer-events: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: left top;
+      contain: size layout;
+      z-index: 1;
+    }
+
+    .remote-rect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 4px;
+      box-sizing: border-box;
+      border-width: 3px;
+      z-index: 1;
+      transform-origin: center center;
+    }
+
+    .remote-cursor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .remote-cursor > svg {
+      display: block;
+    }
+
+    .remote-username {
+      margin-left: 22px;
+      margin-top: -2px;
+
+      color: white;
+
+      max-width: 160px;
+      padding: 0px 3px;
+      border: 1px solid var(--affine-pure-black-20);
+
+      box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.16);
+      border-radius: 4px;
+
+      font-size: 12px;
+      line-height: 18px;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `;
+
   private _remoteColorManager: RemoteColorManager | null = null;
 
   private _updateOnElementChange = (element: string | { id: string }) => {
@@ -96,7 +152,7 @@ export class MahdaadEdgelessRemoteSelectionWidget extends WidgetComponent<
     this._remoteRects = remoteRects;
   };
 
-  private _updateTransform = requestThrottledConnectFrame(() => {
+  private _updateTransform = requestThrottledConnectedFrame(() => {
     const { translateX, translateY } = this.edgeless.service.viewport;
 
     this.style.setProperty(
@@ -105,61 +161,17 @@ export class MahdaadEdgelessRemoteSelectionWidget extends WidgetComponent<
     );
   }, this);
 
-  static override styles = css`
-    :host {
-      pointer-events: none;
-      position: absolute;
-      left: 0;
-      top: 0;
-      transform-origin: left top;
-      contain: size layout;
-      z-index: 1;
-    }
+  get edgeless() {
+    return this.block;
+  }
 
-    .remote-rect {
-      position: absolute;
-      top: 0;
-      left: 0;
-      border-radius: 4px;
-      box-sizing: border-box;
-      border-width: 3px;
-      z-index: 1;
-      transform-origin: center center;
-    }
+  get selection() {
+    return this.edgeless.service.selection;
+  }
 
-    .remote-cursor {
-      position: absolute;
-      top: 0;
-      left: 0;
-      border-radius: 50%;
-      z-index: 1;
-    }
-
-    .remote-cursor > svg {
-      display: block;
-    }
-
-    .remote-username {
-      margin-left: 22px;
-      margin-top: -2px;
-
-      color: white;
-
-      max-width: 160px;
-      padding: 0px 3px;
-      border: 1px solid var(--affine-pure-black-20);
-
-      box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.16);
-      border-radius: 4px;
-
-      font-size: 12px;
-      line-height: 18px;
-
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  `;
+  get surface() {
+    return this.edgeless.surface;
+  }
 
   override connectedCallback() {
     super.connectedCallback();
@@ -252,18 +264,6 @@ export class MahdaadEdgelessRemoteSelectionWidget extends WidgetComponent<
     return html`
       <div class="affine-edgeless-remote-selection">${rects}${cursors}</div>
     `;
-  }
-
-  get edgeless() {
-    return this.block;
-  }
-
-  get selection() {
-    return this.edgeless.service.selection;
-  }
-
-  get surface() {
-    return this.edgeless.surface;
   }
 
   @state()

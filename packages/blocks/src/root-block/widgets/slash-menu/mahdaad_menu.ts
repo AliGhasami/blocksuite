@@ -5,14 +5,12 @@ import { assertExists } from '@blocksuite/global/utils';
 import { type BlockModel, uuidv4 } from '@blocksuite/store';
 
 import type { RootBlockComponent } from '../../types.js';
-
 //import { toggleEmbedCardCreateModal } from '../../../_common/components/embed-card/modal/index.js';
 import {
   openFileOrFiles,
 } from '../../../_common/utils/index.js';
 import { addSiblingAttachmentBlocks } from '../../../attachment-block/utils.js';
 //import { viewPresets } from '../../../database-block/index.js';
-import { onModelTextUpdated } from '../../utils/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 //import type { AffineLinkedDocWidget } from '../linked-doc/index.js';
 import type { DirectiveResult } from 'lit/directive.js';
@@ -24,10 +22,11 @@ import {
   insertContent,
   REFERENCE_NODE
 } from '@blocksuite/affine-components/rich-text';
+import { viewPresets } from "@blocksuite/data-view/view-presets";
 
-import type { DataViewBlockComponent } from "../../../data-view-block/index.js";
 import type { AffineMahdaadObjectPickerWidget } from '../mahdaad-object-picker/index.js';
 import type { IObjectType } from '../mahdaad-object-picker/type.js';
+
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
@@ -202,7 +201,17 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'table',
     action: ({ rootComponent, model }) => {
-      const parent = rootComponent.doc.getParent(model);
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertDatabaseBlock({
+          viewType: viewPresets.tableViewMeta.type,
+          place: 'after',
+          removeEmptyLine: true,
+        })
+        .run();
+      //old method
+      /*const parent = rootComponent.doc.getParent(model);
       if (!parent) return;
       const index = parent.children.indexOf(model);
       const id = rootComponent.doc.addBlock(
@@ -219,7 +228,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
         ) as DataViewBlockComponent | null;
         dataView?.dataSource.viewManager.viewAdd('table');
       });
-      tryRemoveEmptyLine(model);
+      tryRemoveEmptyLine(model);*/
      /* //return;
       const parent = rootComponent.doc.getParent(model);
       assertExists(parent);
@@ -1039,6 +1048,14 @@ function runCommand(
   flavour: BlockSuite.Flavour,
   type?: string
 ) {
+  rootComponent.std.command
+    .chain()
+    .updateBlockType({
+      flavour,
+      props: { type },
+    })
+    .run();
+
   /* rootElement.host.std.command
     .chain()
     .updateBlockType({
@@ -1049,13 +1066,14 @@ function runCommand(
     .run();*/
 
   //console.log('this is root element', rootElement);
-  rootComponent.host.std.command
+ /* rootComponent.host.std.command
     .chain()
     .updateBlockType({
       flavour,
       props: { type },
     })
     .inline((ctx, next) => {
+      //debugger
       const newModels = ctx.updatedBlocks;
       if (!newModels) {
         return false;
@@ -1076,5 +1094,5 @@ function runCommand(
       //console.log('next - change inline menu');
       return next();
     })
-    .run();
+    .run();*/
 }

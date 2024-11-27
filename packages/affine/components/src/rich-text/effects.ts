@@ -22,9 +22,11 @@ import { LatexEditorMenu } from './inline/presets/nodes/latex-node/latex-editor-
 import { LatexEditorUnit } from './inline/presets/nodes/latex-node/latex-editor-unit.js';
 import { AffineLatexNode } from './inline/presets/nodes/latex-node/latex-node.js';
 import { LinkPopup } from './inline/presets/nodes/link-node/link-popup/link-popup.js';
+import {MahdaadDateTimeInline} from './inline/presets/nodes/mahdaad-date-time-node/index.js'
+import {MahdaadObjectLinkInline} from './inline/presets/nodes/mahdaad-object-inline-node/mahdaad-object-inline-node.js'
+import {MahdaadMention} from './inline/presets/nodes/mention-node/index.js'
 import { ReferencePopup } from './inline/presets/nodes/reference-node/reference-popup.js';
 import { RichText } from './rich-text.js';
-
 export function effects() {
   customElements.define('affine-text', AffineText);
   customElements.define('latex-editor-menu', LatexEditorMenu);
@@ -35,6 +37,9 @@ export function effects() {
   customElements.define('affine-link', AffineLink);
   customElements.define('reference-popup', ReferencePopup);
   customElements.define('affine-reference', AffineReference);
+  customElements.define('mahdaad-mention', MahdaadMention);
+  customElements.define('mahdaad-object-link-inline', MahdaadObjectLinkInline);
+  customElements.define('mahdaad-date-time-inline', MahdaadDateTimeInline);
 }
 
 declare global {
@@ -48,6 +53,9 @@ declare global {
     'latex-editor-unit': LatexEditorUnit;
     'latex-editor-menu': LatexEditorMenu;
     'link-popup': LinkPopup;
+    'mahdaad-mention': MahdaadMention;
+    'mahdaad-object-link-inline':MahdaadObjectLinkInline;
+    'mahdaad-date-time-inline':MahdaadDateTimeInline;
   }
   namespace BlockSuite {
     interface CommandContext {

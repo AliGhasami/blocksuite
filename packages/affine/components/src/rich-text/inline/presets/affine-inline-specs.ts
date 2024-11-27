@@ -167,7 +167,7 @@ export const ReferenceInlineSpecExtension = InlineSpecExtension(
   }
 );
 
-export const LinkInlineSpecExtension = InlineSpecExtension({
+/*export const LinkInlineSpecExtension = InlineSpecExtension({
   name: 'link',
   schema: z.string().optional().nullable().catch(undefined),
   match: delta => {
@@ -176,7 +176,7 @@ export const LinkInlineSpecExtension = InlineSpecExtension({
   renderer: ({ delta }) => {
     return html`<affine-link .delta=${delta}></affine-link>`;
   },
-});
+});*/
 
 export const LatexEditorUnitSpecExtension = InlineSpecExtension({
   name: 'latex-editor-unit',
@@ -186,6 +186,89 @@ export const LatexEditorUnitSpecExtension = InlineSpecExtension({
     return html`<latex-editor-unit .delta=${delta}></latex-editor-unit>`;
   },
 });
+
+export const MahdaadMentionSpecExtension = InlineSpecExtension({
+  name: 'mention',
+  schema: z
+    .object({
+      //name: z.string(),
+      user_id: z.string(),
+      id: z.string(),
+    })
+    .optional()
+    .nullable()
+    .catch(undefined),
+    match: delta => {
+      if (delta.insert == '@') return false;
+      return !!delta.attributes?.mention;
+    },
+  renderer: ({ delta, selected }) => {
+    //.config=${referenceNodeConfig}
+    return html`<mahdaad-mention
+      style="display: inline-block"
+      .delta=${delta}
+      .selected=${selected}
+    ></mahdaad-mention>`;
+  },
+  embed:true
+});
+
+export const MahdaadObjectLinkSpecExtension = InlineSpecExtension({
+  name: 'mahdaadObjectLink',
+  schema: z
+    .object({
+      //name: z.string(),
+      //user_id: z.string(),
+      //id: z.string(),
+      object_id: z.string(),
+      link_id: z.union([z.string(), z.number(), z.undefined()]),
+      //link_id: z.string(),
+      type: z.string(),
+    })
+    .optional()
+    .nullable()
+    .catch(undefined),
+  match: delta => {
+    return !!delta.attributes?.mahdaadObjectLink;
+  },
+  renderer: ({ delta, selected }) => {
+  //.config=${referenceNodeConfig}
+    return html`<mahdaad-object-link-inline
+      style="display: inline-block"
+      .delta=${delta}
+      .selected=${selected}
+    ></mahdaad-object-link-inline>`;
+  },
+  embed:true
+});
+
+
+export const MahdaadDateTimeSpecExtension = InlineSpecExtension({
+  name: 'ignoreSyncInlineRange',
+  schema: z.literal(true).optional().nullable().catch(undefined),
+  match: delta => {
+    return !!delta.attributes?.ignoreSyncInlineRange;
+  },
+  renderer: ({ delta }) => {
+    return html`<mahdaad-date-time-inline .delta=${delta}></mahdaad-date-time-inline>`;
+  },
+  embed:true
+});
+
+
+export const LinkInlineSpecExtension = InlineSpecExtension({
+  name: 'link',
+  schema: z.string().optional().nullable().catch(undefined),
+  match: delta => {
+    return !!delta.attributes?.link;
+  },
+  renderer: ({ delta }) => {
+    return html`<mahdaad-weblink-node
+      .delta=${delta}
+    ></mahdaad-weblink-node>`;
+  },
+});
+
 
 export const InlineSpecExtensions = [
   BoldInlineSpecExtension,
@@ -199,4 +282,7 @@ export const InlineSpecExtensions = [
   ReferenceInlineSpecExtension,
   LinkInlineSpecExtension,
   LatexEditorUnitSpecExtension,
+  MahdaadMentionSpecExtension,
+  MahdaadObjectLinkSpecExtension,
+  MahdaadDateTimeSpecExtension
 ];
