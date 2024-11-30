@@ -33,9 +33,9 @@ export class AffineDateTime extends ShadowlessElement {
     //console.log('this is date time', this.delta.insert);
     return html`<span>
       <mahdaad-date-time
-        class="${Prefix}-date-time" 
+        class="${Prefix}-date-time"
         data-event-id="${this.id}"
-        create-mode="${this.delta?.attributes?.date?.createMode ?? false}"
+        create-status="${this.delta?.attributes?.date?.createStatus ?? 2}"
         @update=${this.selfUpdate}
         @close=""
         readonly="${this.blockElement.doc.readonly}"
@@ -48,16 +48,15 @@ export class AffineDateTime extends ShadowlessElement {
     </span>`;
   }
 
-  selfUpdate(event){
+  selfUpdate(event) {
     const data = event?.detail;
     if (data && data.key && data.hasOwnProperty('value')) {
       const format = this.inlineEditor.getFormat(this.selfInlineRange);
-      if (format?.date?.id){
+      if (format?.date?.id) {
         const date = JSON.parse(JSON.stringify(format.date));
-        const {value, key} = data
-        if (value === undefined && date[key] !== undefined)
-          delete date[key];
-        else date[key] = value
+        const { value, key } = data;
+        if (value === undefined && date[key] !== undefined) delete date[key];
+        else date[key] = value;
         this.inlineEditor.formatText(this.selfInlineRange, {
           date,
           ignoreSyncInlineRange: true,

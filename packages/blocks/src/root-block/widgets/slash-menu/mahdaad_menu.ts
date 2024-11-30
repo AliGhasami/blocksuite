@@ -178,7 +178,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
         date: triggerKey,
         time: null,
         id: uuidv4(),
-        createMode: true
+        createStatus: 1,
       };
       /*{
         const triggerKey = '$';
@@ -186,7 +186,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
       }*/
       insertContent(rootComponent.host, model, REFERENCE_NODE, {
         date: temp,
-        ignoreSyncInlineRange: true
+        ignoreSyncInlineRange: true,
       });
     },
   },
@@ -199,15 +199,15 @@ export const actionsMenu: MahdaadActionMenu[] = [
       const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
       const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
       const triggerKey = `${year}-${month}-${day}`;
-      const hour = String(date.getUTCHours()).padStart(2, '0')
-      const minute = String(date.getUTCMinutes()).padStart(2, '0')
-      const second = String(date.getUTCSeconds()).padStart(2, '0')
-      const time = `${hour}:${minute}:${second}`
+      const hour = String(date.getUTCHours()).padStart(2, '0');
+      const minute = String(date.getUTCMinutes()).padStart(2, '0');
+      const second = String(date.getUTCSeconds()).padStart(2, '0');
+      const time = `${hour}:${minute}:${second}`;
       const temp = {
         date: triggerKey,
         time,
         id: uuidv4(),
-        createMode: true
+        createStatus: 1,
       };
       /*{
         const triggerKey = '$';
@@ -215,7 +215,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
       }*/
       insertContent(rootComponent.host, model, REFERENCE_NODE, {
         date: temp,
-        ignoreSyncInlineRange: true
+        ignoreSyncInlineRange: true,
       });
     },
   },
