@@ -7,6 +7,10 @@ import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 import type { Bound } from '@blocksuite/global/utils';
 
 import {
+  ArrowUpIcon,
+  MapTablerIcon,
+} from '@blocksuite/affine-components/icons';
+import {
   EditPropsStore,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
@@ -42,6 +46,12 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
     .partial-clip {
       flex-shrink: 0;
@@ -300,6 +310,7 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
       this.draggableController?.states || {};
 
     const active = popper || draggingElement;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`<edgeless-toolbar-button
       class="edgeless-mindmap-button"
@@ -309,7 +320,11 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
       @click=${this._toggleMenu}
       style="width: 100%; height: 100%; display: inline-block"
     >
-      <div class="partial-clip">
+      ${MapTablerIcon}
+      <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
+     <!-- <div class="partial-clip">
         <div class="basket-wrapper ${active ? 'active' : ''}">
           ${repeat(
             this.draggableTools,
@@ -394,7 +409,7 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
             />
           </mask>
         </defs>
-      </svg>
+      </svg> -->
     </edgeless-toolbar-button>`;
   }
 

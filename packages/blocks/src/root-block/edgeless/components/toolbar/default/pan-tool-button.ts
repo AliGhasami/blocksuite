@@ -1,13 +1,15 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import {
+  HandIcon
+} from '@blocksuite/affine-components/icons';
+import { css, html, LitElement } from 'lit';
+import { query } from 'lit/decorators.js';
 
-import type { EdgelessTool } from '../../../types.js';
+//import type { EdgelessTool } from '../../../types.js';
 
-import { HandIcon } from '../../../../../_common/icons/index.js';
 import { getTooltipWithShortcut } from '../../utils.js';
 import { QuickToolMixin } from '../mixins/quick-tool.mixin.js';
 
-@customElement('edgeless-pan-tool-button')
+//@customElement('edgeless-pan-tool-button')
 export class EdgelessPanToolButton extends QuickToolMixin(LitElement) {
   static override styles = css`
     .current-icon {

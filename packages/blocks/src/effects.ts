@@ -165,7 +165,9 @@ import { EdgelessBrushToolButton } from './root-block/edgeless/components/toolba
 import { EdgelessSlideMenu } from './root-block/edgeless/components/toolbar/common/slide-menu.js';
 import { EdgelessConnectorMenu } from './root-block/edgeless/components/toolbar/connector/connector-menu.js';
 import { EdgelessConnectorToolButton } from './root-block/edgeless/components/toolbar/connector/connector-tool-button.js';
-import { EdgelessDefaultToolButton } from './root-block/edgeless/components/toolbar/default/default-tool-button.js';
+//import { EdgelessDefaultToolButton } from './root-block/edgeless/components/toolbar/default/default-tool-button.js';
+import { EdgelessDefaultToolButton } from './root-block/edgeless/components/toolbar/default/mahdaad-default-tool-button.js';
+import { EdgelessPanToolButton } from "./root-block/edgeless/components/toolbar/default/pan-tool-button.js";
 import {
   EDGELESS_TOOLBAR_WIDGET,
   EdgelessToolbarWidget,
@@ -454,6 +456,10 @@ export function effects() {
     'edgeless-default-tool-button',
     EdgelessDefaultToolButton
   );
+  customElements.define(
+    'edgeless-pan-tool-button',
+    EdgelessPanToolButton
+  )
   customElements.define('surface-ref-note-portal', SurfaceRefNotePortal);
   customElements.define('edgeless-connector-menu', EdgelessConnectorMenu);
   customElements.define('smooth-corner', SmoothCorner);

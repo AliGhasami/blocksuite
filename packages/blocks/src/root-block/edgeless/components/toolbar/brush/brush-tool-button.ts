@@ -1,6 +1,8 @@
 import {
+  ArrowUpIcon,
   EdgelessPenDarkIcon,
   EdgelessPenLightIcon,
+  PenTablerIcon,
 } from '@blocksuite/affine-components/icons';
 import {
   EditPropsStore,
@@ -20,27 +22,34 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
   static override styles = css`
     :host {
       display: flex;
-      height: 100%;
+      //height: 100%;
       overflow-y: hidden;
     }
-    .edgeless-brush-button {
-      height: 100%;
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
-    .pen-wrapper {
-      width: 35px;
-      height: 64px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    #edgeless-pen-icon {
-      transition: transform 0.3s ease-in-out;
-      transform: translateY(8px);
-    }
-    .edgeless-brush-button:hover #edgeless-pen-icon,
-    .pen-wrapper.active #edgeless-pen-icon {
-      transform: translateY(0);
-    }
+
+    //.edgeless-brush-button {
+    //  height: 100%;
+    //}
+    //.pen-wrapper {
+    //  width: 35px;
+    //  //height: 64px;
+    //  display: flex;
+    //  align-items: flex-end;
+    //  justify-content: center;
+    //}
+    //#edgeless-pen-icon {
+    //  transition: transform 0.3s ease-in-out;
+    //  transform: translateY(8px);
+    //}
+    //.edgeless-brush-button:hover #edgeless-pen-icon,
+    //.pen-wrapper.active #edgeless-pen-icon {
+    //  transform: translateY(0);
+    //}
   `;
 
   private _color$ = computed(() => {
@@ -77,6 +86,7 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
     const icon =
       appTheme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
     const color = this._color$.value;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
       <edgeless-toolbar-button
@@ -87,7 +97,11 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
         .withHover=${true}
         @click=${() => this._toggleBrushMenu()}
       >
-        <div style=${styleMap({ color })} class="pen-wrapper">${icon}</div>
+        ${PenTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
+       <!-- <div style=${styleMap({ color })} class="pen-wrapper">${icon}</div> -->
       </edgeless-toolbar-button>
     `;
   }

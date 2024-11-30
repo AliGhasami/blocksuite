@@ -5,6 +5,9 @@ import {
   TextIcon,
 } from '@blocksuite/affine-components/icons';
 import {
+  FileIcon
+} from '@blocksuite/affine-components/icons';
+import {
   EditPropsStore,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
@@ -197,7 +200,8 @@ export class EdgelessNoteSeniorButton extends EdgelessToolbarToolMixin(
         style="--paper-bg: ${this._noteBg$.value}"
       >
         <div class="paper">${toShapeNotToAdapt}</div>
-        <div class="edgeless-toolbar-note-icon link">${LinkIcon}</div>
+        <!--<div class="edgeless-toolbar-note-icon link">${LinkIcon}</div>-->
+        <div class="edgeless-toolbar-note-icon link">${FileIcon}</div>
         <div class="edgeless-toolbar-note-icon heading">${Heading1Icon}</div>
         <div class="edgeless-toolbar-note-icon text">${TextIcon}</div>
       </div>

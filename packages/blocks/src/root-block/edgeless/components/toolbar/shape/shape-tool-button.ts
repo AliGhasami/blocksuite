@@ -1,7 +1,12 @@
 /** @alighasami for check merge **/
+import {
+  ArrowUpIcon,
+  ShapeTablerIcon
+} from '@blocksuite/affine-components/icons';
 import { type ShapeName, ShapeType } from '@blocksuite/affine-model';
 import { SignalWatcher } from '@blocksuite/global/utils';
 import { css, html, LitElement } from 'lit';
+import { styleMap } from "lit/directives/style-map.js";
 
 import type { DraggableShape } from './utils.js';
 
@@ -15,13 +20,19 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
   static override styles = css`
     :host {
       display: block;
-      width: 100%;
-      height: 100%;
+      //width: 100%;
+      //height: 100%;
     }
     edgeless-toolbar-button,
     .shapes {
-      width: 100%;
-      height: 64px;
+      //width: 100%;
+      //height: 64px;
+    }
+    .arrow-up-icon {
+      position: absolute;
+      top: 4px;
+      right: 2px;
+      font-size: 0;
     }
   `;
 
@@ -66,6 +77,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
 
   override render() {
     const { active } = this;
+    const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
       <edgeless-toolbar-button
@@ -74,14 +86,19 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         .tooltipOffset=${5}
         .active=${active}
       >
-        <edgeless-toolbar-shape-draggable
+        <!-- <edgeless-toolbar-shape-draggable
           .edgeless=${this.edgeless}
           .toolbarContainer=${this.toolbarContainer}
           class="shapes"
           @click=${this._handleWrapperClick}
           .onShapeClick=${this._handleShapeClick}
         >
-        </edgeless-toolbar-shape-draggable>
+        </edgeless-toolbar-shape-draggable> -->
+        ${ShapeTablerIcon}
+        <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
+        
       </edgeless-toolbar-button>
     `;
   }

@@ -1,8 +1,6 @@
 import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 
 import {
-  ArrowUpIcon,
-  HandIcon,
   SelectIcon,
 } from '@blocksuite/affine-components/icons';
 import { effect } from '@preact/signals-core';
@@ -93,18 +91,13 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     return html`
       <edgeless-tool-icon-button
         class="edgeless-default-button ${type} ${active ? 'active' : ''}"
-        .tooltip=${type === 'pan'
-          ? getTooltipWithShortcut('Hand', 'H')
-          : getTooltipWithShortcut('Select', 'V')}
+        .tooltip=${getTooltipWithShortcut('Select', 'V')}
         .tooltipOffset=${17}
         .active=${active}
         .iconContainerPadding=${6}
         @click=${this._changeTool}
       >
-        <span class="current-icon">
-          ${localStorage.defaultTool === 'default' ? SelectIcon : HandIcon}
-        </span>
-        <span class="arrow-up-icon">${ArrowUpIcon}</span>
+        <span class="current-icon"> ${SelectIcon} </span>
       </edgeless-tool-icon-button>
     `;
   }

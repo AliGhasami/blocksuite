@@ -291,6 +291,7 @@ export class MahdaadDocRemoteSelectionWidget extends WidgetComponent {
                 >
                   <div
                     style="${styleMap({
+                      userSelect: 'none',
                       position: 'absolute',
                       left: '-4px',
                       bottom: `${

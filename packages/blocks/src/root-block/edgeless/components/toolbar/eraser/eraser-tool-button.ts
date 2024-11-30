@@ -4,6 +4,7 @@ import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 import {
   EdgelessEraserDarkIcon,
   EdgelessEraserLightIcon,
+  EraserTablerIcon
 } from '@blocksuite/affine-components/icons';
 import { ThemeProvider } from '@blocksuite/affine-shared/services';
 import { css, html, LitElement } from 'lit';
@@ -16,7 +17,8 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
 ) {
   static override styles = css`
     :host {
-      height: 100%;
+      //height: 100%;
+      display: flex;
       overflow-y: hidden;
     }
     .eraser-button {
@@ -70,7 +72,8 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
         .active=${type === 'eraser'}
         @click=${() => this.setEdgelessTool({ type: 'eraser' })}
       >
-        <div class="eraser-button">${icon}</div>
+        ${EraserTablerIcon}
+        <!-- <div class="eraser-button">${icon}</div> -->
       </edgeless-toolbar-button>
     `;
   }
