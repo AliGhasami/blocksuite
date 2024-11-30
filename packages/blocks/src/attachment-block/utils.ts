@@ -1,4 +1,4 @@
-/** @alighasami for check merge **/
+/** ok-alighasami for check merge **/
 import type {
   AttachmentBlockModel,
   AttachmentBlockProps,
@@ -9,8 +9,11 @@ import type { BlockModel } from '@blocksuite/store';
 import { toast } from '@blocksuite/affine-components/toast';
 import { defaultAttachmentProps } from '@blocksuite/affine-model';
 import { humanFileSize } from '@blocksuite/affine-shared/utils';
+import { assertExists } from '@blocksuite/global/utils';
 
 import type { AttachmentBlockComponent } from './attachment-block.js';
+
+import { uploadFile } from '../_common/upload.js';
 
 export function cloneAttachmentProperties(model: AttachmentBlockModel) {
   const clonedProps = {} as AttachmentBlockProps;
@@ -48,11 +51,22 @@ async function uploadAttachmentBlob(
   }
 
   const doc = editorHost.doc;
-  let sourceId: string | undefined;
-
+  //let sourceId: string | undefined;
+  const attachmentModel = doc.getBlockById(
+    blockId
+  ) as AttachmentBlockModel | null;
+  assertExists(attachmentModel);
   try {
-    setAttachmentUploading(blockId);
-    sourceId = await doc.blobSync.set(blob);
+    //setAttachmentUploading(blockId);
+    //sourceId = await doc.blobSync.set(blob);
+    const { data } = await uploadFile(blob);
+    //console.log('12111', data.data.storage);
+    doc.withoutTransact(() => {
+      doc.updateBlock(attachmentModel, {
+        src: data.data.storage,
+        //sourceId,
+      } satisfies Partial<AttachmentBlockProps>);
+    });
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -62,7 +76,7 @@ async function uploadAttachmentBlob(
       );
     }
   } finally {
-    setAttachmentUploaded(blockId);
+    /*setAttachmentUploaded(blockId);
 
     const attachmentModel = doc.getBlockById(
       blockId
@@ -75,7 +89,7 @@ async function uploadAttachmentBlob(
       doc.updateBlock(attachmentModel, {
         sourceId,
       } satisfies Partial<AttachmentBlockProps>);
-    });
+    });*/
   }
 }
 

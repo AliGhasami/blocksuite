@@ -1,15 +1,11 @@
 /** @alighasami for check merge **/
 import {
   CaptionIcon,
-  DownloadIcon,
   EditIcon,
-  MoreVerticalIcon,
   SmallArrowDownIcon,
 } from '@blocksuite/affine-components/icons';
 import { createLitPortal } from '@blocksuite/affine-components/portal';
 import {
-  cloneGroups,
-  renderGroups,
   renderToolbarSeparator,
 } from '@blocksuite/affine-components/toolbar';
 import {
@@ -28,9 +24,6 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import type { AttachmentBlockComponent } from '../attachment-block.js';
 
-import { getMoreMenuConfig } from '../../root-block/configs/toolbar.js';
-import { BUILT_IN_GROUPS } from './config.js';
-import { AttachmentToolbarMoreMenuContext } from './context.js';
 import { RenameModal } from './rename-model.js';
 import { styles } from './styles.js';
 
@@ -77,7 +70,7 @@ export function attachmentViewToggleMenu({
   ];
 
   return html`
-    <editor-menu-button
+    <!-- <editor-menu-button
       .contentPadding=${'8px'}
       .button=${html`
         <editor-icon-button
@@ -110,7 +103,7 @@ export function attachmentViewToggleMenu({
           `
         )}
       </div>
-    </editor-menu-button>
+    </editor-menu-button> -->
   `;
 }
 
@@ -123,12 +116,12 @@ export function AttachmentOptionsTemplate({
   model: AttachmentBlockModel;
   abortController: AbortController;
 }) {
-  const std = block.std;
+  //const std = block.std;
   const editorHost = block.host;
   const readonly = model.doc.readonly;
-  const context = new AttachmentToolbarMoreMenuContext(block, abortController);
-  const groups = getMoreMenuConfig(std).configure(cloneGroups(BUILT_IN_GROUPS));
-  const moreMenuActions = renderGroups(groups, context);
+  //const context = new AttachmentToolbarMoreMenuContext(block, abortController);
+  //const groups = getMoreMenuConfig(std).configure(cloneGroups(BUILT_IN_GROUPS));
+  //const moreMenuActions = renderGroups(groups, context);
 
   const buttons = [
     // preview
@@ -168,12 +161,12 @@ export function AttachmentOptionsTemplate({
           </editor-icon-button>
         `,
 
-    attachmentViewToggleMenu({
+   /* attachmentViewToggleMenu({
       block,
       callback: () => abortController.abort(),
-    }),
+    }),*/
 
-    readonly
+    /*readonly
       ? nothing
       : html`
           <editor-icon-button
@@ -183,7 +176,7 @@ export function AttachmentOptionsTemplate({
           >
             ${DownloadIcon}
           </editor-icon-button>
-        `,
+        `,*/
 
     readonly
       ? nothing
@@ -196,8 +189,8 @@ export function AttachmentOptionsTemplate({
             ${CaptionIcon}
           </editor-icon-button>
         `,
-
-    html`
+    
+  /*  html`
       <editor-menu-button
         .contentPadding=${'8px'}
         .button=${html`
@@ -206,11 +199,11 @@ export function AttachmentOptionsTemplate({
           </editor-icon-button>
         `}
       >
-        <div data-size="large" data-orientation="vertical">
+        <!-- <div data-size="large" data-orientation="vertical">
           ${moreMenuActions}
-        </div>
+        </div> -->
       </editor-menu-button>
-    `,
+    `,*/
   ];
 
   return html`

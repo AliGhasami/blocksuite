@@ -1,4 +1,4 @@
-import { type SchemaToModel, defineBlockSchema } from '@blocksuite/store';
+import { defineBlockSchema, type SchemaToModel } from '@blocksuite/store';
 
 export const MahdaadWeblinkBlockSchema = defineBlockSchema({
   flavour: 'affine:mahdaad-weblink-block',
@@ -20,3 +20,13 @@ export const MahdaadWeblinkBlockSchema = defineBlockSchema({
 export type MahdaadWeblinkBlockModel = SchemaToModel<
   typeof MahdaadWeblinkBlockSchema
 >;
+
+declare global {
+  namespace BlockSuite {
+    interface BlockModels {
+      'affine:mahdaad-weblink-block': MahdaadWeblinkBlockModel;
+    }
+  }
+}
+
+

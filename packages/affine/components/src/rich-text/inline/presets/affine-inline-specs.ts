@@ -242,15 +242,24 @@ export const MahdaadObjectLinkSpecExtension = InlineSpecExtension({
   embed:true
 });
 
-
+// TODO return if has bug
+// this attr is for not change cursor position on input keyup in inline elements
 export const MahdaadDateTimeSpecExtension = InlineSpecExtension({
-  name: 'ignoreSyncInlineRange',
-  schema: z.literal(true).optional().nullable().catch(undefined),
+  name: 'date',
+  schema:z
+    .object({
+      time: z.string().nullable(),
+      date: z.string(),
+      id: z.string().optional(),
+      meta: z.any().optional(),
+      createStatus: z.number().optional(),
+      ignoreSyncInlineRange:z.boolean().optional()
+    }).optional().nullable().catch(undefined),
   match: delta => {
-    return !!delta.attributes?.ignoreSyncInlineRange;
+    return !!delta.attributes?.date;
   },
   renderer: ({ delta }) => {
-    console.log("22222",delta);
+    //console.log("this is delta",delta);
     return html`<mahdaad-date-time-inline .delta=${delta}></mahdaad-date-time-inline>`;
   },
   embed:true

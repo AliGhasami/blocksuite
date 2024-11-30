@@ -30,9 +30,10 @@ export * from './edgeless-text-block/index.js';
 export * from './frame-block/index.js';
 export * from './image-block/index.js';
 export * from './latex-block/index.js';
+export * from  './mahdaad-object-block/index.js';
+import './mahdaad-object-block/index.js';
 export * from './mahdaad-weblink-block/index.js';
 export * from './note-block/index.js';
-import './mahdaad-object-block/index.js';
 export { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
 export type {
   Template,

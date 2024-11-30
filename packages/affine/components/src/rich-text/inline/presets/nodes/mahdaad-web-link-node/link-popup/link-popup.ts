@@ -3,28 +3,29 @@ import type { InlineRange } from '@blocksuite/inline/types';
 import {
   type BlockComponent,
   ShadowlessElement,
-  WithDisposable,
 } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
+import { BLOCK_ID_ATTR  } from '@blocksuite/block-std';
+import { assertExists , WithDisposable } from '@blocksuite/global/utils';
 import { computePosition, inline, offset, shift } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 
-import type { ObjectLink } from '../../../../../../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
-import type { EditorIconButton } from '../../../../../components/toolbar/icon-button.js';
-import type { AffineInlineEditor } from '../../../affine-inline-specs.js';
-
-import '../../../../../components/toolbar/icon-button.js';
+//import type { ObjectLink } from '../../../../../../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
+//import type { EditorIconButton } from '../../../../../components/toolbar/icon-button.js';
+/*import '../../../../../components/toolbar/icon-button.js';
 import '../../../../../components/toolbar/menu-button.js';
 import '../../../../../components/toolbar/separator.js';
 import '../../../../../components/toolbar/toolbar.js';
-import '../../../../../components/tooltip/tooltip.js';
-import { BLOCK_ID_ATTR } from '../../../../../consts.js';
-import { normalizeUrl } from '../../../../../utils/url.js';
+import '../../../../../components/tooltip/tooltip.js';*/
+
+import { normalizeUrl } from "@blocksuite/affine-shared/utils";
+
+import type { AffineInlineEditor } from '../../../affine-inline-specs.js';
+
 import { REFERENCE_NODE } from '../../consts.js';
 
-@customElement('mahdaad-weblink-popup')
+//@customElement('mahdaad-weblink-popup')
 export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
   private _bodyOverflowStyle = '';
 
@@ -233,39 +234,8 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     `;*/
   };
 
-  private _convertToCardView(show_type: 'card' | 'embed') {
-    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
-      return;
-    }
-
-    const targetFlavour = 'affine:mahdaad-weblink-block';
-
-    /*if (this._embedOptions && this._embedOptions.viewType === 'card') {
-      targetFlavour = this._embedOptions.flavour;
-    }*/
-
-    const block = this.block;
-    if (!block) return;
-    const url = this.currentLink;
-    const title = this.currentText;
-    const props = {
-      url,
-      title: title === url ? '' : title,
-      show_type,
-    };
-    const doc = block.doc;
-    const parent = doc.getParent(block.model);
-    assertExists(parent);
-    const index = parent.children.indexOf(block.model);
-    doc.addBlock(targetFlavour as never, props, parent, index + 1);
-    const totalTextLength = this.inlineEditor.yTextLength;
-    const inlineTextLength = this.targetInlineRange.length;
-    if (totalTextLength === inlineTextLength) {
-      doc.deleteBlock(block.model);
-    } else {
-      this.inlineEditor.formatText(this.targetInlineRange, { link: null });
-    }
-    this.abortController.abort();
+  private get _rootService() {
+    return this.std?.getService('affine:page');
   }
 
   /* private get _canConvertToEmbedView() {
@@ -287,55 +257,12 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     `;
   }*/
 
-  private _onConfirm(title: string, url: string) {
-    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
-
-    //assertExists(this.linkInput);
-    //const linkInputValue = this.linkInput.value;
-    //if (!linkInputValue || !isValidUrl(linkInputValue)) return;
-
-    const link = normalizeUrl(url);
-    /*this.inlineEditor.formatText(this.targetInlineRange, title, {
-      link: link,
-      reference: null,
-    });*/
-
-    this.inlineEditor.insertText(this.targetInlineRange, title, {
-      link: link,
-      reference: null,
-    });
-    this.inlineEditor.setInlineRange(this.targetInlineRange);
-    const textSelection = this.host?.selection.find('text');
-    assertExists(textSelection);
-    this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
-    this.abortController.abort();
-    return;
-
-    if (this.type === 'create') {
-      this.inlineEditor.formatText(this.targetInlineRange, {
-        link: link,
-        reference: null,
-      });
-      this.inlineEditor.setInlineRange(this.targetInlineRange);
-      const textSelection = this.host?.selection.find('text');
-      assertExists(textSelection);
-      this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
-    } else if (this.type === 'edit') {
-      const text = this.textInput?.value ?? link;
-      this.inlineEditor.insertText(this.targetInlineRange, text, {
-        link: link,
-        reference: null,
-      });
-      this.inlineEditor.setInlineRange({
-        index: this.targetInlineRange.index,
-        length: text.length,
-      });
-      const textSelection = this.host?.selection.find('text');
-      assertExists(textSelection);
-      this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
-    }
-
-    this.abortController.abort();
+  get block() {
+    const block = this.inlineEditor.rootElement.closest<BlockComponent>(
+      `[${BLOCK_ID_ATTR}]`
+    );
+    if (!block) return null;
+    return block;
   }
 
   /*private _convertToEmbedView() {
@@ -426,16 +353,17 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     ]);
   }*/
 
-  private _onKeydown(e: KeyboardEvent) {
-    e.stopPropagation();
-    if (e.key === 'Enter' && !e.isComposing) {
-      e.preventDefault();
-      this._onConfirm();
-    }
+  get currentLink() {
+    const link = this.inlineEditor.getFormat(this.targetInlineRange).link;
+    assertExists(link);
+    return link;
   }
 
-  private get _rootService() {
-    return this.std?.spec.getService('affine:page');
+  get currentText() {
+    return this.inlineEditor.yTextString.slice(
+      this.targetInlineRange.index,
+      this.targetInlineRange.index + this.targetInlineRange.length
+    );
   }
 
   /* private _updateConfirmBtn() {
@@ -445,10 +373,8 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     this.confirmButton.requestUpdate();*!/
   }*/
 
-  private handleSave(event: CustomEvent) {
-    const data = event.detail;
-    this._onConfirm(data.title, data.url);
-    //console.log('this is handle save', data);
+  get host() {
+    return this.block?.host;
   }
 
   /* private _viewMenuButton() {
@@ -509,6 +435,110 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     `;
   }*/
 
+  get std() {
+    return this.block?.std;
+  }
+
+  private _convertToCardView(show_type: 'card' | 'embed') {
+    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) {
+      return;
+    }
+
+    const targetFlavour = 'affine:mahdaad-weblink-block';
+
+    /*if (this._embedOptions && this._embedOptions.viewType === 'card') {
+      targetFlavour = this._embedOptions.flavour;
+    }*/
+
+    const block = this.block;
+    if (!block) return;
+    const url = this.currentLink;
+    const title = this.currentText;
+    const props = {
+      url,
+      title: title === url ? '' : title,
+      show_type,
+    };
+    const doc = block.doc;
+    const parent = doc.getParent(block.model);
+    assertExists(parent);
+    const index = parent.children.indexOf(block.model);
+    doc.addBlock(targetFlavour as never, props, parent, index + 1);
+    const totalTextLength = this.inlineEditor.yTextLength;
+    const inlineTextLength = this.targetInlineRange.length;
+    if (totalTextLength === inlineTextLength) {
+      doc.deleteBlock(block.model);
+    } else {
+      this.inlineEditor.formatText(this.targetInlineRange, { link: null });
+    }
+    this.abortController.abort();
+  }
+
+  private _onConfirm(title: string, url: string) {
+    if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
+
+    //assertExists(this.linkInput);
+    //const linkInputValue = this.linkInput.value;
+    //if (!linkInputValue || !isValidUrl(linkInputValue)) return;
+
+    const link = normalizeUrl(url);
+    /*this.inlineEditor.formatText(this.targetInlineRange, title, {
+      link: link,
+      reference: null,
+    });*/
+
+    this.inlineEditor.insertText(this.targetInlineRange, title, {
+      link: link,
+      reference: null,
+    });
+    this.inlineEditor.setInlineRange(this.targetInlineRange);
+    const textSelection = this.host?.selection.find('text');
+    assertExists(textSelection);
+    this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
+    this.abortController.abort();
+    return;
+
+    if (this.type === 'create') {
+      this.inlineEditor.formatText(this.targetInlineRange, {
+        link: link,
+        reference: null,
+      });
+      this.inlineEditor.setInlineRange(this.targetInlineRange);
+      const textSelection = this.host?.selection.find('text');
+      assertExists(textSelection);
+      this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
+    } else if (this.type === 'edit') {
+      const text = this.textInput?.value ?? link;
+      this.inlineEditor.insertText(this.targetInlineRange, text, {
+        link: link,
+        reference: null,
+      });
+      this.inlineEditor.setInlineRange({
+        index: this.targetInlineRange.index,
+        length: text.length,
+      });
+      const textSelection = this.host?.selection.find('text');
+      assertExists(textSelection);
+      this.host?.rangeManager?.syncTextSelectionToRange(textSelection);
+    }
+
+    this.abortController.abort();
+  }
+
+  private _onKeydown(e: KeyboardEvent) {
+    e.stopPropagation();
+    if (e.key === 'Enter' && !e.isComposing) {
+      e.preventDefault();
+      this._onConfirm();
+    }
+  }
+
+  private handleSave(event: CustomEvent) {
+    const data = event.detail;
+    this._onConfirm(data.title, data.url);
+    //console.log('this is handle save', data);
+  }
+
   override connectedCallback() {
     super.connectedCallback();
 
@@ -560,7 +590,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
   }
 
   generateWeblink(event: CustomEvent) {
-    const lnk: ObjectLink = event.detail;
+    const lnk = event.detail;
     //debugger;
     if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
     this.inlineEditor.insertText(this.targetInlineRange, REFERENCE_NODE, {
@@ -699,40 +729,11 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
       .catch(console.error);
   }
 
-  get block() {
-    const block = this.inlineEditor.rootElement.closest<BlockComponent>(
-      `[${BLOCK_ID_ATTR}]`
-    );
-    if (!block) return null;
-    return block;
-  }
-
-  get currentLink() {
-    const link = this.inlineEditor.getFormat(this.targetInlineRange).link;
-    assertExists(link);
-    return link;
-  }
-
-  get currentText() {
-    return this.inlineEditor.yTextString.slice(
-      this.targetInlineRange.index,
-      this.targetInlineRange.index + this.targetInlineRange.length
-    );
-  }
-
-  get host() {
-    return this.block?.host;
-  }
-
-  get std() {
-    return this.block?.std;
-  }
-
   @property({ attribute: false })
   accessor abortController!: AbortController;
 
-  @query('.affine-confirm-button')
-  accessor confirmButton: EditorIconButton | null = null;
+  //@query('.affine-confirm-button')
+  //accessor confirmButton: EditorIconButton | null = null;
 
   @property({ attribute: false })
   accessor inlineEditor!: AffineInlineEditor;

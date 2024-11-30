@@ -2,10 +2,11 @@
 import { assertExists } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
 import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+//import { customElement } from 'lit/decorators.js';
 
-import type { ObjectBlockModel } from './object-model.js';
+import type { ObjectBlockModel } from "@blocksuite/affine-model";
 
+//import type { ObjectBlockModel } from './object-model.js';
 //import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import {
@@ -15,7 +16,7 @@ import {
 import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
 import { objectBlockStyles } from './styles.js';
 
-@customElement('affine-mahdaad-object')
+//@customElement('affine-mahdaad-object')
 export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockModel> {
   static override styles = objectBlockStyles;
 

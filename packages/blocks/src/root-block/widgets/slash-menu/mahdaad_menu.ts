@@ -187,15 +187,14 @@ export const actionsMenu: MahdaadActionMenu[] = [
         time: null,
         id: uuidv4(),
         createStatus: 1,
+        ignoreSyncInlineRange:true
       };
       /*{
         const triggerKey = '$';
         insertContent(rootComponent.host, model, triggerKey);
       }*/
-      console.log("111111",temp);
       insertContent(rootComponent.host, model, REFERENCE_NODE, {
         date: temp,
-        ignoreSyncInlineRange: true,
       });
     },
   },
@@ -208,15 +207,16 @@ export const actionsMenu: MahdaadActionMenu[] = [
       const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Get minutes in UTC and pad with leading zero if needed
       const day = String(date.getUTCDate()).padStart(2, '0'); // Get seconds in UTC and pad with leading zero if needed
       const triggerKey = `${year}-${month}-${day}`;
-      const hour = String(date.getUTCHours()).padStart(2, '0');
-      const minute = String(date.getUTCMinutes()).padStart(2, '0');
-      const second = String(date.getUTCSeconds()).padStart(2, '0');
-      const time = `${hour}:${minute}:${second}`;
+      const hour = String(date.getUTCHours()).padStart(2, '0')
+      const minute = String(date.getUTCMinutes()).padStart(2, '0')
+      const second = String(date.getUTCSeconds()).padStart(2, '0')
+      const time = `${hour}:${minute}:${second}`
       const temp = {
         date: triggerKey,
         time,
         id: uuidv4(),
         createStatus: 1,
+        ignoreSyncInlineRange: true
       };
       /*{
         const triggerKey = '$';
@@ -224,7 +224,6 @@ export const actionsMenu: MahdaadActionMenu[] = [
       }*/
       insertContent(rootComponent.host, model, REFERENCE_NODE, {
         date: temp,
-        ignoreSyncInlineRange: true,
       });
     },
   },
@@ -293,7 +292,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
       const file = await openFileOrFiles();
       if (!file) return;
       const attachmentService =
-        rootComponent.host.spec.getService('affine:attachment');
+        rootComponent.std.getService('affine:attachment');
       assertExists(attachmentService);
       const maxFileSize = attachmentService.maxFileSize;
 

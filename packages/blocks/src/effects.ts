@@ -104,6 +104,8 @@ import {
 } from './image-block/index.js';
 import { effects as blockLatexEffects } from './latex-block/effects.js';
 import { LatexBlockComponent } from './latex-block/index.js';
+import { ObjectBlockComponent } from './mahdaad-object-block/index.js';
+import { MahdaadWeblinkBlockComponent } from './mahdaad-weblink-block/index.js';
 import {
   EdgelessNoteBlockComponent,
   EdgelessNoteMask,
@@ -696,6 +698,11 @@ export function effects() {
     EdgelessAutoConnectWidget
   );
   //customElements.define(AFFINE_FORMAT_BAR_WIDGET, AffineFormatBarWidget);
+
+  //Mahdaad web component
+  customElements.define('affine-mahdaad-weblink-block',MahdaadWeblinkBlockComponent);
+  customElements.define('affine-mahdaad-object',ObjectBlockComponent);
+
 }
 
 declare global {

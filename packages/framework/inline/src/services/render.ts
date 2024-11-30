@@ -151,18 +151,29 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
       .waitForUpdate()
       .then(() => {
         this._rendering = false;
-        const matchDelta = this.getCurrentInlineRangeDelta;
-        if (matchDelta?.attributes?.ignoreSyncInlineRange) syncInlineRange = false;
-        if (syncInlineRange) {
-          // We need to synchronize the selection immediately after rendering is completed,
-          // otherwise there is a possibility of an error in the cursor position
-          this.editor.rangeService.syncInlineRange();
-        }
         this.editor.slots.renderComplete.emit();
-        //this.editor.syncInlineRange();
+        this.editor.syncInlineRange();
       })
       .catch(console.error);
   };
+
+  // TODO return if has bug
+  get getCurrentInlineRangeDelta() {
+    const range = this.editor.getInlineRange();
+    console.log("1111",range);
+    if (range) return this.getDeltaByInlineRange(range);
+    return undefined;
+  }
+
+  // TODO return if has bug
+  getDeltaByInlineRange(inlineRange: InlineRange) {
+    console.log("22222",this.editor.getDeltasByInlineRange(inlineRange));
+    return this.editor.getDeltasByInlineRange(inlineRange)?.find(
+      ([_, _inlineRange]) =>
+        _inlineRange.length == inlineRange.length &&
+        _inlineRange.index == inlineRange.index
+    )?.[0];
+  }
 
   rerenderWholeEditor = () => {
     const rootElement = this.editor.rootElement;

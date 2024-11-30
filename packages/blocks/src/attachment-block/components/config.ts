@@ -3,7 +3,6 @@ import type { MenuItemGroup } from '@blocksuite/affine-components/toolbar';
 import {
   CopyIcon,
   DeleteIcon,
-  DownloadIcon,
   DuplicateIcon,
   RefreshIcon,
 } from '@blocksuite/affine-components/icons';
@@ -49,7 +48,7 @@ export const BUILT_IN_GROUPS: MenuItemGroup<AttachmentToolbarMoreMenuContext>[] 
             close();
           },
         },
-        {
+        /*{
           type: 'download',
           label: 'Download',
           icon: DownloadIcon,
@@ -58,7 +57,7 @@ export const BUILT_IN_GROUPS: MenuItemGroup<AttachmentToolbarMoreMenuContext>[] 
             blockComponent.download();
             close();
           },
-        },
+        },*/
       ],
     },
     {

@@ -3,12 +3,13 @@ import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { assertExists } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
 import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+//import { customElement } from 'lit/decorators.js';
+
+import type { MahdaadWeblinkBlockModel } from "@blocksuite/affine-model";
 
 import type { ObjectLink } from '../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
-import type { MahdaadWeblinkBlockModel } from './weblink-model.js';
 
-@customElement('affine-mahdaad-weblink-block')
+//@customElement('affine-mahdaad-weblink-block')
 export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<MahdaadWeblinkBlockModel> {
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;

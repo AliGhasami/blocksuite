@@ -16,14 +16,18 @@ import type {
   toggleUnderline,
 } from './format/text-style.js';
 
-import { AffineLink, AffineReference } from './inline/index.js';
+import {
+  AffineReference,
+//AffineLink,
+  MahdaadWebLinkNode } from './inline/index.js';
 import { AffineText } from './inline/presets/nodes/affine-text.js';
 import { LatexEditorMenu } from './inline/presets/nodes/latex-node/latex-editor-menu.js';
 import { LatexEditorUnit } from './inline/presets/nodes/latex-node/latex-editor-unit.js';
 import { AffineLatexNode } from './inline/presets/nodes/latex-node/latex-node.js';
-import { LinkPopup } from './inline/presets/nodes/link-node/link-popup/link-popup.js';
 import {MahdaadDateTimeInline} from './inline/presets/nodes/mahdaad-date-time-node/index.js'
 import {MahdaadObjectLinkInline} from './inline/presets/nodes/mahdaad-object-inline-node/mahdaad-object-inline-node.js'
+//import { LinkPopup } from './inline/presets/nodes/link-node/link-popup/link-popup.js';
+import { MahdaadWebLinkPopup } from './inline/presets/nodes/mahdaad-web-link-node/link-popup/link-popup.js';
 import {MahdaadMention} from './inline/presets/nodes/mention-node/index.js'
 import { ReferencePopup } from './inline/presets/nodes/reference-node/reference-popup.js';
 import { RichText } from './rich-text.js';
@@ -33,26 +37,29 @@ export function effects() {
   customElements.define('latex-editor-unit', LatexEditorUnit);
   customElements.define('rich-text', RichText);
   customElements.define('affine-latex-node', AffineLatexNode);
-  customElements.define('link-popup', LinkPopup);
-  customElements.define('affine-link', AffineLink);
+  //customElements.define('link-popup', LinkPopup);
+  customElements.define('link-popup', MahdaadWebLinkPopup);
+  //customElements.define('affine-link', AffineLink);
   customElements.define('reference-popup', ReferencePopup);
   customElements.define('affine-reference', AffineReference);
   customElements.define('mahdaad-mention', MahdaadMention);
   customElements.define('mahdaad-object-link-inline', MahdaadObjectLinkInline);
   customElements.define('mahdaad-date-time-inline', MahdaadDateTimeInline);
+  customElements.define('mahdaad-weblink-node', MahdaadWebLinkNode);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
     'affine-latex-node': AffineLatexNode;
     'affine-reference': AffineReference;
-    'affine-link': AffineLink;
+    //'affine-link': AffineLink;
     'affine-text': AffineText;
     'rich-text': RichText;
     'reference-popup': ReferencePopup;
     'latex-editor-unit': LatexEditorUnit;
     'latex-editor-menu': LatexEditorMenu;
-    'link-popup': LinkPopup;
+    'link-popup':MahdaadWebLinkPopup;
+    //'link-popup': LinkPopup;
     'mahdaad-mention': MahdaadMention;
     'mahdaad-object-link-inline':MahdaadObjectLinkInline;
     'mahdaad-date-time-inline':MahdaadDateTimeInline;

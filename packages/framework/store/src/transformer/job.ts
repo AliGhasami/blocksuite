@@ -191,7 +191,7 @@ export class Job {
     try {
       BlockSnapshotSchema.parse(snapshot);
       const model = await this._snapshotToBlock(snapshot, doc, parent, index);
-      console.log("not exist model in job");
+      //console.log("not exist model in job");
       if (!model) return;
       return model;
     } catch (error) {

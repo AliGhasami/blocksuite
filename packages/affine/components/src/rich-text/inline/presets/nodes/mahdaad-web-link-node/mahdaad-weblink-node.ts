@@ -1,6 +1,7 @@
-import { type BlockComponent, WithDisposable } from '@blocksuite/block-std';
+import type { BlockComponent} from '@blocksuite/block-std';
+
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { assertExists } from '@blocksuite/global/utils';
+import { assertExists , WithDisposable } from '@blocksuite/global/utils';
 import {
   type DeltaInsert,
   INLINE_ROOT_ATTR,
@@ -8,19 +9,31 @@ import {
   ZERO_WIDTH_SPACE,
 } from '@blocksuite/inline';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import type { AffineTextAttributes } from '../../affine-inline-specs.js';
+//import type { AffineTextAttributes } from '../../affine-inline-specs.js';
+import type { AffineTextAttributes } from '@blocksuite/affine-components/rich-text';
 
-import { HoverController } from '../../../../components/index.js';
-import { BLOCK_ID_ATTR } from '../../../../consts.js';
+import {
+  HoverController,
+} from '@blocksuite/affine-components/hover';
+//import { HoverController } from '../../../../components/index.js';
+//import { BLOCK_ID_ATTR } from '../../../../consts.js';
+import { BLOCK_ID_ATTR  } from '@blocksuite/block-std';
+
 import { affineTextStyles } from '../affine-text.js';
 import { toggleLinkPopup } from './link-popup/toggle-link-popup.js';
 
-@customElement('mahdaad-weblink-node')
+//@customElement('mahdaad-weblink-node')
 export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
+  static override styles = css`
+    affine-link a:hover [data-v-text='true'] {
+      text-decoration: underline;
+    }
+  `;
+
   private _whenHover = new HoverController(
     this,
     ({ abortController }) => {
@@ -61,11 +74,48 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
     { enterDelay: 250 }
   );
 
-  static override styles = css`
-    affine-link a:hover [data-v-text='true'] {
-      text-decoration: underline;
+  get block() {
+    const block = this.inlineEditor.rootElement.closest<BlockComponent>(
+      `[${BLOCK_ID_ATTR}]`
+    );
+    assertExists(block);
+    return block;
+  }
+
+  get inlineEditor() {
+    const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
+      `[${INLINE_ROOT_ATTR}]`
+    );
+    assertExists(inlineRoot);
+    return inlineRoot.inlineEditor;
+  }
+
+  get link() {
+    const link = this.delta.attributes?.link;
+    if (!link) {
+      return '';
     }
-  `;
+    return link;
+  }
+
+  get selfInlineRange() {
+    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
+    assertExists(selfInlineRange);
+    return selfInlineRange;
+  }
+
+  // Workaround for links not working in contenteditable div
+  // see also https://stackoverflow.com/questions/12059211/how-to-make-clickable-anchor-in-contenteditable-div
+  //
+  // Note: We cannot use JS to directly open a new page as this may be blocked by the browser.
+  //
+  // Please also note that when readonly mode active,
+  // this workaround is not necessary and links work normally.
+  get std() {
+    const std = this.block.std;
+    assertExists(std);
+    return std;
+  }
 
   // see https://github.com/toeverything/AFFiNE/issues/1540
   private _onMouseUp() {
@@ -129,7 +179,7 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
     const styles = this.delta.attributes
       ? affineTextStyles(this.delta.attributes, linkStyles)
       : styleMap({});
-
+    console.log("qqqqq",styles);
     return html`
       <a
         @mouseup=${this._onMouseUp}
@@ -137,7 +187,7 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
         href=${this.link}
         rel="noopener noreferrer"
         target="_blank"
-        style=${styles}
+        style=${styleMap(linkStyles)}
         ><v-text .str=${this.delta.insert}></v-text
       ></a>
     `;
@@ -155,49 +205,6 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
     </mahdaad-weblink> <v-text .str="fffff"></v-text
     ></a></v-text>
     </span>`;*/
-  }
-
-  get block() {
-    const block = this.inlineEditor.rootElement.closest<BlockComponent>(
-      `[${BLOCK_ID_ATTR}]`
-    );
-    assertExists(block);
-    return block;
-  }
-
-  get inlineEditor() {
-    const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
-      `[${INLINE_ROOT_ATTR}]`
-    );
-    assertExists(inlineRoot);
-    return inlineRoot.inlineEditor;
-  }
-
-  get link() {
-    const link = this.delta.attributes?.link;
-    if (!link) {
-      return '';
-    }
-    return link;
-  }
-
-  get selfInlineRange() {
-    const selfInlineRange = this.inlineEditor.getInlineRangeFromElement(this);
-    assertExists(selfInlineRange);
-    return selfInlineRange;
-  }
-
-  // Workaround for links not working in contenteditable div
-  // see also https://stackoverflow.com/questions/12059211/how-to-make-clickable-anchor-in-contenteditable-div
-  //
-  // Note: We cannot use JS to directly open a new page as this may be blocked by the browser.
-  //
-  // Please also note that when readonly mode active,
-  // this workaround is not necessary and links work normally.
-  get std() {
-    const std = this.block.std;
-    assertExists(std);
-    return std;
   }
 
   @property({ type: Object })

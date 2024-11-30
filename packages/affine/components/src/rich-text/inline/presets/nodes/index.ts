@@ -1,7 +1,7 @@
 export { DEFAULT_DOC_NAME, REFERENCE_NODE } from './consts.js';
-export { AffineLink, toggleLinkPopup } from './link-node/index.js';
 export {MahdaadDateTimeInline} from './mahdaad-date-time-node/index.js'
 export { MahdaadObjectLinkInline } from './mahdaad-object-inline-node/mahdaad-object-inline-node.js';
+export { MahdaadWebLinkNode,toggleLinkPopup } from './mahdaad-web-link-node/index.js';
 
 export {MahdaadMention} from './mention-node/mahdaad-mention.js'
 export * from './reference-node/reference-config.js';
