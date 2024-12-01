@@ -312,6 +312,7 @@ export const conversionsGroup: MenuItemGroup<ElementToolbarMoreMenuContext> = {
         host,
         std,
       }) => {
+        //debugger
         const title = await promptDocTitle(host);
         if (title === null) return;
 
@@ -365,7 +366,8 @@ export const conversionsGroup: MenuItemGroup<ElementToolbarMoreMenuContext> = {
 
         notifyDocCreated(host, doc);
       },
-      when: ctx => !(ctx.getLinkedDocBlock() || ctx.getNoteBlock()),
+      //when: ctx => !(ctx.getLinkedDocBlock() || ctx.getNoteBlock()),//TODO comment for mahdaad
+      when: () => false,
     },
   ],
 };
