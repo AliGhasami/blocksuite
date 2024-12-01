@@ -17,8 +17,8 @@ import '../../../_common/components/button.js';
 import {
   cleanSpecifiedTail,
   createKeydownObserver,
-  getQuery,
-} from '../../../_common/components/utils.js';
+  getQuery
+} from "../../../_common/components/utils.js";
 //import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 
 import {
@@ -42,6 +42,10 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
     //return getQuery(this.inlineEditor, this._startIndex) || '';
     return getQuery(this.inlineEditor, this._startRange) || '';
   }
+
+ /* get host() {
+    return this.context.rootComponent.host;
+  }*/
 
   constructor(
     private editorHost: EditorHost,
@@ -141,20 +145,35 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
             search-text="${this._searchText}"
             .inline-editor="${this.inlineEditor}"
             @select="${(event: CustomEvent) => {
+
+              /*console.log("a1",this.editorHost);
+              console.log("b1",this.inlineEditor);
+              console.log("c1",this.triggerKey , 'gggg', this._searchText);*/
+              
               cleanSpecifiedTail(
                 this.editorHost,
                 this.inlineEditor,
                 this.triggerKey + this._searchText
               );
+
+              this.inlineEditor
+                .waitForUpdate()
+                .then(() => {
+                  //item.action(this.context)?.catch(console.error);
+                  //this.abortController.abort();
+                  insertContent(this.editorHost, this.model, REFERENCE_NODE, {
+                    mention: {
+                      user_id: event.detail.user_id,
+                      id: event.detail.id,
+                    },
+                  });
+                  this.abortController.abort();
+                })
+                .catch(console.error);
+              
               //return
               //console.log('this is insert content');
-              insertContent(this.editorHost, this.model, REFERENCE_NODE, {
-                mention: {
-                  user_id: event.detail.user_id,
-                  id: event.detail.id,
-                },
-              });
-              this.abortController.abort();
+             
             }}"
             @close="${() => {
               this.abortController.abort();

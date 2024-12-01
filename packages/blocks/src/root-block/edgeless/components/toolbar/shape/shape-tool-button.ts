@@ -80,10 +80,11 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
     const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
     return html`
-      <edgeless-toolbar-button
+      <edgeless-tool-icon-button
         class="edgeless-shape-button"
         .tooltip=${this.popper ? '' : getTooltipWithShortcut('Shape', 'S')}
         .tooltipOffset=${5}
+        .iconContainerPadding=${6}
         .active=${active}
       >
         <!-- <edgeless-toolbar-shape-draggable
@@ -99,7 +100,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
           ${ArrowUpIcon}
         </span>
         
-      </edgeless-toolbar-button>
+      </edgeless-tool-icon-button>
     `;
   }
 }

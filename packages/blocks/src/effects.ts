@@ -197,6 +197,7 @@ import { AffineTemplateLoading } from './root-block/edgeless/components/toolbar/
 import { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
 import { EdgelessTemplateButton } from './root-block/edgeless/components/toolbar/template/template-tool-button.js';
 import { EdgelessTextMenu } from './root-block/edgeless/components/toolbar/text/text-menu.js';
+import { EdgelessTextToolButton } from './root-block/edgeless/components/toolbar/text/text-tool-button.js';
 import { EdgelessRootPreviewBlockComponent } from './root-block/edgeless/edgeless-root-preview-block.js';
 import {
   AFFINE_AI_PANEL_WIDGET,
@@ -522,6 +523,7 @@ export function effects() {
   customElements.define('edgeless-templates-panel', EdgelessTemplatePanel);
   customElements.define('edgeless-text-menu', EdgelessTextMenu);
   customElements.define('edgeless-template-button', EdgelessTemplateButton);
+  customElements.define('edgeless-text-tool-button', EdgelessTextToolButton);
   customElements.define('edgeless-tool-icon-button', EdgelessToolIconButton);
   customElements.define('edgeless-size-panel', EdgelessSizePanel);
   customElements.define('edgeless-scale-panel', EdgelessScalePanel);

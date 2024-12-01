@@ -146,7 +146,7 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
 
   override enableActiveBackground = true;
 
-  override type: GfxToolsFullOptionValue['type'][] = ['empty', 'text'];
+  override type: GfxToolsFullOptionValue['type'][] = ['empty'];
 
   get draggableTools(): DraggableTool[] {
     const style = this._style$.value;
@@ -312,11 +312,12 @@ export class EdgelessMindmapToolButton extends EdgelessToolbarToolMixin(
     const active = popper || draggingElement;
     const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
-    return html`<edgeless-toolbar-button
+    return html`<edgeless-tool-icon-button
       class="edgeless-mindmap-button"
       ?withHover=${true}
-      .tooltip=${popper ? '' : 'Others'}
+      .tooltip=${popper ? '' : 'MindMap'}
       .tooltipOffset=${4}
+      .iconContainerPadding=${6}
       @click=${this._toggleMenu}
       style="width: 100%; height: 100%; display: inline-block"
     >

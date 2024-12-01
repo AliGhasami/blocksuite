@@ -35,6 +35,9 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     // Need to remove the search string
     // We must to do clean the slash string before we do the action
     // Otherwise, the action may change the model and cause the slash string to be changed
+    console.log("a",this.host);
+    console.log("b",this.context.model);
+    console.log("c",this.triggerKey + this._query);
     cleanSpecifiedTail(
       this.host,
       this.context.model,

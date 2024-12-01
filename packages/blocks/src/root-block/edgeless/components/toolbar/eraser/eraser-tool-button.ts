@@ -6,7 +6,7 @@ import {
   EdgelessEraserLightIcon,
   EraserTablerIcon
 } from '@blocksuite/affine-components/icons';
-import { ThemeProvider } from '@blocksuite/affine-shared/services';
+import { ThemeProvider } from "@blocksuite/affine-shared/services";
 import { css, html, LitElement } from 'lit';
 
 import { getTooltipWithShortcut } from '../../utils.js';
@@ -43,6 +43,46 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
 
   override type: GfxToolsFullOptionValue['type'] = 'eraser';
 
+  private handleEraser() {
+    //if (this.tryDisposePopper()) return;
+    //if (this.tryDisposePopper()) return;
+   // this.setEdgelessTool({ type: 'default' });
+    this.setEdgelessTool({ type: 'eraser' })
+
+    //if (this.tryDisposePopper()) return;
+    //this.setEdgelessTool({ type: 'default' });
+    //this.createPopper('edgeless-mindmap-menu', this);
+    /*const menu = this.createPopper('edgeless-mindmap-menu', this);
+    Object.assign(menu.element, {
+      edgeless: this.edgeless,
+      onActiveStyleChange: (style: MindmapStyle) => {
+        this.edgeless.std.get(EditPropsStore).recordLastProps('mindmap', {
+          style,
+        });
+      },
+      onImportMindMap: (bound: Bound) => {
+        return importMindmap(bound).then(mindmap => {
+          const id = this.edgeless.service.addElement('mindmap', {
+            children: mindmap,
+            layoutType: mindmap?.layoutType === 'left' ? 1 : 0,
+          });
+          const element = this.edgeless.service.getElementById(
+            id
+          ) as MindmapElementModel;
+
+          this.tryDisposePopper();
+          this.setEdgelessTool({ type: 'default' });
+          this.edgeless.gfx.selection.set({
+            elements: [element.tree.id],
+            editing: false,
+          });
+        });
+      },
+    });*/
+
+
+  }
+
   override firstUpdated() {
     this.disposables.add(
       this.edgeless.bindHotKey(
@@ -58,6 +98,7 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
     );
   }
 
+
   override render() {
     const type = this.edgelessTool?.type;
     const appTheme = this.edgeless.std.get(ThemeProvider).app$.value;
@@ -65,12 +106,13 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
       appTheme === 'dark' ? EdgelessEraserDarkIcon : EdgelessEraserLightIcon;
 
     return html`
-      <edgeless-toolbar-button
+      <edgeless-tool-icon-button
         class="edgeless-eraser-button"
         .tooltip=${getTooltipWithShortcut('Eraser', 'E')}
         .tooltipOffset=${4}
+        .iconContainerPadding=${6}
         .active=${type === 'eraser'}
-        @click=${() => this.setEdgelessTool({ type: 'eraser' })}
+        @click=${() => this.handleEraser()}
       >
         ${EraserTablerIcon}
         <!-- <div class="eraser-button">${icon}</div> -->

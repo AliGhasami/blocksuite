@@ -1,9 +1,6 @@
 import {
-  ArrowUpIcon,
-  EdgelessPenDarkIcon,
-  EdgelessPenLightIcon,
-  PenTablerIcon,
-} from '@blocksuite/affine-components/icons';
+  ArrowUpIcon, PenTablerIcon
+} from "@blocksuite/affine-components/icons";
 import {
   EditPropsStore,
   ThemeProvider,
@@ -70,6 +67,7 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
   private _toggleBrushMenu() {
     if (this.tryDisposePopper()) return;
     !this.active && this.setEdgelessTool(this.type);
+    this.setEdgelessTool(this.type);
     const menu = this.createPopper('edgeless-brush-menu', this);
     Object.assign(menu.element, {
       edgeless: this.edgeless,
@@ -83,27 +81,47 @@ export class EdgelessBrushToolButton extends EdgelessToolbarToolMixin(
   override render() {
     const { active } = this;
     const appTheme = this.edgeless.std.get(ThemeProvider).app$.value;
-    const icon =
+  /*  const icon =
       appTheme === 'dark' ? EdgelessPenDarkIcon : EdgelessPenLightIcon;
-    const color = this._color$.value;
+    const color = this._color$.value;*/
     const arrowColor = active ? 'currentColor' : 'var(--affine-icon-secondary)';
 
-    return html`
+   /* return html`
       <edgeless-toolbar-button
         class="edgeless-brush-button"
         .tooltip=${this.popper ? '' : getTooltipWithShortcut('Pen', 'P')}
         .tooltipOffset=${4}
+        .iconContainerPadding=${6}
         .active=${active}
         .withHover=${true}
+        @click=${() => this._toggleBrushMenu()}
+      >
+        ${PenTablerIcon}
+  <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
+          ${ArrowUpIcon}
+        </span>
+       <!-- <div style=${styleMap({ color })} class="pen-wrapper">${icon}</div> -->
+      </edgeless-toolbar-button>
+    `;*/
+
+    return html`
+      <edgeless-tool-icon-button
+        class="edgeless-brush-button"
+        .tooltip=${this.popper ? '' : getTooltipWithShortcut('Pen', 'P')}
+        .tooltipOffset=${17}
+        .active=${active}
+        .iconContainerPadding=${6}
         @click=${() => this._toggleBrushMenu()}
       >
         ${PenTablerIcon}
         <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
           ${ArrowUpIcon}
         </span>
-       <!-- <div style=${styleMap({ color })} class="pen-wrapper">${icon}</div> -->
-      </edgeless-toolbar-button>
+      </edgeless-tool-icon-button>
     `;
+
+
+
   }
 }
 

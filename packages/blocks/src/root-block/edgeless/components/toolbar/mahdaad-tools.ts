@@ -170,6 +170,7 @@ export const getSeniorTools = ({
     ></edgeless-mindmap-tool-button>`,
   });
 
+
   // Text
   tools.push({
     name: 'Text',

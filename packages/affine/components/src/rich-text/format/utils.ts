@@ -240,7 +240,7 @@ export function insertContent(
   }
   const inlineRange = inlineEditor.getInlineRange();
   const index = inlineRange ? inlineRange.index : model.text.length;
-  console.log("qqq",attributes);
+  //console.log("qqq",attributes);
   model.text.insert(text, index, attributes as Record<string, unknown>);
   // Update the caret to the end of the inserted text
   inlineEditor.setInlineRange({

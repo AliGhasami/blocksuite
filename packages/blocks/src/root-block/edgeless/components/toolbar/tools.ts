@@ -156,6 +156,7 @@ export const getSeniorTools = ({
     ></edgeless-mindmap-tool-button>`,
   });
 
+
   // Template
   tools.push({
     name: 'Template',
