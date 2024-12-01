@@ -130,7 +130,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       }
 
       //const trigger = '/template/';
-      console.log("999999",this._searchText,trigger);
+     // console.log("999999",this._searchText,trigger);
       const text = this._searchText ? trigger + this._searchText : trigger;
       // console.log('this is text', text);
       cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);

@@ -45,7 +45,14 @@ export class EdgelessTextToolButton extends EdgelessToolbarToolMixin(
       });
     }*/
 
+    if (this.toolbar.activePopper) {
+      // click manually always closes the popper
+      this.toolbar.activePopper.dispose();
+    }
+
+
     if (this.tryDisposePopper()) return;
+    //this.setEdgelessTool({ type: null });
     this.setEdgelessTool({ type: this.type, });
 
   }

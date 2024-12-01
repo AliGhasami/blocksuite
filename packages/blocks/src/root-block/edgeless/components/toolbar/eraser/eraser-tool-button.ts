@@ -47,6 +47,12 @@ export class EdgelessEraserToolButton extends EdgelessToolbarToolMixin(
     //if (this.tryDisposePopper()) return;
     //if (this.tryDisposePopper()) return;
    // this.setEdgelessTool({ type: 'default' });
+
+    if (this.toolbar.activePopper) {
+      // click manually always closes the popper
+      this.toolbar.activePopper.dispose();
+    }
+
     this.setEdgelessTool({ type: 'eraser' })
 
     //if (this.tryDisposePopper()) return;

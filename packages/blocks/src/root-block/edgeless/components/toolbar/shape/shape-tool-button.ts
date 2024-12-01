@@ -86,6 +86,8 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         .tooltipOffset=${5}
         .iconContainerPadding=${6}
         .active=${active}
+        .onShapeClick=${this._handleShapeClick}
+        @click=${this._toggleMenu}
       >
         <!-- <edgeless-toolbar-shape-draggable
           .edgeless=${this.edgeless}

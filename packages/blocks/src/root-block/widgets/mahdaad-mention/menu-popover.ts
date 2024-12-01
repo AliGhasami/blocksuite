@@ -145,10 +145,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
             search-text="${this._searchText}"
             .inline-editor="${this.inlineEditor}"
             @select="${(event: CustomEvent) => {
-
-              /*console.log("a1",this.editorHost);
-              console.log("b1",this.inlineEditor);
-              console.log("c1",this.triggerKey , 'gggg', this._searchText);*/
               
               cleanSpecifiedTail(
                 this.editorHost,
@@ -170,9 +166,6 @@ export class MahdaadMenuPopover extends WithDisposable(ShadowlessElement) {
                   this.abortController.abort();
                 })
                 .catch(console.error);
-              
-              //return
-              //console.log('this is insert content');
              
             }}"
             @close="${() => {

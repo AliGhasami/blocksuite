@@ -39,6 +39,12 @@ export class EdgelessNoteToolButton extends QuickToolMixin(LitElement) {
   }
 
   private _toggleNoteMenu() {
+
+    if (this.toolbar.activePopper) {
+      // click manually always closes the popper
+      this.toolbar.activePopper.dispose();
+    }
+
     this.tryDisposePopper();
     if (this._noteMenu) {
       this._disposeMenu();

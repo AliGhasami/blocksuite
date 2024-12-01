@@ -297,7 +297,9 @@ export const conversionsGroup: MenuItemGroup<ElementToolbarMoreMenuContext> = {
           editing: false,
         });
       },
-      when: ctx => !!ctx.getNoteBlock(),
+      when: ()=> false,
+      //when: ctx => !!ctx.getNoteBlock(), //TODO comment for mahdaad
+
     },
     {
       icon: LinkedPageIcon({ width: '20', height: '20' }),

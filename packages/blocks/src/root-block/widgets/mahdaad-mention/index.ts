@@ -180,7 +180,6 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
         }),
       };*/
       //console.log("77777",text);
-      console.log("88888",matchedKey);
       //closeSlashMenu();
       closeMentionMenu();
       const curRange = getCurrentNativeRange();
