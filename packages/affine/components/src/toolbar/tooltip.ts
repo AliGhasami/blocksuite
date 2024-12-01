@@ -171,7 +171,8 @@ export class Tooltip extends LitElement {
               this.autoFlip && flip({ padding: 12 }),
               offset((this.arrow ? TRIANGLE_HEIGHT : 0) + this.offset),
               arrow({
-                element: portalRoot.shadowRoot!.querySelector('.arrow')!,
+                //TODO fix for mahdaad
+                element: portalRoot.shadowRoot ? portalRoot.shadowRoot!.querySelector('.arrow')! : portalRoot.querySelector('.arrow')!,
               }),
             ],
             autoUpdate: true,

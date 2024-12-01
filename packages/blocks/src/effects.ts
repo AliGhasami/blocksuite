@@ -166,7 +166,7 @@ import { EdgelessSlideMenu } from './root-block/edgeless/components/toolbar/comm
 import { EdgelessConnectorMenu } from './root-block/edgeless/components/toolbar/connector/connector-menu.js';
 import { EdgelessConnectorToolButton } from './root-block/edgeless/components/toolbar/connector/connector-tool-button.js';
 //import { EdgelessDefaultToolButton } from './root-block/edgeless/components/toolbar/default/default-tool-button.js';
-import { EdgelessDefaultToolButton } from './root-block/edgeless/components/toolbar/default/mahdaad-default-tool-button.js';
+import { EdgelessDefaultToolButton } from './root-block/edgeless/components/toolbar/default/default-tool-button.js';
 import { EdgelessPanToolButton } from "./root-block/edgeless/components/toolbar/default/pan-tool-button.js";
 import {
   EDGELESS_TOOLBAR_WIDGET,
@@ -219,8 +219,6 @@ import {
   AffineSurfaceRefToolbar,
   EdgelessCopilotToolbarEntry,
   EdgelessCopilotWidget,
-  EdgelessElementToolbarWidget,
-  EdgelessRemoteSelectionWidget,
   EdgelessRootBlockComponent,
   EmbedCardToolbar,
   FramePreview,
