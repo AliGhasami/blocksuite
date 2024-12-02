@@ -342,7 +342,8 @@ export class EdgelessChangeTextMenu extends WithDisposable(LitElement) {
 
     return join(
       [
-        html`
+       //TODO comment for mahdaad
+        /*html`
           <editor-menu-button
             .contentPadding=${'8px'}
             .button=${html`
@@ -366,7 +367,7 @@ export class EdgelessChangeTextMenu extends WithDisposable(LitElement) {
               .onSelect=${this._setFontFamily}
             ></edgeless-font-family-panel>
           </editor-menu-button>
-        `,
+        `,*/
 
         when(
           this.edgeless.doc.awarenessStore.getFlag('enable_color_picker'),
@@ -414,8 +415,8 @@ export class EdgelessChangeTextMenu extends WithDisposable(LitElement) {
             </editor-menu-button>
           `
         ),
-
-        html`
+        //TODO comment for mahdaad
+        /*html`
           <editor-menu-button
             .contentPadding=${'8px'}
             .button=${html`
@@ -442,7 +443,7 @@ export class EdgelessChangeTextMenu extends WithDisposable(LitElement) {
               .onSelect=${this._setFontWeightAndStyle}
             ></edgeless-font-weight-and-style-panel>
           </editor-menu-button>
-        `,
+        `,*/
 
         this.elementType === 'edgeless-text'
           ? nothing

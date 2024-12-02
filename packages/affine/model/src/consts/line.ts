@@ -25,6 +25,17 @@ export enum LineColor {
   Teal = '--affine-palette-line-teal',
   White = '--affine-palette-line-white',
   Yellow = '--affine-palette-line-yellow',
+  /*Black = '--affine-palette-line-black',
+  Blue = '--affine-palette-line-blue',
+  Green = '--affine-palette-line-green',
+  Grey = '--affine-palette-line-grey',
+  Magenta = '--affine-palette-line-magenta',
+  Orange = '--affine-palette-line-orange',
+  Purple = '--affine-palette-line-purple',
+  Red = 'rgb(var(--mt-red-5))',
+  Teal = '--affine-palette-line-teal',
+  White = '--affine-palette-line-white',
+  Yellow = '--affine-palette-line-yellow',*/
 }
 
 export const LineColorMap = createEnumMap(LineColor);

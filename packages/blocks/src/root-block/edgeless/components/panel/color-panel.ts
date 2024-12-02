@@ -259,6 +259,7 @@ export class EdgelessColorPanel extends LitElement {
   }
 
   onSelect(value: string) {
+    console.log("this is color",value);
     this.dispatchEvent(
       new ColorEvent('select', {
         detail: value,

@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 //import '@blocksuite/presets/themes/affine.css'
+import '@toeverything/theme/style.css';
 import { EdgelessEditor, PageEditor } from '@blocksuite/presets'
 //import { createEmptyDoc } from './helpers'
 import {
@@ -911,9 +912,9 @@ async function init() {
       font-family: unset;
     }
 
-    .claytap-text {
+    /*.claytap-text {
       font-family: unset;
-    }
+    }*/
   }
 
   .place-holder {
@@ -1025,10 +1026,11 @@ async function init() {
     }*/
   }
 
+  //TODO ali ghasami for cxomment text color
   /* paragraph Style */
   .claytap-text {
     //background-color: red;
-    @apply text-neutral-8; //mt-body
+  //  @apply text-neutral-8; //mt-body
     //line-height: unset;
   }
 
@@ -1047,8 +1049,8 @@ async function init() {
   }
 
   /* Fix rtl - ltr Style */
-  .affine-paragraph-placeholder {
-  }
+  /*.affine-paragraph-placeholder {
+  }*/
 
   /* Place Holder - paragraph style */
 
