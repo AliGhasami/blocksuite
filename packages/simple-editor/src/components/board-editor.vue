@@ -883,6 +883,8 @@ async function init() {
   --affine-v2-chip-label-white:@gray-0;
   --affine-v2-chip-label-purple:@pink-1;
   --affine-v2-chip-label-grey:@gray-2;
+  --affine-v2-text-primary:@gray-8;
+  --affine-v2-database-textSecondary:@gray-4;
   //--affine-tag-white:@gray-0;
 }
 

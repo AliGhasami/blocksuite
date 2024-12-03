@@ -38,7 +38,7 @@ export function cleanIllegalAttributes(deltas) {
       item.insert != ' ' &&
       item.attributes &&
       (Object.hasOwn(item.attributes, 'mahdaadObjectLink') ||
-        Object.hasOwn(item.attributes, 'mention'))
+        Object.hasOwn(item.attributes, 'mention') || Object.hasOwn(item.attributes, 'date'))
     ) {
       item.attributes = undefined;
     }
@@ -182,12 +182,23 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
       this.editor.rerenderWholeEditor();
     }
 
+    const matchDelta = this.getCurrentInlineRangeDelta;
+    if (matchDelta?.attributes?.date) syncInlineRange = false;
+    if (syncInlineRange) {
+      // We need to synchronize the selection immediately after rendering is completed,
+      // otherwise there is a possibility of an error in the cursor position
+      this.editor.rangeService.syncInlineRange();
+    }
+
     this.editor
       .waitForUpdate()
       .then(() => {
         this._rendering = false;
         this.editor.slots.renderComplete.emit();
-        this.editor.syncInlineRange();
+        if (syncInlineRange) {
+          this.editor.syncInlineRange();
+        }
+
       })
       .catch(console.error);
   };
@@ -195,14 +206,14 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
   // TODO return if has bug
   get getCurrentInlineRangeDelta() {
     const range = this.editor.getInlineRange();
-    console.log("1111",range);
+    //console.log("1111",range);
     if (range) return this.getDeltaByInlineRange(range);
     return undefined;
   }
 
   // TODO return if has bug
   getDeltaByInlineRange(inlineRange: InlineRange) {
-    console.log("22222",this.editor.getDeltasByInlineRange(inlineRange));
+    //console.log("22222",this.editor.getDeltasByInlineRange(inlineRange));
     return this.editor.getDeltasByInlineRange(inlineRange)?.find(
       ([_, _inlineRange]) =>
         _inlineRange.length == inlineRange.length &&
