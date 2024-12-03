@@ -13,6 +13,41 @@ import type { BaseTextAttributes } from '../utils/base-attributes.js';
 
 import { deltaInsertsToChunks } from '../utils/delta-convert.js';
 
+//todo ali ghasami for remove if has bug or fix after  - fix for mahdaad
+export function cleanIllegalAttributes(deltas) {
+  //const savedAttributes = null;
+  /*deltas.forEach(item => {
+    if (
+      (savedAttributes &&
+        item.attributes &&
+        item.attributes.mention &&
+        item.attributes.mention.id == savedAttributes.id) ||
+      (item.attributes.mahdaadObjectLink &&
+        item.attributes.mahdaadObjectLink.id == savedAttributes.id)
+    ) {
+      item.attributes = undefined;
+    }
+    if (item.attributes && item.attributes.mention) {
+      savedAttributes = item.attributes.mention;
+    }
+    console.log(' ===>', savedAttributes);
+  });*/
+  //debugger;
+  deltas.forEach(item => {
+    if (
+      item.insert != ' ' &&
+      item.attributes &&
+      (Object.hasOwn(item.attributes, 'mahdaadObjectLink') ||
+        Object.hasOwn(item.attributes, 'mention'))
+    ) {
+      item.attributes = undefined;
+    }
+  });
+
+  return deltas;
+}
+
+
 export class RenderService<TextAttributes extends BaseTextAttributes> {
   private _onYTextChange = (_: Y.YTextEvent, transaction: Y.Transaction) => {
     this.editor.slots.textChange.emit();
@@ -84,7 +119,7 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
 
     const rootElement = this.editor.rootElement;
     const embedDeltas = this.editor.deltaService.embedDeltas;
-    const chunks = deltaInsertsToChunks(embedDeltas);
+    const chunks = deltaInsertsToChunks(cleanIllegalAttributes(embedDeltas));
 
     let deltaIndex = 0;
     // every chunk is a line

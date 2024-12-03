@@ -58,8 +58,9 @@ const styles = css`
     margin-inline: 5px;
   }
 
+  /*Todo comment for mahdaad*/
   .label {
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     color: var(--affine-text-secondary-color);
   }
 

@@ -240,9 +240,9 @@ export class KanbanCard extends SignalWatcher(
     }
     return html`
       <div class="card-ops">
-        <div class="card-op" @click="${this.clickEdit}">
+       <!-- <div class="card-op" @click="${this.clickEdit}">
           ${CenterPeekIcon()}
-        </div>
+        </div> -->
         <div class="card-op" @click="${this.clickMore}">
           ${MoreHorizontalIcon()}
         </div>

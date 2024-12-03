@@ -186,7 +186,7 @@ abstract class BaseTextCell extends BaseCellRenderer<Text> {
 
 export class HeaderAreaTextCell extends BaseTextCell {
   override renderBlockText() {
-    return html` <rich-text
+    return html`<rich-text
       .yText="${this.value}"
       .attributesSchema="${this.attributesSchema}"
       .attributeRenderer="${this.attributeRenderer}"

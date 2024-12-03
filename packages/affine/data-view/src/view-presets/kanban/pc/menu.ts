@@ -38,13 +38,13 @@ export const popCardMenu = (
   selection: KanbanSelectionController
 ) => {
   popFilterableSimpleMenu(ele, [
-    menu.action({
+    /*menu.action({
       name: 'Expand Card',
       prefix: ExpandFullIcon(),
       select: () => {
         openDetail(dataViewEle, rowId, selection);
       },
-    }),
+    }),*/
     menu.subMenu({
       name: 'Move To',
       prefix: ArrowRightBigIcon(),

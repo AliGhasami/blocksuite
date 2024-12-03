@@ -6,7 +6,6 @@ import {
 import {
   CopyIcon,
   DeleteIcon,
-  ExpandFullIcon,
   MoveLeftIcon,
   MoveRightIcon,
 } from '@blocksuite/icons/lit';
@@ -81,13 +80,13 @@ export const popRowMenu = (
   }
   const row = selection.rows[0];
   popFilterableSimpleMenu(ele, [
-    menu.action({
+    /*menu.action({
       name: 'Expand Row',
       prefix: ExpandFullIcon(),
       select: () => {
         openDetail(dataViewEle, row.id, selectionController);
       },
-    }),
+    }),*/
     menu.group({
       name: '',
       items: [

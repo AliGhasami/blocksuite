@@ -389,10 +389,15 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
   override renderBlock() {
     const peekViewService = this.std.getOptional(PeekViewProvider);
     const telemetryService = this.std.getOptional(TelemetryProvider);
+    //background-color: var(--affine-background-primary-color)
+
+
+    //return html`<div style="position: relative;border-radius: 4px">1111f gdf gdf gd gdf gdf gdf gdf gf dfg dfgdfg dfg dfgdfg dfgdfgd fgdf gdf gfdgdf gdf gdf gdf gdfgdf gdf gfd gdf gdf gdf gdf gdf gdf gd gf dfg dfg dfg dfg dfg dfg dfg dfg dfgfdg dfg dfg dfgdfg dfgfdg bvcbfd gvbcgcvbv b vb11</div>`
+
     return html`
       <div
         contenteditable="false"
-        style="position: relative;background-color: var(--affine-background-primary-color);border-radius: 4px"
+        style="position: relative;border-radius: 4px"
       >
         ${this.dataView.render({
           virtualPadding$: this.virtualPadding$,

@@ -869,14 +869,48 @@ async function init() {
 </script>
 
 <style lang="less">
+
+[data-theme=light] {
+  --affine-text-primary-color:@gray-10;
+  --affine-divider-color:@gray-2;
+  --affine-background-primary-color:@gray-0;
+  --affine-hover-color-filled:@gray-1;
+  --affine-border-color:@gray-2;
+  --affine-v2-layer-insideBorder-border:@gray-2;
+  --affine-background-secondary-color:@gray-1;
+  //--affine-background-secondary-color:@teal-5;
+  --affine-v2-chip-label-teal:@teal-0;
+  --affine-v2-chip-label-white:@gray-0;
+  --affine-v2-chip-label-purple:@pink-1;
+  --affine-v2-chip-label-grey:@gray-2;
+  //--affine-tag-white:@gray-0;
+}
+
 @prefix:~ 'vue-block-board-editor';
 .@{prefix} {
+
+
+
   .affine-menu-action-text,
   .property-item-name,
   .select-input {
     @apply text-gray-8;
   }
 
+ /* affine-database-table{
+    //width: 100%;
+  }*/
+
+  /*affine-database{
+    width: 90%;
+    overflow-x: hidden;
+  }*/
+
+
+  /*.affine-block-component{
+    overflow: hidden;
+    width: 90%;
+  }*/
   /**{
     font-family: "blocksuite:surface:Poppins";
   }*/
@@ -1012,6 +1046,14 @@ async function init() {
       }
     }
   }*/
+  affine-database,affine-menu{
+    background-color: @gray-0;
+  }
+
+  .affine-menu-button .affine-menu-action-text,.affine-menu-input,.affine-database-title,affine-menu{
+    color:@gray-10;
+  }
+
 
   /* reset Style */
   .affine-paragraph-block-container {
@@ -1049,8 +1091,9 @@ async function init() {
   }
 
   /* Fix rtl - ltr Style */
-  /*.affine-paragraph-placeholder {
-  }*/
+  .affine-paragraph-placeholder {
+    color:@gray-3;
+  }
 
   /* Place Holder - paragraph style */
 
