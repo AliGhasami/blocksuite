@@ -2,6 +2,7 @@ import type { AwarenessSource } from '@blocksuite/sync';
 import type { Awareness } from 'y-protocols/awareness';
 
 import { assertExists } from '@blocksuite/global/utils';
+import { Base64 } from 'js-base64';
 import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
@@ -27,7 +28,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
         channel: 'awareness',
         payload: {
           type: 'update',
-          update: Array.from(update),
+          update: Base64.fromUint8Array(update),
         },
       } satisfies WebSocketMessage)
     );
@@ -41,9 +42,9 @@ export class WebSocketAwarenessSource implements AwarenessSource {
     const { type } = data.payload;
 
     if (type === 'update') {
-      const update = data.payload.update;
+      const update = Base64.toUint8Array(data.payload.update);
       assertExists(this.awareness);
-      applyAwarenessUpdate(this.awareness, new Uint8Array(update), 'remote');
+      applyAwarenessUpdate(this.awareness, update, 'remote');
     }
 
     if (type === 'connect') {
@@ -53,7 +54,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
           channel: 'awareness',
           payload: {
             type: 'update',
-            update: Array.from(
+            update: Base64.fromUint8Array(
               encodeAwarenessUpdate(this.awareness, [this.awareness.clientID])
             ),
           },
