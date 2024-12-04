@@ -116,7 +116,6 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
         const composing = this._composing.value;
 
         let showPlaceHolder=true
-
         if (composing || this.doc.readonly) {
           showPlaceHolder=false
           //this._displayPlaceholder.value = false;
@@ -141,11 +140,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
               //this._displayPlaceholder.value = false;
               //return;
             }
-
-            if(!showPlaceHolder && this.checkIsEmptyAndNotFocus()) {
+            //if(!showPlaceHolder)
+            if(!showPlaceHolder && this.checkIsEmptyAndNotFocus() && !this.doc.readonly) {
               showPlaceHolder = true
             }
-
             //this._displayPlaceholder.value = true;
             this._displayPlaceholder.value = showPlaceHolder;
             return;
