@@ -8,7 +8,7 @@ import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private _onMessage = (event: MessageEvent<string>) => {
-    console.log("_onMessage");
+    //console.log("_onMessage");
     //todo ali ghasami for convert base 64
     const data = JSON.parse(event.data) as WebSocketMessage;
     if (data.channel !== 'doc') return;
@@ -152,7 +152,7 @@ export class WebSocketDocSource implements DocSource {
     this.ws.addEventListener(
       'message',
       (event: MessageEvent<string>) => {
-        console.log("subscribe  on message");
+        //console.log("subscribe  on message");
         //todo convert ali ghasami to base 64
         const data = JSON.parse(event.data) as WebSocketMessage;
         if(data.payload && data.payload.time) {
