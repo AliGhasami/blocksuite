@@ -7,7 +7,6 @@ import {
 } from '@blocksuite/affine-components/context-menu';
 import {
   DeleteIcon,
-  DuplicateIcon,
   InfoIcon,
   MoreHorizontalIcon,
   MoveLeftIcon,
@@ -199,13 +198,14 @@ export class DataViewHeaderViews extends WidgetBase {
           }),
           menu.group({
             items: [
-              menu.action({
+              //todo remove for mahdaad
+             /* menu.action({
                 name: 'Duplicate',
                 prefix: DuplicateIcon(),
                 select: () => {
                   this.viewManager.viewDuplicate(id);
                 },
-              }),
+              }),*/
               menu.action({
                 name: 'Delete',
                 prefix: DeleteIcon(),

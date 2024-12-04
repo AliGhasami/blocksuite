@@ -10,7 +10,6 @@ import { unsafeCSSVarV2 } from '@blocksuite/affine-shared/theme';
 import {
   ArrowRightSmallIcon,
   DeleteIcon,
-  DuplicateIcon,
   FilterIcon,
   GroupingIcon,
   InfoIcon,
@@ -349,13 +348,14 @@ export const popViewOptions = (
   items.push(
     menu.group({
       items: [
-        menu.action({
+        //todo comment for mahdaad
+       /* menu.action({
           name: 'Duplicate',
           prefix: DuplicateIcon(),
           select: () => {
             view.duplicate();
           },
-        }),
+        }),*/
         menu.action({
           name: 'Delete',
           prefix: DeleteIcon(),

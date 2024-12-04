@@ -235,6 +235,7 @@ export class DataViewKanban extends DataViewBase<
     return this.props.view.groupTrait;
   }
 
+  //todo comment for mahdaad
   override render() {
     const groups = this.groupManager.groupsDataList$.value;
     if (!groups) {
@@ -269,7 +270,8 @@ export class DataViewKanban extends DataViewBase<
             ></affine-data-view-kanban-group>`;
           }
         )}
-        ${this.renderAddGroup()}
+        
+       <!--  ${this.renderAddGroup()} -->
       </div>
     `;
   }
