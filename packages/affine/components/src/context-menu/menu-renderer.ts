@@ -14,9 +14,8 @@ import {
   computePosition,
   type Middleware,
   offset,
-  type ReferenceElement,
-  shift,
-} from '@floating-ui/dom';
+  type ReferenceElement, shift
+} from "@floating-ui/dom";
 import { css, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
@@ -446,10 +445,13 @@ export const createPopup = (
   const modal = createModal(target.root);
   autoUpdate(target.targetRect, content, () => {
     computePosition(target.targetRect, content, {
+      strategy: 'fixed',
       middleware: options?.middleware ?? [shift({ crossAxis: true })],
     })
       .then(({ x, y }) => {
+        // formatQuickBarElement.style.position = 'fixed';
         Object.assign(content.style, {
+          position:'fixed',
           left: `${x}px`,
           top: `${y}px`,
         });
@@ -532,6 +534,7 @@ export const popMenu = (
       closePopup();
     },
   });
+  //console.log("contanier",props.container,target);
   const closePopup = createPopup(target, menu.menuElement, {
     onClose: onClose,
     middleware: props.middleware ?? [
