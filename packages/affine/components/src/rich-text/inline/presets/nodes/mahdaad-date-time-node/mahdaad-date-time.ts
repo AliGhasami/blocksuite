@@ -83,16 +83,16 @@ export class MahdaadDateTimeInline extends ShadowlessElement {
   }
 
   override render() {
-    //console.log('this is date time', this.delta);
+    console.log('this is date time', this.delta);
     return html`<span >
       <mahdaad-date-time
         class="${Prefix}-date-time" 
         data-event-id="${this.id}"
-        create-status="${this.delta?.attributes?.date?.createStatus ?? 2}"
         @update=${this.selfUpdate}
         readonly="${this.blockElement.doc.readonly}"
         date="${this.delta.attributes?.date?.date}"
         time="${this.delta.attributes?.date?.time}"
+        id="${this.delta.attributes?.date?.id}"
         meta="${this.delta.attributes?.date?.meta}"
       >
       </mahdaad-date-time>

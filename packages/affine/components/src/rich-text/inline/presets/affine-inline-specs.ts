@@ -252,7 +252,6 @@ export const MahdaadDateTimeSpecExtension = InlineSpecExtension({
       date: z.string(),
       id: z.string().optional(),
       meta: z.any().optional(),
-      createStatus: z.number().optional(),
     }).optional().nullable().catch(undefined),
   match: delta => {
     return !!delta.attributes?.date;

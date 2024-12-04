@@ -16,7 +16,6 @@ export interface DateTimeEvent {
   time: string | null;
   date: string;
   meta?: any;
-  createStatus?: number
 }
 
 export interface AffineTextAttributes {

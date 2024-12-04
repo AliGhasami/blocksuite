@@ -110,3 +110,14 @@
 [NX Daemon Server] - 2024-11-27T11:52:58.689Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2024-11-27T11:52:58.692Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
 [NX Daemon Server] - 2024-11-27T11:52:58.693Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)
+[NX Daemon Server] - 2024-12-03T10:42:42.196Z - Started listening on: /tmp/c7bbe813eec12e2b8a4f/d.sock
+[NX Daemon Server] - 2024-12-03T10:42:42.199Z - [WATCHER]: Subscribed to changes within: /home/sedmedgh/Desktop/projects/js/blocksuite (native)
+[NX Daemon Server] - 2024-12-03T10:42:42.201Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-12-03T10:42:42.201Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-12-03T10:42:42.203Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-12-03T10:42:42.206Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-12-03T10:42:42.208Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-12-03T10:42:42.208Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2024-12-03T10:42:42.210Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-12-03T10:42:42.210Z - [WATCHER]: Stopping the watcher for /home/sedmedgh/Desktop/projects/js/blocksuite (sources)
+[NX Daemon Server] - 2024-12-03T10:42:42.211Z - [WATCHER]: Stopping the watcher for /home/sedmedgh/Desktop/projects/js/blocksuite (outputs)

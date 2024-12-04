@@ -186,7 +186,6 @@ export const actionsMenu: MahdaadActionMenu[] = [
         date: triggerKey,
         time: null,
         id: uuidv4(),
-        createStatus: 1,
       };
       /*{
         const triggerKey = '$';
@@ -214,8 +213,8 @@ export const actionsMenu: MahdaadActionMenu[] = [
         date: triggerKey,
         time,
         id: uuidv4(),
-        createStatus: 1,
       };
+      window.focusedDateTime = temp.id
       /*{
         const triggerKey = '$';
         insertContent(rootComponent.host, model, triggerKey);

@@ -297,9 +297,9 @@
         "hash": "10/8053fbfc21e8297ab55c8e7f9f119e4809fa7e505268691e1bedc2cf5e7a5a7de8c60ad13da2515378621b7601c42e101d2d679904da395fa3806a1edef6b92e"
       }
     },
-    "npm:@babel/helper-create-class-features-plugin@7.25.9": {
+    "npm:@babel/helper-create-class-features-plugin": {
       "type": "npm",
-      "name": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "name": "npm:@babel/helper-create-class-features-plugin",
       "data": {
         "version": "7.25.9",
         "packageName": "@babel/helper-create-class-features-plugin",
@@ -378,9 +378,9 @@
         "hash": "10/ea37ad9f8f7bcc27c109963b8ebb9d22bac7a5db2a51de199cb560e251d5593fe721e46aab2ca7d3e7a24b0aa4aff0eaf9c7307af9c2fd3a1d84268579073052"
       }
     },
-    "npm:@babel/helper-replace-supers@7.25.9": {
+    "npm:@babel/helper-replace-supers": {
       "type": "npm",
-      "name": "npm:@babel/helper-replace-supers@7.25.9",
+      "name": "npm:@babel/helper-replace-supers",
       "data": {
         "version": "7.25.9",
         "packageName": "@babel/helper-replace-supers",
@@ -594,9 +594,9 @@
         "hash": "10/bbd1a56b095be7820029b209677b194db9b1d26691fe999856462e66b25b281f031f3dfd91b1619e9dcf95bebe336211833b854d0fb8780d618e35667c2d0d7e"
       }
     },
-    "npm:@babel/plugin-syntax-typescript@7.25.9": {
+    "npm:@babel/plugin-syntax-typescript": {
       "type": "npm",
-      "name": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "name": "npm:@babel/plugin-syntax-typescript",
       "data": {
         "version": "7.25.9",
         "packageName": "@babel/plugin-syntax-typescript",
@@ -1044,9 +1044,9 @@
         "hash": "10/3ae240358f0b0cd59f8610d6c59d395c216fd1bab407f7de58b86d592f030fb42b4d18e2456a29bee4a2ff014c4c1e3404c8ae64462b1155d1c053b2f9d73438"
       }
     },
-    "npm:@babel/plugin-transform-typescript@7.25.9": {
+    "npm:@babel/plugin-transform-typescript": {
       "type": "npm",
-      "name": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "name": "npm:@babel/plugin-transform-typescript",
       "data": {
         "version": "7.25.9",
         "packageName": "@babel/plugin-transform-typescript",
@@ -2466,9 +2466,9 @@
         "hash": "7127208313631002285"
       }
     },
-    "npm:@esbuild/linux-x64@0.24.0": {
+    "npm:@esbuild/linux-x64": {
       "type": "npm",
-      "name": "npm:@esbuild/linux-x64@0.24.0",
+      "name": "npm:@esbuild/linux-x64",
       "data": {
         "version": "0.24.0",
         "packageName": "@esbuild/linux-x64",
@@ -2646,9 +2646,9 @@
         "hash": "1996963148403849054"
       }
     },
-    "npm:@esbuild/win32-x64": {
+    "npm:@esbuild/win32-x64@0.24.0": {
       "type": "npm",
-      "name": "npm:@esbuild/win32-x64",
+      "name": "npm:@esbuild/win32-x64@0.24.0",
       "data": {
         "version": "0.24.0",
         "packageName": "@esbuild/win32-x64",
@@ -3033,9 +3033,9 @@
         "hash": "14111005903371643343"
       }
     },
-    "npm:@img/sharp-libvips-linux-x64@1.0.4": {
+    "npm:@img/sharp-libvips-linux-x64": {
       "type": "npm",
-      "name": "npm:@img/sharp-libvips-linux-x64@1.0.4",
+      "name": "npm:@img/sharp-libvips-linux-x64",
       "data": {
         "version": "1.0.4",
         "packageName": "@img/sharp-libvips-linux-x64",
@@ -3087,9 +3087,9 @@
         "hash": "13017887543167419797"
       }
     },
-    "npm:@img/sharp-linux-x64@0.33.5": {
+    "npm:@img/sharp-linux-x64": {
       "type": "npm",
-      "name": "npm:@img/sharp-linux-x64@0.33.5",
+      "name": "npm:@img/sharp-linux-x64",
       "data": {
         "version": "0.33.5",
         "packageName": "@img/sharp-linux-x64",
@@ -3132,9 +3132,9 @@
         "hash": "17503160122875990420"
       }
     },
-    "npm:@img/sharp-win32-x64": {
+    "npm:@img/sharp-win32-x64@0.33.5": {
       "type": "npm",
-      "name": "npm:@img/sharp-win32-x64",
+      "name": "npm:@img/sharp-win32-x64@0.33.5",
       "data": {
         "version": "0.33.5",
         "packageName": "@img/sharp-win32-x64",
@@ -3861,9 +3861,9 @@
         "hash": "17992992806347300029"
       }
     },
-    "npm:@nx/nx-linux-x64-gnu@20.0.5": {
+    "npm:@nx/nx-linux-x64-gnu": {
       "type": "npm",
-      "name": "npm:@nx/nx-linux-x64-gnu@20.0.5",
+      "name": "npm:@nx/nx-linux-x64-gnu",
       "data": {
         "version": "20.0.5",
         "packageName": "@nx/nx-linux-x64-gnu",
@@ -3888,9 +3888,9 @@
         "hash": "1194283324298820690"
       }
     },
-    "npm:@nx/nx-win32-x64-msvc": {
+    "npm:@nx/nx-win32-x64-msvc@20.0.5": {
       "type": "npm",
-      "name": "npm:@nx/nx-win32-x64-msvc",
+      "name": "npm:@nx/nx-win32-x64-msvc@20.0.5",
       "data": {
         "version": "20.0.5",
         "packageName": "@nx/nx-win32-x64-msvc",
@@ -4014,9 +4014,9 @@
         "hash": "8509855762762844535"
       }
     },
-    "npm:@oxc-resolver/binding-linux-x64-gnu@1.12.0": {
+    "npm:@oxc-resolver/binding-linux-x64-gnu": {
       "type": "npm",
-      "name": "npm:@oxc-resolver/binding-linux-x64-gnu@1.12.0",
+      "name": "npm:@oxc-resolver/binding-linux-x64-gnu",
       "data": {
         "version": "1.12.0",
         "packageName": "@oxc-resolver/binding-linux-x64-gnu",
@@ -4050,9 +4050,9 @@
         "hash": "6928229992490370443"
       }
     },
-    "npm:@oxc-resolver/binding-win32-x64-msvc": {
+    "npm:@oxc-resolver/binding-win32-x64-msvc@1.12.0": {
       "type": "npm",
-      "name": "npm:@oxc-resolver/binding-win32-x64-msvc",
+      "name": "npm:@oxc-resolver/binding-win32-x64-msvc@1.12.0",
       "data": {
         "version": "1.12.0",
         "packageName": "@oxc-resolver/binding-win32-x64-msvc",
@@ -4464,9 +4464,9 @@
         "hash": "8100504150405219184"
       }
     },
-    "npm:@rollup/rollup-linux-x64-gnu@4.27.4": {
+    "npm:@rollup/rollup-linux-x64-gnu": {
       "type": "npm",
-      "name": "npm:@rollup/rollup-linux-x64-gnu@4.27.4",
+      "name": "npm:@rollup/rollup-linux-x64-gnu",
       "data": {
         "version": "4.27.4",
         "packageName": "@rollup/rollup-linux-x64-gnu",
@@ -4500,9 +4500,9 @@
         "hash": "5160825340633153477"
       }
     },
-    "npm:@rollup/rollup-win32-x64-msvc": {
+    "npm:@rollup/rollup-win32-x64-msvc@4.27.4": {
       "type": "npm",
-      "name": "npm:@rollup/rollup-win32-x64-msvc",
+      "name": "npm:@rollup/rollup-win32-x64-msvc@4.27.4",
       "data": {
         "version": "4.27.4",
         "packageName": "@rollup/rollup-win32-x64-msvc",
@@ -4932,9 +4932,9 @@
         "hash": "16046995716587888988"
       }
     },
-    "npm:@swc/core-linux-x64-gnu@1.9.3": {
+    "npm:@swc/core-linux-x64-gnu": {
       "type": "npm",
-      "name": "npm:@swc/core-linux-x64-gnu@1.9.3",
+      "name": "npm:@swc/core-linux-x64-gnu",
       "data": {
         "version": "1.9.3",
         "packageName": "@swc/core-linux-x64-gnu",
@@ -4968,9 +4968,9 @@
         "hash": "3584081915472716377"
       }
     },
-    "npm:@swc/core-win32-x64-msvc": {
+    "npm:@swc/core-win32-x64-msvc@1.9.3": {
       "type": "npm",
-      "name": "npm:@swc/core-win32-x64-msvc",
+      "name": "npm:@swc/core-win32-x64-msvc@1.9.3",
       "data": {
         "version": "1.9.3",
         "packageName": "@swc/core-win32-x64-msvc",
@@ -11853,9 +11853,9 @@
         "hash": "1614971170758099109"
       }
     },
-    "npm:esbuild-linux-64@0.14.54": {
+    "npm:esbuild-linux-64": {
       "type": "npm",
-      "name": "npm:esbuild-linux-64@0.14.54",
+      "name": "npm:esbuild-linux-64",
       "data": {
         "version": "0.14.54",
         "packageName": "esbuild-linux-64",
@@ -11961,9 +11961,9 @@
         "hash": "15735325598458212237"
       }
     },
-    "npm:esbuild-windows-64": {
+    "npm:esbuild-windows-64@0.14.54": {
       "type": "npm",
-      "name": "npm:esbuild-windows-64",
+      "name": "npm:esbuild-windows-64@0.14.54",
       "data": {
         "version": "0.14.54",
         "packageName": "esbuild-windows-64",
@@ -16191,9 +16191,9 @@
         "hash": "10123785913829619972"
       }
     },
-    "npm:lightningcss-linux-x64-gnu@1.25.1": {
+    "npm:lightningcss-linux-x64-gnu": {
       "type": "npm",
-      "name": "npm:lightningcss-linux-x64-gnu@1.25.1",
+      "name": "npm:lightningcss-linux-x64-gnu",
       "data": {
         "version": "1.25.1",
         "packageName": "lightningcss-linux-x64-gnu",
@@ -16209,9 +16209,9 @@
         "hash": "13394946683286803390"
       }
     },
-    "npm:lightningcss-win32-x64-msvc": {
+    "npm:lightningcss-win32-x64-msvc@1.25.1": {
       "type": "npm",
-      "name": "npm:lightningcss-win32-x64-msvc",
+      "name": "npm:lightningcss-win32-x64-msvc@1.25.1",
       "data": {
         "version": "1.25.1",
         "packageName": "lightningcss-win32-x64-msvc",
@@ -23823,6 +23823,15 @@
         "hash": "10/d6e66472cd312b256fb277d1f7fc1b19f1faa45b1d8ea32bb473130a9075f5b2b0aa9efb3ad3f9492e88f6def65f8c93bc64b7cb818147ca6522e95981cb90ef"
       }
     },
+    "npm:vue-router@4.4.5": {
+      "type": "npm",
+      "name": "npm:vue-router@4.4.5",
+      "data": {
+        "version": "4.4.5",
+        "packageName": "vue-router",
+        "hash": "10/4bc65f103d5304bfa8319f2a013fb924ffd291dd5d236214aa6ce9ffa63c6609fb1bc9bff041e2aa7ba02d44d01083c18fbb9aa034b9d40f2ff9bfaa96e52eee"
+      }
+    },
     "npm:vue-router@4.5.0": {
       "type": "npm",
       "name": "npm:vue-router@4.5.0",
@@ -26120,37 +26129,37 @@
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
       "target": "npm:@babel/helper-annotate-as-pure",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
       "target": "npm:@babel/helper-member-expression-to-functions",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
       "target": "npm:@babel/helper-optimise-call-expression",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
-      "target": "npm:@babel/helper-replace-supers@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
+      "target": "npm:@babel/helper-replace-supers",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
       "target": "npm:@babel/helper-skip-transparent-expression-wrappers",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
       "target": "npm:@babel/traverse",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/helper-create-class-features-plugin",
       "target": "npm:semver@6.3.1",
       "type": "static"
     },
@@ -26350,17 +26359,17 @@
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-replace-supers@7.25.9",
+      "source": "npm:@babel/helper-replace-supers",
       "target": "npm:@babel/helper-member-expression-to-functions",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-replace-supers@7.25.9",
+      "source": "npm:@babel/helper-replace-supers",
       "target": "npm:@babel/helper-optimise-call-expression",
       "type": "static"
     },
     {
-      "source": "npm:@babel/helper-replace-supers@7.25.9",
+      "source": "npm:@babel/helper-replace-supers",
       "target": "npm:@babel/traverse",
       "type": "static"
     },
@@ -26516,7 +26525,7 @@
     },
     {
       "source": "npm:@babel/plugin-proposal-decorators@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -26531,7 +26540,7 @@
     },
     {
       "source": "npm:@babel/plugin-proposal-decorators@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -26610,12 +26619,12 @@
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "source": "npm:@babel/plugin-syntax-typescript",
       "target": "npm:@babel/helper-plugin-utils",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "source": "npm:@babel/plugin-syntax-typescript",
       "target": "npm:@babel/helper-plugin-utils",
       "type": "static"
     },
@@ -26676,7 +26685,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-class-properties@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -26686,7 +26695,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-class-properties@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -26696,7 +26705,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-class-properties@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -26706,7 +26715,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-class-static-block@7.26.0",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -26731,7 +26740,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-classes@7.25.9",
-      "target": "npm:@babel/helper-replace-supers@7.25.9",
+      "target": "npm:@babel/helper-replace-supers",
       "type": "static"
     },
     {
@@ -26981,7 +26990,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-object-super@7.25.9",
-      "target": "npm:@babel/helper-replace-supers@7.25.9",
+      "target": "npm:@babel/helper-replace-supers",
       "type": "static"
     },
     {
@@ -27016,7 +27025,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-private-methods@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -27026,7 +27035,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-private-methods@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -27041,7 +27050,7 @@
     },
     {
       "source": "npm:@babel/plugin-transform-private-property-in-object@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
@@ -27140,103 +27149,103 @@
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-annotate-as-pure",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-plugin-utils",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-skip-transparent-expression-wrappers",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/plugin-syntax-typescript",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-annotate-as-pure",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-plugin-utils",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-skip-transparent-expression-wrappers",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/plugin-syntax-typescript",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-annotate-as-pure",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-plugin-utils",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-skip-transparent-expression-wrappers",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/plugin-syntax-typescript",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-annotate-as-pure",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/helper-create-class-features-plugin@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/helper-create-class-features-plugin",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-plugin-utils",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
       "target": "npm:@babel/helper-skip-transparent-expression-wrappers",
       "type": "static"
     },
     {
-      "source": "npm:@babel/plugin-transform-typescript@7.25.9",
-      "target": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "source": "npm:@babel/plugin-transform-typescript",
+      "target": "npm:@babel/plugin-syntax-typescript",
       "type": "static"
     },
     {
@@ -28016,7 +28025,7 @@
     },
     {
       "source": "npm:@babel/preset-typescript@7.26.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -28041,7 +28050,7 @@
     },
     {
       "source": "npm:@babel/preset-typescript@7.26.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -28066,7 +28075,7 @@
     },
     {
       "source": "npm:@babel/preset-typescript@7.26.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -28091,7 +28100,7 @@
     },
     {
       "source": "npm:@babel/preset-typescript@7.26.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -31250,8 +31259,8 @@
       "type": "static"
     },
     {
-      "source": "npm:@img/sharp-linux-x64@0.33.5",
-      "target": "npm:@img/sharp-libvips-linux-x64@1.0.4",
+      "source": "npm:@img/sharp-linux-x64",
+      "target": "npm:@img/sharp-libvips-linux-x64",
       "type": "static"
     },
     {
@@ -33326,7 +33335,7 @@
     },
     {
       "source": "npm:@swc/core",
-      "target": "npm:@swc/core-linux-x64-gnu@1.9.3",
+      "target": "npm:@swc/core-linux-x64-gnu",
       "type": "static"
     },
     {
@@ -33346,7 +33355,7 @@
     },
     {
       "source": "npm:@swc/core",
-      "target": "npm:@swc/core-win32-x64-msvc",
+      "target": "npm:@swc/core-win32-x64-msvc@1.9.3",
       "type": "static"
     },
     {
@@ -35786,7 +35795,7 @@
     },
     {
       "source": "npm:@vitejs/plugin-vue-jsx@4.0.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -35801,7 +35810,7 @@
     },
     {
       "source": "npm:@vitejs/plugin-vue-jsx@3.1.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -38096,7 +38105,7 @@
     },
     {
       "source": "npm:babel-plugin-const-enum@1.2.0",
-      "target": "npm:@babel/plugin-syntax-typescript@7.25.9",
+      "target": "npm:@babel/plugin-syntax-typescript",
       "type": "static"
     },
     {
@@ -42486,7 +42495,7 @@
     },
     {
       "source": "npm:esbuild@0.14.54",
-      "target": "npm:esbuild-linux-64@0.14.54",
+      "target": "npm:esbuild-linux-64",
       "type": "static"
     },
     {
@@ -42541,7 +42550,7 @@
     },
     {
       "source": "npm:esbuild@0.14.54",
-      "target": "npm:esbuild-windows-64",
+      "target": "npm:esbuild-windows-64@0.14.54",
       "type": "static"
     },
     {
@@ -42746,7 +42755,7 @@
     },
     {
       "source": "npm:esbuild",
-      "target": "npm:@esbuild/linux-x64@0.24.0",
+      "target": "npm:@esbuild/linux-x64",
       "type": "static"
     },
     {
@@ -42781,7 +42790,7 @@
     },
     {
       "source": "npm:esbuild",
-      "target": "npm:@esbuild/win32-x64",
+      "target": "npm:@esbuild/win32-x64@0.24.0",
       "type": "static"
     },
     {
@@ -48256,7 +48265,7 @@
     },
     {
       "source": "npm:lightningcss",
-      "target": "npm:lightningcss-linux-x64-gnu@1.25.1",
+      "target": "npm:lightningcss-linux-x64-gnu",
       "type": "static"
     },
     {
@@ -48266,7 +48275,7 @@
     },
     {
       "source": "npm:lightningcss",
-      "target": "npm:lightningcss-win32-x64-msvc",
+      "target": "npm:lightningcss-win32-x64-msvc@1.25.1",
       "type": "static"
     },
     {
@@ -50881,7 +50890,7 @@
     },
     {
       "source": "npm:nx",
-      "target": "npm:@nx/nx-linux-x64-gnu@20.0.5",
+      "target": "npm:@nx/nx-linux-x64-gnu",
       "type": "static"
     },
     {
@@ -50896,7 +50905,7 @@
     },
     {
       "source": "npm:nx",
-      "target": "npm:@nx/nx-win32-x64-msvc",
+      "target": "npm:@nx/nx-win32-x64-msvc@20.0.5",
       "type": "static"
     },
     {
@@ -51541,7 +51550,7 @@
     },
     {
       "source": "npm:oxc-resolver",
-      "target": "npm:@oxc-resolver/binding-linux-x64-gnu@1.12.0",
+      "target": "npm:@oxc-resolver/binding-linux-x64-gnu",
       "type": "static"
     },
     {
@@ -51561,7 +51570,7 @@
     },
     {
       "source": "npm:oxc-resolver",
-      "target": "npm:@oxc-resolver/binding-win32-x64-msvc",
+      "target": "npm:@oxc-resolver/binding-win32-x64-msvc@1.12.0",
       "type": "static"
     },
     {
@@ -53411,7 +53420,7 @@
     },
     {
       "source": "npm:rollup",
-      "target": "npm:@rollup/rollup-linux-x64-gnu@4.27.4",
+      "target": "npm:@rollup/rollup-linux-x64-gnu",
       "type": "static"
     },
     {
@@ -53431,7 +53440,7 @@
     },
     {
       "source": "npm:rollup",
-      "target": "npm:@rollup/rollup-win32-x64-msvc",
+      "target": "npm:@rollup/rollup-win32-x64-msvc@4.27.4",
       "type": "static"
     },
     {
@@ -53511,7 +53520,7 @@
     },
     {
       "source": "npm:rollup",
-      "target": "npm:@rollup/rollup-linux-x64-gnu@4.27.4",
+      "target": "npm:@rollup/rollup-linux-x64-gnu",
       "type": "static"
     },
     {
@@ -53531,7 +53540,7 @@
     },
     {
       "source": "npm:rollup",
-      "target": "npm:@rollup/rollup-win32-x64-msvc",
+      "target": "npm:@rollup/rollup-win32-x64-msvc@4.27.4",
       "type": "static"
     },
     {
@@ -53771,7 +53780,7 @@
     },
     {
       "source": "npm:sharp",
-      "target": "npm:@img/sharp-libvips-linux-x64@1.0.4",
+      "target": "npm:@img/sharp-libvips-linux-x64",
       "type": "static"
     },
     {
@@ -53801,7 +53810,7 @@
     },
     {
       "source": "npm:sharp",
-      "target": "npm:@img/sharp-linux-x64@0.33.5",
+      "target": "npm:@img/sharp-linux-x64",
       "type": "static"
     },
     {
@@ -53826,7 +53835,7 @@
     },
     {
       "source": "npm:sharp",
-      "target": "npm:@img/sharp-win32-x64",
+      "target": "npm:@img/sharp-win32-x64@0.33.5",
       "type": "static"
     },
     {
@@ -56961,7 +56970,7 @@
     },
     {
       "source": "npm:vite-plugin-vue-inspector@5.3.0",
-      "target": "npm:@babel/plugin-transform-typescript@7.25.9",
+      "target": "npm:@babel/plugin-transform-typescript",
       "type": "static"
     },
     {
@@ -57600,7 +57609,7 @@
       "type": "static"
     },
     {
-      "source": "npm:vue-router@4.5.0",
+      "source": "npm:vue-router@4.4.5",
       "target": "npm:@vue/devtools-api",
       "type": "static"
     },
