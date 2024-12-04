@@ -72,6 +72,12 @@ export class DatabaseHeaderColumn extends SignalWatcher(
       return;
     }
     event.stopPropagation();
+    //const body=document.body
+    //console.log("body",body);
+    //console.log("222220",document,popupTargetFromElement(body));
+    //const temp=
+    //popupTargetFromElement(this)
+    //const temp=document.querySelector('.vue-block-board-editor')
     popMenu(popupTargetFromElement(this), {
       options: {
         items: this.tableViewManager.propertyMetas.map(config => {
@@ -87,6 +93,7 @@ export class DatabaseHeaderColumn extends SignalWatcher(
           });
         }),
       },
+      //container:document.body
     });
   };
 
