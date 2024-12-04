@@ -27,6 +27,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
       JSON.stringify({
         channel: 'awareness',
         payload: {
+          time: Date.now(),
           type: 'update',
           update: Base64.fromUint8Array(update),
         },
@@ -40,7 +41,9 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
     if (data.channel !== 'awareness') return;
     const { type } = data.payload;
-
+    if(data.payload && data.payload.time) {
+      console.log("==>send time awareness",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+    }
     if (type === 'update') {
       const update = Base64.toUint8Array(data.payload.update);
       assertExists(this.awareness);
@@ -53,6 +56,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
         JSON.stringify({
           channel: 'awareness',
           payload: {
+            time: Date.now(),
             type: 'update',
             update: Base64.fromUint8Array(
               encodeAwarenessUpdate(this.awareness, [this.awareness.clientID])
@@ -77,6 +81,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
       JSON.stringify({
         channel: 'awareness',
         payload: {
+          time: Date.now(),
           type: 'connect',
         },
       } satisfies WebSocketMessage)

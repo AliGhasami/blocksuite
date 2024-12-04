@@ -8,10 +8,13 @@ import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private _onMessage = (event: MessageEvent<string>) => {
-    //console.log("_onMessage");
+    console.log("_onMessage");
     //todo ali ghasami for convert base 64
     const data = JSON.parse(event.data) as WebSocketMessage;
     if (data.channel !== 'doc') return;
+    if(data.payload && data.payload.time) {
+      console.log("==>send time",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+    }
     //@ts-ignore
     if (data.not_exists) {
       console.log('==>message from socket server and not doc not exists');
@@ -82,6 +85,7 @@ export class WebSocketDocSource implements DocSource {
       JSON.stringify({
         channel: 'doc',
         payload: {
+          time: Date.now(),
           type: 'init',
           //todo send doc id
           //docId: 'quickEdgeless',
@@ -119,6 +123,7 @@ export class WebSocketDocSource implements DocSource {
         JSON.stringify({
           channel: 'doc',
           payload: {
+            time: Date.now(),
             type: 'update',
             docId,
             updates: Base64.fromUint8Array(latest) ,
@@ -147,9 +152,12 @@ export class WebSocketDocSource implements DocSource {
     this.ws.addEventListener(
       'message',
       (event: MessageEvent<string>) => {
-        //console.log("subscribe  on message");
+        console.log("subscribe  on message");
         //todo convert ali ghasami to base 64
         const data = JSON.parse(event.data) as WebSocketMessage;
+        if(data.payload && data.payload.time) {
+          console.log("==>send time",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+        }
         if (data.channel !== 'doc' || data.payload.type !== 'update') return;
         const { docId, updates } = data.payload;
         cb(docId,Base64.toUint8Array(updates));
