@@ -112,7 +112,6 @@ export class MahdaadDateTimeInline extends ShadowlessElement {
         else date[key] = value
         this.inlineEditor.formatText(this.selfInlineRange, {
           date,
-          ignoreSyncInlineRange: true,
         });
       }
     }

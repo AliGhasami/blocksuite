@@ -17,7 +17,6 @@ export interface DateTimeEvent {
   date: string;
   meta?: any;
   createStatus?: number
-  ignoreSyncInlineRange?: true | null;
 }
 
 export interface AffineTextAttributes {
@@ -46,10 +45,6 @@ export interface AffineTextAttributes {
     type: string;
   } | null;
   date?: DateTimeEvent;
-  // TODO return if has bug
-  //ignoreSyncInlineRange?: true | null;
-  // TODO return if has bug
-  //createMode?: boolean
 }
 
 export type InlineSpecs<

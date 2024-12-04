@@ -112,7 +112,8 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
     return this._rendering;
   }
   // render current deltas to VLines
-  render = (syncInlineRange = true) => {
+  render = () => {
+    let syncInlineRange = true
     if (!this.editor.mounted) return;
 
     this._rendering = true;

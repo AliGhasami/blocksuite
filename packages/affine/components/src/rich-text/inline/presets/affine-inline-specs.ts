@@ -253,7 +253,6 @@ export const MahdaadDateTimeSpecExtension = InlineSpecExtension({
       id: z.string().optional(),
       meta: z.any().optional(),
       createStatus: z.number().optional(),
-      ignoreSyncInlineRange:z.boolean().optional()
     }).optional().nullable().catch(undefined),
   match: delta => {
     return !!delta.attributes?.date;

@@ -187,7 +187,6 @@ export const actionsMenu: MahdaadActionMenu[] = [
         time: null,
         id: uuidv4(),
         createStatus: 1,
-        ignoreSyncInlineRange:true
       };
       /*{
         const triggerKey = '$';
@@ -216,7 +215,6 @@ export const actionsMenu: MahdaadActionMenu[] = [
         time,
         id: uuidv4(),
         createStatus: 1,
-        ignoreSyncInlineRange: true
       };
       /*{
         const triggerKey = '$';
