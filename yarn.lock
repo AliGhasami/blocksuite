@@ -2053,6 +2053,7 @@ __metadata:
     "@types/micromatch": "npm:^4.0.9"
     browser-fs-access: "npm:^0.35.0"
     graphql: "npm:^16.9.0"
+    js-base64: "npm:^3.7.7"
     jszip: "npm:^3.10.1"
     lit: "npm:^3.2.0"
     lz-string: "npm:^1.5.0"
@@ -18449,6 +18450,13 @@ __metadata:
   bin:
     jpegtran: cli.js
   checksum: 10/6d95668af8511c1d6c7fe3afb78694126c41a5b100d0c623b6e10147a681d540a6955e1f101c10c4271e4f376fec26df20c1813bf1eed601cecd3d522adf3a24
+  languageName: node
+  linkType: hard
+
+"js-base64@npm:^3.7.7":
+  version: 3.7.7
+  resolution: "js-base64@npm:3.7.7"
+  checksum: 10/185e34c536a6b1c4e1ad8bd96d25b49a9ea4e6803e259eaaaca95f1b392a0d590b2933c5ca8580c776f7279507944b81ff1faf889d84baa5e31f026e96d676a5
   languageName: node
   linkType: hard
 

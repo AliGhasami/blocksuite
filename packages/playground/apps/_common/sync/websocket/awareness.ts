@@ -2,6 +2,7 @@ import type { AwarenessSource } from '@blocksuite/sync';
 import type { Awareness } from 'y-protocols/awareness';
 
 import { assertExists } from '@blocksuite/global/utils';
+import { Base64 } from 'js-base64';
 import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
@@ -26,8 +27,9 @@ export class WebSocketAwarenessSource implements AwarenessSource {
       JSON.stringify({
         channel: 'awareness',
         payload: {
+          time: Date.now(),
           type: 'update',
-          update: Array.from(update),
+          update: Base64.fromUint8Array(update),
         },
       } satisfies WebSocketMessage)
     );
@@ -39,11 +41,13 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
     if (data.channel !== 'awareness') return;
     const { type } = data.payload;
-
+    if(data.payload && data.payload.time) {
+      console.log("==>send time awareness",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+    }
     if (type === 'update') {
-      const update = data.payload.update;
+      const update = Base64.toUint8Array(data.payload.update);
       assertExists(this.awareness);
-      applyAwarenessUpdate(this.awareness, new Uint8Array(update), 'remote');
+      applyAwarenessUpdate(this.awareness, update, 'remote');
     }
 
     if (type === 'connect') {
@@ -52,8 +56,9 @@ export class WebSocketAwarenessSource implements AwarenessSource {
         JSON.stringify({
           channel: 'awareness',
           payload: {
+            time: Date.now(),
             type: 'update',
-            update: Array.from(
+            update: Base64.fromUint8Array(
               encodeAwarenessUpdate(this.awareness, [this.awareness.clientID])
             ),
           },
@@ -76,6 +81,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
       JSON.stringify({
         channel: 'awareness',
         payload: {
+          time: Date.now(),
           type: 'connect',
         },
       } satisfies WebSocketMessage)
