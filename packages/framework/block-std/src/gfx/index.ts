@@ -1,3 +1,4 @@
+export { generateKeyBetweenV2 } from '../utils/fractional-indexing.js';
 export {
   compare as compareLayer,
   renderableInEdgeless,
