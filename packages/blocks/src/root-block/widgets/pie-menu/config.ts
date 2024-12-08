@@ -65,6 +65,8 @@ const pie = new PieMenuBuilder({
   label: 'Tools',
   icon: ToolsIcon,
   trigger: ({ keyEvent: ev, rootComponent }) => {
+    //todo disabled for mahdaad
+    return
     if (isControlledKeyboardEvent(ev)) return false;
     const isEditing = rootComponent.service.selection.editing;
 

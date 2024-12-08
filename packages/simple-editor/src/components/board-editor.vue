@@ -530,6 +530,7 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 
 async function init() {
   loading.value=true
+  //debugger
   console.log("==>init function");
   //debugger
   //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
@@ -885,6 +886,8 @@ async function init() {
   --affine-v2-chip-label-grey:@gray-2;
   --affine-v2-text-primary:@gray-8;
   --affine-v2-database-textSecondary:@gray-4;
+  --affine-background-overlay-panel-color:@gray-0;
+  //--affine-background-overlay-panel-color:
   //--affine-tag-white:@gray-0;
 }
 
