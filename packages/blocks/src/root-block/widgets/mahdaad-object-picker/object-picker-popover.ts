@@ -26,6 +26,7 @@ import { AffineSchemas } from '../../../schemas.js';
 import { styles } from './styles.js';
 export interface ObjectLink {
   link_id: string;
+  //id:string,
   object_id: string;
   type: IObjectType;
 }

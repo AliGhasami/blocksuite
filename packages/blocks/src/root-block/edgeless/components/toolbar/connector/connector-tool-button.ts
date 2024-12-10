@@ -47,6 +47,7 @@ export class EdgelessConnectorToolButton extends QuickToolMixin(
   override type = 'connector' as const;
 
   private _toggleMenu() {
+    //debugger
     if (this.tryDisposePopper()) return;
 
     const menu = this.createPopper('edgeless-connector-menu', this);

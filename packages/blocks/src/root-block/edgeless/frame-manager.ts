@@ -3,7 +3,6 @@ import type { Doc } from '@blocksuite/store';
 
 import { Overlay } from '@blocksuite/affine-block-surface';
 import {
-  generateKeyBetweenV2,
   getTopElements,
   type GfxController,
   GfxExtension,
@@ -139,50 +138,17 @@ export class EdgelessFrameManager extends GfxExtension {
   private _disposable = new DisposableGroup();
 
   /**
-   * Get all sorted frames by presentation orderer,
-   * the legacy frame that uses `index` as presentation order
-   * will be put at the beginning of the array.
+   * Get all sorted frames
    */
   get frames() {
-    return Object.values(this.gfx.doc.blocks.value)
-      .map(({ model }) => model)
-      .filter(isFrameBlock)
-      .sort(EdgelessFrameManager.framePresentationComparator);
+    return this.gfx.layer.blocks.filter(
+      block => block.flavour === 'affine:frame'
+    ) as FrameBlockModel[];
   }
 
   constructor(gfx: GfxController) {
     super(gfx);
     this._watchElementAdded();
-  }
-
-  static framePresentationComparator<
-    T extends FrameBlockModel | { index: string; presentationIndex?: string },
-  >(a: T, b: T) {
-    function stringCompare(a: string, b: string) {
-      if (a < b) return -1;
-      if (a > b) return 1;
-      return 0;
-    }
-
-    if (
-      'presentationIndex$' in a &&
-      'presentationIndex$' in b &&
-      a.presentationIndex$.value &&
-      b.presentationIndex$.value
-    ) {
-      return stringCompare(
-        a.presentationIndex$.value,
-        b.presentationIndex$.value
-      );
-    } else if (a.presentationIndex && b.presentationIndex) {
-      return stringCompare(a.presentationIndex, b.presentationIndex);
-    } else if (a.presentationIndex) {
-      return -1;
-    } else if (b.presentationIndex) {
-      return 1;
-    } else {
-      return stringCompare(a.index, b.index);
-    }
   }
 
   private _addChildrenToLegacyFrame(frame: FrameBlockModel) {
@@ -205,7 +171,6 @@ export class EdgelessFrameManager extends GfxExtension {
         ),
         xywh: bound.serialize(),
         index: this.gfx.layer.generateIndex(true),
-        presentationIndex: this.generatePresentationIndex(),
       },
       surfaceModel
     );
@@ -356,13 +321,6 @@ export class EdgelessFrameManager extends GfxExtension {
     this.createFrameOnBound(bound);
   }
 
-  generatePresentationIndex() {
-    const before =
-      this.frames[this.frames.length - 1]?.presentationIndex ?? null;
-
-    return generateKeyBetweenV2(before, null);
-  }
-
   /**
    * Get all elements in the frame, there are three cases:
    * 1. The frame doesn't have `childElements`, return all elements in the frame bound but not owned by another frame.
@@ -411,28 +369,6 @@ export class EdgelessFrameManager extends GfxExtension {
   getParentFrame(element: GfxModel) {
     const container = element.group;
     return container && isFrameBlock(container) ? container : null;
-  }
-
-  /**
-   * This method will populate `presentationIndex` for all legacy frames,
-   * and keep the orderer of the legacy frames.
-   */
-  refreshLegacyFrameOrder() {
-    const frames = this.frames.splice(0, this.frames.length);
-
-    let splitIndex = frames.findIndex(frame => frame.presentationIndex);
-    if (splitIndex === 0) return;
-
-    if (splitIndex === -1) splitIndex = frames.length;
-
-    let afterPreIndex =
-      frames[splitIndex]?.presentationIndex || generateKeyBetweenV2(null, null);
-
-    for (let index = splitIndex - 1; index >= 0; index--) {
-      const preIndex = generateKeyBetweenV2(null, afterPreIndex);
-      frames[index].presentationIndex = preIndex;
-      afterPreIndex = preIndex;
-    }
   }
 
   removeAllChildrenFromFrame(frame: FrameBlockModel) {

@@ -375,7 +375,8 @@ defineExpose({
   //reset,
   isEmpty,
   doc: currentDocument,
-  checkIsEmpty
+  checkIsEmpty,
+  editor:refEditor
   //collection:myCollection
 })
 

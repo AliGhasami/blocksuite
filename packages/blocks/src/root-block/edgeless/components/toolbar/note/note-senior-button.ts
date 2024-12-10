@@ -1,9 +1,11 @@
 /** @alighasami for check merge **/
 import {
-  FileIcon,
   Heading1Icon,
   LinkIcon,
-  TextIcon
+  TextIcon,
+} from '@blocksuite/affine-components/icons';
+import {
+  FileIcon
 } from '@blocksuite/affine-components/icons';
 import {
   EditPropsStore,
