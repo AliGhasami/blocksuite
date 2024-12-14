@@ -61,7 +61,7 @@ const currentDocument = ref<Doc | null>(null)
 const editorElement = ref<EdgelessEditor | PageEditor | null>(null)
 const isEmpty = ref<boolean>(false)
 let myCollection: DocCollection | null = null
-
+const stopEvent=ref<boolean>(false)
 interface Props {
   isBoardView?: boolean
   //mentionUserList?: any[]
@@ -235,8 +235,14 @@ function checkReadOnly() {
 }
 
 
+
 function bindEvent(doc: Doc) {
+  //return
   doc.slots.blockUpdated.on((data) => {
+    //console.log("stop event",stopEvent.value);
+    if(stopEvent.value){
+      return
+    }
     checkNotEmptyDocBlock(doc)
     checkIsEmpty()
     emit('change', data)
@@ -244,6 +250,7 @@ function bindEvent(doc: Doc) {
       if (data.flavour == 'affine:mahdaad-object') {
         //console.log("this is link data",data,data.model.link_id);
         //if(data.model && !data.model.link_id){
+        console.log("sssssss");
           emit('addObjectLink', data)
         //}
       }
@@ -531,6 +538,7 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 
 async function init() {
   loading.value=true
+  stopEvent.value=true
   //debugger
   console.log("==>init function");
   //debugger
@@ -678,6 +686,7 @@ async function init() {
     appendTODOM(editorElement.value)
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
+    stopEvent.value=false
     loading.value=false
   }
 
