@@ -90,6 +90,10 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     });*/
   }
 
+  docId() {
+
+  }
+
   duplicate() {
     this.doc.addSiblingBlocks(this.model, [
       {
@@ -106,12 +110,16 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     tryRemoveEmptyLine(this.model);
   }
 
+  parentId() {
+    return (this.doc.meta && this.doc.meta?.object_id) ?? null
+  }
+
   removeBlock() {
     this.doc.deleteBlock(this.model);
   }
 
   override renderBlock() {
-    //console.log('this is model and props', this.model);
+    console.log('this is model and props', this.doc);
     //.doc="${this.doc}"
     //this.model.propsUpdated({})
 
@@ -120,6 +128,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         .model="${this.model}"
         read-only="${this.doc.readonly}"
         object-id="${this.model.object_id}"
+        parent-id="${this.parentId()}"
         link-id="${this.model.link_id}"
         type="${this.model.type}"
         show-type="${this.model.show_type}"

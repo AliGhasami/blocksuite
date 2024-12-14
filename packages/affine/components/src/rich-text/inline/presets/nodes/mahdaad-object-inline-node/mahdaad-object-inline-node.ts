@@ -130,6 +130,13 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     return this.delta.attributes?.mahdaadObjectLink;
   }
 
+  parentId() {
+    const block = this.block;
+    const doc = block.host.doc;
+    return (doc.meta && doc.meta?.object_id) ?? null
+  }
+
+
   override render() {
     const meta = this.getMeta();
     return html`<span
@@ -140,6 +147,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
         read-only="false"
         object-id="${meta?.object_id}"
         link-id="${meta?.link_id}"
+        parent-id="${this.parentId()}"
         type="${meta?.type}"
         show-type="inline"
         @changeViewMode="${this.changeViewMode}"
