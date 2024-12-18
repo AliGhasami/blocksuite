@@ -66,7 +66,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-widget-scroll-anchoring"
+              "{workspaceRoot}\\.coverage\\affine-widget-scroll-anchoring"
             ],
             "metadata": {
               "technologies": [
@@ -226,7 +226,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-block-paragraph"
+              "{workspaceRoot}\\.coverage\\affine-block-paragraph"
             ],
             "metadata": {
               "technologies": [
@@ -386,7 +386,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-block-surface"
+              "{workspaceRoot}\\.coverage\\affine-block-surface"
             ],
             "metadata": {
               "technologies": [
@@ -547,7 +547,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/block-std"
+              "{workspaceRoot}\\.coverage\\block-std"
             ],
             "metadata": {
               "technologies": [
@@ -719,7 +719,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-block-list"
+              "{workspaceRoot}\\.coverage\\affine-block-list"
             ],
             "metadata": {
               "technologies": [
@@ -879,7 +879,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-block-list"
+              "{workspaceRoot}\\.coverage\\affine-block-list"
             ],
             "metadata": {
               "technologies": [
@@ -1039,7 +1039,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-components"
+              "{workspaceRoot}\\.coverage\\affine-components"
             ],
             "metadata": {
               "technologies": [
@@ -1199,7 +1199,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/packages/.coverage/blocks"
+              "{workspaceRoot}\\packages\\.coverage\\blocks"
             ],
             "metadata": {
               "technologies": [
@@ -1358,7 +1358,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/global"
+              "{workspaceRoot}\\.coverage\\global"
             ],
             "metadata": {
               "technologies": [
@@ -1518,7 +1518,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/inline"
+              "{workspaceRoot}\\.coverage\\inline"
             ],
             "metadata": {
               "technologies": [
@@ -1679,7 +1679,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/store"
+              "{workspaceRoot}\\.coverage\\store"
             ],
             "metadata": {
               "technologies": [
@@ -1850,7 +1850,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/sync"
+              "{workspaceRoot}\\.coverage\\sync"
             ],
             "metadata": {
               "technologies": [
@@ -1998,7 +1998,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-shared"
+              "{workspaceRoot}\\.coverage\\affine-shared"
             ],
             "metadata": {
               "technologies": [
@@ -2131,7 +2131,7 @@
               }
             ],
             "outputs": [
-              "{projectRoot}/dist"
+              "{projectRoot}\\dist"
             ],
             "metadata": {
               "technologies": [
@@ -2459,7 +2459,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine-model"
+              "{workspaceRoot}\\.coverage\\affine-model"
             ],
             "metadata": {
               "technologies": [
@@ -2619,7 +2619,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/affine"
+              "{workspaceRoot}\\.coverage\\affine"
             ],
             "metadata": {
               "technologies": [
@@ -2749,7 +2749,7 @@
               }
             ],
             "outputs": [
-              "{projectRoot}/dist"
+              "{projectRoot}\\dist"
             ],
             "metadata": {
               "technologies": [
@@ -2987,7 +2987,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/presets"
+              "{workspaceRoot}\\.coverage\\presets"
             ],
             "metadata": {
               "technologies": [
@@ -3136,7 +3136,7 @@
               }
             ],
             "outputs": [
-              "{workspaceRoot}/.coverage/blocks"
+              "{workspaceRoot}\\.coverage\\blocks"
             ],
             "metadata": {
               "technologies": [
@@ -3470,7 +3470,7 @@
               }
             ],
             "outputs": [
-              "{projectRoot}/.coverage/unit"
+              "{projectRoot}\\.coverage\\unit"
             ],
             "metadata": {
               "technologies": [
@@ -6287,9 +6287,9 @@
         "hash": "7127208313631002285"
       }
     },
-    "npm:@esbuild/linux-x64": {
+    "npm:@esbuild/linux-x64@0.24.0": {
       "type": "npm",
-      "name": "npm:@esbuild/linux-x64",
+      "name": "npm:@esbuild/linux-x64@0.24.0",
       "data": {
         "version": "0.24.0",
         "packageName": "@esbuild/linux-x64",
@@ -6467,9 +6467,9 @@
         "hash": "1996963148403849054"
       }
     },
-    "npm:@esbuild/win32-x64@0.24.0": {
+    "npm:@esbuild/win32-x64": {
       "type": "npm",
-      "name": "npm:@esbuild/win32-x64@0.24.0",
+      "name": "npm:@esbuild/win32-x64",
       "data": {
         "version": "0.24.0",
         "packageName": "@esbuild/win32-x64",
@@ -6854,9 +6854,9 @@
         "hash": "14111005903371643343"
       }
     },
-    "npm:@img/sharp-libvips-linux-x64": {
+    "npm:@img/sharp-libvips-linux-x64@1.0.4": {
       "type": "npm",
-      "name": "npm:@img/sharp-libvips-linux-x64",
+      "name": "npm:@img/sharp-libvips-linux-x64@1.0.4",
       "data": {
         "version": "1.0.4",
         "packageName": "@img/sharp-libvips-linux-x64",
@@ -6908,9 +6908,9 @@
         "hash": "13017887543167419797"
       }
     },
-    "npm:@img/sharp-linux-x64": {
+    "npm:@img/sharp-linux-x64@0.33.5": {
       "type": "npm",
-      "name": "npm:@img/sharp-linux-x64",
+      "name": "npm:@img/sharp-linux-x64@0.33.5",
       "data": {
         "version": "0.33.5",
         "packageName": "@img/sharp-linux-x64",
@@ -6953,9 +6953,9 @@
         "hash": "17503160122875990420"
       }
     },
-    "npm:@img/sharp-win32-x64@0.33.5": {
+    "npm:@img/sharp-win32-x64": {
       "type": "npm",
-      "name": "npm:@img/sharp-win32-x64@0.33.5",
+      "name": "npm:@img/sharp-win32-x64",
       "data": {
         "version": "0.33.5",
         "packageName": "@img/sharp-win32-x64",
@@ -7029,27 +7029,27 @@
       "type": "npm",
       "name": "npm:@intlify/core-base",
       "data": {
-        "version": "9.13.1",
+        "version": "10.0.5",
         "packageName": "@intlify/core-base",
-        "hash": "10/4fbe47b7b786639f6f6d49f7fd725e7148905efa9b6d0d5f84ed39112c55f1c2dc0a1d9f3cede24fa933600bd4ee02b2e3cd266c5e766f29d5cef9a4417aa161"
+        "hash": "10/d0680074ca5abc26c348976047001fda76045917fabcbe041fa662c2ca66dc6d22570ebf5e198f718e8b98c3d662e29d824f891183f51ff6b888c7c68db5e4fd"
       }
     },
     "npm:@intlify/message-compiler": {
       "type": "npm",
       "name": "npm:@intlify/message-compiler",
       "data": {
-        "version": "9.13.1",
+        "version": "10.0.5",
         "packageName": "@intlify/message-compiler",
-        "hash": "10/ecdfd2ba677999e28429289518b8d11e82d63345f30da84051199b39e209873c0970a6f1d4d24d0d33a8f5a8f5dbc1ba93d2a08be9389faa6035e145fb7dd937"
+        "hash": "10/3e386b042ac6dd98533b6ea2b4af610999236a1eb7ff4d77762cd06cae1858a53735b0b7e60828c569c715a9f0ae588aaaf8496f9a4b287a44e7f0fd470857ff"
       }
     },
     "npm:@intlify/shared": {
       "type": "npm",
       "name": "npm:@intlify/shared",
       "data": {
-        "version": "9.13.1",
+        "version": "10.0.5",
         "packageName": "@intlify/shared",
-        "hash": "10/d87b9da6b2cddad88db37e9b2d2d00f612bac2f23e5366b76908fa5d6d3fae1be7088b3043eab9ea53f4921ec50c4c43b1f606eb66e2491a656c13bf497025e3"
+        "hash": "10/64552b8770ad236c11893837e95e4e2ea7c947396cfcee797bf8e26afea6d06f707178f4aa36b0b416d89800ba9cd058e6742bf2ebdd7c7ff7f9fc1ec9bc7b48"
       }
     },
     "npm:@isaacs/cliui": {
@@ -7311,6 +7311,15 @@
         "version": "0.0.31",
         "packageName": "@mahdaad/bounty-vue",
         "hash": "10/9158245c85beefd6e4619897489dd9bef86446fe353a49e3779ef240195c2feea929348bec6ed1609172c4d60485cc47361243a16d3aa9bed608c926e54b2e77"
+      }
+    },
+    "npm:@mahdaad/editor-vue": {
+      "type": "npm",
+      "name": "npm:@mahdaad/editor-vue",
+      "data": {
+        "version": "0.0.40",
+        "packageName": "@mahdaad/editor-vue",
+        "hash": "10/8a916d3829af15452e140e59e3d490521e4bf1c34b8dc9df3dab6f78c4ce1c5d08eae458a432931025cc7880b384b8473a0af6032dcb5b6e89f13ed83e168b7f"
       }
     },
     "npm:@mahdaad/tokens": {
@@ -7682,9 +7691,9 @@
         "hash": "17992992806347300029"
       }
     },
-    "npm:@nx/nx-linux-x64-gnu": {
+    "npm:@nx/nx-linux-x64-gnu@20.0.5": {
       "type": "npm",
-      "name": "npm:@nx/nx-linux-x64-gnu",
+      "name": "npm:@nx/nx-linux-x64-gnu@20.0.5",
       "data": {
         "version": "20.0.5",
         "packageName": "@nx/nx-linux-x64-gnu",
@@ -7709,9 +7718,9 @@
         "hash": "1194283324298820690"
       }
     },
-    "npm:@nx/nx-win32-x64-msvc@20.0.5": {
+    "npm:@nx/nx-win32-x64-msvc": {
       "type": "npm",
-      "name": "npm:@nx/nx-win32-x64-msvc@20.0.5",
+      "name": "npm:@nx/nx-win32-x64-msvc",
       "data": {
         "version": "20.0.5",
         "packageName": "@nx/nx-win32-x64-msvc",
@@ -7835,9 +7844,9 @@
         "hash": "8509855762762844535"
       }
     },
-    "npm:@oxc-resolver/binding-linux-x64-gnu": {
+    "npm:@oxc-resolver/binding-linux-x64-gnu@1.12.0": {
       "type": "npm",
-      "name": "npm:@oxc-resolver/binding-linux-x64-gnu",
+      "name": "npm:@oxc-resolver/binding-linux-x64-gnu@1.12.0",
       "data": {
         "version": "1.12.0",
         "packageName": "@oxc-resolver/binding-linux-x64-gnu",
@@ -7871,9 +7880,9 @@
         "hash": "6928229992490370443"
       }
     },
-    "npm:@oxc-resolver/binding-win32-x64-msvc@1.12.0": {
+    "npm:@oxc-resolver/binding-win32-x64-msvc": {
       "type": "npm",
-      "name": "npm:@oxc-resolver/binding-win32-x64-msvc@1.12.0",
+      "name": "npm:@oxc-resolver/binding-win32-x64-msvc",
       "data": {
         "version": "1.12.0",
         "packageName": "@oxc-resolver/binding-win32-x64-msvc",
@@ -8285,9 +8294,9 @@
         "hash": "8100504150405219184"
       }
     },
-    "npm:@rollup/rollup-linux-x64-gnu": {
+    "npm:@rollup/rollup-linux-x64-gnu@4.27.4": {
       "type": "npm",
-      "name": "npm:@rollup/rollup-linux-x64-gnu",
+      "name": "npm:@rollup/rollup-linux-x64-gnu@4.27.4",
       "data": {
         "version": "4.27.4",
         "packageName": "@rollup/rollup-linux-x64-gnu",
@@ -8321,9 +8330,9 @@
         "hash": "5160825340633153477"
       }
     },
-    "npm:@rollup/rollup-win32-x64-msvc@4.27.4": {
+    "npm:@rollup/rollup-win32-x64-msvc": {
       "type": "npm",
-      "name": "npm:@rollup/rollup-win32-x64-msvc@4.27.4",
+      "name": "npm:@rollup/rollup-win32-x64-msvc",
       "data": {
         "version": "4.27.4",
         "packageName": "@rollup/rollup-win32-x64-msvc",
@@ -8753,9 +8762,9 @@
         "hash": "16046995716587888988"
       }
     },
-    "npm:@swc/core-linux-x64-gnu": {
+    "npm:@swc/core-linux-x64-gnu@1.9.3": {
       "type": "npm",
-      "name": "npm:@swc/core-linux-x64-gnu",
+      "name": "npm:@swc/core-linux-x64-gnu@1.9.3",
       "data": {
         "version": "1.9.3",
         "packageName": "@swc/core-linux-x64-gnu",
@@ -8789,9 +8798,9 @@
         "hash": "3584081915472716377"
       }
     },
-    "npm:@swc/core-win32-x64-msvc@1.9.3": {
+    "npm:@swc/core-win32-x64-msvc": {
       "type": "npm",
-      "name": "npm:@swc/core-win32-x64-msvc@1.9.3",
+      "name": "npm:@swc/core-win32-x64-msvc",
       "data": {
         "version": "1.9.3",
         "packageName": "@swc/core-win32-x64-msvc",
@@ -8895,6 +8904,15 @@
         "version": "14.5.2",
         "packageName": "@testing-library/user-event",
         "hash": "10/49821459d81c6bc435d97128d6386ca24f1e4b3ba8e46cb5a96fe3643efa6e002d88c1b02b7f2ec58da593e805c59b78d7fdf0db565c1f02ba782f63ee984040"
+      }
+    },
+    "npm:@tiptap/extension-mention": {
+      "type": "npm",
+      "name": "npm:@tiptap/extension-mention",
+      "data": {
+        "version": "2.5.4",
+        "packageName": "@tiptap/extension-mention",
+        "hash": "10/61444440afced2a857264a5cd88e0261c1eeb2465745b49da69cb0f0579a13441895d0fa3b2a1fda3780d5a1dcac561e28f799002c018b241744b93226431e39"
       }
     },
     "npm:@toeverything/pdf-viewer-types": {
@@ -11543,18 +11561,18 @@
         "hash": "10/4cab5328216d9912c48ccad95b1cc32efd4a32e11590f2e3aca04d5aa0b7a4be6bdf68a2a0a1931a16a58fcc09bf99efd03cca944aa59d8269f0d7f7e384e555"
       }
     },
-    "npm:@vueuse/metadata": {
+    "npm:@vueuse/metadata@10.11.0": {
       "type": "npm",
-      "name": "npm:@vueuse/metadata",
+      "name": "npm:@vueuse/metadata@10.11.0",
       "data": {
         "version": "10.11.0",
         "packageName": "@vueuse/metadata",
         "hash": "10/52229c65facf4c83bd18d67c995ebeadd927d92902882d82e131242610bdad7422889e3001c8dc95d8c3a189c9c63dffa2b73f8d6a0c071405790e4fc2fc6233"
       }
     },
-    "npm:@vueuse/metadata@10.11.1": {
+    "npm:@vueuse/metadata": {
       "type": "npm",
-      "name": "npm:@vueuse/metadata@10.11.1",
+      "name": "npm:@vueuse/metadata",
       "data": {
         "version": "10.11.1",
         "packageName": "@vueuse/metadata",
@@ -11570,18 +11588,18 @@
         "hash": "10/d8b6976896d2bc9924fcbcdaa2f3ffd6f60ff3a13355c92136ed6ad83ee6188d308064f0a8e56d07060b8829b29e41958ec3df9248231859e487a0af0f5e6b2f"
       }
     },
-    "npm:@vueuse/shared": {
+    "npm:@vueuse/shared@10.11.0": {
       "type": "npm",
-      "name": "npm:@vueuse/shared",
+      "name": "npm:@vueuse/shared@10.11.0",
       "data": {
         "version": "10.11.0",
         "packageName": "@vueuse/shared",
         "hash": "10/670d8b934ba6348de085a82aa3adf457421bd2d18a7db3db29d67aa74fd36ef4123847858b9340aeb843b8feece3ef9118c90d400780dda29ecc961c08706553"
       }
     },
-    "npm:@vueuse/shared@10.11.1": {
+    "npm:@vueuse/shared": {
       "type": "npm",
-      "name": "npm:@vueuse/shared@10.11.1",
+      "name": "npm:@vueuse/shared",
       "data": {
         "version": "10.11.1",
         "packageName": "@vueuse/shared",
@@ -15674,9 +15692,9 @@
         "hash": "1614971170758099109"
       }
     },
-    "npm:esbuild-linux-64": {
+    "npm:esbuild-linux-64@0.14.54": {
       "type": "npm",
-      "name": "npm:esbuild-linux-64",
+      "name": "npm:esbuild-linux-64@0.14.54",
       "data": {
         "version": "0.14.54",
         "packageName": "esbuild-linux-64",
@@ -15782,9 +15800,9 @@
         "hash": "15735325598458212237"
       }
     },
-    "npm:esbuild-windows-64@0.14.54": {
+    "npm:esbuild-windows-64": {
       "type": "npm",
-      "name": "npm:esbuild-windows-64@0.14.54",
+      "name": "npm:esbuild-windows-64",
       "data": {
         "version": "0.14.54",
         "packageName": "esbuild-windows-64",
@@ -19454,6 +19472,15 @@
         "hash": "10/6d95668af8511c1d6c7fe3afb78694126c41a5b100d0c623b6e10147a681d540a6955e1f101c10c4271e4f376fec26df20c1813bf1eed601cecd3d522adf3a24"
       }
     },
+    "npm:js-base64": {
+      "type": "npm",
+      "name": "npm:js-base64",
+      "data": {
+        "version": "3.7.7",
+        "packageName": "js-base64",
+        "hash": "10/185e34c536a6b1c4e1ad8bd96d25b49a9ea4e6803e259eaaaca95f1b392a0d590b2933c5ca8580c776f7279507944b81ff1faf889d84baa5e31f026e96d676a5"
+      }
+    },
     "npm:js-beautify": {
       "type": "npm",
       "name": "npm:js-beautify",
@@ -20012,9 +20039,9 @@
         "hash": "10123785913829619972"
       }
     },
-    "npm:lightningcss-linux-x64-gnu": {
+    "npm:lightningcss-linux-x64-gnu@1.25.1": {
       "type": "npm",
-      "name": "npm:lightningcss-linux-x64-gnu",
+      "name": "npm:lightningcss-linux-x64-gnu@1.25.1",
       "data": {
         "version": "1.25.1",
         "packageName": "lightningcss-linux-x64-gnu",
@@ -20030,9 +20057,9 @@
         "hash": "13394946683286803390"
       }
     },
-    "npm:lightningcss-win32-x64-msvc@1.25.1": {
+    "npm:lightningcss-win32-x64-msvc": {
       "type": "npm",
-      "name": "npm:lightningcss-win32-x64-msvc@1.25.1",
+      "name": "npm:lightningcss-win32-x64-msvc",
       "data": {
         "version": "1.25.1",
         "packageName": "lightningcss-win32-x64-msvc",
@@ -26249,6 +26276,15 @@
         "hash": "10/9bd1c6ab68704dd10b8896fd66e28f3b4b4017a32b8802a9d57a565dee1704df45c249d8363bcaca235dbc0d9a7a90d6f1326f1e6b999f7809b36599a3f92eb3"
       }
     },
+    "npm:tiptap-text-direction": {
+      "type": "npm",
+      "name": "npm:tiptap-text-direction",
+      "data": {
+        "version": "0.3.1",
+        "packageName": "tiptap-text-direction",
+        "hash": "10/724d82350b69cc6c586f205ad56a0b04fe47a88f53c9dc2f13e51299508da6d34116b68d3903b27b96f2726552f6588fc446a5c13846c6881065cac513d077fe"
+      }
+    },
     "npm:tmp@0.0.33": {
       "type": "npm",
       "name": "npm:tmp@0.0.33",
@@ -27626,13 +27662,13 @@
         "hash": "10/228e43f0067e5f1fa87a4192f355ebbb4a224f0c7e170b1fbd4205fdf42fe7b3c6820a7e467496a8174e51ba351bc9caed00389d05519206cfa1615cac44516c"
       }
     },
-    "npm:vue-i18n@9.13.1": {
+    "npm:vue-i18n@10.0.5": {
       "type": "npm",
-      "name": "npm:vue-i18n@9.13.1",
+      "name": "npm:vue-i18n@10.0.5",
       "data": {
-        "version": "9.13.1",
+        "version": "10.0.5",
         "packageName": "vue-i18n",
-        "hash": "10/e9bbcf5e0d2a646acf48af527ab5ca73cd2e0716177a80bedde762c9e0e056810afd0f46dde620a25de955148066774956408abe94deecc7a5ce6b47b8781e9d"
+        "hash": "10/557c00fbce207a1eaa836894d4a5140be7c9df546168dac1e14dec7b04f2ecc351161ac11e9cc31eb34da408f863f7371477ab3947ae89f9480ad531c24db1f2"
       }
     },
     "npm:vue-resize@2.0.0-alpha.1": {
@@ -29917,6 +29953,11 @@
       {
         "source": "@blocksuite/playground",
         "target": "npm:browser-fs-access",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/playground",
+        "target": "npm:js-base64",
         "type": "static"
       },
       {
@@ -34985,10 +35026,10 @@
         "type": "static"
       }
     ],
-    "npm:@img/sharp-linux-x64": [
+    "npm:@img/sharp-linux-x64@0.33.5": [
       {
-        "source": "npm:@img/sharp-linux-x64",
-        "target": "npm:@img/sharp-libvips-linux-x64",
+        "source": "npm:@img/sharp-linux-x64@0.33.5",
+        "target": "npm:@img/sharp-libvips-linux-x64@1.0.4",
         "type": "static"
       }
     ],
@@ -35357,6 +35398,28 @@
       {
         "source": "npm:@mahdaad/bounty-vue@0.0.31",
         "target": "npm:@vueuse/core",
+        "type": "static"
+      }
+    ],
+    "npm:@mahdaad/editor-vue": [
+      {
+        "source": "npm:@mahdaad/editor-vue",
+        "target": "npm:@tiptap/extension-mention",
+        "type": "static"
+      },
+      {
+        "source": "npm:@mahdaad/editor-vue",
+        "target": "npm:@vueuse/core",
+        "type": "static"
+      },
+      {
+        "source": "npm:@mahdaad/editor-vue",
+        "target": "npm:tiptap-text-direction",
+        "type": "static"
+      },
+      {
+        "source": "npm:@mahdaad/editor-vue",
+        "target": "npm:vue",
         "type": "static"
       }
     ],
@@ -37128,7 +37191,7 @@
       },
       {
         "source": "npm:@swc/core",
-        "target": "npm:@swc/core-linux-x64-gnu",
+        "target": "npm:@swc/core-linux-x64-gnu@1.9.3",
         "type": "static"
       },
       {
@@ -37148,7 +37211,7 @@
       },
       {
         "source": "npm:@swc/core",
-        "target": "npm:@swc/core-win32-x64-msvc@1.9.3",
+        "target": "npm:@swc/core-win32-x64-msvc",
         "type": "static"
       },
       {
@@ -40813,7 +40876,7 @@
       },
       {
         "source": "npm:@vueuse/components",
-        "target": "npm:@vueuse/shared",
+        "target": "npm:@vueuse/shared@10.11.0",
         "type": "static"
       },
       {
@@ -40830,12 +40893,12 @@
       },
       {
         "source": "npm:@vueuse/core@10.11.0",
-        "target": "npm:@vueuse/metadata",
+        "target": "npm:@vueuse/metadata@10.11.0",
         "type": "static"
       },
       {
         "source": "npm:@vueuse/core@10.11.0",
-        "target": "npm:@vueuse/shared",
+        "target": "npm:@vueuse/shared@10.11.0",
         "type": "static"
       },
       {
@@ -40874,12 +40937,12 @@
       },
       {
         "source": "npm:@vueuse/core",
-        "target": "npm:@vueuse/metadata@10.11.1",
+        "target": "npm:@vueuse/metadata",
         "type": "static"
       },
       {
         "source": "npm:@vueuse/core",
-        "target": "npm:@vueuse/shared@10.11.1",
+        "target": "npm:@vueuse/shared",
         "type": "static"
       },
       {
@@ -40896,7 +40959,7 @@
       },
       {
         "source": "npm:@vueuse/integrations",
-        "target": "npm:@vueuse/shared",
+        "target": "npm:@vueuse/shared@10.11.0",
         "type": "static"
       },
       {
@@ -40922,16 +40985,16 @@
         "type": "static"
       }
     ],
-    "npm:@vueuse/shared": [
+    "npm:@vueuse/shared@10.11.0": [
       {
-        "source": "npm:@vueuse/shared",
+        "source": "npm:@vueuse/shared@10.11.0",
         "target": "npm:vue-demi",
         "type": "static"
       }
     ],
-    "npm:@vueuse/shared@10.11.1": [
+    "npm:@vueuse/shared": [
       {
-        "source": "npm:@vueuse/shared@10.11.1",
+        "source": "npm:@vueuse/shared",
         "target": "npm:vue-demi",
         "type": "static"
       }
@@ -44972,7 +45035,7 @@
       },
       {
         "source": "npm:esbuild@0.14.54",
-        "target": "npm:esbuild-linux-64",
+        "target": "npm:esbuild-linux-64@0.14.54",
         "type": "static"
       },
       {
@@ -45027,7 +45090,7 @@
       },
       {
         "source": "npm:esbuild@0.14.54",
-        "target": "npm:esbuild-windows-64@0.14.54",
+        "target": "npm:esbuild-windows-64",
         "type": "static"
       },
       {
@@ -45236,7 +45299,7 @@
       },
       {
         "source": "npm:esbuild",
-        "target": "npm:@esbuild/linux-x64",
+        "target": "npm:@esbuild/linux-x64@0.24.0",
         "type": "static"
       },
       {
@@ -45271,7 +45334,7 @@
       },
       {
         "source": "npm:esbuild",
-        "target": "npm:@esbuild/win32-x64@0.24.0",
+        "target": "npm:@esbuild/win32-x64",
         "type": "static"
       }
     ],
@@ -50186,7 +50249,7 @@
       },
       {
         "source": "npm:lightningcss",
-        "target": "npm:lightningcss-linux-x64-gnu",
+        "target": "npm:lightningcss-linux-x64-gnu@1.25.1",
         "type": "static"
       },
       {
@@ -50196,7 +50259,7 @@
       },
       {
         "source": "npm:lightningcss",
-        "target": "npm:lightningcss-win32-x64-msvc@1.25.1",
+        "target": "npm:lightningcss-win32-x64-msvc",
         "type": "static"
       }
     ],
@@ -52561,7 +52624,7 @@
       },
       {
         "source": "npm:nx",
-        "target": "npm:@nx/nx-linux-x64-gnu",
+        "target": "npm:@nx/nx-linux-x64-gnu@20.0.5",
         "type": "static"
       },
       {
@@ -52576,7 +52639,7 @@
       },
       {
         "source": "npm:nx",
-        "target": "npm:@nx/nx-win32-x64-msvc@20.0.5",
+        "target": "npm:@nx/nx-win32-x64-msvc",
         "type": "static"
       },
       {
@@ -53246,7 +53309,7 @@
       },
       {
         "source": "npm:oxc-resolver",
-        "target": "npm:@oxc-resolver/binding-linux-x64-gnu",
+        "target": "npm:@oxc-resolver/binding-linux-x64-gnu@1.12.0",
         "type": "static"
       },
       {
@@ -53266,7 +53329,7 @@
       },
       {
         "source": "npm:oxc-resolver",
-        "target": "npm:@oxc-resolver/binding-win32-x64-msvc@1.12.0",
+        "target": "npm:@oxc-resolver/binding-win32-x64-msvc",
         "type": "static"
       }
     ],
@@ -54016,7 +54079,7 @@
       },
       {
         "source": "npm:radix-vue@1.9.1",
-        "target": "npm:@vueuse/shared@10.11.1",
+        "target": "npm:@vueuse/shared",
         "type": "static"
       },
       {
@@ -54073,7 +54136,7 @@
       },
       {
         "source": "npm:radix-vue@1.9.10",
-        "target": "npm:@vueuse/shared@10.11.1",
+        "target": "npm:@vueuse/shared",
         "type": "static"
       },
       {
@@ -54977,7 +55040,7 @@
       },
       {
         "source": "npm:rollup",
-        "target": "npm:@rollup/rollup-linux-x64-gnu",
+        "target": "npm:@rollup/rollup-linux-x64-gnu@4.27.4",
         "type": "static"
       },
       {
@@ -54997,7 +55060,7 @@
       },
       {
         "source": "npm:rollup",
-        "target": "npm:@rollup/rollup-win32-x64-msvc@4.27.4",
+        "target": "npm:@rollup/rollup-win32-x64-msvc",
         "type": "static"
       },
       {
@@ -55268,7 +55331,7 @@
       },
       {
         "source": "npm:sharp",
-        "target": "npm:@img/sharp-libvips-linux-x64",
+        "target": "npm:@img/sharp-libvips-linux-x64@1.0.4",
         "type": "static"
       },
       {
@@ -55298,7 +55361,7 @@
       },
       {
         "source": "npm:sharp",
-        "target": "npm:@img/sharp-linux-x64",
+        "target": "npm:@img/sharp-linux-x64@0.33.5",
         "type": "static"
       },
       {
@@ -55323,7 +55386,7 @@
       },
       {
         "source": "npm:sharp",
-        "target": "npm:@img/sharp-win32-x64@0.33.5",
+        "target": "npm:@img/sharp-win32-x64",
         "type": "static"
       },
       {
@@ -58838,19 +58901,19 @@
         "type": "static"
       }
     ],
-    "npm:vue-i18n@9.13.1": [
+    "npm:vue-i18n@10.0.5": [
       {
-        "source": "npm:vue-i18n@9.13.1",
+        "source": "npm:vue-i18n@10.0.5",
         "target": "npm:@intlify/core-base",
         "type": "static"
       },
       {
-        "source": "npm:vue-i18n@9.13.1",
+        "source": "npm:vue-i18n@10.0.5",
         "target": "npm:@intlify/shared",
         "type": "static"
       },
       {
-        "source": "npm:vue-i18n@9.13.1",
+        "source": "npm:vue-i18n@10.0.5",
         "target": "npm:@vue/devtools-api",
         "type": "static"
       }

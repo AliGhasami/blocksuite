@@ -4498,7 +4498,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:^1.1.6, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -4569,15 +4569,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/editor-vue@npm:^0.0.36":
-  version: 0.0.36
-  resolution: "@mahdaad/editor-vue@npm:0.0.36"
+"@mahdaad/editor-vue@npm:^0.0.40":
+  version: 0.0.40
+  resolution: "@mahdaad/editor-vue@npm:0.0.40"
   dependencies:
     "@tiptap/extension-mention": "npm:2.5.4"
     "@vueuse/core": "npm:^10.9.0"
     tiptap-text-direction: "npm:0.3.1"
     vue: "npm:^3.4.21"
-  checksum: 10/5298531cab23ec65eb55d6fc8f7032141c90cb64b07591d55f452c645ac5ffe591f53721632221a7b0fb4e9513aaa5e7b182e00495a069206e2c38ed8ba2fc02
+  checksum: 10/8a916d3829af15452e140e59e3d490521e4bf1c34b8dc9df3dab6f78c4ce1c5d08eae458a432931025cc7880b384b8473a0af6032dcb5b6e89f13ed83e168b7f
   languageName: node
   linkType: hard
 
@@ -11286,10 +11286,10 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:^1.1.6"
+    "@mahdaad/block-editor": "workspace:*"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
-    "@mahdaad/editor-vue": "npm:^0.0.36"
+    "@mahdaad/editor-vue": "npm:^0.0.40"
     "@mahdaad/tokens": "npm:0.0.43"
     "@novu/headless": "npm:2.0.0-canary.0"
     "@novu/notification-center-vue": "npm:2.0.0-canary.0"
