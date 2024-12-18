@@ -121,3 +121,14 @@
 [NX Daemon Server] - 2024-12-03T10:42:42.210Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2024-12-03T10:42:42.210Z - [WATCHER]: Stopping the watcher for /home/sedmedgh/Desktop/projects/js/blocksuite (sources)
 [NX Daemon Server] - 2024-12-03T10:42:42.211Z - [WATCHER]: Stopping the watcher for /home/sedmedgh/Desktop/projects/js/blocksuite (outputs)
+[NX Daemon Server] - 2024-12-18T07:45:18.994Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\e474629dbedacb7546a1\d.sock
+[NX Daemon Server] - 2024-12-18T07:45:18.998Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite (native)
+[NX Daemon Server] - 2024-12-18T07:45:19.014Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-12-18T07:45:19.016Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-12-18T07:45:19.017Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-12-18T07:45:19.019Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-12-18T07:45:19.020Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-12-18T07:45:19.020Z - Handled FORCE_SHUTDOWN. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2024-12-18T07:45:19.020Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-12-18T07:45:19.021Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2024-12-18T07:45:19.021Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)

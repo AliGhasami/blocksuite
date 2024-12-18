@@ -83,7 +83,7 @@ export class MahdaadDateTimeInline extends ShadowlessElement {
   }
 
   override render() {
-    console.log('this is date time', this.delta);
+    //console.log('this is date time', this.delta);
     return html`<span >
       <mahdaad-date-time
         class="${Prefix}-date-time" 

@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "1.1.6",
+  "version": "1.1.7-beta",
   "type": "module",
   "files": [
     "dist",
@@ -11,7 +11,8 @@
   "exports": {
     ".": {
       "require": "./dist/vue-block-editor.js",
-      "import": "./dist/vue-block-editor.js"
+      "import": "./dist/vue-block-editor.js",
+      "development": "./src/index.ts"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
@@ -26,6 +27,10 @@
       ".": {
         "require": "./dist/vue-block-editor.js",
         "import": "./dist/vue-block-editor.js"
+      },
+      "./dist/style.css": {
+        "import": "./dist/style.css",
+        "require": "./dist/style.css"
       }
     }
   },
