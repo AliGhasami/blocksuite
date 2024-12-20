@@ -178,7 +178,7 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(
 
     this.onImportMindMap?.(bound)
       .then(() => {
-        this.std.get(TelemetryProvider)?.track('CanvasElementAdded', {
+        this.std.getOptional(TelemetryProvider)?.track('CanvasElementAdded', {
           page: 'whiteboard editor',
           type: 'imported mind map',
           other: 'success',
@@ -187,7 +187,7 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(
       })
       .catch(e => {
         if (e.code === ErrorCode.UserAbortError) return;
-        this.std.get(TelemetryProvider)?.track('CanvasElementAdded', {
+        this.std.getOptional(TelemetryProvider)?.track('CanvasElementAdded', {
           page: 'whiteboard editor',
           type: 'imported mind map',
           other: 'failed',

@@ -1,25 +1,25 @@
-import {
-  EmbedEdgelessIcon,
-  EmbedPageIcon,
-} from '@blocksuite/affine-components/icons';
 import { Peekable } from '@blocksuite/affine-components/peek';
 import {
-  cloneReferenceInfo,
   REFERENCE_NODE,
   RefNodeSlotsProvider,
 } from '@blocksuite/affine-components/rich-text';
 import {
+  type AliasInfo,
   type DocMode,
   type EmbedSyncedDocModel,
   NoteDisplayMode,
   type ReferenceInfo,
 } from '@blocksuite/affine-model';
 import {
+  DocDisplayMetaProvider,
   DocModeProvider,
   ThemeExtensionIdentifier,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
-import { SpecProvider } from '@blocksuite/affine-shared/utils';
+import {
+  cloneReferenceInfo,
+  SpecProvider,
+} from '@blocksuite/affine-shared/utils';
 import {
   BlockServiceWatcher,
   BlockStdScope,
@@ -27,7 +27,13 @@ import {
 } from '@blocksuite/block-std';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
 import { assertExists, Bound, getCommonBound } from '@blocksuite/global/utils';
-import { BlockViewType, DocCollection, type Query } from '@blocksuite/store';
+import {
+  BlockViewType,
+  DocCollection,
+  type GetDocOptions,
+  type Query,
+} from '@blocksuite/store';
+import { computed } from '@preact/signals-core';
 import { html, type PropertyValues } from 'lit';
 import { query, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
@@ -149,9 +155,7 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
     assertExists(syncedDoc);
 
     if (isPageMode) {
-      this.style.width = 'calc(100% + 48px)';
-      this.style.marginLeft = '-24px';
-      this.style.marginRight = '-24px';
+      this.dataset.pageMode = '';
     }
 
     const containerStyleMap = styleMap({
@@ -198,8 +202,6 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
       ]);
     };
 
-    const icon = isPageMode ? EmbedPageIcon : EmbedEdgelessIcon;
-
     return this.renderEmbed(
       () => html`
         <div
@@ -232,10 +234,10 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
             })}
           >
             <div class="affine-embed-synced-doc-header">
-              ${icon}
-              <span class="affine-embed-synced-doc-title">
-                ${this.docTitle}
-              </span>
+              <span class="affine-embed-synced-doc-icon"
+                >${this.icon$.value}</span
+              >
+              <span class="affine-embed-synced-doc-title">${this.title$}</span>
             </div>
           </div>
         </div>
@@ -249,7 +251,7 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
     width: '100%',
   });
 
-  convertToCard = () => {
+  convertToCard = (aliasInfo?: AliasInfo) => {
     const { doc, caption } = this.model;
 
     const parent = doc.getParent(this.model);
@@ -258,7 +260,7 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
 
     doc.addBlock(
       'affine:embed-linked-doc',
-      { caption, ...this.referenceInfo },
+      { caption, ...this.referenceInfo, ...aliasInfo },
       parent,
       index
     );
@@ -299,6 +301,13 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
     height: 'unset',
   };
 
+  icon$ = computed(() => {
+    const { pageId, params } = this.model;
+    return this.std
+      .get(DocDisplayMetaProvider)
+      .icon(pageId, { params, referenced: true }).value;
+  });
+
   open = () => {
     const pageId = this.model.pageId;
     if (pageId === this.doc.id) return;
@@ -312,6 +321,13 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
       this._error = true;
     });
   };
+
+  title$ = computed(() => {
+    const { pageId, params } = this.model;
+    return this.std
+      .get(DocDisplayMetaProvider)
+      .title(pageId, { params, referenced: true });
+  });
 
   private get _rootService() {
     return this.std.getService('affine:page');
@@ -327,9 +343,7 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
   }
 
   get docTitle() {
-    return this.syncedDoc?.meta?.title.length
-      ? this.syncedDoc.meta.title
-      : 'Untitled';
+    return this.syncedDoc?.meta?.title || 'Untitled';
   }
 
   get docUpdatedAt() {
@@ -353,14 +367,9 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
   }
 
   get syncedDoc() {
-    return this.isPageMode
-      ? this.std.collection.getDoc(this.model.pageId, {
-          readonly: true,
-          query: this._pageFilter,
-        })
-      : this.std.collection.getDoc(this.model.pageId, {
-          readonly: true,
-        });
+    const options: GetDocOptions = { readonly: true };
+    if (this.isPageMode) options.query = this._pageFilter;
+    return this.std.collection.getDoc(this.model.pageId, options);
   }
 
   private _checkCycle() {
@@ -456,14 +465,16 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
 
     this.contentEditable = 'false';
 
-    this.model.propsUpdated.on(({ key }) => {
-      if (key === 'pageId' || key === 'style') {
-        this._load().catch(e => {
-          console.error(e);
-          this._error = true;
-        });
-      }
-    });
+    this.disposables.add(
+      this.model.propsUpdated.on(({ key }) => {
+        if (key === 'pageId' || key === 'style') {
+          this._load().catch(e => {
+            console.error(e);
+            this._error = true;
+          });
+        }
+      })
+    );
 
     this._setDocUpdatedAt();
     this.disposables.add(

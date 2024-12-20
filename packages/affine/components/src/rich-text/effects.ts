@@ -1,3 +1,4 @@
+//ali ghasami for new merge
 import type { AffineTextAttributes } from './extension/index.js';
 import type { deleteTextCommand } from './format/delete-text.js';
 import type { formatBlockCommand } from './format/format-block.js';

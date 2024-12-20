@@ -66,6 +66,7 @@ export const defaultAttachmentProps: AttachmentBlockProps = {
   style: AttachmentBlockStyles[1],
   index: 'a0',
   xywh: '[0,0,0,0]',
+  lockedBySelf: false,
   rotate: 0,
 };
 

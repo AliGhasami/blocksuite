@@ -261,7 +261,8 @@ export class MobileMenuComponent
       user-select: none;
       width: 100%;
       background-color: ${unsafeCSSVarV2('layer/background/secondary')};
-      padding: 8px;
+      padding: calc(8px + env(safe-area-inset-top, 0px)) 8px
+        calc(8px + env(safe-area-inset-bottom, 0px)) 8px;
       position: absolute;
       z-index: 999;
       color: ${unsafeCSSVarV2('text/primary')};
@@ -503,11 +504,12 @@ const popMobileMenu = (options: MenuOptions): MenuHandler => {
   };
   return {
     close: () => {
-      closePopup();
+      menu.close();
     },
     menu,
     reopen: () => {
-      options.onClose?.();
+      menu.close();
+      popMobileMenu(options);
     },
   };
 };
@@ -527,16 +529,17 @@ export const popMenu = (
   const onClose = () => {
     props.options.onClose?.();
     popupEnd();
+    closePopup();
   };
   const menu = new Menu({
     ...props.options,
-    onClose: () => {
-      closePopup();
-    },
+    onClose: onClose,
   });
   //console.log("contanier",props.container,target);
   const closePopup = createPopup(target, menu.menuElement, {
-    onClose: onClose,
+    onClose: () => {
+      menu.close();
+    },
     middleware: props.middleware ?? [
       autoPlacement({
         allowedPlacements: [

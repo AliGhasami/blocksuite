@@ -63,11 +63,9 @@ export class Job {
     afterExport: new Slot<FinalPayload>(),
   };
 
-  blockToSnapshot = async (
-    model: DraftModel
-  ): Promise<BlockSnapshot | undefined> => {
+  blockToSnapshot = (model: DraftModel): BlockSnapshot | undefined => {
     try {
-      const snapshot = await this._blockToSnapshot(model);
+      const snapshot = this._blockToSnapshot(model);
       BlockSnapshotSchema.parse(snapshot);
 
       return snapshot;
@@ -103,7 +101,7 @@ export class Job {
     }
   };
 
-  docToSnapshot = async (doc: Doc): Promise<DocSnapshot | undefined> => {
+  docToSnapshot = (doc: Doc): DocSnapshot | undefined => {
     try {
       this._slots.beforeExport.emit({
         type: 'page',
@@ -117,7 +115,7 @@ export class Job {
           'Root block not found in doc'
         );
       }
-      const blocks = await this.blockToSnapshot(rootModel);
+      const blocks = this.blockToSnapshot(rootModel);
       if (!blocks) {
         return;
       }
@@ -141,19 +139,16 @@ export class Job {
     }
   };
 
-  sliceToSnapshot = async (
-    slice: Slice
-  ): Promise<SliceSnapshot | undefined> => {
+  sliceToSnapshot = (slice: Slice): SliceSnapshot | undefined => {
     try {
       this._slots.beforeExport.emit({
         type: 'slice',
         slice,
       });
-      const { content, pageVersion, workspaceVersion, pageId, workspaceId } =
-        slice.data;
+      const { content, pageId, workspaceId } = slice.data;
       const contentSnapshot = [];
       for (const block of content) {
-        const blockSnapshot = await this.blockToSnapshot(block);
+        const blockSnapshot = this.blockToSnapshot(block);
         if (!blockSnapshot) {
           return;
         }
@@ -163,8 +158,6 @@ export class Job {
         type: 'slice',
         workspaceId,
         pageId,
-        pageVersion,
-        workspaceVersion,
         content: contentSnapshot,
       };
       this._slots.afterExport.emit({
@@ -264,8 +257,7 @@ export class Job {
         snapshot,
       });
 
-      const { content, pageVersion, workspaceVersion, workspaceId, pageId } =
-        snapshot;
+      const { content, workspaceId, pageId } = snapshot;
 
       // Create a temporary root snapshot to encompass all content blocks
       const tmpRootSnapshot: BlockSnapshot = {
@@ -292,8 +284,6 @@ export class Job {
 
       const slice = new Slice({
         content: contentBlocks,
-        pageVersion,
-        workspaceVersion,
         workspaceId,
         pageId,
       });
@@ -359,22 +349,20 @@ export class Job {
     });
   }
 
-  private async _blockToSnapshot(model: DraftModel): Promise<BlockSnapshot> {
+  private _blockToSnapshot(model: DraftModel): BlockSnapshot {
     this._slots.beforeExport.emit({
       type: 'block',
       model,
     });
     const schema = this._getSchema(model.flavour);
     const transformer = this._getTransformer(schema);
-    const snapshotLeaf = await transformer.toSnapshot({
+    const snapshotLeaf = transformer.toSnapshot({
       model,
       assets: this._assetsManager,
     });
-    const children = await Promise.all(
-      model.children.map(child => {
-        return this._blockToSnapshot(child);
-      })
-    );
+    const children = model.children.map(child => {
+      return this._blockToSnapshot(child);
+    });
     const snapshot: BlockSnapshot = {
       type: 'block',
       ...snapshotLeaf,
@@ -483,25 +471,11 @@ export class Job {
 
   private _getCollectionMeta() {
     const { meta } = this._collection;
-    const { pageVersion, workspaceVersion, docs } = meta;
-    if (!pageVersion) {
-      throw new BlockSuiteError(
-        ErrorCode.TransformerError,
-        'Page version not found'
-      );
-    }
-    if (!workspaceVersion) {
-      throw new BlockSuiteError(
-        ErrorCode.TransformerError,
-        'Workspace version not found'
-      );
-    }
+    const { docs } = meta;
     if (!docs) {
       throw new BlockSuiteError(ErrorCode.TransformerError, 'Docs not found');
     }
     return {
-      pageVersion,
-      workspaceVersion,
       properties: {}, // for backward compatibility
       pages: JSON.parse(JSON.stringify(docs)) as DocMeta[],
     };

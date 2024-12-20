@@ -8,9 +8,11 @@ import {
   type IBound,
   last,
 } from '@blocksuite/global/utils';
+import { Signal } from '@preact/signals-core';
 
 import type { BlockStdScope } from '../scope/block-std-scope.js';
 import type { BlockComponent } from '../view/index.js';
+import type { CursorType } from './cursor.js';
 import type { PointTestOptions } from './model/base.js';
 import type { GfxModel } from './model/model.js';
 import type { SurfaceBlockModel } from './model/surface/surface-model.js';
@@ -38,6 +40,8 @@ export class GfxController extends LifeCycleWatcher {
   private _disposables: DisposableGroup = new DisposableGroup();
 
   private _surface: SurfaceBlockModel | null = null;
+
+  readonly cursor$ = new Signal<CursorType>();
 
   readonly grid: GridManager;
 
@@ -271,7 +275,7 @@ export class GfxController extends LifeCycleWatcher {
   }
 
   override mounted() {
-    this.viewport.setViewportElm(this.std.host);
+    this.viewport.setViewportElement(this.std.host);
     this.std.provider.getAll(GfxExtensionIdentifier).forEach(ext => {
       ext.mounted();
     });
@@ -281,6 +285,7 @@ export class GfxController extends LifeCycleWatcher {
     this.std.provider.getAll(GfxExtensionIdentifier).forEach(ext => {
       ext.unmounted();
     });
+    this.viewport.clearViewportElement();
     this._disposables.dispose();
   }
 
