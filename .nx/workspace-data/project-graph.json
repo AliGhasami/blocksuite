@@ -29100,6 +29100,11 @@
       },
       {
         "source": "@blocksuite/affine-block-paragraph",
+        "target": "npm:@types/mdast",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/affine-block-paragraph",
         "target": "npm:lit",
         "type": "static"
       },
@@ -29409,6 +29414,11 @@
       {
         "source": "@blocksuite/affine-block-list",
         "target": "npm:@toeverything/theme",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/affine-block-list",
+        "target": "npm:@types/mdast",
         "type": "static"
       },
       {
@@ -29812,6 +29822,11 @@
       },
       {
         "source": "@blocksuite/affine-shared",
+        "target": "npm:@blocksuite/icons",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/affine-shared",
         "target": "@blocksuite/inline",
         "type": "static"
       },
@@ -29838,6 +29853,16 @@
       {
         "source": "@blocksuite/affine-shared",
         "target": "npm:@toeverything/theme",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/affine-shared",
+        "target": "npm:@types/hast",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/affine-shared",
+        "target": "npm:@types/mdast",
         "type": "static"
       },
       {

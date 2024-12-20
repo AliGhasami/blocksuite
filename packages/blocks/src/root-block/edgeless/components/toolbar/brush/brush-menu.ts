@@ -50,6 +50,9 @@ export class EdgelessBrushMenu extends EdgelessToolbarToolMixin(
   type: GfxToolsFullOptionValue['type'] = 'brush';
 
   override render() {
+    console.log("1111",this.edgeless.doc.awarenessStore.getFlag(
+      'enable_color_picker'
+    ))
     const theme = this.edgeless.std.get(ThemeProvider).theme;
     const color = this.edgeless.std
       .get(ThemeProvider)

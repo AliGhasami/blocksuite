@@ -377,6 +377,7 @@ export class EdgelessTextEditor extends WithDisposable(ShadowlessElement) {
         lineHeight: `${lineHeight}px`,
         boxSizing: 'content-box',
       })}
+        contenteditable="false"
       class="edgeless-text-editor"
     >
       <rich-text

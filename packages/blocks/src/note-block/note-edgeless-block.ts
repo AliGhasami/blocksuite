@@ -67,6 +67,7 @@ export class EdgelessNoteMask extends WithDisposable(ShadowlessElement) {
     return html`
       <div
         class="affine-note-mask"
+        contenteditable="false"
         style=${styleMap({
           position: 'absolute',
           top: `${-extra}px`,
@@ -442,6 +443,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
       <div
         class="edgeless-note-container"
         style=${styleMap(style)}
+        contenteditable="false"
         data-model-height="${bound.h}"
         @mouseleave=${this._leaved}
         @mousemove=${this._hovered}
@@ -449,6 +451,7 @@ export class EdgelessNoteBlockComponent extends toGfxBlockComponent(
       >
         <div
           class="note-background"
+          contenteditable="false"
           style=${styleMap(backgroundStyle)}
           @pointerdown=${stopPropagation}
           @click=${this._handleClickAtBackground}

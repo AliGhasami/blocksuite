@@ -206,7 +206,7 @@ import {
   AFFINE_EMBED_CARD_TOOLBAR_WIDGET,
   //AFFINE_FORMAT_BAR_WIDGET,
   AffineAIPanelWidget,
-  AffineCodeLanguageListWidget,
+  //AffineCodeLanguageListWidget,
   AffineCodeToolbarWidget,
   //AffineDocRemoteSelectionWidget,
   AffineDragHandleWidget,
@@ -240,8 +240,8 @@ import {
   AIPanelGenerating,
   AIPanelInput,
 } from './root-block/widgets/ai-panel/components/index.js';
-import { LanguageListButton } from './root-block/widgets/code-language-list/components/lang-button.js';
-import { AFFINE_CODE_LANGUAGE_LIST_WIDGET } from './root-block/widgets/code-language-list/index.js';
+//import { LanguageListButton } from './root-block/widgets/code-language-list/components/lang-button.js';
+//import { AFFINE_CODE_LANGUAGE_LIST_WIDGET } from './root-block/widgets/code-language-list/index.js';
 import { AffineCodeToolbar } from './root-block/widgets/code-toolbar/components/code-toolbar.js';
 import { AFFINE_CODE_TOOLBAR_WIDGET } from './root-block/widgets/code-toolbar/index.js';
 //import { AFFINE_DOC_REMOTE_SELECTION_WIDGET } from './root-block/widgets/doc-remote-selection/index.js';
@@ -552,7 +552,6 @@ export function effects() {
     'edgeless-group-title-editor',
     EdgelessGroupTitleEditor
   );
-  customElements.define('language-list-button', LanguageListButton);
   customElements.define('affine-drag-preview', DragPreview);
   customElements.define(EDGELESS_TOOLBAR_WIDGET, EdgelessToolbarWidget);
   customElements.define('edgeless-shape-style-panel', EdgelessShapeStylePanel);
@@ -600,10 +599,10 @@ export function effects() {
 
   customElements.define(AFFINE_IMAGE_TOOLBAR_WIDGET, AffineImageToolbarWidget);
   customElements.define(AFFINE_SLASH_MENU_WIDGET, AffineSlashMenuWidget);
-  customElements.define(
+  /*customElements.define(
     AFFINE_CODE_LANGUAGE_LIST_WIDGET,
     AffineCodeLanguageListWidget
-  );
+  );*/
   /*customElements.define(
     AFFINE_EDGELESS_REMOTE_SELECTION_WIDGET,
     EdgelessRemoteSelectionWidget

@@ -12,7 +12,7 @@
 <script setup lang="ts">
 //import '@blocksuite/presets/themes/affine.css'
 import '@toeverything/theme/style.css';
-import { EdgelessEditor, PageEditor } from '@blocksuite/presets'
+import { AffineEditorContainer, EdgelessEditor, PageEditor } from '@blocksuite/presets'
 //import { createEmptyDoc } from './helpers'
 import {
   type BlockCollection,
@@ -268,6 +268,7 @@ function bindEvent(doc: Doc) {
 
 
 function checkNotEmptyDocBlock(doc: Doc) {
+  return
   const noteList = doc.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
   if (note) {
@@ -318,6 +319,7 @@ function setFocus() {
 }
 
 function checkIsEmpty() {
+  return
   let res = true
   const doc= toRaw(unref(currentDocument.value))
   const noteList = doc.getBlockByFlavour('affine:note')
@@ -541,6 +543,13 @@ async function init() {
   stopEvent.value=true
   //debugger
   console.log("==>init function");
+  const defaultFlags= {
+    enable_synced_doc_block: true,
+    enable_pie_menu: true,
+    enable_lasso_tool: true,
+    enable_color_picker: true,
+    // ...flags,
+  }
   //debugger
   //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
  /* await new Promise((resolve, reject) => {
@@ -663,9 +672,12 @@ async function init() {
     //const app = document.getElementById('app');
     /* const app = refEditor.value;
      if (!app) return;*/
+    //editorElement.value = new AffineEditorContainer()
     if (props.isBoardView) {
+      //editorElement.value.mode='edgeless'
       editorElement.value = new EdgelessEditor()
     } else {
+      //editorElement.value.mode = 'page';
       editorElement.value = new PageEditor()
     }
     console.log('==>doc for mount is', doc)
@@ -822,7 +834,6 @@ async function init() {
           new BroadcastChannelAwarenessSource(edgelessId.value)
         ]
       })
-
     const options: DocCollectionOptions = {
       //id: 'quickEdgeless',
       id: edgelessId.value,
@@ -834,12 +845,14 @@ async function init() {
       },*/
       docSources,
       awarenessSources,
-      defaultFlags: {
+      defaultFlags,
+      /*defaultFlags: {
         enable_synced_doc_block: true,
         enable_pie_menu: true,
-        enable_lasso_tool: true
+        enable_lasso_tool: true,
+        enable_color_picker: true,
         // ...flags,
-      }
+      }*/
     }
     console.log("==>Init collection in collaboration mode and start")
     myCollection = new DocCollection(options)
@@ -849,7 +862,7 @@ async function init() {
   }else{
     console.log("==>not collaboration mode");
     //console.log("5555555",props.data);
-    myCollection = new DocCollection({schema})
+    myCollection = new DocCollection({schema,defaultFlags})
     myCollection.start()
     myCollection.meta.initialize()
     if(editorData){

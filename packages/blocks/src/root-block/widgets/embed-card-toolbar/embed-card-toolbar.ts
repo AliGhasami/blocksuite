@@ -12,7 +12,7 @@ import {
   SmallArrowDownIcon,
 } from '@blocksuite/affine-components/icons';
 import { isPeekable, peek } from '@blocksuite/affine-components/peek';
-import { isLinkToNode } from '@blocksuite/affine-components/rich-text';
+//import { isLinkToNode } from '@blocksuite/affine-components/rich-text';
 import { toast } from '@blocksuite/affine-components/toast';
 import {
   cloneGroups,
@@ -33,7 +33,7 @@ import {
   type EmbedOptions,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
-import { getHostName } from '@blocksuite/affine-shared/utils';
+import { getHostName, referenceToNode } from '@blocksuite/affine-shared/utils';
 import { WidgetComponent } from '@blocksuite/block-std';
 import { type BlockModel, DocCollection } from '@blocksuite/store';
 import { autoUpdate, computePosition, flip, offset } from '@floating-ui/dom';
@@ -121,7 +121,7 @@ export class EmbedCardToolbar extends WidgetComponent<
       this.focusModel &&
       this.focusBlock &&
       isEmbedLinkedDocBlock(this.focusModel) &&
-      (isLinkToNode(this.focusModel) ||
+      (referenceToNode(this.focusModel) ||
         !!this.focusBlock.closest('affine-embed-synced-doc-block') ||
         this.focusModel.pageId === this.doc.id)
     );

@@ -8,6 +8,7 @@ import type { BlockModel } from '@blocksuite/store';
 
 import { toast } from '@blocksuite/affine-components/toast';
 import { defaultAttachmentProps } from '@blocksuite/affine-model';
+import { TelemetryProvider } from '@blocksuite/affine-shared/services';
 import { humanFileSize } from '@blocksuite/affine-shared/utils';
 import { assertExists } from '@blocksuite/global/utils';
 
@@ -41,7 +42,7 @@ function isAttachmentUploading(blockId: string) {
 /**
  * This function will not verify the size of the file.
  */
-async function uploadAttachmentBlob(
+export async function uploadAttachmentBlob(
   editorHost: EditorHost,
   blockId: string,
   blob: Blob
