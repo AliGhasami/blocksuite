@@ -309,11 +309,17 @@ async function exportData(collection: DocCollection, docs: any[]) {
 
 function setFocus() {
   if (refEditor.value) {
+    //new method
+   /* const page_root=(refEditor.value as HTMLElement).querySelector('affine-page-root')
+    if(page_root){
+      page_root.focusFirstParagraph()
+    }*/
+    //old method
     const editor = (refEditor.value as HTMLElement).querySelector('rich-text')
-    //console.log("1111",editor);
     if (editor && editor.inlineEditor) {
       editor.inlineEditor.focusEnd()
     }
+
   }
 }
 

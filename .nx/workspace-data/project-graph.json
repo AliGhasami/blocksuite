@@ -7025,27 +7025,27 @@
         "hash": "10/76428f75fd289008580108beef02816f94aaca37d48c9e26c2274fdbb81e8f32c4247ff624b8f854384b18ce2556cc8d817ccf1bc39b0fd87b0da1f3d911209b"
       }
     },
-    "npm:@intlify/core-base": {
+    "npm:@intlify/core-base@10.0.5": {
       "type": "npm",
-      "name": "npm:@intlify/core-base",
+      "name": "npm:@intlify/core-base@10.0.5",
       "data": {
         "version": "10.0.5",
         "packageName": "@intlify/core-base",
         "hash": "10/d0680074ca5abc26c348976047001fda76045917fabcbe041fa662c2ca66dc6d22570ebf5e198f718e8b98c3d662e29d824f891183f51ff6b888c7c68db5e4fd"
       }
     },
-    "npm:@intlify/message-compiler": {
+    "npm:@intlify/message-compiler@10.0.5": {
       "type": "npm",
-      "name": "npm:@intlify/message-compiler",
+      "name": "npm:@intlify/message-compiler@10.0.5",
       "data": {
         "version": "10.0.5",
         "packageName": "@intlify/message-compiler",
         "hash": "10/3e386b042ac6dd98533b6ea2b4af610999236a1eb7ff4d77762cd06cae1858a53735b0b7e60828c569c715a9f0ae588aaaf8496f9a4b287a44e7f0fd470857ff"
       }
     },
-    "npm:@intlify/shared": {
+    "npm:@intlify/shared@10.0.5": {
       "type": "npm",
-      "name": "npm:@intlify/shared",
+      "name": "npm:@intlify/shared@10.0.5",
       "data": {
         "version": "10.0.5",
         "packageName": "@intlify/shared",
@@ -7313,9 +7313,9 @@
         "hash": "10/9158245c85beefd6e4619897489dd9bef86446fe353a49e3779ef240195c2feea929348bec6ed1609172c4d60485cc47361243a16d3aa9bed608c926e54b2e77"
       }
     },
-    "npm:@mahdaad/editor-vue": {
+    "npm:@mahdaad/editor-vue@0.0.40": {
       "type": "npm",
-      "name": "npm:@mahdaad/editor-vue",
+      "name": "npm:@mahdaad/editor-vue@0.0.40",
       "data": {
         "version": "0.0.40",
         "packageName": "@mahdaad/editor-vue",
@@ -8906,9 +8906,9 @@
         "hash": "10/49821459d81c6bc435d97128d6386ca24f1e4b3ba8e46cb5a96fe3643efa6e002d88c1b02b7f2ec58da593e805c59b78d7fdf0db565c1f02ba782f63ee984040"
       }
     },
-    "npm:@tiptap/extension-mention": {
+    "npm:@tiptap/extension-mention@2.5.4": {
       "type": "npm",
-      "name": "npm:@tiptap/extension-mention",
+      "name": "npm:@tiptap/extension-mention@2.5.4",
       "data": {
         "version": "2.5.4",
         "packageName": "@tiptap/extension-mention",
@@ -11561,18 +11561,18 @@
         "hash": "10/4cab5328216d9912c48ccad95b1cc32efd4a32e11590f2e3aca04d5aa0b7a4be6bdf68a2a0a1931a16a58fcc09bf99efd03cca944aa59d8269f0d7f7e384e555"
       }
     },
-    "npm:@vueuse/metadata@10.11.0": {
+    "npm:@vueuse/metadata": {
       "type": "npm",
-      "name": "npm:@vueuse/metadata@10.11.0",
+      "name": "npm:@vueuse/metadata",
       "data": {
         "version": "10.11.0",
         "packageName": "@vueuse/metadata",
         "hash": "10/52229c65facf4c83bd18d67c995ebeadd927d92902882d82e131242610bdad7422889e3001c8dc95d8c3a189c9c63dffa2b73f8d6a0c071405790e4fc2fc6233"
       }
     },
-    "npm:@vueuse/metadata": {
+    "npm:@vueuse/metadata@10.11.1": {
       "type": "npm",
-      "name": "npm:@vueuse/metadata",
+      "name": "npm:@vueuse/metadata@10.11.1",
       "data": {
         "version": "10.11.1",
         "packageName": "@vueuse/metadata",
@@ -11588,18 +11588,18 @@
         "hash": "10/d8b6976896d2bc9924fcbcdaa2f3ffd6f60ff3a13355c92136ed6ad83ee6188d308064f0a8e56d07060b8829b29e41958ec3df9248231859e487a0af0f5e6b2f"
       }
     },
-    "npm:@vueuse/shared@10.11.0": {
+    "npm:@vueuse/shared": {
       "type": "npm",
-      "name": "npm:@vueuse/shared@10.11.0",
+      "name": "npm:@vueuse/shared",
       "data": {
         "version": "10.11.0",
         "packageName": "@vueuse/shared",
         "hash": "10/670d8b934ba6348de085a82aa3adf457421bd2d18a7db3db29d67aa74fd36ef4123847858b9340aeb843b8feece3ef9118c90d400780dda29ecc961c08706553"
       }
     },
-    "npm:@vueuse/shared": {
+    "npm:@vueuse/shared@10.11.1": {
       "type": "npm",
-      "name": "npm:@vueuse/shared",
+      "name": "npm:@vueuse/shared@10.11.1",
       "data": {
         "version": "10.11.1",
         "packageName": "@vueuse/shared",
@@ -26276,9 +26276,9 @@
         "hash": "10/9bd1c6ab68704dd10b8896fd66e28f3b4b4017a32b8802a9d57a565dee1704df45c249d8363bcaca235dbc0d9a7a90d6f1326f1e6b999f7809b36599a3f92eb3"
       }
     },
-    "npm:tiptap-text-direction": {
+    "npm:tiptap-text-direction@0.3.1": {
       "type": "npm",
-      "name": "npm:tiptap-text-direction",
+      "name": "npm:tiptap-text-direction@0.3.1",
       "data": {
         "version": "0.3.1",
         "packageName": "tiptap-text-direction",
@@ -35127,26 +35127,26 @@
         "type": "static"
       }
     ],
-    "npm:@intlify/core-base": [
+    "npm:@intlify/core-base@10.0.5": [
       {
-        "source": "npm:@intlify/core-base",
-        "target": "npm:@intlify/message-compiler",
+        "source": "npm:@intlify/core-base@10.0.5",
+        "target": "npm:@intlify/message-compiler@10.0.5",
         "type": "static"
       },
       {
-        "source": "npm:@intlify/core-base",
-        "target": "npm:@intlify/shared",
+        "source": "npm:@intlify/core-base@10.0.5",
+        "target": "npm:@intlify/shared@10.0.5",
         "type": "static"
       }
     ],
-    "npm:@intlify/message-compiler": [
+    "npm:@intlify/message-compiler@10.0.5": [
       {
-        "source": "npm:@intlify/message-compiler",
-        "target": "npm:@intlify/shared",
+        "source": "npm:@intlify/message-compiler@10.0.5",
+        "target": "npm:@intlify/shared@10.0.5",
         "type": "static"
       },
       {
-        "source": "npm:@intlify/message-compiler",
+        "source": "npm:@intlify/message-compiler@10.0.5",
         "target": "npm:source-map-js",
         "type": "static"
       }
@@ -35401,24 +35401,24 @@
         "type": "static"
       }
     ],
-    "npm:@mahdaad/editor-vue": [
+    "npm:@mahdaad/editor-vue@0.0.40": [
       {
-        "source": "npm:@mahdaad/editor-vue",
-        "target": "npm:@tiptap/extension-mention",
+        "source": "npm:@mahdaad/editor-vue@0.0.40",
+        "target": "npm:@tiptap/extension-mention@2.5.4",
         "type": "static"
       },
       {
-        "source": "npm:@mahdaad/editor-vue",
+        "source": "npm:@mahdaad/editor-vue@0.0.40",
         "target": "npm:@vueuse/core",
         "type": "static"
       },
       {
-        "source": "npm:@mahdaad/editor-vue",
-        "target": "npm:tiptap-text-direction",
+        "source": "npm:@mahdaad/editor-vue@0.0.40",
+        "target": "npm:tiptap-text-direction@0.3.1",
         "type": "static"
       },
       {
-        "source": "npm:@mahdaad/editor-vue",
+        "source": "npm:@mahdaad/editor-vue@0.0.40",
         "target": "npm:vue",
         "type": "static"
       }
@@ -40876,7 +40876,7 @@
       },
       {
         "source": "npm:@vueuse/components",
-        "target": "npm:@vueuse/shared@10.11.0",
+        "target": "npm:@vueuse/shared",
         "type": "static"
       },
       {
@@ -40893,12 +40893,12 @@
       },
       {
         "source": "npm:@vueuse/core@10.11.0",
-        "target": "npm:@vueuse/metadata@10.11.0",
+        "target": "npm:@vueuse/metadata",
         "type": "static"
       },
       {
         "source": "npm:@vueuse/core@10.11.0",
-        "target": "npm:@vueuse/shared@10.11.0",
+        "target": "npm:@vueuse/shared",
         "type": "static"
       },
       {
@@ -40937,12 +40937,12 @@
       },
       {
         "source": "npm:@vueuse/core",
-        "target": "npm:@vueuse/metadata",
+        "target": "npm:@vueuse/metadata@10.11.1",
         "type": "static"
       },
       {
         "source": "npm:@vueuse/core",
-        "target": "npm:@vueuse/shared",
+        "target": "npm:@vueuse/shared@10.11.1",
         "type": "static"
       },
       {
@@ -40959,7 +40959,7 @@
       },
       {
         "source": "npm:@vueuse/integrations",
-        "target": "npm:@vueuse/shared@10.11.0",
+        "target": "npm:@vueuse/shared",
         "type": "static"
       },
       {
@@ -40985,16 +40985,16 @@
         "type": "static"
       }
     ],
-    "npm:@vueuse/shared@10.11.0": [
+    "npm:@vueuse/shared": [
       {
-        "source": "npm:@vueuse/shared@10.11.0",
+        "source": "npm:@vueuse/shared",
         "target": "npm:vue-demi",
         "type": "static"
       }
     ],
-    "npm:@vueuse/shared": [
+    "npm:@vueuse/shared@10.11.1": [
       {
-        "source": "npm:@vueuse/shared",
+        "source": "npm:@vueuse/shared@10.11.1",
         "target": "npm:vue-demi",
         "type": "static"
       }
@@ -54079,7 +54079,7 @@
       },
       {
         "source": "npm:radix-vue@1.9.1",
-        "target": "npm:@vueuse/shared",
+        "target": "npm:@vueuse/shared@10.11.1",
         "type": "static"
       },
       {
@@ -54136,7 +54136,7 @@
       },
       {
         "source": "npm:radix-vue@1.9.10",
-        "target": "npm:@vueuse/shared",
+        "target": "npm:@vueuse/shared@10.11.1",
         "type": "static"
       },
       {
@@ -58904,12 +58904,12 @@
     "npm:vue-i18n@10.0.5": [
       {
         "source": "npm:vue-i18n@10.0.5",
-        "target": "npm:@intlify/core-base",
+        "target": "npm:@intlify/core-base@10.0.5",
         "type": "static"
       },
       {
         "source": "npm:vue-i18n@10.0.5",
-        "target": "npm:@intlify/shared",
+        "target": "npm:@intlify/shared@10.0.5",
         "type": "static"
       },
       {

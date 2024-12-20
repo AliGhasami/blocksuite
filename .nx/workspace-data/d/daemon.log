@@ -132,3 +132,40 @@
 [NX Daemon Server] - 2024-12-18T11:33:08.363Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2024-12-18T11:33:08.363Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
 [NX Daemon Server] - 2024-12-18T11:33:08.363Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)
+[NX Daemon Server] - 2024-12-20T14:03:00.656Z - Started listening on: \\.\pipe\nx\C:\Users\ALIGHA~1\AppData\Local\Temp\9f1c0b77faf91af1d9cf\d.sock
+[NX Daemon Server] - 2024-12-20T14:03:00.660Z - [WATCHER]: Subscribed to changes within: D:\Vue_Project\hacoupian-mahdaad\blocksuite (native)
+[NX Daemon Server] - 2024-12-20T14:03:00.669Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-12-20T14:03:00.673Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-12-20T14:03:00.673Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-12-20T14:03:00.676Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2024-12-20T14:03:06.740Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-12-20T14:03:06.741Z - [REQUEST]: 
+[NX Daemon Server] - 2024-12-20T14:03:06.741Z - [REQUEST]: 
+[NX Daemon Server] - 2024-12-20T14:03:06.779Z - Time taken for 'loadNxPlugins' 6058.9269ms
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+[NX Daemon Server] - 2024-12-20T14:03:27.418Z - Time taken for 'build-project-configs' 20613.275499999996ms
+[NX Daemon Server] - 2024-12-20T14:03:27.419Z - Time taken for '@nx/vite/plugin:createDependencies' 13.534999999999854ms
+[NX Daemon Server] - 2024-12-20T14:03:27.518Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2024-12-20T14:03:27.522Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2024-12-20T14:03:27.526Z - Time taken for 'total for creating and serializing project graph' 26846.518799999998ms
+[NX Daemon Server] - 2024-12-20T14:03:27.528Z - Done responding to the client project-graph
+[NX Daemon Server] - 2024-12-20T14:03:27.528Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 26847. Response time: 6.
+[NX Daemon Server] - 2024-12-20T14:03:27.555Z - [REQUEST]: Responding to the client. handleGlob
+[NX Daemon Server] - 2024-12-20T14:03:27.556Z - Done responding to the client handleGlob
+[NX Daemon Server] - 2024-12-20T14:03:27.556Z - Handled GLOB. Handling time: 5. Response time: 1.
+[NX Daemon Server] - 2024-12-20T14:03:27.596Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2024-12-20T14:03:27.597Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2024-12-20T14:03:27.598Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 7. Response time: 2.
+[NX Daemon Server] - 2024-12-20T14:03:27.606Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-12-20T14:03:27.820Z - [WATCHER]: 0 file(s) created or restored, 2 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2024-12-20T14:03:27.821Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2024-12-20T14:03:27.927Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2024-12-20T14:03:27.927Z - [REQUEST]: packages/blocks/src/root-block/page/page-root-block.ts,packages/simple-editor/src/components/board-editor.vue
+[NX Daemon Server] - 2024-12-20T14:03:27.927Z - [REQUEST]: 
+[NX Daemon Server] - 2024-12-20T14:03:27.958Z - Time taken for 'hash changed files from watcher' 3.7983000000022002ms
+[NX Daemon Server] - 2024-12-20T14:03:28.384Z - Time taken for 'build-project-configs' 416.3260999999984ms
+[NX Daemon Server] - 2024-12-20T14:03:28.384Z - Time taken for '@nx/vite/plugin:createDependencies' 18.882399999998597ms
+[NX Daemon Server] - 2024-12-20T14:03:28.449Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2024-12-20T14:03:28.451Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX Daemon Server] - 2024-12-20T14:03:28.452Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX Daemon Server] - 2024-12-20T14:03:28.452Z - Time taken for 'total execution time for createProjectGraph()' 73.32720000000336ms
