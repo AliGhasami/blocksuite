@@ -3465,15 +3465,6 @@
         "hash": "10/ec7135337f4c33c661f83fdef8d53cb53773fde58aa6fb167a364bcd9e714e84c45f8bae358215bd84e1f39ea6090a22d1fea817256c22250ae9ac8d05c7e5c0"
       }
     },
-    "npm:@mahdaad/block-editor@1.1.6": {
-      "type": "npm",
-      "name": "npm:@mahdaad/block-editor@1.1.6",
-      "data": {
-        "version": "1.1.6",
-        "packageName": "@mahdaad/block-editor",
-        "hash": "10/6942ea08218854f7df7373fe5dc0e326fbb9abae3bed4c8134fde37d4be56004458e37f0282903c926b180ac6de84bdb10b095fc802e75ac237ebff5c84ced6f"
-      }
-    },
     "npm:@mahdaad/bounty-theme": {
       "type": "npm",
       "name": "npm:@mahdaad/bounty-theme",
@@ -3496,23 +3487,23 @@
       "type": "npm",
       "name": "npm:@mahdaad/editor-vue",
       "data": {
-        "version": "0.0.36",
+        "version": "0.0.40",
         "packageName": "@mahdaad/editor-vue",
-        "hash": "10/5298531cab23ec65eb55d6fc8f7032141c90cb64b07591d55f452c645ac5ffe591f53721632221a7b0fb4e9513aaa5e7b182e00495a069206e2c38ed8ba2fc02"
+        "hash": "10/8a916d3829af15452e140e59e3d490521e4bf1c34b8dc9df3dab6f78c4ce1c5d08eae458a432931025cc7880b384b8473a0af6032dcb5b6e89f13ed83e168b7f"
       }
     },
-    "npm:@mahdaad/tokens@0.0.43": {
+    "npm:@mahdaad/tokens": {
       "type": "npm",
-      "name": "npm:@mahdaad/tokens@0.0.43",
+      "name": "npm:@mahdaad/tokens",
       "data": {
         "version": "0.0.43",
         "packageName": "@mahdaad/tokens",
         "hash": "10/4e0a9d183dc9f619afa70f6e32d072accb036546109f6cf226c927787f7802cdc9a209823c332d1adca67b2f2fb03d118b6d8bb3f7c02e1916a004c1d9afe8e8"
       }
     },
-    "npm:@mahdaad/tokens": {
+    "npm:@mahdaad/tokens@0.0.36": {
       "type": "npm",
-      "name": "npm:@mahdaad/tokens",
+      "name": "npm:@mahdaad/tokens@0.0.36",
       "data": {
         "version": "0.0.36",
         "packageName": "@mahdaad/tokens",
@@ -7443,18 +7434,18 @@
         "hash": "10/f064e6634cb84c925a17d8937df7441d150c3e24fa5bbd6304151d11dab6cdeb0cb3d5a95a9aacb8b416c87fb0d9aa8c6b9cc5e174191784231e8345948d6d18"
       }
     },
-    "npm:@volar/language-core": {
+    "npm:@volar/language-core@1.11.1": {
       "type": "npm",
-      "name": "npm:@volar/language-core",
+      "name": "npm:@volar/language-core@1.11.1",
       "data": {
         "version": "1.11.1",
         "packageName": "@volar/language-core",
         "hash": "10/2fef58727bb3058b7bbd350fea6c38ded6608c65f7f672ffd825f0ba48307e4c5eded634e0c3b37d2ebbdd2e7ab32bc974eeb54f455c0390f85971ebeef3a6ca"
       }
     },
-    "npm:@volar/language-core@2.3.4": {
+    "npm:@volar/language-core": {
       "type": "npm",
-      "name": "npm:@volar/language-core@2.3.4",
+      "name": "npm:@volar/language-core",
       "data": {
         "version": "2.3.4",
         "packageName": "@volar/language-core",
@@ -7497,18 +7488,18 @@
         "hash": "10/689803b2e788bdfda45a7994605798e8ed5ae7bb1116912db5e8f8c8a18000c0c66ebfae5ce33d3ac4cd3a7e171819253511232ed1eb20b1781b4aaed806d100"
       }
     },
-    "npm:@volar/typescript": {
+    "npm:@volar/typescript@1.11.1": {
       "type": "npm",
-      "name": "npm:@volar/typescript",
+      "name": "npm:@volar/typescript@1.11.1",
       "data": {
         "version": "1.11.1",
         "packageName": "@volar/typescript",
         "hash": "10/714eeb3472902617555b9b4959722a215b391160fe4fdf2f8f4abcb075edbd24a5a633db0c36acd175daeddac5f1b35c33f5fc8788e1e251d91385aad27deda9"
       }
     },
-    "npm:@volar/typescript@2.3.4": {
+    "npm:@volar/typescript": {
       "type": "npm",
-      "name": "npm:@volar/typescript@2.3.4",
+      "name": "npm:@volar/typescript",
       "data": {
         "version": "2.3.4",
         "packageName": "@volar/typescript",
@@ -7722,9 +7713,9 @@
         "hash": "10/abe697b9bd20720c73508f4a1ce148f236f42434a26e60e43fab6ee2a9ce33f97993f05e103db9980e7d7d1d2484b11bfac6be3042668ddba5f0753a1ed58cd4"
       }
     },
-    "npm:@vue/language-core": {
+    "npm:@vue/language-core@1.8.27": {
       "type": "npm",
-      "name": "npm:@vue/language-core",
+      "name": "npm:@vue/language-core@1.8.27",
       "data": {
         "version": "1.8.27",
         "packageName": "@vue/language-core",
@@ -14742,18 +14733,18 @@
         "hash": "10/2cacfad06e652b1edc50be650f7ec3be08c5e5a6f6d12d035c440a42a8cc028e60a5b99ca08a77ab4d6b1346da7d971915828f33cdab730d3d42f08242d09baa"
       }
     },
-    "npm:import-lazy@3.1.0": {
+    "npm:import-lazy": {
       "type": "npm",
-      "name": "npm:import-lazy@3.1.0",
+      "name": "npm:import-lazy",
       "data": {
         "version": "3.1.0",
         "packageName": "import-lazy",
         "hash": "10/b202acbbecc16445fd284cdd3a4575f8ade7d22c13254b75c6adad8f2d61c4411092acd88628150f3d551d032b28a0e85030273adbf6cf48779989eee1d49b37"
       }
     },
-    "npm:import-lazy": {
+    "npm:import-lazy@4.0.0": {
       "type": "npm",
-      "name": "npm:import-lazy",
+      "name": "npm:import-lazy@4.0.0",
       "data": {
         "version": "4.0.0",
         "packageName": "import-lazy",
@@ -16308,18 +16299,18 @@
         "hash": "10/3969ebef060b6f665fc78310ec769f7d2945db2d5af2b6663eda1bc9ec45c845deba9c4a3f75f124ce2c76fedf56514a063ee5c2affc8bc94963fbbddb442a88"
       }
     },
-    "npm:less@4.2.0": {
+    "npm:less": {
       "type": "npm",
-      "name": "npm:less@4.2.0",
+      "name": "npm:less",
       "data": {
         "version": "4.2.0",
         "packageName": "less",
         "hash": "10/98200dce570cdc396e03cafc95fb7bbbecdbe3ae28e456a6dcf7a1ac75c3b1979aa56749ac7581ace1814f8a03c9d3456b272280cc098a6e1e24295c4b7caddb"
       }
     },
-    "npm:less": {
+    "npm:less@4.2.1": {
       "type": "npm",
-      "name": "npm:less",
+      "name": "npm:less@4.2.1",
       "data": {
         "version": "4.2.1",
         "packageName": "less",
@@ -22284,18 +22275,18 @@
         "hash": "10/81c6f97f9fb2ae31a9abc9f10ddbe595cde697e42cab56f7d745dda2e5378bd9e083f2c12f9d0082745c6283974ad0537bbc0ea71a1bf910fb4de836b1407bd9"
       }
     },
-    "npm:stylis@4.2.0": {
+    "npm:stylis": {
       "type": "npm",
-      "name": "npm:stylis@4.2.0",
+      "name": "npm:stylis",
       "data": {
         "version": "4.2.0",
         "packageName": "stylis",
         "hash": "10/58359185275ef1f39c339ae94e598168aa6bb789f6cf0d52e726c1e7087a94e9c17f0385a28d34483dec1ffc2c75670ec714dc5603d99c3124ec83bc2b0a0f42"
       }
     },
-    "npm:stylis": {
+    "npm:stylis@4.3.4": {
       "type": "npm",
-      "name": "npm:stylis",
+      "name": "npm:stylis@4.3.4",
       "data": {
         "version": "4.3.4",
         "packageName": "stylis",
@@ -23571,9 +23562,9 @@
         "hash": "10/ecd8469fe0db28e7de9e5289d32bd1b6ba8f7183db34f3bfc4ca53c49891c2d6aa05f3fb3936a81285a905cc509fb641a0c3fc131ec786167eff41236ae32e60"
       }
     },
-    "npm:unocss-preset-autoprefixer": {
+    "npm:unocss-preset-autoprefixer@0.0.7": {
       "type": "npm",
-      "name": "npm:unocss-preset-autoprefixer",
+      "name": "npm:unocss-preset-autoprefixer@0.0.7",
       "data": {
         "version": "0.0.7",
         "packageName": "unocss-preset-autoprefixer",
@@ -23886,9 +23877,9 @@
         "hash": "10/8ba6b145cbb02a492c7bb1f0490d02383000462f234ed61d24f650547163825c16f14e6908ee1eb661403bd0a7a3fb3cdbedf116cc015b1e5cdf7bb992872a01"
       }
     },
-    "npm:vite-plugin-dts": {
+    "npm:vite-plugin-dts@3.9.1": {
       "type": "npm",
-      "name": "npm:vite-plugin-dts",
+      "name": "npm:vite-plugin-dts@3.9.1",
       "data": {
         "version": "3.9.1",
         "packageName": "vite-plugin-dts",
@@ -24219,9 +24210,9 @@
         "hash": "10/eede6de86ee20f7bd2174b975b3ef6a1e43e480279db6bcec1103241d7800c70568d2e0a67ccfec6255b3b77f814bd663448074b083fd5ea19e4ec225d7a7276"
       }
     },
-    "npm:vue-tsc": {
+    "npm:vue-tsc@1.8.27": {
       "type": "npm",
-      "name": "npm:vue-tsc",
+      "name": "npm:vue-tsc@1.8.27",
       "data": {
         "version": "1.8.27",
         "packageName": "vue-tsc",
@@ -31020,7 +31011,7 @@
     },
     {
       "source": "npm:@emotion/babel-plugin",
-      "target": "npm:stylis@4.2.0",
+      "target": "npm:stylis",
       "type": "static"
     },
     {
@@ -31045,7 +31036,7 @@
     },
     {
       "source": "npm:@emotion/cache",
-      "target": "npm:stylis@4.2.0",
+      "target": "npm:stylis",
       "type": "static"
     },
     {
@@ -31070,7 +31061,7 @@
     },
     {
       "source": "npm:@emotion/cache",
-      "target": "npm:stylis@4.2.0",
+      "target": "npm:stylis",
       "type": "static"
     },
     {
@@ -32064,86 +32055,6 @@
       "type": "static"
     },
     {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:@mahdaad/tokens",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:@unhead/vue@1.11.14",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:@vueuse/core",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:ant-design-vue@4.2.6",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:dayjs",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:i18n-js",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:less",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:lit-i18n",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:pinia@2.3.0",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:radix-vue@1.9.11",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:tippy.js",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:unocss-preset-autoprefixer",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:vite-plugin-dts",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:vue",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:vue-router@4.5.0",
-      "type": "static"
-    },
-    {
-      "source": "npm:@mahdaad/block-editor@1.1.6",
-      "target": "npm:vue3-webcomponent-wrapper",
-      "type": "static"
-    },
-    {
       "source": "npm:@mahdaad/bounty-theme",
       "target": "npm:tailwind-merge",
       "type": "static"
@@ -32174,22 +32085,22 @@
       "type": "static"
     },
     {
-      "source": "npm:@mahdaad/tokens@0.0.43",
+      "source": "npm:@mahdaad/tokens",
       "target": "npm:mitt",
       "type": "static"
     },
     {
-      "source": "npm:@mahdaad/tokens@0.0.43",
+      "source": "npm:@mahdaad/tokens",
       "target": "npm:tinycolor2",
       "type": "static"
     },
     {
-      "source": "npm:@mahdaad/tokens",
+      "source": "npm:@mahdaad/tokens@0.0.36",
       "target": "npm:mitt",
       "type": "static"
     },
     {
-      "source": "npm:@mahdaad/tokens",
+      "source": "npm:@mahdaad/tokens@0.0.36",
       "target": "npm:tinycolor2",
       "type": "static"
     },
@@ -33390,7 +33301,7 @@
     },
     {
       "source": "npm:@rushstack/node-core-library",
-      "target": "npm:import-lazy",
+      "target": "npm:import-lazy@4.0.0",
       "type": "static"
     },
     {
@@ -36784,22 +36695,22 @@
       "type": "static"
     },
     {
-      "source": "npm:@volar/language-core",
+      "source": "npm:@volar/language-core@1.11.1",
+      "target": "npm:@volar/source-map",
+      "type": "static"
+    },
+    {
+      "source": "npm:@volar/language-core@1.11.1",
       "target": "npm:@volar/source-map",
       "type": "static"
     },
     {
       "source": "npm:@volar/language-core",
-      "target": "npm:@volar/source-map",
-      "type": "static"
-    },
-    {
-      "source": "npm:@volar/language-core@2.3.4",
       "target": "npm:@volar/source-map@2.3.4",
       "type": "static"
     },
     {
-      "source": "npm:@volar/language-core@2.3.4",
+      "source": "npm:@volar/language-core",
       "target": "npm:@volar/source-map@2.3.4",
       "type": "static"
     },
@@ -36821,6 +36732,16 @@
     {
       "source": "npm:@volar/source-map",
       "target": "npm:muggle-string",
+      "type": "static"
+    },
+    {
+      "source": "npm:@volar/typescript@1.11.1",
+      "target": "npm:@volar/language-core@1.11.1",
+      "type": "static"
+    },
+    {
+      "source": "npm:@volar/typescript@1.11.1",
+      "target": "npm:path-browserify",
       "type": "static"
     },
     {
@@ -36834,17 +36755,7 @@
       "type": "static"
     },
     {
-      "source": "npm:@volar/typescript@2.3.4",
-      "target": "npm:@volar/language-core@2.3.4",
-      "type": "static"
-    },
-    {
-      "source": "npm:@volar/typescript@2.3.4",
-      "target": "npm:path-browserify",
-      "type": "static"
-    },
-    {
-      "source": "npm:@volar/typescript@2.3.4",
+      "source": "npm:@volar/typescript",
       "target": "npm:vscode-uri@3.0.8",
       "type": "static"
     },
@@ -37434,98 +37345,98 @@
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
-      "target": "npm:@volar/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
+      "target": "npm:@volar/language-core@1.11.1",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:@volar/source-map",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:@vue/compiler-dom",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:@vue/shared",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:computeds",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:minimatch@9.0.5",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:muggle-string",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:path-browserify",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:vue-template-compiler",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
-      "target": "npm:@volar/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
+      "target": "npm:@volar/language-core@1.11.1",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:@volar/source-map",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:@vue/compiler-dom",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:@vue/shared",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:computeds",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:minimatch@9.0.5",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:muggle-string",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:path-browserify",
       "type": "static"
     },
     {
-      "source": "npm:@vue/language-core",
+      "source": "npm:@vue/language-core@1.8.27",
       "target": "npm:vue-template-compiler",
       "type": "static"
     },
     {
       "source": "npm:@vue/language-core@2.0.21",
-      "target": "npm:@volar/language-core@2.3.4",
+      "target": "npm:@volar/language-core",
       "type": "static"
     },
     {
@@ -38335,7 +38246,7 @@
     },
     {
       "source": "npm:ant-design-vue@4.2.3",
-      "target": "npm:stylis",
+      "target": "npm:stylis@4.3.4",
       "type": "static"
     },
     {
@@ -38445,7 +38356,7 @@
     },
     {
       "source": "npm:ant-design-vue@4.2.6",
-      "target": "npm:stylis",
+      "target": "npm:stylis@4.3.4",
       "type": "static"
     },
     {
@@ -38820,7 +38731,7 @@
     },
     {
       "source": "npm:bin-wrapper",
-      "target": "npm:import-lazy@3.1.0",
+      "target": "npm:import-lazy",
       "type": "static"
     },
     {
@@ -38850,7 +38761,7 @@
     },
     {
       "source": "npm:bin-wrapper",
-      "target": "npm:import-lazy@3.1.0",
+      "target": "npm:import-lazy",
       "type": "static"
     },
     {
@@ -48339,102 +48250,102 @@
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:copy-anything",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:errno",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:graceful-fs",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:image-size",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:make-dir@2.1.0",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:mime",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:needle",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:parse-node-version",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:source-map",
       "type": "static"
     },
     {
-      "source": "npm:less@4.2.0",
+      "source": "npm:less",
       "target": "npm:tslib",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:copy-anything",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:errno",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:graceful-fs",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:image-size",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:make-dir@2.1.0",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:mime",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:needle",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:parse-node-version",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:source-map",
       "type": "static"
     },
     {
-      "source": "npm:less",
+      "source": "npm:less@4.2.1",
       "target": "npm:tslib",
       "type": "static"
     },
@@ -56894,38 +56805,38 @@
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
+      "source": "npm:vite-plugin-dts@3.9.1",
       "target": "npm:@microsoft/api-extractor",
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
+      "source": "npm:vite-plugin-dts@3.9.1",
       "target": "npm:@rollup/pluginutils",
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
-      "target": "npm:@vue/language-core",
+      "source": "npm:vite-plugin-dts@3.9.1",
+      "target": "npm:@vue/language-core@1.8.27",
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
+      "source": "npm:vite-plugin-dts@3.9.1",
       "target": "npm:debug@4.4.0",
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
+      "source": "npm:vite-plugin-dts@3.9.1",
       "target": "npm:kolorist",
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
+      "source": "npm:vite-plugin-dts@3.9.1",
       "target": "npm:magic-string",
       "type": "static"
     },
     {
-      "source": "npm:vite-plugin-dts",
-      "target": "npm:vue-tsc",
+      "source": "npm:vite-plugin-dts@3.9.1",
+      "target": "npm:vue-tsc@1.8.27",
       "type": "static"
     },
     {
@@ -57925,7 +57836,7 @@
     },
     {
       "source": "npm:vue-tsc@2.0.21",
-      "target": "npm:@volar/typescript@2.3.4",
+      "target": "npm:@volar/typescript",
       "type": "static"
     },
     {
@@ -57939,17 +57850,17 @@
       "type": "static"
     },
     {
-      "source": "npm:vue-tsc",
-      "target": "npm:@volar/typescript",
+      "source": "npm:vue-tsc@1.8.27",
+      "target": "npm:@volar/typescript@1.11.1",
       "type": "static"
     },
     {
-      "source": "npm:vue-tsc",
-      "target": "npm:@vue/language-core",
+      "source": "npm:vue-tsc@1.8.27",
+      "target": "npm:@vue/language-core@1.8.27",
       "type": "static"
     },
     {
-      "source": "npm:vue-tsc",
+      "source": "npm:vue-tsc@1.8.27",
       "target": "npm:semver",
       "type": "static"
     },

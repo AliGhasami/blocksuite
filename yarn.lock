@@ -4485,33 +4485,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:^1.1.6":
-  version: 1.1.6
-  resolution: "@mahdaad/block-editor@npm:1.1.6"
-  dependencies:
-    "@mahdaad/tokens": "npm:^0.0.36"
-    "@unhead/vue": "npm:^1.9.5"
-    "@vueuse/core": "npm:^10.9.0"
-    ant-design-vue: "npm:^4.2.3"
-    dayjs: "npm:^1.11.12"
-    i18n-js: "npm:^4.4.3"
-    less: "npm:^4.2.0"
-    lit-i18n: "npm:^4.1.0"
-    pinia: "npm:^2.1.7"
-    radix-vue: "npm:^1.7.3"
-    tippy.js: "npm:^6.3.7"
-    unocss-preset-autoprefixer: "npm:^0.0.7"
-    vite-plugin-dts: "npm:^3.7.3"
-    vue: "npm:^3.4.21"
-    vue-router: "npm:^4.3.0"
-    vue3-webcomponent-wrapper: "npm:^0.2.0"
-  peerDependencies:
-    vue: ^3.0.0
-  checksum: 10/6942ea08218854f7df7373fe5dc0e326fbb9abae3bed4c8134fde37d4be56004458e37f0282903c926b180ac6de84bdb10b095fc802e75ac237ebff5c84ced6f
-  languageName: node
-  linkType: hard
-
-"@mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -4582,15 +4556,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/editor-vue@npm:^0.0.39":
-  version: 0.0.39
-  resolution: "@mahdaad/editor-vue@npm:0.0.39"
+"@mahdaad/editor-vue@npm:^0.0.40":
+  version: 0.0.40
+  resolution: "@mahdaad/editor-vue@npm:0.0.40"
   dependencies:
     "@tiptap/extension-mention": "npm:2.5.4"
     "@vueuse/core": "npm:^10.9.0"
     tiptap-text-direction: "npm:0.3.1"
     vue: "npm:^3.4.21"
-  checksum: 10/ee3317c6d9d1006ff12f1f8843aa82f58d2db54611d994daeb79cc6a12ee21eab4964dbdc7780fe00d4b673acefa5999ad867a54454781b62f290fdc22ac41a0
+  checksum: 10/8a916d3829af15452e140e59e3d490521e4bf1c34b8dc9df3dab6f78c4ce1c5d08eae458a432931025cc7880b384b8473a0af6032dcb5b6e89f13ed83e168b7f
   languageName: node
   linkType: hard
 
@@ -11450,10 +11424,10 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:^1.1.6"
+    "@mahdaad/block-editor": "workspace:*"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
-    "@mahdaad/editor-vue": "npm:^0.0.39"
+    "@mahdaad/editor-vue": "npm:^0.0.40"
     "@mahdaad/tokens": "npm:0.0.43"
     "@novu/headless": "npm:2.0.0-canary.0"
     "@novu/notification-center-vue": "npm:2.0.0-canary.0"
