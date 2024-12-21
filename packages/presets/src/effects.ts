@@ -3,7 +3,7 @@ import '@blocksuite/blocks/effects';
 
 import {
   AffineEditorContainer,
-  EdgelessEditor,
+  EdgelessEditor, MahdaadEditorContainer,
   PageEditor,
 } from './editors/index.js';
 import { CommentInput } from './fragments/comment/comment-input.js';
@@ -82,6 +82,7 @@ export function effects() {
   customElements.define('backlink-button', BacklinkButton);
   customElements.define(AFFINE_OUTLINE_PANEL_HEADER, OutlinePanelHeader);
   customElements.define('affine-editor-container', AffineEditorContainer);
+  customElements.define('mahdaad-editor-container', MahdaadEditorContainer);
   customElements.define(AFFINE_OUTLINE_NOTE_CARD, OutlineNoteCard);
   customElements.define(AFFINE_FRAME_TITLE_EDITOR, FrameCardTitleEditor);
   customElements.define('edgeless-editor', EdgelessEditor);

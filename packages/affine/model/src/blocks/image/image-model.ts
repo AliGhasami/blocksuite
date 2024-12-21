@@ -16,12 +16,14 @@ export type ImageBlockProps = {
   height?: number;
   rotate: number;
   size?: number;
+  meta:Record<string,string>,
 } & Omit<GfxCommonBlockProps, 'scale'>;
 
 const defaultImageProps: ImageBlockProps = {
   caption: '',
   sourceId: '',
   src: '',
+  meta: { },
   width: 0,
   height: 0,
   index: 'a0',

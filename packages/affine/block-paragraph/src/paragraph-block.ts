@@ -63,8 +63,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   get inEdgelessText() {
     return (
       this.topContenteditableElement?.tagName.toLowerCase() ===
-      'affine-edgeless-root'
-      //'affine-edgeless-text'
+      //'affine-edgeless-root'
+      'affine-edgeless-text'
     );
   }
 

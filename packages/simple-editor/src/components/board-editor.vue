@@ -1,8 +1,8 @@
 <template>
   <div>
-<!--        <Button @click="handleClick">export pdf</Button>-->
-<!--    {{ props.objectId }}-->
-<!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
+    <!--        <Button @click="handleClick">export pdf</Button>-->
+    <!--    {{ props.objectId }}-->
+    <!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
     <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 //import '@blocksuite/presets/themes/affine.css'
 import '@toeverything/theme/style.css';
-import { AffineEditorContainer, EdgelessEditor, PageEditor } from '@blocksuite/presets'
+import { EdgelessEditor, MahdaadEditorContainer, PageEditor } from '@blocksuite/presets';
 //import { createEmptyDoc } from './helpers'
 import {
   type BlockCollection,
@@ -26,7 +26,13 @@ import {
 } from "@blocksuite/store";
 import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
 /** @alighasami for check merge **/
-import { AffineSchemas, replaceIdMiddleware,  } from '@blocksuite/blocks' //toolsList
+import {
+  AffineSchemas, CommunityCanvasTextFonts,
+  DocModeExtension, EdgelessEditorBlockSpecs, FontConfigExtension, GenerateDocUrlExtension, NotificationExtension,
+  OverrideThemeExtension, ParseDocUrlExtension,
+  RefNodeSlotsExtension,
+  replaceIdMiddleware,
+} from '@blocksuite/blocks'; //toolsList
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next'
@@ -43,14 +49,19 @@ import { assertExists } from '@blocksuite/global/utils'
 import { get } from "lodash";
 import { effects as blocksEffects } from "@blocksuite/blocks/effects";
 import { effects as presetsEffects } from "@blocksuite/presets/effects";
+import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examples';
+import type { ExtensionType } from '@blocksuite/block-std';
+import {
+  mockDocModeService, mockGenerateDocUrlService, mockNotificationService,
+  mockParseDocUrlService, mockPeekViewExtension,
+  themeExtension,
+} from '@blocksuite/playground/apps/_common/mock-services';
 
 if(!window.$blockEditor){
   window.$blockEditor={}
 }
 
-//console.log("111111",window.$blockEditor);
 if(!window.$blockEditor.is_loaded_custom_elements){
-  //console.log("22222222");
   blocksEffects();
   presetsEffects();
   Object.assign(window.$blockEditor,{is_loaded_custom_elements:true})
@@ -81,23 +92,23 @@ interface Props {
 
 type IBlockChange =
   | {
-      type: 'add'
-      id: string
-      flavour: string
-    }
+  type: 'add'
+  id: string
+  flavour: string
+}
   | {
-      type: 'delete'
-      id: string
-      flavour: string
-      parent: string
-      model: BlockModel
-    }
+  type: 'delete'
+  id: string
+  flavour: string
+  parent: string
+  model: BlockModel
+}
   | {
-      type: 'update'
-      id: string
-      flavour: string
-      props: { key: string }
-    }
+  type: 'update'
+  id: string
+  flavour: string
+  props: { key: string }
+}
 
 const props = withDefaults(defineProps<Props>(), {
   isBoardView: false,
@@ -119,7 +130,7 @@ const emit = defineEmits<{
 }>()
 
 watch(loading,()=>{
-    emit('loading',loading.value)
+  emit('loading',loading.value)
 },{immediate:true})
 
 i18next.use(initLitI18n).init({
@@ -139,7 +150,7 @@ watch(
   async () => {
     if (props.objectId) {
       console.log("==>this is object id in watch and call init function ",props.objectId);
-     await init()
+      await init()
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
       }
@@ -251,7 +262,7 @@ function bindEvent(doc: Doc) {
         //console.log("this is link data",data,data.model.link_id);
         //if(data.model && !data.model.link_id){
         console.log("sssssss");
-          emit('addObjectLink', data)
+        emit('addObjectLink', data)
         //}
       }
       emit('addBlock', data)
@@ -268,7 +279,9 @@ function bindEvent(doc: Doc) {
 
 
 function checkNotEmptyDocBlock(doc: Doc) {
-  return
+  if(editorElement.value.mode=='edgeless'){
+    return
+  }
   const noteList = doc.getBlockByFlavour('affine:note')
   const note = noteList.length ? noteList[0] : null
   if (note) {
@@ -319,7 +332,6 @@ function setFocus() {
 }
 
 function checkIsEmpty() {
-  return
   let res = true
   const doc= toRaw(unref(currentDocument.value))
   const noteList = doc.getBlockByFlavour('affine:note')
@@ -330,13 +342,13 @@ function checkIsEmpty() {
       res=false
     }
     else if(children.length>0){
-        const first=children[0]
-        if(first.flavour!='affine:paragraph'){
+      const first=children[0]
+      if(first.flavour!='affine:paragraph'){
+        res=false
+      }else{
+        if(first.text?.length!=0)
           res=false
-        }else{
-          if(first.text?.length!=0)
-            res=false
-        }
+      }
     }
   } else {
     res = false
@@ -392,11 +404,11 @@ defineExpose({
 /************************************************************/
 
 function handleClick() {
- /// console.log("1111",refEditor.value,currentDocument.value);
+  /// console.log("1111",refEditor.value,currentDocument.value);
   //const temp=(refEditor.value as HTMLElement).querySelector('editor-host')
- /* const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
-  const service=temp.host.spec.getService('affine:page')
-  service.exportManager.exportPdf().catch(console.error);*/
+  /* const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
+   const service=temp.host.spec.getService('affine:page')
+   service.exportManager.exportPdf().catch(console.error);*/
   //console.log("11111",);
   //console.log("222",temp.host?.spec.getService('affine:page'));
   //console.log("this is temp",temp);
@@ -454,12 +466,12 @@ async function setData(data: any, clear_history?: boolean = true) {
           await job.snapshotToBlock(item, doc,notes[0].id,index++); // parent.id, insertIndex++
         }
         //const parent = doc.getParent(this.model);
-       /* if (parent) {
-          const targetIndex =
-            parent.children.findIndex(({ id }) => id === this.model.id) ?? 0;
-          let insertIndex = targetIndex + 1; //place === 'before' ? targetIndex :
+        /* if (parent) {
+           const targetIndex =
+             parent.children.findIndex(({ id }) => id === this.model.id) ?? 0;
+           let insertIndex = targetIndex + 1; //place === 'before' ? targetIndex :
 
-        }*/
+         }*/
       }
     }
     //const doc = this.model.doc;
@@ -503,6 +515,24 @@ function reset() {
 const edgelessId=computed(()=>{
   return `edgeless_${props.objectId}`
 })
+
+function patchPageRootSpec(spec: ExtensionType[]) {
+  const setEditorModeCallBack =editorElement.value.switchEditor.bind(editorElement.value);
+  const getEditorModeCallback =() => editorElement.value.mode;
+  const newSpec: typeof spec = [
+    ...spec,
+    DocModeExtension(
+      mockDocModeService(getEditorModeCallback, setEditorModeCallBack)
+    ),
+    /*OverrideThemeExtension(themeExtension),
+    ParseDocUrlExtension(mockParseDocUrlService(collection)),
+    GenerateDocUrlExtension(mockGenerateDocUrlService(collection)),
+    NotificationExtension(mockNotificationService(editor)),
+    FontConfigExtension(CommunityCanvasTextFonts),
+    mockPeekViewExtension(attachmentViewerPanel),*/
+  ];
+  return newSpec;
+}
 
 
 const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
@@ -552,11 +582,11 @@ async function init() {
   }
   //debugger
   //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
- /* await new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(true)
-    }, 1000)
-  })*/
+  /* await new Promise((resolve, reject) => {
+     setTimeout(() => {
+       resolve(true)
+     }, 1000)
+   })*/
   //if(!props.objectId) return
   //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
   //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
@@ -615,40 +645,40 @@ async function init() {
 
 
 
-   /* const request = indexedDB.open(DEFAULT_DB_NAME, dbVersion);
-    request.onsuccess = function (event) {
-      const db = event.target.result;
+    /* const request = indexedDB.open(DEFAULT_DB_NAME, dbVersion);
+     request.onsuccess = function (event) {
+       const db = event.target.result;
 
-      // Start a transaction
-      const transaction = db.transaction('collection', 'readwrite');
-      const objectStore = transaction.objectStore('collection');
+       // Start a transaction
+       const transaction = db.transaction('collection', 'readwrite');
+       const objectStore = transaction.objectStore('collection');
 
-      // Define the key of the record you want to delete
-      const keyToDelete = props.objectId; // Replace with the actual key
+       // Define the key of the record you want to delete
+       const keyToDelete = props.objectId; // Replace with the actual key
 
-      // Delete the record
-      const deleteRequest = objectStore.delete(keyToDelete);
+       // Delete the record
+       const deleteRequest = objectStore.delete(keyToDelete);
 
-      deleteRequest.onsuccess = function () {
-        console.log('Record deleted successfully');
-      };
+       deleteRequest.onsuccess = function () {
+         console.log('Record deleted successfully');
+       };
 
-      deleteRequest.onerror = function () {
-        console.error('Error deleting record:', deleteRequest.error);
-      };
+       deleteRequest.onerror = function () {
+         console.error('Error deleting record:', deleteRequest.error);
+       };
 
-      transaction.oncomplete = function () {
-        console.log('Transaction completed.');
-      };
+       transaction.oncomplete = function () {
+         console.log('Transaction completed.');
+       };
 
-      transaction.onerror = function (event) {
-        console.error('Transaction failed:', event.target.error);
-      };
-    };
+       transaction.onerror = function (event) {
+         console.error('Transaction failed:', event.target.error);
+       };
+     };
 
-    request.onerror = function () {
-      console.error('Error opening database:', request.error);
-    };*/
+     request.onerror = function () {
+       console.error('Error opening database:', request.error);
+     };*/
   }
   /*******************/
   if(!window.$blockEditor){
@@ -672,13 +702,27 @@ async function init() {
     //const app = document.getElementById('app');
     /* const app = refEditor.value;
      if (!app) return;*/
-    //editorElement.value = new AffineEditorContainer()
+    editorElement.value = new MahdaadEditorContainer()
+    const specs = getExampleSpecs();
+    const refNodeSlotsExtension = RefNodeSlotsExtension();
+    editorElement.value.pageSpecs = patchPageRootSpec([
+      refNodeSlotsExtension,
+      ...specs.pageModeSpecs,
+    ]);
+    editorElement.value.edgelessSpecs = patchPageRootSpec([
+      refNodeSlotsExtension,
+      ...specs.edgelessModeSpecs,
+    ]);
     if (props.isBoardView) {
-      //editorElement.value.mode='edgeless'
-      editorElement.value = new EdgelessEditor()
+      editorElement.value.mode='edgeless'
+      //editorElement.value = new EdgelessEditor()
+     /* editorElement.value.specs=patchPageRootSpec([
+        ...EdgelessEditorBlockSpecs,
+      ])*/
+      //console.log("1111",editorElement.value);
     } else {
-      //editorElement.value.mode = 'page';
-      editorElement.value = new PageEditor()
+      editorElement.value.mode = 'page';
+      //editorElement.value = new PageEditor()
     }
     console.log('==>doc for mount is', doc)
     //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
@@ -746,7 +790,7 @@ async function init() {
       console.log("==>start initDoc function");
       //exist:boolean
       //console.log("this is exist",exist);
-     // const id=props.objectId
+      // const id=props.objectId
       console.log('==>before waitForSynced')
       await myCollection.waitForSynced()
       console.log('==>after waitForSynced')
@@ -771,21 +815,21 @@ async function init() {
 
         }else{
           console.log("==>start create empty doc for new doc in collaboration mode");
-           const doc = myCollection.createDoc({ id:props.objectId }) //'doc:home'
-           doc.load()
-           const rootId = doc.addBlock('affine:page')
-           doc.addBlock('affine:surface', {}, rootId)
-           if (!props.isBoardView) {
-             const noteId = doc.addBlock('affine:note', {}, rootId)
-             doc.addBlock('affine:paragraph', {}, noteId)
-           }
-           doc.resetHistory()
+          const doc = myCollection.createDoc({ id:props.objectId }) //'doc:home'
+          doc.load()
+          const rootId = doc.addBlock('affine:page')
+          doc.addBlock('affine:surface', {}, rootId)
+          if (!props.isBoardView) {
+            const noteId = doc.addBlock('affine:note', {}, rootId)
+            doc.addBlock('affine:paragraph', {}, noteId)
+          }
+          doc.resetHistory()
         }
-      /*  if(!exist){
-          debugger
-        }else{
+        /*  if(!exist){
+            debugger
+          }else{
 
-        }*/
+          }*/
       } else {
         // debugger
         // wait for data injected from provider
@@ -922,12 +966,12 @@ async function init() {
   .affine-menu-action-text,
   .property-item-name,
   .select-input {
-    @apply text-gray-8;
+  @apply text-gray-8;
   }
 
- /* affine-database-table{
-    //width: 100%;
-  }*/
+  /* affine-database-table{
+     //width: 100%;
+   }*/
 
   /*affine-database{
     width: 90%;
@@ -980,7 +1024,7 @@ async function init() {
   }
 
   .place-holder {
-    @apply flex items-center gap-1 text-neutral-4 mt-body;
+  @apply flex items-center gap-1 text-neutral-4 mt-body;
     //line-height: unset;
     transition: all 0.3s ease-in-out;
     .short-code {
@@ -1086,7 +1130,7 @@ async function init() {
   /* reset Style */
   .affine-paragraph-block-container {
     &:hover .place-holder {
-      @apply text-neutral-6;
+    @apply text-neutral-6;
     }
     /*&:hover{
       //background-color: red;
@@ -1100,21 +1144,21 @@ async function init() {
   /* paragraph Style */
   .claytap-text {
     //background-color: red;
-  //  @apply text-neutral-8; //mt-body
+    //  @apply text-neutral-8; //mt-body
     //line-height: unset;
   }
 
   .claytap-h1 {
-    @apply mt-page-display text-neutral-8;
+  @apply mt-page-display text-neutral-8;
     //line-height: unset;
   }
 
   .claytap-h2 {
-    @apply mt-page-heading text-neutral-8;
+  @apply mt-page-heading text-neutral-8;
     //line-height: unset;
   }
   .claytap-h3 {
-    @apply mt-page-subheading text-neutral-8;
+  @apply mt-page-subheading text-neutral-8;
     //line-height: unset;
   }
 
@@ -1142,7 +1186,7 @@ async function init() {
 
 /* popover Style */
 .@{prefix}-popover {
-  @apply pb-1 shadow-floated border-roundness bg-gray-0;
+@apply pb-1 shadow-floated border-roundness bg-gray-0;
   position: fixed;
   left: 0;
   top: 0;
@@ -1277,7 +1321,7 @@ async function init() {
 }
 
 .tippy-box[data-theme='block-editor'] {
-  @apply bg-gray-0 shadow-floated  text-gray-8;
+@apply bg-gray-0 shadow-floated  text-gray-8;
   border-radius: @roundness-3;
   position: relative;
 }

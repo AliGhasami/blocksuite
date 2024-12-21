@@ -18,6 +18,7 @@ import {
   resetImageSize,
   turnImageIntoCardView,
 } from './utils.js';
+import { getStorageURL } from '../_common/upload.js';
 
 @Peekable()
 export class ImageEdgelessBlockComponent extends GfxBlockComponent<
@@ -65,7 +66,7 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<
   override connectedCallback() {
     super.connectedCallback();
 
-    this.refreshData();
+    //this.refreshData();
     this.contentEditable = 'false';
     this.disposables.add(
       this.model.propsUpdated.on(({ key }) => {
@@ -84,6 +85,7 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<
   }
 
   override renderGfxBlock() {
+    //console.log("1111",this.model, getStorageURL()+this.model.src,this.loading ,this.error ,!this.model.src);
     const rotate = this.model.rotate ?? 0;
     const containerStyleMap = styleMap({
       position: 'relative',
@@ -95,7 +97,7 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<
     return html`
       <div class="affine-image-container" style=${containerStyleMap}>
         ${when(
-          this.loading || this.error || !this.blobUrl,
+          this.loading || this.error || !this.model.src,
           () =>
             html`<affine-image-fallback-card
               .error=${this.error}
@@ -106,7 +108,7 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<
             html`<div class="resizable-img">
               <img
                 class="drag-target"
-                src=${this.blobUrl ?? ''}
+                src=${this.model.src ? getStorageURL()+this.model.src : ''}
                 draggable="false"
                 @error=${this._handleError}
                 loading="lazy"

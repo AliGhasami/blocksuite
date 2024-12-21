@@ -38,6 +38,7 @@ import {
 import { calcBoundByOrigin, readImageSize } from '../components/utils.js';
 import { DEFAULT_NOTE_OFFSET_X, DEFAULT_NOTE_OFFSET_Y } from './consts.js';
 import { addBlock } from './crud.js';
+import { uploadFile } from '../../../_common/upload.js';
 
 export async function addAttachments(
   std: BlockStdScope,
@@ -176,8 +177,8 @@ export async function addImages(
   // upload image data and update the image model
   const uploadPromises = imageFiles.map(async (file, index) => {
     const { point, blockId } = dropInfos[index];
-
-    const sourceId = await std.doc.blobSync.set(file);
+    const { data } = await uploadFile(file);
+    //const sourceId = await std.doc.blobSync.set(file);
     const imageSize = await readImageSize(file);
 
     const center = Vec.toVec(point);
@@ -190,7 +191,9 @@ export async function addImages(
 
     std.doc.withoutTransact(() => {
       gfx.updateElement(blockId, {
-        sourceId,
+        //sourceId,
+        src: data.data.storage,
+        meta:data.data,
         ...imageSize,
         xywh: bound.serialize(),
       } satisfies Partial<ImageBlockProps>);
