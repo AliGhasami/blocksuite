@@ -178,7 +178,7 @@ export async function addImages(
   const uploadPromises = imageFiles.map(async (file, index) => {
     const { point, blockId } = dropInfos[index];
     const { data } = await uploadFile(file);
-    //const sourceId = await std.doc.blobSync.set(file);
+    const sourceId = await std.doc.blobSync.set(file);
     const imageSize = await readImageSize(file);
 
     const center = Vec.toVec(point);
@@ -191,7 +191,7 @@ export async function addImages(
 
     std.doc.withoutTransact(() => {
       gfx.updateElement(blockId, {
-        //sourceId,
+        sourceId,
         src: data.data.storage,
         meta:data.data,
         ...imageSize,

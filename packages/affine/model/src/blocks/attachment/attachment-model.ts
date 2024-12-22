@@ -53,6 +53,7 @@ export type AttachmentBlockProps = {
   embed: boolean | BackwardCompatibleUndefined;
   src: string;
   style?: (typeof AttachmentBlockStyles)[number];
+  meta:Record<string, string>
 } & Omit<GfxCommonBlockProps, 'scale'>;
 
 export const defaultAttachmentProps: AttachmentBlockProps = {
@@ -68,6 +69,7 @@ export const defaultAttachmentProps: AttachmentBlockProps = {
   xywh: '[0,0,0,0]',
   lockedBySelf: false,
   rotate: 0,
+  meta:{}
 };
 
 export const AttachmentBlockSchema = defineBlockSchema({

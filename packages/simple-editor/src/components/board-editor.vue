@@ -261,7 +261,7 @@ function bindEvent(doc: Doc) {
       if (data.flavour == 'affine:mahdaad-object') {
         //console.log("this is link data",data,data.model.link_id);
         //if(data.model && !data.model.link_id){
-        console.log("sssssss");
+       // console.log("sssssss");
         emit('addObjectLink', data)
         //}
       }

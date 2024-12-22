@@ -15,6 +15,7 @@ import { assertExists } from '@blocksuite/global/utils';
 import type { AttachmentBlockComponent } from './attachment-block.js';
 
 import { uploadFile } from '../_common/upload.js';
+import { downloadFile } from '../_common/mahdaad/url.js';
 
 export function cloneAttachmentProperties(model: AttachmentBlockModel) {
   const clonedProps = {} as AttachmentBlockProps;
@@ -65,6 +66,7 @@ export async function uploadAttachmentBlob(
     doc.withoutTransact(() => {
       doc.updateBlock(attachmentModel, {
         src: data.data.storage,
+        meta:data.data,
         //sourceId,
       } satisfies Partial<AttachmentBlockProps>);
     });
@@ -160,7 +162,12 @@ export async function checkAttachmentBlob(block: AttachmentBlockComponent) {
  * the download process may take a long time!
  */
 export function downloadAttachmentBlob(block: AttachmentBlockComponent) {
-  const { host, model, loading, error, downloading, blobUrl } = block;
+  const {fullSrc}=block
+  //console.log("1111",fullSrc);
+  if(fullSrc){
+    downloadFile(fullSrc)
+  }
+ /* const { host, model, loading, error, downloading, blobUrl } = block;
   if (downloading) {
     toast(host, 'Download in progress...');
     return;
@@ -190,7 +197,7 @@ export function downloadAttachmentBlob(block: AttachmentBlockComponent) {
   tmpLink.dispatchEvent(event);
   tmpLink.remove();
 
-  block.downloading = false;
+  block.downloading = false;*/
 }
 
 export async function getFileType(file: File) {

@@ -9,7 +9,7 @@ import type { BlockModel } from '@blocksuite/store';
 
 import { toast } from '@blocksuite/affine-components/toast';
 import {
-  downloadBlob,
+  //downloadBlob,
   humanFileSize,
   withTempBlobData,
 } from '@blocksuite/affine-shared/utils';
@@ -20,6 +20,7 @@ import type { ImageEdgelessBlockComponent } from './image-edgeless-block.js';
 
 import { readImageSize } from '../root-block/edgeless/components/utils.js';
 import { transformModel } from '../root-block/utils/operations/model.js';
+import { downloadFile } from '../_common/mahdaad/url.js';
 
 const MAX_RETRY_COUNT = 3;
 const DEFAULT_ATTACHMENT_NAME = 'affine-attachment';
@@ -161,7 +162,14 @@ export async function fetchImageBlob(
 export async function downloadImageBlob(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
-  const { host, downloading } = block;
+  //debugger
+  const {fullSrc}=block
+  //console.log("1111",fullSrc);
+  if(fullSrc){
+    downloadFile(fullSrc)
+  }
+
+  /*const { host, downloading } = block;
   if (downloading) {
     toast(host, 'Download in progress...');
     return;
@@ -179,7 +187,7 @@ export async function downloadImageBlob(
 
   downloadBlob(blob, 'image');
 
-  block.downloading = false;
+  block.downloading = false;*/
 }
 
 export async function resetImageSize(
@@ -232,6 +240,7 @@ function convertToPng(blob: Blob): Promise<Blob | null> {
 export async function copyImageBlob(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
+
   const { host, model } = block;
   let blob = await getImageBlob(model);
   if (!blob) {

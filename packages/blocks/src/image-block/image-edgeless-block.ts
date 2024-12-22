@@ -84,6 +84,11 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<
     super.disconnectedCallback();
   }
 
+  get fullSrc() :string{
+    return this.model.src ? getStorageURL()+this.model.src : ''
+  }
+
+
   override renderGfxBlock() {
     //console.log("1111",this.model, getStorageURL()+this.model.src,this.loading ,this.error ,!this.model.src);
     const rotate = this.model.rotate ?? 0;
@@ -108,7 +113,7 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<
             html`<div class="resizable-img">
               <img
                 class="drag-target"
-                src=${this.model.src ? getStorageURL()+this.model.src : ''}
+                src=${this.fullSrc}
                 draggable="false"
                 @error=${this._handleError}
                 loading="lazy"

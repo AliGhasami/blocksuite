@@ -86,9 +86,11 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
     //model.doc.addBlocks()
     //console.log('this', model.text?.length);
-    if (model.text?.length == 0) {
-      model.doc.deleteBlock(this.model);
-    }
+    setTimeout(()=>{
+      if (model.text?.length == 0) {
+        model.doc.deleteBlock(this.model);
+      }
+    },10)
     const next = model.doc.getNext(temp[0]);
     if (next) {
       const inline: InlineEditor | null = getInlineEditorByModel(

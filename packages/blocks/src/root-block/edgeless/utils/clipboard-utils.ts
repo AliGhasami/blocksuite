@@ -46,7 +46,6 @@ export async function duplicate(
     );
 
   const newElements = [...canvasElements, ...blockModels];
-
   edgeless.surface.fitToViewport(totalBound);
 
   if (select) {

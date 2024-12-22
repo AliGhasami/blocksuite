@@ -206,7 +206,7 @@ export const clipboardGroup: MenuItemGroup<ElementToolbarMoreMenuContext> = {
       action: ({ edgeless, selectedElements }) =>
         duplicate(edgeless, selectedElements),
     },
-    {
+    /*{
       icon: ResetIcon({ width: '20', height: '20' }),
       label: 'Reload',
       type: 'reload',
@@ -234,7 +234,7 @@ export const clipboardGroup: MenuItemGroup<ElementToolbarMoreMenuContext> = {
             ),
         };
       },
-    },
+    },*/
   ],
 };
 

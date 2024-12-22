@@ -119,7 +119,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   }
 
   override renderBlock() {
-    console.log('this is model and props', this.doc);
+    //console.log('this is model and props', this.doc);
     //.doc="${this.doc}"
     //this.model.propsUpdated({})
 

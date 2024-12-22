@@ -27,6 +27,7 @@ import { AttachmentOptionsTemplate } from './components/options.js';
 import { AttachmentEmbedProvider } from './embed.js';
 import { styles } from './styles.js';
 import { checkAttachmentBlob, downloadAttachmentBlob } from './utils.js';
+import { getStorageURL } from '../_common/upload.js';
 
 @Peekable()
 export class AttachmentBlockComponent extends CaptionedBlockComponent<
@@ -207,6 +208,10 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
     event.stopPropagation();
 
     this._selectBlock();
+  }
+
+  get fullSrc(){
+    return this.model.src ? getStorageURL()+this.model.src : ''
   }
 
   override renderBlock() {
