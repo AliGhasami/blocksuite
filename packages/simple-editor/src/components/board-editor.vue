@@ -1,11 +1,18 @@
 <template>
   <div>
-    <!--        <Button @click="handleClick">export pdf</Button>-->
-    <!--    {{ props.objectId }}-->
-    <!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
-    <div class="vue-block-board-editor">
-      <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
-    </div>
+   <div>
+     <div class="flex-1">
+       <iframe id="myIframe" style="width: 100%; height: 300px;"></iframe>
+     </div>
+     <Button @click="handleClick">export pdf</Button>
+     <!--    {{ props.objectId }}-->
+     <!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
+     <div class="vue-block-board-editor">
+       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
+     </div>
+   </div>
+
+
   </div>
 </template>
 
@@ -27,11 +34,20 @@ import {
 import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
 /** @alighasami for check merge **/
 import {
-  AffineSchemas, CommunityCanvasTextFonts,
-  DocModeExtension, EdgelessEditorBlockSpecs, FontConfigExtension, GenerateDocUrlExtension, NotificationExtension,
-  OverrideThemeExtension, ParseDocUrlExtension,
+  AffineSchemas,
+  CommunityCanvasTextFonts, createAssetsArchive,
+  docLinkBaseURLMiddleware,
+  DocModeExtension, download,
+  EdgelessEditorBlockSpecs,
+  FontConfigExtension,
+  GenerateDocUrlExtension,
+  MahdaadHtmlAdapter,
+  NotificationExtension,
+  OverrideThemeExtension,
+  ParseDocUrlExtension,
   RefNodeSlotsExtension,
   replaceIdMiddleware,
+  titleMiddleware,
 } from '@blocksuite/blocks'; //toolsList
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
@@ -415,12 +431,46 @@ defineExpose({
 
 /************************************************************/
 
-function handleClick() {
+async function handleClick() {
+  const doc=toRaw(unref(currentDocument.value))
+  const job = new Job({
+    collection: doc.collection,
+    middlewares: [docLinkBaseURLMiddleware, titleMiddleware],
+  });
+  const snapshot = job.docToSnapshot(doc);
+  console.log("this is snapshoot",snapshot);
+  const adapter = new MahdaadHtmlAdapter(job);
+  if (!snapshot) {
+    return;
+  }
+  const htmlResult = await adapter.fromDocSnapshot({
+    snapshot,
+    //assets: job.assetsManager,
+  });
+  console.log("1111",htmlResult);
+  const iframe = document.getElementById('myIframe');
+  iframe.srcdoc = htmlResult.file;
+  //let downloadBlob: Blob;
+  //const docTitle = doc.meta?.title || 'Untitled';
+  //let name: string;
+  //const contentBlob = new Blob([htmlResult.file], { type: 'plain/text' });
+  /*if (htmlResult.assetsIds.length > 0) {
+    const zip = await createAssetsArchive(job.assets, htmlResult.assetsIds);
+
+    await zip.file('index.html', contentBlob);
+
+    downloadBlob = await zip.generate();
+    name = `${docTitle}.zip`;
+  } else {
+    downloadBlob = contentBlob;
+    name = `${docTitle}.html`;
+  }
+  download(downloadBlob, name);*/
   /// console.log("1111",refEditor.value,currentDocument.value);
-  //const temp=(refEditor.value as HTMLElement).querySelector('editor-host')
-  /* const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
-   const service=temp.host.spec.getService('affine:page')
-   service.exportManager.exportPdf().catch(console.error);*/
+    //const temp=(refEditor.value as HTMLElement).querySelector('editor-host')
+   //const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
+   //const service=temp.host.spec.getService('affine:page')
+   //service.exportManager.exportPdf().catch(console.error);
   //console.log("11111",);
   //console.log("222",temp.host?.spec.getService('affine:page'));
   //console.log("this is temp",temp);
