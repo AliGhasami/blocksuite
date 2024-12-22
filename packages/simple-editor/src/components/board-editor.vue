@@ -323,11 +323,17 @@ async function exportData(collection: DocCollection, docs: any[]) {
 
 function setFocus() {
   if (refEditor.value) {
+    //new method
+   /* const page_root=(refEditor.value as HTMLElement).querySelector('affine-page-root')
+    if(page_root){
+      page_root.focusFirstParagraph()
+    }*/
+    //old method
     const editor = (refEditor.value as HTMLElement).querySelector('rich-text')
-    //console.log("1111",editor);
     if (editor && editor.inlineEditor) {
       editor.inlineEditor.focusEnd()
     }
+
   }
 }
 
@@ -358,9 +364,15 @@ function checkIsEmpty() {
 }
 
 function handleSelectAll(event: Event) {
+  //console.log("1111",event.target);
   // Check if Ctrl (or Cmd on macOS) is pressed along with the 'A' key
   if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+
     const target = event.target as HTMLElement
+    //todo for fix in ctrl + a in tiptap on comment in put
+    if(element.classList.contains('tiptap')){
+      return
+    }
     if (!target.closest('page-editor')) {
       const temp = document.querySelectorAll(
         'page-editor:not(page-editor page-editor):not(.ignore-select page-editor)'
