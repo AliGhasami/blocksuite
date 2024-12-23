@@ -6,7 +6,6 @@ import {
 } from '@blocksuite/affine-shared/adapters';
 import mahdaadStyle from './mahdaad-style.css?raw'
 
-console.log('1111',mahdaadStyle);
 
 export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   flavour: RootBlockSchema.model.flavour,

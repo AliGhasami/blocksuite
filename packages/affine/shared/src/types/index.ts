@@ -1,6 +1,7 @@
 import type { EmbedCardStyle, ReferenceInfo } from '@blocksuite/affine-model';
 import type { BlockComponent } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
+import { z } from 'zod';
 
 export interface EditingState {
   element: BlockComponent;
@@ -71,4 +72,16 @@ export interface AffineTextAttributes {
   background?: string | null;
   color?: string | null;
   latex?: string | null;
+  mention?:{
+    user_id:string,
+    id: string,
+  },
+  date:{
+    time: null | string,
+    date: string,
+    id?: string | null,
+    event_at?:string|null,
+    //@ts-ignore
+    meta?: any | null,
+  }
 }

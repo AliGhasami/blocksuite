@@ -450,6 +450,9 @@ async function handleClick() {
   console.log("1111",htmlResult);
   const iframe = document.getElementById('myIframe');
   iframe.srcdoc = htmlResult.file;
+  /*setTimeout(()=>{
+    debugger
+  },6000)*/
   //let downloadBlob: Blob;
   //const docTitle = doc.meta?.title || 'Untitled';
   //let name: string;

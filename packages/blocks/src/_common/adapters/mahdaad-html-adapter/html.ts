@@ -33,13 +33,14 @@ import {
   type ToDocSnapshotPayload,
 } from '@blocksuite/store';
 import rehypeParse from 'rehype-parse';
+import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
 import { unified } from 'unified';
 
 import { AdapterFactoryIdentifier } from '../type.js';
 import {mahdaadDefaultBlockHtmlAdapterMatchers } from './block-matcher.js';
-import { htmlInlineToDeltaMatchers } from './delta-converter/html-inline.js';
-import { inlineDeltaToHtmlAdapterMatchers } from './delta-converter/inline-delta.js';
+import { mahdaadHtmlInlineToDeltaMatchers } from './delta-converter/html-inline.js';
+import { mahdaadInlineDeltaToHtmlAdapterMatchers } from './delta-converter/inline-delta.js';
 
 type Html = string;
 
@@ -52,8 +53,47 @@ type HtmlToSliceSnapshotPayload = {
 };
 
 export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
+
   private _astToHtml = (ast: Root) => {
-    return unified().use(rehypeStringify).stringify(ast);
+    //console.log(ast)
+
+    const processor = unified()
+      .use(rehypeRaw) // پردازش raw
+      .use(rehypeStringify); // تبدیل AST به HTML
+
+    const processedAst = processor.runSync(ast); // پردازش AST
+    return processor.stringify(processedAst); // خروجی HTML
+
+
+    /*const processAST=async (_ast) {
+      const file = await unified()
+        .use(rehypeRaw) // پردازش raw
+        .use(rehypeStringify) // تبدیل به HTML
+        .process(_ast); // پردازش کامل AST
+
+      return String(file);
+    }*/
+
+    /*const temp= {
+      type: 'root',
+      children: [
+        {
+          type: 'element',
+          tagName: 'div',
+          properties: { className: ['container'] },
+          children: [
+            {
+              type: 'raw',
+              value: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                    <circle cx="12" cy="12" r="10" fill="blue" />
+                  </svg>`,
+            },
+          ],
+        },
+      ],
+    };*/
+    //processAST(temp).then((output) => console.log(output));
+    //return unified().use(rehypeRaw).use(rehypeStringify).stringify(ast);
   };
 
   private _traverseHtml = async (
@@ -183,10 +223,11 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
     super(job);
     this.deltaConverter = new HtmlDeltaConverter(
       job.adapterConfigs,
-      inlineDeltaToHtmlAdapterMatchers,
-      htmlInlineToDeltaMatchers
+      mahdaadInlineDeltaToHtmlAdapterMatchers,
+      mahdaadHtmlInlineToDeltaMatchers
     );
   }
+
 
   private _htmlToAst(html: Html) {
     return unified().use(rehypeParse).parse(html);
@@ -208,7 +249,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
       root,
       payload.assets
     );
-    console.log("333333",ast);
+    //console.log("333333",ast);
     return {
       file: this._astToHtml(ast),
       assetsIds,
