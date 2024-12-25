@@ -4,6 +4,7 @@ import {
   type BlockHtmlAdapterMatcher,
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
+
 import mahdaadStyle from './mahdaad-style.css?raw'
 
 
@@ -63,7 +64,7 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         )
         .openNode(
           {
-            type: 'text',
+            type: 'raw',
             value: mahdaadStyle.replace(/\s\s+/g, ''),
           },
           'children'
@@ -80,12 +81,12 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           },
           'children'
         )
-        .openNode(
+        /*.openNode(
           {
             type: 'element',
             tagName: 'div',
             properties: {
-              style: 'width: 70vw; margin: 60px auto;',
+              //style: 'width: 70vw; margin: 60px auto;',
             },
             children: [],
           },
@@ -95,7 +96,7 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           type: 'comment',
           value: 'BlockSuiteDocTitlePlaceholder',
         })
-        .closeNode();
+        .closeNode();*/
     },
     leave: (_, context) => {
       const { walkerContext } = context;

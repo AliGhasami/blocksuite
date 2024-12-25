@@ -198,10 +198,17 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
   },
   fromBlockSnapshot: {
     enter: (o, context) => {
+      console.log("qqqqq",o,context);
       const text = (o.node.props.text ?? { delta: [] }) as {
         delta: DeltaInsert[];
       };
       const { walkerContext, deltaConverter } = context;
+      console.log("bb",deltaConverter.deltaToAST(text.delta));
+
+      const temp= deltaConverter.deltaToAST(text.delta)
+      const children= temp.length==0 ? [{type:'text',value:' '}]: temp
+      //console.log("bb children",children,o.node.props.type);
+
       switch (o.node.props.type) {
         case 'text': {
           walkerContext
@@ -221,7 +228,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 type: 'element',
                 tagName: 'pre',
                 properties: {},
-                children: deltaConverter.deltaToAST(text.delta),
+                children, //children.length==0 ? [{type:'raw',value:'&nbsp;'}]: children,
               },
               'children'
             )
@@ -261,9 +268,15 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
             .openNode(
               {
                 type: 'element',
-                tagName: o.node.props.type,
-                properties: {},
-                children: deltaConverter.deltaToAST(text.delta),
+                tagName:'pre',
+                children:[
+                  //@ts-ignore
+                  {
+                    type:'element',
+                    tagName: o.node.props.type,
+                    children, //: deltaConverter.deltaToAST(text.delta)
+                  }
+                ],
               },
               'children'
             )
@@ -311,7 +324,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 type: 'element',
                 tagName: 'pre',
                 properties: {},
-                children: deltaConverter.deltaToAST(text.delta),
+                children, //deltaConverter.deltaToAST(text.delta),
               },
               'children'
             )

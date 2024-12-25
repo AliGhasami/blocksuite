@@ -1,4 +1,3 @@
-/** @alighasami for check merge **/
 import { css } from 'lit';
 
 export const paragraphBlockStyles = css`
@@ -291,5 +290,3 @@ export const mahdaadParagraphBlockStyles = css`
     }
   }
 `;
-
-

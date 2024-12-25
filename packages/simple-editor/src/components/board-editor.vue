@@ -1,18 +1,16 @@
 <template>
   <div>
    <div>
-     <div class="flex-1">
+     <div class="flex-1 ps-6">
        <iframe id="myIframe" style="width: 100%; height: 300px;"></iframe>
      </div>
-     <Button @click="handleClick">export pdf</Button>
+<!--     <Button @click="handleClick">export pdf</Button>-->
      <!--    {{ props.objectId }}-->
      <!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
      <div class="vue-block-board-editor">
        <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
      </div>
    </div>
-
-
   </div>
 </template>
 
@@ -35,16 +33,9 @@ import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue"
 /** @alighasami for check merge **/
 import {
   AffineSchemas,
-  CommunityCanvasTextFonts, createAssetsArchive,
   docLinkBaseURLMiddleware,
-  DocModeExtension, download,
-  EdgelessEditorBlockSpecs,
-  FontConfigExtension,
-  GenerateDocUrlExtension,
+  DocModeExtension,
   MahdaadHtmlAdapter,
-  NotificationExtension,
-  OverrideThemeExtension,
-  ParseDocUrlExtension,
   RefNodeSlotsExtension,
   replaceIdMiddleware,
   titleMiddleware,
@@ -68,9 +59,7 @@ import { effects as presetsEffects } from "@blocksuite/presets/effects";
 import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examples';
 import type { ExtensionType } from '@blocksuite/block-std';
 import {
-  mockDocModeService, mockGenerateDocUrlService, mockNotificationService,
-  mockParseDocUrlService, mockPeekViewExtension,
-  themeExtension,
+  mockDocModeService
 } from '@blocksuite/playground/apps/_common/mock-services';
 
 if(!window.$blockEditor){
@@ -337,6 +326,35 @@ async function exportData(collection: DocCollection, docs: any[]) {
   return null
 }
 
+async function exportHTML(config:any) {
+  /*const job = new Job({ collection })
+  const snapshots = await Promise.all(docs.map(job.docToSnapshot))
+  if (snapshots.length > 0) {
+    return snapshots[0]
+  }
+ return null*/
+  const doc=toRaw(unref(currentDocument.value))
+  const job = new Job({
+    collection: doc.collection,
+    //middlewares: [docLinkBaseURLMiddleware, titleMiddleware],
+  });
+  job.adapterConfigs.set('mahdaad_config',config)
+  const snapshot = job.docToSnapshot(doc);
+  //console.log("this is snapshoot",snapshot);
+  const adapter = new MahdaadHtmlAdapter(job);
+  if (!snapshot) {
+    return;
+  }
+  const htmlResult = await adapter.fromDocSnapshot({
+    snapshot,
+    //assets: job.assetsManager,
+  });
+  console.log("this is resault",htmlResult);
+  const iframe = document.getElementById('myIframe');
+  iframe.srcdoc = htmlResult.file;
+}
+
+
 function setFocus() {
   if (refEditor.value) {
     //new method
@@ -420,6 +438,7 @@ onUnmounted(() => {
 defineExpose({
   getData,
   setData,
+  exportHTML,
   setFocus,
   //reset,
   isEmpty,
@@ -436,7 +455,9 @@ async function handleClick() {
   const job = new Job({
     collection: doc.collection,
     middlewares: [docLinkBaseURLMiddleware, titleMiddleware],
+
   });
+  job.adapterConfigs.set('aaa','bbb')
   const snapshot = job.docToSnapshot(doc);
   console.log("this is snapshoot",snapshot);
   const adapter = new MahdaadHtmlAdapter(job);
@@ -489,7 +510,6 @@ watch(
 /*watch(()=>props.objectId,()=>{
   debugger
 })*/
-
 
 //todo ali ghasami
 async function setData(data: any, clear_history?: boolean = true) {

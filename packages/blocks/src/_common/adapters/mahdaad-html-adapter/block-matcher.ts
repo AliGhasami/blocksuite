@@ -18,17 +18,28 @@ import {
   ListBlockHtmlAdapterExtension,
   listBlockHtmlAdapterMatcher,
 } from '@blocksuite/affine-block-list';*/
+
 import {
+  MahdaadListBlockHtmlAdapterExtension,
+  mahdaadListBlockHtmlAdapterMatcher
+} from '@blocksuite/affine-block-list';
+import {
+  MahdaadParagraphBlockHtmlAdapterExtension,
   //ParagraphBlockHtmlAdapterExtension,
   //paragraphBlockHtmlAdapterMatcher,
-  mahdaadParagraphBlockHtmlAdapterMatcher,
-  MahdaadParagraphBlockHtmlAdapterExtension
+  mahdaadParagraphBlockHtmlAdapterMatcher
 } from '@blocksuite/affine-block-paragraph';
 
 import {
-  mahdaadRootBlockHtmlAdapterMatcher,
-  MahdaadRootBlockHtmlAdapterExtension
+  MahdaadDividerBlockHtmlAdapterExtension,
+  mahdaadDividerBlockHtmlAdapterMatcher
+} from '../../../divider-block/adapters/mahdaad-html.js';
+import {MahdaadObjectBlockHtmlAdapterExtension ,mahdaadObjectBlockHtmlAdapterMatcher} from '../../../mahdaad-object-block/adapters/mahdaad-html.js'
+import {
+  MahdaadRootBlockHtmlAdapterExtension,
+  mahdaadRootBlockHtmlAdapterMatcher
 } from '../../../root-block/adapters/mahdaad-html.js';
+
 
 /*import {
   BookmarkBlockHtmlAdapterExtension,
@@ -52,9 +63,15 @@ import {
 } from '../../../image-block/adapters/html.js';
 */
 
+
+
+
 export const mahdaadDefaultBlockHtmlAdapterMatchers = [
   mahdaadRootBlockHtmlAdapterMatcher,
   mahdaadParagraphBlockHtmlAdapterMatcher,
+  mahdaadListBlockHtmlAdapterMatcher,
+  mahdaadObjectBlockHtmlAdapterMatcher,
+  mahdaadDividerBlockHtmlAdapterMatcher
   //listBlockHtmlAdapterMatcher,
   /*codeBlockHtmlAdapterMatcher,
   dividerBlockHtmlAdapterMatcher,
@@ -72,7 +89,10 @@ export const mahdaadDefaultBlockHtmlAdapterMatchers = [
 
 export const mahdaadBlockHtmlAdapterExtensions: ExtensionType[] = [
   MahdaadRootBlockHtmlAdapterExtension,
-  MahdaadParagraphBlockHtmlAdapterExtension
+  MahdaadParagraphBlockHtmlAdapterExtension,
+  MahdaadListBlockHtmlAdapterExtension,
+  MahdaadObjectBlockHtmlAdapterExtension,
+  MahdaadDividerBlockHtmlAdapterExtension
   /*ListBlockHtmlAdapterExtension,
   ParagraphBlockHtmlAdapterExtension,
   CodeBlockHtmlAdapterExtension,

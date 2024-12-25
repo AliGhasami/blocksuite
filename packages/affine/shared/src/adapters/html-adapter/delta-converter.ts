@@ -72,9 +72,31 @@ export class HtmlDeltaConverter extends DeltaASTConverter<
   private _applyTextFormatting(
     delta: DeltaInsert<AffineTextAttributes>
   ): InlineHtmlAST {
+    console.log("tt",delta)
+    let style=''
+    /*const properties={
+      style:
+    }*/
+    if(delta && delta.attributes) {
+      if(delta.attributes.background) {
+        style+=`background:${delta.attributes.background};`
+      }
+      if(delta.attributes.color) {
+        style+=`color:${delta.attributes.color};`
+      }
+    }
     let hast: InlineHtmlAST = {
-      type: 'text',
-      value: delta.insert,
+      //type: 'text',
+      //value: delta.insert,
+      type:'element',
+      tagName:'span',
+      properties:{
+        style
+      },
+      children:[{
+        type: 'text',
+        value: delta.insert,
+      }]
     };
 
     const context: {

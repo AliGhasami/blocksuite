@@ -1866,6 +1866,8 @@ __metadata:
     "@types/mdast": "npm:^4.0.4"
     collapse-white-space: "npm:^2.1.0"
     date-fns: "npm:^4.0.0"
+    dayjs: "npm:^1.11.13"
+    dayjs-plugin-utc: "npm:^0.1.2"
     dompurify: "npm:^3.1.6"
     fflate: "npm:^0.8.2"
     file-type: "npm:^19.5.0"
@@ -4511,7 +4513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:^2.0.2, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -11492,7 +11494,7 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:^2.0.2"
+    "@mahdaad/block-editor": "workspace:*"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"
@@ -13089,6 +13091,13 @@ __metadata:
   version: 3.0.3
   resolution: "dateformat@npm:3.0.3"
   checksum: 10/0504baf50c3777ad333c96c37d1673d67efcb7dd071563832f70b5cbf7f3f4753f18981d44bfd8f665d5e5a511d2fc0af8e0ead8b585b9b3ddaa90067864d3f0
+  languageName: node
+  linkType: hard
+
+"dayjs-plugin-utc@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "dayjs-plugin-utc@npm:0.1.2"
+  checksum: 10/ccd4d8d342bd018b988e2134756122159bc98e9f2949fd76cc82eb54554b4440223d2ca550ab389ca6e598a96d66dfc6a0fcab3103782a2726db4e24f0018143
   languageName: node
   linkType: hard
 

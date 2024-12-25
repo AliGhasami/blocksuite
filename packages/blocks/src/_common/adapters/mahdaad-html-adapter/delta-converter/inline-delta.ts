@@ -7,11 +7,6 @@ import { generateDocUrl } from '@blocksuite/affine-block-embed';
 
 const EventIcon=`<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="1em" height="1em" viewBox="0 0 24 24" class="iconify iconify--tabler"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1m6-10.273A11.05 11.05 0 0 0 18.206 3M3 6.727A11.05 11.05 0 0 1 5.792 3"></path></svg>`
 
-const a=  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-  <circle cx="12" cy="12" r="10" fill="blue" />
-</svg>`;
-
-
 export const boldDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher = {
   name: 'bold',
   match: delta => !!delta.attributes?.bold,
@@ -147,9 +142,15 @@ export const mentionDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher =
     name: 'mention',
     match: delta => !!delta.attributes?.mention,
     toAST: (delta, context) => {
-      //console.log("this is context",context,delta);
-      //const user= delta.attributes.mention.user_id
-      //debugger
+      const userId=delta.attributes.mention.user_id
+      let user : string= ''
+      //@ts-ignore
+      const userList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config').userList : [] //get(context,'configs.mahdaad_config.userList',[])
+      console.log("111",userList)
+      const temp=userList.find(item=> item._id==userId)
+      if(temp) {
+          user=temp.name as string
+      }
       return {
         type: 'element',
         tagName: 'span',
@@ -169,7 +170,7 @@ export const mentionDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher =
             tagName:'span',
             children:[{
               type:'text',
-              value:'ali ahamdi'//user
+              value:user
             }]
           }],
       };
@@ -181,10 +182,14 @@ export const DateTimeDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher 
     name: 'date',
     match: delta => !!delta.attributes?.date,
     toAST: (delta, context) => {
-      console.log("this is context",context,delta);
-      const _date=delta.attributes?.date
-      //const user= delta.attributes.mention.user_id
-      //debugger
+      console.log("this is context ^^",context,delta);
+      //@ts-ignore
+      const convertDateTime=context.configs.get('mahdaad_config')?.convertDateTime
+      const _dateTime= delta.attributes?.date
+      let _date=_dateTime?.date
+      if(convertDateTime) {
+        _date=convertDateTime(delta.attributes?.date.date,delta.attributes?.date.time)
+      }
       const children=[]
       children.push({
         type:'element',
@@ -194,12 +199,12 @@ export const DateTimeDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher 
         },
         children:[{
           type:'text',
-          value:_date?.date,
+          value:_date,
         }]
       })
 
       if(_date) {
-        if(_date.time) {
+        /*if(_date.time) {
           children.push({
             type:'element',
             tagName:'span',
@@ -211,9 +216,9 @@ export const DateTimeDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher 
               value:`- ${_date.time}`
             }]
           })
-        }
+        }*/
 
-        if(_date.event_at) {
+        if(_dateTime?.event_at) {
           children.push({
             type:'element',
             tagName:'span',
@@ -228,8 +233,8 @@ export const DateTimeDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher 
           })
         }
 
-        if(_date.meta) {
-          const temp= JSON.parse(_date.meta);
+        if(_dateTime?.meta) {
+          const temp= JSON.parse(_dateTime?.meta);
           if(temp.title) {
             children.push({
               type:'element',
