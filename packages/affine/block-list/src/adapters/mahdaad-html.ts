@@ -1,6 +1,7 @@
 import type { DeltaInsert } from '@blocksuite/inline';
 import type { Element } from 'hast';
 
+import { checkboxChecked, checkboxUnchecked } from '@blocksuite/affine-components/icons';
 import { ListBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
@@ -94,9 +95,9 @@ export const mahdaadListBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       };
       const { deltaConverter, walkerContext } = context;
       const currentTNode = walkerContext.currentNode();
-      const liChildren = deltaConverter.deltaToAST(text.delta);
+      let liChildren = deltaConverter.deltaToAST(text.delta);
       if (o.node.props.type === 'todo') {
-        liChildren.unshift({
+        /*liChildren.unshift({
           type: 'element',
           tagName: 'input',
           properties: {
@@ -113,7 +114,43 @@ export const mahdaadListBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
               children: [],
             },
           ],
+        });*/
+
+        liChildren.unshift({
+          type: 'raw',
+          value:o.node.props.checked ? checkboxChecked().strings[0] : checkboxUnchecked().strings[0],
+          //tagName: 'input',
+          /*properties: {
+            type: 'checkbox',
+            checked: o.node.props.checked as boolean,
+          },*/
+          /*children: [
+            /!*{
+              type: 'element',
+              tagName: 'label',
+              properties: {
+                style: 'margin-right: 3px;',
+              },
+              children: [],
+            },*!/
+          ],*/
         });
+
+        liChildren=[
+          {
+           type:'element',
+           tagName:'span',
+            properties: {
+              className: ['todo-item',o.node.props.checked ? 'checked':'unchecked'],
+            },
+            children:liChildren
+          }
+        ]
+
+
+        //console.log("1111",liChildren);
+
+
       }
       // check if the list is of the same type
       if (
@@ -141,7 +178,7 @@ export const mahdaadListBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             properties: {
               style:
                 o.node.props.type === 'todo'
-                  ? 'list-style-type: none; padding-inline-start: 18px;'
+                  ? 'list-style-type: none; ' //padding-inline-start: 18px;
                   : null,
               className: [o.node.props.type + '-list'],
             },

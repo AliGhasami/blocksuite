@@ -1,7 +1,7 @@
 import type { EmbedCardStyle, ReferenceInfo } from '@blocksuite/affine-model';
 import type { BlockComponent } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
-import { z } from 'zod';
+
 
 export interface EditingState {
   element: BlockComponent;
@@ -83,5 +83,10 @@ export interface AffineTextAttributes {
     event_at?:string|null,
     //@ts-ignore
     meta?: any | null,
+  },
+  mahdaadObjectLink:{
+    object_id: string,
+    link_id?: string | number | null,
+    type: string,
   }
 }

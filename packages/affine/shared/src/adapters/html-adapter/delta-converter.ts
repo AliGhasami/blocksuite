@@ -72,7 +72,7 @@ export class HtmlDeltaConverter extends DeltaASTConverter<
   private _applyTextFormatting(
     delta: DeltaInsert<AffineTextAttributes>
   ): InlineHtmlAST {
-    console.log("tt",delta)
+    //console.log("tt",delta)
     let style=''
     /*const properties={
       style:
@@ -93,9 +93,14 @@ export class HtmlDeltaConverter extends DeltaASTConverter<
       properties:{
         style
       },
+      //@ts-ignore
       children:[{
-        type: 'text',
-        value: delta.insert,
+        type: 'element',
+        tagName:'pre',
+        children:[{
+          type: 'text',
+          value: delta.insert,
+        }]
       }]
     };
 

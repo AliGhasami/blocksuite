@@ -146,7 +146,7 @@ export const mentionDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher =
       let user : string= ''
       //@ts-ignore
       const userList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config').userList : [] //get(context,'configs.mahdaad_config.userList',[])
-      console.log("111",userList)
+      //console.log("111",userList)
       const temp=userList.find(item=> item._id==userId)
       if(temp) {
           user=temp.name as string
@@ -182,7 +182,7 @@ export const DateTimeDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher 
     name: 'date',
     match: delta => !!delta.attributes?.date,
     toAST: (delta, context) => {
-      console.log("this is context ^^",context,delta);
+      //console.log("this is context ^^",context,delta);
       //@ts-ignore
       const convertDateTime=context.configs.get('mahdaad_config')?.convertDateTime
       const _dateTime= delta.attributes?.date
@@ -258,6 +258,64 @@ export const DateTimeDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher 
     },
   };
 
+export const objectDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher =
+  {
+    name: 'object',
+    match: delta => !!delta.attributes?.mahdaadObjectLink,
+    toAST: (delta, context) => {
+      //const userId=delta.attributes.mention.user_id
+      //let user : string= ''
+      //@ts-ignore
+      //const userList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config').userList : [] //get(context,'configs.mahdaad_config.userList',[])
+      //console.log("111",userList)
+      //const temp=userList.find(item=> item._id==userId)
+      /*if(temp) {
+        user=temp.name as string
+      }*/
+
+      //const {  walkerContext } = context;
+      const objectId=delta.attributes?.mahdaadObjectLink?.object_id
+      //@ts-ignore
+      const objectList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.objectList ?? [] : []
+      const object=objectList.find(item=> item._id==objectId);
+      if(!object || (object.status && (object.status=='403'||object.status=='404')))
+        return
+      //@ts-ignore
+      //const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
+      //console.log("object",object,o.node.props);
+
+      return {
+        type: 'element',
+        tagName: 'span',
+        properties: {
+          className: ['mahdaad-object-link-inline',object?.object_type,object.object_type=='file' ? object.meta.type : ''],
+        },
+        children: [{
+          type: 'element',
+          tagName: 'span',
+          properties:{
+            className:['icon']
+          },
+          children: [
+            {
+              type:'raw',
+              value:object.iconSVG ?? ''
+            },
+          ]
+        },
+          {
+            type:'element',
+            tagName:'span',
+            children:[{
+              type:'text',
+              value:object.title
+            }]
+          }],
+      };
+    },
+  };
+
+
 
 
 
@@ -272,4 +330,5 @@ export const mahdaadInlineDeltaToHtmlAdapterMatchers: InlineDeltaToHtmlAdapterMa
     linkDeltaToHtmlAdapterMatcher,
     mentionDeltaToHtmlAdapterMatcher,
     DateTimeDeltaToHtmlAdapterMatcher,
+    objectDeltaToHtmlAdapterMatcher
   ];

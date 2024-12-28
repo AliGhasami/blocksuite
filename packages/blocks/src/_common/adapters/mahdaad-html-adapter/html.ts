@@ -162,7 +162,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
         BlockSnapshotSchema.safeParse(node).success
     );
     walker.setEnter(async (o, context) => {
-      console.log("this is o i nset enter",o);
+    //  console.log("this is o i nset enter",o);
       //debugger
       for (const matcher of this.blockMatchers) {
         if (matcher.fromMatch(o)) {
@@ -188,7 +188,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
     });
     walker.setLeave(async (o, context) => {
       //debugger
-      console.log("this is o in set leave ",o);
+      //console.log("this is o in set leave ",o);
       for (const matcher of this.blockMatchers) {
         if (matcher.fromMatch(o)) {
           const adapterContext: AdapterContext<
@@ -264,10 +264,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
       assets: payload.assets,
     });
     return {
-      file: file.replace(
-        '<!--BlockSuiteDocTitlePlaceholder-->',
-        `<h1>${payload.snapshot.meta.title}</h1>`
-      ),
+      file,
       assetsIds,
     };
   }

@@ -1,4 +1,4 @@
-import { ObjectBlockSchema } from '@blocksuite/affine-model';
+import { MahdaadWeblinkBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
@@ -25,6 +25,7 @@ export function ObjectIcon(type:string,context) {
 }
 */
 
+/*
 function convertToFullUrl(inputString) {
   // Check if the input string starts with 'http' or 'www' to avoid duplication
   if (!inputString.startsWith('http')) {
@@ -40,13 +41,14 @@ function convertToFullUrl(inputString) {
 
   return inputString;
 }
+*/
 
 
-export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
-  flavour: ObjectBlockSchema.model.flavour,
+export const mahdaadWeblinkBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
+  flavour: MahdaadWeblinkBlockSchema.model.flavour,
   //todo ali ghasami for implement after
   toMatch: o => HastUtils.isElement(o.node) && o.node.tagName === 'img',
-  fromMatch: o => o.node.flavour === ObjectBlockSchema.model.flavour,
+  fromMatch: o => o.node.flavour === MahdaadWeblinkBlockSchema.model.flavour,
   toBlockSnapshot: {
     enter: async (o, context) => {
       if (!HastUtils.isElement(o.node)) {
@@ -122,114 +124,117 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   fromBlockSnapshot: {
     enter: async (o, context) => {
       const {  walkerContext } = context;
-      const objectId=o.node.props.object_id
+      console.log("this is o",o);
+      //const objectId=o.node.props.object_id
       //@ts-ignore
-      const objectList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.objectList ?? [] : []
+      //const objectList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.objectList ?? [] : []
+      //const object=objectList.find(item=> item._id==objectId);
+      /*if(!object || (object.status && (object.status=='403'||object.status=='404')))
+        return*/
+      //@ts-ignore
+      //const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
+      //console.log("object",object,o.node.props);
 
-      const object=objectList.find(item=> item._id==objectId);
-      if(!object || (object.status && (object.status=='403'||object.status=='404')))
-        return
-      //@ts-ignore
-      const embedList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.embedList ?? [] : []
-      const include_embed : boolean=context.configs.get('mahdaad_config')?.include_embed ?? false
-      const embedItem=embedList.find(item=> item.object_id==objectId)
-      //@ts-ignore
-      const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
-      console.log("object",object,o.node.props);
-      const isEmbed=include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem
       walkerContext
         .openNode(
           {
             type: 'element',
             tagName: 'div',
             properties: {
-              className: [`mahdaad-block-container `,isEmbed ? 'mahdaad-object-embed' : `mahdaad-object ${o.node.props?.show_type} ${o.node.props?.type} ${object?.meta?.color ?? ''} ${object.object_type=='file' ? object.meta.type : ''} `],
+              className: [`mahdaad-block-container mahdaad-web-link`],
             },
             children: [],
           },
           'children'
-        )
+        ).openNode({
+        type:'element',
+        tagName:'a',
+        properties:{
+          href:o.node.props.url
+        },
+        children:[
+          {
+            type:'text',
+            value:o.node.props.title,
+          }
+        ]
+      }).closeNode().closeNode()
 
-      if(include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem) {
-          walkerContext.openNode({
-            type:'raw',
-            value:embedItem.context
-          }).closeNode()
+      /*if(o.node.props?.type!='tag' && (object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type!='embed')) {
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: {
+              className: [`icon`],
+            },
+            children:[{
+              type:'raw',
+              value:object.iconSVG ?? ''
+            }]
+          },
+          'children'
+        ).closeNode();
+      }*/
+
+
+      /*if(object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed') {
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'img',
+            properties: {
+             src:`${storageUrl}/${object.meta.storage}`
+              //className: [`title line-clamp-1`],
+            },
+            children:[]
+          },
+          'children'
+        ).closeNode()
       }else{
-        if(!(
-          o.node.props?.type=='tag' ||
-          (object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed'))) {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`icon`],
-              },
-              children:[{
-                type:'raw',
-                value:object.iconSVG ?? ''
-              }]
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: {
+              className: [`title line-clamp-1`],
             },
-            'children'
-          ).closeNode();
-        }
-
-        if(object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed') {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'img',
-              properties: {
-                src:`${storageUrl}/${object.meta.storage}`
-                //className: [`title line-clamp-1`],
-              },
-              children:[]
-            },
-            'children'
-          ).closeNode()
-        }else{
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`title line-clamp-1`],
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.title
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
-        }
-        if(o.node.props?.type=='weblink') {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'a',
-              properties: {
-                className: [`link`],
-                href:convertToFullUrl(object.meta.weblink)
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.meta.weblink
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
-        }
-
-      }
+            children: [
+              {
+                type:'text',
+                value:object.title
+              }
+            ],
+          },
+          'children'
+        ).closeNode()
+      }*/
 
 
-      walkerContext.closeNode()
+
+
+      /*if(o.node.props?.type=='weblink') {
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'a',
+            properties: {
+              className: [`link`],
+              href:convertToFullUrl(object.meta.weblink)
+            },
+            children: [
+              {
+                type:'text',
+                value:object.meta.weblink
+              }
+            ],
+          },
+          'children'
+        ).closeNode()
+      }*/
+
+
+      //walkerContext.closeNode()
 
 
 
@@ -282,6 +287,6 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   },
 };
 
-export const MahdaadObjectBlockHtmlAdapterExtension = BlockHtmlAdapterExtension(
-  mahdaadObjectBlockHtmlAdapterMatcher
+export const MahdaadWeblinkBlockHtmlAdapterExtension = BlockHtmlAdapterExtension(
+  mahdaadWeblinkBlockHtmlAdapterMatcher
 );

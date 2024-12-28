@@ -198,12 +198,12 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
   },
   fromBlockSnapshot: {
     enter: (o, context) => {
-      console.log("qqqqq",o,context);
+      //console.log("qqqqq",o,context);
       const text = (o.node.props.text ?? { delta: [] }) as {
         delta: DeltaInsert[];
       };
       const { walkerContext, deltaConverter } = context;
-      console.log("bb",deltaConverter.deltaToAST(text.delta));
+      //console.log("bb",deltaConverter.deltaToAST(text.delta));
 
       const temp= deltaConverter.deltaToAST(text.delta)
       const children= temp.length==0 ? [{type:'text',value:' '}]: temp

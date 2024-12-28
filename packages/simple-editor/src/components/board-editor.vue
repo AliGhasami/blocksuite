@@ -24,11 +24,11 @@ import {
   type BlockModel,
   Doc,
   DocCollection,
-  type DocCollectionOptions,
+  type DocCollectionOptions, type DocSnapshot,
   IdGeneratorType,
   Job,
   Schema,
-} from "@blocksuite/store";
+} from '@blocksuite/store';
 import { computed, onMounted, onUnmounted, ref, toRaw, unref, watch } from "vue";
 /** @alighasami for check merge **/
 import {
@@ -326,6 +326,27 @@ async function exportData(collection: DocCollection, docs: any[]) {
   return null
 }
 
+async function exportHTMLFromSnapshot(snapshot:DocSnapshot,config:any) {
+  //debugger
+  const doc=toRaw(unref(currentDocument.value))
+  const job = new Job({
+    collection: doc.collection,
+  });
+  job.adapterConfigs.set('mahdaad_config',config)
+  //const snapshot = job.docToSnapshot(doc);
+  //console.log("this is snapshoot",snapshot);
+  const adapter = new MahdaadHtmlAdapter(job);
+  if (!snapshot) {
+    return;
+  }
+  const htmlResult = await adapter.fromDocSnapshot({
+    snapshot,
+    //assets: job.assetsManager,
+  });
+  return htmlResult
+}
+
+
 async function exportHTML(config:any) {
   /*const job = new Job({ collection })
   const snapshots = await Promise.all(docs.map(job.docToSnapshot))
@@ -352,6 +373,9 @@ async function exportHTML(config:any) {
   console.log("this is resault",htmlResult);
   const iframe = document.getElementById('myIframe');
   iframe.srcdoc = htmlResult.file;
+  const iframeWindow = iframe.contentWindow;
+
+  iframeWindow.print()
 }
 
 
@@ -444,7 +468,8 @@ defineExpose({
   isEmpty,
   doc: currentDocument,
   checkIsEmpty,
-  editor:refEditor
+  editor:refEditor,
+  exportHTMLFromSnapshot,
   //collection:myCollection
 })
 

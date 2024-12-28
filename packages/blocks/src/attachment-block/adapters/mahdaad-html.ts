@@ -1,4 +1,4 @@
-import { ObjectBlockSchema } from '@blocksuite/affine-model';
+import { AttachmentBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
@@ -25,6 +25,7 @@ export function ObjectIcon(type:string,context) {
 }
 */
 
+/*
 function convertToFullUrl(inputString) {
   // Check if the input string starts with 'http' or 'www' to avoid duplication
   if (!inputString.startsWith('http')) {
@@ -40,13 +41,14 @@ function convertToFullUrl(inputString) {
 
   return inputString;
 }
+*/
 
 
-export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
-  flavour: ObjectBlockSchema.model.flavour,
+export const mahdaadAttachmentBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
+  flavour: AttachmentBlockSchema.model.flavour,
   //todo ali ghasami for implement after
   toMatch: o => HastUtils.isElement(o.node) && o.node.tagName === 'img',
-  fromMatch: o => o.node.flavour === ObjectBlockSchema.model.flavour,
+  fromMatch: o => o.node.flavour === AttachmentBlockSchema.model.flavour,
   toBlockSnapshot: {
     enter: async (o, context) => {
       if (!HastUtils.isElement(o.node)) {
@@ -122,114 +124,144 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   fromBlockSnapshot: {
     enter: async (o, context) => {
       const {  walkerContext } = context;
-      const objectId=o.node.props.object_id
-      //@ts-ignore
-      const objectList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.objectList ?? [] : []
+      console.log("this is o",o);
 
-      const object=objectList.find(item=> item._id==objectId);
-      if(!object || (object.status && (object.status=='403'||object.status=='404')))
-        return
+      //return
+      //const objectId=o.node.props.object_id
       //@ts-ignore
-      const embedList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.embedList ?? [] : []
-      const include_embed : boolean=context.configs.get('mahdaad_config')?.include_embed ?? false
-      const embedItem=embedList.find(item=> item.object_id==objectId)
+      //const objectList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.objectList ?? [] : []
+      //const object=objectList.find(item=> item._id==objectId);
+      /*if(!object || (object.status && (object.status=='403'||object.status=='404')))
+        return*/
       //@ts-ignore
-      const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
-      console.log("object",object,o.node.props);
-      const isEmbed=include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem
+      //const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
+      //console.log("object",object,o.node.props);
+
       walkerContext
         .openNode(
           {
             type: 'element',
             tagName: 'div',
             properties: {
-              className: [`mahdaad-block-container `,isEmbed ? 'mahdaad-object-embed' : `mahdaad-object ${o.node.props?.show_type} ${o.node.props?.type} ${object?.meta?.color ?? ''} ${object.object_type=='file' ? object.meta.type : ''} `],
+              className: [`mahdaad-block-container mahdaad-attachment`],
             },
             children: [],
           },
           'children'
         )
-
-      if(include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem) {
-          walkerContext.openNode({
+        .openNode({
+          type:'element',
+          tagName:'span',
+          children:[{
             type:'raw',
-            value:embedItem.context
-          }).closeNode()
+            value:'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">\n' +
+              '<path d="M9.9998 4.66668L5.66647 9.00002C5.40125 9.26523 5.25226 9.62494 5.25226 10C5.25226 10.3751 5.40125 10.7348 5.66647 11C5.93169 11.2652 6.2914 11.4142 6.66647 11.4142C7.04154 11.4142 7.40125 11.2652 7.66647 11L11.9998 6.66668C12.5302 6.13625 12.8282 5.41683 12.8282 4.66668C12.8282 3.91654 12.5302 3.19712 11.9998 2.66668C11.4694 2.13625 10.7499 1.83826 9.9998 1.83826C9.24966 1.83826 8.53024 2.13625 7.9998 2.66668L3.66647 7.00002C2.87082 7.79567 2.42383 8.8748 2.42383 10C2.42383 11.1252 2.87082 12.2044 3.66647 13C4.46212 13.7957 5.54125 14.2427 6.66647 14.2427C7.79169 14.2427 8.87082 13.7957 9.66647 13L13.9998 8.66668" stroke="#37424D" stroke-linecap="round" stroke-linejoin="round"/>\n' +
+              '</svg>'
+          }]
+        }).closeNode()
+        .openNode(
+          {
+            type:'element',
+            tagName:'span',
+            properties:{
+              className:['title']
+            },
+            children:[{
+              type:'text',
+              value:o.node.props?.name ?? ''
+            }],
+          },'children')
+        .closeNode()
+        .openNode(
+          {
+            type:'element',
+            tagName:'span',
+            properties:{
+              className:['size']
+            },
+            children:[{
+              type:'text',
+              value:o.node.props.meta ? `${o.node.props.meta?.file_size} KB` : ''
+            }]
+          },'children'
+        ).closeNode()
+        .closeNode()
+
+      /*if(o.node.props?.type!='tag' && (object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type!='embed')) {
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: {
+              className: [`icon`],
+            },
+            children:[{
+              type:'raw',
+              value:object.iconSVG ?? ''
+            }]
+          },
+          'children'
+        ).closeNode();
+      }*/
+
+
+      /*if(object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed') {
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'img',
+            properties: {
+             src:`${storageUrl}/${object.meta.storage}`
+              //className: [`title line-clamp-1`],
+            },
+            children:[]
+          },
+          'children'
+        ).closeNode()
       }else{
-        if(!(
-          o.node.props?.type=='tag' ||
-          (object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed'))) {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`icon`],
-              },
-              children:[{
-                type:'raw',
-                value:object.iconSVG ?? ''
-              }]
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: {
+              className: [`title line-clamp-1`],
             },
-            'children'
-          ).closeNode();
-        }
-
-        if(object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed') {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'img',
-              properties: {
-                src:`${storageUrl}/${object.meta.storage}`
-                //className: [`title line-clamp-1`],
-              },
-              children:[]
-            },
-            'children'
-          ).closeNode()
-        }else{
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`title line-clamp-1`],
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.title
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
-        }
-        if(o.node.props?.type=='weblink') {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'a',
-              properties: {
-                className: [`link`],
-                href:convertToFullUrl(object.meta.weblink)
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.meta.weblink
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
-        }
-
-      }
+            children: [
+              {
+                type:'text',
+                value:object.title
+              }
+            ],
+          },
+          'children'
+        ).closeNode()
+      }*/
 
 
-      walkerContext.closeNode()
+
+
+      /*if(o.node.props?.type=='weblink') {
+        walkerContext.openNode(
+          {
+            type: 'element',
+            tagName: 'a',
+            properties: {
+              className: [`link`],
+              href:convertToFullUrl(object.meta.weblink)
+            },
+            children: [
+              {
+                type:'text',
+                value:object.meta.weblink
+              }
+            ],
+          },
+          'children'
+        ).closeNode()
+      }*/
+
+
+      //walkerContext.closeNode()
 
 
 
@@ -282,6 +314,6 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   },
 };
 
-export const MahdaadObjectBlockHtmlAdapterExtension = BlockHtmlAdapterExtension(
-  mahdaadObjectBlockHtmlAdapterMatcher
+export const MahdaadAttachmentBlockHtmlAdapterExtension = BlockHtmlAdapterExtension(
+  mahdaadAttachmentBlockHtmlAdapterMatcher
 );

@@ -179,7 +179,7 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
     const styles = this.delta.attributes
       ? affineTextStyles(this.delta.attributes, linkStyles)
       : styleMap({});
-    console.log("qqqqq",styles);
+    //console.log("qqqqq",styles);
     return html`
       <a
         @mouseup=${this._onMouseUp}

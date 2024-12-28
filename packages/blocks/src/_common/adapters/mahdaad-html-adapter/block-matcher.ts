@@ -30,11 +30,13 @@ import {
   mahdaadParagraphBlockHtmlAdapterMatcher
 } from '@blocksuite/affine-block-paragraph';
 
+import {MahdaadAttachmentBlockHtmlAdapterExtension,mahdaadAttachmentBlockHtmlAdapterMatcher} from '../../../attachment-block/adapters/mahdaad-html.js'
 import {
   MahdaadDividerBlockHtmlAdapterExtension,
   mahdaadDividerBlockHtmlAdapterMatcher
 } from '../../../divider-block/adapters/mahdaad-html.js';
 import {MahdaadObjectBlockHtmlAdapterExtension ,mahdaadObjectBlockHtmlAdapterMatcher} from '../../../mahdaad-object-block/adapters/mahdaad-html.js'
+import {MahdaadWeblinkBlockHtmlAdapterExtension,mahdaadWeblinkBlockHtmlAdapterMatcher} from '../../../mahdaad-weblink-block/adapters/mahdaad-html.js'
 import {
   MahdaadRootBlockHtmlAdapterExtension,
   mahdaadRootBlockHtmlAdapterMatcher
@@ -71,7 +73,9 @@ export const mahdaadDefaultBlockHtmlAdapterMatchers = [
   mahdaadParagraphBlockHtmlAdapterMatcher,
   mahdaadListBlockHtmlAdapterMatcher,
   mahdaadObjectBlockHtmlAdapterMatcher,
-  mahdaadDividerBlockHtmlAdapterMatcher
+  mahdaadDividerBlockHtmlAdapterMatcher,
+  mahdaadWeblinkBlockHtmlAdapterMatcher,
+  mahdaadAttachmentBlockHtmlAdapterMatcher
   //listBlockHtmlAdapterMatcher,
   /*codeBlockHtmlAdapterMatcher,
   dividerBlockHtmlAdapterMatcher,
@@ -92,7 +96,9 @@ export const mahdaadBlockHtmlAdapterExtensions: ExtensionType[] = [
   MahdaadParagraphBlockHtmlAdapterExtension,
   MahdaadListBlockHtmlAdapterExtension,
   MahdaadObjectBlockHtmlAdapterExtension,
-  MahdaadDividerBlockHtmlAdapterExtension
+  MahdaadDividerBlockHtmlAdapterExtension,
+  MahdaadWeblinkBlockHtmlAdapterExtension,
+  MahdaadAttachmentBlockHtmlAdapterExtension,
   /*ListBlockHtmlAdapterExtension,
   ParagraphBlockHtmlAdapterExtension,
   CodeBlockHtmlAdapterExtension,
