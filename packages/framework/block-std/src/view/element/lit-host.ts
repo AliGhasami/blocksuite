@@ -96,11 +96,42 @@ export class EditorHost extends SignalWatcher(
     model: BlockModel,
     filter?: (model: BlockModel) => boolean
   ): TemplateResult => {
-    return html`${repeat(
-      model.children.filter(filter ?? (() => true)),
-      child => child.id,
-      child => this._renderModel(child)
-    )}`;
+    console.log("model",model);
+    const type=['added','deleted','edited'];
+
+    if(model.flavour=='affine:note') {
+      const temp = model.children.filter(filter ?? (() => true));
+      const list = this.groupByThree(temp);
+
+      return html`${repeat(
+        list,
+        (group, index) => `group-${index}`, // کلید برای هر گروه ۳ تایی
+        (group) => html`
+    <div class="version-history-container ${type[Math.floor(Math.random() * type.length)]}" style="margin-top: 20px" >
+      <div class="details" style="position: absolute;top:-20px">this is details</div>
+    <!--<div class="group">-->
+      ${repeat(
+          group,
+          (item) => item.id, // کلید برای هر آیتم داخل گروه
+          (item) => html`${this._renderModel(item)}` // رندر کردن هر آیتم
+        )}
+    <!--</div>-->
+    </div>
+  `
+      )}`;
+
+    }else{
+      return html`${repeat(
+        model.children.filter(filter ?? (() => true)),
+        child => child.id,
+        (child,index) => {
+          console.log("this is index",index);
+          return html`${this._renderModel(child)}`
+        }
+      )}`;
+    }
+
+
   };
 
   readonly slots = {
@@ -183,6 +214,14 @@ export class EditorHost extends SignalWatcher(
       }
       return true;
     }
+  }
+
+  groupByThree(arr) {
+    const result = [];
+    for (let i = 0; i < arr.length; i += 3) {
+      result.push(arr.slice(i, i + 3));
+    }
+    return result;
   }
 
   override render() {

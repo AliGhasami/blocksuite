@@ -1437,6 +1437,29 @@ async function init() {
   position: relative;
 }
 
+.version-history-container{
+  position: relative;
+  background-color: #0BA2E8;
+
+  &.deleted{
+
+  }
+
+  &.edited{
+
+  }
+
+  &.added{
+    @apply bg-green-1;
+
+    .details{
+    @apply bg-green-5;
+    }
+
+  }
+
+}
+
 /*//.slash-menu,
 !*.popover-menu{
   border-radius: var(--mt-roundness-3);
