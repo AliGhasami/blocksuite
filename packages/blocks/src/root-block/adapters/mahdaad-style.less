@@ -365,6 +365,7 @@ q::after {
   --mt-primary-9: var(--mt-ocean-9, 0, 10, 92);
   --ptp-dimension-050:1px;
   --mt-space-015:6px;
+  --pta-size-xlg:48px;
   //--pta-br:#E9EDF2;
 }
 
@@ -706,3 +707,27 @@ blockquote{
   }
 }
 
+.mahdaad-table{
+  table{
+    border-radius: var(--pta-roundness-md, 6px);
+    border: 1px solid var(--pta-br);
+    border-spacing:0;
+    text-align: center;
+  }
+  th,td{
+    border-bottom: 1px solid var(--pta-br);
+    height: var(--pta-size-xlg, 48px);
+    padding: 8px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 200% */
+  }
+
+  th{
+    color: var(--pta-fg-subtle);
+  }
+  tbody tr:last-child td{
+    border-bottom: unset;
+  }
+}
