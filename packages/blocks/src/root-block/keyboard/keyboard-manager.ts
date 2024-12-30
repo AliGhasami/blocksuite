@@ -13,6 +13,7 @@ import {
 
 export class PageKeyboardManager {
   private _handleDelete = () => {
+    //console.log("_handleDelete");
     const blockSelections = this._currentSelection.filter(sel =>
       sel.is('block')
     );

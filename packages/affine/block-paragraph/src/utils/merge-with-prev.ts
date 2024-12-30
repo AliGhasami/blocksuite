@@ -30,6 +30,7 @@ import {
  *   - line3
  */
 export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
+  //debugger
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent) return false;
@@ -63,6 +64,7 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
     return true;
   }
 
+  //todo ali ghasami for delete with backspace
   if (
     matchFlavours(prevBlock, [
       'affine:attachment',
@@ -71,6 +73,8 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
       'affine:image',
       'affine:divider',
       ...EMBED_BLOCK_FLAVOUR_LIST,
+      'affine:mahdaad-object',
+      'affine:mahdaad-weblink-block'
     ])
   ) {
     const selection = editorHost.selection.create('block', {

@@ -19,6 +19,8 @@ export const ParagraphKeymapExtension = KeymapExtension(
   std => {
     return {
       Backspace: ctx => {
+        //console.log("this is Backspace",);
+        //return
         const text = std.selection.find('text');
         if (!text) return;
         const isCollapsed = text.isCollapsed();
@@ -155,6 +157,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
         return true;
       },
       Delete: ctx => {
+        //console.log("ParagraphKeymapExtension delete");
         const deleted = forwardDelete(std);
         if (!deleted) {
           return;

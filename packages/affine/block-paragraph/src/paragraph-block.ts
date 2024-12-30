@@ -103,6 +103,43 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     return paragraphList.length == 1
   }
 
+  checkShowPlaceHolder() {
+    const composing = this._composing.value;
+
+    let showPlaceHolder=true
+    if (composing || this.doc.readonly) {
+      showPlaceHolder=false
+      //this._displayPlaceholder.value = false;
+      //return;
+    }
+    const textSelection = this.host.selection.find('text');
+    const isCollapsed = textSelection?.isCollapsed() ?? false;
+
+    if (!this.selected || !isCollapsed) {
+      showPlaceHolder=false
+      //this._displayPlaceholder.value = false;
+      //return;
+    }
+
+    if (
+      (this.inlineEditor?.yTextLength ?? 0) > 0 ||
+      this._isInDatabase()
+    ) {
+      showPlaceHolder=false
+      //this._displayPlaceholder.value = false;
+      //return;
+    }
+    //if(!showPlaceHolder)
+    if(!showPlaceHolder && this.checkIsEmptyAndNotFocus() && !this.doc.readonly) {
+      showPlaceHolder = true
+    }
+    //this._displayPlaceholder.value = true;
+    this._displayPlaceholder.value = showPlaceHolder;
+    //console.log("id",this.blockId,this._displayPlaceholder.value);
+    return showPlaceHolder
+
+  }
+
 
   override connectedCallback() {
     super.connectedCallback();
@@ -125,6 +162,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
     this.disposables.add(
       effect(() => {
+
         const composing = this._composing.value;
 
         let showPlaceHolder=true
@@ -242,6 +280,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ? this._readonlyCollapsed
       : this.model.collapsed;
     const collapsedSiblings = this.collapsedSiblings;
+    /** alighasami - fix for show place holder in claytap when delete text*/
+    this.checkShowPlaceHolder()
 
     let style = html``;
     if (this.model.type.startsWith('h') && collapsed) {
@@ -271,14 +311,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     const temp = document.querySelector(
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
     );
-    /*console.log('this is temp', temp);
-    console.log(
-      '10000',
-      this.doc.root?.id,
-      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
-    );*/
     const scrollContainer = temp ? temp : getViewportElement(this.host);
-
     return html`
       ${style}
       <div class="affine-paragraph-block-container">
@@ -322,6 +355,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .verticalScrollContainerGetter=${() => scrollContainer}
            
           ></rich-text>
+          
           ${this.inEdgelessText
             ? nothing
             : html`

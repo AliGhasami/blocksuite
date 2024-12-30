@@ -7,6 +7,7 @@ import {
 } from '@blocksuite/affine-shared/utils';
 
 export function forwardDelete(std: BlockStdScope) {
+
   const { doc, host } = std;
   const text = std.selection.find('text');
   if (!text) return;

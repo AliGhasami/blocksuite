@@ -66,6 +66,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         };
       },
     });
+    this._handleWrapperClick()
   }
 
   private _updateOverlay() {

@@ -571,6 +571,7 @@ export class NoteBlockService extends BlockService {
         return true;
       },
       'Mod-Backspace': ctx => {
+        console.log("Mod-Backspace");
         const { success } = this.std.command.exec('dedentBlocksToRoot');
 
         if (!success) return;
