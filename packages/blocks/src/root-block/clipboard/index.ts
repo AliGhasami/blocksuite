@@ -126,6 +126,8 @@ export class PageClipboard {
   };
 
   onPagePaste: UIEventHandler = ctx => {
+    //console.log("onPagePaste",ctx);
+    //return
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
 

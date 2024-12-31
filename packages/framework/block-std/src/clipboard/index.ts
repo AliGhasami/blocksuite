@@ -207,6 +207,10 @@ export class Clipboard extends LifeCycleWatcher {
     parent?: string,
     index?: number
   ) => {
+    //todo ali ghasami for check paste
+    console.log("clipboard/paste");
+    //debugger
+    //return
     const data = event.clipboardData;
     if (!data) return;
 

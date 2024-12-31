@@ -280,7 +280,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ? this._readonlyCollapsed
       : this.model.collapsed;
     const collapsedSiblings = this.collapsedSiblings;
-    /** alighasami - fix for show place holder in claytap when delete text*/
+    /** alighasami - fix for show placeholder in claytap when delete text*/
     this.checkShowPlaceHolder()
 
     let style = html``;
