@@ -5,6 +5,7 @@ import {
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
 
+import fa from './fa.css?raw'
 import mahdaadStyle from './mahdaad-style.css?raw'
 
 
@@ -34,6 +35,8 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       }
 
       const include_style : boolean=context.configs.get('mahdaad_config')?.include_style ?? false
+
+      const lang : string | null=context.configs.get('mahdaad_config')?.lang ?? null
 
 
       walkerContext
@@ -72,6 +75,13 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           'children'
         )
         .closeNode()
+        .openNode(
+          {
+            type: 'raw',
+            value: lang=='fa' ? fa.replace(/\s\s+/g, '') : '',
+          },
+          'children'
+        ).closeNode()
         .closeNode()
         .closeNode()
         .openNode(

@@ -135,7 +135,7 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       const embedItem=embedList.find(item=> item.object_id==objectId)
       //@ts-ignore
       const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
-      console.log("object",object,o.node.props);
+      //console.log("object",object,o.node.props);
       const isEmbed=include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem
       walkerContext
         .openNode(
