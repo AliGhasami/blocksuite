@@ -1,10 +1,7 @@
 <template>
   <div>
-    <!--     <div class="flex-1 ps-6">
-       <iframe id="myIframe" style=" width: 794px; /* عرض A4 */
-      height: 1123px; /* ارتفاع A4 */
-      border: 1px solid #ccc;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);"></iframe>
+<!--         <div class="flex-1 ps-6">
+       <iframe id="myIframe" ></iframe>
      </div>-->
     <!--     <Button @click="handleClick">export pdf</Button>-->
     <!--    {{ props.objectId }}-->
@@ -349,10 +346,22 @@ async function exportHTML(config: any) {
   if (!snapshot) {
     return
   }
-  return await adapter.fromDocSnapshot({
+ /* return await adapter.fromDocSnapshot({
     snapshot
     //assets: job.assetsManager,
-  })
+  })*/
+  const htmlResult = await adapter.fromDocSnapshot({
+    snapshot,
+    //assets: job.assetsManager,
+  });
+
+  /*const iframe = document.getElementById('myIframe');
+  iframe.srcdoc = htmlResult.file;
+  const iframeWindow = iframe.contentWindow;
+  iframeWindow.print()*/
+
+  return htmlResult
+
 }
 
 function setFocus(e) {
