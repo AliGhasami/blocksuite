@@ -4513,7 +4513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@npm:^2.0.5, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -4890,7 +4890,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/canvas@npm:^0.1.64":
+"@napi-rs/canvas@npm:^0.1.64, @napi-rs/canvas@npm:^0.1.65":
   version: 0.1.65
   resolution: "@napi-rs/canvas@npm:0.1.65"
   dependencies:
@@ -11243,7 +11243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvas@npm:^2.11.2, canvas@npm:^2.6.1":
+"canvas@npm:^2.6.1":
   version: 2.11.2
   resolution: "canvas@npm:2.11.2"
   dependencies:
@@ -11494,7 +11494,7 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "workspace:*"
+    "@mahdaad/block-editor": "npm:^2.0.5"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"
@@ -11585,7 +11585,7 @@ __metadata:
     npm-run-all2: "npm:6.2.0"
     p-queue: "npm:8.0.1"
     path-to-regexp: "npm:^6.2.2"
-    pdfjs-dist: "npm:4.3.136"
+    pdfjs-dist: "npm:^4.10.38"
     pinia: "npm:^2.1.7"
     prettier: "npm:3.3.2"
     pretty-quick: "npm:4.0.0"
@@ -22756,13 +22756,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path2d@npm:^0.2.0":
-  version: 0.2.2
-  resolution: "path2d@npm:0.2.2"
-  checksum: 10/4e1a18ec0d92b050fe8ebf5fd0f35c61887b743a1979d4a4a1b00c38907a0cbed85365045897ca769eec98f55346659a72d5249543994fa52d26be07e14ff67e
-  languageName: node
-  linkType: hard
-
 "pathe@npm:^0.2.0":
   version: 0.2.0
   resolution: "pathe@npm:0.2.0"
@@ -22812,21 +22805,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfjs-dist@npm:4.3.136":
-  version: 4.3.136
-  resolution: "pdfjs-dist@npm:4.3.136"
-  dependencies:
-    canvas: "npm:^2.11.2"
-    path2d: "npm:^0.2.0"
-  dependenciesMeta:
-    canvas:
-      optional: true
-    path2d:
-      optional: true
-  checksum: 10/5511a54a0811c93c6d0517d3bd7ee1df5ffc00577d8b27054956d3775bb9a8a75427ad878c4b13fdda830aabf17e2807667b957e499848bb5968caaba4254d46
-  languageName: node
-  linkType: hard
-
 "pdfjs-dist@npm:4.9.124":
   version: 4.9.124
   resolution: "pdfjs-dist@npm:4.9.124"
@@ -22836,6 +22814,18 @@ __metadata:
     "@napi-rs/canvas":
       optional: true
   checksum: 10/f7a894319eff7df2d266f75c14573430cbcdba136888dd5f662bac046d20b8e73cf9e77b4aefa19dd0ff00a90142e3e027e454f16ba99013fed1ce188dc45278
+  languageName: node
+  linkType: hard
+
+"pdfjs-dist@npm:^4.10.38":
+  version: 4.10.38
+  resolution: "pdfjs-dist@npm:4.10.38"
+  dependencies:
+    "@napi-rs/canvas": "npm:^0.1.65"
+  dependenciesMeta:
+    "@napi-rs/canvas":
+      optional: true
+  checksum: 10/2fee929540863a32a368c02fe445550ce6f0992a08ccfaa05f2e2e185e8ac98b43eda6f88c94c366b86fe99149478eeff7ebb57793270b030c7af54169a4a54c
   languageName: node
   linkType: hard
 

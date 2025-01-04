@@ -363,7 +363,7 @@ export class Doc {
       if (block.model.role === 'root') {
         this.slots.rootAdded.emit(id);
       }
-
+      //console.log("before add block");
       this.slots.blockUpdated.emit({
         type: 'add',
         id,
