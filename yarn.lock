@@ -4513,7 +4513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:^2.0.5, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@npm:^2.0.8, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -11494,7 +11494,7 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:^2.0.5"
+    "@mahdaad/block-editor": "npm:^2.0.8"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"
@@ -11620,6 +11620,7 @@ __metadata:
     vue-boring-avatars: "npm:1.4.0"
     vue-content-loader: "npm:2.0.1"
     vue-dndrop: "npm:1.3.1"
+    vue-draggable-resizable: "npm:^3.0.0"
     vue-eslint-parser: "npm:9.4.2"
     vue-i18n: "npm:^10.0.5"
     vue-router: "npm:4.4.5"
@@ -28223,6 +28224,15 @@ __metadata:
   version: 1.3.1
   resolution: "vue-dndrop@npm:1.3.1"
   checksum: 10/6be19e3cdebeb3f9f61a62facca3f588b30c755080007cc2216808f72ec33a962676248e746aab0aee83c60b903c7d224cad0eeea4e878cdf7d22cdcb51af42a
+  languageName: node
+  linkType: hard
+
+"vue-draggable-resizable@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "vue-draggable-resizable@npm:3.0.0"
+  peerDependencies:
+    vue: ^3.2.25
+  checksum: 10/0ae1ce49ee531876b227a288d64b47f128169fe807d46bddadcf68bcb04d2ad05dbf3a18f61356e6a2df2388b05dab1cc3efece7242476c661d11eed378aac98
   languageName: node
   linkType: hard
 

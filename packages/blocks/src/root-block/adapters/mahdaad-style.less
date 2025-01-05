@@ -24,6 +24,9 @@ h1, h2, h3, h4, h5, h6 {
 pre{
   font-family: Arial;
   display: inline;
+  word-break:break-word;
+  text-wrap:wrap;
+  white-space-collapse:break-spaces;
 }
 
 //:not(.todo-list)
@@ -367,6 +370,24 @@ q::after {
   --mt-space-015:6px;
   --pta-size-xlg:48px;
   //--pta-br:#E9EDF2;
+  /* for support old color and background color  */
+  --affine-text-highlight-pink: rgba(255, 206, 206, 1);
+  --affine-text-highlight-red: rgba(254, 213, 213, 1);
+  --affine-text-highlight-orange: rgba(254, 223, 187, 1);
+  --affine-text-highlight-yellow: rgba(254, 243, 161, 1);
+  --affine-text-highlight-green: rgba(225, 250, 177, 1);
+  --affine-text-highlight-teal: rgba(173, 248, 233, 1);
+  --affine-text-highlight-blue: rgba(204, 226, 254, 1);
+  --affine-text-highlight-purple: rgba(237, 221, 255, 1);
+  --affine-text-highlight-grey: rgba(234, 236, 239, 1);
+  --affine-text-highlight-foreground-red: rgba(198, 34, 34, 1);
+  --affine-text-highlight-foreground-orange: rgba(211, 79, 11, 1);
+  --affine-text-highlight-foreground-yellow: rgba(182, 124, 4, 1);
+  --affine-text-highlight-foreground-green: rgba(20, 147, 67, 1);
+  --affine-text-highlight-foreground-teal: rgba(7, 130, 160, 1);
+  --affine-text-highlight-foreground-blue: rgba(33, 89, 211, 1);
+  --affine-text-highlight-foreground-purple: rgba(132, 46, 211, 1);
+  --affine-text-highlight-foreground-grey: rgba(122, 122, 122, 1);
 }
 
 body{

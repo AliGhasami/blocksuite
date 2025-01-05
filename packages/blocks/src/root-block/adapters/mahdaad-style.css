@@ -32,6 +32,9 @@ h6 {
 pre {
   font-family: Arial;
   display: inline;
+  word-break: break-word;
+  text-wrap: wrap;
+  white-space-collapse: break-spaces;
 }
 ul,
 ol {
@@ -359,6 +362,24 @@ q::after {
   --ptp-dimension-050: 1px;
   --mt-space-015: 6px;
   --pta-size-xlg: 48px;
+  /* for support old color and background color  */
+  --affine-text-highlight-pink: #ffcece;
+  --affine-text-highlight-red: #fed5d5;
+  --affine-text-highlight-orange: #fedfbb;
+  --affine-text-highlight-yellow: #fef3a1;
+  --affine-text-highlight-green: #e1fab1;
+  --affine-text-highlight-teal: #adf8e9;
+  --affine-text-highlight-blue: #cce2fe;
+  --affine-text-highlight-purple: #edddff;
+  --affine-text-highlight-grey: #eaecef;
+  --affine-text-highlight-foreground-red: #c62222;
+  --affine-text-highlight-foreground-orange: #d34f0b;
+  --affine-text-highlight-foreground-yellow: #b67c04;
+  --affine-text-highlight-foreground-green: #149343;
+  --affine-text-highlight-foreground-teal: #0782a0;
+  --affine-text-highlight-foreground-blue: #2159d3;
+  --affine-text-highlight-foreground-purple: #842ed3;
+  --affine-text-highlight-foreground-grey: #7a7a7a;
 }
 body {
   font-family: Arial;
