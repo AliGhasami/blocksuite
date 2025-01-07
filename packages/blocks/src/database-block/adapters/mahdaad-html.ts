@@ -155,7 +155,7 @@ export const mahdaadDatabaseBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   fromBlockSnapshot: {
     enter: (o, context) => {
       const { walkerContext } = context;
-      console.log("1111",o);
+      //console.log("1111",o);
       const columns = o.node.props.columns as Array<Column>;
       const children = o.node.children;
       const cells = o.node.props.cells as SerializedCells;
@@ -225,7 +225,7 @@ export const mahdaadDatabaseBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
               case 'multi-select': {
                 const value = Array.prototype.map
                   .call(
-                    cell.value,
+                    cell.value ?? [],
                     val =>
                       col.data.options.find(
                         (opt: Record<string, string>) => val === opt.id
