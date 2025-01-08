@@ -400,7 +400,6 @@ function checkIsEmpty() {
 }
 
 function handleSelectAll(event: Event) {
-  //console.log("1111",event.target);
   // Check if Ctrl (or Cmd on macOS) is pressed along with the 'A' key
   if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
     const target = event.target as HTMLElement
@@ -408,9 +407,9 @@ function handleSelectAll(event: Event) {
     if (target && target.classList.contains('tiptap')) {
       return
     }
-    if (!target.closest('page-editor')) {
+    if (!target.closest('mahdaad-editor-container')) {
       const temp = document.querySelectorAll(
-        'page-editor:not(page-editor page-editor):not(.ignore-select page-editor)'
+        'mahdaad-editor-container:not(mahdaad-editor-container mahdaad-editor-container):not(.ignore-select mahdaad-editor-container)'
       )
       if (temp.length > 0) {
         const pageRoot = temp[temp.length - 1].querySelector('affine-page-root')
@@ -449,7 +448,7 @@ defineExpose({
 /************************************************************/
 
 async function handleClick() {
-  const doc = toRaw(unref(currentDocument.value))
+ /* const doc = toRaw(unref(currentDocument.value))
   const job = new Job({
     collection: doc.collection,
     middlewares: [docLinkBaseURLMiddleware, titleMiddleware]
@@ -467,7 +466,7 @@ async function handleClick() {
   })
   console.log('1111', htmlResult)
   const iframe = document.getElementById('myIframe')
-  iframe.srcdoc = htmlResult.file
+  iframe.srcdoc = htmlResult.file*/
   /*setTimeout(()=>{
     debugger
   },6000)*/

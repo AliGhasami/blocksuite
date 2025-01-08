@@ -1,4 +1,4 @@
-1- select all block in out side editor 
+1- select all block in out side editor (important if change class and selector of page root)
 2- full slash menu and check all menu item 
 3- set data in editor 
 4- collaboration 
@@ -16,10 +16,11 @@
 16 - check full dark mode - all block and content 
 17 - drag handler and fix style drag handler
 18 - clayboard tools menu full check 
-19- check all inline - (mention - date time - object inline - link )
+19- check all inline - (mention - date time - object inline - link)
 20- full check old save data on stage and production
 21- check date time inline for edit in text input event title and edit mode when hover and check (ignoreSyncInlineRange in inline)
-22- 
+22- google calendar add event (in next block of selected of end of blocks)
+23- 
 
 
 
