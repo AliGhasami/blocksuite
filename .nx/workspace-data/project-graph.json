@@ -14738,6 +14738,15 @@
         "hash": "10/0504baf50c3777ad333c96c37d1673d67efcb7dd071563832f70b5cbf7f3f4753f18981d44bfd8f665d5e5a511d2fc0af8e0ead8b585b9b3ddaa90067864d3f0"
       }
     },
+    "npm:dayjs-plugin-utc": {
+      "type": "npm",
+      "name": "npm:dayjs-plugin-utc",
+      "data": {
+        "version": "0.1.2",
+        "packageName": "dayjs-plugin-utc",
+        "hash": "10/ccd4d8d342bd018b988e2134756122159bc98e9f2949fd76cc82eb54554b4440223d2ca550ab389ca6e598a96d66dfc6a0fcab3103782a2726db4e24f0018143"
+      }
+    },
     "npm:dayjs": {
       "type": "npm",
       "name": "npm:dayjs",
@@ -15510,6 +15519,15 @@
         "version": "1.4.7",
         "packageName": "downloadjs",
         "hash": "10/3374b9aaab892c524dea757d0687f938a327e60132ba65cd566783c99c5869b940558326037eb824ade02f7959ea58df731345bcb33502372f4bab79ed14eae8"
+      }
+    },
+    "npm:draggable-resizable-vue3": {
+      "type": "npm",
+      "name": "npm:draggable-resizable-vue3",
+      "data": {
+        "version": "1.0.94-beta",
+        "packageName": "draggable-resizable-vue3",
+        "hash": "10/898998f675cb3592418b26857ed2d529fe5aecb77b49dcf97e65f3556448525c28c6f30257641e8bb8c069350c512d547dadeb07f13dd7ea0cc4cadd3028ec0b"
       }
     },
     "npm:dunder-proto": {
@@ -18131,6 +18149,15 @@
         "hash": "10/76087670d3b0b50b23a6cb70bca53a6176d6608307ccdbb3ed18b650b82e7c3513bfc40348f1389dc0c5ae872b9a768851f4335f44654abd7deafd6974c52402"
       }
     },
+    "npm:hast-util-raw": {
+      "type": "npm",
+      "name": "npm:hast-util-raw",
+      "data": {
+        "version": "9.1.0",
+        "packageName": "hast-util-raw",
+        "hash": "10/fa304d08a9fce0f54b2baa18d15c45cb5cac695cbee3567b8ccbd9a57fa295c0fb23d238daca1cf0135ad8d538bb341dcd7d9da03f8b7d12e6980a9f8c4340ae"
+      }
+    },
     "npm:hast-util-to-html": {
       "type": "npm",
       "name": "npm:hast-util-to-html",
@@ -18138,6 +18165,15 @@
         "version": "9.0.4",
         "packageName": "hast-util-to-html",
         "hash": "10/a0b4ed9058e57fa2ca010d10c077fda78d2ab2af99f5bd09fe4b9948970025ac4a2a1a03ec7e2e0f3b0444066b1b35d602fa3e9fbd9b7fc9cdd35d0cafa909ca"
+      }
+    },
+    "npm:hast-util-to-parse5": {
+      "type": "npm",
+      "name": "npm:hast-util-to-parse5",
+      "data": {
+        "version": "8.0.0",
+        "packageName": "hast-util-to-parse5",
+        "hash": "10/ba59d0913ba7e914d8b0a50955c06806a6868445c56796ac9129d58185e86d7ff24037246767aba2ea904d9dee8c09b8ff303630bcd854431fdc1bbee2164c36"
       }
     },
     "npm:hast-util-whitespace": {
@@ -23234,15 +23270,6 @@
         "hash": "10/5b1e2daa247062061325b8fdbfd1fb56dde0a448fb1455453276ea18c60685bdad23a445dc148cf87bc216be1573357509b7d4060494a6fd768c7efad833ee45"
       }
     },
-    "npm:path2d": {
-      "type": "npm",
-      "name": "npm:path2d",
-      "data": {
-        "version": "0.2.2",
-        "packageName": "path2d",
-        "hash": "10/4e1a18ec0d92b050fe8ebf5fd0f35c61887b743a1979d4a4a1b00c38907a0cbed85365045897ca769eec98f55346659a72d5249543994fa52d26be07e14ff67e"
-      }
-    },
     "npm:pathe@0.2.0": {
       "type": "npm",
       "name": "npm:pathe@0.2.0",
@@ -23297,15 +23324,6 @@
         "hash": "10/ea8c2c0c813d89ca359a0c831cb2e8a581c569ed44b074316f917942b5baa101f878ce922f1cb87e6f41a035008ba75b52267480aee5d65a5e68c445ee83bc37"
       }
     },
-    "npm:pdfjs-dist": {
-      "type": "npm",
-      "name": "npm:pdfjs-dist",
-      "data": {
-        "version": "4.3.136",
-        "packageName": "pdfjs-dist",
-        "hash": "10/5511a54a0811c93c6d0517d3bd7ee1df5ffc00577d8b27054956d3775bb9a8a75427ad878c4b13fdda830aabf17e2807667b957e499848bb5968caaba4254d46"
-      }
-    },
     "npm:pdfjs-dist@4.9.124": {
       "type": "npm",
       "name": "npm:pdfjs-dist@4.9.124",
@@ -23313,6 +23331,15 @@
         "version": "4.9.124",
         "packageName": "pdfjs-dist",
         "hash": "10/f7a894319eff7df2d266f75c14573430cbcdba136888dd5f662bac046d20b8e73cf9e77b4aefa19dd0ff00a90142e3e027e454f16ba99013fed1ce188dc45278"
+      }
+    },
+    "npm:pdfjs-dist": {
+      "type": "npm",
+      "name": "npm:pdfjs-dist",
+      "data": {
+        "version": "4.10.38",
+        "packageName": "pdfjs-dist",
+        "hash": "10/2fee929540863a32a368c02fe445550ce6f0992a08ccfaa05f2e2e185e8ac98b43eda6f88c94c366b86fe99149478eeff7ebb57793270b030c7af54169a4a54c"
       }
     },
     "npm:peek-readable": {
@@ -24384,6 +24411,15 @@
         "version": "9.0.1",
         "packageName": "rehype-parse",
         "hash": "10/67855c6426d1cd39d64b4a38e934bb234e59f1d4df2f67008848b9bde01f9e068eed549d62a97f54d5c5eb8bfa56c7e2c4b7c3aad769fc4ded9218dc9078ef37"
+      }
+    },
+    "npm:rehype-raw": {
+      "type": "npm",
+      "name": "npm:rehype-raw",
+      "data": {
+        "version": "7.0.0",
+        "packageName": "rehype-raw",
+        "hash": "10/65dd5809f95410ca5056efe50f5b16cb08a69c0785c6d4ec80c9280487efbaec81d342084f6cfdca5624134c1c4018705d97c37b5c0a21d9625ed8a3c88700f1"
       }
     },
     "npm:rehype-stringify": {
@@ -28022,6 +28058,24 @@
         "hash": "10/6be19e3cdebeb3f9f61a62facca3f588b30c755080007cc2216808f72ec33a962676248e746aab0aee83c60b903c7d224cad0eeea4e878cdf7d22cdcb51af42a"
       }
     },
+    "npm:vue-drag-resize": {
+      "type": "npm",
+      "name": "npm:vue-drag-resize",
+      "data": {
+        "version": "1.5.4",
+        "packageName": "vue-drag-resize",
+        "hash": "10/7c7c90b83736d802eca6834fe329bf566622a0f0e5c1a929c18e5c74be258a11d0fb36c1dff4c2b0b7506579a96f32603ec0849ea975a9a5fa803972e46c8882"
+      }
+    },
+    "npm:vue-draggable-resizable@3.0.0": {
+      "type": "npm",
+      "name": "npm:vue-draggable-resizable@3.0.0",
+      "data": {
+        "version": "3.0.0",
+        "packageName": "vue-draggable-resizable",
+        "hash": "10/0ae1ce49ee531876b227a288d64b47f128169fe807d46bddadcf68bcb04d2ad05dbf3a18f61356e6a2df2388b05dab1cc3efece7242476c661d11eed378aac98"
+      }
+    },
     "npm:vue-eslint-parser@9.4.2": {
       "type": "npm",
       "name": "npm:vue-eslint-parser@9.4.2",
@@ -28047,6 +28101,15 @@
         "version": "10.0.5",
         "packageName": "vue-i18n",
         "hash": "10/557c00fbce207a1eaa836894d4a5140be7c9df546168dac1e14dec7b04f2ecc351161ac11e9cc31eb34da408f863f7371477ab3947ae89f9480ad531c24db1f2"
+      }
+    },
+    "npm:vue-resizable": {
+      "type": "npm",
+      "name": "npm:vue-resizable",
+      "data": {
+        "version": "2.1.7",
+        "packageName": "vue-resizable",
+        "hash": "10/fa8a62a6480359669efa01a678bb2f25ab24f961fc59c5e99e0fef21e5c80d5c3413879eb2de9f57802990c711d53aa82b02aaf41365914f6474a0472dd3accf"
       }
     },
     "npm:vue-resize@2.0.0-alpha.1": {
@@ -30608,6 +30671,16 @@
       },
       {
         "source": "@blocksuite/blocks",
+        "target": "npm:dayjs",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/blocks",
+        "target": "npm:dayjs-plugin-utc",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/blocks",
         "target": "npm:dompurify",
         "type": "static"
       },
@@ -30709,6 +30782,11 @@
       {
         "source": "@blocksuite/blocks",
         "target": "npm:rehype-parse",
+        "type": "static"
+      },
+      {
+        "source": "@blocksuite/blocks",
+        "target": "npm:rehype-raw",
         "type": "static"
       },
       {
@@ -49008,6 +49086,73 @@
         "type": "static"
       }
     ],
+    "npm:hast-util-raw": [
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:@types/hast",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:@types/unist",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:@ungap/structured-clone",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:hast-util-from-parse5",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:hast-util-to-parse5",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:html-void-elements",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:mdast-util-to-hast",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:parse5@7.2.1",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:unist-util-position",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:unist-util-visit",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:vfile",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:web-namespaces",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-raw",
+        "target": "npm:zwitch",
+        "type": "static"
+      }
+    ],
     "npm:hast-util-to-html": [
       {
         "source": "npm:hast-util-to-html",
@@ -49061,6 +49206,43 @@
       },
       {
         "source": "npm:hast-util-to-html",
+        "target": "npm:zwitch",
+        "type": "static"
+      }
+    ],
+    "npm:hast-util-to-parse5": [
+      {
+        "source": "npm:hast-util-to-parse5",
+        "target": "npm:@types/hast",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-to-parse5",
+        "target": "npm:comma-separated-tokens",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-to-parse5",
+        "target": "npm:devlop",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-to-parse5",
+        "target": "npm:property-information",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-to-parse5",
+        "target": "npm:space-separated-tokens",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-to-parse5",
+        "target": "npm:web-namespaces",
+        "type": "static"
+      },
+      {
+        "source": "npm:hast-util-to-parse5",
         "target": "npm:zwitch",
         "type": "static"
       }
@@ -54412,21 +54594,16 @@
         "type": "static"
       }
     ],
-    "npm:pdfjs-dist": [
-      {
-        "source": "npm:pdfjs-dist",
-        "target": "npm:canvas",
-        "type": "static"
-      },
-      {
-        "source": "npm:pdfjs-dist",
-        "target": "npm:path2d",
-        "type": "static"
-      }
-    ],
     "npm:pdfjs-dist@4.9.124": [
       {
         "source": "npm:pdfjs-dist@4.9.124",
+        "target": "npm:@napi-rs/canvas",
+        "type": "static"
+      }
+    ],
+    "npm:pdfjs-dist": [
+      {
+        "source": "npm:pdfjs-dist",
         "target": "npm:@napi-rs/canvas",
         "type": "static"
       }
@@ -55409,6 +55586,23 @@
       {
         "source": "npm:rehype-parse",
         "target": "npm:unified",
+        "type": "static"
+      }
+    ],
+    "npm:rehype-raw": [
+      {
+        "source": "npm:rehype-raw",
+        "target": "npm:@types/hast",
+        "type": "static"
+      },
+      {
+        "source": "npm:rehype-raw",
+        "target": "npm:hast-util-raw",
+        "type": "static"
+      },
+      {
+        "source": "npm:rehype-raw",
+        "target": "npm:vfile",
         "type": "static"
       }
     ],

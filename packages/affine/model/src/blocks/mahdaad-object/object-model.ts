@@ -8,6 +8,7 @@ export const ObjectBlockSchema = defineBlockSchema({
     type: undefined,
     //id:undefined,
     show_type: 'inline',
+    meta:{},
   }),
   metadata: {
     version: 1,

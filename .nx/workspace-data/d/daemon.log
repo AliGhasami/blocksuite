@@ -165,3 +165,14 @@
 [NX Daemon Server] - 2024-12-21T07:09:57.278Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2024-12-21T07:09:57.280Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
 [NX Daemon Server] - 2024-12-21T07:09:57.281Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)
+[NX Daemon Server] - 2025-01-10T21:59:11.363Z - Started listening on: \\.\pipe\nx\C:\Users\ALIGHA~1\AppData\Local\Temp\d10c7da9ae36298e7d12\d.sock
+[NX Daemon Server] - 2025-01-10T21:59:11.367Z - [WATCHER]: Subscribed to changes within: K:\Vue_Project\hacoupian-mahdaad\blocksuite (native)
+[NX Daemon Server] - 2025-01-10T21:59:11.384Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-10T21:59:11.387Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-01-10T21:59:11.388Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-10T21:59:11.392Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-01-10T21:59:11.393Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-01-10T21:59:11.394Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-01-10T21:59:11.395Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2025-01-10T21:59:11.395Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-01-10T21:59:11.396Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (outputs)

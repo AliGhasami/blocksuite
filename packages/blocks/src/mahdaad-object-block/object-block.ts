@@ -90,9 +90,9 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     });*/
   }
 
-  docId() {
+  /*docId() {
 
-  }
+  }*/
 
   duplicate() {
     this.doc.addSiblingBlocks(this.model, [
@@ -117,6 +117,12 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   removeBlock() {
     this.doc.deleteBlock(this.model);
   }
+  updateProps(props:any){
+    console.log("this is props",props);
+    /*this.doc.updateBlock(this.model, {
+      ...props
+    });*/
+  }
 
   override renderBlock() {
     //console.log('this is model and props', this.doc);
@@ -140,6 +146,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         }}"
         @changeViewMode="${this.changeViewMode}"
         @convertToLink="${this._convertLink}"
+        @updateProps="${this.updateProps}"
       ></mahdaad-object-link-component>
     </div>`;
   }
