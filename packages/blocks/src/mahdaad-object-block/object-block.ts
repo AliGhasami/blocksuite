@@ -117,15 +117,9 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   removeBlock() {
     this.doc.deleteBlock(this.model);
   }
-  updateProps(props:any){
-    console.log("this is props",props);
-    /*this.doc.updateBlock(this.model, {
-      ...props
-    });*/
-  }
 
   override renderBlock() {
-    //console.log('this is model and props', this.doc);
+    console.log('this is model and props', this.model.meta);
     //.doc="${this.doc}"
     //this.model.propsUpdated({})
 
@@ -138,6 +132,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         link-id="${this.model.link_id}"
         type="${this.model.type}"
         show-type="${this.model.show_type}"
+        meta="${JSON.stringify(this.model.meta ?? {})}"
         @remove="${() => {
           this.removeBlock();
         }}"
@@ -149,6 +144,15 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         @updateProps="${this.updateProps}"
       ></mahdaad-object-link-component>
     </div>`;
+  }
+
+  updateProps(event: CustomEvent) {
+    const props=event.detail;
+    //console.log("this is props",props);
+    this.doc.updateBlock(this.model, {
+      //...this.model,
+       meta:{...props}
+    });
   }
 }
 
