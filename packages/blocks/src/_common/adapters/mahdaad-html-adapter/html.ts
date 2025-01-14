@@ -154,7 +154,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
     html: HtmlAST,
     assets?: AssetsManager
   ) => {
-    //debugger
+
     const assetsIds: string[] = [];
     const walker = new ASTWalker<BlockSnapshot, HtmlAST>();
     walker.setONodeTypeGuard(
@@ -163,7 +163,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
     );
     walker.setEnter(async (o, context) => {
     //  console.log("this is o i nset enter",o);
-      //debugger
+
       for (const matcher of this.blockMatchers) {
         if (matcher.fromMatch(o)) {
           const adapterContext: AdapterContext<
@@ -187,8 +187,6 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
       }
     });
     walker.setLeave(async (o, context) => {
-      //debugger
-      //console.log("this is o in set leave ",o);
       for (const matcher of this.blockMatchers) {
         if (matcher.fromMatch(o)) {
           const adapterContext: AdapterContext<

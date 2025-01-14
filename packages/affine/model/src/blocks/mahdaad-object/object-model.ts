@@ -1,5 +1,16 @@
 import { defineBlockSchema, type SchemaToModel } from '@blocksuite/store';
 
+export type ObjectBlockProps = {
+  object_id: undefined | string,
+  link_id: undefined | string,
+  type: undefined | string,
+  show_type: 'inline' | 'embed',
+  meta?:Record<string, string | null | any>
+  file_id?:string
+}
+
+
+
 export const ObjectBlockSchema = defineBlockSchema({
   flavour: 'affine:mahdaad-object',
   props: () => ({

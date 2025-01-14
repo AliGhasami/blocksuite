@@ -15,9 +15,9 @@ import {
 
 import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
 import { objectBlockStyles } from './styles.js';
-
+import type {ObjectBlockService} from './object-service.js'
 //@customElement('affine-mahdaad-object')
-export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockModel> {
+export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockModel,ObjectBlockService> {
   static override styles = objectBlockStyles;
 
   _convertLink(event: CustomEvent) {
@@ -128,6 +128,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         .model="${this.model}"
         read-only="${this.doc.readonly}"
         object-id="${this.model.object_id}"
+        file-id="${this.model.file_id ?? null}"
         parent-id="${this.parentId()}"
         link-id="${this.model.link_id}"
         type="${this.model.type}"

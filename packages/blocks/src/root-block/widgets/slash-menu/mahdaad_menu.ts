@@ -1099,7 +1099,6 @@ function runCommand(
       props: { type },
     })
     .inline((ctx, next) => {
-      //debugger
       const newModels = ctx.updatedBlocks;
       if (!newModels) {
         return false;

@@ -313,7 +313,6 @@ export const conversionsGroup: MenuItemGroup<ElementToolbarMoreMenuContext> = {
         host,
         std,
       }) => {
-        //debugger
         const title = await promptDocTitle(host);
         if (title === null) return;
 

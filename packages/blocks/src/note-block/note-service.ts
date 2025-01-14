@@ -600,6 +600,7 @@ export const NoteDragHandleOption = DragHandleConfigExtension({
     state,
     editorHost,
   }) => {
+    console.log("note onDragEnd");
     if (
       draggingElements.length !== 1 ||
       !matchFlavours(draggingElements[0].model, [NoteBlockSchema.model.flavour])

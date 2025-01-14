@@ -106,6 +106,7 @@ export class DragEventWatcher {
    * When start dragging, should set dragging elements and create drag preview
    */
   private _dragStartHandler: UIEventHandler = ctx => {
+    console.log("_dragStartHandler");
     const state = ctx.get('dndState');
     // If not click left button to start dragging, should do nothing
     const { button } = state.raw;
@@ -117,6 +118,8 @@ export class DragEventWatcher {
   };
 
   private _dropHandler = (context: UIEventStateContext) => {
+    console.log("_dropHandler");
+    //return
     this._onDrop(context);
     this._std.selection.setGroup('gfx', []);
     this.widget.clearRaf();
@@ -134,6 +137,7 @@ export class DragEventWatcher {
   };
 
   private _onDragStart = (state: DndEventState) => {
+    console.log("_onDragStart");
     // Get current hover block element by path
     const hoverBlock = this.widget.anchorBlockComponent.peek();
     if (!hoverBlock) return false;
@@ -238,6 +242,7 @@ export class DragEventWatcher {
   };
 
   private _onDrop = (context: UIEventStateContext) => {
+    console.log("_onDrop");
     const state = context.get('dndState');
 
     const event = state.raw;
@@ -288,6 +293,7 @@ export class DragEventWatcher {
     parent?: string,
     index?: number
   ) => {
+    console.log("_onDropNoteOnNote");
     const [first] = snapshot.content;
     const id = first.id;
 
@@ -309,6 +315,7 @@ export class DragEventWatcher {
   };
 
   private _onDropOnEdgelessCanvas = (context: UIEventStateContext) => {
+    console.log("_onDropOnEdgelessCanvas");
     const state = context.get('dndState');
     // If drop a note, should do nothing
     const snapshot = this._deserializeSnapshot(state);
@@ -414,6 +421,7 @@ export class DragEventWatcher {
     dragPreviewEl?: HTMLElement,
     dragPreviewOffset?: Point
   ) => {
+    console.log("_startDragging");
     if (!blocks.length) {
       return;
     }
@@ -572,6 +580,7 @@ export class DragEventWatcher {
     });
 
     this.widget.handleEvent('dragStart', ctx => {
+      //console.log("this.widget.handleEvent('dragStart'");
       const state = ctx.get('pointerState');
       const event = state.raw;
       const target = captureEventTarget(event.target);

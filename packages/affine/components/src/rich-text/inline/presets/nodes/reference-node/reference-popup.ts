@@ -167,7 +167,6 @@ export class ReferencePopup extends WithDisposable(LitElement) {
   }
 
   private _convertToCardView() {
-    //debugger;
     const block = this.block;
     const doc = block.host.doc;
     const parent = doc.getParent(block.model);
@@ -194,7 +193,6 @@ export class ReferencePopup extends WithDisposable(LitElement) {
   }
 
   private _convertToEmbedView() {
-    //debugger;
     const block = this.block;
     const std = block.std;
     const doc = block.host.doc;

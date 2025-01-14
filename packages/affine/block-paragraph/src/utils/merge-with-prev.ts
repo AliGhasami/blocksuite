@@ -30,7 +30,6 @@ import {
  *   - line3
  */
 export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
-  //debugger
   const doc = model.doc;
   const parent = doc.getParent(model);
   if (!parent) return false;

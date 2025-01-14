@@ -580,7 +580,6 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
     //this.disposables.
 
     this._disposables.addFromEvent(this, 'mousedown', e => {
-      //debugger;
       e.stopPropagation();
     });
 
@@ -591,7 +590,6 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
 
   generateWeblink(event: CustomEvent) {
     const lnk = event.detail;
-    //debugger;
     if (!this.inlineEditor.isValidInlineRange(this.targetInlineRange)) return;
     this.inlineEditor.insertText(this.targetInlineRange, REFERENCE_NODE, {
       mahdaadObjectLink: {
@@ -637,7 +635,6 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
               <div
                 class="affine-link-popover-overlay-mask"
                 @click=${() => {
-                  debugger;
                   this.abortController.abort();
                   this.host?.selection.clear();
                 }}

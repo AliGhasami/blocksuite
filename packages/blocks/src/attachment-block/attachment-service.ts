@@ -30,6 +30,8 @@ export class AttachmentBlockService extends BlockService {
   private _fileDropOptions: FileDropOptions = {
     flavour: this.flavour,
     onDrop: async ({ files, targetModel, place, point }) => {
+      /** disable for mahdaad */
+      return
       if (!files.length) return false;
 
       // generic attachment block for all files except images

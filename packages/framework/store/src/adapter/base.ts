@@ -181,6 +181,7 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     index?: number
   ) {
     try {
+      //debugger
       console.log('toSlice');
       const snapshot = await this.toSliceSnapshot(payload);
       if (!snapshot) return;

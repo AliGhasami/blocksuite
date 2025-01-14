@@ -1,8 +1,10 @@
 /** @alighasami for check merge **/
 import type {
-  AttachmentBlockProps,
-  ImageBlockModel,
-  ImageBlockProps,
+  //AttachmentBlockProps,
+  //ImageBlockModel,
+  //ImageBlockProps,
+  ObjectBlockProps,
+  //ObjectBlockModel
 } from '@blocksuite/affine-model';
 import type { EditorHost } from '@blocksuite/block-std';
 import type { BlockModel } from '@blocksuite/store';
@@ -11,19 +13,20 @@ import { toast } from '@blocksuite/affine-components/toast';
 import {
   //downloadBlob,
   humanFileSize,
-  withTempBlobData,
+  //withTempBlobData,
 } from '@blocksuite/affine-shared/utils';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
+import { nanoid } from 'nanoid';
 
-import type { ImageBlockComponent } from './image-block.js';
-import type { ImageEdgelessBlockComponent } from './image-edgeless-block.js';
+//import type { ImageBlockComponent } from './image-block.js';
+//import type { ImageEdgelessBlockComponent } from './image-edgeless-block.js';
 
-import { readImageSize } from '../root-block/edgeless/components/utils.js';
-import { transformModel } from '../root-block/utils/operations/model.js';
-import { downloadFile } from '../_common/mahdaad/url.js';
+//import { readImageSize } from '../root-block/edgeless/components/utils.js';
+//import { transformModel } from '../root-block/utils/operations/model.js';
+//import { downloadFile } from '../_common/mahdaad/url.js';
 
-const MAX_RETRY_COUNT = 3;
-const DEFAULT_ATTACHMENT_NAME = 'affine-attachment';
+//const MAX_RETRY_COUNT = 3;
+//const DEFAULT_ATTACHMENT_NAME = 'affine-attachment';
 
 const imageUploads = new Set<string>();
 export function setImageUploading(blockId: string) {
@@ -36,7 +39,7 @@ export function isImageUploading(blockId: string) {
   return imageUploads.has(blockId);
 }
 
-export async function uploadBlobForImage(
+/*export async function uploadBlobForImage(
   editorHost: EditorHost,
   blockId: string,
   blob: Blob
@@ -73,9 +76,9 @@ export async function uploadBlobForImage(
       } satisfies Partial<ImageBlockProps>);
     });
   }
-}
+}*/
 
-async function getImageBlob(model: ImageBlockModel) {
+/*async function getImageBlob(model: ImageBlockModel) {
   const sourceId = model.sourceId;
   if (!sourceId) {
     return null;
@@ -104,9 +107,9 @@ async function getImageBlob(model: ImageBlockModel) {
   }
 
   return blob;
-}
+}*/
 
-export async function fetchImageBlob(
+/*export async function fetchImageBlob(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
   try {
@@ -157,19 +160,18 @@ export async function fetchImageBlob(
       block.error = true;
     }
   }
-}
+}*/
 
-export async function downloadImageBlob(
+/*export async function downloadImageBlob(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
-
   const {fullSrc}=block
   //console.log("1111",fullSrc);
   if(fullSrc){
     downloadFile(fullSrc)
   }
 
-  /*const { host, downloading } = block;
+  /!*const { host, downloading } = block;
   if (downloading) {
     toast(host, 'Download in progress...');
     return;
@@ -187,10 +189,10 @@ export async function downloadImageBlob(
 
   downloadBlob(blob, 'image');
 
-  block.downloading = false;*/
-}
+  block.downloading = false;*!/
+}*/
 
-export async function resetImageSize(
+/*export async function resetImageSize(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
   const { blob, model } = block;
@@ -204,18 +206,18 @@ export async function resetImageSize(
     width: size.width,
     height: size.height,
   });
-}
+}*/
 
-function convertToString(blob: Blob): Promise<string | null> {
+/*function convertToString(blob: Blob): Promise<string | null> {
   return new Promise(resolve => {
     const reader = new FileReader();
     reader.addEventListener('load', _ => resolve(reader.result as string));
     reader.addEventListener('error', () => resolve(null));
     reader.readAsDataURL(blob);
   });
-}
+}*/
 
-function convertToPng(blob: Blob): Promise<Blob | null> {
+/*function convertToPng(blob: Blob): Promise<Blob | null> {
   return new Promise(resolve => {
     const reader = new FileReader();
     reader.addEventListener('load', _ => {
@@ -235,9 +237,9 @@ function convertToPng(blob: Blob): Promise<Blob | null> {
     reader.addEventListener('error', () => resolve(null));
     reader.readAsDataURL(blob);
   });
-}
+}*/
 
-export async function copyImageBlob(
+/*export async function copyImageBlob(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
 
@@ -288,18 +290,18 @@ export async function copyImageBlob(
   } catch (error) {
     console.error(error);
   }
-}
+}*/
 
-export function shouldResizeImage(node: Node, target: EventTarget | null) {
+/*export function shouldResizeImage(node: Node, target: EventTarget | null) {
   return !!(
     target &&
     target instanceof HTMLElement &&
     node.contains(target) &&
     target.classList.contains('resize')
   );
-}
+}*/
 
-export function addSiblingImageBlock(
+export function addSiblingObjectBlock(
   editorHost: EditorHost,
   files: File[],
   maxFileSize: number,
@@ -324,24 +326,42 @@ export function addSiblingImageBlock(
     return;
   }
 
-  const imageBlockProps: Partial<ImageBlockProps> &
-    {
-      flavour: 'affine:image';
-    }[] = imageFiles.map(file => ({
-    flavour: 'affine:image',
-    size: file.size,
-  }));
+  //if()
+  //Object.assign(window.$blockEditor, temp)
+  if(!window.$blockEditor.files){
+    window.$blockEditor.files=[]
+  }
 
+  const objectBlockProps: Partial<ObjectBlockProps> &
+    {
+      flavour: 'affine:mahdaad-object';
+    }[] = imageFiles.map(file => {
+
+      const id=nanoid()
+      window.$blockEditor.files.push({id, file})
+      return {
+        flavour: 'affine:mahdaad-object',
+        file_id:id,
+        object_id: undefined ,
+        link_id: undefined ,
+        type: 'image' ,
+        show_type: 'embed',
+        meta:{},
+        //size: file.size,
+      }
+
+  });
+  //console.log("files",window.$blockEditor);
   const doc = editorHost.doc;
-  const blockIds = doc.addSiblingBlocks(targetModel, imageBlockProps, place);
-  blockIds.map(
+  const blockIds = doc.addSiblingBlocks(targetModel, objectBlockProps, place);
+  /*blockIds.map(
     (blockId, index) =>
       void uploadBlobForImage(editorHost, blockId, imageFiles[index])
-  );
+  );*/
   return blockIds;
 }
 
-export function addImageBlocks(
+/*export function addImageBlocks(
   editorHost: EditorHost,
   files: File[],
   maxFileSize: number,
@@ -375,12 +395,12 @@ export function addImageBlocks(
       void uploadBlobForImage(editorHost, blockId, imageFiles[index])
   );
   return blockIds;
-}
+}*/
 
 /**
  * Turn the image block into a attachment block.
  */
-export async function turnImageIntoCardView(
+/*export async function turnImageIntoCardView(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
   const doc = block.doc;
@@ -409,4 +429,4 @@ export async function turnImageIntoCardView(
     ...attachmentConvertData,
   };
   transformModel(model, 'affine:attachment', attachmentProp);
-}
+}*/

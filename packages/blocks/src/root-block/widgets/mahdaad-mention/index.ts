@@ -204,7 +204,6 @@ export class MahdaadMentionMenuWidget extends WidgetComponent {
 
   //old method
   /*private _onBeforeInput = (ctx: UIEventStateContext) => {
-    //debugger
     const eventState = ctx.get('defaultState');
     const event = eventState.event as InputEvent;
 

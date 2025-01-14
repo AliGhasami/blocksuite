@@ -47,6 +47,7 @@ export class EditorHost extends SignalWatcher(
   `;
 
   private _renderModel = (model: BlockModel): TemplateResult => {
+
     const { flavour } = model;
     const block = this.doc.getBlock(model.id);
     if (!block || block.blockViewType === BlockViewType.Hidden) {

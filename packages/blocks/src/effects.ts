@@ -105,7 +105,7 @@ import {
 } from './image-block/index.js';
 import { effects as blockLatexEffects } from './latex-block/effects.js';
 import { LatexBlockComponent } from './latex-block/index.js';
-import { ObjectBlockComponent } from './mahdaad-object-block/index.js';
+import { ObjectBlockComponent , type ObjectBlockService} from './mahdaad-object-block/index.js';
 import { MahdaadWeblinkBlockComponent } from './mahdaad-weblink-block/index.js';
 import {
   EdgelessNoteBlockComponent,
@@ -667,6 +667,7 @@ declare global {
       'affine:database': DatabaseBlockService;
       'affine:image': ImageBlockService;
       'affine:surface-ref': SurfaceRefBlockService;
+      'affine-mahdaad-object':ObjectBlockService;
     }
   }
 }

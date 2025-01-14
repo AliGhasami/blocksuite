@@ -74,6 +74,7 @@ declare global {
       storageUrl: string;
       apiToken: string;
       locale: 'fa' | 'en';
+      files:{id:string,file:File}[]
       //i18n: never;
     };
   }

@@ -129,7 +129,7 @@ export class Clipboard extends LifeCycleWatcher {
           continue;
         }
         /**@(ali ghasami)  - for disable paste image or file for calytap */
-        continue;
+        //continue;
       }
       if (item) {
         const job = this._getJob();
@@ -141,13 +141,15 @@ export class Clipboard extends LifeCycleWatcher {
           workspaceId: doc.collection.id,
           pageId: doc.id,
         };
-        //console.log('this is result', payload);
+        //debugger
+        console.log('this is result', payload);
         const result = await adapterInstance.toSlice(
           payload,
           doc,
           parent,
           index
         );
+        console.log("this is result",result);
 
         if (result) {
           return result;
@@ -207,11 +209,13 @@ export class Clipboard extends LifeCycleWatcher {
     parent?: string,
     index?: number
   ) => {
+    //debugger
     const data = event.clipboardData;
     if (!data) return;
 
     try {
       const json = this.readFromClipboard(data);
+     // debugger
       const slice = await this._getSnapshotByPriority(
         type => json[type],
         doc,

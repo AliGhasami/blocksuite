@@ -43,13 +43,14 @@ export class PageClipboard {
       95
     );
     this._std.clipboard.registerAdapter('text/html', HtmlAdapter, 90);
+    /** change for mahdaad */
     [
-      'image/apng',
-      'image/avif',
-      'image/gif',
+      //'image/apng',
+      //'image/avif',
+      //'image/gif',
       'image/jpeg',
-      'image/png',
-      'image/svg+xml',
+      //'image/png',
+      //'image/svg+xml',
       'image/webp',
     ].map(type => this._std.clipboard.registerAdapter(type, ImageAdapter, 80));
     this._std.clipboard.registerAdapter('text/plain', MixTextAdapter, 70);
@@ -126,6 +127,7 @@ export class PageClipboard {
   };
 
   onPagePaste: UIEventHandler = ctx => {
+    console.log("onPagePaste");
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
 

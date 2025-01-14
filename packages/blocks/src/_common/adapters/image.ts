@@ -94,16 +94,36 @@ export class ImageAdapter extends BaseAdapter<Image> {
     payload: ImageToSliceSnapshotPayload
   ): Promise<SliceSnapshot | null> {
     const content: SliceSnapshot['content'] = [];
+    if(!window.$blockEditor.files){
+      window.$blockEditor.files=[]
+    }
     for (const item of payload.file) {
-      const blobId = await sha(await item.arrayBuffer());
-      payload.assets?.getAssets().set(blobId, item);
-      await payload.assets?.writeToBlob(blobId);
+      /** comment for mahdaad */
+      //const blobId = await sha(await item.arrayBuffer());
+      //payload.assets?.getAssets().set(blobId, item);
+      //await payload.assets?.writeToBlob(blobId);
+      // content.push({
+      //   type: 'block',
+      //   flavour: 'affine:image',
+      //   id: nanoid(),
+      //   props: {
+      //     sourceId: blobId,
+      //   },
+      //   children: [],
+      // });
+      const id=nanoid()
+      window.$blockEditor.files.push({id, file:item})
+
       content.push({
         type: 'block',
-        flavour: 'affine:image',
+        flavour: 'affine:mahdaad-object',
         id: nanoid(),
         props: {
-          sourceId: blobId,
+          //sourceId: blobId,
+          //file:item,
+          file_id:id,
+          type:'image',
+          show_type:'embed'
         },
         children: [],
       });

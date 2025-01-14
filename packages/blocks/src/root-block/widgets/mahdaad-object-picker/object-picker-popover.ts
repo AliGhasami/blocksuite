@@ -208,7 +208,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   async insertTemplate(data: any) {
     // console.log('this is data', data);
-    //debugger
     if (!data.context) return;
     const content = JSON.parse(data.context);
     ///console.log('14141444', content);

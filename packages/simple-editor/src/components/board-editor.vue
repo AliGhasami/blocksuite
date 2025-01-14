@@ -253,7 +253,9 @@ function bindEvent(doc: Doc) {
     emit('change', data)
     if (data.type == 'add') {
       if (data.flavour == 'affine:mahdaad-object') {
-        emit('addObjectLink', data)
+        if(data.model.object_id){
+          emit('addObjectLink', data)
+        }
       }
       emit('addBlock', data)
     }

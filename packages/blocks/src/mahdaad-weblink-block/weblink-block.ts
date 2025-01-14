@@ -72,7 +72,6 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
 
   generateWeblink(event: CustomEvent) {
     const lnk: ObjectLink = event.detail;
-    //debugger;
     this.doc.addSiblingBlocks(this.model, [
       {
         flavour: 'affine:mahdaad-object',
@@ -133,7 +132,6 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
       url: data.url,
     });
     //this.model.propsUpdated
-    //debugger;
     //this._onConfirm(data.title, data.url);
   }
 }
