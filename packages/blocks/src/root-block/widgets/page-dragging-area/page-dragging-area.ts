@@ -229,8 +229,6 @@ export class AffinePageDraggingAreaWidget extends WidgetComponent<
     this.handleEvent(
       'dragStart',
       ctx => {
-        console.log(" this.handleEvent(\n" +
-          "      'dragStart',");
         const state = ctx.get('pointerState');
         const { button } = state.raw;
         if (button !== 0) return;

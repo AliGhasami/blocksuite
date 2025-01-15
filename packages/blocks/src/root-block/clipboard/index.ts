@@ -5,7 +5,6 @@ import type { BlockSnapshot, Doc } from '@blocksuite/store';
 import { DisposableGroup } from '@blocksuite/global/utils';
 
 import {
-  AttachmentAdapter,
   HtmlAdapter,
   ImageAdapter,
   MixTextAdapter,
@@ -49,12 +48,13 @@ export class PageClipboard {
       //'image/avif',
       //'image/gif',
       'image/jpeg',
-      //'image/png',
+      'image/png',
       //'image/svg+xml',
-      'image/webp',
+      //'image/webp',
     ].map(type => this._std.clipboard.registerAdapter(type, ImageAdapter, 80));
     this._std.clipboard.registerAdapter('text/plain', MixTextAdapter, 70);
-    this._std.clipboard.registerAdapter('*/*', AttachmentAdapter, 60);
+    /** disable for mahdaad */
+    //this._std.clipboard.registerAdapter('*/*', AttachmentAdapter, 60);
     const copy = copyMiddleware(this._std);
     const paste = pasteMiddleware(this._std);
     this._std.clipboard.use(copy);

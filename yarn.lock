@@ -11705,7 +11705,6 @@ __metadata:
     dompurify: "npm:^3.1.4"
     dotenv: "npm:16.4.5"
     downloadjs: "npm:1.4.7"
-    draggable-resizable-vue3: "npm:^1.0.94-beta"
     escape-html: "npm:1.0.3"
     eslint: "npm:8.57.0"
     eslint-plugin-cypress: "npm:2.15.1"
@@ -14220,13 +14219,6 @@ __metadata:
   version: 1.4.7
   resolution: "downloadjs@npm:1.4.7"
   checksum: 10/3374b9aaab892c524dea757d0687f938a327e60132ba65cd566783c99c5869b940558326037eb824ade02f7959ea58df731345bcb33502372f4bab79ed14eae8
-  languageName: node
-  linkType: hard
-
-"draggable-resizable-vue3@npm:^1.0.94-beta":
-  version: 1.0.94-beta
-  resolution: "draggable-resizable-vue3@npm:1.0.94-beta"
-  checksum: 10/898998f675cb3592418b26857ed2d529fe5aecb77b49dcf97e65f3556448525c28c6f30257641e8bb8c069350c512d547dadeb07f13dd7ea0cc4cadd3028ec0b
   languageName: node
   linkType: hard
 

@@ -13,9 +13,10 @@ import {
   REFERENCE_NODE,
 } from '@blocksuite/affine-components/rich-text';
 
+import type {ObjectBlockService} from './object-service.js'
+
 import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
 import { objectBlockStyles } from './styles.js';
-import type {ObjectBlockService} from './object-service.js'
 //@customElement('affine-mahdaad-object')
 export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockModel,ObjectBlockService> {
   static override styles = objectBlockStyles;
@@ -150,10 +151,9 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   updateProps(event: CustomEvent) {
     const props=event.detail;
     //console.log("this is props",props);
-    this.doc.updateBlock(this.model, {
-      //...this.model,
-       meta:{...props}
-    });
+    //...this.model,
+    //meta:{...props}
+    this.doc.updateBlock(this.model, props);
   }
 }
 

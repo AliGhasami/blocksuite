@@ -32,7 +32,7 @@ export class ObjectBlockService extends BlockService {
   private _fileDropOptions: FileDropOptions = {
     flavour: this.flavour,
     onDrop: async ({ files, targetModel, place, point }) => {
-      const imageFiles = files.filter(file => file.type.startsWith('image/'));
+      const imageFiles = files.filter(file => [  'image/jpeg', 'image/png'].includes(file.type) ); //file.type.startsWith('image/')
       if (!imageFiles.length) return false;
 
       if (targetModel && !matchFlavours(targetModel, ['affine:surface'])) {
