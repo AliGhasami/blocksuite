@@ -98,6 +98,9 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   }
 
   checkIsEmptyAndNotFocus() {
+    if (this.std.get(DocModeProvider).getEditorMode() === 'edgeless') {
+      return  false
+    }
     const note = this.doc.getBlocksByFlavour('affine:note'); //.getBlockByFlavour('affine:note');
     const paragraphList = note.length ? note[0].model.children : [];
     return paragraphList.length == 1
