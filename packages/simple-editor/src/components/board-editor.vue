@@ -901,7 +901,9 @@ async function init() {
           doc.addBlock('affine:surface', {}, rootId)
           if (!props.isBoardView) {
             const noteId = doc.addBlock('affine:note', {}, rootId)
+            const noteId2 = doc.addBlock('affine:note', {}, rootId)
             doc.addBlock('affine:paragraph', {}, noteId)
+            doc.addBlock('affine:paragraph', {}, noteId2)
           }
           doc.resetHistory()
         }
@@ -1004,6 +1006,7 @@ async function init() {
       doc.addBlock('affine:surface', {}, rootId)
       if (!props.isBoardView) {
         const noteId = doc.addBlock('affine:note', {}, rootId)
+       // const noteId2 = doc.addBlock('affine:note', {}, rootId)
         doc.addBlock('affine:paragraph', {}, noteId)
       }
       doc.resetHistory()
