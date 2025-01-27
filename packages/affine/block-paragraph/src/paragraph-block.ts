@@ -26,9 +26,11 @@ import { query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import type { ParagraphBlockService } from './paragraph-service.js';
 
+import quoteIcon from './assets/quote.svg?raw'
 import {mahdaadParagraphBlockStyles } from './styles.js';
 
 export class ParagraphBlockComponent extends CaptionedBlockComponent<
@@ -277,13 +279,27 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     return result;
   }
 
+  placeHolder() {
+    return this.inEdgelessText
+      ? nothing
+      : html`<div
+              contenteditable="false"
+              class=${classMap({
+        'affine-paragraph-placeholder': true,
+        visible: this._displayPlaceholder.value,
+      })}>
+          ${this.service.placeholderGenerator(this.model)}
+      </div>`
+  }
+
+
   override renderBlock(): TemplateResult<1> {
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
       ? this._readonlyCollapsed
       : this.model.collapsed;
     const collapsedSiblings = this.collapsedSiblings;
-    /** alighasami - fix for show place holder in claytap when delete text*/
+    /** alighasami - fix for show placeholder in claytap when delete text*/
     this.checkShowPlaceHolder()
 
     let style = html``;
@@ -311,10 +327,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ${this.renderChildren(this.model)}
     </div>`;
 
-    const temp = document.querySelector(
+    /*const temp = document.querySelector(
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
-    );
-    const scrollContainer = temp ? temp : getViewportElement(this.host);
+    );*/
+    //const scrollContainer = temp ? temp : getViewportElement(this.host);
     return html`
       ${style}
       <div class="affine-paragraph-block-container">
@@ -343,7 +359,31 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
                 ></blocksuite-toggle-button>
               `
             : nothing}
-          <rich-text
+          
+          ${type$.value=='quote' ? 
+            html`<div class="quote-container">
+              <span class="quote-icon">${html`${unsafeSVG(quoteIcon)}`}</span>
+              ${this.richText()}
+              ${this.placeHolder()}
+            </div>` 
+            : this.richText()}
+            
+          ${this.model.type=='quote' ? nothing : this.placeHolder()}
+          
+        </div>
+
+        ${children}
+      </div>
+    `;
+  }
+
+
+  richText() {
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
+    return html`<rich-text
             .yText=${this.model.text.yText}
             .inlineEventSource=${this.topContenteditableElement ?? nothing}
             .undoManager=${this.doc.history}
@@ -356,27 +396,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .enableClipboard=${false}
             .enableUndoRedo=${false}
             .verticalScrollContainerGetter=${() => scrollContainer}
-           
-          ></rich-text>
-          
-          ${this.inEdgelessText
-            ? nothing
-            : html`
-                <div
-                  contenteditable="false"
-                  class=${classMap({
-                    'affine-paragraph-placeholder': true,
-                    visible: this._displayPlaceholder.value,
-                  })}
-                >
-                  ${this.service.placeholderGenerator(this.model)}
-                </div>
-              `}
-        </div>
-
-        ${children}
-      </div>
-    `;
+          ></rich-text>`
   }
 
   @state()

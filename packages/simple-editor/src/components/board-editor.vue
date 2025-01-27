@@ -1043,6 +1043,31 @@ async function init() {
     @apply text-gray-8;
   }
 
+
+  .claytap-quote{
+    @apply bg-gray-05;
+    &::after{
+      @apply bg-gray-2;
+    }
+  }
+
+  .quote-container{
+    //padding: var(----pta-space-400, 8px);
+    @apply flex gap-2 p-2;
+    .quote-icon{
+      @apply stroke-gray-5 mt-1;
+    }
+
+
+    .affine-paragraph-placeholder{
+      bottom: unset !important;
+      @apply ps-9 text-gray-5;
+    }
+
+  }
+
+
+
   /* affine-database-table{
      //width: 100%;
    }*/

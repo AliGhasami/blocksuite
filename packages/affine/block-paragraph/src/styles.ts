@@ -231,23 +231,23 @@ export const mahdaadParagraphBlockStyles = css`
   }
 
   .claytap-quote {
-    line-height: 26px;
+    /*line-height: 26px;
     padding-left: 17px;
     margin-top: var(--affine-paragraph-space);
     padding-top: 10px;
     padding-bottom: 10px;
-    position: relative;
+    position: relative;*/
   }
   .claytap-quote::after {
     content: '';
     width: 2px;
-    height: calc(100% - 20px);
-    margin-top: 10px;
-    margin-bottom: 10px;
+    height: 100%;  /*calc(100% - 20px);*/
+    /*margin-top: 10px;*/
+    /*margin-bottom: 10px;*/
     position: absolute;
     left: 0;
     top: 0;
-    background: var(--affine-quote-color);
+    //background: var(--affine-quote-color);
     border-radius: 18px;
   }
 

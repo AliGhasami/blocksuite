@@ -61,7 +61,10 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     super();
   }
 
+  //todo ali ghasami for migrate to event bus
   addObjectLink(model: BlockModel, lnk: ObjectLink) {
+   // console.log("bbbbb");
+    //return;
     //console.log('111', model.doc.getSchemaByFlavour('affine:mahdaad-object'));
     if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
       return;
@@ -86,13 +89,17 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
     //model.doc.addBlocks()
     //console.log('this', model.text?.length);
-    setTimeout(()=>{
+
+    //return;
+    /*setTimeout(()=>{
       if (model.text?.length == 0) {
         model.doc.deleteBlock(this.model);
       }
-    },10)
+    },10)*/
     const next = model.doc.getNext(temp[0]);
-    if (next) {
+    //console.log("cccc",next);
+    if (next && this.editorHost) {
+      //console.log("host",this.editorHost);
       const inline: InlineEditor | null = getInlineEditorByModel(
         this.editorHost,
         next

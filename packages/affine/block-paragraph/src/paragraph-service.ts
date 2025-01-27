@@ -19,10 +19,13 @@ export class ParagraphBlockService extends BlockService {
             ${t('for_block_types')}
           </span>
         </div>
-        <!-- TODO ali ghasami  -->
         <div>&nbsp;</div>
       </div>`;
       // return "Type '/' for commands";
+    }
+
+    if(model.type=='quote'){
+      return t('quote_placeholder') as string
     }
 
     const placeholders = {
@@ -32,7 +35,7 @@ export class ParagraphBlockService extends BlockService {
       h4: 'Heading 4',
       h5: 'Heading 5',
       h6: 'Heading 6',
-      quote: '',
+      //quote: '',
     };
     return placeholders[model.type];
   };

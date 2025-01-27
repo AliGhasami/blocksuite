@@ -3,6 +3,7 @@ export default {
     translation: {
       typing_placeholder: 'Start typing or Press',
       for_block_types : 'for block types',
+      quote_placeholder: 'Start typing a quote',
       /*text:'Text',
       normal_text:'Normal Text',
       basic:'Basic',
@@ -47,6 +48,7 @@ export default {
   fa: {
     translation: {
       typing_placeholder: 'شروع به تایپ کنید یا دکمه',
+      quote_placeholder: 'شروع به تایپ یک نقل قول کنید',
       for_block_types : 'برای انتخاب بلاک بزنید',
       /*text:'text',
       normal_text:'متن Normal',
