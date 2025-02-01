@@ -900,8 +900,12 @@ async function init() {
           const rootId = doc.addBlock('affine:page')
           doc.addBlock('affine:surface', {}, rootId)
           if (!props.isBoardView) {
+            console.log("aaaaa");
             const noteId = doc.addBlock('affine:note', {}, rootId)
             doc.addBlock('affine:paragraph', {}, noteId)
+
+            const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
+            doc.addBlock('affine:paragraph', {}, temp1)
           }
           doc.resetHistory()
         }

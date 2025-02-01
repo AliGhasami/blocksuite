@@ -105,6 +105,7 @@ import {
 } from './image-block/index.js';
 import { effects as blockLatexEffects } from './latex-block/effects.js';
 import { LatexBlockComponent } from './latex-block/index.js';
+import {MahdaadCalloutBlockComponent} from './mahdaad-callout-block/index.js'
 import { ObjectBlockComponent , type ObjectBlockService} from './mahdaad-object-block/index.js';
 import { MahdaadWeblinkBlockComponent } from './mahdaad-weblink-block/index.js';
 import {
@@ -510,6 +511,7 @@ export function effects() {
   customElements.define('edgeless-color-picker', EdgelessColorPicker);
   customElements.define('overlay-scrollbar', OverlayScrollbar);
   customElements.define('affine-note', NoteBlockComponent);
+  customElements.define('affine-mahdaad-callout', MahdaadCalloutBlockComponent);
   customElements.define('affine-template-loading', AffineTemplateLoading);
   customElements.define(
     'edgeless-color-picker-button',

@@ -20,8 +20,8 @@ import {
   type StrokeStyle,
 } from '../../consts/index.js';
 
-export const NoteBlockSchema = defineBlockSchema({
-  flavour: 'affine:note',
+export const MahdaadCalloutBlockSchema = defineBlockSchema({
+  flavour: 'affine:mahdaad-callout',
   props: (): NoteProps => ({
     xywh: `[0,0,${DEFAULT_NOTE_WIDTH},${DEFAULT_NOTE_HEIGHT}]`,
     background: DEFAULT_NOTE_BACKGROUND_COLOR,
@@ -41,7 +41,7 @@ export const NoteBlockSchema = defineBlockSchema({
   metadata: {
     version: 1,
     role: 'hub',
-    parent: ['affine:page','affine:note'],
+    parent: ['affine:note'],
     children: [
       'affine:paragraph',
       'affine:list',
@@ -60,12 +60,11 @@ export const NoteBlockSchema = defineBlockSchema({
       'affine:surface-ref',
       'affine:embed-*',
       'affine:latex',
-      'affine:note',
-      'affine:mahdaad-callout',
+      //'affine:note'
     ],
   },
   toModel: () => {
-    return new NoteBlockModel();
+    return new MahdaadCalloutBlockModel();
   },
 });
 
@@ -96,7 +95,7 @@ export type NoteEdgelessProps = {
   scale?: number;
 };
 
-export class NoteBlockModel
+export class MahdaadCalloutBlockModel
   extends GfxCompatible<NoteProps>(BlockModel)
   implements GfxElementGeometry
 {
@@ -125,10 +124,10 @@ export class NoteBlockModel
 declare global {
   namespace BlockSuite {
     interface BlockModels {
-      'affine:note': NoteBlockModel;
+      'affine:mahdaad-callout': MahdaadCalloutBlockModel;
     }
-    interface EdgelessBlockModelMap {
+    /*interface EdgelessBlockModelMap {
       'affine:note': NoteBlockModel;
-    }
+    }*/
   }
 }
