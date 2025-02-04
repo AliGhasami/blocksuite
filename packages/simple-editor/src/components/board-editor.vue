@@ -1052,6 +1052,7 @@ async function init() {
     @apply bg-gray-05;
     &::after{
       @apply bg-gray-2;
+      inset-inline-start:0;
     }
   }
 

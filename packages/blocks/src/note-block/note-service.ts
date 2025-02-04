@@ -416,6 +416,7 @@ export class NoteBlockService extends BlockService {
   };
 
   private _onEnter = (ctx: UIEventStateContext) => {
+    //debugger
     const event = ctx.get('defaultState').event;
     const [result] = this._std.command
       .chain()

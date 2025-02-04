@@ -12,6 +12,8 @@ import {
 export const ParagraphDragHandleOption = DragHandleConfigExtension({
   flavour: ParagraphBlockSchema.model.flavour,
   onDragStart: ({ state, startDragging, anchorBlockId, editorHost }) => {
+    console.log("paraghraph onDragStart");
+    debugger
     if (!anchorBlockId) return false;
 
     const element = captureEventTarget(state.raw.target);
@@ -38,6 +40,9 @@ export const ParagraphDragHandleOption = DragHandleConfigExtension({
     return false;
   },
   onDragEnd: ({ draggingElements }) => {
+    console.log("paraghraph onDragEnd");
+    debugger
+
     draggingElements
       .filter(el => matchFlavours(el.model, ['affine:paragraph']))
       .forEach(el => {

@@ -69,6 +69,12 @@ export interface MahdaadActionMenu {
 
 export const actionsMenu: MahdaadActionMenu[] = [
   {
+    key: 'callout',
+    action: ({ rootComponent }) => {
+      runCommand(rootComponent, 'affine:mahdaad-callout', 'info');
+    },
+  },
+  {
     key: 'text',
     action: ({ rootComponent }) => {
       runCommand(rootComponent, 'affine:paragraph', 'text');
