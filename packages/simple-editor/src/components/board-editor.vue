@@ -904,8 +904,8 @@ async function init() {
             const noteId = doc.addBlock('affine:note', {}, rootId)
             doc.addBlock('affine:paragraph', {}, noteId)
 
-            const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
-            doc.addBlock('affine:paragraph', {}, temp1)
+            //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
+            //doc.addBlock('affine:paragraph', {}, temp1)
           }
           doc.resetHistory()
         }

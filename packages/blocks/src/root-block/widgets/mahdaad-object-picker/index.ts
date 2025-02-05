@@ -194,12 +194,9 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
   };
 
   private _onBeforeInput = (ctx: UIEventStateContext) => {
-    //console.log('1111');
     //const eventState = ctx.get('defaultState');
     //const event = eventState.event as InputEvent;
-
     //const triggerKey = event.data;
-    //console.log('1111', triggerKey);
     //if (!triggerKey || !this.config.triggerKeys.includes(triggerKey)) return;
     const textSelection = this.host.selection.find('text');
     if (!textSelection) return;

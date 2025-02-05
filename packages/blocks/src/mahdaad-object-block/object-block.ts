@@ -49,7 +49,8 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
 
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
-    if (['document', 'weblink'].includes(this.model.type) && mode == 'inline') {
+    console.log("111111",this.model.type);
+    if (['document', 'image','weblink'].includes(this.model.type) && mode == 'inline') {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);
       assertExists(parent);

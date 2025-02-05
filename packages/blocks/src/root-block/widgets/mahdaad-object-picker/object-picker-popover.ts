@@ -65,12 +65,10 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   addObjectLink(model: BlockModel, lnk: ObjectLink) {
    // console.log("bbbbb");
     //return;
-    //console.log('111', model.doc.getSchemaByFlavour('affine:mahdaad-object'));
     if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
       return;
     }
 
-    //console.log('11111', lnk);
     /*insertContent(this.editorHost, this.model, REFERENCE_NODE, {
       mahdaadObjectLink: {
         object_id: lnk.object_id,
@@ -78,7 +76,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         type: lnk.type,
       },
     });*/
-    //return;
 
     const temp = model.doc.addSiblingBlocks(this.model, [
       {
