@@ -7,6 +7,12 @@ import { generateDocUrl } from '@blocksuite/affine-block-embed';
 
 const EventIcon=`<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="1em" height="1em" viewBox="0 0 24 24" class="iconify iconify--tabler"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1m6-10.273A11.05 11.05 0 0 0 18.206 3M3 6.727A11.05 11.05 0 0 1 5.792 3"></path></svg>`
 
+
+function convertVWToPX(vw: number) {
+  const viewportWidth = 2480//window.innerWidth
+  return (vw * viewportWidth) / 100
+}
+
 export const boldDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher = {
   name: 'bold',
   match: delta => !!delta.attributes?.bold,
@@ -280,17 +286,48 @@ export const objectDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher =
       const object=objectList.find(item=> item._id==objectId);
       if(!object || (object.status && (object.status=='403'||object.status=='404')))
         return
+
+      //@ts-ignore
+      const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
+      //@ts-ignore
+      const minioStorageImageUrl=context.configs.get('mahdaad_config')?.minioStorageImageUrl ?? ''
+
       //@ts-ignore
       //const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
       //console.log("object",object,o.node.props);
+      const children= []
 
-      return {
-        type: 'element',
-        tagName: 'span',
-        properties: {
-          className: ['mahdaad-object-link-inline',object?.object_type,object.object_type=='file' ? object.meta.type : ''],
-        },
-        children: [{
+      if(object.object_type=='image'){
+
+        /*const _blockContainerWidth =   //blockContainerWidth.value - 15
+        const imageOriginalSize = getImageOriginalSize()
+        const temp = meta.value.width
+          ? Math.min(convertVWToPX(meta.value.width), _blockContainerWidth)
+          : Math.min(imageOriginalSize.width, _blockContainerWidth)
+        element.value.width = temp.toString() //imageOriginalSize.width.toString()
+        element.value.height = (
+          meta.value.width
+            ? +element.value.width * meta.value.aspectRatio
+            : +element.value.width * imageOriginalSize.aspectRatio
+        ).toString()*/
+          const meta=delta.attributes?.mahdaadObjectLink?.meta ?? {}
+
+          const width=convertVWToPX(meta.width)
+
+          const style=meta.width  ?
+            `width:${width}px;height:${width * meta.aspectRatio}px` : ``
+        console.log("1111",meta,style);
+
+          children.push(...[{
+            type:'element',
+            tagName: 'img',
+            properties:{
+              src: object.meta &&  object.meta.bucket_name ? `${minioStorageImageUrl}/${object.meta.storage}` :  `${storageUrl}/${object.meta.storage}`,
+              style
+            },
+          }])
+      }else{
+        children.push(...[{
           type: 'element',
           tagName: 'span',
           properties:{
@@ -310,7 +347,16 @@ export const objectDeltaToHtmlAdapterMatcher: InlineDeltaToHtmlAdapterMatcher =
               type:'text',
               value:object.title
             }]
-          }],
+          }])
+      }
+
+      return {
+        type: 'element',
+        tagName: 'span',
+        properties: {
+          className: ['mahdaad-object-link-inline',object?.object_type,object.object_type=='file' ? object.meta.type : ''],
+        },
+        children,
       };
     },
   };

@@ -216,6 +216,7 @@ export const MahdaadObjectLinkSpecExtension = InlineSpecExtension({
       link_id: z.union([z.string(), z.number(), z.undefined()]),
       //link_id: z.string(),
       type: z.string(),
+      meta: z.any().optional(),
     })
     .optional()
     .nullable()

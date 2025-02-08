@@ -1080,13 +1080,14 @@ function runCommand(
   flavour: BlockSuite.Flavour,
   type?: string
 ) {
-  rootComponent.std.command
+  const aa =  rootComponent.std.command
     .chain()
     .updateBlockType({
       flavour,
       props: { type },
     })
     .run();
+  console.log('aa',aa);
 
   /* rootElement.host.std.command
     .chain()

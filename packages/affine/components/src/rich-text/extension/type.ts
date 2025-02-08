@@ -43,6 +43,7 @@ export interface AffineTextAttributes {
     object_id: string;
     link_id: string | number | undefined;
     type: string;
+    meta?:Record<string, string | null | number> | undefined
   } | null;
   date?: DateTimeEvent;
 }

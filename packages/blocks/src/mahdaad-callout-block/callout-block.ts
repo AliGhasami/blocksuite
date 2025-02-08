@@ -39,7 +39,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
 
 
   override renderBlock() {
-    console.log('this is load ', this._isLoad);
+    //console.log('this is load ', this._isLoad);
     //const temp = this.renderChildren(this.model);
     //const a=
     return html`

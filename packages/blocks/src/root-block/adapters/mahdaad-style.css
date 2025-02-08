@@ -499,6 +499,9 @@ blockquote {
   padding-left: var(--mt-space-015, 6px);
   padding-right: var(--mt-space-015, 6px);
 }
+.mahdaad-object-link-inline.image {
+  display: inline;
+}
 .mahdaad-date-time {
   display: inline-flex;
   padding: var(--pta-space-200, 4px) var(--pta-space-300, 6px);

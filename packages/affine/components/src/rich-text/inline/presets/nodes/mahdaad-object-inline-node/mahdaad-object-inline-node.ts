@@ -12,7 +12,7 @@ import {
 } from '@blocksuite/inline';
 import { html } from 'lit';
 import {  property } from 'lit/decorators.js';
-
+import {merge,cloneDeep} from 'lodash-es'
 import { Peekable } from '../../../../../peek/index.js';
 import { REFERENCE_NODE } from '../consts.js';
 
@@ -139,6 +139,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
 
   override render() {
     const meta = this.getMeta();
+
     return html`<span
       data-selected=${this.selected}
       class="mahdaad-object-link-inline"
@@ -152,10 +153,44 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
         show-type="inline"
         @changeViewMode="${this.changeViewMode}"
         @convertToLink="${this._convertLink}"
+        @updateProps="${this.updateProps}"
+        meta="${JSON.stringify(meta?.meta ?? {})}"
       ></mahdaad-object-link-component
       ><v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
     ></span>`;
   }
+
+  updateProps(event){
+    const data = event?.detail;
+    const format = this.inlineEditor.getFormat(this.selfInlineRange);
+    if(format.mahdaadObjectLink){
+      merge(format.mahdaadObjectLink,{meta:data.meta})
+    }
+    console.log("this is format",format,cloneDeep(format));
+    //
+    this.inlineEditor.formatText(this.selfInlineRange, {
+      ...cloneDeep(format)  /*{
+        object_id: '11111',
+        link_id: '225',
+        type: 'image',
+        //meta?:Record<string, string | null | number> | undefined
+      } //cloneDeep(format.mahdaadObjectLink)*/
+    });
+    /*if (data && data.key && data.hasOwnProperty('value')) {
+
+      if (format?.date?.id) {
+        const date = JSON.parse(JSON.stringify(format.date));
+        const {value, key} = data
+        if (value === undefined && date[key] !== undefined)
+          delete date[key];
+        else date[key] = value
+        this.inlineEditor.formatText(this.selfInlineRange, {
+          date,
+        });
+      }
+    }*/
+  }
+
 
   @property({ type: Object })
   accessor delta: DeltaInsert<AffineTextAttributes> = {
