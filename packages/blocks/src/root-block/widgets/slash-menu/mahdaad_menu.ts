@@ -71,7 +71,30 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'callout',
     action: ({ rootComponent }) => {
-      runCommand(rootComponent, 'affine:mahdaad-callout', 'info');
+
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertCalloutBlock({
+          type:'info'
+          //viewType: viewPresets.tableViewMeta.type,
+          //place: 'after',
+          //removeEmptyLine: true,
+        })
+        .run();
+
+      //runCommand(rootComponent, 'affine:mahdaad-callout', 'info');
+      /*const aa =  rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-callout',
+          props: { type:'info' },
+        })
+        .run();
+      console.log('aa',aa);*/
+
+
+
     },
   },
   {
@@ -1080,14 +1103,17 @@ function runCommand(
   flavour: BlockSuite.Flavour,
   type?: string
 ) {
-  const aa =  rootComponent.std.command
+  rootComponent.std.command
     .chain()
     .updateBlockType({
       flavour,
       props: { type },
     })
     .run();
-  console.log('aa',aa);
+  //console.log('aa',aa);
+  //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
+  //doc.addBlock('affine:paragraph', {}, temp1)
+  //debugger
 
   /* rootElement.host.std.command
     .chain()

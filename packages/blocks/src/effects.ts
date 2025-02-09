@@ -74,6 +74,7 @@ import { DatabaseTitle } from './database-block/components/title/index.js';
 import { BlockRenderer } from './database-block/detail-panel/block-renderer.js';
 import { NoteRenderer } from './database-block/detail-panel/note-renderer.js';
 import { effects as blockDatabaseEffects } from './database-block/effects.js';
+import { effects as blockMahdaadCalloutEffects } from './mahdaad-callout-block/effects.js';
 import {
   DatabaseBlockComponent,
   type DatabaseBlockService,
@@ -319,6 +320,7 @@ export function effects() {
   blockDatabaseEffects();
   blockSurfaceRefEffects();
   blockLatexEffects();
+  blockMahdaadCalloutEffects()
 
   componentCaptionEffects();
   componentContextMenuEffects();

@@ -20,5 +20,4 @@ export const PageEditorBlockSpecs: ExtensionType[] = [
   ObjectBlockSpec,
   MahdaadWeblinkBlockSpec,
   MahdaadCalloutBlockSpec
-
 ].flat();

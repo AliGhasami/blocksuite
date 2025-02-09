@@ -149,7 +149,7 @@ export class AffineSlashMenuWidget extends WidgetComponent {
     };
 
     const rootComponent = this.block;
-    console.log("rootComponent",rootComponent);
+    //console.log("rootComponent",rootComponent);
     if (rootComponent.model.flavour !== 'affine:page') {
       console.error('SlashMenuWidget should be used in RootBlock');
       return;

@@ -28,3 +28,4 @@ export const MahdaadCalloutBlockSpec: ExtensionType[] = [
   NoteDragHandleOption,
   EdgelessNoteBlockAdapterExtensions,
 ].flat();*/
+
