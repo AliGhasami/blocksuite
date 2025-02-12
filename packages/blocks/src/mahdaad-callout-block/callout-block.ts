@@ -3,6 +3,7 @@ import type { MahdaadCalloutBlockModel } from '@blocksuite/affine-model';
 import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
+import {pick} from 'lodash-es'
 
 import type { MahdaadCalloutBlockService } from './callout-service.js';
 
@@ -32,20 +33,31 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
 
   //isLoad=false
 
+  changeProps(event:CustomEvent) {
+    const data=event.detail[0]
+    if(data) {
+      const normal=pick(data,['type','icon','background'])
+      this.doc.updateBlock(this.model,{
+        ...normal
+      })
+    }
+  }
+
   override connectedCallback() {
     super.connectedCallback();
   }
-  //protected _isLoad: boolean = false;
 
 
   override renderBlock() {
-    //console.log('this is load ', this._isLoad);
-    //const temp = this.renderChildren(this.model);
-    //const a=
+    //const props=this.model
+    //console.log("props",props);
     return html`
       <mahdaad-callout-component
+        type="${this.model.type}"
+        background="${this.model.background}"
+        icon="${this.model.icon}"
+        @changeProps="${this.changeProps}"
         @mount="${() => {
-          //console.log('mount event');
           this._isLoad = true;
         }}"
       >

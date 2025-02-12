@@ -89,5 +89,6 @@ export interface AffineTextAttributes {
     link_id?: string | number | null,
     type: string,
     meta:Record<string, string | null | number>
-  }
+  },
+  TestInline:Record<string, string | null | number>
 }

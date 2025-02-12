@@ -28,7 +28,8 @@ import {
   ObjectBlockSchema,
   ParagraphBlockSchema,
   RootBlockSchema,
-  SurfaceRefBlockSchema
+  SurfaceRefBlockSchema,
+  TestBlockSchema
 } from '@blocksuite/affine-model';
 
 import { DataViewBlockSchema } from './data-view-block/data-view-model.js';
@@ -63,5 +64,6 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   HintBlockSchema,
   ObjectBlockSchema,
   MahdaadWeblinkBlockSchema,
-  MahdaadCalloutBlockSchema
+  MahdaadCalloutBlockSchema,
+  TestBlockSchema
 ];

@@ -143,21 +143,10 @@ export class TestInline extends WithDisposable(ShadowlessElement) {
 
     return html`<span
       data-selected=${this.selected}
-      class="mahdaad-object-link-inline"
-      ><mahdaad-object-link-component
-        style="display: inline"
-        read-only="false"
-        object-id="${meta?.object_id}"
-        link-id="${meta?.link_id}"
-        parent-id="${this.parentId()}"
-        type="${meta?.type}"
-        show-type="inline"
-        @changeViewMode="${this.changeViewMode}"
-        @convertToLink="${this._convertLink}"
-        @updateProps="${this.updateProps}"
-        meta="${JSON.stringify(meta?.meta ?? {})}"
-      ></mahdaad-object-link-component
-      ><v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
+      class="test-inline"
+      >test inline
+      <mahdaad-test-block-component></mahdaad-test-block-component>
+      <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
     ></span>`;
   }
 

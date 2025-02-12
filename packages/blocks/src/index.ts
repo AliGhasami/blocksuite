@@ -31,8 +31,8 @@ export * from './frame-block/index.js';
 export * from './image-block/index.js';
 export * from './latex-block/index.js';
 export * from './mahdaad-callout-block/index.js';
-import './mahdaad-object-block/index.js';
 export * from  './mahdaad-object-block/index.js';
+import './mahdaad-object-block/index.js';
 export * from './mahdaad-weblink-block/index.js';
 export * from './note-block/index.js';
 export { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
@@ -46,8 +46,8 @@ export {
   FrameOverlay,
 } from './root-block/edgeless/frame-manager.js';
 export { CopilotTool } from './root-block/edgeless/gfx-tool/copilot-tool.js';
-
 export * from './root-block/edgeless/gfx-tool/index.js';
+
 export { EditPropsMiddlewareBuilder } from './root-block/edgeless/middlewares/base.js';
 export * from './root-block/edgeless/utils/common.js';
 export { EdgelessSnapManager } from './root-block/edgeless/utils/snap-manager.js';
@@ -59,6 +59,7 @@ export {
   MiniMindmapPreview,
 } from './surface-block/mini-mindmap/index.js';
 export * from './surface-ref-block/index.js';
+export * from './test-block/index.js'
 export * from '@blocksuite/affine-block-embed';
 export * from '@blocksuite/affine-block-list';
 export * from '@blocksuite/affine-block-paragraph';

@@ -1,1 +1,1 @@
-export * from './object-model.js';
+export * from './test-block-model.js';

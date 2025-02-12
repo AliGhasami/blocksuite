@@ -69,32 +69,51 @@ export interface MahdaadActionMenu {
 
 export const actionsMenu: MahdaadActionMenu[] = [
   {
+    key: 'test',
+    action: ({ rootComponent,model }) => {
+      //rootComponent.doc.addSiblingBlocks()
+
+      insertContent(rootComponent.host, model, REFERENCE_NODE, {
+       TestInline:{aa:'bb'}
+      });
+     /* rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:test-block',
+          props: {  },
+        })
+        .run();*/
+
+      /*      rootComponent.std.command
+              .chain()
+              .getSelectedModels()
+              .insertCalloutBlock({
+                type:'info'
+              })
+              .run();*/
+    },
+  },
+  {
     key: 'callout',
     action: ({ rootComponent }) => {
+      //rootComponent.doc.addSiblingBlocks()
+
+
+/*      rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:test-block',
+          props: {  },
+        })
+        .run();*/
 
       rootComponent.std.command
         .chain()
         .getSelectedModels()
         .insertCalloutBlock({
           type:'info'
-          //viewType: viewPresets.tableViewMeta.type,
-          //place: 'after',
-          //removeEmptyLine: true,
         })
         .run();
-
-      //runCommand(rootComponent, 'affine:mahdaad-callout', 'info');
-      /*const aa =  rootComponent.std.command
-        .chain()
-        .updateBlockType({
-          flavour:'affine:mahdaad-callout',
-          props: { type:'info' },
-        })
-        .run();
-      console.log('aa',aa);*/
-
-
-
     },
   },
   {

@@ -235,6 +235,39 @@ export const MahdaadObjectLinkSpecExtension = InlineSpecExtension({
   embed:true
 });
 
+export const TestInlineSpecExtension = InlineSpecExtension({
+  name: 'TestInline',
+  schema: z
+    .object({
+      //name: z.string(),
+      //user_id: z.string(),
+      //id: z.string(),
+      //object_id: z.string(),
+      //link_id: z.union([z.string(), z.number(), z.undefined()]),
+      //link_id: z.string(),
+      //type: z.string(),
+      //meta: z.any().optional(),
+    })
+    .optional()
+    .nullable()
+    .catch(undefined),
+  match: delta => {
+    return !!delta.attributes?.TestInline;
+  },
+  renderer: ({ delta, selected }) => {
+    //.config=${referenceNodeConfig}
+    return html`<test-inline
+      style="display: inline-block"
+      .delta=${delta}
+      .selected=${selected}
+    ></test-inline>`;
+  },
+  embed:true
+});
+
+
+
+
 // TODO return if has bug
 // this attr is for not change cursor position on input keyup in inline elements
 export const MahdaadDateTimeSpecExtension = InlineSpecExtension({
@@ -271,6 +304,9 @@ export const LinkInlineSpecExtension = InlineSpecExtension({
 });
 
 
+
+
+
 export const InlineSpecExtensions = [
   BoldInlineSpecExtension,
   ItalicInlineSpecExtension,
@@ -285,5 +321,6 @@ export const InlineSpecExtensions = [
   LatexEditorUnitSpecExtension,
   MahdaadMentionSpecExtension,
   MahdaadObjectLinkSpecExtension,
-  MahdaadDateTimeSpecExtension
+  MahdaadDateTimeSpecExtension,
+  TestInlineSpecExtension
 ];

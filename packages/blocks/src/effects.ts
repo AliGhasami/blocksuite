@@ -74,7 +74,6 @@ import { DatabaseTitle } from './database-block/components/title/index.js';
 import { BlockRenderer } from './database-block/detail-panel/block-renderer.js';
 import { NoteRenderer } from './database-block/detail-panel/note-renderer.js';
 import { effects as blockDatabaseEffects } from './database-block/effects.js';
-import { effects as blockMahdaadCalloutEffects } from './mahdaad-callout-block/effects.js';
 import {
   DatabaseBlockComponent,
   type DatabaseBlockService,
@@ -106,6 +105,7 @@ import {
 } from './image-block/index.js';
 import { effects as blockLatexEffects } from './latex-block/effects.js';
 import { LatexBlockComponent } from './latex-block/index.js';
+import { effects as blockMahdaadCalloutEffects } from './mahdaad-callout-block/effects.js';
 import {MahdaadCalloutBlockComponent} from './mahdaad-callout-block/index.js'
 import { ObjectBlockComponent , type ObjectBlockService} from './mahdaad-object-block/index.js';
 import { MahdaadWeblinkBlockComponent } from './mahdaad-weblink-block/index.js';
@@ -158,6 +158,7 @@ import {
   EdgelessSelectedRectWidget,
 } from './root-block/edgeless/components/rects/edgeless-selected-rect.js';
 import { EdgelessConnectorLabelEditor } from './root-block/edgeless/components/text/edgeless-connector-label-editor.js';
+import {TestBlockComponent} from './test-block/test-block.js'
 // TODO
 import { EdgelessFrameTitleEditor } from './root-block/edgeless/components/text/edgeless-frame-title-editor.js';
 import { EdgelessGroupTitleEditor } from './root-block/edgeless/components/text/edgeless-group-title-editor.js';
@@ -514,6 +515,7 @@ export function effects() {
   customElements.define('overlay-scrollbar', OverlayScrollbar);
   customElements.define('affine-note', NoteBlockComponent);
   customElements.define('affine-mahdaad-callout', MahdaadCalloutBlockComponent);
+  customElements.define('affine-test-block', TestBlockComponent);
   customElements.define('affine-template-loading', AffineTemplateLoading);
   customElements.define(
     'edgeless-color-picker-button',

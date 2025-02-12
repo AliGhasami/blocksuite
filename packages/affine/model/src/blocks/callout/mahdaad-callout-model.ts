@@ -1,42 +1,48 @@
-import type {
+/*import type {
   GfxCompatibleProps,
   GfxElementGeometry,
-} from '@blocksuite/block-std/gfx';
+} from '@blocksuite/block-std/gfx';*/
 
-import { GfxCompatible } from '@blocksuite/block-std/gfx';
-import { Bound } from '@blocksuite/global/utils';
-import { BlockModel, defineBlockSchema } from '@blocksuite/store';
+/*import { GfxCompatible } from '@blocksuite/block-std/gfx';
+import { Bound } from '@blocksuite/global/utils';*/
+import {
+  //BlockModel,
+  defineBlockSchema, type SchemaToModel } from '@blocksuite/store';
 
 import {
-  type Color,
-  DEFAULT_NOTE_BACKGROUND_COLOR,
+  //type Color,
+  /*DEFAULT_NOTE_BACKGROUND_COLOR,
   DEFAULT_NOTE_BORDER_SIZE,
   DEFAULT_NOTE_BORDER_STYLE,
   DEFAULT_NOTE_CORNER,
   DEFAULT_NOTE_HEIGHT,
   DEFAULT_NOTE_SHADOW,
-  DEFAULT_NOTE_WIDTH,
-  NoteDisplayMode,
+  DEFAULT_NOTE_WIDTH,*/
+  //NoteDisplayMode,
   type StrokeStyle,
 } from '../../consts/index.js';
+//import { CodeBlockSchema } from '../code/index.js';
 
 export const MahdaadCalloutBlockSchema = defineBlockSchema({
   flavour: 'affine:mahdaad-callout',
-  props: (): NoteProps => ({
-    xywh: `[0,0,${DEFAULT_NOTE_WIDTH},${DEFAULT_NOTE_HEIGHT}]`,
-    background: DEFAULT_NOTE_BACKGROUND_COLOR,
-    index: 'a0',
-    lockedBySelf: false,
-    hidden: false,
-    displayMode: NoteDisplayMode.DocAndEdgeless,
-    edgeless: {
+  props: (): CalloutProps => ({
+    type:'info',
+    icon:null,
+    background:null,
+    //xywh: `[0,0,${DEFAULT_NOTE_WIDTH},${DEFAULT_NOTE_HEIGHT}]`,
+    //background: DEFAULT_NOTE_BACKGROUND_COLOR,
+    //index: 'a0',
+    //lockedBySelf: false,
+    //hidden: false,
+    //displayMode: NoteDisplayMode.DocAndEdgeless,
+    /*edgeless: {
       style: {
         borderRadius: DEFAULT_NOTE_CORNER,
         borderSize: DEFAULT_NOTE_BORDER_SIZE,
         borderStyle: DEFAULT_NOTE_BORDER_STYLE,
         shadowType: DEFAULT_NOTE_SHADOW,
       },
-    },
+    },*/
   }),
   metadata: {
     version: 1,
@@ -63,15 +69,18 @@ export const MahdaadCalloutBlockSchema = defineBlockSchema({
       //'affine:note'
     ],
   },
-  toModel: () => {
+  /*toModel: () => {
     return new MahdaadCalloutBlockModel();
-  },
+  },*/
 });
 
-export type NoteProps = {
-  background: Color;
+export type CalloutProps = {
+  type?:string | null,
+  background?:string | null,
+  icon?:string | null,
+  /*background: Color;
   displayMode: NoteDisplayMode;
-  edgeless: NoteEdgelessProps;
+  edgeless: NoteEdgelessProps;*/
   /**
    * @deprecated
    * use `displayMode` instead
@@ -80,8 +89,8 @@ export type NoteProps = {
    * hidden:false -> displayMode:NoteDisplayMode.DocAndEdgeless:
    *  means the note is visible in the doc and edgeless mode
    */
-  hidden: boolean;
-} & GfxCompatibleProps;
+  //hidden: boolean;
+} //& GfxCompatibleProps;
 
 export type NoteEdgelessProps = {
   style: {
@@ -95,12 +104,17 @@ export type NoteEdgelessProps = {
   scale?: number;
 };
 
-export class MahdaadCalloutBlockModel
-  extends GfxCompatible<NoteProps>(BlockModel)
+
+export type MahdaadCalloutBlockModel = SchemaToModel<typeof MahdaadCalloutBlockSchema>;
+
+/*export class MahdaadCalloutBlockModel
+  extends GfxCompatible<CalloutProps>(BlockModel)
   implements GfxElementGeometry
 {
   private _isSelectable(): boolean {
-    return this.displayMode !== NoteDisplayMode.DocOnly;
+    //todo check after ali ghasami
+    return  false
+    //return this.displayMode !== NoteDisplayMode.DocOnly;
   }
 
   override containsBound(bounds: Bound): boolean {
@@ -111,15 +125,16 @@ export class MahdaadCalloutBlockModel
   override includesPoint(x: number, y: number): boolean {
     if (!this._isSelectable()) return false;
 
-    const bound = Bound.deserialize(this.xywh);
-    return bound.isPointInBound([x, y], 0);
+    /!*const bound = Bound.deserialize(this.xywh);
+    return bound.isPointInBound([x, y], 0);*!/
+    return false
   }
 
   override intersectsBound(bound: Bound): boolean {
     if (!this._isSelectable()) return false;
     return super.intersectsBound(bound);
   }
-}
+}*/
 
 declare global {
   namespace BlockSuite {
