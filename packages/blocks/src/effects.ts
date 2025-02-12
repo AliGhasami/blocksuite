@@ -158,7 +158,6 @@ import {
   EdgelessSelectedRectWidget,
 } from './root-block/edgeless/components/rects/edgeless-selected-rect.js';
 import { EdgelessConnectorLabelEditor } from './root-block/edgeless/components/text/edgeless-connector-label-editor.js';
-import {TestBlockComponent} from './test-block/test-block.js'
 // TODO
 import { EdgelessFrameTitleEditor } from './root-block/edgeless/components/text/edgeless-frame-title-editor.js';
 import { EdgelessGroupTitleEditor } from './root-block/edgeless/components/text/edgeless-group-title-editor.js';
@@ -515,7 +514,6 @@ export function effects() {
   customElements.define('overlay-scrollbar', OverlayScrollbar);
   customElements.define('affine-note', NoteBlockComponent);
   customElements.define('affine-mahdaad-callout', MahdaadCalloutBlockComponent);
-  customElements.define('affine-test-block', TestBlockComponent);
   customElements.define('affine-template-loading', AffineTemplateLoading);
   customElements.define(
     'edgeless-color-picker-button',

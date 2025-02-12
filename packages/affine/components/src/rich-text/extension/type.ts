@@ -46,7 +46,6 @@ export interface AffineTextAttributes {
     meta?:Record<string, string | null | number> | undefined
   } | null;
   date?: DateTimeEvent;
-  TestInline?:Record<string, string>
 }
 
 export type InlineSpecs<

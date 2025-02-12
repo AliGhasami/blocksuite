@@ -27,7 +27,6 @@ import { LatexEditorUnit } from './inline/presets/nodes/latex-node/latex-editor-
 import { AffineLatexNode } from './inline/presets/nodes/latex-node/latex-node.js';
 import {MahdaadDateTimeInline} from './inline/presets/nodes/mahdaad-date-time-node/index.js'
 import {MahdaadObjectLinkInline} from './inline/presets/nodes/mahdaad-object-inline-node/mahdaad-object-inline-node.js'
-import {TestInline} from './inline/presets/nodes/mahdaad-test-inline-node/mahdaad-test-inline-node.js'
 //import { LinkPopup } from './inline/presets/nodes/link-node/link-popup/link-popup.js';
 import { MahdaadWebLinkPopup } from './inline/presets/nodes/mahdaad-web-link-node/link-popup/link-popup.js';
 import {MahdaadMention} from './inline/presets/nodes/mention-node/index.js'
@@ -48,7 +47,6 @@ export function effects() {
   customElements.define('mahdaad-object-link-inline', MahdaadObjectLinkInline);
   customElements.define('mahdaad-date-time-inline', MahdaadDateTimeInline);
   customElements.define('mahdaad-weblink-node', MahdaadWebLinkNode);
-  customElements.define('test-inline', TestInline);
 }
 
 declare global {

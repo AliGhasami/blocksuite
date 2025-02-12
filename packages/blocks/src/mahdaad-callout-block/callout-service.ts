@@ -22,7 +22,7 @@ export class MahdaadCalloutBlockService extends BlockService {
   private _anchorSel: BlockSelection | null = null;
 
   private _bindMoveBlockHotKey = () => {
-    //debugger
+    debugger
     return moveBlockConfigs.reduce(
       (acc, config) => {
         const keys = config.hotkey.reduce(

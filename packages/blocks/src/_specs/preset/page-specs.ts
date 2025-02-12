@@ -9,7 +9,6 @@ import {ObjectBlockSpec} from '../../mahdaad-object-block/object-spec.js'
 import {MahdaadWeblinkBlockSpec} from '../../mahdaad-weblink-block/weblink-spec.js'
 import { PageRootBlockSpec } from '../../root-block/page/page-root-spec.js';
 import { PageSurfaceRefBlockSpec } from '../../surface-ref-block/surface-ref-spec.js';
-import {TestBlockSpec} from '../../test-block/test-spec.js'
 import { CommonFirstPartyBlockSpecs } from '../common.js';
 export const PageEditorBlockSpecs: ExtensionType[] = [
   PageRootBlockSpec,
@@ -20,6 +19,5 @@ export const PageEditorBlockSpecs: ExtensionType[] = [
   FontLoaderService,
   ObjectBlockSpec,
   MahdaadWeblinkBlockSpec,
-  MahdaadCalloutBlockSpec,
-  TestBlockSpec
+  MahdaadCalloutBlockSpec
 ].flat();
