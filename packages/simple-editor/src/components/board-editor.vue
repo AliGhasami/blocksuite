@@ -900,7 +900,7 @@ async function init() {
           const rootId = doc.addBlock('affine:page')
           doc.addBlock('affine:surface', {}, rootId)
           if (!props.isBoardView) {
-            console.log("aaaaa");
+            //console.log("aaaaa");
             const noteId = doc.addBlock('affine:note', {}, rootId)
             doc.addBlock('affine:paragraph', {}, noteId)
 

@@ -4,7 +4,7 @@ import {
   markdownInput,
   textKeymap,
 } from '@blocksuite/affine-components/rich-text';
-import { ParagraphBlockSchema } from '@blocksuite/affine-model';
+import { MahdaadCalloutBlockSchema, ParagraphBlockSchema } from '@blocksuite/affine-model';
 import {
   calculateCollapsedSiblings,
   matchFlavours,
@@ -20,16 +20,20 @@ export const ParagraphKeymapExtension = KeymapExtension(
     return {
       Backspace: ctx => {
         //console.log("this is Backspace",);
-        //return
         const text = std.selection.find('text');
         if (!text) return;
         const isCollapsed = text.isCollapsed();
         const isStart = isCollapsed && text.from.index === 0;
         if (!isStart) return;
+        //debugger
 
         const { doc } = std;
         const model = doc.getBlock(text.from.blockId)?.model;
         if (!model || !matchFlavours(model, ['affine:paragraph'])) return;
+
+
+
+
 
         // const { model, doc } = this;
         const event = ctx.get('keyboardState').raw;
@@ -43,6 +47,18 @@ export const ParagraphKeymapExtension = KeymapExtension(
           doc.updateBlock(model, { type: 'text' });
           return true;
         }
+
+
+        /*const blockComponent=std.view.getBlock(text.from.blockId)
+        if(blockComponent && blockComponent.closest('.nest-editor')){
+          console.log("this ");
+          debugger
+        }*/
+        //check for callout block
+        if(model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour && model.parent.children.length==1){
+          return true;
+        }
+
 
         const merged = mergeWithPrev(std.host, model);
         if (merged) {
@@ -66,6 +82,30 @@ export const ParagraphKeymapExtension = KeymapExtension(
         if (!inlineRange || !inlineEditor) return;
         const raw = ctx.get('keyboardState').raw;
         raw.preventDefault();
+
+        //todo ali ghasami for check in mac os
+        //for check enter in callout
+        const isLastInCallout= model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour &&
+          model.parent.children.length &&
+          model.parent.children[model.parent.children.length-1]==model
+        if(isLastInCallout){
+          const textStr = model.text.toString();
+          const endWithTwoBlankLines =
+            textStr === '\n' || textStr.endsWith('\n');
+          if (!textStr || endWithTwoBlankLines) {
+            raw.preventDefault();
+            doc.captureSync();
+            const [paragraphId] = doc.addSiblingBlocks(model.parent, [
+              { flavour: 'affine:paragraph' },
+            ]);
+            focusTextModel(std, paragraphId);
+            doc.deleteBlock(model)
+            return true
+          }
+        }
+
+
+
         if (model.type === 'quote') {
           doc.captureSync();
           inlineEditor.insertText(inlineRange, '\n');
@@ -95,6 +135,33 @@ export const ParagraphKeymapExtension = KeymapExtension(
         const raw = ctx.get('keyboardState').raw;
         const isEnd = model.text.length === range.index;
 
+
+       /* if(model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour &&
+          model.parent.children.length &&
+          model.parent.children[model.parent.children.length-1]==model){
+          debugger
+          return true;
+        }*/
+
+        //for check enter in callout
+        const isLastInCallout= model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour &&
+          model.parent.children.length &&
+          model.parent.children[model.parent.children.length-1]==model
+        if(isLastInCallout){
+          const textStr = model.text.toString();
+          const endWithTwoBlankLines =
+             textStr === '\n' || textStr.endsWith('\n');
+          if (!textStr || endWithTwoBlankLines) {
+            raw.preventDefault();
+            doc.captureSync();
+            const [paragraphId] = doc.addSiblingBlocks(model.parent, [
+              { flavour: 'affine:paragraph' },
+            ]);
+            focusTextModel(std, paragraphId);
+            doc.deleteBlock(model)
+            return true
+          }
+        }
         if (model.type === 'quote') {
           const textStr = model.text.toString();
 
@@ -117,6 +184,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
             doc.captureSync();
             model.text.delete(range.index - 1, 1);
             std.command.exec('addParagraph');
+            //console.log("100000");
             return true;
           }
           return true;

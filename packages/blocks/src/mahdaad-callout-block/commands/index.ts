@@ -47,7 +47,7 @@ export const insertCalloutBlockCommand: Command<
 
   const result = std.doc.addSiblingBlocks(
     targetModel,
-    [{ flavour: 'affine:mahdaad-callout' }],'after'
+    [{ flavour: 'affine:mahdaad-callout',icon:'tabler:info-circle',background:'sky',type:'info' }],'after'
   );
 
   //console.log("this is result",result);

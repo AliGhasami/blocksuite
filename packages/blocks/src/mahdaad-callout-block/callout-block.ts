@@ -6,19 +6,14 @@ import { property } from 'lit/decorators.js';
 import {pick} from 'lodash-es'
 
 import type { MahdaadCalloutBlockService } from './callout-service.js';
+import { BlockModel } from '@blocksuite/store';
+import { transformModel } from '../root-block/utils/operations/model.js';
 
 
 export class MahdaadCalloutBlockComponent extends BlockComponent<
   MahdaadCalloutBlockModel,
   MahdaadCalloutBlockService
 > {
-  /*static override properties = {
-    isReady: { type: Boolean },
-  };*/
-
-  // static override properties = {
-  //   _isLoad: { type: Boolean, state: true },
-  // };
 
   static override styles = css`
     .affine-note-block-container {
@@ -29,10 +24,6 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     }
   `;
 
-  //temp = null;
-
-  //isLoad=false
-
   changeProps(event:CustomEvent) {
     const data=event.detail[0]
     if(data) {
@@ -40,6 +31,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
       this.doc.updateBlock(this.model,{
         ...normal
       })
+
     }
   }
 
@@ -47,10 +39,56 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     super.connectedCallback();
   }
 
+  convertToType(blocksModel:BlockModel[],flavour:string,type:string){
+    blocksModel.forEach(blockModel=>{
+      /*this.std.command
+        .chain()
+        .updateBlockType({
+          flavour,
+          props:{ type } ,
+        })
+        .run();*/
+      //this.std.doc.updateBlock(blockModel,{flavour,type})
+      if(blockModel.flavour==flavour){
+        this.std.doc.updateBlock(blockModel,{flavour,type})
+      }else{
+        transformModel(blockModel, flavour, {type});
+      }
+      this.convertToType(blockModel.children,flavour,type)
+    })
+  }
+
+
+  changeOptions(event:CustomEvent){
+    const key=event.detail[0]
+    switch (key){
+      case 'delete':
+        this.std.doc.deleteBlock(this.model)
+        break
+      case 'text':
+        this.convertToType(this.model.children,'affine:paragraph','text')
+        break
+      case 'heading_1':
+        this.convertToType(this.model.children,'affine:paragraph','h1')
+        break
+      case 'heading_2':
+        this.convertToType(this.model.children,'affine:paragraph','h2')
+        break
+      case 'heading_3':
+        this.convertToType(this.model.children,'affine:paragraph','h3')
+        break
+      case 'bullet_list':
+        this.convertToType(this.model.children,'affine:list', 'bulleted')
+        break
+      case 'number_list':
+        this.convertToType(this.model.children,'affine:list', 'numbered')
+        break
+    }
+  }
+
+
 
   override renderBlock() {
-    //const props=this.model
-    //console.log("props",props);
     return html`
       <mahdaad-callout-component
         type="${this.model.type}"
@@ -60,6 +98,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
         @mount="${() => {
           this._isLoad = true;
         }}"
+        @changeOption="${this.changeOptions}"
       >
         <div class="nest-editor">
           <div class="affine-note-block-container">

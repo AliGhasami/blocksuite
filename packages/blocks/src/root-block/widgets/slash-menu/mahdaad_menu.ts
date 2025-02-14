@@ -71,7 +71,6 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'callout',
     action: ({ rootComponent }) => {
-
       rootComponent.std.command
         .chain()
         .getSelectedModels()
