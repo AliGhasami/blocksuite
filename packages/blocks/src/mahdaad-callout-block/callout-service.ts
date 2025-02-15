@@ -22,7 +22,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   private _anchorSel: BlockSelection | null = null;
 
   private _bindMoveBlockHotKey = () => {
-    debugger
     return moveBlockConfigs.reduce(
       (acc, config) => {
         const keys = config.hotkey.reduce(
@@ -66,7 +65,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _bindTextConversionHotKey = () => {
-    debugger
     return textConversionConfigs
       .filter(item => item.hotkey)
       .reduce(
@@ -145,7 +143,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onArrowDown = (ctx: UIEventStateContext) => {
-    debugger
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -243,7 +240,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onArrowUp = (ctx: UIEventStateContext) => {
-    debugger
     const event = ctx.get('defaultState').event;
 
     const [result] = this._std.command
@@ -340,7 +336,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onBlockShiftDown = (cmd: BlockSuite.CommandChain) => {
-    debugger
     return cmd
       .getBlockSelections()
       .inline<'currentSelectionPath' | 'anchorBlock'>((ctx, next) => {
@@ -419,7 +414,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onEnter = (ctx: UIEventStateContext) => {
-    debugger
     const event = ctx.get('defaultState').event;
     const [result] = this._std.command
       .chain()
@@ -467,7 +461,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onEsc = () => {
-    debugger
     const [result] = this._std.command
       .chain()
       .getBlockSelections()
@@ -489,7 +482,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onSelectAll: UIEventHandler = ctx => {
-    debugger
     const selection = this._std.selection;
     const block = selection.find('block');
     if (!block) {
@@ -514,7 +506,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onShiftArrowDown = () => {
-    debugger
     const [result] = this._std.command
       .chain()
       .try(cmd => [
@@ -527,7 +518,6 @@ export class MahdaadCalloutBlockService extends BlockService {
   };
 
   private _onShiftArrowUp = () => {
-    debugger
     const [result] = this._std.command
       .chain()
       .try(cmd => [

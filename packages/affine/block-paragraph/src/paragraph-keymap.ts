@@ -25,7 +25,6 @@ export const ParagraphKeymapExtension = KeymapExtension(
         const isCollapsed = text.isCollapsed();
         const isStart = isCollapsed && text.from.index === 0;
         if (!isStart) return;
-        //debugger
 
         const { doc } = std;
         const model = doc.getBlock(text.from.blockId)?.model;
@@ -52,10 +51,9 @@ export const ParagraphKeymapExtension = KeymapExtension(
         /*const blockComponent=std.view.getBlock(text.from.blockId)
         if(blockComponent && blockComponent.closest('.nest-editor')){
           console.log("this ");
-          debugger
         }*/
         //check for callout block
-        if(model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour && model.parent.children.length==1){
+        if(model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour && model.parent.children.length==1) {
           return true;
         }
 
@@ -88,7 +86,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
         const isLastInCallout= model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour &&
           model.parent.children.length &&
           model.parent.children[model.parent.children.length-1]==model
-        if(isLastInCallout){
+        if(isLastInCallout) {
           const textStr = model.text.toString();
           const endWithTwoBlankLines =
             textStr === '\n' || textStr.endsWith('\n');
@@ -139,7 +137,6 @@ export const ParagraphKeymapExtension = KeymapExtension(
        /* if(model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour &&
           model.parent.children.length &&
           model.parent.children[model.parent.children.length-1]==model){
-          debugger
           return true;
         }*/
 
@@ -147,7 +144,7 @@ export const ParagraphKeymapExtension = KeymapExtension(
         const isLastInCallout= model.parent?.flavour==MahdaadCalloutBlockSchema.model.flavour &&
           model.parent.children.length &&
           model.parent.children[model.parent.children.length-1]==model
-        if(isLastInCallout){
+        if(isLastInCallout) {
           const textStr = model.text.toString();
           const endWithTwoBlankLines =
              textStr === '\n' || textStr.endsWith('\n');

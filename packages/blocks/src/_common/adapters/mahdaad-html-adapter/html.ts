@@ -162,7 +162,7 @@ export class MahdaadHtmlAdapter extends BaseAdapter<Html> {
         BlockSnapshotSchema.safeParse(node).success
     );
     walker.setEnter(async (o, context) => {
-    //  console.log("this is o i nset enter",o);
+      console.log("this is o i nset enter",o);
 
       for (const matcher of this.blockMatchers) {
         if (matcher.fromMatch(o)) {
