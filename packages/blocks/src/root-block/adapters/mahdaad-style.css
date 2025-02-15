@@ -724,6 +724,9 @@ blockquote {
   border-radius: var(--pta-roundness-lg, 8px);
   border: 1px solid transparent;
 }
+.mahdaad-callout .content {
+  width: 100%;
+}
 .mahdaad-callout .icon {
   margin-top: 12px;
 }

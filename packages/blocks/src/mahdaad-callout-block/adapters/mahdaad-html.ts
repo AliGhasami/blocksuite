@@ -122,6 +122,8 @@ export const mahdaadCalloutBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   fromBlockSnapshot: {
     enter: async (o, context) => {
 
+      const {  walkerContext } = context;
+
       const style ={
           textColor: `rgb(var(--mt-${o.node.props.background}-5))`,
           backgroundColor:
@@ -131,13 +133,6 @@ export const mahdaadCalloutBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           borderColor: `rgb(var(--mt-${o.node.props.background}-1))`,
       }
 
-
-
-
-
-      const {  walkerContext } = context;
-
-//o.node.props?.type=='document'
       walkerContext
         .openNode(
           {
@@ -155,8 +150,7 @@ export const mahdaadCalloutBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         tagName:'div',
         properties: {
           style:`color:${style.textColor}`,
-          className:['icon'],//'iconify'
-          //'data-icon':'mdi:home'
+          className:['icon'],
         },
         children:[]
       }).openNode({
@@ -175,7 +169,7 @@ export const mahdaadCalloutBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         type:'element',
         tagName:'div',
         properties:{
-          className:[]
+          className:['content']
         },
         children:[]
       })
