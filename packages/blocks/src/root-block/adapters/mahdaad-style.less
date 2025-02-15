@@ -84,12 +84,14 @@ q::after {
   --ptp-dimension-600:12px;
   --ptp-dimension-1200:24px;
   --ptp-dimension-1600:32px;
+  --pta-space-600:12px;
   /*--pta-fg-subtle:#8194A7;*/
   --pta-fg-subtle:#90959D;
   --pta-space-100:2px;
   --pta-space-200:4px;
   --pta-space-300:6px;
   --pta-space-400:8px;
+  --pta-roundness-lg:8px;
   --pta-bg-secondary:#F8F8FC;
   --pta-size-sm:24px;
   --pta-size-lg:40px;
@@ -779,6 +781,24 @@ blockquote{
     border-bottom: unset;
   }
 }
+
+
+.mahdaad-callout{
+  display: flex;
+  //align-items: center;
+  //align-self: stretch;
+  padding: var(--pta-space-600, 12px);
+  padding-top:2px;
+  gap: var(--pta-space-300, 6px);
+  border-radius: var(--pta-roundness-lg, 8px);
+  border: 1px solid transparent;
+
+  .icon{
+    margin-top: 12px;
+  }
+
+}
+
 
 
 

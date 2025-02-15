@@ -4,10 +4,10 @@ import {
   type BlockHtmlAdapterMatcher,
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
+import { generateCSSVars } from '@mahdaad/tokens'
 
 import fa from './fa.css?raw'
 import mahdaadStyle from './mahdaad-style.css?raw'
-
 
 export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   flavour: RootBlockSchema.model.flavour,
@@ -58,6 +58,13 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           },
           'children'
         )
+        .openNode({
+            type: 'element',
+            tagName: 'script',
+            properties: { src:'https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js'},
+            children: [],
+          },
+          'children').closeNode()
         .openNode(
           {
             type: 'element',
@@ -79,6 +86,13 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           {
             type: 'raw',
             value: lang=='fa' ? fa.replace(/\s\s+/g, '') : '',
+          },
+          'children'
+        ).closeNode()
+        .openNode(
+          {
+            type: 'raw',
+            value:generateCSSVars(),
           },
           'children'
         ).closeNode()

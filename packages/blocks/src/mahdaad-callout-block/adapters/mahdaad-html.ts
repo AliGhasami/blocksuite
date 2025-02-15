@@ -121,165 +121,75 @@ export const mahdaadCalloutBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   },
   fromBlockSnapshot: {
     enter: async (o, context) => {
-      const {  walkerContext } = context;
-      const objectId=o.node.props.object_id
-      //@ts-ignore
-      const objectList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.objectList ?? [] : []
 
-      const object=objectList.find(item=> item._id==objectId);
-      if(!object || (object.status && (object.status=='403'||object.status=='404')))
-        return
-      //@ts-ignore
-      const embedList : any[]=context.configs.has('mahdaad_config') ? context.configs.get('mahdaad_config')?.embedList ?? [] : []
-      const include_embed : boolean=context.configs.get('mahdaad_config')?.include_embed ?? false
-      const embedItem=embedList.find(item=> item.object_id==objectId)
-      //@ts-ignore
-      const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
-      //@ts-ignore
-      const minioStorageImageUrl=context.configs.get('mahdaad_config')?.minioStorageImageUrl ?? ''
-      //console.log("object",object,o.node.props);
-      const isEmbed=include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem
+      const style ={
+          textColor: `rgb(var(--mt-${o.node.props.background}-5))`,
+          backgroundColor:
+        o.node.props.background == 'gray'
+          ? `rgb(var(--mt-${o.node.props.background}-1))`
+          : `rgb(var(--mt-${o.node.props.background}-0))`,
+          borderColor: `rgb(var(--mt-${o.node.props.background}-1))`,
+      }
+
+
+
+
+
+      const {  walkerContext } = context;
+
+//o.node.props?.type=='document'
       walkerContext
         .openNode(
           {
             type: 'element',
             tagName: 'div',
             properties: {
-              className: [`mahdaad-block-container `,isEmbed ? 'mahdaad-object-embed' : `mahdaad-object ${o.node.props?.show_type} ${o.node.props?.type} ${object?.meta?.color ?? ''} ${object.object_type=='file' ? object.meta.type : ''} `],
+              className: [`mahdaad-block-container mahdaad-callout`],
+              style:`background-color:${style.backgroundColor};border-color:${style.borderColor}`
             },
-            children: [],
+            children:[],
           },
           'children'
-        )
-
-      if(include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem) {
-          walkerContext.openNode({
-            type:'raw',
-            value:embedItem.context
-          }).closeNode()
-      }else{
-        if(!(
-          o.node.props?.type=='tag' ||
-          (object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed'))) {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`icon`],
-              },
-              children:[{
-                type:'raw',
-                value:object.iconSVG ?? ''
-              }]
-            },
-            'children'
-          ).closeNode();
-        }
-
-        if(object.object_type=='image' && o.node.props?.show_type && o.node.props?.show_type=='embed') {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'img',
-              properties: {
-                src: object.meta &&  object.meta.bucket_name ? `${minioStorageImageUrl}/${object.meta.storage}` :  `${storageUrl}/${object.meta.storage}`
-                //className: [`title line-clamp-1`],
-              },
-              children:[]
-            },
-            'children'
-          ).closeNode()
-        }else{
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`title line-clamp-1`],
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.title
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
-        }
-        if(o.node.props?.type=='weblink') {
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'a',
-              properties: {
-                className: [`link`],
-                href:convertToFullUrl(object.meta.weblink)
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.meta.weblink
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
-        }
-
-      }
-
-
-      walkerContext.closeNode()
-
-
-
-      /*walkerContext
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'div',
-            properties: {
-              className: [`mahdaad-block-container mahdaad-object ${o.node.props?.type}`],
-            },
-            children: [],
+        ).openNode({
+        type:'element',
+        tagName:'div',
+        properties: {
+          style:`color:${style.textColor}`,
+          className:['icon'],//'iconify'
+          //'data-icon':'mdi:home'
+        },
+        children:[]
+      }).openNode({
+          type: 'element',
+          tagName: 'iconify-icon',
+          properties: {
+            className: [],
+            //src:'https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js'
+            icon:o.node.props.icon,
+            style:"font-size: 24px"
           },
-          'children'
-        )
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'span',
-            properties: {
-              className: [`icon`],
-            },
-            children:o.node.props?.type!='tag'  ?  [{
-              type:'raw',
-              value:object.iconSVG ?? ''
-            }] : []
-          },
-          'children'
-        )
-        .closeNode()
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'span',
-            properties: {
-              className: [`title`],
-            },
-            children: [
-              {
-                type:'text',
-                value:object.title
-              }
-            ],
-          },
-          'children'
-        )
-        .closeNode()
-        .closeNode();*/
+          children:[],
+        },
+        'children').closeNode()
+        .closeNode().openNode({
+        type:'element',
+        tagName:'div',
+        properties:{
+          className:[]
+        },
+        children:[]
+      })
+    },
+    leave: (_, context) => {
+      const { walkerContext } = context;
+      //console.log("111111",walkerContext);
+      /*const htmlRootDocContext =
+        walkerContext.getGlobalContext('hast:html-root-doc');
+      const isRootDoc = htmlRootDocContext ?? true;
+      if (!isRootDoc) {
+        return;
+      }*/
+      walkerContext.closeNode().closeNode();
     },
   },
 };

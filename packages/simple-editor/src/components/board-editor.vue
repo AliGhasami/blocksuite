@@ -1128,7 +1128,7 @@ async function init() {
 
   .place-holder {
     @apply flex items-center gap-1 text-neutral-4 mt-body;
-    //line-height: unset;
+    line-height: 32px;
     transition: all 0.3s ease-in-out;
     .short-code {
       font-size: 10px;
@@ -1144,6 +1144,12 @@ async function init() {
       align-items: center;
       justify-content: center;
     }
+  }
+
+
+  *[data-v-text]{
+    //background-color: red;
+    line-height: 32px;
   }
 
   /* Mention Style */
@@ -1338,6 +1344,8 @@ async function init() {
     width: auto;
   }
 }
+
+
 
 /* slash Menu Style */
 /*.@{prefix}-slash-menu {
