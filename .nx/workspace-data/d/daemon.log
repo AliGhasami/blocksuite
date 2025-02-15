@@ -9450,3 +9450,17 @@ Error: Source project does not exist: npm:@microsoft/api-extractor
 [NX Daemon Server] - 2025-02-13T15:19:24.395Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (sources)
 [NX Daemon Server] - 2025-02-13T15:19:24.395Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2025-02-13T15:19:24.395Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (outputs)
+[NX Daemon Server] - 2025-02-15T13:48:47.929Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\e474629dbedacb7546a1\d.sock
+[NX Daemon Server] - 2025-02-15T13:48:47.935Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite (native)
+[NX Daemon Server] - 2025-02-15T13:48:47.948Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-15T13:48:47.950Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-15T13:48:47.951Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-15T13:48:47.953Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-15T13:48:47.954Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-15T13:48:47.955Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-02-15T13:48:47.955Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-15T13:48:47.955Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2025-02-15T13:48:47.955Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+

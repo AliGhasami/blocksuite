@@ -22374,6 +22374,15 @@
         "hash": "10/4a49e532e495436982c9555867f0f97a7bc331b4567c8263942f9a11bd8570efe0d5d08a0f8a549c28819f10b8884e27fc5c2b04b93fd6eaa6c4494104e6c763"
       }
     },
+    "npm:split-grid": {
+      "type": "npm",
+      "name": "npm:split-grid",
+      "data": {
+        "version": "1.0.11",
+        "packageName": "split-grid",
+        "hash": "10/f8909b7be744485152f9a90fb14be1ececeeb2164fb32ac673578df90ce2681c33ed7a49fea245a2a52441481fec3b10c3180dcad5b853f4e19becbbf8f4cab9"
+      }
+    },
     "npm:split2@3.2.2": {
       "type": "npm",
       "name": "npm:split2@3.2.2",
