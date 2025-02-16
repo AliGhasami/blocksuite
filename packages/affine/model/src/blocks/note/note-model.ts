@@ -62,6 +62,7 @@ export const NoteBlockSchema = defineBlockSchema({
       'affine:latex',
       'affine:note',
       'affine:mahdaad-callout',
+      'affine:mahdaad-multi-column',
     ],
   },
   toModel: () => {

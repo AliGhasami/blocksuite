@@ -5,6 +5,7 @@ import { FontLoaderService } from '@blocksuite/affine-shared/services';
 
 import { LatexBlockSpec } from '../../latex-block/latex-spec.js';
 import {MahdaadCalloutBlockSpec} from '../../mahdaad-callout-block/callout-spec.js'
+import { MahdaadMultiColumnBlockSpec } from '../../mahdaad-multi-column-block/multi-column-spec.js'
 import {ObjectBlockSpec} from '../../mahdaad-object-block/object-spec.js'
 import {MahdaadWeblinkBlockSpec} from '../../mahdaad-weblink-block/weblink-spec.js'
 import { PageRootBlockSpec } from '../../root-block/page/page-root-spec.js';
@@ -19,5 +20,6 @@ export const PageEditorBlockSpecs: ExtensionType[] = [
   FontLoaderService,
   ObjectBlockSpec,
   MahdaadWeblinkBlockSpec,
-  MahdaadCalloutBlockSpec
+  MahdaadCalloutBlockSpec,
+  MahdaadMultiColumnBlockSpec
 ].flat();
