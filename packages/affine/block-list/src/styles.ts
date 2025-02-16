@@ -7,6 +7,10 @@ export const listPrefix = css`
     font-size: var(--affine-font-sm);
     user-select: none;
     position: relative;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    /*margin-top: 3px;*/
   }
 
   .affine-list-block__numbered {
