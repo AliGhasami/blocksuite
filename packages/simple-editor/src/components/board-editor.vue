@@ -511,17 +511,8 @@ watch(
 
 //todo ali ghasami
 async function setData(data: any, clear_history?: boolean = true) {
-  //return
-  //console.log("2222222222222222222this is data",data);
-  //init()
-  /*if(myCollection && currentDocument.value){
-  }*/
-  //return
-
   //method 1
   if (myCollection && currentDocument.value) {
-    //debugger
-    //myCollection.
     const doc = toRaw(unref(currentDocument.value)) //currentDocument.value as Doc
     console.log('this is doc', doc)
     const blocks = get(data, 'blocks.children', [])
@@ -536,8 +527,6 @@ async function setData(data: any, clear_history?: boolean = true) {
         middlewares: [replaceIdMiddleware]
       })
       const notes: BlockModel[] = doc.getBlocksByFlavour('affine:note')
-      //const id = doc.
-      //console.log("|1111",notes,notes[0].id);
       let index = 1
       //doc.load()
       if (notes.length > 0) {
@@ -558,7 +547,6 @@ async function setData(data: any, clear_history?: boolean = true) {
       }
     }
     //const doc = this.model.doc;
-    ///console.log('14141444', content);
   }
   //old method (before collabration)
   /*if (myCollection) {

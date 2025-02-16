@@ -15,6 +15,7 @@ export const MahdaadMultiColumnBlockSchema = defineBlockSchema({
     role: 'hub',
     parent: ['affine:note'],
     children: [
+      'affine:note'
       // 'affine:paragraph',
       // 'affine:list',
       // 'affine:hint',
