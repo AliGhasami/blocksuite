@@ -31,6 +31,7 @@ export * from './frame-block/index.js';
 export * from './image-block/index.js';
 export * from './latex-block/index.js';
 export * from './mahdaad-callout-block/index.js';
+export * from './mahdaad-multi-column-block/index.js';
 import './mahdaad-object-block/index.js';
 export * from  './mahdaad-object-block/index.js';
 export * from './mahdaad-weblink-block/index.js';
