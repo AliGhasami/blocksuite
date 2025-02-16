@@ -8,9 +8,6 @@ import { html } from 'lit';
 export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<MahdaadMultiColumnBlockModel> {
   // static override styles = objectBlockStyles;
 
- 
-
-  
   override connectedCallback() {
     super.connectedCallback();
   }
@@ -19,7 +16,6 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
 
   }*/
 
-  
 
   parentId() {
     return (this.doc.meta && this.doc.meta?.object_id) ?? null
@@ -33,8 +29,9 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
     // console.log('this is model and props', this.model.meta);
     //.doc="${this.doc}"
     //this.model.propsUpdated({})
-
+    console.log("this model",this.model);
     return html`<div contenteditable="false">
+      ${this.model.children.length}
      <mahdaad-multi-column-component></mahdaad-multi-column-component>
     </div>`;
   }

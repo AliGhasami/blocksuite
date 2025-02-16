@@ -107,6 +107,7 @@ import { effects as blockLatexEffects } from './latex-block/effects.js';
 import { LatexBlockComponent } from './latex-block/index.js';
 import { effects as blockMahdaadCalloutEffects } from './mahdaad-callout-block/effects.js';
 import {MahdaadCalloutBlockComponent} from './mahdaad-callout-block/index.js'
+import { effects as blockMahdaadMultiColumnEffects } from './mahdaad-multi-column-block/effects.js';
 import {MahdaadMultiColumnBlockComponent} from './mahdaad-multi-column-block/index.js'
 import { ObjectBlockComponent , type ObjectBlockService} from './mahdaad-object-block/index.js';
 import { MahdaadWeblinkBlockComponent } from './mahdaad-weblink-block/index.js';
@@ -322,7 +323,7 @@ export function effects() {
   blockSurfaceRefEffects();
   blockLatexEffects();
   blockMahdaadCalloutEffects()
-
+  blockMahdaadMultiColumnEffects()
   componentCaptionEffects();
   componentContextMenuEffects();
   componentDatePickerEffects();

@@ -1,4 +1,5 @@
 import type { MahdaadCalloutBlockModel } from '@blocksuite/affine-model';
+import type { BlockModel } from '@blocksuite/store';
 
 import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
@@ -6,7 +7,7 @@ import { property } from 'lit/decorators.js';
 import {pick} from 'lodash-es'
 
 import type { MahdaadCalloutBlockService } from './callout-service.js';
-import { BlockModel } from '@blocksuite/store';
+
 import { transformModel } from '../root-block/utils/operations/model.js';
 
 
@@ -24,44 +25,9 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     }
   `;
 
-  changeProps(event:CustomEvent) {
-    const data=event.detail[0]
-    if(data) {
-      const normal=pick(data,['type','icon','background'])
-      this.doc.updateBlock(this.model,{
-        ...normal
-      })
-
-    }
-  }
-
-  override connectedCallback() {
-    super.connectedCallback();
-  }
-
-  convertToType(blocksModel:BlockModel[],flavour:string,type:string){
-    blocksModel.forEach(blockModel=>{
-      /*this.std.command
-        .chain()
-        .updateBlockType({
-          flavour,
-          props:{ type } ,
-        })
-        .run();*/
-      //this.std.doc.updateBlock(blockModel,{flavour,type})
-      if(blockModel.flavour==flavour){
-        this.std.doc.updateBlock(blockModel,{flavour,type})
-      }else{
-        transformModel(blockModel, flavour, {type});
-      }
-      this.convertToType(blockModel.children,flavour,type)
-    })
-  }
-
-
-  changeOptions(event:CustomEvent){
+  changeOptions(event:CustomEvent) {
     const key=event.detail[0]
-    switch (key){
+    switch (key) {
       case 'delete':
         this.std.doc.deleteBlock(this.model)
         break
@@ -86,9 +52,45 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     }
   }
 
+  changeProps(event:CustomEvent) {
+    const data=event.detail[0]
+    if(data) {
+      const normal=pick(data,['type','icon','background'])
+      this.doc.updateBlock(this.model,{
+        ...normal
+      })
+
+    }
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+  }
+
+
+  convertToType(blocksModel:BlockModel[],flavour:string,type:string) {
+    blocksModel.forEach(blockModel=>{
+      /*this.std.command
+        .chain()
+        .updateBlockType({
+          flavour,
+          props:{ type } ,
+        })
+        .run();*/
+      //this.std.doc.updateBlock(blockModel,{flavour,type})
+      if(blockModel.flavour==flavour) {
+        this.std.doc.updateBlock(blockModel,{flavour,type})
+      }else{
+        transformModel(blockModel, flavour, {type});
+      }
+      this.convertToType(blockModel.children,flavour,type)
+    })
+  }
+
 
 
   override renderBlock() {
+    console.log("this is model callout ",this.model);
     return html`
       <mahdaad-callout-component
         type="${this.model.type}"
