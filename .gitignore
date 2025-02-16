@@ -44,3 +44,5 @@ __screenshots__/
 !.yarn/sdks
 !.yarn/versions
 /packages/claytap/dist/
+
+.history
