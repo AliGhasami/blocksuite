@@ -90,7 +90,6 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
 
 
   override renderBlock() {
-    console.log("this is model callout ",this.model);
     return html`
       <mahdaad-callout-component
         type="${this.model.type}"

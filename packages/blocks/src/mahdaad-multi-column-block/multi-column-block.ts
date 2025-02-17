@@ -2,7 +2,8 @@
 import type { MahdaadMultiColumnBlockModel } from "@blocksuite/affine-model";
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
-import { html } from 'lit';
+import { BlockModel } from '@blocksuite/store';
+import { html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 
 //@customElement('affine-mahdaad-object')
@@ -27,32 +28,54 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
   }
 
   override renderBlock() {
-    // console.log('this is model and props', this.model.meta);
-    //.doc="${this.doc}"
-    //this.model.propsUpdated({})
-    //console.log("this model",this.model);
-    return html`<div contenteditable="false" style="border:1px solid pink">
-      ${this.model.children.length} 
-    
-      
+    const children= this.model.children.map((item)=>{
+      const temp= new BlockModel()
+      temp.children.push(item)
+      return  temp
+    })
+
+    return html`<div style="border:1px solid pink">
      <mahdaad-multi-column-component
-       column-count="${this.model.children.length}"
+       column-count="${children.length}"
        @mount="${() => {
-       this._isLoad = true;
+         this._isLoad = true;
      }}">
-      <!-- ${this.model.children.map((item,index)=>{
-         return html`<span slot="slot_${index}" >${this._isLoad ? this.renderChildren(this.model.children[index]) : ''}</span>`
-       })} -->
-       <span slot="slot_0">
-         ${this._isLoad ? this.renderChildren(this.model.children[0]) : ''}
-       </span>
-     </mahdaad-multi-column-component> 
+       ${this._isLoad ? children.map((item,index)=>{
+         return html`<div  class="split-pan ps-4" >${this.renderChildren(item)}</div>`
+       }) : nothing } 
+     </mahdaad-multi-column-component>   
     </div>`;
   }
 
   @property({ attribute: false })
   accessor _isLoad: boolean = false;
 
+
+
+  /*${this._isLoad ? childs.map((item,index)=>{
+  return html`<span slot="slot_${index}">${this.renderChildren(item) }</span>`
+}) : '1111'}*/
+
+
+/*
+<!-- <span slot="slot_0">
+    ${this.renderChildren(childs[0])}
+</span>
+<span slot="slot_1">
+  ${this.renderChildren(childs[1])}
+</span> -->
+*/
+
+
+/*<!-- ${this.model.children.map((item,index)=>{
+  return html`<span slot="slot_${index}" >${this._isLoad ? this.renderChildren(this.model.children[index]) : ''}</span>`
+})} -->
+<span slot="slot_0">
+${this._isLoad ? this.renderChildren(this.model.children[0]) : ''}
+</span>
+<!-- <span slot="slot_1">
+${this._isLoad ? this.renderChildren(this.model.children[1]) : ''}
+</span> -->*/
 
   /*
   ${this.model.children.map((item,index)=>{

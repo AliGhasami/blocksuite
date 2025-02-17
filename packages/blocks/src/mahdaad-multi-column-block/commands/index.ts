@@ -51,10 +51,17 @@ export const insertMahdaadColumnBlockCommand: Command<
   //console.log("this is result",result);
   //std.doc. updateBlock()
   if (result.length === 0) return;
-  const note_1= std.doc.addBlock('affine:note', {}, result[0])
+
+  for (let i = 0 ;i<count;i++) {
+    const noteId= std.doc.addBlock('affine:note', {}, result[0])
+    std.doc.addBlock('affine:paragraph', {},noteId)
+  }
+  /*const note_1= std.doc.addBlock('affine:note', {}, result[0])
   std.doc.addBlock('affine:paragraph', {},note_1)
   const note_2= std.doc.addBlock('affine:note', {}, result[0])
   std.doc.addBlock('affine:paragraph', {},note_2)
+  const note_3= std.doc.addBlock('affine:note', {}, result[0])
+  std.doc.addBlock('affine:paragraph', {},note_3)*/
   //const blockId= std.doc.addBlock('affine:note', {}, result[0])
   //focusTextModel(std, blockId);
 
