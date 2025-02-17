@@ -40,15 +40,22 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
        @mount="${() => {
          this._isLoad = true;
      }}">
-       ${this._isLoad ? children.map((item,index)=>{
-         return html`<div  class="split-pan ps-4" >${this.renderChildren(item)}</div>`
-       }) : nothing } 
+       <div slot="slot_0">${ this._isLoad && children[0]  ? this.renderChildren(children[0]) : nothing }</div>
+       <div slot="slot_1">${ this._isLoad && children[1] ? this.renderChildren(children[1]) : nothing }</div>
+       <div slot="slot_2">${ this._isLoad && children[2] ? this.renderChildren(children[2]) : nothing }</div>
+       <div slot="slot_3">${ this._isLoad && children[3] ? this.renderChildren(children[3]) : nothing }</div>
      </mahdaad-multi-column-component>   
     </div>`;
   }
 
   @property({ attribute: false })
   accessor _isLoad: boolean = false;
+
+
+/*${this._isLoad ? children.map((item,index)=>{
+  return html`<div  class="split-pan ps-4" >${this.renderChildren(item)}</div>`
+}) : nothing } */
+
 
 
 
