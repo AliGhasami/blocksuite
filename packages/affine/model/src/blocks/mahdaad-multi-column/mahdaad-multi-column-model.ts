@@ -6,6 +6,7 @@ export type MultiColumnProps = {}
 export const MahdaadMultiColumnBlockSchema = defineBlockSchema({
   flavour: 'affine:mahdaad-multi-column',
   props: () => ({
+    sizes:[]
     // type:'info',
     // icon:null,
     // background:null,
