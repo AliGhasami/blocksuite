@@ -25,7 +25,7 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
 
 
   deleteColumn(currentIndex:number) {
-    if(this.model.children.length==1){
+    if(this.model.children.length==1) {
       this.doc.deleteBlock(this.model)
     }else{
       this.doc.deleteBlock(this.model.children[currentIndex])
@@ -61,6 +61,7 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
        column-count="${children.length}"
        .sizes="${this.model.sizes}"
        @add-column="${(event:CustomEvent)=>{
+         
          const detail=event.detail
          this.addColumn(detail[0],detail[1])
        }}"
