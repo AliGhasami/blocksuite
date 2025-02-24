@@ -4660,7 +4660,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:2.0.27, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@npm:2.0.28, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -11880,7 +11880,7 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:2.0.27"
+    "@mahdaad/block-editor": "npm:2.0.28"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"

@@ -68,25 +68,22 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
   }
 
   moveColumn(currentIndex: number, position: 'left' | 'right') {
-    const target =
-      position == 'left'
-        ? this.model.children[currentIndex - 1]
-        : this.model.children[currentIndex + 1];
+    const moveIndex= position == 'left' ? currentIndex - 1 : currentIndex + 1
+    const target = this.model.children[moveIndex]
+    const sizes= this.model.sizes.slice(0)
+    const temp= sizes[currentIndex]
+    sizes[currentIndex]=sizes[moveIndex]
+    sizes[moveIndex]= temp
     this.doc.moveBlocks(
       [this.model.children[currentIndex]],
       this.model,
       target,
       position == 'left'
     );
+    this.doc.updateBlock(this.model, {
+      sizes
+    });
   }
-
-  /*parentId() {
-    return (this.doc.meta && this.doc.meta?.object_id) ?? null
-  }*/
-
-  /* removeBlock() {
-     this.doc.deleteBlock(this.model);
-   }*/
 
   override renderBlock() {
     const children = this.model.children.map(item => {
@@ -94,12 +91,11 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
       temp.children.push(item);
       return temp;
     });
-    //console.log("this is children",children.length);
+    //console.log("this is children in block suite",children.length);
     return html` <div>
-      <!--<div style="height: 450px">  </div>-->
       <mahdaad-multi-column-component
-        .columnCount="${children.length}"
-        .sizes="${this.model.sizes}"
+        column-count="${children.length}"
+        sizes="${JSON.stringify(this.model.sizes)}"
         @add-column="${(event: CustomEvent) => {
           const detail = event.detail;
           this.addColumn(detail[0], detail[1]);
@@ -155,58 +151,11 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
     this.doc.updateBlock(this.model, {
       ...normal,
     });
-    //this.doc.updateBlock(this.model,{...props})
   }
 
   @property({ attribute: false })
   accessor _isLoad: boolean = false;
 
-  /*${this._isLoad ? children.map((item,index)=>{
-    return html`<div  class="split-pan ps-4" >${this.renderChildren(item)}</div>`
-  }) : nothing } */
-
-  /*${this._isLoad ? childs.map((item,index)=>{
-  return html`<span slot="slot_${index}">${this.renderChildren(item) }</span>`
-}) : '1111'}*/
-
-  /*
-  <!-- <span slot="slot_0">
-      ${this.renderChildren(childs[0])}
-  </span>
-  <span slot="slot_1">
-    ${this.renderChildren(childs[1])}
-  </span> -->
-  */
-
-  /*<!-- ${this.model.children.map((item,index)=>{
-    return html`<span slot="slot_${index}" >${this._isLoad ? this.renderChildren(this.model.children[index]) : ''}</span>`
-  })} -->
-  <span slot="slot_0">
-  ${this._isLoad ? this.renderChildren(this.model.children[0]) : ''}
-  </span>
-  <!-- <span slot="slot_1">
-  ${this._isLoad ? this.renderChildren(this.model.children[1]) : ''}
-  </span> -->*/
-
-  /*
-  ${this.model.children.map((item,index)=>{
-            html`<span>${index}</span>`
-       })}
-       <span slot="slot_1">
-         ${this._isLoad ? this.renderChildren(this.model.children[0]) : ''}
-       </span>
-       <span slot="slot_2">
-         ${this._isLoad ? this.renderChildren(this.model.children[1]) : ''}
-       </span>
-*/
-  // updateProps(event: CustomEvent) {
-  //   const props=event.detail;
-  //   //console.log("this is props",props);
-  //   this.doc.updateBlock(this.model, {
-  //     //...this.model,
-  //      meta:{...props}
-  //   });
-  // }
 }
 
 declare global {
