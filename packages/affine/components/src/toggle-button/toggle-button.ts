@@ -5,7 +5,6 @@ import { property } from 'lit/decorators.js';
 import { html } from 'lit-html';
 
 import { toggleDown, toggleRight } from '../icons/list.js';
-import type { ParagraphBlockModel } from '@blocksuite/affine-model'
 
 export const TOGGLE_BUTTON_PARENT_CLASS = 'blocksuite-toggle-button-parent';
 

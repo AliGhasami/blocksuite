@@ -363,7 +363,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
                   .model=${this.model}
                 ></affine-paragraph-heading-icon> -->
                 <blocksuite-toggle-button
-                  .direction=${ `rtl`}
+                  .direction=${ this.model.dir}
                   .collapsed=${collapsed}
                   .updateCollapsed=${(value: boolean) => {
               if (this.doc.readonly) {

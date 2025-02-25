@@ -1,4 +1,4 @@
-import { ObjectBlockSchema } from '@blocksuite/affine-model';
+import { MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
@@ -7,13 +7,12 @@ import {
 
 
 
-export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
-  flavour: ObjectBlockSchema.model.flavour,
-  //todo ali ghasami for implement after
+export const mahdaadMultiColumnBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
+  flavour: MahdaadMultiColumnBlockSchema.model.flavour,
   toMatch: o => HastUtils.isElement(o.node) && o.node.tagName === 'img',
-  fromMatch: o => o.node.flavour === ObjectBlockSchema.model.flavour,
+  fromMatch: o => o.node.flavour === MahdaadMultiColumnBlockSchema.model.flavour,
   toBlockSnapshot: {
-    enter: async (o, context) => {
+    enter: (o, context) => {
       if (!HastUtils.isElement(o.node)) {
         return;
       }
@@ -22,6 +21,7 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   fromBlockSnapshot: {
     enter: (o, context) => {
       const {  walkerContext } = context;
+      console.log("1111",context)
       walkerContext
         .openNode(
           {
@@ -33,19 +33,22 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             children:[],
           },
           'children'
-        ).openNode({
-        type:'element',
-        tagName:'div',
-        properties: {
-          //style:`color:${style.textColor}`,
-          className:['icon'],
-        },
-        children:[]
-      })
+        )
+    },
+    leave: (_, context) => {
+      const { walkerContext } = context;
+      console.log("111111",walkerContext);
+      /*const htmlRootDocContext =
+        walkerContext.getGlobalContext('hast:html-root-doc');
+      const isRootDoc = htmlRootDocContext ?? true;
+      if (!isRootDoc) {
+        return;
+      }*/
+      walkerContext.closeNode();
     },
   },
 };
 
-export const MahdaadObjectBlockHtmlAdapterExtension = BlockHtmlAdapterExtension(
-  mahdaadObjectBlockHtmlAdapterMatcher
+export const MahdaadMultiColumnBlockHtmlAdapterExtension = BlockHtmlAdapterExtension(
+  mahdaadMultiColumnBlockHtmlAdapterMatcher
 );
