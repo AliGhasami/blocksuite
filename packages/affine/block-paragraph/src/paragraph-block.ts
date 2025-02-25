@@ -20,6 +20,7 @@ import {
   getViewportElement,
 } from '@blocksuite/affine-shared/utils';
 import { getInlineRangeProvider } from '@blocksuite/block-std';
+import { setDirectionBasedOnText } from '@blocksuite/store'
 import { effect, signal } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';
@@ -55,6 +56,22 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       parent = parent.parentElement;
     }
     return false;
+  };
+
+   private _onKeyDown = (ctx: UIEventStateContext) => {
+    const eventState = ctx.get('keyboardState');
+    const event = eventState.raw;
+
+    const key = event.key;
+    const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
+
+    if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
+      if(key=='/')return 
+      this.setDirection(key)
+    } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
+      delete this.model.dir
+      this.doc.updateBlock(this.model, {})
+    }
   };
 
   get attributeRenderer() {
@@ -148,6 +165,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
   override connectedCallback() {
     super.connectedCallback();
+    this.handleEvent('keyDown', this._onKeyDown);
     this.handleEvent(
       'compositionStart',
       () => {
@@ -317,10 +335,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       `;
     }
 
-    const children = html`<div
+    const children = html`<div dir=${this.model.dir}
       class="affine-block-children-container"
       style=${styleMap({
-        paddingLeft: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
+        paddingStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
         display: collapsed ? 'none' : undefined,
       })}
     >
@@ -333,7 +351,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     //const scrollContainer = temp ? temp : getViewportElement(this.host);
     return html`
       ${style}
-      <div class="affine-paragraph-block-container">
+      <div class="affine-paragraph-block-container" dir=${this.model.dir}>
         <div  class=${classMap({
           'affine-paragraph-rich-text-wrapper': true,
           [`claytap-${type$.value}`]: true,
@@ -361,7 +379,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             : nothing}
           
           ${type$.value=='quote' ? 
-            html`<div class="quote-container">
+            html`<div class="quote-container" dir=${this.model.dir}>
               <span class="quote-icon">${html`${unsafeSVG(quoteIcon)}`}</span>
               ${this.richText()}
               ${this.placeHolder()}
@@ -398,6 +416,12 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .verticalScrollContainerGetter=${() => scrollContainer}
           ></rich-text>`
   }
+
+  setDirection(key:string) {
+   setDirectionBasedOnText(this.model, this.doc,key);
+  }
+
+
 
   @state()
   private accessor _readonlyCollapsed = false;

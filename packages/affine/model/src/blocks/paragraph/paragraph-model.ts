@@ -14,6 +14,7 @@ export type ParagraphProps = {
   type: ParagraphType;
   text: Text;
   collapsed: boolean;
+  dir?: null | 'rtl';
 };
 
 export const ParagraphBlockSchema = defineBlockSchema({
@@ -22,6 +23,7 @@ export const ParagraphBlockSchema = defineBlockSchema({
     type: 'text',
     text: internal.Text(),
     collapsed: false,
+    dir: null
   }),
   metadata: {
     version: 1,

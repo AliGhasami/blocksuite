@@ -26,6 +26,8 @@ export interface AffineTextAttributes {
   strike?: true | null;
   code?: true | null;
   link?: string | null;
+  rtl?: string | null;
+  ltr?: string | null;
   reference?:
     | ({
         type: 'Subpage' | 'LinkedPage';

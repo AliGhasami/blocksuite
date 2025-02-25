@@ -29,6 +29,7 @@ export const MahdaadCalloutBlockSchema = defineBlockSchema({
     type:'info',
     icon:null,
     background:null,
+    dir: null,
     //xywh: `[0,0,${DEFAULT_NOTE_WIDTH},${DEFAULT_NOTE_HEIGHT}]`,
     //background: DEFAULT_NOTE_BACKGROUND_COLOR,
     //index: 'a0',
@@ -78,6 +79,7 @@ export type CalloutProps = {
   type?:string | null,
   background?:string | null,
   icon?:string | null,
+  dir?: null | 'rtl';
   /*background: Color;
   displayMode: NoteDisplayMode;
   edgeless: NoteEdgelessProps;*/

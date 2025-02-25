@@ -141,6 +141,7 @@ export const mahdaadListBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
            type:'element',
            tagName:'span',
             properties: {
+              dir: o.node.props.dir as string,
               className: ['todo-item',o.node.props.checked ? 'checked':'unchecked'],
             },
             children:liChildren
@@ -194,6 +195,11 @@ export const mahdaadListBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           type: 'element',
           tagName: 'li',
           properties: {
+            dir: o.node.props.dir as string,
+            style:
+            o.node.props.dir === 'rtl'
+                  ? 'text-align:right' //padding-inline-start: 18px;
+                  : null,
             className: ['affine-list-block-container'],
           },
           children: liChildren,

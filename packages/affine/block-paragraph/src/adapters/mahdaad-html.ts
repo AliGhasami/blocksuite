@@ -218,6 +218,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 type: 'element',
                 tagName: 'div',
                 properties: {
+                  dir: o.node.props.dir as string,
                   className: ['mahdaad-block-container mahdaad-text'],
                 },
                 children: [],
@@ -260,6 +261,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 type: 'element',
                 tagName: 'div',
                 properties: {
+                  dir: o.node.props.dir as string,
                   className: [`mahdaad-block-container mahdaad-${o.node.props.type}`],
                 },
                 children: [],
@@ -303,6 +305,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 type: 'element',
                 tagName: 'div',
                 properties: {
+                  dir: o.node.props.dir as string,
                   className: ['mahdaad-block-container mahdaad-blockquote'],
                 },
                 children: [],

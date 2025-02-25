@@ -127,8 +127,9 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     //.doc="${this.doc}"
     //this.model.propsUpdated({})
 
-    return html`<div contenteditable="false">
+    return html`<div dir=${this.model.dir} contenteditable="false">
       <mahdaad-object-link-component
+        direction=${this.model.dir}
         .model="${this.model}"
         read-only="${this.doc.readonly}"
         object-id="${this.model.object_id}"
@@ -141,6 +142,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         @remove="${() => {
           this.removeBlock();
         }}"
+        @setDirection="${this.setDirection}"
         @duplicate="${() => {
           this.duplicate();
         }}"
@@ -149,6 +151,10 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
         @updateProps="${this.updateProps}"
       ></mahdaad-object-link-component>
     </div>`;
+  }
+
+  setDirection(event: CustomEvent) {
+    this.doc.updateBlock(this.model, {dir:event.detail});
   }
 
   updateProps(event: CustomEvent) {
