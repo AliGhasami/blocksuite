@@ -38,6 +38,7 @@ export const mahdaadCalloutBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             type: 'element',
             tagName: 'div',
             properties: {
+              dir: o.node.props.dir as string,
               className: [`mahdaad-block-container mahdaad-callout`],
               style:`background-color:${style.backgroundColor};border-color:${style.borderColor}`
             },

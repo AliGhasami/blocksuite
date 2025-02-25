@@ -49,6 +49,13 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
       case 'number_list':
         this.convertToType(this.model.children,'affine:list', 'numbered')
         break
+      case 'right_to_left':
+        this.doc.updateBlock(this.model, { dir: 'rtl'})
+        break
+      case 'left_to_right':
+        delete this.model.dir
+        this.doc.updateBlock(this.model, { })
+        break
     }
   }
 
@@ -87,11 +94,46 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     })
   }
 
+  changeProps(event:CustomEvent) {
+    const data=event.detail[0]
 
+    if(data) {
+      const normal=pick(data,['type','icon','background'])
+      this.doc.updateBlock(this.model,{
+        ...normal
+      })
+
+    }
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+  }
+
+
+  convertToType(blocksModel:BlockModel[],flavour:string,type:string) {
+    blocksModel.forEach(blockModel=>{
+      /*this.std.command
+        .chain()
+        .updateBlockType({
+          flavour,
+          props:{ type } ,
+        })
+        .run();*/
+      //this.std.doc.updateBlock(blockModel,{flavour,type})
+      if(blockModel.flavour==flavour) {
+        this.std.doc.updateBlock(blockModel,{flavour,type})
+      }else{
+        transformModel(blockModel, flavour, {type});
+      }
+      this.convertToType(blockModel.children,flavour,type)
+    })
+  }
 
   override renderBlock() {
 
     return html`
+      <div dir=${this.model.dir}>
       <mahdaad-callout-component
         type="${this.model.type}"
         background="${this.model.background}"
@@ -101,6 +143,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
           this._isLoad = true;
         }}"
         @changeOption="${this.changeOptions}"
+        direction="${this.model.dir}"
       >
         <div class="nest-editor">
           <div class="affine-note-block-container">
@@ -110,6 +153,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
           </div>
         </div>
       </mahdaad-callout-component>
+      </div>
     `;
   }
 

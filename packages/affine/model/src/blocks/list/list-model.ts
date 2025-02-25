@@ -11,6 +11,7 @@ export interface ListProps {
   checked: boolean;
   collapsed: boolean;
   order: number | null;
+  dir?: null | 'rtl';
 }
 
 export const ListBlockSchema = defineBlockSchema({
@@ -24,6 +25,7 @@ export const ListBlockSchema = defineBlockSchema({
 
       // number type only for numbered list
       order: null,
+      dir: null
     }) as ListProps,
   metadata: {
     version: 1,

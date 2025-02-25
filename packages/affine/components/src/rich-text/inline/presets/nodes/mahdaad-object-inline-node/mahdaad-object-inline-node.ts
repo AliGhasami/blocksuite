@@ -160,10 +160,10 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     ></span>`;
   }
 
-  updateProps(event){
+  updateProps(event) {
     const data = event?.detail;
     const format = this.inlineEditor.getFormat(this.selfInlineRange);
-    if(format.mahdaadObjectLink){
+    if(format.mahdaadObjectLink) {
       merge(format.mahdaadObjectLink,{meta:data.meta})
     }
     console.log("this is format",format,cloneDeep(format));

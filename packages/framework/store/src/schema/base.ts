@@ -252,6 +252,20 @@ export class BlockModel<
     });
   }
 
+  detectFirstCharacterType(text: string): string {
+    if (!text) return 'Empty string';
+
+    const firstChar = text.charAt(0);
+
+    if (/^[A-Za-z]$/.test(firstChar)) {
+      return 'LTR';
+    } else if (/^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]$/.test(firstChar)) {
+      return 'RTL';
+    } else {
+      return 'Other';
+    }
+  }
+
   dispose() {
     this.created.dispose();
     this.deleted.dispose();

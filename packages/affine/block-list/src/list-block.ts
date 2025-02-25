@@ -1,5 +1,5 @@
 /** @alighasami for check merge **/
-import type { ListBlockModel } from '@blocksuite/affine-model';
+import type { ListBlockModel, type ParagraphBlockModel } from '@blocksuite/affine-model';
 import type { BaseSelection, BlockComponent } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
@@ -18,6 +18,7 @@ import {
 import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import { getViewportElement } from '@blocksuite/affine-shared/utils';
 import { getInlineRangeProvider } from '@blocksuite/block-std';
+import { setDirectionBasedOnText } from '@blocksuite/store'
 import { effect } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';
@@ -69,6 +70,21 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     this._select();
   };
 
+  private _onKeyDown = (ctx: UIEventStateContext) => {
+    const eventState = ctx.get('keyboardState');
+    const event = eventState.raw;
+
+    const key = event.key;
+    const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
+
+    if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
+      this.setDirection(key)
+    } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
+      delete this.model.dir
+      this.doc.updateBlock(this.model, {})
+    }
+  };
+
   get attributeRenderer() {
     return this.inlineManager.getRenderer();
   }
@@ -79,6 +95,10 @@ export class ListBlockComponent extends CaptionedBlockComponent<
 
   get embedChecker() {
     return this.inlineManager.embedChecker;
+  }
+
+  get inlineEditor() {
+    return this._richTextElement?.inlineEditor;
   }
 
   get inlineManager() {
@@ -107,7 +127,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
 
   override connectedCallback() {
     super.connectedCallback();
-
+    this.handleEvent('keyDown', this._onKeyDown);
     this._inlineRangeProvider = getInlineRangeProvider(this);
 
     this.disposables.add(
@@ -148,9 +168,10 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     const listIcon = getListIcon(model, !collapsed, _onClickIcon);
 
     const children = html`<div
+      dir=${this.model.dir}
       class="affine-block-children-container"
       style=${styleMap({
-        paddingLeft: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
+        paddingStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
         display: collapsed ? 'none' : undefined,
       })}
     >
@@ -164,7 +185,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
 
 
     return html`
-      <div class=${'affine-list-block-container'}>
+      <div dir=${model.dir} class=${'affine-list-block-container'}>
         <div
           class=${classMap({
             'affine-list-rich-text-wrapper': true,
@@ -211,6 +232,11 @@ export class ListBlockComponent extends CaptionedBlockComponent<
       </div>
     `;
   }
+
+  setDirection(key:string) {
+    setDirectionBasedOnText(this.model as unknown as ParagraphBlockModel, this.doc, key);
+  }
+
 
   @state()
   private accessor _readonlyCollapsed = false;

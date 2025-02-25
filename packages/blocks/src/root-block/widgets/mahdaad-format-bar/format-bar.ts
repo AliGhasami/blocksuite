@@ -506,7 +506,7 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
     const keys: Exclude<
       keyof AffineTextAttributes,
       'color' | 'background' | 'reference'
-    >[] = ['bold', 'italic', 'underline', 'strike', 'link'];
+    >[] = ['bold', 'italic', 'underline', 'strike', 'link', 'rtl', 'ltr'];
     const temp: string[] = [];
     keys.forEach(key => {
       const [result] = this.std.command
@@ -632,6 +632,16 @@ export class MahdaadFormatBarWidget extends WidgetComponent {
               this.reset();
               //this._abortController.abort();
               chain.toggleLink().run();
+              break;
+            case 'rtl':
+              this._selectedBlocks.forEach(block => {
+               this.std.doc.updateBlock(block.model, { dir: 'rtl' })
+              });
+              break;
+            case 'ltr':
+              this._selectedBlocks.forEach(block => {
+                this.std.doc.updateBlock(block.model, { dir: 'ltr' })
+               });
               break;
           }
         }}"

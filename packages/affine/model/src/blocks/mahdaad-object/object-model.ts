@@ -6,7 +6,8 @@ export type ObjectBlockProps = {
   type: undefined | string,
   show_type: 'inline' | 'embed',
   meta?:Record<string, string | null | any>
-  file_id?:string
+  file_id?:string,
+  dir: 'rtl' | 'ltr',
 }
 
 
@@ -20,6 +21,7 @@ export const ObjectBlockSchema = defineBlockSchema({
     //id:undefined,
     show_type: 'inline',
     meta:{},
+    dir:'ltr'
   }),
   metadata: {
     version: 1,
