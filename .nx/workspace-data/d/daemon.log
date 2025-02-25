@@ -3478,3 +3478,67 @@ Failed to process project graph. Run "nx reset" to fix this. Please report the i
 
 > NX runtime error err=cannot send event from fs watcher: sending into a closed channel
 
+[NX Daemon Server] - 2025-02-25T06:16:47.373Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T06:16:47.377Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T06:16:47.391Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T06:16:47.392Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T06:16:47.394Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T06:16:47.397Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T06:16:47.400Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T06:16:47.401Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 4.
+[NX Daemon Server] - 2025-02-25T06:16:47.401Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T06:16:47.401Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T06:16:47.402Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+[NX Daemon Server] - 2025-02-25T07:19:44.982Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T07:19:44.995Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T07:19:45.004Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:19:45.005Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T07:19:45.007Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:19:45.009Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:19:45.011Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:19:45.011Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-02-25T07:19:45.011Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T07:19:45.011Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T07:19:45.012Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+
+[NX Daemon Server] - 2025-02-25T07:27:35.510Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T07:27:35.515Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T07:27:35.524Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:27:35.525Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T07:27:35.527Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:27:35.529Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:27:35.537Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:27:35.537Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 8.
+[NX Daemon Server] - 2025-02-25T07:27:35.537Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T07:27:35.538Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T07:27:35.538Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+[NX Daemon Server] - 2025-02-25T07:37:10.934Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T07:37:10.942Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T07:37:10.990Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:37:10.992Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T07:37:10.994Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:37:10.997Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:37:10.999Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:37:10.999Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-02-25T07:37:10.999Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T07:37:11.001Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T07:37:11.001Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+
+[NX Daemon Server] - 2025-02-25T07:46:16.668Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T07:46:16.675Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T07:46:16.702Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:46:16.703Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T07:46:16.707Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T07:46:16.709Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:46:16.711Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T07:46:16.712Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 3.
+[NX Daemon Server] - 2025-02-25T07:46:16.712Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T07:46:16.712Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T07:46:16.712Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
