@@ -9464,3 +9464,42 @@ Error: Source project does not exist: npm:@microsoft/api-extractor
 
 > NX runtime error err=cannot send event from fs watcher: sending into a closed channel
 
+[NX Daemon Server] - 2025-02-25T10:52:11.388Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T10:52:11.393Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T10:52:11.428Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T10:52:11.429Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T10:52:11.431Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T10:52:11.433Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T10:52:11.435Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T10:52:11.435Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-02-25T10:52:11.435Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T10:52:11.436Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T10:52:11.436Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+
+[NX Daemon Server] - 2025-02-25T11:43:42.286Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T11:43:42.301Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T11:43:42.305Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T11:43:42.308Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T11:43:42.309Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T11:43:42.312Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T11:43:42.313Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T11:43:42.313Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-25T11:43:42.314Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T11:43:42.314Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T11:43:42.314Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+
+[NX Daemon Server] - 2025-02-25T11:54:52.603Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\058156a7f0c8534afab0\d.sock
+[NX Daemon Server] - 2025-02-25T11:54:52.608Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\claytap\src\blocksuite (native)
+[NX Daemon Server] - 2025-02-25T11:54:52.624Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T11:54:52.625Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T11:54:52.627Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T11:54:52.629Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T11:54:52.631Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T11:54:52.631Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-02-25T11:54:52.631Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T11:54:52.631Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
+[NX Daemon Server] - 2025-02-25T11:54:52.632Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)

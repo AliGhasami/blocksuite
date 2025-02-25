@@ -218,6 +218,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 type: 'element',
                 tagName: 'div',
                 properties: {
+
                   className: ['mahdaad-block-container mahdaad-text'],
                 },
                 children: [],
