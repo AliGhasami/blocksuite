@@ -45,3 +45,5 @@ __screenshots__/
 !.yarn/versions
 /packages/claytap/dist/
 /.nx/
+
+.history

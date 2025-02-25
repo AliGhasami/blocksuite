@@ -5,6 +5,7 @@ import {
   type AffineInlineEditor,
   getInlineEditorByModel,
 } from '@blocksuite/affine-components/rich-text';
+import { MahdaadCalloutBlockSchema } from '@blocksuite/affine-model';
 import {
   getCurrentNativeRange,
   matchFlavours,
@@ -33,6 +34,7 @@ import {
   type SlashMenuStaticConfig,
   type SlashSubMenu,
 } from './config.js';
+
 //import { SlashMenu } from './slash-menu-popover.js';
 import {
   SlashMenu,
@@ -147,6 +149,7 @@ export class AffineSlashMenuWidget extends WidgetComponent {
     };
 
     const rootComponent = this.block;
+    //console.log("rootComponent",rootComponent);
     if (rootComponent.model.flavour !== 'affine:page') {
       console.error('SlashMenuWidget should be used in RootBlock');
       return;
@@ -158,7 +161,22 @@ export class AffineSlashMenuWidget extends WidgetComponent {
       if (!textSelection) return;
 
       const model = this.host.doc.getBlock(textSelection.blockId)?.model;
+      //const block=this.host.doc.getBlock(textSelection.blockId)
+      //console.log("this is host",this.host);
+      //this.host.closest()
+      //console.log("this is closest", this.std.view.getBlock(textSelection.blockId).closest('.nest-editor'));
+      //!!this.block.closest('affine-embed-synced-doc-block') ||
+      //console.log('this is block ',block);
       if (!model) return;
+
+      const parent=this.host.doc.getParent(model)
+      const blockComponent=this.std.view.getBlock(textSelection.blockId)
+
+      if(parent && parent.flavour==MahdaadCalloutBlockSchema.model.flavour ||
+        blockComponent && blockComponent.closest('.nest-editor')
+      ) return;
+      //console.log("this is parent",parent);
+      //console.log("blockComponent",blockComponent);
 
       if (matchFlavours(model, this.config.ignoreBlockTypes)) return;
 
@@ -228,6 +246,7 @@ export class AffineSlashMenuWidget extends WidgetComponent {
   };
 
   private _onKeyDown = (ctx: UIEventStateContext) => {
+    //console.log("11111",ctx);
     const eventState = ctx.get('keyboardState');
     const event = eventState.raw;
 

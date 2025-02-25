@@ -1,6 +1,7 @@
 import {
   type ParagraphBlockModel,
   ParagraphBlockSchema,
+  MahdaadCalloutBlockSchema
 } from '@blocksuite/affine-model';
 import { BlockService } from '@blocksuite/block-std';
 import { html, type TemplateResult } from 'lit';
@@ -11,6 +12,19 @@ export class ParagraphBlockService extends BlockService {
 
   getPlaceholder = (model: ParagraphBlockModel): TemplateResult<1> | string => {
     if (model.type === 'text') {
+      const blockComponent=this.std.view.getBlock(model.id)
+        if((model.parent && model.parent.flavour==MahdaadCalloutBlockSchema.model.flavour) ||  (blockComponent && blockComponent.closest('.nest-editor')) ){
+          return html`<div class="affine-paragraph-placeholder-content">
+        <div>
+          <span class="place-holder">
+            ${t('start_typing')}
+          </span>
+        </div>
+        <div>
+          <div>&nbsp;</div>
+      </div>`;
+    }
+
       return html`<div class="affine-paragraph-placeholder-content">
         <div>
           <span class="place-holder">
@@ -19,10 +33,13 @@ export class ParagraphBlockService extends BlockService {
             ${t('for_block_types')}
           </span>
         </div>
-        <!-- TODO ali ghasami  -->
         <div>&nbsp;</div>
       </div>`;
       // return "Type '/' for commands";
+    }
+
+    if(model.type=='quote'){
+      return t('quote_placeholder') as string
     }
 
     const placeholders = {
@@ -32,7 +49,7 @@ export class ParagraphBlockService extends BlockService {
       h4: 'Heading 4',
       h5: 'Heading 5',
       h6: 'Heading 6',
-      quote: '',
+      //quote: '',
     };
     return placeholders[model.type];
   };

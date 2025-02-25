@@ -7,7 +7,6 @@ import {
 } from '@blocksuite/affine-shared/utils';
 
 export function forwardDelete(std: BlockStdScope) {
-
   const { doc, host } = std;
   const text = std.selection.find('text');
   if (!text) return;
@@ -29,6 +28,7 @@ export function forwardDelete(std: BlockStdScope) {
     'affine:image',
     'affine:divider',
     ...EMBED_BLOCK_FLAVOUR_LIST,
+    'affine:mahdaad-callout'
   ];
 
   if (matchFlavours(nextSibling, ignoreForwardDeleteFlavourList)) {
@@ -37,6 +37,7 @@ export function forwardDelete(std: BlockStdScope) {
     ]);
     return true;
   }
+
 
   if (nextSibling?.text) {
     model.text.join(nextSibling.text);
@@ -50,7 +51,18 @@ export function forwardDelete(std: BlockStdScope) {
     return true;
   }
 
+
+
   const nextBlock = getNextContentBlock(host, model);
+
+  const blockComponent= std.view.getBlock(model.id)
+  const nextBlockComponent=std.view.getBlock(nextBlock?.id)
+  //check for callout block
+  const outSideCallout=blockComponent && blockComponent.closest('.nest-editor') && nextBlockComponent && !nextBlockComponent.closest('.nest-editor')
+  if(outSideCallout){
+    return true;
+  }
+
   if (nextBlock?.text) {
     model.text.join(nextBlock.text);
     if (nextBlock.children) {

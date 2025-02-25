@@ -53,8 +53,10 @@ export class EditorHost extends SignalWatcher(
     if (!block || block.blockViewType === BlockViewType.Hidden) {
       return html`${nothing}`;
     }
+    //console.log("11111",flavour,this.doc.schema.flavourSchemaMap);
     const schema = this.doc.schema.flavourSchemaMap.get(flavour);
     const view = this.std.getView(flavour);
+    //console.log("22222",schema ,view);
     if (!schema || !view) {
       console.warn(`Cannot find render flavour ${flavour}.`);
       return html`${nothing}`;

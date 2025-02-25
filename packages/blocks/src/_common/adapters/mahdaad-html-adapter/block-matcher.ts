@@ -45,6 +45,10 @@ import {
   MahdaadRootBlockHtmlAdapterExtension,
   mahdaadRootBlockHtmlAdapterMatcher
 } from '../../../root-block/adapters/mahdaad-html.js';
+import {
+  MahdaadCalloutBlockHtmlAdapterExtension,
+  mahdaadCalloutBlockHtmlAdapterMatcher,
+} from '../../../mahdaad-callout-block/adapters/index.js';
 
 
 /*import {
@@ -80,7 +84,8 @@ export const mahdaadDefaultBlockHtmlAdapterMatchers = [
   mahdaadDividerBlockHtmlAdapterMatcher,
   mahdaadWeblinkBlockHtmlAdapterMatcher,
   mahdaadAttachmentBlockHtmlAdapterMatcher,
-  mahdaadDatabaseBlockHtmlAdapterMatcher
+  mahdaadDatabaseBlockHtmlAdapterMatcher,
+  mahdaadCalloutBlockHtmlAdapterMatcher
   //listBlockHtmlAdapterMatcher,
   /*codeBlockHtmlAdapterMatcher,
   dividerBlockHtmlAdapterMatcher,
@@ -104,7 +109,8 @@ export const mahdaadBlockHtmlAdapterExtensions: ExtensionType[] = [
   MahdaadDividerBlockHtmlAdapterExtension,
   MahdaadWeblinkBlockHtmlAdapterExtension,
   MahdaadAttachmentBlockHtmlAdapterExtension,
-  MahdaadDatabaseBlockHtmlAdapterExtension
+  MahdaadDatabaseBlockHtmlAdapterExtension,
+  MahdaadCalloutBlockHtmlAdapterExtension
   /*ListBlockHtmlAdapterExtension,
   ParagraphBlockHtmlAdapterExtension,
   CodeBlockHtmlAdapterExtension,

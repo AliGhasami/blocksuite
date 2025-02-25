@@ -69,6 +69,91 @@ export interface MahdaadActionMenu {
 
 export const actionsMenu: MahdaadActionMenu[] = [
   {
+    key: 'two_columns',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertMahdaadColumnBlock({
+          count:2
+        })
+        .run();
+       /* rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-multi-column',
+          props: {  },
+        })
+        .run();*/
+    },
+  },
+  {
+    key: 'three_columns',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertMahdaadColumnBlock({
+          count:3
+        })
+        .run();
+        /*rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-multi-column',
+          props: {  },
+        })
+        .run();*/
+    },
+  },
+  {
+    key: 'four_columns',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertMahdaadColumnBlock({
+          count:4
+        })
+        .run();
+        /*rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-multi-column',
+          props: {  },
+        })
+        .run();*/
+    },
+  },
+  {
+    key: 'callout',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertCalloutBlock({
+          type:'info'
+          //viewType: viewPresets.tableViewMeta.type,
+          //place: 'after',
+          //removeEmptyLine: true,
+        })
+        .run();
+
+      //runCommand(rootComponent, 'affine:mahdaad-callout', 'info');
+      /*const aa =  rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-callout',
+          props: { type:'info' },
+        })
+        .run();
+      console.log('aa',aa);*/
+
+
+
+    },
+  },
+  {
     key: 'text',
     action: ({ rootComponent }) => {
       runCommand(rootComponent, 'affine:paragraph', 'text');
@@ -1081,6 +1166,10 @@ function runCommand(
       props: { type },
     })
     .run();
+  //console.log('aa',aa);
+  //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
+  //doc.addBlock('affine:paragraph', {}, temp1)
+  //debugger
 
   /* rootElement.host.std.command
     .chain()

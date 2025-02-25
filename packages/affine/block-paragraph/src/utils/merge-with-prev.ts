@@ -10,10 +10,11 @@ import {
 import { EMBED_BLOCK_FLAVOUR_LIST } from '@blocksuite/affine-shared/consts';
 import {
   focusTitle,
-  getDocTitleInlineEditor,
+  getDocTitleInlineEditor, getNextContentBlock,
   getPrevContentBlock,
   matchFlavours,
 } from '@blocksuite/affine-shared/utils';
+import { MahdaadCalloutBlockSchema } from '@blocksuite/affine-model';
 
 /**
  * Merge the paragraph with prev block
@@ -35,7 +36,7 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
   if (!parent) return false;
 
   if (matchFlavours(parent, ['affine:edgeless-text'])) {
-    return true;
+    return false;
   }
 
   const prevBlock = getPrevContentBlock(editorHost, model);
@@ -43,7 +44,12 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
     return handleNoPreviousSibling(editorHost, model);
   }
 
-  if (matchFlavours(prevBlock, ['affine:paragraph', 'affine:list'])) {
+  const blockComponent= editorHost.std.view.getBlock(model.id)
+  const prevBlockComponent=editorHost.std.view.getBlock(prevBlock.id)
+  //check for callout block
+  const insideCallout= blockComponent && !blockComponent.closest('.nest-editor') && prevBlockComponent && prevBlockComponent.closest('.nest-editor')
+
+  if (!insideCallout && matchFlavours(prevBlock, ['affine:paragraph', 'affine:list'])) {
     const modelIndex = parent.children.indexOf(model);
     if (
       (modelIndex === -1 || modelIndex === parent.children.length - 1) &&
@@ -73,7 +79,8 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
       'affine:divider',
       ...EMBED_BLOCK_FLAVOUR_LIST,
       'affine:mahdaad-object',
-      'affine:mahdaad-weblink-block'
+      'affine:mahdaad-weblink-block',
+      'affine:mahdaad-callout'
     ])
   ) {
     const selection = editorHost.selection.create('block', {

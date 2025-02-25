@@ -1,5 +1,6 @@
 export * from './attachment/index.js';
 export * from './bookmark/index.js';
+export * from './callout/index.js';
 export * from './code/index.js';
 export * from './database/index.js';
 export * from './divider/index.js';
@@ -9,6 +10,7 @@ export * from './frame/index.js';
 export * from './image/index.js';
 export * from './latex/index.js';
 export * from './list/index.js';
+export * from './mahdaad-multi-column/index.js';
 export * from './mahdaad-object/index.js';
 export * from './mahdaad-weblink/index.js';
 export * from './note/index.js';

@@ -1,10 +1,12 @@
+import type { ObjectBlockModel } from "@blocksuite/affine-model";
+
 /// <reference types="vite/client" />
 import { assertExists } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
 import { html } from 'lit';
-//import { customElement } from 'lit/decorators.js';
 
-import type { ObjectBlockModel } from "@blocksuite/affine-model";
+//import { customElement } from 'lit/decorators.js';
+import {merge} from 'lodash-es'
 
 //import type { ObjectBlockModel } from './object-model.js';
 //import { CaptionedBlockComponent } from '../_common/components/captioned-block-component.js';
@@ -47,7 +49,8 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
 
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
-    if (['document', 'weblink'].includes(this.model.type) && mode == 'inline') {
+    //console.log("111111",this.model.type);
+    if (['document', 'image','weblink'].includes(this.model.type) && mode == 'inline') {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);
       assertExists(parent);
@@ -153,6 +156,8 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     //console.log("this is props",props);
     //...this.model,
     //meta:{...props}
+    //const meta=
+    props.meta= merge(this.model.meta, props.meta ?? {})
     this.doc.updateBlock(this.model, props);
   }
 }

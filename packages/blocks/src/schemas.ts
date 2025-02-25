@@ -22,6 +22,8 @@ import {
   ImageBlockSchema,
   LatexBlockSchema,
   ListBlockSchema,
+  MahdaadCalloutBlockSchema,
+  MahdaadMultiColumnBlockSchema,
   MahdaadWeblinkBlockSchema,
   NoteBlockSchema,
   ObjectBlockSchema,
@@ -62,4 +64,6 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   HintBlockSchema,
   ObjectBlockSchema,
   MahdaadWeblinkBlockSchema,
+  MahdaadCalloutBlockSchema,
+  MahdaadMultiColumnBlockSchema
 ];

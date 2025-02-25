@@ -511,17 +511,8 @@ watch(
 
 //todo ali ghasami
 async function setData(data: any, clear_history?: boolean = true) {
-  //return
-  //console.log("2222222222222222222this is data",data);
-  //init()
-  /*if(myCollection && currentDocument.value){
-  }*/
-  //return
-
   //method 1
   if (myCollection && currentDocument.value) {
-    //debugger
-    //myCollection.
     const doc = toRaw(unref(currentDocument.value)) //currentDocument.value as Doc
     console.log('this is doc', doc)
     const blocks = get(data, 'blocks.children', [])
@@ -536,8 +527,6 @@ async function setData(data: any, clear_history?: boolean = true) {
         middlewares: [replaceIdMiddleware]
       })
       const notes: BlockModel[] = doc.getBlocksByFlavour('affine:note')
-      //const id = doc.
-      //console.log("|1111",notes,notes[0].id);
       let index = 1
       //doc.load()
       if (notes.length > 0) {
@@ -558,7 +547,6 @@ async function setData(data: any, clear_history?: boolean = true) {
       }
     }
     //const doc = this.model.doc;
-    ///console.log('14141444', content);
   }
   //old method (before collabration)
   /*if (myCollection) {
@@ -900,8 +888,12 @@ async function init() {
           const rootId = doc.addBlock('affine:page')
           doc.addBlock('affine:surface', {}, rootId)
           if (!props.isBoardView) {
+            //console.log("aaaaa");
             const noteId = doc.addBlock('affine:note', {}, rootId)
             doc.addBlock('affine:paragraph', {}, noteId)
+
+            //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
+            //doc.addBlock('affine:paragraph', {}, temp1)
           }
           doc.resetHistory()
         }
@@ -1043,6 +1035,32 @@ async function init() {
     @apply text-gray-8;
   }
 
+
+  .claytap-quote{
+    @apply bg-gray-05;
+    &::after{
+      @apply bg-gray-2;
+      inset-inline-start:0;
+    }
+  }
+
+  .quote-container{
+    //padding: var(----pta-space-400, 8px);
+    @apply flex gap-2 p-2;
+    .quote-icon{
+      @apply stroke-gray-5 mt-1;
+    }
+
+
+    .affine-paragraph-placeholder{
+      bottom: unset !important;
+      @apply ps-9 text-gray-5;
+    }
+
+  }
+
+
+
   /* affine-database-table{
      //width: 100%;
    }*/
@@ -1098,7 +1116,7 @@ async function init() {
 
   .place-holder {
     @apply flex items-center gap-1 text-neutral-4 mt-body;
-    //line-height: unset;
+    line-height: 32px;
     transition: all 0.3s ease-in-out;
     .short-code {
       font-size: 10px;
@@ -1114,6 +1132,12 @@ async function init() {
       align-items: center;
       justify-content: center;
     }
+  }
+
+
+  *[data-v-text]{
+    //background-color: red;
+    line-height: 32px;
   }
 
   /* Mention Style */
@@ -1308,6 +1332,8 @@ async function init() {
     width: auto;
   }
 }
+
+
 
 /* slash Menu Style */
 /*.@{prefix}-slash-menu {

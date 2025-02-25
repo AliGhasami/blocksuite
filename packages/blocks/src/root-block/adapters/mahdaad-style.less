@@ -84,11 +84,14 @@ q::after {
   --ptp-dimension-600:12px;
   --ptp-dimension-1200:24px;
   --ptp-dimension-1600:32px;
-  --pta-fg-subtle:#8194A7;
+  --pta-space-600:12px;
+  /*--pta-fg-subtle:#8194A7;*/
+  --pta-fg-subtle:#90959D;
   --pta-space-100:2px;
   --pta-space-200:4px;
   --pta-space-300:6px;
   --pta-space-400:8px;
+  --pta-roundness-lg:8px;
   --pta-bg-secondary:#F8F8FC;
   --pta-size-sm:24px;
   --pta-size-lg:40px;
@@ -458,21 +461,41 @@ h3{
 }
 
 blockquote{
-  color: var(--pta-fg-subtle);
+  color: var(--pta-fg);
+  /*color: var(--pta-fg-subtle);*/
   /*font-family: Arial;*/
-  font-size: 14px;
+  font-size: var(--ptp-dimension-600, 12px);
+  //font-style: italic;
+  font-weight: 400;
+  //line-height: 20px; /* 166.667% */
+  /*font-size: 14px;
   font-style: italic;
   font-weight: 400;
-  line-height: var(--ptp-dimension-1200, 24px); /* 171.429% */
+  line-height: var(--ptp-dimension-1200, 24px); !* 171.429% *!*/
 }
+
+
 
 .mahdaad-blockquote{
   display: flex;
-  padding: var(--pta-space-100, 2px) var(--pta-space-300, 6px);
-  justify-content: space-between;
-  align-items: center;
-  align-self: stretch;
+  gap: var(--pta-space-200, 4px);
+  padding: var(--pta-space-400, 8px);
+  //padding: var(--pta-space-100, 2px) var(--pta-space-300, 6px);
+  /*justify-content: space-between;*/
+  //align-items: center;
+  //align-self: stretch;
   background: var(--pta-bg-secondary);
+
+  .quote{
+      margin-top: 2px;
+  }
+
+  //@apply bg-gray-05;
+  .quote-icon{
+    stroke: var(--pta-fg-subtle);
+    //margin-top: 2px;
+    //@apply stroke-gray-5 mt-1;
+  }
 }
 
 .mahdaad-mention{
@@ -506,6 +529,12 @@ blockquote{
   background-color: rgba(var(--mt-gray-05));
   padding-left: var(--mt-space-015, 6px);
   padding-right: var(--mt-space-015, 6px);
+
+  &.image{
+    display: inline;
+  }
+
+
 }
 
 
@@ -751,6 +780,25 @@ blockquote{
   tbody tr:last-child td{
     border-bottom: unset;
   }
+}
+
+
+.mahdaad-callout{
+  display: flex;
+  padding: var(--pta-space-600, 12px);
+  padding-top:2px;
+  gap: var(--pta-space-300, 6px);
+  border-radius: var(--pta-roundness-lg, 8px);
+  border: 1px solid transparent;
+
+  .content{
+    width: 100%;
+  }
+
+  .icon{
+    margin-top: 12px;
+  }
+
 }
 
 

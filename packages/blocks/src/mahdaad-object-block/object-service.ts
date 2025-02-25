@@ -1,7 +1,7 @@
-import { ImageBlockSchema, ObjectBlockSchema } from '@blocksuite/affine-model';
+import { ObjectBlockSchema } from '@blocksuite/affine-model';
 import {
   DragHandleConfigExtension,
-  TelemetryProvider,
+  //TelemetryProvider,
 } from '@blocksuite/affine-shared/services';
 import {
 /*  captureEventTarget,

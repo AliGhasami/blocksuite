@@ -135,6 +135,8 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       const embedItem=embedList.find(item=> item.object_id==objectId)
       //@ts-ignore
       const storageUrl=context.configs.get('mahdaad_config')?.storageUrl ?? ''
+      //@ts-ignore
+      const minioStorageImageUrl=context.configs.get('mahdaad_config')?.minioStorageImageUrl ?? ''
       //console.log("object",object,o.node.props);
       const isEmbed=include_embed && o.node.props?.type=='document' && o.node.props?.show_type && o.node.props?.show_type=='embed' && embedItem
       walkerContext
@@ -181,7 +183,7 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
               type: 'element',
               tagName: 'img',
               properties: {
-                src:`${storageUrl}/${object.meta.storage}`
+                src: object.meta &&  object.meta.bucket_name ? `${minioStorageImageUrl}/${object.meta.storage}` :  `${storageUrl}/${object.meta.storage}`
                 //className: [`title line-clamp-1`],
               },
               children:[]

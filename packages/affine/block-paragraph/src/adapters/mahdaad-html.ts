@@ -8,6 +8,7 @@ import {
 } from '@blocksuite/affine-shared/adapters';
 import { nanoid } from '@blocksuite/store';
 
+import quoteIcon from '../assets/quote.svg?raw'
 const paragraphBlockMatchTags = [
   'p',
   'h1',
@@ -308,6 +309,19 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
               },
               'children'
             )
+            .openNode({
+                type: 'element',
+                tagName: 'span',
+                properties: {
+                  className: ['quote-icon'],
+                },
+                children: [{
+                  type:'raw',
+                  value:quoteIcon
+                }],
+              },
+              'children')
+            .closeNode()
             .openNode(
               {
                 type: 'element',
@@ -336,7 +350,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
                 tagName: 'div',
                 properties: {
                   className: ['affine-block-children-container'],
-                  style: 'padding-left: 26px;',
+                 // style: 'padding-left: 26px;',
                 },
                 children: [],
               },
