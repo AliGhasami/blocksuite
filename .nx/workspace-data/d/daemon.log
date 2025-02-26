@@ -9503,3 +9503,50 @@ Error: Source project does not exist: npm:@microsoft/api-extractor
 [NX Daemon Server] - 2025-02-25T11:54:52.631Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2025-02-25T11:54:52.631Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (sources)
 [NX Daemon Server] - 2025-02-25T11:54:52.632Z - [WATCHER]: Stopping the watcher for D:\mahdaad\claytap\src\blocksuite (outputs)
+[NX Daemon Server] - 2025-02-26T06:19:57.451Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\0e37f8ccbc0583004a3e\d.sock
+[NX Daemon Server] - 2025-02-26T06:19:57.457Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite-old-method-1403-12-07 (native)
+[NX Daemon Server] - 2025-02-26T06:19:57.461Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T06:19:57.463Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T06:19:57.464Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T06:19:57.466Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-26T06:19:57.469Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-26T06:19:57.469Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 3.
+[NX Daemon Server] - 2025-02-26T06:19:57.470Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T06:19:57.470Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite-old-method-1403-12-07 (sources)
+[NX Daemon Server] - 2025-02-26T06:19:57.471Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite-old-method-1403-12-07 (outputs)
+[NX Daemon Server] - 2025-02-26T06:38:34.695Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\0e37f8ccbc0583004a3e\d.sock
+[NX Daemon Server] - 2025-02-26T06:38:34.700Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite-old-method-1403-12-07 (native)
+[NX Daemon Server] - 2025-02-26T06:38:34.710Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T06:38:34.713Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T06:38:34.713Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T06:38:34.716Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-26T06:38:34.717Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-26T06:38:34.717Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-26T06:38:34.718Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T06:38:34.718Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite-old-method-1403-12-07 (sources)
+[NX Daemon Server] - 2025-02-26T06:38:34.718Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite-old-method-1403-12-07 (outputs)
+[NX Daemon Server] - 2025-02-26T06:54:16.210Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\0e37f8ccbc0583004a3e\d.sock
+[NX Daemon Server] - 2025-02-26T06:54:16.215Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite-old-method-1403-12-07 (native)
+[NX Daemon Server] - 2025-02-26T06:54:16.252Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T06:54:16.254Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T06:54:16.255Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T06:54:16.259Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-26T06:54:16.261Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-26T06:54:16.261Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-02-26T06:54:16.261Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T06:54:16.264Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite-old-method-1403-12-07 (sources)
+[NX Daemon Server] - 2025-02-26T06:54:16.267Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite-old-method-1403-12-07 (outputs)
+[NX Daemon Server] - 2025-02-26T07:30:23.291Z - Started listening on: \\.\pipe\nx\C:\Users\HACO-T~1\AppData\Local\Temp\e474629dbedacb7546a1\d.sock
+[NX Daemon Server] - 2025-02-26T07:30:23.303Z - [WATCHER]: Subscribed to changes within: D:\mahdaad\blocksuite (native)
+[NX Daemon Server] - 2025-02-26T07:30:23.307Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T07:30:23.308Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-26T07:30:23.310Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-26T07:30:23.312Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-26T07:30:23.313Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-26T07:30:23.313Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-26T07:30:23.313Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2025-02-26T07:30:23.314Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-26T07:30:23.314Z - [WATCHER]: Stopping the watcher for D:\mahdaad\blocksuite (outputs)
+
+> NX runtime error err=cannot send event from fs watcher: sending into a closed channel
+
