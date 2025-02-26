@@ -359,10 +359,11 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
         })}>
           ${this.model.type.startsWith('h') && collapsedSiblings.length > 0
             ? html`
-                <affine-paragraph-heading-icon
+                <!-- <affine-paragraph-heading-icon
                   .model=${this.model}
-                ></affine-paragraph-heading-icon>
+                ></affine-paragraph-heading-icon> -->
                 <blocksuite-toggle-button
+                  .direction=${ this.model.dir}
                   .collapsed=${collapsed}
                   .updateCollapsed=${(value: boolean) => {
               if (this.doc.readonly) {

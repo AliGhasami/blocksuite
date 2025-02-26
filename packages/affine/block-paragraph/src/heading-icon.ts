@@ -40,7 +40,8 @@ export class ParagraphHeadingIcon extends WithDisposable(ShadowlessElement) {
       align-items: start;
       margin-top: 0.3em;
       position: absolute;
-      left: 0;
+      /*left: 0;*/
+      inset-inline-start: 0;
       transform: translateX(-64px);
       border-radius: 4px;
       padding: 2px;

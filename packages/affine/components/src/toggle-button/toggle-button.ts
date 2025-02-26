@@ -15,13 +15,26 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
       align-items: start;
       margin-top: 0.45em;
       position: absolute;
-      left: 0;
+      /*left: 0;*/
+      inset-inline-start: 0;
       transform: translateX(-100%);
       border-radius: 4px;
       cursor: pointer;
       opacity: 0;
       transition: opacity 0.2s ease-in-out;
     }
+    
+    .icon-right{
+      inset-inline-start: -20px;
+      transform: rotate(-180deg);
+    }
+    
+    .icon-down{
+      inset-inline-start: -35px;
+      //transform: rotate(-180deg);
+    }
+    
+    
     .toggle-icon:hover {
       background: var(--affine-hover-color);
     }
@@ -50,7 +63,7 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     const toggleDownTemplate = html`
       <div
         contenteditable="false"
-        class="toggle-icon"
+        class="toggle-icon ${this.direction=='rtl'? 'icon-down' : ''}"
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
         ${toggleDown}
@@ -60,7 +73,7 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     const toggleRightTemplate = html`
       <div
         contenteditable="false"
-        class="toggle-icon"
+        class="toggle-icon ${this.direction=='rtl'? 'icon-right' : ''}"
         data-collapsed=${this.collapsed}
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
@@ -75,7 +88,13 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
   accessor collapsed!: boolean;
 
   @property({ attribute: false })
+  accessor direction!: string | null;
+
+  @property({ attribute: false })
   accessor updateCollapsed!: (collapsed: boolean) => void;
+
+
+
 }
 
 declare global {
