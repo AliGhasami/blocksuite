@@ -41,6 +41,7 @@ import {
 } from '../../../divider-block/adapters/mahdaad-html.js';
 import {MahdaadObjectBlockHtmlAdapterExtension ,mahdaadObjectBlockHtmlAdapterMatcher} from '../../../mahdaad-object-block/adapters/mahdaad-html.js'
 import {MahdaadMultiColumnBlockHtmlAdapterExtension,mahdaadMultiColumnBlockHtmlAdapterMatcher} from '../../../mahdaad-multi-column-block/adapters/mahdaad-html.js'
+import {MahdaadNoteBlockHtmlAdapterExtension,mahdaadNoteBlockHtmlAdapterMatcher} from '../../../note-block/adapters/mahdaad-html.js'
 import {MahdaadWeblinkBlockHtmlAdapterExtension,mahdaadWeblinkBlockHtmlAdapterMatcher} from '../../../mahdaad-weblink-block/adapters/mahdaad-html.js'
 import {
   MahdaadRootBlockHtmlAdapterExtension,
@@ -87,7 +88,8 @@ export const mahdaadDefaultBlockHtmlAdapterMatchers = [
   mahdaadAttachmentBlockHtmlAdapterMatcher,
   mahdaadDatabaseBlockHtmlAdapterMatcher,
   mahdaadCalloutBlockHtmlAdapterMatcher,
-  mahdaadMultiColumnBlockHtmlAdapterMatcher
+  mahdaadMultiColumnBlockHtmlAdapterMatcher,
+  mahdaadNoteBlockHtmlAdapterMatcher
   //listBlockHtmlAdapterMatcher,
   /*codeBlockHtmlAdapterMatcher,
   dividerBlockHtmlAdapterMatcher,
@@ -113,7 +115,8 @@ export const mahdaadBlockHtmlAdapterExtensions: ExtensionType[] = [
   MahdaadAttachmentBlockHtmlAdapterExtension,
   MahdaadDatabaseBlockHtmlAdapterExtension,
   MahdaadCalloutBlockHtmlAdapterExtension,
-  MahdaadMultiColumnBlockHtmlAdapterExtension
+  MahdaadMultiColumnBlockHtmlAdapterExtension,
+  MahdaadNoteBlockHtmlAdapterExtension
   /*ListBlockHtmlAdapterExtension,
   ParagraphBlockHtmlAdapterExtension,
   CodeBlockHtmlAdapterExtension,

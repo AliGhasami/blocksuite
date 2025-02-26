@@ -20,6 +20,7 @@ const createNoteBlockHtmlAdapterMatcher = (
   toBlockSnapshot: {},
   fromBlockSnapshot: {
     enter: (o, context) => {
+      console.log("note",o,context,displayModeToSkip);
       const node = o.node;
       if (node.props.displayMode === displayModeToSkip) {
         context.walkerContext.skipAllChildren();
