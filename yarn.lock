@@ -4660,7 +4660,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@npm:2.0.30, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -11880,7 +11880,7 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "workspace:*"
+    "@mahdaad/block-editor": "npm:2.0.30"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"
@@ -11985,6 +11985,8 @@ __metadata:
     simple-git-hooks: "npm:2.11.1"
     slash: "npm:5.1.0"
     sortablejs: "npm:1.15.2"
+    split-grid: "npm:^1.0.11"
+    split.js: "npm:^1.6.5"
     standard-version: "npm:^9.5.0"
     start-server-and-test: "npm:2.0.4"
     stylelint: "npm:16.6.1"
@@ -26039,6 +26041,20 @@ __metadata:
   version: 14.0.1
   resolution: "speakingurl@npm:14.0.1"
   checksum: 10/4a49e532e495436982c9555867f0f97a7bc331b4567c8263942f9a11bd8570efe0d5d08a0f8a549c28819f10b8884e27fc5c2b04b93fd6eaa6c4494104e6c763
+  languageName: node
+  linkType: hard
+
+"split-grid@npm:^1.0.11":
+  version: 1.0.11
+  resolution: "split-grid@npm:1.0.11"
+  checksum: 10/f8909b7be744485152f9a90fb14be1ececeeb2164fb32ac673578df90ce2681c33ed7a49fea245a2a52441481fec3b10c3180dcad5b853f4e19becbbf8f4cab9
+  languageName: node
+  linkType: hard
+
+"split.js@npm:^1.6.5":
+  version: 1.6.5
+  resolution: "split.js@npm:1.6.5"
+  checksum: 10/9597f317e26bd040f20d5221e6b08dd5b5195b8014d5482a149a5f4a49033765257b1fa34e31eb5372fc738f1d8c43e8715a5c08bce1b14cbd9346cc31c20cbd
   languageName: node
   linkType: hard
 

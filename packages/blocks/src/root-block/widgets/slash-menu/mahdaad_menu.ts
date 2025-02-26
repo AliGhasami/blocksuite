@@ -69,6 +69,63 @@ export interface MahdaadActionMenu {
 
 export const actionsMenu: MahdaadActionMenu[] = [
   {
+    key: 'two_columns',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertMahdaadColumnBlock({
+          count:2
+        })
+        .run();
+       /* rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-multi-column',
+          props: {  },
+        })
+        .run();*/
+    },
+  },
+  {
+    key: 'three_columns',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertMahdaadColumnBlock({
+          count:3
+        })
+        .run();
+        /*rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-multi-column',
+          props: {  },
+        })
+        .run();*/
+    },
+  },
+  {
+    key: 'four_columns',
+    action: ({ rootComponent }) => {
+      rootComponent.std.command
+        .chain()
+        .getSelectedModels()
+        .insertMahdaadColumnBlock({
+          count:4
+        })
+        .run();
+        /*rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-multi-column',
+          props: {  },
+        })
+        .run();*/
+    },
+  },
+  {
     key: 'callout',
     action: ({ rootComponent }) => {
       rootComponent.std.command

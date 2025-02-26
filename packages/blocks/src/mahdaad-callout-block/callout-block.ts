@@ -61,12 +61,46 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
 
   changeProps(event:CustomEvent) {
     const data=event.detail[0]
+<<<<<<< HEAD
     
+=======
+>>>>>>> stable_v2
     if(data) {
       const normal=pick(data,['type','icon','background'])
       this.doc.updateBlock(this.model,{
         ...normal
       })
+<<<<<<< HEAD
+=======
+
+    }
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+  }
+
+
+  convertToType(blocksModel:BlockModel[],flavour:string,type:string) {
+    blocksModel.forEach(blockModel=>{
+      /*this.std.command
+        .chain()
+        .updateBlockType({
+          flavour,
+          props:{ type } ,
+        })
+        .run();*/
+      //this.std.doc.updateBlock(blockModel,{flavour,type})
+      if(blockModel.flavour==flavour) {
+        this.std.doc.updateBlock(blockModel,{flavour,type})
+      }else{
+        transformModel(blockModel, flavour, {type});
+      }
+      this.convertToType(blockModel.children,flavour,type)
+    })
+  }
+
+>>>>>>> stable_v2
 
     }
   }
@@ -96,6 +130,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
   }
 
   override renderBlock() {
+
     return html`
       <div dir=${this.model.dir}>
       <mahdaad-callout-component
