@@ -10872,15 +10872,6 @@
         "hash": "10/0283879f55e7c16fdceacc181f87a0a65c53bc16ffe1d58b9d19a6277adcd71900d02bb2c4843dd55e78c51e30e89b0fec618a7f170ebcc95b33182c28f05fd6"
       }
     },
-    "npm:crypto": {
-      "type": "npm",
-      "name": "npm:crypto",
-      "data": {
-        "version": "1.0.1",
-        "packageName": "crypto",
-        "hash": "10/087fe3165bd94c333a49e6ed66a0193911f63eac38a24f379b3001a5fe260a59c413646e53a0f67875ba13902b2686d81dc703cb2c147a4ec727dcdc04e5645e"
-      }
-    },
     "npm:css-functions-list": {
       "type": "npm",
       "name": "npm:css-functions-list",

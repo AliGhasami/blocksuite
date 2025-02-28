@@ -20,6 +20,8 @@ export const mahdaadNoteBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   fromBlockSnapshot: {
     enter: (o, context) => {
       if(o.parent && o.parent.node.flavour==MahdaadMultiColumnBlockSchema.model.flavour){
+        const sizes= o.parent.node.props.sizes
+        //console.log("bbbbb",sizes[o.index]);
         const {  walkerContext } = context;
         walkerContext
           .openNode(
@@ -28,6 +30,7 @@ export const mahdaadNoteBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
               tagName: 'div',
               properties: {
                 className: [`column`],
+                style:`width:${sizes[o.index]}%`
               },
               children:[],
             },

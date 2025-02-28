@@ -66,7 +66,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
 
     if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
-      if(key=='/')return 
+      if(key=='/')return
       this.setDirection(key)
     } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
       delete this.model.dir
@@ -320,7 +320,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override renderBlock(): TemplateResult<1> {
-    console.log("this is render block",this.model.id);
+    //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
       ? this._readonlyCollapsed
@@ -392,11 +392,11 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             html`<div class="quote-container" dir=${this.model.dir}>
               <span class="quote-icon">${html`${unsafeSVG(quoteIcon)}`}</span>
               ${this.richText()}
-              <!-- ${this.placeHolder()} -->
+              ${this.placeHolder()}
             </div>` 
             : this.richText()}
             
-          <!-- ${this.model.type=='quote' ? nothing : this.placeHolder()} -->
+          ${this.model.type=='quote' ? nothing : this.placeHolder()}
           
         </div>
 

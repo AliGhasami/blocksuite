@@ -730,4 +730,8 @@ blockquote {
 .mahdaad-callout .icon {
   margin-top: 12px;
 }
+.mahdaad-multi-column {
+  display: flex;
+  gap: 12px;
+}
 /*# sourceMappingURL=mahdaad-style.css.map */

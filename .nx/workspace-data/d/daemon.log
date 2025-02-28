@@ -9550,3 +9550,671 @@ Error: Source project does not exist: npm:@microsoft/api-extractor
 
 > NX runtime error err=cannot send event from fs watcher: sending into a closed channel
 
+[NX Daemon Server] - 2025-02-28T16:55:22.360Z - Started listening on: \\.\pipe\nx\C:\Users\ALIGHA~1\AppData\Local\Temp\d10c7da9ae36298e7d12\d.sock
+[NX Daemon Server] - 2025-02-28T16:55:22.365Z - [WATCHER]: Subscribed to changes within: K:\Vue_Project\hacoupian-mahdaad\blocksuite (native)
+[NX Daemon Server] - 2025-02-28T16:55:22.373Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T16:55:22.376Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T16:55:22.376Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T16:55:22.379Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T16:55:23.002Z - Time taken for 'Load Nx Plugin: K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\plugins\js' 619.7440999999999ms
+[NX Daemon Server] - 2025-02-28T16:55:23.024Z - Time taken for 'Load Nx Plugin: K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\plugins\project-json\build-nodes\project-json' 640.8112000000001ms
+[NX Daemon Server] - 2025-02-28T16:55:23.054Z - Time taken for 'Load Nx Plugin: K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\plugins\package-json' 671.4233999999999ms
+[NX Daemon Server] - 2025-02-28T16:55:24.587Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-02-28T16:55:24.588Z - [REQUEST]: 
+[NX Daemon Server] - 2025-02-28T16:55:24.588Z - [REQUEST]: 
+[NX Daemon Server] - 2025-02-28T16:55:24.652Z - Time taken for 'loadNxPlugins' 2187.194ms
+[NX Daemon Server] - 2025-02-28T16:55:24.670Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T16:55:24.670Z - Established a connection. Number of open connections: 3
+[NX Daemon Server] - 2025-02-28T16:55:24.670Z - Closed a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T16:55:24.685Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:24.685Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:24.685Z - Handled HASH_GLOB. Handling time: 12. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:24.859Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:24.860Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:24.860Z - Handled HASH_GLOB. Handling time: 78. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:24.907Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:24.908Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:24.908Z - Handled HASH_GLOB. Handling time: 41. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.159Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.160Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.160Z - Handled HASH_GLOB. Handling time: 70. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.187Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.188Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.188Z - Handled HASH_GLOB. Handling time: 24. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.194Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.195Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.195Z - Handled HASH_GLOB. Handling time: 3. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.205Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.206Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.206Z - Handled HASH_GLOB. Handling time: 7. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.215Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.215Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.215Z - Handled HASH_GLOB. Handling time: 6. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:25.222Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.223Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.223Z - Handled HASH_GLOB. Handling time: 3. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.230Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.230Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.230Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:25.240Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.241Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.241Z - Handled HASH_GLOB. Handling time: 7. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.248Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.249Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.249Z - Handled HASH_GLOB. Handling time: 5. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.253Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.254Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.254Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.259Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.259Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.259Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:25.266Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.266Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.266Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:25.274Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.274Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.274Z - Handled HASH_GLOB. Handling time: 5. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:25.299Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.300Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.300Z - Handled HASH_GLOB. Handling time: 22. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.335Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.335Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.335Z - Handled HASH_GLOB. Handling time: 33. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:25.341Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.342Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.342Z - Handled HASH_GLOB. Handling time: 3. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:25.348Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.349Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:25.349Z - Handled HASH_GLOB. Handling time: 4. Response time: 1.
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+[NX Daemon Server] - 2025-02-28T16:55:28.908Z - Time taken for 'build-project-configs' 4265.966700000001ms
+[NX Daemon Server] - 2025-02-28T16:55:28.910Z - Time taken for '@nx/vite/plugin:createDependencies' 15.249399999999696ms
+[NX Daemon Server] - 2025-02-28T16:55:29.149Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-02-28T16:55:29.151Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-02-28T16:55:29.153Z - Time taken for 'total for creating and serializing project graph' 6772.2753999999995ms
+[NX Daemon Server] - 2025-02-28T16:55:29.154Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-02-28T16:55:29.154Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 6772. Response time: 3.
+[NX Daemon Server] - 2025-02-28T16:55:29.167Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T16:55:29.168Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-02-28T16:55:29.171Z - Time taken for 'total for creating and serializing project graph' 0.39720000000033906ms
+[NX Daemon Server] - 2025-02-28T16:55:29.173Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-02-28T16:55:29.173Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 5.
+[NX Daemon Server] - 2025-02-28T16:55:29.194Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-02-28T16:55:29.195Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-02-28T16:55:29.196Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 7. Response time: 2.
+[NX Daemon Server] - 2025-02-28T16:55:29.201Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T16:55:36.249Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T16:55:36.251Z - [WATCHER]: yarn.lock was modified
+[NX Daemon Server] - 2025-02-28T16:55:36.363Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-02-28T16:55:36.363Z - [REQUEST]: yarn.lock
+[NX Daemon Server] - 2025-02-28T16:55:36.363Z - [REQUEST]: 
+[NX Daemon Server] - 2025-02-28T16:55:36.396Z - Time taken for 'hash changed files from watcher' 4.543700000000172ms
+[NX Daemon Server] - 2025-02-28T16:55:36.445Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.446Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.447Z - Handled HASH_GLOB. Handling time: 3. Response time: 2.
+[NX Daemon Server] - 2025-02-28T16:55:36.455Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.455Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.455Z - Handled HASH_GLOB. Handling time: 3. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.469Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.470Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.471Z - Handled HASH_GLOB. Handling time: 10. Response time: 2.
+[NX Daemon Server] - 2025-02-28T16:55:36.486Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.488Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.489Z - Handled HASH_GLOB. Handling time: 13. Response time: 3.
+[NX Daemon Server] - 2025-02-28T16:55:36.521Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.522Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.523Z - Handled HASH_GLOB. Handling time: 29. Response time: 2.
+[NX Daemon Server] - 2025-02-28T16:55:36.540Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.540Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.540Z - Handled HASH_GLOB. Handling time: 15. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.550Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.550Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.551Z - Handled HASH_GLOB. Handling time: 7. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.567Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.568Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.568Z - Handled HASH_GLOB. Handling time: 13. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.585Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.585Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.585Z - Handled HASH_GLOB. Handling time: 13. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.596Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.597Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.597Z - Handled HASH_GLOB. Handling time: 8. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.605Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.605Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.605Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.618Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.618Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.618Z - Handled HASH_GLOB. Handling time: 10. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.626Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.626Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.626Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.635Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.635Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.635Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.650Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.650Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.650Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.663Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.664Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.664Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.672Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.672Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.672Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.684Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.684Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.684Z - Handled HASH_GLOB. Handling time: 4. Response time: 0.
+[NX Daemon Server] - 2025-02-28T16:55:36.693Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.694Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.694Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.702Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.703Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T16:55:36.703Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:36.839Z - Time taken for 'build-project-configs' 443.9429ms
+[NX Daemon Server] - 2025-02-28T16:55:36.840Z - Time taken for '@nx/vite/plugin:createDependencies' 15.7612999999983ms
+[NX Daemon Server] - 2025-02-28T16:55:36.908Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-02-28T16:55:36.910Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX Daemon Server] - 2025-02-28T16:55:36.910Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX Daemon Server] - 2025-02-28T16:55:36.910Z - Time taken for 'total execution time for createProjectGraph()' 67.48329999999987ms
+[NX Daemon Server] - 2025-02-28T16:55:37.256Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T16:55:37.256Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T16:55:37.257Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T16:55:37.257Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T16:55:37.258Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-02-28T16:55:37.259Z - Time taken for 'total for creating and serializing project graph' 0.3004000000000815ms
+[NX Daemon Server] - 2025-02-28T16:55:37.260Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-02-28T16:55:37.260Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2025-02-28T16:55:37.274Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-02-28T16:55:37.275Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-02-28T16:55:37.275Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 4. Response time: 1.
+[NX Daemon Server] - 2025-02-28T16:55:37.279Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T16:55:55.947Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:12:51.396Z - [WATCHER]: packages/blocks/src/root-block/widgets/drag-handle/drag-handle.ts was modified
+[NX Daemon Server] - 2025-02-28T17:12:51.396Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:12:51.508Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-02-28T17:12:51.508Z - [REQUEST]: packages/blocks/src/root-block/widgets/drag-handle/drag-handle.ts
+[NX Daemon Server] - 2025-02-28T17:12:51.508Z - [REQUEST]: 
+[NX Daemon Server] - 2025-02-28T17:12:51.525Z - Time taken for 'hash changed files from watcher' 2.787400000030175ms
+[NX Daemon Server] - 2025-02-28T17:12:51.546Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.547Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.547Z - Handled HASH_GLOB. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:12:51.551Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.551Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.551Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.555Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.555Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.555Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.559Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.560Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.560Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:12:51.565Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.565Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.565Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.570Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.570Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.570Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.575Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.575Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.575Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.579Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.579Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.579Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.583Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.583Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.583Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.588Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.588Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.588Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.595Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.595Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.595Z - Handled HASH_GLOB. Handling time: 1. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.601Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.601Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.601Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.607Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.607Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.607Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.613Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.613Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.613Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.618Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.619Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.619Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:12:51.624Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.624Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.624Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.630Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.631Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.631Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:12:51.639Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.639Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.639Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.646Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.646Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.646Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.656Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.656Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:12:51.656Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:12:51.868Z - Time taken for 'build-project-configs' 320.58600000012666ms
+[NX Daemon Server] - 2025-02-28T17:12:51.869Z - Time taken for '@nx/vite/plugin:createDependencies' 17.800500000128523ms
+[NX Daemon Server] - 2025-02-28T17:12:51.943Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-02-28T17:12:51.944Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX Daemon Server] - 2025-02-28T17:12:51.944Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX Daemon Server] - 2025-02-28T17:12:51.944Z - Time taken for 'total execution time for createProjectGraph()' 80.50290000019595ms
+[NX Daemon Server] - 2025-02-28T17:12:52.409Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T17:12:52.409Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T17:12:52.409Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T17:12:52.410Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T17:12:52.411Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-02-28T17:12:52.412Z - Time taken for 'total for creating and serializing project graph' 0.420200000051409ms
+[NX Daemon Server] - 2025-02-28T17:12:52.413Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-02-28T17:12:52.413Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2025-02-28T17:12:52.433Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-02-28T17:12:52.434Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-02-28T17:12:52.434Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 5. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:12:52.441Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T17:13:08.883Z - [WATCHER]: packages/blocks/src/root-block/widgets/drag-handle/watchers/drag-event-watcher.ts was modified
+[NX Daemon Server] - 2025-02-28T17:13:08.884Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:13:08.995Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-02-28T17:13:08.996Z - [REQUEST]: packages/blocks/src/root-block/widgets/drag-handle/watchers/drag-event-watcher.ts
+[NX Daemon Server] - 2025-02-28T17:13:08.996Z - [REQUEST]: 
+[NX Daemon Server] - 2025-02-28T17:13:09.010Z - Time taken for 'hash changed files from watcher' 2.626399999950081ms
+[NX Daemon Server] - 2025-02-28T17:13:09.029Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.034Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.034Z - Handled HASH_GLOB. Handling time: 2. Response time: 5.
+[NX Daemon Server] - 2025-02-28T17:13:09.037Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.037Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.037Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.041Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.041Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.042Z - Handled HASH_GLOB. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.046Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.046Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.046Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.050Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.051Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.051Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.057Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.057Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.058Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.062Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.062Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.062Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.067Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.067Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.067Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.073Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.074Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.074Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.081Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.082Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.082Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.086Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.086Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.087Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.092Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.092Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.092Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.096Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.096Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.096Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.105Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.105Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.105Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.112Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.112Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.112Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.117Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.117Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.117Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.123Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.124Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.124Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.132Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.132Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.132Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.143Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.144Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.144Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.152Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.153Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:13:09.153Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:13:09.645Z - Time taken for 'build-project-configs' 592.4314999999478ms
+[NX Daemon Server] - 2025-02-28T17:13:09.647Z - Time taken for '@nx/vite/plugin:createDependencies' 27.90170000004582ms
+[NX Daemon Server] - 2025-02-28T17:13:09.735Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-02-28T17:13:09.737Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX Daemon Server] - 2025-02-28T17:13:09.737Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX Daemon Server] - 2025-02-28T17:13:09.737Z - Time taken for 'total execution time for createProjectGraph()' 101.76970000006258ms
+[NX Daemon Server] - 2025-02-28T17:13:09.895Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T17:13:09.895Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T17:13:09.896Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T17:13:09.898Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T17:13:09.899Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-02-28T17:13:09.902Z - Time taken for 'total for creating and serializing project graph' 0.7101000000257045ms
+[NX Daemon Server] - 2025-02-28T17:13:09.903Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-02-28T17:13:09.903Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 4.
+[NX Daemon Server] - 2025-02-28T17:13:09.919Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-02-28T17:13:09.919Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-02-28T17:13:09.919Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 5. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:13:09.925Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T17:13:19.456Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:29:17.165Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:51:46.044Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:51:46.054Z - [WATCHER]: 0 file(s) created or restored, 7 file(s) modified, 0 file(s) deleted
+[NX Daemon Server] - 2025-02-28T17:51:46.211Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-02-28T17:51:46.211Z - [REQUEST]: packages/blocks/src/note-block/adapters/html.ts,packages/blocks/src/note-block/adapters/mahdaad-html.ts,packages/blocks/src/_specs/common.ts,packages/framework/block-std/src/view/element/lit-host.ts,packages/affine/block-paragraph/src/paragraph-block.ts,packages/blocks/src/_common/adapters/mahdaad-html-adapter/block-matcher.ts,packages/blocks/src/_specs/preset/page-specs.ts
+[NX Daemon Server] - 2025-02-28T17:51:46.211Z - [REQUEST]: 
+[NX Daemon Server] - 2025-02-28T17:51:46.225Z - Time taken for 'hash changed files from watcher' 40.17670000018552ms
+[NX Daemon Server] - 2025-02-28T17:51:46.253Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.253Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.253Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.256Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.256Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.256Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.261Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.266Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.266Z - Handled HASH_GLOB. Handling time: 3. Response time: 5.
+[NX Daemon Server] - 2025-02-28T17:51:46.268Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.270Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.270Z - Handled HASH_GLOB. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2025-02-28T17:51:46.273Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.273Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.273Z - Handled HASH_GLOB. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:51:46.285Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.285Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.285Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.289Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.289Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.289Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.293Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.294Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.294Z - Handled HASH_GLOB. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:51:46.301Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.301Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.301Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.306Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.306Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.306Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.315Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.315Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.315Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.326Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.326Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.326Z - Handled HASH_GLOB. Handling time: 1. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.335Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.335Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.335Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.345Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.345Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.345Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.356Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.357Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.357Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:51:46.365Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.365Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.365Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.375Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.375Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.375Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.383Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.383Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.383Z - Handled HASH_GLOB. Handling time: 3. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.391Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.391Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.391Z - Handled HASH_GLOB. Handling time: 2. Response time: 0.
+[NX Daemon Server] - 2025-02-28T17:51:46.396Z - [REQUEST]: Responding to the client. handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.397Z - Done responding to the client handleHashGlob
+[NX Daemon Server] - 2025-02-28T17:51:46.397Z - Handled HASH_GLOB. Handling time: 2. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:51:46.646Z - Time taken for 'build-project-configs' 404.153299999889ms
+[NX Daemon Server] - 2025-02-28T17:51:46.647Z - Time taken for '@nx/vite/plugin:createDependencies' 17.274100000038743ms
+[NX Daemon Server] - 2025-02-28T17:51:46.698Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-02-28T17:51:46.699Z - [SYNC]: project graph hash is the same, not collecting task sync generators
+[NX Daemon Server] - 2025-02-28T17:51:46.699Z - [SYNC]: nx.json hash is the same, not collecting global sync generators
+[NX Daemon Server] - 2025-02-28T17:51:46.699Z - Time taken for 'total execution time for createProjectGraph()' 58.64559999993071ms
+[NX Daemon Server] - 2025-02-28T17:51:47.061Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T17:51:47.061Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T17:51:47.061Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T17:51:47.062Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T17:51:47.063Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-02-28T17:51:47.065Z - Time taken for 'total for creating and serializing project graph' 0.4815000002272427ms
+[NX Daemon Server] - 2025-02-28T17:51:47.065Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-02-28T17:51:47.065Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2025-02-28T17:51:47.080Z - [REQUEST]: Responding to the client. handleContextFileData
+[NX Daemon Server] - 2025-02-28T17:51:47.081Z - Done responding to the client handleContextFileData
+[NX Daemon Server] - 2025-02-28T17:51:47.081Z - Handled GET_CONTEXT_FILE_DATA. Handling time: 4. Response time: 1.
+[NX Daemon Server] - 2025-02-28T17:51:47.085Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T17:52:05.023Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T17:52:28.224Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:03:14.053Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:03:39.036Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:03:40.092Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:03:40.187Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:04:00.430Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:08:16.323Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:12:33.604Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:12:56.939Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:12:57.065Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:52:37.430Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:57:03.210Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:57:03.211Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2025-02-28T18:57:03.211Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:03.211Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (outputs)
+[NX Daemon Server] - 2025-02-28T18:57:08.476Z - Started listening on: \\.\pipe\nx\C:\Users\ALIGHA~1\AppData\Local\Temp\d10c7da9ae36298e7d12\d.sock
+[NX Daemon Server] - 2025-02-28T18:57:08.479Z - [WATCHER]: Subscribed to changes within: K:\Vue_Project\hacoupian-mahdaad\blocksuite (native)
+[NX Daemon Server] - 2025-02-28T18:57:08.484Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:08.485Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-28T18:57:08.487Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:08.489Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T18:57:08.750Z - Time taken for 'Load Nx Plugin: K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\plugins\package-json' 246.6225999999997ms
+[NX Daemon Server] - 2025-02-28T18:57:08.766Z - Time taken for 'Load Nx Plugin: K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\plugins\project-json\build-nodes\project-json' 262.7353000000003ms
+[NX Daemon Server] - 2025-02-28T18:57:09.557Z - Time taken for 'Load Nx Plugin: K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\plugins\js' 1054.7382000000007ms
+[NX Daemon Server] - 2025-02-28T18:57:16.205Z - [REQUEST]: Responding to the client with an error. Error when preparing serialized project graph. Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+Error: Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1249:15)
+    at Function._load (node:internal/modules/cjs/loader:1075:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:315:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:218:24)
+    at Module.require (node:internal/modules/cjs/loader:1340:12)
+    at require (node:internal/modules/helpers:141:16)
+    at Object.<anonymous> (K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1546:14)
+    at Object..js (node:internal/modules/cjs/loader:1689:10)
+    at Module.load (node:internal/modules/cjs/loader:1318:32)
+[NX Daemon Server] - 2025-02-28T18:57:16.206Z - Done responding to the client null
+[NX Daemon Server] - 2025-02-28T18:57:16.206Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 7716. Response time: 1.
+[NX Daemon Server] - 2025-02-28T18:57:16.207Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:20.605Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:20.605Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:20.606Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:20.609Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T18:57:20.609Z - [REQUEST]: Responding to the client with an error. Error when preparing serialized project graph. Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+Error: Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1249:15)
+    at Function._load (node:internal/modules/cjs/loader:1075:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:315:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:218:24)
+    at Module.require (node:internal/modules/cjs/loader:1340:12)
+    at require (node:internal/modules/helpers:141:16)
+    at Object.<anonymous> (K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1546:14)
+    at Object..js (node:internal/modules/cjs/loader:1689:10)
+    at Module.load (node:internal/modules/cjs/loader:1318:32)
+[NX Daemon Server] - 2025-02-28T18:57:20.610Z - Done responding to the client null
+[NX Daemon Server] - 2025-02-28T18:57:20.610Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-28T18:57:20.610Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:27.793Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:27.794Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:27.797Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:27.810Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T18:57:27.811Z - [REQUEST]: Responding to the client with an error. Error when preparing serialized project graph. Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+Error: Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1249:15)
+    at Function._load (node:internal/modules/cjs/loader:1075:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:315:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:218:24)
+    at Module.require (node:internal/modules/cjs/loader:1340:12)
+    at require (node:internal/modules/helpers:141:16)
+    at Object.<anonymous> (K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1546:14)
+    at Object..js (node:internal/modules/cjs/loader:1689:10)
+    at Module.load (node:internal/modules/cjs/loader:1318:32)
+[NX Daemon Server] - 2025-02-28T18:57:27.811Z - Done responding to the client null
+[NX Daemon Server] - 2025-02-28T18:57:27.812Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-02-28T18:57:27.812Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:37.161Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:57:38.205Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:38.205Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:38.206Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:38.209Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-02-28T18:57:38.209Z - [REQUEST]: Responding to the client with an error. Error when preparing serialized project graph. Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+Error: Cannot find module 'reusify'
+Require stack:
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\readers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nodelib\fs.walk\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\readers\stream.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\providers\async.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\node_modules\fast-glob\out\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\copy-assets-handler.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\utils\assets\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\js\src\index.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\src\plugins\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\@nx\vite\plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\load-resolved-plugin.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\loader.js
+- K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\nx\src\project-graph\plugins\isolation\plugin-worker.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1249:15)
+    at Function._load (node:internal/modules/cjs/loader:1075:27)
+    at TracingChannel.traceSync (node:diagnostics_channel:315:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:218:24)
+    at Module.require (node:internal/modules/cjs/loader:1340:12)
+    at require (node:internal/modules/helpers:141:16)
+    at Object.<anonymous> (K:\Vue_Project\hacoupian-mahdaad\blocksuite\node_modules\fastq\queue.js:5:15)
+    at Module._compile (node:internal/modules/cjs/loader:1546:14)
+    at Object..js (node:internal/modules/cjs/loader:1689:10)
+    at Module.load (node:internal/modules/cjs/loader:1318:32)
+[NX Daemon Server] - 2025-02-28T18:57:38.210Z - Done responding to the client null
+[NX Daemon Server] - 2025-02-28T18:57:38.210Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-28T18:57:38.210Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:39.890Z - [WATCHER]: Processing file changes in outputs
+[NX Daemon Server] - 2025-02-28T18:57:50.325Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:50.326Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:50.327Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-28T18:57:50.330Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-28T18:57:50.331Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-28T18:57:50.331Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-28T18:57:50.331Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-28T18:57:50.332Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (sources)
+[NX Daemon Server] - 2025-02-28T18:57:50.332Z - [WATCHER]: Stopping the watcher for K:\Vue_Project\hacoupian-mahdaad\blocksuite (outputs)
