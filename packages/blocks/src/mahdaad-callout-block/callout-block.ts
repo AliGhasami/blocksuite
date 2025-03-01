@@ -66,10 +66,8 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
       this.doc.updateBlock(this.model,{
         ...normal
       })
-
     }
   }
-
 
   override connectedCallback() {
     super.connectedCallback();
@@ -102,7 +100,6 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
       this.convertToType(blockModel.children,flavour,type)
     })
   }
-
 
   override renderBlock() {
 

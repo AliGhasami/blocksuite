@@ -25,13 +25,11 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     }
     
     .icon-right{
-      inset-inline-start: -20px;
-      transform: rotate(-180deg);
+      transform: translateX(100%) rotate(-180deg);
     }
     
     .icon-down{
-      inset-inline-start: -35px;
-      //transform: rotate(-180deg);
+      transform: translateX(100%);
     }
     
     
@@ -92,8 +90,6 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
 
   @property({ attribute: false })
   accessor updateCollapsed!: (collapsed: boolean) => void;
-
-
 
 }
 

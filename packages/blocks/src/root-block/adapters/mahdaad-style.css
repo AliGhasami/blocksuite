@@ -606,7 +606,7 @@ blockquote {
   border: 1px solid var(--pta-br);
   background: var(--pta-bg);
 }
-.mahdaad-object.tag {
+.mahdaad-object .tag {
   display: flex;
   height: var(--pta-size-md, 32px);
   min-width: var(--pta-size-lg, 40px);
@@ -618,35 +618,35 @@ blockquote {
   background: var(--pta-primary-fill-subtle);
   padding: 0 var(--pta-space-400, 8px);
 }
-.mahdaad-object.tag.orange {
+.mahdaad-object .tag.orange {
   border-color: rgb(var(--mt-orange-1));
   background-color: rgb(var(--mt-orange-0));
 }
-.mahdaad-object.tag.red {
+.mahdaad-object .tag.red {
   border-color: rgb(var(--mt-red-1));
   background-color: rgb(var(--mt-red-0));
 }
-.mahdaad-object.tag.violet {
+.mahdaad-object .tag.violet {
   border-color: rgb(var(--mt-violet-1));
   background-color: rgb(var(--mt-violet-0));
 }
-.mahdaad-object.tag.sky {
+.mahdaad-object .tag.sky {
   border-color: rgb(var(--mt-sky-1));
   background-color: rgb(var(--mt-sky-0));
 }
-.mahdaad-object.tag.green {
+.mahdaad-object .tag.green {
   border-color: rgb(var(--mt-green-1));
   background-color: rgb(var(--mt-green-0));
 }
-.mahdaad-object.tag.yellow {
+.mahdaad-object .tag.yellow {
   border-color: rgb(var(--mt-yellow-1));
   background-color: rgb(var(--mt-yellow-0));
 }
-.mahdaad-object.tag.pink {
+.mahdaad-object .tag.pink {
   border-color: rgb(var(--mt-pink-1));
   background-color: rgb(var(--mt-pink-0));
 }
-.mahdaad-object.tag.blue {
+.mahdaad-object .tag.blue {
   border-color: rgb(var(--mt-blue-1));
   background-color: rgb(var(--mt-blue-0));
 }

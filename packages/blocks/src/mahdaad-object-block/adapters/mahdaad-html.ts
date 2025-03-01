@@ -9,21 +9,6 @@ import { getFilenameFromContentDisposition } from '@blocksuite/affine-shared/uti
 import { sha } from '@blocksuite/global/utils';
 import { nanoid } from '@blocksuite/store';
 
-/*
-export function ObjectIcon(type:string,context) {
-  return {
-    type: 'element',
-    tagName: 'div',
-    properties: {
-      /!*src: `assets/${blobName}`,
-      alt: blobName,
-      title: (o.node.props.caption as string | undefined) ?? null,
-      ...widthStyle,*!/
-    },
-    children: [],
-  }
-}
-*/
 
 function convertToFullUrl(inputString) {
   // Check if the input string starts with 'http' or 'www' to avoid duplication
@@ -192,22 +177,41 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             'children'
           ).closeNode()
         }else{
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`title line-clamp-1`],
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.title
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
+         if(o.node.props?.type=='tag'){
+           walkerContext.openNode(
+             {
+               type: 'element',
+               tagName: 'span',
+               properties: {
+                 className: [`title line-clamp-1 card tag green`],
+               },
+               children: [
+                 {
+                   type:'text',
+                   value:object.title
+                 }
+               ],
+             },
+             'children'
+           ).closeNode()
+         }else{
+           walkerContext.openNode(
+             {
+               type: 'element',
+               tagName: 'span',
+               properties: {
+                 className: [`title line-clamp-1`],
+               },
+               children: [
+                 {
+                   type:'text',
+                   value:object.title
+                 }
+               ],
+             },
+             'children'
+           ).closeNode()
+         }
         }
         if(o.node.props?.type=='weblink') {
           walkerContext.openNode(
@@ -230,57 +234,8 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         }
 
       }
-
-
       walkerContext.closeNode()
 
-
-
-      /*walkerContext
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'div',
-            properties: {
-              className: [`mahdaad-block-container mahdaad-object ${o.node.props?.type}`],
-            },
-            children: [],
-          },
-          'children'
-        )
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'span',
-            properties: {
-              className: [`icon`],
-            },
-            children:o.node.props?.type!='tag'  ?  [{
-              type:'raw',
-              value:object.iconSVG ?? ''
-            }] : []
-          },
-          'children'
-        )
-        .closeNode()
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'span',
-            properties: {
-              className: [`title`],
-            },
-            children: [
-              {
-                type:'text',
-                value:object.title
-              }
-            ],
-          },
-          'children'
-        )
-        .closeNode()
-        .closeNode();*/
     },
   },
 };
