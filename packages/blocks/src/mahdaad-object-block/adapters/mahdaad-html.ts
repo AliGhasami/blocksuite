@@ -106,6 +106,7 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   },
   fromBlockSnapshot: {
     enter: async (o, context) => {
+      console.log("fromBlockSnapshot object block ");
       const {  walkerContext } = context;
       const objectId=o.node.props.object_id
       //@ts-ignore

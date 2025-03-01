@@ -26,6 +26,7 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   },
   fromBlockSnapshot: {
     enter: (_, context) => {
+      console.log("fromBlockSnapshot root block");
       const { walkerContext } = context;
       const htmlRootDocContext =
         walkerContext.getGlobalContext('hast:html-root-doc');

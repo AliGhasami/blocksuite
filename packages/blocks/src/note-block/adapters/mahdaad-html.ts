@@ -1,4 +1,4 @@
-import { NoteBlockSchema,MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
+import { MahdaadMultiColumnBlockSchema,NoteBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
@@ -19,7 +19,8 @@ export const mahdaadNoteBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   },
   fromBlockSnapshot: {
     enter: (o, context) => {
-      if(o.parent && o.parent.node.flavour==MahdaadMultiColumnBlockSchema.model.flavour){
+      console.log("fromBlockSnapshot note block");
+      if(o.parent && o.parent.node.flavour==MahdaadMultiColumnBlockSchema.model.flavour) {
         const sizes= o.parent.node.props.sizes
         //console.log("bbbbb",sizes[o.index]);
         const {  walkerContext } = context;
@@ -41,11 +42,13 @@ export const mahdaadNoteBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       return
     },
     leave: (o, context) => {
-      if(o.parent && o.parent.node.flavour==MahdaadMultiColumnBlockSchema.model.flavour){
-        const {  walkerContext } = context;
-        walkerContext.closeNode();
+      const {  walkerContext } = context;
+      if(o.parent && o.parent.node.flavour==MahdaadMultiColumnBlockSchema.model.flavour) {
+
+        walkerContext.closeNode()
       }
-      return
+      //walkerContext.closeNode()
+      //return
     },
   },
 };
