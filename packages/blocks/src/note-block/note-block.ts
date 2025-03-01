@@ -20,7 +20,19 @@ export class NoteBlockComponent extends BlockComponent<
 
   override connectedCallback() {
     super.connectedCallback();
+
+    /*this.disposables.add()*/
+
   }
+
+  override async getUpdateComplete() {
+    const result = await super.getUpdateComplete();
+    if(this.model.children.length==0){
+      this.doc.addBlock('affine:paragraph', {}, this.model);
+    }
+    return result;
+  }
+
 
   override renderBlock() {
     return html`

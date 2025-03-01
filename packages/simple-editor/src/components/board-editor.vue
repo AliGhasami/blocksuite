@@ -530,7 +530,7 @@ async function setData(data: any, clear_history?: boolean = true) {
       let index = 1
       //doc.load()
       if (notes.length > 0) {
-        console.log('11111', notes[0])
+       // console.log('11111', notes[0])
         notes[0].model.children.forEach((item) => {
           doc.deleteBlock(item)
         })

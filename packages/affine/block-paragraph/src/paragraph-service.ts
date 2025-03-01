@@ -25,12 +25,16 @@ export class ParagraphBlockService extends BlockService {
       </div>`;
     }
 
-      return html`<div class="affine-paragraph-placeholder-content">
+      /*style="width:100%; white-space: nowrap; /!* جلوگیری از رفتن به خط بعد *!/
+      overflow: hidden; /!* مخفی کردن بخش اضافه *!/
+      text-overflow: ellipsis; /!* نمایش ... به جای متن اضافی *!/"*/
+
+      return html`<div class="affine-paragraph-placeholder-content" style="overflow: hidden">
         <div>
           <span class="place-holder">
-            ${t('typing_placeholder')}
-            <span class="short-code">/</span>
-            ${t('for_block_types')}
+           <span style="min-width: max-content;"> ${t('typing_placeholder')}</span>
+            <span class="short-code" style="min-width: 10px">/</span>
+            <span style="min-width: max-content;">${t('for_block_types')}</span>
           </span>
         </div>
         <div>&nbsp;</div>

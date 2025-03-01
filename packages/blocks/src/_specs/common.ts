@@ -17,6 +17,10 @@ import { DataViewBlockSpec } from '../data-view-block/data-view-spec.js';
 import { DatabaseBlockSpec } from '../database-block/database-spec.js';
 import { DividerBlockSpec } from '../divider-block/divider-spec.js';
 import { ImageBlockSpec } from '../image-block/image-spec.js';
+import {ObjectBlockSpec} from  '../mahdaad-object-block/object-spec.js'
+import {MahdaadCalloutBlockSpec} from  '../mahdaad-callout-block/callout-spec.js'
+import {MahdaadWeblinkBlockSpec} from '../mahdaad-weblink-block/weblink-spec.js'
+import { MahdaadMultiColumnBlockSpec } from '../mahdaad-multi-column-block/multi-column-spec.js'
 import {
   EdgelessNoteBlockSpec,
   NoteBlockSpec,
@@ -38,6 +42,10 @@ export const CommonFirstPartyBlockSpecs: ExtensionType[] = [
   EmbedExtensions,
   BlockAdapterMatcherExtensions,
   AdapterFactoryExtensions,
+  ObjectBlockSpec,
+  MahdaadCalloutBlockSpec,
+  MahdaadWeblinkBlockSpec,
+  MahdaadMultiColumnBlockSpec
 ].flat();
 
 export const EdgelessFirstPartyBlockSpecs: ExtensionType[] = [
@@ -56,4 +64,8 @@ export const EdgelessFirstPartyBlockSpecs: ExtensionType[] = [
   EmbedExtensions,
   BlockAdapterMatcherExtensions,
   AdapterFactoryExtensions,
+  ObjectBlockSpec,
+  MahdaadCalloutBlockSpec,
+  MahdaadWeblinkBlockSpec,
+  MahdaadMultiColumnBlockSpec
 ].flat();

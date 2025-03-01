@@ -1,6 +1,6 @@
 //ali ghasami for new merge
 import type { ParagraphBlockModel } from '@blocksuite/affine-model';
-import type { BlockComponent } from '@blocksuite/block-std';
+import { type BlockComponent, UIEventStateContext } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
@@ -66,7 +66,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
 
     if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
-      if(key=='/')return 
+      if(key=='/')return
       this.setDirection(key)
     } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
       delete this.model.dir
@@ -127,9 +127,12 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
   checkShowPlaceHolder() {
     const composing = this._composing.value;
+    //console.log("composing");
+
 
     let showPlaceHolder=true
     if (composing || this.doc.readonly) {
+      //console.log("composing || this.doc.readonly");
       showPlaceHolder=false
       //this._displayPlaceholder.value = false;
       //return;
@@ -138,6 +141,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     const isCollapsed = textSelection?.isCollapsed() ?? false;
 
     if (!this.selected || !isCollapsed) {
+      //console.log("!this.selected || !isCollapsed");
       showPlaceHolder=false
       //this._displayPlaceholder.value = false;
       //return;
@@ -147,19 +151,23 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       (this.inlineEditor?.yTextLength ?? 0) > 0 ||
       this._isInDatabase()
     ) {
+      /*console.log("(this.inlineEditor?.yTextLength ?? 0) > 0 ||\n" +
+        "      this._isInDatabase()");*/
       showPlaceHolder=false
       //this._displayPlaceholder.value = false;
       //return;
     }
     //if(!showPlaceHolder)
     if(!showPlaceHolder && this.checkIsEmptyAndNotFocus() && !this.doc.readonly) {
+      //console.log("!showPlaceHolder && this.checkIsEmptyAndNotFocus() && !this.doc.readonly");
       showPlaceHolder = true
     }
+    //console.log("this._displayPlaceholder.value",showPlaceHolder);
     //this._displayPlaceholder.value = true;
     this._displayPlaceholder.value = showPlaceHolder;
+
     //console.log("id",this.blockId,this._displayPlaceholder.value);
     return showPlaceHolder
-
   }
 
 
@@ -312,6 +320,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override renderBlock(): TemplateResult<1> {
+    //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
       ? this._readonlyCollapsed

@@ -58,7 +58,7 @@ export class InlineTextService<TextAttributes extends BaseTextAttributes> {
   };
 
   insertLineBreak = (inlineRange: InlineRange): void => {
-    console.log('this is insert line break');
+   // console.log('this is insert line break');
     if (this.editor.isReadonly) return;
 
     this.transact(() => {
