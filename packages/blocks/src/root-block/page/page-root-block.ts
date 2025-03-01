@@ -86,7 +86,9 @@ export class PageRootBlockComponent extends BlockComponent<
       /* prettier-ignore */
       //padding-bottom: var(--affine-editor-bottom-padding, ${DOC_BOTTOM_PADDING}px);
       //padding-inline-start: 20px;
-      padding-inline-start: 24px;
+      //padding-inline-start: 24px;
+      padding-inline: 24px;
+
     }
 
     /* Extra small devices (phones, 640px and down) */

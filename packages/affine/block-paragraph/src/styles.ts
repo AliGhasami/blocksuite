@@ -261,6 +261,7 @@ export const mahdaadParagraphBlockStyles = css`
     fill: var(--affine-black-30);
     width: 100%;
     padding-inline-end: 30px;
+    height: 100%;
   }
 
   .affine-paragraph-placeholder-content {
@@ -270,7 +271,8 @@ export const mahdaadParagraphBlockStyles = css`
   }
 
   .affine-paragraph-placeholder.visible {
-    display: block;
+    display: flex;
+    align-items: center;
   }
 
   /* .affine-block-children-container:not(:has(.selected))
