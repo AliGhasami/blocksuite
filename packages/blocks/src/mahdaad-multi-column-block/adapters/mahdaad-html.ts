@@ -5,8 +5,6 @@ import {
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
 
-
-
 export const mahdaadMultiColumnBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   flavour: MahdaadMultiColumnBlockSchema.model.flavour,
   toMatch: o => HastUtils.isElement(o.node) && o.node.tagName === 'img',
@@ -21,14 +19,15 @@ export const mahdaadMultiColumnBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher 
   fromBlockSnapshot: {
     enter: (o, context) => {
       const {  walkerContext } = context;
-      console.log("1111",context)
+      //@ts-ignore
+      const lang=context.configs.get('mahdaad_config')?.lang ?? 'en'
       walkerContext
         .openNode(
           {
             type: 'element',
             tagName: 'div',
             properties: {
-              className: [`mahdaad-block-container mahdaad-multi-column`],
+              className: [`mahdaad-block-container mahdaad-multi-column`,lang=='fa' ? 'rtl' : 'ltr'],
             },
             children:[],
           },
@@ -37,13 +36,6 @@ export const mahdaadMultiColumnBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher 
     },
     leave: (_, context) => {
       const { walkerContext } = context;
-      console.log("111111",walkerContext);
-      /*const htmlRootDocContext =
-        walkerContext.getGlobalContext('hast:html-root-doc');
-      const isRootDoc = htmlRootDocContext ?? true;
-      if (!isRootDoc) {
-        return;
-      }*/
       walkerContext.closeNode();
     },
   },

@@ -1,6 +1,6 @@
 //ali ghasami for new merge
 import type { ParagraphBlockModel } from '@blocksuite/affine-model';
-import { type BlockComponent, UIEventStateContext } from '@blocksuite/block-std';
+import type { BlockComponent, UIEventStateContext } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';

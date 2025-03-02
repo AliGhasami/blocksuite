@@ -734,4 +734,7 @@ blockquote {
   display: flex;
   gap: 12px;
 }
+.mahdaad-multi-column.rtl {
+  flex-direction: row-reverse;
+}
 /*# sourceMappingURL=mahdaad-style.css.map */
