@@ -1,5 +1,6 @@
 import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
 
+import { MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { WithDisposable } from '@blocksuite/global/utils';
@@ -18,6 +19,7 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
+import { checkParentIs } from '../../../_common/mahdaad/is.js';
 import { toolsList } from '../../../_common/mahdaad/toolsList.js';
 import { actionsMenu, type MahdaadActionMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
@@ -194,7 +196,20 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   }
 
+  disabledKeys() {
+    const temp = []
+    //console.log("thisisss",this.inlineEditor,this.context,);
+    if(checkParentIs(this.context.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
+      temp.push('two_columns','three_columns','four_columns')
+    }
+    return temp
+  }
+
+
+
   override render() {
+
+    this.disabledKeys()
     //this._toolsList();
     const slashMenuStyles = this._position
       ? {
@@ -221,6 +236,7 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
           search-text="${this._searchText}"
           .tools-list="${this._toolsList()}"
           .inline-editor="${this.inlineEditor}"
+          disabled-keys="${JSON.stringify(this.disabledKeys())}"
           @select="${(event: CustomEvent) => {
             //console.log("11111",event);
             const key = event.detail;
