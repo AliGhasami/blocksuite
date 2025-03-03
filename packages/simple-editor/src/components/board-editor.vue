@@ -1,6 +1,6 @@
 <template>
   <div>
-<!--         <div class="flex-1 ps-6">
+    <!--         <div class="flex-1 ps-6">
        <iframe id="myIframe" ></iframe>
      </div>-->
     <!--     <Button @click="handleClick">export pdf</Button>-->
@@ -253,7 +253,7 @@ function bindEvent(doc: Doc) {
     emit('change', data)
     if (data.type == 'add') {
       if (data.flavour == 'affine:mahdaad-object') {
-        if(data.model.object_id){
+        if (data.model.object_id) {
           emit('addObjectLink', data)
         }
       }
@@ -348,14 +348,14 @@ async function exportHTML(config: any) {
   if (!snapshot) {
     return
   }
- /* return await adapter.fromDocSnapshot({
+  /* return await adapter.fromDocSnapshot({
     snapshot
     //assets: job.assetsManager,
   })*/
   const htmlResult = await adapter.fromDocSnapshot({
-    snapshot,
+    snapshot
     //assets: job.assetsManager,
-  });
+  })
 
   /*const iframe = document.getElementById('myIframe');
   iframe.srcdoc = htmlResult.file;
@@ -363,7 +363,6 @@ async function exportHTML(config: any) {
   iframeWindow.print()*/
 
   return htmlResult
-
 }
 
 function setFocus(e) {
@@ -450,7 +449,7 @@ defineExpose({
 /************************************************************/
 
 async function handleClick() {
- /* const doc = toRaw(unref(currentDocument.value))
+  /* const doc = toRaw(unref(currentDocument.value))
   const job = new Job({
     collection: doc.collection,
     middlewares: [docLinkBaseURLMiddleware, titleMiddleware]
@@ -530,7 +529,7 @@ async function setData(data: any, clear_history?: boolean = true) {
       let index = 1
       //doc.load()
       if (notes.length > 0) {
-       // console.log('11111', notes[0])
+        // console.log('11111', notes[0])
         notes[0].model.children.forEach((item) => {
           doc.deleteBlock(item)
         })
@@ -1035,31 +1034,26 @@ async function init() {
     @apply text-gray-8;
   }
 
-
-  .claytap-quote{
+  .claytap-quote {
     @apply bg-gray-05;
-    &::after{
+    &::after {
       @apply bg-gray-2;
-      inset-inline-start:0;
+      inset-inline-start: 0;
     }
   }
 
-  .quote-container{
+  .quote-container {
     //padding: var(----pta-space-400, 8px);
     @apply flex gap-2 p-2;
-    .quote-icon{
+    .quote-icon {
       @apply stroke-gray-5 mt-1;
     }
 
-
-    .affine-paragraph-placeholder{
-      bottom: unset !important;
+    .affine-paragraph-placeholder {
+      //bottom: unset !important;
       @apply ps-9 text-gray-5;
     }
-
   }
-
-
 
   /* affine-database-table{
      //width: 100%;
@@ -1134,8 +1128,7 @@ async function init() {
     }
   }
 
-
-  *[data-v-text]{
+  *[data-v-text] {
     //background-color: red;
     line-height: 32px;
   }
@@ -1332,8 +1325,6 @@ async function init() {
     width: auto;
   }
 }
-
-
 
 /* slash Menu Style */
 /*.@{prefix}-slash-menu {

@@ -256,7 +256,10 @@ export class RichText extends WithDisposable(ShadowlessElement) {
               this.scrollLeft = scrollLeft;
             }
           })
-          .catch(console.error);
+          .catch(()=>{
+            //todo ali ghasami for fix bug after add quote
+            console.error()
+          });
       })
     );
 

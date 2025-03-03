@@ -198,7 +198,6 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   disabledKeys() {
     const temp = []
-    //console.log("thisisss",this.inlineEditor,this.context,);
     if(checkParentIs(this.context.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
       temp.push('two_columns','three_columns','four_columns')
     }

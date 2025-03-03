@@ -28,7 +28,8 @@ export function forwardDelete(std: BlockStdScope) {
     'affine:image',
     'affine:divider',
     ...EMBED_BLOCK_FLAVOUR_LIST,
-    'affine:mahdaad-callout'
+    'affine:mahdaad-callout',
+    'affine:mahdaad-multi-column'
   ];
 
   if (matchFlavours(nextSibling, ignoreForwardDeleteFlavourList)) {
@@ -59,7 +60,7 @@ export function forwardDelete(std: BlockStdScope) {
   const nextBlockComponent=std.view.getBlock(nextBlock?.id)
   //check for callout block
   const outSideCallout=blockComponent && blockComponent.closest('.nest-editor') && nextBlockComponent && !nextBlockComponent.closest('.nest-editor')
-  if(outSideCallout){
+  if(outSideCallout) {
     return true;
   }
 

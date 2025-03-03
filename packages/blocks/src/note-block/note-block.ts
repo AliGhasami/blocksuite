@@ -27,7 +27,11 @@ export class NoteBlockComponent extends BlockComponent<
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
-    if(this.model.children.length==0){
+    if (
+      this.model.children.length == 0 ||
+      (this.model.children.length > 0 &&
+        this.model.children[this.model.children.length - 1].flavour != 'affine:paragraph')
+    ) {
       this.doc.addBlock('affine:paragraph', {}, this.model);
     }
     return result;

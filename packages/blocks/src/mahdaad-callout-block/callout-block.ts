@@ -73,15 +73,6 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     super.connectedCallback();
   }
 
-  override async getUpdateComplete() {
-    const result = await super.getUpdateComplete();
-    if(this.model.children.length==0){
-      this.doc.addBlock('affine:paragraph', {}, this.model);
-    }
-    return result;
-  }
-
-
   convertToType(blocksModel:BlockModel[],flavour:string,type:string) {
     blocksModel.forEach(blockModel=>{
       /*this.std.command
@@ -99,6 +90,19 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
       }
       this.convertToType(blockModel.children,flavour,type)
     })
+  }
+
+
+  override async getUpdateComplete() {
+    const result = await super.getUpdateComplete();
+    if (
+      this.model.children.length == 0 ||
+      (this.model.children.length > 0 &&
+        this.model.children[this.model.children.length - 1].flavour != 'affine:paragraph')
+    ) {
+      this.doc.addBlock('affine:paragraph', {}, this.model);
+    }
+    return result;
   }
 
   override renderBlock() {
