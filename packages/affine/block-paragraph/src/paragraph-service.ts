@@ -1,7 +1,7 @@
 import {
+  MahdaadCalloutBlockSchema,
   type ParagraphBlockModel,
-  ParagraphBlockSchema,
-  MahdaadCalloutBlockSchema
+  ParagraphBlockSchema
 } from '@blocksuite/affine-model';
 import { BlockService } from '@blocksuite/block-std';
 import { html, type TemplateResult } from 'lit';
@@ -13,8 +13,8 @@ export class ParagraphBlockService extends BlockService {
   getPlaceholder = (model: ParagraphBlockModel): TemplateResult<1> | string => {
     if (model.type === 'text') {
       const blockComponent=this.std.view.getBlock(model.id)
-        if((model.parent && model.parent.flavour==MahdaadCalloutBlockSchema.model.flavour) ||  (blockComponent && blockComponent.closest('.nest-editor')) ){
-          return html`<div class="affine-paragraph-placeholder-content">
+        if((model.parent && model.parent.flavour==MahdaadCalloutBlockSchema.model.flavour) ||  (blockComponent && blockComponent.closest('.nest-editor')) ) {
+          return html`<div class="affine-paragraph-placeholder-content" style="overflow: hidden">
         <div>
           <span class="place-holder">
             ${t('start_typing')}
@@ -42,7 +42,7 @@ export class ParagraphBlockService extends BlockService {
       // return "Type '/' for commands";
     }
 
-    if(model.type=='quote'){
+    if(model.type=='quote') {
       return t('quote_placeholder') as string
     }
 

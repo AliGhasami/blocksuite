@@ -405,7 +405,7 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
     return html`
       <div
         contenteditable="false"
-        style="position: relative;border-radius: 4px"
+        style="position: relative;border-radius: 4px;min-width: 450px"
       >
         ${this.dataView.render({
           virtualPadding$: this.virtualPadding$,

@@ -310,11 +310,12 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ? nothing
       : html`<div
               contenteditable="false"
+              style="overflow: hidden"
               class=${classMap({
         'affine-paragraph-placeholder': true,
         visible: this._displayPlaceholder.value,
       })}>
-          ${this.service.placeholderGenerator(this.model)}
+          <span style="min-width: 150px"> ${this.service.placeholderGenerator(this.model)}</span> 
       </div>`
   }
 

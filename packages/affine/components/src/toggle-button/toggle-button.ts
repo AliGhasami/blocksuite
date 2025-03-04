@@ -42,7 +42,7 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     }
 
     .${unsafeCSS(TOGGLE_BUTTON_PARENT_CLASS)}{
-      align-items: center;
+      //align-items: center;
     }
 
     .${unsafeCSS(TOGGLE_BUTTON_PARENT_CLASS)}:hover .toggle-icon {

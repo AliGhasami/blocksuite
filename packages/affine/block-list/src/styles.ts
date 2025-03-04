@@ -8,9 +8,9 @@ export const listPrefix = css`
     user-select: none;
     position: relative;
     align-items: center;
-    justify-content: center;
+    //justify-content: center;
     flex-direction: column;
-    /*margin-top: 3px;*/
+    margin-top: 3px;
   }
 
   .affine-list-block__numbered {
@@ -35,6 +35,7 @@ export const listPrefix = css`
   .affine-list-block__todo-prefix > svg {
     width: 20px;
     height: 20px;
+    margin-top: 3px;
   }
 `;
 

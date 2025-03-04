@@ -5700,41 +5700,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pantograph/tokens@npm:0.0.14, @pantograph/tokens@npm:^0.0.14":
-  version: 0.0.14
-  resolution: "@pantograph/tokens@npm:0.0.14"
-  checksum: 10/76d508eb72bcef0192977ac647f266c2015b554c6b6ad2e5e3d317e0405a1d00ce0eb39f77b2ac65ec855c1b9c0193a643335ccf369d1a0c17345d73a6e4e212
+"@pantograph/tokens@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "@pantograph/tokens@npm:0.0.15"
+  checksum: 10/bd7632d71484954908b6f42b42aa7c6e4eab46252eadb64a7263f950bd27ed39d1e8e6286773aa0de43e49a8c01d16b8b9cadb5bccaae720916c72c97e8abba5
   languageName: node
   linkType: hard
 
-"@pantograph/unocss-preset@npm:0.0.6":
-  version: 0.0.6
-  resolution: "@pantograph/unocss-preset@npm:0.0.6"
+"@pantograph/unocss-preset@npm:0.0.7":
+  version: 0.0.7
+  resolution: "@pantograph/unocss-preset@npm:0.0.7"
   dependencies:
-    "@pantograph/tokens": "npm:^0.0.14"
+    "@pantograph/tokens": "npm:^0.0.15"
     unocss: "npm:^0.65.2"
     unocss-preset-animations: "npm:^1.1.0"
-  checksum: 10/104d7130a3fb93c1d481cfdba8982abe555bd708dfae7e27eac1982c84db3c9fb28694a0d77d2e37a6cc58321f609c1c52df62714376e50e3f63fabb0b2f3132
+  checksum: 10/b69e16bbc857a71628068b03ad2e043e2ce94748d5044b67bfc1842c676a007d3a24b0c3e3bee598425ed8461b012553e34e5ff231e9df85f760020a7d6edaa9
   languageName: node
   linkType: hard
 
-"@pantograph/utils@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@pantograph/utils@npm:0.0.4"
+"@pantograph/utils@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@pantograph/utils@npm:0.0.5"
   dependencies:
-    "@pantograph/tokens": "npm:^0.0.14"
-  checksum: 10/aa204cc0682320e91901d92daff8f1ff745d5e0ddf85ee85c3d31be530579c1c3baa9529ddf4c7e8adbc68285575c7374449fed194575b62b78391a719954b8d
+    "@pantograph/tokens": "npm:^0.0.15"
+  checksum: 10/5df4aaecb3c67e9d71e753cbdcdfac2305fba6b6cafdc964424d42b1da9fb6234274fb4d141fec079686d446b2e8cff566fda922b9cd8d419a2bc6be0e3ad14e
   languageName: node
   linkType: hard
 
-"@pantograph/vue@npm:^0.10.12":
-  version: 0.10.12
-  resolution: "@pantograph/vue@npm:0.10.12"
+"@pantograph/vue@npm:^0.10.13":
+  version: 0.10.13
+  resolution: "@pantograph/vue@npm:0.10.13"
   dependencies:
     "@faker-js/faker": "npm:^9.5.0"
     "@iconify/vue": "npm:^4.3.0"
-    "@pantograph/tokens": "npm:0.0.14"
-    "@pantograph/utils": "npm:^0.0.4"
+    "@pantograph/tokens": "npm:^0.0.15"
+    "@pantograph/utils": "npm:^0.0.5"
     "@tanstack/vue-table": "npm:^8.21.2"
     "@types/lodash-es": "npm:^4.17.12"
     "@types/sortablejs": "npm:^1.15.8"
@@ -5747,7 +5747,7 @@ __metadata:
     vue-tippy: "npm:^6.6.0"
   peerDependencies:
     vue: ^3.5.13
-  checksum: 10/a908945bc756c7c2875a29fc562b9a4b50c0f4d4ac168d6f03bb4f31fa33ab875e6ed9647ffb1df0a82a57df15981f51e023c3e5064c77391aec0e6c33ed4007
+  checksum: 10/8c555ef38cd8ee59fa5db7238fd9adc671ba65cb913100bd7a99e881a1ac8361e832de8c396e1151a16033cb9b013fca4c46f62f715e83005d5982d2b20a7890
   languageName: node
   linkType: hard
 
@@ -12152,9 +12152,9 @@ __metadata:
     "@mahdaad/tokens": "npm:0.0.43"
     "@novu/headless": "npm:2.0.0-canary.0"
     "@novu/notification-center-vue": "npm:2.0.0-canary.0"
-    "@pantograph/tokens": "npm:0.0.14"
-    "@pantograph/unocss-preset": "npm:0.0.6"
-    "@pantograph/vue": "npm:^0.10.12"
+    "@pantograph/tokens": "npm:^0.0.15"
+    "@pantograph/unocss-preset": "npm:0.0.7"
+    "@pantograph/vue": "npm:^0.10.13"
     "@purge-icons/generated": "npm:0.10.0"
     "@rushstack/eslint-patch": "npm:1.10.2"
     "@sentry/vue": "npm:7.105.0"

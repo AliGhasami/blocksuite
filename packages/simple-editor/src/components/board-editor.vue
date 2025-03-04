@@ -1046,7 +1046,7 @@ async function init() {
     //padding: var(----pta-space-400, 8px);
     @apply flex gap-2 p-2;
     .quote-icon {
-      @apply stroke-gray-5 mt-1;
+      @apply stroke-gray-5 mt-2;
     }
 
     .affine-paragraph-placeholder {
@@ -1272,6 +1272,7 @@ async function init() {
   &-date-time {
     //@apply mt-overline;
     display: inline-block;
+    //display: inline-flex;
     color: @blue-5;
     text-decoration: underline;
   }
