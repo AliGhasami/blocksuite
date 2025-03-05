@@ -88,6 +88,7 @@ q::after {
   --pta-roundness-lg: 8px;
   --pta-bg-secondary: #F8F8FC;
   --pta-size-sm: 24px;
+  --pta-size-md: 32px;
   --pta-size-lg: 40px;
   --pta-roundness-sm: 4px;
   --pta-primary-br-subtle: #D7EEFE;
@@ -472,7 +473,7 @@ blockquote {
 .mahdaad-mention {
   color: var(--pta-primary-fg);
   display: inline-flex;
-  height: var(--pta-size-sm, 24px);
+  min-height: var(--pta-size-sm, 24px);
   gap: 4px;
   padding-inline: 4px;
   /*min-width: var(--pta-size-lg, 40px);*/
@@ -494,7 +495,7 @@ blockquote {
 .mahdaad-object-link-inline {
   display: inline-flex;
   align-items: center;
-  height: var(--ptp-dimension-1600);
+  min-height: var(--ptp-dimension-1600);
   gap: var(--mt-space-015, 6px);
   border-radius: var(--mt-roundness-md, 6px);
   background-color: rgba(var(--mt-gray-05));
@@ -506,6 +507,7 @@ blockquote {
 }
 .mahdaad-date-time {
   display: inline-flex;
+  width: max-content;
   padding: var(--pta-space-200, 4px) var(--pta-space-300, 6px);
   align-items: center;
   gap: var(--pta-space-300, 6px);
@@ -608,7 +610,7 @@ blockquote {
 }
 .mahdaad-object .tag {
   display: flex;
-  height: var(--pta-size-md, 32px);
+  min-height: var(--pta-size-md, 32px);
   min-width: var(--pta-size-lg, 40px);
   width: fit-content;
   justify-content: center;
@@ -736,5 +738,8 @@ blockquote {
 }
 .mahdaad-multi-column.rtl {
   flex-direction: row-reverse;
+}
+.mahdaad-multi-column .column {
+  overflow: scroll;
 }
 /*# sourceMappingURL=mahdaad-style.css.map */
