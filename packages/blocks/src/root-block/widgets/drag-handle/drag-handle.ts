@@ -129,7 +129,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
     if (isDraggedElementNote && dropType === 'in') return null;
 
-    const dropIndicator = {
+    const
+      dropIndicator = {
       rect,
       dropBlockId: blockId,
       dropType,
@@ -391,8 +392,10 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     this.pointerEventWatcher.watch();
     this._keyboardEventWatcher.watch();
     if (this._enableNewDnd) {
+      console.log("this._enableNewDnd");
       this._dragEventWatcher.watch();
     } else {
+      console.log("notttttttttttttttttttttt this._enableNewDnd");
       this._legacyDragEventWatcher.watch();
     }
   }

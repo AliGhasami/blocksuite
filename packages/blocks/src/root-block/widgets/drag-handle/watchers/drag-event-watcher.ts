@@ -119,7 +119,6 @@ export class DragEventWatcher {
 
   private _dropHandler = (context: UIEventStateContext) => {
     console.log("_dropHandler");
-    //return
     this._onDrop(context);
     this._std.selection.setGroup('gfx', []);
     this.widget.clearRaf();
@@ -242,9 +241,8 @@ export class DragEventWatcher {
   };
 
   private _onDrop = (context: UIEventStateContext) => {
-    console.log("_onDrop");
+    //console.log("_onDrop");
     const state = context.get('dndState');
-
     const event = state.raw;
     const { clientX, clientY } = event;
     const point = new Point(clientX, clientY);
@@ -486,6 +484,7 @@ export class DragEventWatcher {
       const std = this._std;
       const job = this._getJob();
 
+      //debugger
       const snapshot = this._deserializeSnapshot(state);
       if (snapshot) {
         if (snapshot.content.length === 1) {

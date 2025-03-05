@@ -250,6 +250,7 @@ export class Job {
     parent?: string,
     index?: number
   ): Promise<Slice | undefined> => {
+    debugger
     SliceSnapshotSchema.parse(snapshot);
     try {
       this._slots.beforeImport.emit({
@@ -503,6 +504,7 @@ export class Job {
     startIndex?: number,
     counter: number = 0
   ) {
+    //debugger
     for (let index = 0; index < nodes.length; index++) {
       const node = nodes[index];
       const { draft } = node;
@@ -510,8 +512,9 @@ export class Job {
 
       const actualIndex =
         startIndex !== undefined ? startIndex + index : undefined;
-      doc.addBlock(flavour as BlockSuite.Flavour, draft, parentId, actualIndex);
 
+      doc.addBlock(flavour as BlockSuite.Flavour, draft, parentId, actualIndex);
+      console.log("after add block",flavour);
       const model = doc.getBlock(id)?.model;
       if (!model) {
         throw new BlockSuiteError(

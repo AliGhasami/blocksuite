@@ -30,6 +30,7 @@ export class DragIndicator extends LitElement {
       width: `${width}px`,
       height: `${height}px`,
       transform: `translate(${left}px, ${top}px)`,
+      'background-color':'red'
     });
     return html`<div class="affine-drag-indicator" style=${style}></div>`;
   }
