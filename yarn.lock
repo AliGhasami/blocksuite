@@ -12286,6 +12286,7 @@ __metadata:
     vue-tippy: "npm:^6.4.1"
     vue-tsc: "npm:2.0.21"
     vue-types: "npm:5.1.2"
+    vue-web-component-wrapper: "npm:^1.7.6"
     vue3-webcomponent-wrapper: "npm:^0.2.0"
     vuedraggable: "npm:^4.1.0"
     zod: "npm:^3.23.8"
@@ -29753,6 +29754,13 @@ __metadata:
   peerDependencies:
     vue: ^3.0.0
   checksum: 10/456d68f93c0480af44fa2d1c17368318b22768a515be8f57e9f5ca109f893b548bc6a1e0c03751d1719223dc22b2e26f9fd949f3965ebb792c10b0f3bf2e9e63
+  languageName: node
+  linkType: hard
+
+"vue-web-component-wrapper@npm:^1.7.6":
+  version: 1.7.6
+  resolution: "vue-web-component-wrapper@npm:1.7.6"
+  checksum: 10/a4a2828684f8a070bec6517108e388dba27241b981d9e6cee7e0b234820f7126d36527ecd03cb3bab4db396da9c41734e8b6282cd4ed5d16e1ceb0bb0a7f142b
   languageName: node
   linkType: hard
 

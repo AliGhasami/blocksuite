@@ -9,6 +9,7 @@ import {pick} from 'lodash-es'
 import type { MahdaadCalloutBlockService } from './callout-service.js';
 
 import { transformModel } from '../root-block/utils/operations/model.js';
+import { nanoid } from '@blocksuite/store';
 
 
 export class MahdaadCalloutBlockComponent extends BlockComponent<
@@ -92,6 +93,21 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     })
   }
 
+  /*protected override firstUpdated() {
+    //super.firstUpdated(_changedProperties);
+    console.log("this is first updtedddd");
+    setTimeout(()=>{
+      this.renderBlock()
+      const i=nanoid()
+      console.log("uuuuuuuuuuuu",i);
+      //this.model.id=i
+      this.doc.updateBlock(this.model,{id:i})
+      this.requestUpdate()
+    },5000)
+    this.std.view.rendered()
+
+  }
+*/
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
@@ -102,28 +118,42 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     ) {
       this.doc.addBlock('affine:paragraph', {}, this.model);
     }
+    this.requestUpdate()
     return result;
   }
 
   override renderBlock() {
+    console.log("this is is_loadeeed",this._isLoad);
+    const aa=this.renderChildren(this.model).strings
+    console.log("aaaa",aa);
+
+
+    const gg=()=> {
+      return this.renderChildren(this.model)
+    }
 
     return html`
       <div dir=${this.model.dir}>
       <mahdaad-callout-component
+        style="min-height: 350px;border: 1px solid pink"
         type="${this.model.type}"
         background="${this.model.background}"
         icon="${this.model.icon}"
         @changeProps="${this.changeProps}"
         @mount="${() => {
+          console.log("this is true is_load");
           this._isLoad = true;
         }}"
         @changeOption="${this.changeOptions}"
         direction="${this.model.dir}"
       >
-        <div class="nest-editor">
-          <div class="affine-note-block-container">
-            <div class="affine-block-children-container">
-              ${this._isLoad ? this.renderChildren(this.model) : ''}
+        <div>
+          1111111
+          <div class="nest-editor">
+            <div class="affine-note-block-container">
+              <div class="affine-block-children-container">
+                ${this._isLoad ? this.renderChildren(this.model) : ''}
+              </div>
             </div>
           </div>
         </div>
@@ -134,6 +164,9 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
 
   @property({ attribute: false })
   accessor _isLoad: boolean = false;
+
+  @property({ attribute: false })
+  accessor key:string = '1111';
 
 }
 
