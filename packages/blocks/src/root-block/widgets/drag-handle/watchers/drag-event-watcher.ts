@@ -84,6 +84,8 @@ export class DragEventWatcher {
   };
 
   private _dragMoveHandler: UIEventHandler = ctx => {
+    console.log("_dragMoveHandler");
+    //return
     if (
       this.widget.isHoverDragHandleVisible ||
       this.widget.isTopLevelDragHandleVisible
@@ -107,6 +109,7 @@ export class DragEventWatcher {
    */
   private _dragStartHandler: UIEventHandler = ctx => {
     console.log("_dragStartHandler");
+    return
     const state = ctx.get('dndState');
     // If not click left button to start dragging, should do nothing
     const { button } = state.raw;
@@ -128,7 +131,6 @@ export class DragEventWatcher {
 
   private _onDragMove = (state: DndEventState) => {
     this.widget.clearRaf();
-
     this.widget.rafID = requestAnimationFrame(() => {
       this.widget.edgelessWatcher.updateDragPreviewPosition(state);
       this.widget.updateDropIndicator(state, true);
@@ -141,6 +143,7 @@ export class DragEventWatcher {
     // Get current hover block element by path
     const hoverBlock = this.widget.anchorBlockComponent.peek();
     if (!hoverBlock) return false;
+    console.log("this is hover block",hoverBlock);
 
     const element = captureEventTarget(state.raw.target);
     const dragByHandle = !!element?.closest(AFFINE_DRAG_HANDLE_WIDGET);
@@ -248,7 +251,9 @@ export class DragEventWatcher {
     const event = state.raw;
     const { clientX, clientY } = event;
     const point = new Point(clientX, clientY);
+    //console.log();
     const element = getClosestBlockComponentByPoint(point.clone());
+    console.log("this is element",element);
     if (!element) {
       const target = captureEventTarget(event.target);
       const isEdgelessContainer =
@@ -581,6 +586,7 @@ export class DragEventWatcher {
 
     this.widget.handleEvent('dragStart', ctx => {
       //console.log("this.widget.handleEvent('dragStart'");
+      //return
       const state = ctx.get('pointerState');
       const event = state.raw;
       const target = captureEventTarget(event.target);

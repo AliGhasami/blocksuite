@@ -317,6 +317,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this.rootComponent,
       point
     );
+    //console.log("closestNoteBlock",closestNoteBlock);
     if (
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
