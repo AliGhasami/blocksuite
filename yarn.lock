@@ -10195,6 +10195,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vue/web-component-wrapper@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@vue/web-component-wrapper@npm:1.3.0"
+  checksum: 10/60b94cbf34bcaa9c04be867a19981083d0b235ae2dd24d70b9c89cf4b682f80cec0df125553af8ba78deaf162ca1c635e4054bd451897655b4bad07da842fae3
+  languageName: node
+  linkType: hard
+
 "@vueuse/components@npm:10.11.0":
   version: 10.11.0
   resolution: "@vueuse/components@npm:10.11.0"
@@ -12187,6 +12194,7 @@ __metadata:
     "@vue/eslint-config-typescript": "npm:13.0.0"
     "@vue/test-utils": "npm:2.4.6"
     "@vue/tsconfig": "npm:0.5.1"
+    "@vue/web-component-wrapper": "npm:^1.3.0"
     "@vueuse/components": "npm:10.11.0"
     "@vueuse/core": "npm:10.11.0"
     "@vueuse/integrations": "npm:10.11.0"
@@ -12278,6 +12286,7 @@ __metadata:
     vue-advanced-cropper: "npm:^2.8.9"
     vue-boring-avatars: "npm:1.4.0"
     vue-content-loader: "npm:2.0.1"
+    vue-custom-element: "npm:^3.3.0"
     vue-dndrop: "npm:1.3.1"
     vue-draggable-resizable: "npm:^3.0.0"
     vue-eslint-parser: "npm:9.4.2"
@@ -29538,6 +29547,13 @@ __metadata:
   peerDependencies:
     vue: ^3
   checksum: 10/c2267e81f9c99e74ee7b4245223118eab7a84dc154cac6a6a80724d02d8e3075dc2d387ca441126c9800f6c0a6b32b27741ca3c7cc719b534e0f80ce48705c17
+  languageName: node
+  linkType: hard
+
+"vue-custom-element@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "vue-custom-element@npm:3.3.0"
+  checksum: 10/4a11f9d3273320ca45bc761f12aa480f54d699b4635740d370028f6e66fafc44765caf506ebb7516f04fe5cfbb2eecc4e640dee3d2de64bdd40f36acba9a002f
   languageName: node
   linkType: hard
 

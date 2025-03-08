@@ -9,7 +9,6 @@ import {pick} from 'lodash-es'
 import type { MahdaadCalloutBlockService } from './callout-service.js';
 
 import { transformModel } from '../root-block/utils/operations/model.js';
-import { nanoid } from '@blocksuite/store';
 
 
 export class MahdaadCalloutBlockComponent extends BlockComponent<
@@ -123,18 +122,23 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
   }
 
   override renderBlock() {
-    console.log("this is is_loadeeed",this._isLoad);
+    //console.log("this is is_loadeeed",this._isLoad);
     const aa=this.renderChildren(this.model).strings
-    console.log("aaaa",aa);
+    ///console.log("aaaa",aa);
 
 
-    const gg=()=> {
+    /*const gg=()=> {
       return this.renderChildren(this.model)
-    }
+    }*/
 
     return html`
       <div dir=${this.model.dir}>
-      <mahdaad-callout-component
+       <mahdaad-callout-component>
+         sample text 
+          <span>this is default  slot </span>
+          <span slot="sl">this is sl slot </span>
+        </mahdaad-callout-component> 
+      <!-- <mahdaad-callout-component
         style="min-height: 350px;border: 1px solid pink"
         type="${this.model.type}"
         background="${this.model.background}"
@@ -157,7 +161,7 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
             </div>
           </div>
         </div>
-      </mahdaad-callout-component>
+      </mahdaad-callout-component> -->
       </div>
     `;
   }
