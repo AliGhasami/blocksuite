@@ -1420,6 +1420,22 @@ async function init() {
   position: relative;
 }
 
+.editor{
+  border:1px solid pink;
+}
+
+affine-note{
+  border:1px solid #d34f0b;
+}
+
+.drag{
+  //border: 1px dashed red !important;
+  opacity: 0.5;
+}
+
+/*.with-drag-handle{
+  background-color: yellow;
+}*/
 /*//.slash-menu,
 !*.popover-menu{
   border-radius: var(--mt-roundness-3);

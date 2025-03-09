@@ -6,7 +6,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 export class DropIndicator extends LitElement {
   static override styles = css`
-    .affine-drop-indicator {
+    .affine-drop-indicator{
       position: absolute;
       top: 0;
       left: 0;
@@ -22,21 +22,44 @@ export class DropIndicator extends LitElement {
   `;
 
   override render() {
-    if (!this.rect) {
+    if (!this.rect && !this.rectVertical) {
       return null;
     }
-    const { left, top, width, height } = this.rect;
-    const style = styleMap({
-      width: `${width}px`,
-      height: `${height}px`,
-      top: `${top}px`,
-      left: `${left}px`,
-    });
-    return html`<div class="affine-drop-indicator" style=${style}></div>`;
+    console.log("this is rect",this.rect);
+
+    let style,styleVertical =styleMap({display:'none'})
+    //const styleVertical=styleMap({})
+    if(this.rect) {
+      const { left, top, width, height } = this.rect;
+      style = styleMap({
+        width: `${width}px`,
+        height: `${height}px`,
+        top: `${top}px`,
+        left: `${left}px`,
+        'background-color':'green'
+      });
+    }
+    if(this.rectVertical) {
+      const { left, top, width, height } = this.rectVertical;
+      styleVertical = styleMap({
+        width: `${height}px`,
+        height: `30px`,
+        top: `${top}px`,
+        left: `${width+30}px`,
+        'background-color':'yellow'
+      });
+    }
+
+    return html`<div class="affine-drop-indicator" style=${style}></div>
+          <div class="affine-drop-indicator vertical" style=${styleVertical}></div>
+    `;
   }
 
   @property({ attribute: false })
   accessor rect: Rect | null = null;
+
+  @property({ attribute: false })
+  accessor rectVertical: Rect | null = null;
 }
 
 declare global {

@@ -30,9 +30,7 @@ import {
   DRAG_HANDLE_CONTAINER_HEIGHT,
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT,
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_LIST,
-  type DropResult,
-  EDGELESS_NOTE_EXTRA_PADDING,
-  NOTE_CONTAINER_PADDING,
+  type DropResult, EDGELESS_NOTE_EXTRA_PADDING, NOTE_CONTAINER_PADDING,
 } from './config.js';
 
 const heightMap: Record<string, number> = {
@@ -112,8 +110,10 @@ export const isOutOfNoteBlock = (
   point: Point,
   scale: number
 ) => {
+  //console.log("this is scale",scale,noteBlock);
   // TODO: need to find a better way to check if the point is out of note block
   const rect = noteBlock.getBoundingClientRect();
+  //console.log("rect",rect);
   const insidePageEditor =
     editorHost.std.get(DocModeProvider).getEditorMode() === 'page';
   const padding =
@@ -348,4 +348,37 @@ export function getDuplicateBlocks(blocks: BlockModel[]) {
     blockProps: getBlockProps(block),
   }));
   return duplicateBlocks;
+}
+
+
+/**
+ * Checks if a point is inside an element's bounds
+ * @param point The point to check {x: number, y: number}
+ * @param element The HTML element to check against
+ * @param scale Optional scale factor (default is 1)
+ * @returns boolean - true if point is inside element, false if outside
+ */
+export function isPointInElement(
+  point: { x: number; y: number },
+  element: HTMLElement,
+  scale: number = 1
+): boolean {
+  // Get the element's bounding rectangle
+  const rect = element.getBoundingClientRect();
+
+  // Account for scaling if needed
+  const scaledRect = {
+    left: rect.left * scale,
+    right: rect.right * scale,
+    top: rect.top * scale,
+    bottom: rect.bottom * scale
+  };
+
+  // Check if point is within the rectangle bounds
+  return (
+    point.x >= scaledRect.left &&
+    point.x <= scaledRect.right &&
+    point.y >= scaledRect.top &&
+    point.y <= scaledRect.bottom
+  );
 }

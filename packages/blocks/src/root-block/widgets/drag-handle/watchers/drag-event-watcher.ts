@@ -72,6 +72,7 @@ export class DragEventWatcher {
   };
 
   private _createDropIndicator = () => {
+    //console.log("this.widget.dropIndicator",this.widget.dropIndicator);
     if (!this.widget.dropIndicator) {
       this.widget.dropIndicator = new DropIndicator();
       this.widget.rootComponent.append(this.widget.dropIndicator);
@@ -86,6 +87,8 @@ export class DragEventWatcher {
   private _dragMoveHandler: UIEventHandler = ctx => {
     console.log("_dragMoveHandler");
     //return
+    //debugger
+
     if (
       this.widget.isHoverDragHandleVisible ||
       this.widget.isTopLevelDragHandleVisible
@@ -108,8 +111,11 @@ export class DragEventWatcher {
    * When start dragging, should set dragging elements and create drag preview
    */
   private _dragStartHandler: UIEventHandler = ctx => {
+    setTimeout(()=>{
+      //  debugger
+    },5000)
     console.log("_dragStartHandler");
-    return
+    //return
     const state = ctx.get('dndState');
     // If not click left button to start dragging, should do nothing
     const { button } = state.raw;
@@ -139,7 +145,12 @@ export class DragEventWatcher {
   };
 
   private _onDragStart = (state: DndEventState) => {
-    console.log("_onDragStart");
+    //return
+    console.log("_onDragStart",this.widget.selectionHelper.selectedBlockComponents);
+    const className='drag'
+    this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(className))
+    this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(className))
+
     // Get current hover block element by path
     const hoverBlock = this.widget.anchorBlockComponent.peek();
     if (!hoverBlock) return false;
@@ -196,6 +207,8 @@ export class DragEventWatcher {
     if (!this.widget.isHoverDragHandleVisible) return false;
 
     let selections = this.widget.selectionHelper.selectedBlocks;
+    //console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+    //getSelectedBlock
 
     // When current selection is TextSelection
     // Should set BlockSelection for the blocks in native range
@@ -240,6 +253,7 @@ export class DragEventWatcher {
     if (blocksExcludingChildren.length === 0) return false;
 
     this._startDragging(blocksExcludingChildren, state);
+    //console.log("sample blocks",blocksExcludingChildren);
     this.widget.hide();
     return true;
   };
@@ -572,11 +586,13 @@ export class DragEventWatcher {
 
   watch() {
     this.widget.handleEvent('pointerDown', ctx => {
+      //return true
+      //console.log("drag event pointerDown ");
       const state = ctx.get('pointerState');
       const event = state.raw;
       const target = captureEventTarget(event.target);
       if (!target) return;
-
+      //console.log("this is target",target);
       if (this.widget.contains(target)) {
         return true;
       }
@@ -585,8 +601,9 @@ export class DragEventWatcher {
     });
 
     this.widget.handleEvent('dragStart', ctx => {
+      console.log("drag event drag start ");
       //console.log("this.widget.handleEvent('dragStart'");
-      //return
+      //return true
       const state = ctx.get('pointerState');
       const event = state.raw;
       const target = captureEventTarget(event.target);

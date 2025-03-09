@@ -43,7 +43,7 @@ import {
   containChildBlock,
   getClosestBlockByPoint,
   getClosestNoteBlock,
-  isOutOfNoteBlock,
+  isOutOfNoteBlock, isPointInElement,
   updateDragHandleClassName,
 } from './utils.js';
 import { DragEventWatcher } from './watchers/drag-event-watcher.js';
@@ -76,6 +76,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       point
     );
     if (!closestBlock) return null;
+    //console.log("blockkkkkk",closestBlock);
 
     const blockId = closestBlock.model.id;
     const model = closestBlock.model;
@@ -181,12 +182,17 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   private _resetDropResult = () => {
     this.dropBlockId = '';
     this.dropType = null;
-    if (this.dropIndicator) this.dropIndicator.rect = null;
+    if (this.dropIndicator) {
+      this.dropIndicator.rect = null
+      this.dropIndicator.rectVertical = null
+    };
   };
 
-  private _updateDropResult = (dropResult: DropResult | null) => {
+  private _updateDropResult = (dropResult: DropResult | null,showVerticalIndicator =  false ) => {
     if (!this.dropIndicator) return;
+    let result=null
     this.dropBlockId = dropResult?.dropBlockId ?? '';
+    console.log("this.dropBlockId",this.dropBlockId);
     this.dropType = dropResult?.dropType ?? null;
     if (dropResult?.rect) {
       const offsetParentRect =
@@ -198,9 +204,16 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       const { width, height } = dropResult.rect;
 
       const rect = Rect.fromLWTH(left, width, top, height);
-      this.dropIndicator.rect = rect;
+      result= rect
+      //this.dropIndicator.rect = rect;
     } else {
-      this.dropIndicator.rect = dropResult?.rect ?? null;
+      //this.dropIndicator.rect = dropResult?.rect ?? null;
+      result= dropResult?.rect ?? null;
+    }
+    if(showVerticalIndicator){
+      this.dropIndicator.rectVertical=result
+    }else{
+      this.dropIndicator.rect = result;
     }
   };
 
@@ -312,20 +325,47 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     shouldAutoScroll: boolean = false
   ) => {
     const point = new Point(state.raw.x, state.raw.y);
+    console.log("this is point ",point,this.host,this.rootComponent);
     const closestNoteBlock = getClosestNoteBlock(
       this.host,
       this.rootComponent,
       point
     );
+
+    /*console.log("final",this.rootComponent,isPointInElement(point,this.rootComponent));
+    if() {
+      console.log("show vertical indicator");
+    }else{
+      console.log("hide vertical indicator");
+    }*/
     //console.log("closestNoteBlock",closestNoteBlock);
+    //console.log("aaaaa",findClosestBlockComponent(this.rootComponent, point, 'affine-page-root'));
+    /*if(findClosestBlockComponent(rootComponent, point, 'affine-note')) {
+      console.log("1111111111");
+    }*/
+    //console.log("aaaa",isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek()));
+    /*if(closestNoteBlock) {
+      //console.log("ZZZZZZZZZZZZZZZZZZZZZZ");
+    }*/
+
+    //const b = getClosestBlockComponentByPoint(point) as BlockComponent;
+    //console.log("bbbbbbbb",b);
+
+    //console.log("aaaaaa",isOutOfNoteBlock(this.rootComponent, closestNoteBlock, point, this.scale.peek()))
+    //console.log("isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())",isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek()));
+    //return;
+    const showVerticalIndicator= closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent))
+    console.log("showVerticalIndicator",showVerticalIndicator);
     if (
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
     ) {
+      console.log("this is reset");
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state);
-      this._updateDropResult(dropResult);
+      console.log("dropResult",dropResult);
+      this._updateDropResult(dropResult,showVerticalIndicator);
     }
 
     this.lastDragPointerState = state;
