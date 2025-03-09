@@ -45,6 +45,7 @@ import { surfaceRefToEmbed } from '../middleware/surface-ref-to-embed.js';
 import { containBlock, includeTextSelection } from '../utils.js';
 
 export class DragEventWatcher {
+  private  className='drag'
   private _computeEdgelessBound = (
     x: number,
     y: number,
@@ -80,6 +81,7 @@ export class DragEventWatcher {
   };
 
   private _dragEndHandler: UIEventHandler = () => {
+    console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     this.widget.clearRaf();
     this.widget.hide(true);
   };
@@ -127,7 +129,9 @@ export class DragEventWatcher {
   };
 
   private _dropHandler = (context: UIEventStateContext) => {
-    console.log("_dropHandler");
+    console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
+    //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
+    //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //return
     this._onDrop(context);
     this._std.selection.setGroup('gfx', []);
@@ -146,11 +150,10 @@ export class DragEventWatcher {
 
   private _onDragStart = (state: DndEventState) => {
     //return
-    console.log("_onDragStart",this.widget.selectionHelper.selectedBlockComponents);
-    const className='drag'
-    this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(className))
-    this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(className))
 
+    console.log("_onDragStart",this.widget.selectionHelper.selectedBlockComponents);
+    //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
+    //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     // Get current hover block element by path
     const hoverBlock = this.widget.anchorBlockComponent.peek();
     if (!hoverBlock) return false;
@@ -173,6 +176,8 @@ export class DragEventWatcher {
       ]);
       this._startDragging([hoverBlock], state);
     };
+
+    console.log("draggingElements",this.widget.draggingElements);
 
     if (this.widget.draggingElements.length === 0) {
       const dragByBlock =
@@ -207,8 +212,11 @@ export class DragEventWatcher {
     if (!this.widget.isHoverDragHandleVisible) return false;
 
     let selections = this.widget.selectionHelper.selectedBlocks;
-    //console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+    console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+    //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
+    //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //getSelectedBlock
+
 
     // When current selection is TextSelection
     // Should set BlockSelection for the blocks in native range

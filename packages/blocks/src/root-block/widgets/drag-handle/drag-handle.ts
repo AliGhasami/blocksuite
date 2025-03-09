@@ -42,7 +42,7 @@ import {
   containBlock,
   containChildBlock,
   getClosestBlockByPoint,
-  getClosestNoteBlock,
+  getClosestNoteBlock, isEndRight,
   isOutOfNoteBlock, isPointInElement,
   updateDragHandleClassName,
 } from './utils.js';
@@ -76,7 +76,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       point
     );
     if (!closestBlock) return null;
-    //console.log("blockkkkkk",closestBlock);
+    console.log("dropResult blockkkkkk",closestBlock);
 
     const blockId = closestBlock.model.id;
     const model = closestBlock.model;
@@ -354,7 +354,11 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     //console.log("aaaaaa",isOutOfNoteBlock(this.rootComponent, closestNoteBlock, point, this.scale.peek()))
     //console.log("isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())",isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek()));
     //return;
-    const showVerticalIndicator= closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent))
+    //console.log("11111",closestNoteBlock ? && );
+    /*if(closestNoteBlock){
+      console.log("33333",);
+    }*/
+    const showVerticalIndicator= closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock))
     console.log("showVerticalIndicator",showVerticalIndicator);
     if (
       !closestNoteBlock ||

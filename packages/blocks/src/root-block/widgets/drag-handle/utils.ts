@@ -157,13 +157,14 @@ export const getClosestBlockByPoint = (
   if (!closestNoteBlock || closestNoteBlock.closest('.affine-surface-ref')) {
     return null;
   }
-
+  console.log("dropResult aaaa",closestNoteBlock);
   const noteRect = Rect.fromDOM(closestNoteBlock);
-
+  console.log("dropResult noteRect",noteRect);
   const block = getClosestBlockComponentByPoint(point, {
     container: closestNoteBlock,
     rect: noteRect,
   }) as BlockComponent | null;
+  console.log("dropResult bbbbb",block);
 
   const blockSelector =
     '.affine-note-block-container > .affine-block-children-container > [data-block-id]';
@@ -177,6 +178,7 @@ export const getClosestBlockByPoint = (
           blockSelector
         )
   ) as BlockComponent;
+  console.log("dropResult cccccc",closestBlock);
 
   if (!closestBlock || !!closestBlock.closest('.surface-ref-note-portal')) {
     return null;
@@ -382,3 +384,27 @@ export function isPointInElement(
     point.y <= scaledRect.bottom
   );
 }
+
+
+export function isEndRight(
+  point: { x: number; y: number },
+  element: HTMLElement,
+  scale: number = 1
+): boolean {
+  // Get the element's bounding rectangle
+  const rect = element.getBoundingClientRect();
+  console.log("this is rect",rect,point);
+  // Account for scaling if needed
+  const scaledRect = {
+    //left: rect.left * scale,
+    right: rect.right * scale,
+    //top: rect.top * scale,
+    //bottom: rect.bottom * scale
+  };
+  console.log("this is rect 2",point.x > scaledRect.right);
+  return (
+    point.x > scaledRect.right
+  );
+}
+
+
