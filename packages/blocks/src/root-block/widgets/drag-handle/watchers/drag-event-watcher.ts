@@ -45,7 +45,6 @@ import { surfaceRefToEmbed } from '../middleware/surface-ref-to-embed.js';
 import { containBlock, includeTextSelection } from '../utils.js';
 
 export class DragEventWatcher {
-  private  className='drag'
   private _computeEdgelessBound = (
     x: number,
     y: number,
@@ -114,7 +113,7 @@ export class DragEventWatcher {
    */
   private _dragStartHandler: UIEventHandler = ctx => {
     setTimeout(()=>{
-      //  debugger
+       debugger
     },5000)
     console.log("_dragStartHandler");
     //return
@@ -490,6 +489,8 @@ export class DragEventWatcher {
       other: 'new doc',
     });
   };
+
+  private  className='drag'
 
   private get _dndAPI() {
     return this._std.get(DndApiExtensionIdentifier);

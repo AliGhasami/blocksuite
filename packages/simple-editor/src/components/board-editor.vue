@@ -1428,10 +1428,16 @@ affine-note{
   border:1px solid #d34f0b;
 }
 
+.affine-drag-indicator{
+  @apply h-100;
+  background: @primary-fill;
+}
+
+/*
 .drag{
   //border: 1px dashed red !important;
   opacity: 0.5;
-}
+}*/
 
 /*.with-drag-handle{
   background-color: yellow;
