@@ -157,14 +157,14 @@ export const getClosestBlockByPoint = (
   if (!closestNoteBlock || closestNoteBlock.closest('.affine-surface-ref')) {
     return null;
   }
-  console.log("dropResult aaaa",closestNoteBlock);
+  //console.log("dropResult aaaa",closestNoteBlock);
   const noteRect = Rect.fromDOM(closestNoteBlock);
-  console.log("dropResult noteRect",noteRect);
+  //console.log("dropResult noteRect",noteRect);
   const block = getClosestBlockComponentByPoint(point, {
     container: closestNoteBlock,
     rect: noteRect,
   }) as BlockComponent | null;
-  console.log("dropResult bbbbb",block);
+  //console.log("dropResult bbbbb",block);
 
   const blockSelector =
     '.affine-note-block-container > .affine-block-children-container > [data-block-id]';
@@ -178,7 +178,7 @@ export const getClosestBlockByPoint = (
           blockSelector
         )
   ) as BlockComponent;
-  console.log("dropResult cccccc",closestBlock);
+  //console.log("dropResult cccccc",closestBlock);
 
   if (!closestBlock || !!closestBlock.closest('.surface-ref-note-portal')) {
     return null;
@@ -198,6 +198,7 @@ export function calcDropTarget(
    */
   allowSublist: boolean = true
 ): DropResult | null {
+  console.log("");
   let type: DropType | 'none' = 'none';
   const height = 3 * scale;
   const { rect: domRect } = getDropRectByPoint(point, model, element);
@@ -290,6 +291,7 @@ export function calcDropTarget(
 
   return {
     rect: Rect.fromLWTH(domRect.left, domRect.width, top - height / 2, height),
+    //rect: Rect.fromLWTH(domRect.left, domRect.width, top - domRect.height / 2, domRect.height),
     dropBlockId: model.id,
     dropType: type,
   };
@@ -393,7 +395,7 @@ export function isEndRight(
 ): boolean {
   // Get the element's bounding rectangle
   const rect = element.getBoundingClientRect();
-  console.log("this is rect",rect,point);
+  //console.log("this is rect",rect,point);
   // Account for scaling if needed
   const scaledRect = {
     //left: rect.left * scale,
@@ -401,7 +403,7 @@ export function isEndRight(
     //top: rect.top * scale,
     //bottom: rect.bottom * scale
   };
-  console.log("this is rect 2",point.x > scaledRect.right);
+  //console.log("this is rect 2",point.x > scaledRect.right);
   return (
     point.x > scaledRect.right
   );

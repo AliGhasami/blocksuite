@@ -36,15 +36,7 @@ export class DragIndicator extends ShadowlessElement {
      // 'background-color':'red'
     });
     return html`<div class="affine-drag-indicator" style=${style}>
-      <span style="border: 4px solid red;
-    width: 20px;
-    height: 20px;
-    display: block;
-    background-color: #fff;
-    border-radius: 50%;
-    top: -8px;
-    position: absolute;
-}"></span>
+      <span class="circle-indicator" ></span>
     </div>`;
   }
 

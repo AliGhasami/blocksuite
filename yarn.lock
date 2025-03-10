@@ -4832,35 +4832,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:2.0.36":
-  version: 2.0.36
-  resolution: "@mahdaad/block-editor@npm:2.0.36"
-  dependencies:
-    "@mahdaad/tokens": "npm:^0.0.36"
-    "@pantograph/tokens": "npm:0.0.15"
-    "@pantograph/unocss-preset": "npm:0.0.7"
-    "@unhead/vue": "npm:^1.9.5"
-    "@vueuse/core": "npm:^10.9.0"
-    ant-design-vue: "npm:^4.2.3"
-    dayjs: "npm:^1.11.12"
-    i18n-js: "npm:^4.4.3"
-    less: "npm:^4.2.0"
-    lit-i18n: "npm:^4.1.0"
-    pinia: "npm:^2.1.7"
-    radix-vue: "npm:^1.7.3"
-    tippy.js: "npm:^6.3.7"
-    unocss-preset-autoprefixer: "npm:0.0.7"
-    vite-plugin-dts: "npm:^3.7.3"
-    vue: "npm:^3.4.21"
-    vue-router: "npm:^4.3.0"
-    vue3-webcomponent-wrapper: "npm:^0.2.0"
-  peerDependencies:
-    vue: ^3.0.0
-  checksum: 10/5bba8291a3de80014acbaeaec1852e4b8882a11e94729af511e813675a288288876d1fe16eb0638e4190046d8589d310d72e72a83cf8b1f064d30930f38bd1a8
-  languageName: node
-  linkType: hard
-
-"@mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -12175,7 +12147,7 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:2.0.36"
+    "@mahdaad/block-editor": "workspace:*"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"

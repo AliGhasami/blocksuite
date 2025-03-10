@@ -1424,14 +1424,35 @@ async function init() {
   border:1px solid pink;
 }
 
-affine-note{
+/*affine-note{
   border:1px solid #d34f0b;
-}
+}*/
 
-.affine-drag-indicator{
+.affine-drag-indicator,.affine-drop-indicator{
   @apply h-100;
   background: @primary-fill;
+
+  .circle-indicator{
+    border: 2px solid @primary-5;
+    width: 8px;
+    height: 8px;
+    display: block;
+    background-color: @gray-0;
+    border-radius: 50%;
+    top: -3px;
+    position: absolute;
+  }
+
 }
+
+
+affine-drag-preview{
+  @apply rounded-md shadow-sharp txs-body text-fg-subtle;
+  width: 232px;
+  padding: @space-400  @space-600;
+  background: @bg-target;
+}
+
 
 /*
 .drag{

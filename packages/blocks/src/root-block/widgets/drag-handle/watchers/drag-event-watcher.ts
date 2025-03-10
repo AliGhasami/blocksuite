@@ -80,13 +80,13 @@ export class DragEventWatcher {
   };
 
   private _dragEndHandler: UIEventHandler = () => {
-    console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+   // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     this.widget.clearRaf();
     this.widget.hide(true);
   };
 
   private _dragMoveHandler: UIEventHandler = ctx => {
-    console.log("_dragMoveHandler");
+    //console.log("_dragMoveHandler");
     //return
     //debugger
 
@@ -115,7 +115,7 @@ export class DragEventWatcher {
     setTimeout(()=>{
        debugger
     },5000)
-    console.log("_dragStartHandler");
+  /// console.log("_dragStartHandler");
     //return
     const state = ctx.get('dndState');
     // If not click left button to start dragging, should do nothing
@@ -128,7 +128,7 @@ export class DragEventWatcher {
   };
 
   private _dropHandler = (context: UIEventStateContext) => {
-    console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
+   // console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //return
@@ -150,13 +150,13 @@ export class DragEventWatcher {
   private _onDragStart = (state: DndEventState) => {
     //return
 
-    console.log("_onDragStart",this.widget.selectionHelper.selectedBlockComponents);
+    //console.log("_onDragStart",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     // Get current hover block element by path
     const hoverBlock = this.widget.anchorBlockComponent.peek();
     if (!hoverBlock) return false;
-    console.log("this is hover block",hoverBlock);
+    //console.log("this is hover block",hoverBlock);
 
     const element = captureEventTarget(state.raw.target);
     const dragByHandle = !!element?.closest(AFFINE_DRAG_HANDLE_WIDGET);
@@ -211,7 +211,7 @@ export class DragEventWatcher {
     if (!this.widget.isHoverDragHandleVisible) return false;
 
     let selections = this.widget.selectionHelper.selectedBlocks;
-    console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+    //console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //getSelectedBlock
@@ -274,7 +274,7 @@ export class DragEventWatcher {
     const point = new Point(clientX, clientY);
     //console.log();
     const element = getClosestBlockComponentByPoint(point.clone());
-    console.log("this is element",element);
+    //console.log("this is element",element);
     if (!element) {
       const target = captureEventTarget(event.target);
       const isEdgelessContainer =
@@ -610,7 +610,7 @@ export class DragEventWatcher {
     });
 
     this.widget.handleEvent('dragStart', ctx => {
-      console.log("drag event drag start ");
+      //console.log("drag event drag start ");
       //console.log("this.widget.handleEvent('dragStart'");
       //return true
       const state = ctx.get('pointerState');

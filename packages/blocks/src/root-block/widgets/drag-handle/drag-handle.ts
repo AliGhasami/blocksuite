@@ -76,7 +76,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       point
     );
     if (!closestBlock) return null;
-    console.log("dropResult blockkkkkk",closestBlock);
+    //console.log("dropResult blockkkkkk",closestBlock);
 
     const blockId = closestBlock.model.id;
     const model = closestBlock.model;
@@ -122,11 +122,13 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this.scale.peek(),
       isDraggedElementNote === false
     );
+    console.log("result",result);
 
     if (result) {
       rect = result.rect;
       dropType = result.dropType;
     }
+
 
     if (isDraggedElementNote && dropType === 'in') return null;
 
@@ -192,7 +194,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     if (!this.dropIndicator) return;
     let result=null
     this.dropBlockId = dropResult?.dropBlockId ?? '';
-    console.log("this.dropBlockId",this.dropBlockId);
+    //console.log("this.dropBlockId",this.dropBlockId);
     this.dropType = dropResult?.dropType ?? null;
     if (dropResult?.rect) {
       const offsetParentRect =
@@ -210,7 +212,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       //this.dropIndicator.rect = dropResult?.rect ?? null;
       result= dropResult?.rect ?? null;
     }
-    if(showVerticalIndicator){
+    if(showVerticalIndicator) {
       this.dropIndicator.rectVertical=result
     }else{
       this.dropIndicator.rect = result;
@@ -325,7 +327,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     shouldAutoScroll: boolean = false
   ) => {
     const point = new Point(state.raw.x, state.raw.y);
-    console.log("this is point ",point,this.host,this.rootComponent);
+    //console.log("this is point ",point,this.host,this.rootComponent);
     const closestNoteBlock = getClosestNoteBlock(
       this.host,
       this.rootComponent,
@@ -359,12 +361,12 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       console.log("33333",);
     }*/
     const showVerticalIndicator= closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock))
-    console.log("showVerticalIndicator",showVerticalIndicator);
+    //console.log("showVerticalIndicator",showVerticalIndicator);
     if (
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
     ) {
-      console.log("this is reset");
+    //  console.log("this is reset");
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state);
