@@ -1,5 +1,6 @@
 import type { NoteBlockModel } from '@blocksuite/affine-model';
 
+import { checkNotEmptyNote } from '@blocksuite/affine-shared/utils';
 import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 
@@ -27,14 +28,26 @@ export class NoteBlockComponent extends BlockComponent<
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
-    if (
-      this.model.children.length == 0 ||
-      (this.model.children.length > 0 &&
-        this.model.children[this.model.children.length - 1].flavour != 'affine:paragraph')
-    ) {
-      this.doc.addBlock('affine:paragraph', {}, this.model);
-    }
+    checkNotEmptyNote(this.model,this.doc)
+    /*try{
+      let  lastChild :  null | BlockModel = null
+      if(this.model.children.length > 0) {
+        lastChild=this.model.children[this.model.children.length - 1]
+      }
+      if (
+        this.model.children.length == 0 ||
+        (lastChild &&
+          (lastChild.flavour != 'affine:paragraph' ||  (lastChild.flavour == 'affine:paragraph' && lastChild.type && lastChild.type=='quote' )))
+      ) {
+        this.doc.addBlock('affine:paragraph', {}, this.model);
+      }
+    }catch (e) {
+      console.log("error",e);
+    }finally {
+
+    }*/
     return result;
+
   }
 
 
