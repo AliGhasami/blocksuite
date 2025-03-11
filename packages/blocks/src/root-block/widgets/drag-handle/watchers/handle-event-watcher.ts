@@ -10,7 +10,6 @@ export class HandleEventWatcher {
   private _onDragHandlePointerDown = () => {
     if (!this.widget.isHoverDragHandleVisible || !this.widget.anchorBlockId)
       return;
-
     this.widget.dragHoverRect = this.widget.draggingAreaRect.value;
   };
 

@@ -161,8 +161,10 @@ export class EdgelessWatcher {
 
     this.widget.dragPreview.style.transform = `translate(${posX}px, ${posY}px) scale(${this.widget.scaleInNote.peek()})`;
 
-    const altKey = state.raw.altKey;
-    this.widget.dragPreview.style.opacity = altKey ? '1' : '0.5';
+    //const altKey = state.raw.altKey;
+    //this.widget.dragPreview.style.opacity = '1';
+    //this.widget.dragPreview.style.opacity = altKey ? '1' : '0.5';
+    //console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   };
 
   get edgelessRoot() {

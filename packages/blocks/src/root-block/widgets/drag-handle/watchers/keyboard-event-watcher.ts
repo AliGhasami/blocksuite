@@ -13,8 +13,10 @@ export class KeyboardEventWatcher {
     event.preventDefault();
     event.stopPropagation();
 
-    const altKey = event.key === 'Alt' && event.altKey;
-    this.widget.dragPreview.style.opacity = altKey ? '1' : '0.5';
+    //const altKey = event.key === 'Alt' && event.altKey;
+    //this.widget.dragPreview.style.opacity = altKey ? '1' : '0.5';
+    //this.widget.dragPreview.style.opacity = '1' ;
+
   };
 
   constructor(readonly widget: AffineDragHandleWidget) {}
