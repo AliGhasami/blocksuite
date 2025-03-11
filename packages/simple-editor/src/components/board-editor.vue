@@ -1441,6 +1441,11 @@ async function init() {
     border-radius: 50%;
     top: -3px;
     position: absolute;
+
+    &.vertical{
+      right: -3px;
+    }
+
   }
 
 }

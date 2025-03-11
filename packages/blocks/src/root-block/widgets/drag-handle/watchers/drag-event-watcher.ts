@@ -81,12 +81,14 @@ export class DragEventWatcher {
 
   private _dragEndHandler: UIEventHandler = () => {
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+    console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
     this.widget.clearRaf();
     this.widget.hide(true);
   };
 
   private _dragMoveHandler: UIEventHandler = ctx => {
-    //console.log("_dragMoveHandler");
+    console.log("_dragMoveHandler");
+    //return false
     //return
     //debugger
 
@@ -100,7 +102,7 @@ export class DragEventWatcher {
     if (!this.widget.dragging || this.widget.draggingElements.length === 0) {
       return false;
     }
-
+    console.log("_dragMoveHandler draggingElements",this.widget.draggingElements);
     ctx.get('defaultState').event.preventDefault();
     const state = ctx.get('dndState');
 
@@ -112,10 +114,10 @@ export class DragEventWatcher {
    * When start dragging, should set dragging elements and create drag preview
    */
   private _dragStartHandler: UIEventHandler = ctx => {
-    setTimeout(()=>{
+    /*setTimeout(()=>{
        debugger
-    },5000)
-  /// console.log("_dragStartHandler");
+    },5000)*/
+    console.log("_dragStartHandler", ctx);
     //return
     const state = ctx.get('dndState');
     // If not click left button to start dragging, should do nothing
@@ -123,6 +125,7 @@ export class DragEventWatcher {
     if (button !== 0) {
       return false;
     }
+    //ctx.add({})
 
     return this._onDragStart(state);
   };
@@ -132,6 +135,7 @@ export class DragEventWatcher {
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //return
+    console.log("____dropHandler",this.widget.draggingElements);
     this._onDrop(context);
     this._std.selection.setGroup('gfx', []);
     this.widget.clearRaf();
@@ -522,6 +526,8 @@ export class DragEventWatcher {
             this._trackLinkedDocCreated(first.id);
           }
         }
+        console.log("_dragMoveHandler snapshot",snapshot);
+        //return null
         // use snapshot
         const slice = await job.snapshotToSlice(
           snapshot,
@@ -529,6 +535,8 @@ export class DragEventWatcher {
           parent,
           index
         );
+        console.log("_dragMoveHandler slice",slice);
+        //return  null
         return slice;
       }
 

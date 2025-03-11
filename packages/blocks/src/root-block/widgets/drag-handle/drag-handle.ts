@@ -213,8 +213,10 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       result= dropResult?.rect ?? null;
     }
     if(showVerticalIndicator) {
+      this.dropIndicator.rect = null;
       this.dropIndicator.rectVertical=result
     }else{
+      this.dropIndicator.rectVertical=null
       this.dropIndicator.rect = result;
     }
   };

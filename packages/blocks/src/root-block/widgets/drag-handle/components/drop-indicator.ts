@@ -27,9 +27,10 @@ export class DropIndicator extends ShadowlessElement {
     if (!this.rect && !this.rectVertical) {
       return null;
     }
-    //console.log("this is rect",this.rect);
+    console.log("this is rect",this.rect,this.rectVertical);
 
-    let style,styleVertical =styleMap({display:'none'})
+    let style =styleMap({display:'none'})
+    let styleVertical =styleMap({display:'none'})
     //const styleVertical=styleMap({})
     if(this.rect) {
       const { left, top, width, height } = this.rect;
@@ -52,11 +53,12 @@ export class DropIndicator extends ShadowlessElement {
         //'background-color':'yellow'
       });
     }
-
     return html`<div class="affine-drop-indicator" style=${style}>
       <span class="circle-indicator"></span>
     </div>
-        <div class="affine-drop-indicator vertical" style=${styleVertical}></div>
+        <div class="affine-drop-indicator vertical" style=${styleVertical}>
+          <span class="circle-indicator vertical"></span>
+        </div>
     `;
   }
 
