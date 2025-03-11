@@ -46,11 +46,9 @@ export const styles = css`
     left: 0;
     border-radius: 6px;
     background: var(--affine-hover-color);
-    //background-color: red;
     pointer-events: none;
     z-index: 2;
     animation: expand 0.25s forwards;
-    opacity: 0.9;
   }
   @keyframes expand {
     0% {

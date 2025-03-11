@@ -30,7 +30,9 @@ import {
   DRAG_HANDLE_CONTAINER_HEIGHT,
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT,
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_LIST,
-  type DropResult, EDGELESS_NOTE_EXTRA_PADDING, NOTE_CONTAINER_PADDING,
+  type DropResult,
+  EDGELESS_NOTE_EXTRA_PADDING,
+  NOTE_CONTAINER_PADDING,
 } from './config.js';
 
 const heightMap: Record<string, number> = {
@@ -110,10 +112,8 @@ export const isOutOfNoteBlock = (
   point: Point,
   scale: number
 ) => {
-  //console.log("this is scale",scale,noteBlock);
   // TODO: need to find a better way to check if the point is out of note block
   const rect = noteBlock.getBoundingClientRect();
-  //console.log("rect",rect);
   const insidePageEditor =
     editorHost.std.get(DocModeProvider).getEditorMode() === 'page';
   const padding =
@@ -157,14 +157,13 @@ export const getClosestBlockByPoint = (
   if (!closestNoteBlock || closestNoteBlock.closest('.affine-surface-ref')) {
     return null;
   }
-  //console.log("dropResult aaaa",closestNoteBlock);
+
   const noteRect = Rect.fromDOM(closestNoteBlock);
-  //console.log("dropResult noteRect",noteRect);
+
   const block = getClosestBlockComponentByPoint(point, {
     container: closestNoteBlock,
     rect: noteRect,
   }) as BlockComponent | null;
-  //console.log("dropResult bbbbb",block);
 
   const blockSelector =
     '.affine-note-block-container > .affine-block-children-container > [data-block-id]';
@@ -178,7 +177,6 @@ export const getClosestBlockByPoint = (
           blockSelector
         )
   ) as BlockComponent;
-  //console.log("dropResult cccccc",closestBlock);
 
   if (!closestBlock || !!closestBlock.closest('.surface-ref-note-portal')) {
     return null;
@@ -198,7 +196,6 @@ export function calcDropTarget(
    */
   allowSublist: boolean = true
 ): DropResult | null {
-  console.log("");
   let type: DropType | 'none' = 'none';
   const height = 3 * scale;
   const { rect: domRect } = getDropRectByPoint(point, model, element);
@@ -291,7 +288,6 @@ export function calcDropTarget(
 
   return {
     rect: Rect.fromLWTH(domRect.left, domRect.width, top - height / 2, height),
-    //rect: Rect.fromLWTH(domRect.left, domRect.width, top - domRect.height / 2, domRect.height),
     dropBlockId: model.id,
     dropType: type,
   };
@@ -353,60 +349,3 @@ export function getDuplicateBlocks(blocks: BlockModel[]) {
   }));
   return duplicateBlocks;
 }
-
-
-/**
- * Checks if a point is inside an element's bounds
- * @param point The point to check {x: number, y: number}
- * @param element The HTML element to check against
- * @param scale Optional scale factor (default is 1)
- * @returns boolean - true if point is inside element, false if outside
- */
-export function isPointInElement(
-  point: { x: number; y: number },
-  element: HTMLElement,
-  scale: number = 1
-): boolean {
-  // Get the element's bounding rectangle
-  const rect = element.getBoundingClientRect();
-
-  // Account for scaling if needed
-  const scaledRect = {
-    left: rect.left * scale,
-    right: rect.right * scale,
-    top: rect.top * scale,
-    bottom: rect.bottom * scale
-  };
-
-  // Check if point is within the rectangle bounds
-  return (
-    point.x >= scaledRect.left &&
-    point.x <= scaledRect.right &&
-    point.y >= scaledRect.top &&
-    point.y <= scaledRect.bottom
-  );
-}
-
-
-export function isEndRight(
-  point: { x: number; y: number },
-  element: HTMLElement,
-  scale: number = 1
-): boolean {
-  // Get the element's bounding rectangle
-  const rect = element.getBoundingClientRect();
-  //console.log("this is rect",rect,point);
-  // Account for scaling if needed
-  const scaledRect = {
-    //left: rect.left * scale,
-    right: rect.right * scale,
-    //top: rect.top * scale,
-    //bottom: rect.bottom * scale
-  };
-  //console.log("this is rect 2",point.x > scaledRect.right);
-  return (
-    point.x > scaledRect.right
-  );
-}
-
-
