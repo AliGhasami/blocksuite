@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "2.0.38",
+  "version": "2.0.40",
   "type": "module",
   "files": [
     "dist",
@@ -49,8 +49,7 @@
   },
   "dependencies": {
     "@mahdaad/tokens": "^0.0.36",
-    "@pantograph/tokens": "0.0.15",
-    "@pantograph/unocss-preset": "0.0.7",
+    "@pantograph/unocss-preset": "^0.0.11",
     "@unhead/vue": "^1.9.5",
     "@vueuse/core": "^10.9.0",
     "ant-design-vue": "^4.2.3",
