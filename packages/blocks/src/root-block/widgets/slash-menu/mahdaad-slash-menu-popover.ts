@@ -1,6 +1,6 @@
 import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
 
-import { MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
+import { MahdaadCalloutBlockSchema,MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { WithDisposable } from '@blocksuite/global/utils';
@@ -111,6 +111,19 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     return list;
   }
 
+  checkKeys() {
+    let allowKeys=['*']
+    const denyKeys=[]
+    //const temp = []
+    if(checkParentIs(this.context.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
+      denyKeys.push('two_columns','three_columns','four_columns')
+    }
+    if(checkParentIs(this.context.model,MahdaadCalloutBlockSchema.model.flavour)) {
+      allowKeys=['text','h1','h2','h3','bullet_list','number_list','check_list','quote']
+    }
+    return  {allowKeys,denyKeys}
+  }
+
   override connectedCallback() {
     super.connectedCallback();
 
@@ -196,19 +209,13 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   }
 
-  disabledKeys() {
-    const temp = []
-    if(checkParentIs(this.context.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
-      temp.push('two_columns','three_columns','four_columns')
-    }
-    return temp
-  }
+
 
 
 
   override render() {
-
-    this.disabledKeys()
+    const {denyKeys,allowKeys} = this.checkKeys()
+    //this.disabledKeys()
     //this._toolsList();
     const slashMenuStyles = this._position
       ? {
@@ -235,7 +242,8 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
           search-text="${this._searchText}"
           .tools-list="${this._toolsList()}"
           .inline-editor="${this.inlineEditor}"
-          disabled-keys="${JSON.stringify(this.disabledKeys())}"
+          deny-keys="${JSON.stringify(denyKeys)}"
+          allow-keys="${JSON.stringify(allowKeys)}"
           @select="${(event: CustomEvent) => {
             //console.log("11111",event);
             const key = event.detail;

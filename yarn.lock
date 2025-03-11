@@ -5709,6 +5709,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pantograph/tokens@npm:^0.0.16":
+  version: 0.0.16
+  resolution: "@pantograph/tokens@npm:0.0.16"
+  dependencies:
+    "@types/culori": "npm:^2.1.1"
+    culori: "npm:^4.0.1"
+  checksum: 10/2d132b0d5738253efb0e92ab2406a2627a06bf4f0e574af0e8c39cb0325cb35f269ec687008f2e4845584f0dff432b9619c403fb708fe60abd4d31594a51c67c
+  languageName: node
+  linkType: hard
+
+"@pantograph/tokens@npm:^0.0.17":
+  version: 0.0.17
+  resolution: "@pantograph/tokens@npm:0.0.17"
+  dependencies:
+    "@types/culori": "npm:^2.1.1"
+    culori: "npm:^4.0.1"
+  checksum: 10/bbb0c19069ba3809d5a4b70d18e7ebefa31fba66293b891aac934f8b1d655ca691b0951af241e503dc17d1a255da239befe7ebe7aa228c1a3f88ab8bb4e620c4
+  languageName: node
+  linkType: hard
+
 "@pantograph/unocss-preset@npm:0.0.7":
   version: 0.0.7
   resolution: "@pantograph/unocss-preset@npm:0.0.7"
@@ -5720,23 +5740,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pantograph/utils@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@pantograph/utils@npm:0.0.5"
+"@pantograph/unocss-preset@npm:^0.0.9":
+  version: 0.0.9
+  resolution: "@pantograph/unocss-preset@npm:0.0.9"
   dependencies:
-    "@pantograph/tokens": "npm:^0.0.15"
-  checksum: 10/5df4aaecb3c67e9d71e753cbdcdfac2305fba6b6cafdc964424d42b1da9fb6234274fb4d141fec079686d446b2e8cff566fda922b9cd8d419a2bc6be0e3ad14e
+    "@pantograph/tokens": "npm:^0.0.17"
+    unocss: "npm:^0.65.2"
+    unocss-preset-animations: "npm:^1.1.0"
+  checksum: 10/369bc608c3601b69ceb3ad19e4377f8a7d8ea14c6d3edcb05c26ae5f6ec04a65f9fd15118be90f57095c673eca4f98a822f6739431c5da8ac8ea7e8c546e8fb2
   languageName: node
   linkType: hard
 
-"@pantograph/vue@npm:^0.10.13":
-  version: 0.10.13
-  resolution: "@pantograph/vue@npm:0.10.13"
+"@pantograph/utils@npm:^0.0.6":
+  version: 0.0.6
+  resolution: "@pantograph/utils@npm:0.0.6"
+  dependencies:
+    "@pantograph/tokens": "npm:^0.0.16"
+  checksum: 10/7ad0fcc6f450d1392aaa446445e101a13d61b3bf2b05df54724518a35b95d1db995faf2246d5bd7d2139e85ff28298189fdc1b1c30cefe0cce3cea9f57615a17
+  languageName: node
+  linkType: hard
+
+"@pantograph/vue@npm:^0.13.1":
+  version: 0.13.1
+  resolution: "@pantograph/vue@npm:0.13.1"
   dependencies:
     "@faker-js/faker": "npm:^9.5.0"
     "@iconify/vue": "npm:^4.3.0"
-    "@pantograph/tokens": "npm:^0.0.15"
-    "@pantograph/utils": "npm:^0.0.5"
+    "@pantograph/tokens": "npm:^0.0.17"
+    "@pantograph/utils": "npm:^0.0.6"
     "@tanstack/vue-table": "npm:^8.21.2"
     "@types/lodash-es": "npm:^4.17.12"
     "@types/sortablejs": "npm:^1.15.8"
@@ -5749,7 +5780,7 @@ __metadata:
     vue-tippy: "npm:^6.6.0"
   peerDependencies:
     vue: ^3.5.13
-  checksum: 10/8c555ef38cd8ee59fa5db7238fd9adc671ba65cb913100bd7a99e881a1ac8361e832de8c396e1151a16033cb9b013fca4c46f62f715e83005d5982d2b20a7890
+  checksum: 10/876023c3d0b83652b269d0e09ff20f854f0d843f2afa28dc08d75462161e35d3ea963ee368e8dbd1ce662f6b45c7286b8bda820984f8fb4f0bde8129e041e426
   languageName: node
   linkType: hard
 
@@ -7195,6 +7226,13 @@ __metadata:
   version: 4.2.2
   resolution: "@types/crypto-js@npm:4.2.2"
   checksum: 10/a40fc5a9219fd33f54ba3e094c5e5ab2904d3106681a76f1029bb038976591e9c8959099963bf4474fde21c2d8d00c1f896445206a3a58f85588f9cb1bd96a9a
+  languageName: node
+  linkType: hard
+
+"@types/culori@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@types/culori@npm:2.1.1"
+  checksum: 10/b8b8066bd6996fc4c323f0bad3bb923a6082b17f26aade28c309dcfd98f65ef1800fcf7c2f532b8a670f126b8f70cba68f5c2915a96730e80ff5f967de8492f2
   languageName: node
   linkType: hard
 
@@ -12154,9 +12192,9 @@ __metadata:
     "@mahdaad/tokens": "npm:0.0.43"
     "@novu/headless": "npm:2.0.0-canary.0"
     "@novu/notification-center-vue": "npm:2.0.0-canary.0"
-    "@pantograph/tokens": "npm:^0.0.15"
-    "@pantograph/unocss-preset": "npm:0.0.7"
-    "@pantograph/vue": "npm:^0.10.13"
+    "@pantograph/tokens": "npm:^0.0.17"
+    "@pantograph/unocss-preset": "npm:^0.0.9"
+    "@pantograph/vue": "npm:^0.13.1"
     "@purge-icons/generated": "npm:0.10.0"
     "@rushstack/eslint-patch": "npm:1.10.2"
     "@sentry/vue": "npm:7.105.0"
@@ -13491,6 +13529,13 @@ __metadata:
   version: 3.1.3
   resolution: "csstype@npm:3.1.3"
   checksum: 10/f593cce41ff5ade23f44e77521e3a1bcc2c64107041e1bf6c3c32adc5187d0d60983292fda326154d20b01079e24931aa5b08e4467cc488b60bb1e7f6d478ade
+  languageName: node
+  linkType: hard
+
+"culori@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "culori@npm:4.0.1"
+  checksum: 10/8751ea969bfa7d89fdd7dbc67d6bb37a10c459416574b26853b099f7a0c068d0d29942b3c034f60092f4593faa4e7008e0aca743a418f815fac19939332c4bea
   languageName: node
   linkType: hard
 
