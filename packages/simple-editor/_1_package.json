@@ -11,7 +11,6 @@
   "module": "./dist/vue-block-editor.js",
   "exports": {
     ".": "./src/index.ts",
-    "./*": "./src/index.ts",
     ".": {
       "require": "./dist/vue-block-editor.js",
       "import": "./dist/vue-block-editor.js"

@@ -136,6 +136,8 @@ export class DragEventWatcher {
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //return
     console.log("____dropHandler",this.widget.draggingElements);
+    this.removeGroupDragStyle()
+    //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     this._onDrop(context);
     this._std.selection.setGroup('gfx', []);
     this.widget.clearRaf();
@@ -180,7 +182,9 @@ export class DragEventWatcher {
       this._startDragging([hoverBlock], state);
     };
 
-    console.log("draggingElements",this.widget.draggingElements);
+    console.log("~~ draggingElements",this.widget.draggingElements);
+
+    //debugger
 
     if (this.widget.draggingElements.length === 0) {
       const dragByBlock =
@@ -458,6 +462,13 @@ export class DragEventWatcher {
 
     this.widget.draggingElements = blocks;
 
+    this.groupingStyleForDrag()
+
+    //document.insertBefore(wrapper,blocks[0])
+    // for (let i = startIndex; i <= endIndex; i++) {
+    //
+    // }
+
     this.widget.dragPreview = this.widget.previewHelper.createDragPreview(
       blocks,
       state,
@@ -494,7 +505,9 @@ export class DragEventWatcher {
     });
   };
 
-  private  className='drag'
+  private  className='drag-test' //drag-test
+
+  private  wrapperDragStyle : HTMLElement | null=null //drag-test
 
   private get _dndAPI() {
     return this._std.get(DndApiExtensionIdentifier);
@@ -526,8 +539,6 @@ export class DragEventWatcher {
             this._trackLinkedDocCreated(first.id);
           }
         }
-        console.log("_dragMoveHandler snapshot",snapshot);
-        //return null
         // use snapshot
         const slice = await job.snapshotToSlice(
           snapshot,
@@ -535,8 +546,6 @@ export class DragEventWatcher {
           parent,
           index
         );
-        console.log("_dragMoveHandler slice",slice);
-        //return  null
         return slice;
       }
 
@@ -600,6 +609,42 @@ export class DragEventWatcher {
     const data = this._dndAPI.encodeSnapshot(snapshot);
     dataTransfer.setData(this._dndAPI.mimeType, data);
   }
+
+  groupingStyleForDrag() {
+    //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
+    //this.widget.draggingElements.forEach(item=>item.classList.add(this.className))
+    //return
+    const blocks=this.widget.draggingElements
+    if(blocks.length>0) {
+      this.wrapperDragStyle = document.createElement("div");
+      this.wrapperDragStyle.classList.add(this.className);
+      blocks[0].parentElement?.insertBefore(this.wrapperDragStyle,blocks[0])
+      blocks.forEach(item=>{
+        this.wrapperDragStyle.append(item);
+      })
+    }
+  }
+
+  removeGroupDragStyle() {
+    //return
+    const blocks=this.widget.draggingElements
+    if(this.wrapperDragStyle && blocks.length>0) {
+      console.log("aaaaaa",this.wrapperDragStyle.parentElement);
+      blocks.forEach(item=>{
+        console.log("bbbbbb",item);
+        this.wrapperDragStyle.parentElement?.insertBefore(item,this.wrapperDragStyle)
+      })
+      this.wrapperDragStyle.remove()
+      this.wrapperDragStyle=null
+      /*const first = blocks[0]
+      if(first.classList.contains(this.className)) {
+
+      }*/
+    }
+
+  }
+
+
 
   watch() {
     this.widget.handleEvent('pointerDown', ctx => {

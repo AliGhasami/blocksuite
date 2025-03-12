@@ -30,7 +30,9 @@ import {
   DRAG_HANDLE_CONTAINER_HEIGHT,
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT,
   DRAG_HANDLE_CONTAINER_OFFSET_LEFT_LIST,
-  type DropResult, EDGELESS_NOTE_EXTRA_PADDING, NOTE_CONTAINER_PADDING,
+  type DropResult,
+  EDGELESS_NOTE_EXTRA_PADDING,
+  NOTE_CONTAINER_PADDING,
 } from './config.js';
 
 const heightMap: Record<string, number> = {
@@ -110,10 +112,8 @@ export const isOutOfNoteBlock = (
   point: Point,
   scale: number
 ) => {
-  //console.log("this is scale",scale,noteBlock);
   // TODO: need to find a better way to check if the point is out of note block
   const rect = noteBlock.getBoundingClientRect();
-  //console.log("rect",rect);
   const insidePageEditor =
     editorHost.std.get(DocModeProvider).getEditorMode() === 'page';
   const padding =
@@ -157,14 +157,13 @@ export const getClosestBlockByPoint = (
   if (!closestNoteBlock || closestNoteBlock.closest('.affine-surface-ref')) {
     return null;
   }
-  //console.log("dropResult aaaa",closestNoteBlock);
+
   const noteRect = Rect.fromDOM(closestNoteBlock);
-  //console.log("dropResult noteRect",noteRect);
+
   const block = getClosestBlockComponentByPoint(point, {
     container: closestNoteBlock,
     rect: noteRect,
   }) as BlockComponent | null;
-  //console.log("dropResult bbbbb",block);
 
   const blockSelector =
     '.affine-note-block-container > .affine-block-children-container > [data-block-id]';
@@ -178,7 +177,6 @@ export const getClosestBlockByPoint = (
           blockSelector
         )
   ) as BlockComponent;
-  //console.log("dropResult cccccc",closestBlock);
 
   if (!closestBlock || !!closestBlock.closest('.surface-ref-note-portal')) {
     return null;
@@ -198,7 +196,6 @@ export function calcDropTarget(
    */
   allowSublist: boolean = true
 ): DropResult | null {
-  console.log("");
   let type: DropType | 'none' = 'none';
   const height = 3 * scale;
   const { rect: domRect } = getDropRectByPoint(point, model, element);
@@ -291,7 +288,6 @@ export function calcDropTarget(
 
   return {
     rect: Rect.fromLWTH(domRect.left, domRect.width, top - height / 2, height),
-    //rect: Rect.fromLWTH(domRect.left, domRect.width, top - domRect.height / 2, domRect.height),
     dropBlockId: model.id,
     dropType: type,
   };

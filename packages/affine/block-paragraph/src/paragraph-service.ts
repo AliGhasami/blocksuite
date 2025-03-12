@@ -1,5 +1,4 @@
 import {
-  MahdaadCalloutBlockSchema,
   type ParagraphBlockModel,
   ParagraphBlockSchema
 } from '@blocksuite/affine-model';
@@ -12,8 +11,8 @@ export class ParagraphBlockService extends BlockService {
 
   getPlaceholder = (model: ParagraphBlockModel): TemplateResult<1> | string => {
     if (model.type === 'text') {
-      const blockComponent=this.std.view.getBlock(model.id)
-        if((model.parent && model.parent.flavour==MahdaadCalloutBlockSchema.model.flavour) ||  (blockComponent && blockComponent.closest('.nest-editor')) ) {
+      //const blockComponent=this.std.view.getBlock(model.id)
+        /*if((model.parent && model.parent.flavour==MahdaadCalloutBlockSchema.model.flavour) ||  (blockComponent && blockComponent.closest('.nest-editor')) ) {
           return html`<div class="affine-paragraph-placeholder-content" style="overflow: hidden">
         <div>
           <span class="place-holder">
@@ -23,7 +22,7 @@ export class ParagraphBlockService extends BlockService {
         <div>
           <div>&nbsp;</div>
       </div>`;
-    }
+    }*/
 
       /*style="width:100%; white-space: nowrap; /!* جلوگیری از رفتن به خط بعد *!/
       overflow: hidden; /!* مخفی کردن بخش اضافه *!/

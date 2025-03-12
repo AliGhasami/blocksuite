@@ -1457,6 +1457,112 @@ affine-drag-preview{
   padding: @space-400  @space-600;
   background: @bg-target;
 }
+/*
+
+affine-paragraph:hover{
+
+
+  .drag-test{
+
+    border: 1px dashed @gray-5;
+    //box-shadow: 0 0 5px 5px darkblue;
+    padding: var(----pta-space-200, 4px);
+    opacity: 0.5;
+  }
+}
+*/
+
+.drag-test{
+  position: relative;
+  opacity: 0.5;
+}
+
+.drag-test::after {
+  content: "";
+  @apply  rounded-lg;
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 1px dashed @gray-5;
+  border-radius: 8px;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+/*affine-paragraph{
+  position: relative;
+}*/
+/*
+.drag-test:hover::after {
+  //opacity: 1;
+}
+*/
+
+
+
+.group {
+  position: relative;
+}
+
+.group:first-child {
+  border-top: 2px solid black;
+}
+
+.group:last-child {
+  border-bottom: 2px solid black;
+}
+
+.group::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  //left: -10px;
+  width: calc(100% + 20px);
+  height: 100%;
+  border-left: 2px solid black;
+}
+
+.group:last-child::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  //left: -10px;
+  width: calc(100% + 20px);
+  height: 100%;
+  border-right: 2px solid black;
+}
+
+
+
+/*
+.drag-test:before{
+
+  content: "";
+  position: absolute;
+  top: -10px; !* فاصله از بالا *!
+  left: -10px; !* فاصله از چپ *!
+  right: -10px; !* فاصله از راست *!
+  bottom: -10px; !* فاصله از پایین *!
+  border: 3px solid darkblue; !* استایل حاشیه *!
+  border-radius: 12px;
+  opacity: 0; !* در حالت عادی دیده نشود *!
+  transition: opacity 0.3s ease;
+
+  .element:hover::after {
+    opacity: 1; !* هنگام هاور، حاشیه نمایش داده شود *!
+  }
+
+ !* content: ' ';
+  background-color: red;*!
+  //border: 1px dashed @gray-5;
+  //box-shadow: 0 0 5px 5px darkblue;
+  //padding: var(----pta-space-200, 4px);
+  //opacity: 0.5;
+}*/
+
 
 
 /*
