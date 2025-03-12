@@ -306,6 +306,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   isTopLevelDragHandleVisible = false;
 
+  lastBlockDropStyle : null | BlockComponent = null
+
   lastDragPointerState: DndEventState | null = null;
 
   noteScale = signal(1);
@@ -323,6 +325,12 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   scaleInNote = computed(() => this.scale.value * this.noteScale.value);
 
   selectionHelper = new SelectionHelper(this);
+
+
+  /*applyBlockDropStyle(){
+    this._getBlockView()
+  } */
+
 
   updateDropIndicator = (
     state: DndEventState,
@@ -368,18 +376,33 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
     ) {
+      if(this.lastBlockDropStyle) {
+        this.lastBlockDropStyle.classList.remove('active-drop')
+      }
     //  console.log("this is reset");
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state);
-      console.log("dropResult",dropResult);
+      if(showVerticalIndicator) {
+        console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
+        if(dropResult && dropResult.dropBlockId) {
+          if(this.lastBlockDropStyle) {
+            this.lastBlockDropStyle.classList.remove('active-drop')
+          }
+          this.lastBlockDropStyle = this._getBlockView(dropResult.dropBlockId)
+          if(this.lastBlockDropStyle) {
+            this.lastBlockDropStyle.classList.add('active-drop')
+          }
+          console.log("_dragMoveHandler block vuew",this.lastBlockDropStyle)
+        }
+
+      }
       this._updateDropResult(dropResult,showVerticalIndicator);
     }
 
     this.lastDragPointerState = state;
     if (this.mode === 'page') {
       if (!shouldAutoScroll) return;
-
       const scrollContainer = getScrollContainer(this.rootComponent);
       const result = autoScroll(scrollContainer, state.raw.y);
       if (!result) {

@@ -1535,6 +1535,9 @@ affine-paragraph:hover{
   border-right: 2px solid black;
 }
 
+.active-drop{
+  background-color: red;
+}
 
 
 /*

@@ -610,6 +610,7 @@ export class DragEventWatcher {
     dataTransfer.setData(this._dndAPI.mimeType, data);
   }
 
+  //todo ali ghasami for check and test
   groupingStyleForDrag() {
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     //this.widget.draggingElements.forEach(item=>item.classList.add(this.className))
@@ -625,6 +626,7 @@ export class DragEventWatcher {
     }
   }
 
+  //todo ali ghasami for check and test
   removeGroupDragStyle() {
     //return
     const blocks=this.widget.draggingElements

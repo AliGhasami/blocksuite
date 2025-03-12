@@ -4832,7 +4832,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mahdaad/block-editor@npm:2.0.40, @mahdaad/block-editor@workspace:packages/simple-editor":
+"@mahdaad/block-editor@workspace:*, @mahdaad/block-editor@workspace:packages/simple-editor":
   version: 0.0.0-use.local
   resolution: "@mahdaad/block-editor@workspace:packages/simple-editor"
   dependencies:
@@ -5701,26 +5701,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pantograph/tokens@npm:^0.0.16":
-  version: 0.0.16
-  resolution: "@pantograph/tokens@npm:0.0.16"
-  dependencies:
-    "@types/culori": "npm:^2.1.1"
-    culori: "npm:^4.0.1"
-  checksum: 10/2d132b0d5738253efb0e92ab2406a2627a06bf4f0e574af0e8c39cb0325cb35f269ec687008f2e4845584f0dff432b9619c403fb708fe60abd4d31594a51c67c
-  languageName: node
-  linkType: hard
-
-"@pantograph/tokens@npm:^0.0.17":
-  version: 0.0.17
-  resolution: "@pantograph/tokens@npm:0.0.17"
-  dependencies:
-    "@types/culori": "npm:^2.1.1"
-    culori: "npm:^4.0.1"
-  checksum: 10/bbb0c19069ba3809d5a4b70d18e7ebefa31fba66293b891aac934f8b1d655ca691b0951af241e503dc17d1a255da239befe7ebe7aa228c1a3f88ab8bb4e620c4
-  languageName: node
-  linkType: hard
-
 "@pantograph/tokens@npm:^0.0.19":
   version: 0.0.19
   resolution: "@pantograph/tokens@npm:0.0.19"
@@ -5742,34 +5722,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pantograph/unocss-preset@npm:^0.0.9":
+"@pantograph/utils@npm:^0.0.9":
   version: 0.0.9
-  resolution: "@pantograph/unocss-preset@npm:0.0.9"
+  resolution: "@pantograph/utils@npm:0.0.9"
   dependencies:
-    "@pantograph/tokens": "npm:^0.0.17"
-    unocss: "npm:^0.65.2"
-    unocss-preset-animations: "npm:^1.1.0"
-  checksum: 10/369bc608c3601b69ceb3ad19e4377f8a7d8ea14c6d3edcb05c26ae5f6ec04a65f9fd15118be90f57095c673eca4f98a822f6739431c5da8ac8ea7e8c546e8fb2
+    "@pantograph/tokens": "npm:^0.0.19"
+  checksum: 10/fc6aacfb9246d29c29ce885bd89069d9d8c1035aaaae3fcbd23dee46dc82bb2c6bc8b3b54823affd9bcc7f13faa3e6bc55f93097e46ff6249cfb42c94664afc8
   languageName: node
   linkType: hard
 
-"@pantograph/utils@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "@pantograph/utils@npm:0.0.6"
-  dependencies:
-    "@pantograph/tokens": "npm:^0.0.16"
-  checksum: 10/7ad0fcc6f450d1392aaa446445e101a13d61b3bf2b05df54724518a35b95d1db995faf2246d5bd7d2139e85ff28298189fdc1b1c30cefe0cce3cea9f57615a17
-  languageName: node
-  linkType: hard
-
-"@pantograph/vue@npm:^0.13.1":
-  version: 0.13.1
-  resolution: "@pantograph/vue@npm:0.13.1"
+"@pantograph/vue@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "@pantograph/vue@npm:0.15.0"
   dependencies:
     "@faker-js/faker": "npm:^9.5.0"
     "@iconify/vue": "npm:^4.3.0"
-    "@pantograph/tokens": "npm:^0.0.17"
-    "@pantograph/utils": "npm:^0.0.6"
+    "@pantograph/tokens": "npm:^0.0.19"
+    "@pantograph/utils": "npm:^0.0.9"
     "@tanstack/vue-table": "npm:^8.21.2"
     "@types/lodash-es": "npm:^4.17.12"
     "@types/sortablejs": "npm:^1.15.8"
@@ -5781,8 +5750,9 @@ __metadata:
     vue-the-mask: "npm:^0.11.1"
     vue-tippy: "npm:^6.6.0"
   peerDependencies:
+    nuxt: ^3.0.0
     vue: ^3.5.13
-  checksum: 10/876023c3d0b83652b269d0e09ff20f854f0d843f2afa28dc08d75462161e35d3ea963ee368e8dbd1ce662f6b45c7286b8bda820984f8fb4f0bde8129e041e426
+  checksum: 10/d447510a73873836b3beb590ad56568e5b95df3644f9f17d917cbaf99a6aad410e7ec443388720e2cc29e18f5b797709aab8ae62d972d80989e10b85320dc0a4
   languageName: node
   linkType: hard
 
@@ -12187,16 +12157,16 @@ __metadata:
     "@floating-ui/dom": "npm:^1.6.5"
     "@growthbook/growthbook": "npm:^1.2.1"
     "@iconify/iconify": "npm:3.1.1"
-    "@mahdaad/block-editor": "npm:2.0.40"
+    "@mahdaad/block-editor": "workspace:*"
     "@mahdaad/bounty-theme": "npm:0.0.15"
     "@mahdaad/bounty-vue": "npm:0.0.31"
     "@mahdaad/editor-vue": "npm:^0.0.40"
     "@mahdaad/tokens": "npm:0.0.43"
     "@novu/headless": "npm:2.0.0-canary.0"
     "@novu/notification-center-vue": "npm:2.0.0-canary.0"
-    "@pantograph/tokens": "npm:^0.0.17"
-    "@pantograph/unocss-preset": "npm:^0.0.9"
-    "@pantograph/vue": "npm:^0.13.1"
+    "@pantograph/tokens": "npm:^0.0.19"
+    "@pantograph/unocss-preset": "npm:^0.0.11"
+    "@pantograph/vue": "npm:^0.15.0"
     "@purge-icons/generated": "npm:0.10.0"
     "@rushstack/eslint-patch": "npm:1.10.2"
     "@sentry/vue": "npm:7.105.0"
