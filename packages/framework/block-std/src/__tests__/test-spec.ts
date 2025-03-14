@@ -1,9 +1,10 @@
+import './test-block.js';
+
+import type { ExtensionType } from '@blocksuite/store';
 import { literal } from 'lit/static-html.js';
 
+import { BlockViewExtension } from '../extension/index.js';
 import type { HeadingBlockModel } from './test-schema.js';
-
-import { BlockViewExtension, type ExtensionType } from '../extension/index.js';
-import './test-block.js';
 
 export const testSpecs: ExtensionType[] = [
   BlockViewExtension('test:page', literal`test-root-block`),

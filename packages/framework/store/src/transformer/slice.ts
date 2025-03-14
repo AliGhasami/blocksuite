@@ -1,5 +1,9 @@
-import type { Doc } from '../store/index.js';
-import type { DraftModel } from './draft.js';
+import {
+  BlockModel,
+  type DraftModel,
+  type Store,
+  toDraftModel,
+} from '../model/index';
 
 type SliceData = {
   content: DraftModel[];
@@ -22,10 +26,16 @@ export class Slice {
 
   constructor(readonly data: SliceData) {}
 
-  static fromModels(doc: Doc, models: DraftModel[]) {
+  static fromModels(doc: Store, models: DraftModel[] | BlockModel[]) {
+    const draftModels = models.map(model => {
+      if (model instanceof BlockModel) {
+        return toDraftModel(model);
+      }
+      return model;
+    });
     return new Slice({
-      content: models,
-      workspaceId: doc.collection.id,
+      content: draftModels,
+      workspaceId: doc.workspace.id,
       pageId: doc.id,
     });
   }

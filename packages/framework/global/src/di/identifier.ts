@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+import { DEFAULT_SERVICE_VARIANT } from './consts.js';
+import { stableHash } from './stable-hash.js';
 import type {
   ServiceIdentifier,
   ServiceIdentifierValue,
   ServiceVariant,
   Type,
 } from './types.js';
-
-import { DEFAULT_SERVICE_VARIANT } from './consts.js';
-import { stableHash } from './stable-hash.js';
 
 /**
  * create a ServiceIdentifier.

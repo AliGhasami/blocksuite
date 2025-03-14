@@ -1,10 +1,10 @@
-import { DisposableGroup } from '@blocksuite/global/utils';
+import { DisposableGroup } from '@blocksuite/global/disposable';
 import { Signal } from '@preact/signals-core';
 
 import type { BlockStdScope } from '../scope/block-std-scope.js';
 
 export class KeyboardController {
-  private _disposable = new DisposableGroup();
+  private readonly _disposable = new DisposableGroup();
 
   shiftKey$ = new Signal<boolean>(false);
 

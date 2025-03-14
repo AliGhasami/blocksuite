@@ -58,13 +58,13 @@ export {
   prop,
 } from './model/surface/local-element-model.js';
 export {
+  SURFACE_TEXT_UNIQ_IDENTIFIER,
+  SURFACE_YMAP_UNIQ_IDENTIFIER,
   SurfaceBlockModel,
   type SurfaceBlockProps,
   type SurfaceMiddleware,
 } from './model/surface/surface-model.js';
-
 export { GfxSelectionManager } from './selection.js';
-
 export {
   SurfaceMiddlewareBuilder,
   SurfaceMiddlewareExtension,
@@ -76,7 +76,6 @@ export {
   type GfxToolsMap,
   type GfxToolsOption,
 } from './tool/tool.js';
-
 export { MouseButton, ToolController } from './tool/tool-controller.js';
 export {
   type EventsHandlerMap,

@@ -1,3 +1,4 @@
+//todo ali ghasami for remove
 import type { BlockModel } from '../schema/base.js';
 
 type PropsInDraft = 'version' | 'flavour' | 'role' | 'id' | 'keys' | 'text';

@@ -1,9 +1,9 @@
 import { IS_IPAD } from '@blocksuite/global/env';
-import { nextTick, Vec } from '@blocksuite/global/utils';
-
-import type { UIEventDispatcher } from '../dispatcher.js';
+import { Vec } from '@blocksuite/global/gfx';
+import { nextTick } from '@blocksuite/global/utils';
 
 import { UIEventState, UIEventStateContext } from '../base.js';
+import type { UIEventDispatcher } from '../dispatcher.js';
 import {
   DndEventState,
   MultiPointerEventState,
@@ -40,7 +40,7 @@ abstract class PointerControllerBase {
 }
 
 class PointerEventForward extends PointerControllerBase {
-  private _down = (event: PointerEvent) => {
+  private readonly _down = (event: PointerEvent) => {
     const { pointerId } = event;
 
     const pointerState = new PointerEventState({
@@ -55,9 +55,9 @@ class PointerEventForward extends PointerControllerBase {
     this._dispatcher.run('pointerDown', createContext(event, pointerState));
   };
 
-  private _lastStates = new Map<PointerId, PointerEventState>();
+  private readonly _lastStates = new Map<PointerId, PointerEventState>();
 
-  private _move = (event: PointerEvent) => {
+  private readonly _move = (event: PointerEvent) => {
     const { pointerId } = event;
 
     const start = this._startStates.get(pointerId) ?? null;
@@ -75,9 +75,9 @@ class PointerEventForward extends PointerControllerBase {
     this._dispatcher.run('pointerMove', createContext(event, state));
   };
 
-  private _startStates = new Map<PointerId, PointerEventState>();
+  private readonly _startStates = new Map<PointerId, PointerEventState>();
 
-  private _upOrOut = (up: boolean) => (event: PointerEvent) => {
+  private readonly _upOrOut = (up: boolean) => (event: PointerEvent) => {
     const { pointerId } = event;
 
     const start = this._startStates.get(pointerId) ?? null;
@@ -110,7 +110,7 @@ class PointerEventForward extends PointerControllerBase {
 }
 
 class ClickController extends PointerControllerBase {
-  private _down = (event: PointerEvent) => {
+  private readonly _down = (event: PointerEvent) => {
     // disable for secondary pointer
     if (event.isPrimary === false) return;
 
@@ -138,7 +138,7 @@ class ClickController extends PointerControllerBase {
 
   private _pointerDownCount = 0;
 
-  private _up = (event: PointerEvent) => {
+  private readonly _up = (event: PointerEvent) => {
     if (!this._downPointerState) return;
 
     if (isFarEnough(this._downPointerState.raw, event)) {
@@ -178,7 +178,7 @@ class ClickController extends PointerControllerBase {
 }
 
 class DragController extends PointerControllerBase {
-  private _down = (event: PointerEvent) => {
+  private readonly _down = (event: PointerEvent) => {
     if (this._nativeDragging) return;
 
     if (!event.isPrimary) {
@@ -210,7 +210,7 @@ class DragController extends PointerControllerBase {
 
   private _lastPointerState: PointerEventState | null = null;
 
-  private _move = (event: PointerEvent) => {
+  private readonly _move = (event: PointerEvent) => {
     if (
       this._startPointerState === null ||
       this._startPointerState.raw.pointerId !== event.pointerId
@@ -244,7 +244,7 @@ class DragController extends PointerControllerBase {
     }
   };
 
-  private _nativeDragEnd = (event: DragEvent) => {
+  private readonly _nativeDragEnd = (event: DragEvent) => {
     this._nativeDragging = false;
     const dndEventState = new DndEventState({ event });
     this._dispatcher.run(
@@ -255,7 +255,7 @@ class DragController extends PointerControllerBase {
 
   private _nativeDragging = false;
 
-  private _nativeDragMove = (event: DragEvent) => {
+  private readonly _nativeDragMove = (event: DragEvent) => {
     const dndEventState = new DndEventState({ event });
     this._dispatcher.run(
       'nativeDragMove',
@@ -263,7 +263,7 @@ class DragController extends PointerControllerBase {
     );
   };
 
-  private _nativeDragStart = (event: DragEvent) => {
+  private readonly _nativeDragStart = (event: DragEvent) => {
     this._reset();
     this._nativeDragging = true;
     const dndEventState = new DndEventState({ event });
@@ -273,7 +273,25 @@ class DragController extends PointerControllerBase {
     );
   };
 
-  private _nativeDrop = (event: DragEvent) => {
+  private readonly _nativeDragOver = (event: DragEvent) => {
+    // prevent default to allow drop in editor
+    event.preventDefault();
+    const dndEventState = new DndEventState({ event });
+    this._dispatcher.run(
+      'nativeDragOver',
+      this._createContext(event, dndEventState)
+    );
+  };
+
+  private readonly _nativeDragLeave = (event: DragEvent) => {
+    const dndEventState = new DndEventState({ event });
+    this._dispatcher.run(
+      'nativeDragLeave',
+      this._createContext(event, dndEventState)
+    );
+  };
+
+  private readonly _nativeDrop = (event: DragEvent) => {
     this._reset();
     this._nativeDragging = false;
     const dndEventState = new DndEventState({ event });
@@ -283,7 +301,7 @@ class DragController extends PointerControllerBase {
     );
   };
 
-  private _reset = () => {
+  private readonly _reset = () => {
     this._dragging = false;
     this._startPointerState = null;
     this._lastPointerState = null;
@@ -294,7 +312,7 @@ class DragController extends PointerControllerBase {
 
   private _startPointerState: PointerEventState | null = null;
 
-  private _up = (event: PointerEvent) => {
+  private readonly _up = (event: PointerEvent) => {
     if (
       !this._startPointerState ||
       this._startPointerState.raw.pointerId !== event.pointerId
@@ -351,15 +369,28 @@ class DragController extends PointerControllerBase {
     disposables.addFromEvent(host, 'pointerdown', this._down);
     this._applyScribblePatch();
 
+    disposables.add(
+      host.std.dnd.monitor({
+        onDragStart: () => {
+          this._nativeDragging = true;
+        },
+        onDrop: () => {
+          this._nativeDragging = false;
+        },
+      })
+    );
+
     disposables.addFromEvent(host, 'dragstart', this._nativeDragStart);
     disposables.addFromEvent(host, 'dragend', this._nativeDragEnd);
     disposables.addFromEvent(host, 'drag', this._nativeDragMove);
     disposables.addFromEvent(host, 'drop', this._nativeDrop);
+    disposables.addFromEvent(host, 'dragover', this._nativeDragOver);
+    disposables.addFromEvent(host, 'dragleave', this._nativeDragLeave);
   }
 }
 
 abstract class DualDragControllerBase extends PointerControllerBase {
-  private _down = (event: PointerEvent) => {
+  private readonly _down = (event: PointerEvent) => {
     // Another pointer down
     if (
       this._startPointerStates.primary !== null &&
@@ -395,7 +426,7 @@ abstract class DualDragControllerBase extends PointerControllerBase {
     secondary: null,
   };
 
-  private _move = (event: PointerEvent) => {
+  private readonly _move = (event: PointerEvent) => {
     if (
       this._startPointerStates.primary === null ||
       this._startPointerStates.secondary === null
@@ -441,7 +472,7 @@ abstract class DualDragControllerBase extends PointerControllerBase {
     };
   };
 
-  private _reset = () => {
+  private readonly _reset = () => {
     this._startPointerStates = {
       primary: null,
       secondary: null,
@@ -460,7 +491,7 @@ abstract class DualDragControllerBase extends PointerControllerBase {
     secondary: null,
   };
 
-  private _upOrOut = (event: PointerEvent) => {
+  private readonly _upOrOut = (event: PointerEvent) => {
     const { pointerId } = event;
     if (
       pointerId === this._startPointerStates.primary?.raw.pointerId ||
@@ -543,7 +574,7 @@ class PanController extends DualDragControllerBase {
 export class PointerControl {
   private _cachedRect: DOMRect | null = null;
 
-  private _getRect = () => {
+  private readonly _getRect = () => {
     if (this._cachedRect === null) {
       this._updateRect();
     }
@@ -554,9 +585,9 @@ export class PointerControl {
   // due to potential performance issues
   private _pollingInterval: number | null = null;
 
-  private controllers: PointerControllerBase[];
+  private readonly controllers: PointerControllerBase[];
 
-  constructor(private _dispatcher: UIEventDispatcher) {
+  constructor(private readonly _dispatcher: UIEventDispatcher) {
     this.controllers = [
       new PointerEventForward(_dispatcher, this._getRect),
       new ClickController(_dispatcher, this._getRect),

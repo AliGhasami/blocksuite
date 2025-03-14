@@ -1,9 +1,8 @@
 import { INLINE_ROOT_ATTR, type InlineRootElement } from '@blocksuite/inline';
 
-import type { TextSelection } from '../selection/index.js';
-import type { BlockComponent } from '../view/element/block-component.js';
-
 import { LifeCycleWatcher } from '../extension/index.js';
+import { TextSelection } from '../selection/index.js';
+import type { BlockComponent } from '../view/element/block-component.js';
 import { BLOCK_ID_ATTR } from '../view/index.js';
 import { RANGE_QUERY_EXCLUDE_ATTR, RANGE_SYNC_EXCLUDE_ATTR } from './consts.js';
 import { RangeBinding } from './range-binding.js';
@@ -164,7 +163,7 @@ export class RangeManager extends LifeCycleWatcher {
       return null;
     }
 
-    return this.std.host.selection.create('text', {
+    return this.std.host.selection.create(TextSelection, {
       from: {
         blockId: startBlock.blockId,
         index: startInlineRange.index,

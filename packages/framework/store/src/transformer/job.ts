@@ -1,3 +1,4 @@
+//todo ali ghasami for remove
 /** ok-alighasami for check merge **/
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import { nextTick, Slot } from '@blocksuite/global/utils';

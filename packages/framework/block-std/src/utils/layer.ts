@@ -1,17 +1,14 @@
-import type { Doc } from '@blocksuite/store';
-
-import { nToLast } from '@blocksuite/global/utils';
+import type { Store } from '@blocksuite/store';
 
 import type { GfxLocalElementModel } from '../gfx/index.js';
 import type { Layer } from '../gfx/layer.js';
-import type { GfxBlockElementModel } from '../gfx/model/gfx-block-model.js';
-import type { GfxModel } from '../gfx/model/model.js';
-import type { SurfaceBlockModel } from '../gfx/model/surface/surface-model.js';
-
 import {
   type GfxGroupCompatibleInterface,
   isGfxGroupCompatibleModel,
 } from '../gfx/model/base.js';
+import type { GfxBlockElementModel } from '../gfx/model/gfx-block-model.js';
+import type { GfxModel } from '../gfx/model/model.js';
+import type { SurfaceBlockModel } from '../gfx/model/surface/surface-model.js';
 
 export function getLayerEndZIndex(layers: Layer[], layerIndex: number) {
   const layer = layers[layerIndex];
@@ -84,7 +81,7 @@ export function isInRange(edges: [GfxModel, GfxModel], target: GfxModel) {
 }
 
 export function renderableInEdgeless(
-  doc: Doc,
+  doc: Store,
   surface: SurfaceBlockModel,
   block: GfxBlockElementModel
 ) {
@@ -115,17 +112,17 @@ export function compare(
       | GfxModel
       | GfxGroupCompatibleInterface
       | GfxLocalElementModel
-      | undefined = nToLast(aGroups, i);
+      | undefined = aGroups.at(-i);
     let bGroup:
       | GfxModel
       | GfxGroupCompatibleInterface
       | GfxLocalElementModel
-      | undefined = nToLast(bGroups, i);
+      | undefined = bGroups.at(-i);
 
     while (aGroup === bGroup && aGroup) {
       ++i;
-      aGroup = nToLast(aGroups, i);
-      bGroup = nToLast(bGroups, i);
+      aGroup = aGroups.at(-i);
+      bGroup = bGroups.at(-i);
     }
 
     aGroup = aGroup ?? a;

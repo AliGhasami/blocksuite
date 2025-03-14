@@ -1,35 +1,23 @@
-import {
-  type IVec,
-  type SerializedXYWH,
-  Slot,
-  type XYWH,
-} from '@blocksuite/global/utils';
+import { DisposableGroup } from '@blocksuite/global/disposable';
 import {
   Bound,
   deserializeXYWH,
-  DisposableGroup,
   getBoundWithRotation,
   getPointsFromBoundWithRotation,
-  isEqual,
+  type IVec,
   linePolygonIntersects,
   PointLocation,
   polygonGetPointTangent,
   polygonNearestPoint,
   randomSeed,
   rotatePoints,
-} from '@blocksuite/global/utils';
-import { DocCollection, type Y } from '@blocksuite/store';
+  type SerializedXYWH,
+  type XYWH,
+} from '@blocksuite/global/gfx';
 import { createMutex } from 'lib0/mutex';
-
-import type { EditorHost } from '../../../view/index.js';
-import type {
-  GfxCompatibleInterface,
-  GfxGroupCompatibleInterface,
-  PointTestOptions,
-} from '../base.js';
-import type { GfxBlockElementModel } from '../gfx-block-model.js';
-import type { GfxGroupModel, GfxModel } from '../model.js';
-import type { SurfaceBlockModel } from './surface-model.js';
+import isEqual from 'lodash-es/isEqual';
+import { Subject } from 'rxjs';
+import * as Y from 'yjs';
 
 import {
   descendantElementsImpl,
@@ -40,7 +28,15 @@ import {
   lockElementImpl,
   unlockElementImpl,
 } from '../../../utils/tree.js';
+import type { EditorHost } from '../../../view/index.js';
+import type {
+  GfxCompatibleInterface,
+  GfxGroupCompatibleInterface,
+  PointTestOptions,
+} from '../base.js';
 import { gfxGroupCompatibleSymbol } from '../base.js';
+import type { GfxBlockElementModel } from '../gfx-block-model.js';
+import type { GfxGroupModel, GfxModel } from '../model.js';
 import {
   convertProps,
   field,
@@ -50,6 +46,7 @@ import {
   updateDerivedProps,
   watch,
 } from './decorators/index.js';
+import type { SurfaceBlockModel } from './surface-model.js';
 
 export type BaseElementProps = {
   index: string;
@@ -90,7 +87,7 @@ export abstract class GfxPrimitiveElementModel<
 
   protected _stashed: Map<keyof Props | string, unknown>;
 
-  propsUpdated = new Slot<{ key: string }>();
+  propsUpdated = new Subject<{ key: string }>();
 
   abstract rotate: number;
 
@@ -202,10 +199,6 @@ export abstract class GfxPrimitiveElementModel<
     this.seed = randomSeed();
   }
 
-  static propsToY(props: Record<string, unknown>) {
-    return props;
-  }
-
   containsBound(bounds: Bound): boolean {
     return getPointsFromBoundWithRotation(this).some(point =>
       bounds.containsPoint(point)
@@ -270,7 +263,7 @@ export abstract class GfxPrimitiveElementModel<
 
   onDestroyed() {
     this._disposable.dispose();
-    this.propsUpdated.dispose();
+    this.propsUpdated.complete();
   }
 
   pop(prop: keyof Props | string) {
@@ -280,7 +273,7 @@ export abstract class GfxPrimitiveElementModel<
 
     const value = this._stashed.get(prop);
     this._stashed.delete(prop);
-    // @ts-ignore
+    // @ts-expect-error ignore
     delete this[prop];
 
     if (getFieldPropsSet(this).has(prop as string)) {
@@ -391,9 +384,8 @@ export abstract class GfxGroupLikeElementModel<
 {
   private _childIds: string[] = [];
 
-  private _mutex = createMutex();
+  private readonly _mutex = createMutex();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abstract children: Y.Map<any>;
 
   [gfxGroupCompatibleSymbol] = true as const;
@@ -542,7 +534,7 @@ export function syncElementFromY(
       if (type.action === 'update' || type.action === 'add') {
         const value = model.yMap.get(key);
 
-        if (value instanceof DocCollection.Y.Text) {
+        if (value instanceof Y.Text) {
           disposables[key]?.();
           disposables[key] = watchText(key, value, callback);
         }
@@ -564,7 +556,7 @@ export function syncElementFromY(
   };
 
   Array.from(model.yMap.entries()).forEach(([key, value]) => {
-    if (value instanceof DocCollection.Y.Text) {
+    if (value instanceof Y.Text) {
       disposables[key] = watchText(key, value, callback);
     }
 

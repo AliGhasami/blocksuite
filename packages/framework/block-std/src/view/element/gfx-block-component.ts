@@ -1,11 +1,12 @@
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import { Bound } from '@blocksuite/global/utils';
+import { Bound } from '@blocksuite/global/gfx';
+import { computed } from '@preact/signals-core';
 import { nothing } from 'lit';
 
 import type { BlockService } from '../../extension/index.js';
-import type { GfxBlockElementModel } from '../../gfx/index.js';
-
 import { GfxControllerIdentifier } from '../../gfx/identifiers.js';
+import type { GfxBlockElementModel } from '../../gfx/index.js';
+import { SurfaceSelection } from '../../selection/index.js';
 import { BlockComponent } from './block-component.js';
 
 export function isGfxBlockComponent(
@@ -17,6 +18,10 @@ export function isGfxBlockComponent(
 export const GfxElementSymbol = Symbol('GfxElement');
 
 function updateTransform(element: GfxBlockComponent) {
+  if (element.dataset.blockState === 'idle') return;
+
+  const { viewport } = element.gfx;
+  element.dataset.viewportState = viewport.serializeRecord();
   element.style.transformOrigin = '0 0';
   element.style.transform = element.getCSSTransform();
 }
@@ -25,13 +30,13 @@ function handleGfxConnection(instance: GfxBlockComponent) {
   instance.style.position = 'absolute';
 
   instance.disposables.add(
-    instance.gfx.viewport.viewportUpdated.on(() => {
+    instance.gfx.viewport.viewportUpdated.subscribe(() => {
       updateTransform(instance);
     })
   );
 
   instance.disposables.add(
-    instance.doc.slots.blockUpdated.on(({ type, id }) => {
+    instance.doc.slots.blockUpdated.subscribe(({ type, id }) => {
       if (id === instance.model.id && type === 'update') {
         updateTransform(instance);
       }
@@ -88,11 +93,11 @@ export abstract class GfxBlockComponent<
   override renderBlock() {
     const { x, y, w, h, zIndex } = this.getRenderingRect();
 
-    this.style.left = `${x}px`;
-    this.style.top = `${y}px`;
-    this.style.width = `${w}px`;
-    this.style.height = `${h}px`;
-    this.style.zIndex = zIndex;
+    if (this.style.left !== `${x}px`) this.style.left = `${x}px`;
+    if (this.style.top !== `${y}px`) this.style.top = `${y}px`;
+    if (this.style.width !== `${w}px`) this.style.width = `${w}px`;
+    if (this.style.height !== `${h}px`) this.style.height = `${h}px`;
+    if (this.style.zIndex !== zIndex) this.style.zIndex = zIndex;
 
     return this.renderGfxBlock();
   }
@@ -109,14 +114,13 @@ export abstract class GfxBlockComponent<
     const parent = this.parentElement;
 
     if (this.hasUpdated || !parent || !('scheduleUpdateChildren' in parent)) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      super.scheduleUpdate();
+      return super.scheduleUpdate();
     } else {
       await (parent.scheduleUpdateChildren as (id: string) => Promise<void>)(
         this.model.id
       );
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      super.scheduleUpdate();
+
+      return super.scheduleUpdate();
     }
   }
 
@@ -135,9 +139,17 @@ export function toGfxBlockComponent<
   WidgetName extends string,
   B extends typeof BlockComponent<Model, Service, WidgetName>,
 >(CustomBlock: B) {
-  // @ts-ignore
+  // @ts-expect-error ignore
   return class extends CustomBlock {
     [GfxElementSymbol] = true;
+
+    override selected$ = computed(() => {
+      const selection = this.std.selection.value.find(
+        selection => selection.blockId === this.model?.id
+      );
+      if (!selection) return false;
+      return selection.is(SurfaceSelection);
+    });
 
     get gfx() {
       return this.std.get(GfxControllerIdentifier);
@@ -148,6 +160,7 @@ export function toGfxBlockComponent<
       handleGfxConnection(this);
     }
 
+    // eslint-disable-next-line sonarjs/no-identical-functions
     getCSSTransform() {
       const viewport = this.gfx.viewport;
       const { translateX, translateY, zoom } = viewport;
@@ -161,6 +174,7 @@ export function toGfxBlockComponent<
       return `translate(${translateX + deltaX}px, ${translateY + deltaY}px) scale(${zoom})`;
     }
 
+    // eslint-disable-next-line sonarjs/no-identical-functions
     getRenderingRect(): {
       x: number;
       y: number;
@@ -202,18 +216,18 @@ export function toGfxBlockComponent<
       return super.renderBlock();
     }
 
+    // eslint-disable-next-line sonarjs/no-identical-functions
     override async scheduleUpdate() {
       const parent = this.parentElement;
 
       if (this.hasUpdated || !parent || !('scheduleUpdateChildren' in parent)) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        super.scheduleUpdate();
+        return super.scheduleUpdate();
       } else {
         await (parent.scheduleUpdateChildren as (id: string) => Promise<void>)(
           this.model.id
         );
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        super.scheduleUpdate();
+
+        return super.scheduleUpdate();
       }
     }
 
@@ -225,9 +239,6 @@ export function toGfxBlockComponent<
       this.style.zIndex = this.toZIndex();
     }
   } as B & {
-    new (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...args: any[]
-    ): GfxBlockComponent;
+    new (...args: any[]): GfxBlockComponent;
   };
 }
