@@ -310,6 +310,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   lastDragPointerState: DndEventState | null = null;
 
+  isVerticalIndicator : boolean = false
+
   noteScale = signal(1);
 
   readonly optionRunner = new DragHandleOptionsRunner();
@@ -370,7 +372,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     /*if(closestNoteBlock){
       console.log("33333",);
     }*/
-    const showVerticalIndicator= closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock))
+    this.isVerticalIndicator = closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock))
+    //const showVerticalIndicator=
     //console.log("showVerticalIndicator",showVerticalIndicator);
     if (
       !closestNoteBlock ||
@@ -383,7 +386,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state);
-      if(showVerticalIndicator) {
+      if(this.isVerticalIndicator) {
         console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
         if(dropResult && dropResult.dropBlockId) {
           if(this.lastBlockDropStyle) {
@@ -397,7 +400,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
         }
 
       }
-      this._updateDropResult(dropResult,showVerticalIndicator);
+      this._updateDropResult(dropResult,this.isVerticalIndicator);
     }
 
     this.lastDragPointerState = state;

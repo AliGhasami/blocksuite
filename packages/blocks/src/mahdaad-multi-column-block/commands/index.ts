@@ -1,6 +1,10 @@
 import type { BlockCommands, Command } from '@blocksuite/block-std';
 
 import { focusTextModel } from '@blocksuite/affine-components/rich-text';
+import { BlockStdScope } from '@blocksuite/block-std';
+import { BlockModel } from '@blocksuite/store';
+import type { MahdaadMultiColumnBlockModel } from '@blocksuite/affine-model';
+import { MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
 
 export const insertMahdaadColumnBlockCommand: Command<
   'selectedModels',
@@ -41,6 +45,34 @@ export const insertMahdaadColumnBlockCommand: Command<
   }
   next({ insertedMahdaadMultiColumnBlockId: result[0] });
 };
+
+
+export function _insertMultiColumn(std:BlockStdScope,targetModel:BlockModel,count:number=0){
+  const result = std.doc.addSiblingBlocks(
+    targetModel,
+    [{ flavour: 'affine:mahdaad-multi-column',count }],'after'
+  );
+  for (let i = 0 ;i<count;i++) {
+    const noteId= std.doc.addBlock('affine:note', {}, result[0])
+    //const paragraphId= std.doc.addBlock('affine:paragraph', {},noteId)
+    /*if(i==0) {
+      firstParagraphId= paragraphId
+    }*/
+  }
+  return std.doc.getBlock(result[0])
+  /*if (targetModel.text?.length === 0) {
+    std.doc.deleteBlock(targetModel);
+  }*/
+}
+
+export function addColumnToMultiColumn(std:BlockStdScope,multiColumn:BlockModel){
+  if(multiColumn.flavour==MahdaadMultiColumnBlockSchema.model.flavour && multiColumn.children.length<4){
+    std.doc.addBlock('affine:note', {}, multiColumn)
+    return multiColumn
+  }
+  return null
+
+}
 
 
 export const mahdaadCalloutCommands: BlockCommands = {

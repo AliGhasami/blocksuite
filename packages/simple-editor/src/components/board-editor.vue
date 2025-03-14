@@ -1430,7 +1430,7 @@ async function init() {
 
 .affine-drag-indicator,.affine-drop-indicator{
   @apply h-100;
-  background: @primary-fill;
+  background: @primary-5;
 
   .circle-indicator{
     border: 2px solid @primary-5;
@@ -1454,8 +1454,8 @@ async function init() {
 affine-drag-preview{
   @apply rounded-md shadow-sharp txs-body text-fg-subtle;
   width: 232px;
-  padding: @space-400  @space-600;
-  background: @bg-target;
+ // padding: @space-400  @space-600;
+  //background: @bg-target;
 }
 /*
 

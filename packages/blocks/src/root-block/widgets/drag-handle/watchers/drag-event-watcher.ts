@@ -1,6 +1,9 @@
 import type { EmbedCardStyle, NoteBlockModel } from '@blocksuite/affine-model';
 
 import {
+   MahdaadMultiColumnBlockSchema,
+} from '@blocksuite/affine-model';
+import {
   EMBED_CARD_HEIGHT,
   EMBED_CARD_WIDTH,
 } from '@blocksuite/affine-shared/consts';
@@ -43,6 +46,7 @@ import { AFFINE_DRAG_HANDLE_WIDGET } from '../consts.js';
 import { newIdCrossDoc } from '../middleware/new-id-cross-doc.js';
 import { surfaceRefToEmbed } from '../middleware/surface-ref-to-embed.js';
 import { containBlock, includeTextSelection } from '../utils.js';
+import { _insertMultiColumn, addColumnToMultiColumn } from '../../../../mahdaad-multi-column-block/commands/index.js';
 
 export class DragEventWatcher {
   private _computeEdgelessBound = (
@@ -285,10 +289,10 @@ export class DragEventWatcher {
 
     const event = state.raw;
     const { clientX, clientY } = event;
-    const point = new Point(clientX, clientY);
+    const point = new Point(clientX-30, clientY);
     //console.log();
     const element = getClosestBlockComponentByPoint(point.clone());
-    //console.log("this is element",element);
+    console.log("this is element",element);
     if (!element) {
       const target = captureEventTarget(event.target);
       const isEdgelessContainer =
@@ -300,16 +304,19 @@ export class DragEventWatcher {
       return;
     }
     const model = element.model;
+    console.log("model",model);
     const parent = this._std.doc.getParent(model.id);
+    console.log("parent",parent);
     if (!parent) return;
     if (matchFlavours(parent, ['affine:surface'])) {
       return;
     }
     const result: DropResult | null = calcDropTarget(point, model, element);
     if (!result) return;
-
+    console.log("result",result);
     const index =
       parent.children.indexOf(model) + (result.type === 'before' ? 0 : 1);
+    console.log("this is index",index);
     event.preventDefault();
 
     if (matchFlavours(parent, ['affine:note'])) {
@@ -325,7 +332,7 @@ export class DragEventWatcher {
       }
     }
 
-    this._deserializeData(state, parent.id, index).catch(console.error);
+    this._deserializeData(state, parent.id, index,result).catch(console.error);
   };
 
   private _onDropNoteOnNote = (
@@ -528,7 +535,8 @@ export class DragEventWatcher {
   private async _deserializeData(
     state: DndEventState,
     parent?: string,
-    index?: number
+    index?: number,
+    dropResult ?: DropResult
   ) {
     try {
       const dataTransfer = state.raw.dataTransfer;
@@ -536,15 +544,45 @@ export class DragEventWatcher {
 
       const std = this._std;
       const job = this._getJob();
-
+      console.log("this is state", state);
       const snapshot = this._deserializeSnapshot(state);
+      //return
       if (snapshot) {
         if (snapshot.content.length === 1) {
           const [first] = snapshot.content;
           if (first.flavour === 'affine:embed-linked-doc') {
             this._trackLinkedDocCreated(first.id);
           }
+
         }
+
+        //snapshot.content.length >  1 &&
+        console.log("200000",this.widget.isVerticalIndicator);
+        if(dropResult && this.widget.isVerticalIndicator){
+          console.log("start",dropResult,);
+          if(dropResult.modelState.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour){
+              //const temp=
+            //this._std.command.
+           const res = _insertMultiColumn(this._std,dropResult.modelState.model,2)
+            console.log("this is res",res);
+           if(res){
+             this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+             parent= res.model.children[1].id
+             index=0
+           }
+          }else{
+            const res=addColumnToMultiColumn(this._std,dropResult.modelState.model)
+            if(res){
+              parent= res.children[res.children.length-1].id //.model.children[1].id
+              index=0
+            }else{
+              return null
+            }
+            //if(dropResult.modelState.)
+          }
+        }
+        console.log("this is final",snapshot);
+       // return
         // use snapshot
         const slice = await job.snapshotToSlice(
           snapshot,
@@ -588,7 +626,7 @@ export class DragEventWatcher {
       if (!dataTransfer) throw new Error('No data transfer');
       const data = dataTransfer.getData(this._dndAPI.mimeType);
       const snapshot = this._dndAPI.decodeSnapshot(data);
-
+      console.log("this is snap shoot ",snapshot);
       return snapshot;
     } catch {
       return null;
@@ -620,7 +658,7 @@ export class DragEventWatcher {
   groupingStyleForDrag() {
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     //this.widget.draggingElements.forEach(item=>item.classList.add(this.className))
-    //return
+    return
     const blocks=this.widget.draggingElements
     if(blocks.length>0) {
       this.wrapperDragStyle = document.createElement("div");
