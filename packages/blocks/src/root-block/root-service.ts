@@ -65,6 +65,7 @@ export abstract class RootService extends BlockService {
 
   override mounted() {
     super.mounted();
+    //return
 
     this.disposables.addFromEvent(
       this.host,

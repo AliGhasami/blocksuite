@@ -72,13 +72,17 @@ export class FileDropManager {
   };
 
   onDragOver = (event: DragEvent) => {
+    console.log("host drage over ");
     event.preventDefault();
+    //return false
 
+    //return true;
     const dataTransfer = event.dataTransfer;
     if (!dataTransfer) return;
 
     const effectAllowed = dataTransfer.effectAllowed;
     if (effectAllowed === 'none') return;
+
 
     const { clientX, clientY } = event;
     const point = new Point(clientX, clientY);

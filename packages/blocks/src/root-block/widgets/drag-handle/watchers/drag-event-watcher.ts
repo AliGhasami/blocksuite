@@ -80,6 +80,7 @@ export class DragEventWatcher {
   };
 
   private _dragEndHandler: UIEventHandler = () => {
+  //  debugger
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
     this.widget.clearRaf();
@@ -87,7 +88,10 @@ export class DragEventWatcher {
   };
 
   private _dragMoveHandler: UIEventHandler = ctx => {
-    console.log("_dragMoveHandler");
+    //debugger
+    console.log("_dragMoveHandler native");
+    //document.body.style.cursor = 'e-resize';
+    //ctx.
     //return false
     //return
     //debugger
@@ -114,6 +118,7 @@ export class DragEventWatcher {
    * When start dragging, should set dragging elements and create drag preview
    */
   private _dragStartHandler: UIEventHandler = ctx => {
+    //debugger
     /*setTimeout(()=>{
        debugger
     },5000)*/
@@ -131,6 +136,7 @@ export class DragEventWatcher {
   };
 
   private _dropHandler = (context: UIEventStateContext) => {
+   // debugger
    // console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
@@ -650,6 +656,7 @@ export class DragEventWatcher {
 
   watch() {
     this.widget.handleEvent('pointerDown', ctx => {
+     // debugger
       //return true
       //console.log("drag event pointerDown ");
       const state = ctx.get('pointerState');
@@ -665,6 +672,7 @@ export class DragEventWatcher {
     });
 
     this.widget.handleEvent('dragStart', ctx => {
+     // debugger
       //console.log("drag event drag start ");
       //console.log("this.widget.handleEvent('dragStart'");
       //return true
