@@ -48,3 +48,4 @@ __screenshots__/
 
 .history
 /.nx/
+yarn.lock
