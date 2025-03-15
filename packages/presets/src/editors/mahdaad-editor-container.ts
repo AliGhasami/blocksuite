@@ -29,6 +29,7 @@ export class MahdaadEditorContainer
       flex-direction: column;
       overflow-x: hidden;
       overflow-y: auto;
+      //overflow-x: auto !important;
       /* container-name: viewport;
       container-type: inline-size;*/
       font-family: var(--affine-font-family);

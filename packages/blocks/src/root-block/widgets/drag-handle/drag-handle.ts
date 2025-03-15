@@ -306,11 +306,11 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   isTopLevelDragHandleVisible = false;
 
+  isVerticalIndicator : boolean = false
+
   lastBlockDropStyle : null | BlockComponent = null
 
   lastDragPointerState: DndEventState | null = null;
-
-  isVerticalIndicator : boolean = false
 
   noteScale = signal(1);
 
@@ -327,11 +327,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   scaleInNote = computed(() => this.scale.value * this.noteScale.value);
 
   selectionHelper = new SelectionHelper(this);
-
-
-  /*applyBlockDropStyle(){
-    this._getBlockView()
-  } */
 
 
   updateDropIndicator = (
@@ -364,7 +359,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
     //const b = getClosestBlockComponentByPoint(point) as BlockComponent;
     //console.log("bbbbbbbb",b);
-
     //console.log("aaaaaa",isOutOfNoteBlock(this.rootComponent, closestNoteBlock, point, this.scale.peek()))
     //console.log("isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())",isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek()));
     //return;
@@ -372,16 +366,16 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     /*if(closestNoteBlock){
       console.log("33333",);
     }*/
-    this.isVerticalIndicator = closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock))
-    //const showVerticalIndicator=
-    //console.log("showVerticalIndicator",showVerticalIndicator);
+    this.applyBlockDropStyle(null)
+    this.isVerticalIndicator = !!(closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock)))
     if (
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
     ) {
-      if(this.lastBlockDropStyle) {
+       //this.applyBlockDropStyle(null)
+      /*if(this.lastBlockDropStyle) {
         this.lastBlockDropStyle.classList.remove('active-drop')
-      }
+      }*/
     //  console.log("this is reset");
       this._resetDropResult();
     } else {
@@ -389,14 +383,15 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       if(this.isVerticalIndicator) {
         console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
         if(dropResult && dropResult.dropBlockId) {
-          if(this.lastBlockDropStyle) {
+          this.applyBlockDropStyle(dropResult.dropBlockId)
+          /*if(this.lastBlockDropStyle) {
             this.lastBlockDropStyle.classList.remove('active-drop')
           }
           this.lastBlockDropStyle = this._getBlockView(dropResult.dropBlockId)
           if(this.lastBlockDropStyle) {
             this.lastBlockDropStyle.classList.add('active-drop')
           }
-          console.log("_dragMoveHandler block vuew",this.lastBlockDropStyle)
+          console.log("_dragMoveHandler block vuew",this.lastBlockDropStyle)*/
         }
 
       }
@@ -419,6 +414,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this.clearRaf();
     }
   };
+
 
   updateDropIndicatorOnScroll = () => {
     if (
@@ -448,6 +444,18 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   get rootComponent() {
     return this.block;
+  }
+
+  applyBlockDropStyle(blockId:string | null) {
+    if(this.lastBlockDropStyle) {
+      this.lastBlockDropStyle.classList.remove('active-drop')
+    }
+    if(blockId) {
+      this.lastBlockDropStyle = this._getBlockView(blockId)
+      if(this.lastBlockDropStyle) {
+        this.lastBlockDropStyle.classList.add('active-drop')
+      }
+    }
   }
 
   clearRaf() {

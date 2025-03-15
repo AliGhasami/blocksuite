@@ -1420,9 +1420,11 @@ async function init() {
   position: relative;
 }
 
+/*
 .editor{
   border:1px solid pink;
 }
+*/
 
 /*affine-note{
   border:1px solid #d34f0b;
@@ -1452,10 +1454,10 @@ async function init() {
 
 
 affine-drag-preview{
-  @apply rounded-md shadow-sharp txs-body text-fg-subtle;
-  width: 232px;
- // padding: @space-400  @space-600;
-  //background: @bg-target;
+  @apply rounded-md shadow-sharp txs-body text-fg-subtle ;
+  width: 232px; //bg-target
+  padding: @space-400  @space-600;
+  background: @bg-target;
 }
 /*
 
@@ -1486,10 +1488,40 @@ affine-paragraph:hover{
   right: -6px;
   bottom: -6px;
   border: 1px dashed @gray-5;
-  border-radius: 8px;
+  //border-radius: 8px;
   opacity: 0.5;
   transition: opacity 0.3s ease;
 }
+
+.active-drop{
+  position: relative;
+  //background-color: red;
+  //@apply bg-primary-fill-subtle border-primary-br-subtle-target ; //border-1
+
+  /*.affine-paragraph-block-container,.claytap-quote{
+    @apply bg-primary-fill-subtle;
+  }*/
+
+  &::after{
+    content: "";
+    @apply  rounded   bg-primary-fill-subtle; //bg-primary-fill-subtle //bg-primary-fill-subtle
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    //z-index:;
+    border: 1px solid @primary-br-subtle-target;
+    //border-radius: 8px;
+    //opacity: 0.5;
+    //transition: opacity 0.3s ease;
+  }
+
+}
+
+
+
 /*affine-paragraph{
   position: relative;
 }*/
@@ -1501,6 +1533,7 @@ affine-paragraph:hover{
 
 
 
+/*
 .group {
   position: relative;
 }
@@ -1534,10 +1567,8 @@ affine-paragraph:hover{
   height: 100%;
   border-right: 2px solid black;
 }
+*/
 
-.active-drop{
-  background-color: red;
-}
 
 
 /*

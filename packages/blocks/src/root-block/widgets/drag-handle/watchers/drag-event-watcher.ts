@@ -40,13 +40,13 @@ import {
   calcDropTarget,
   type DropResult,
 } from '../../../../_common/utils/index.js';
+import { _insertMultiColumn, addColumnToMultiColumn } from '../../../../mahdaad-multi-column-block/commands/index.js';
 import { addNoteAtPoint } from '../../../edgeless/utils/common.js';
 import { DropIndicator } from '../components/drop-indicator.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../consts.js';
 import { newIdCrossDoc } from '../middleware/new-id-cross-doc.js';
 import { surfaceRefToEmbed } from '../middleware/surface-ref-to-embed.js';
 import { containBlock, includeTextSelection } from '../utils.js';
-import { _insertMultiColumn, addColumnToMultiColumn } from '../../../../mahdaad-multi-column-block/commands/index.js';
 
 export class DragEventWatcher {
   private _computeEdgelessBound = (
@@ -87,6 +87,7 @@ export class DragEventWatcher {
   //  debugger
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
+    this.removeGroupDragStyle()
     this.widget.clearRaf();
     this.widget.hide(true);
   };
@@ -125,7 +126,7 @@ export class DragEventWatcher {
     //debugger
     /*setTimeout(()=>{
        debugger
-    },5000)*/
+    },3000)*/
     console.log("_dragStartHandler", ctx);
     //return
     const state = ctx.get('dndState');
@@ -192,7 +193,7 @@ export class DragEventWatcher {
       this._startDragging([hoverBlock], state);
     };
 
-    console.log("~~ draggingElements",this.widget.draggingElements);
+    //console.log("~~ draggingElements",this.widget.draggingElements);
 
     //debugger
 
@@ -304,9 +305,9 @@ export class DragEventWatcher {
       return;
     }
     const model = element.model;
-    console.log("model",model);
+    //console.log("model",model);
     const parent = this._std.doc.getParent(model.id);
-    console.log("parent",parent);
+    //console.log("parent",parent);
     if (!parent) return;
     if (matchFlavours(parent, ['affine:surface'])) {
       return;
@@ -468,7 +469,7 @@ export class DragEventWatcher {
     dragPreviewEl?: HTMLElement,
     dragPreviewOffset?: Point
   ) => {
-    console.log("_startDragging");
+    //console.log("_startDragging");
     if (!blocks.length) {
       return;
     }
@@ -476,6 +477,9 @@ export class DragEventWatcher {
     this.widget.draggingElements = blocks;
 
     this.groupingStyleForDrag()
+
+    //console.log("11111",blocks);
+    //console.log("22222",blocks[0].model.previewName());
 
     //document.insertBefore(wrapper,blocks[0])
     // for (let i = startIndex; i <= endIndex; i++) {
@@ -546,6 +550,7 @@ export class DragEventWatcher {
       const job = this._getJob();
       console.log("this is state", state);
       const snapshot = this._deserializeSnapshot(state);
+      console.log("this is snapshoot ",snapshot);
       //return
       if (snapshot) {
         if (snapshot.content.length === 1) {
@@ -557,22 +562,22 @@ export class DragEventWatcher {
         }
 
         //snapshot.content.length >  1 &&
-        console.log("200000",this.widget.isVerticalIndicator);
-        if(dropResult && this.widget.isVerticalIndicator){
+        //console.log("200000",this.widget.isVerticalIndicator);
+        if(dropResult && this.widget.isVerticalIndicator) {
           console.log("start",dropResult,);
-          if(dropResult.modelState.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour){
+          if(dropResult.modelState.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
               //const temp=
             //this._std.command.
            const res = _insertMultiColumn(this._std,dropResult.modelState.model,2)
             console.log("this is res",res);
-           if(res){
+           if(res) {
              this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
              parent= res.model.children[1].id
              index=0
            }
           }else{
             const res=addColumnToMultiColumn(this._std,dropResult.modelState.model)
-            if(res){
+            if(res) {
               parent= res.children[res.children.length-1].id //.model.children[1].id
               index=0
             }else{
@@ -658,7 +663,7 @@ export class DragEventWatcher {
   groupingStyleForDrag() {
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     //this.widget.draggingElements.forEach(item=>item.classList.add(this.className))
-    return
+    //return
     const blocks=this.widget.draggingElements
     if(blocks.length>0) {
       this.wrapperDragStyle = document.createElement("div");
@@ -675,9 +680,9 @@ export class DragEventWatcher {
     //return
     const blocks=this.widget.draggingElements
     if(this.wrapperDragStyle && blocks.length>0) {
-      console.log("aaaaaa",this.wrapperDragStyle.parentElement);
+      //console.log("aaaaaa",this.wrapperDragStyle.parentElement);
       blocks.forEach(item=>{
-        console.log("bbbbbb",item);
+        //console.log("bbbbbb",item);
         this.wrapperDragStyle.parentElement?.insertBefore(item,this.wrapperDragStyle)
       })
       this.wrapperDragStyle.remove()
@@ -687,7 +692,6 @@ export class DragEventWatcher {
 
       }*/
     }
-
   }
 
 

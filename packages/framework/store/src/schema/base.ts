@@ -283,6 +283,7 @@ export class BlockModel<
     return this.children[this.children.length - 1].lastChild();
   }
 
+
   [Symbol.dispose]() {
     this._onCreated.dispose();
     this._onDeleted.dispose();

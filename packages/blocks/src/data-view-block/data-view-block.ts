@@ -258,6 +258,10 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
     this.setAttribute(RANGE_SYNC_EXCLUDE_ATTR, 'true');
   }
 
+  override previewName(): string {
+    return 'Table'
+  }
+
   override renderBlock() {
     const peekViewService = this.std.getOptional(PeekViewProvider);
     const telemetryService = this.std.getOptional(TelemetryProvider);

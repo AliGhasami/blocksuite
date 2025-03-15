@@ -255,6 +255,10 @@ export class BlockComponent<
     return result;
   }
 
+  previewName() {
+    return  this.model.flavour
+  }
+
   override render() {
     return this._renderers.reduce(
       (acc, cur) => cur.call(this, acc),

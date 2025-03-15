@@ -20,7 +20,10 @@ import type {ObjectBlockService} from './object-service.js'
 import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
 import { objectBlockStyles } from './styles.js';
 //@customElement('affine-mahdaad-object')
-export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockModel,ObjectBlockService> {
+export class ObjectBlockComponent extends CaptionedBlockComponent<
+  ObjectBlockModel,
+  ObjectBlockService
+> {
   static override styles = objectBlockStyles;
 
   _convertLink(event: CustomEvent) {
@@ -50,7 +53,10 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
     //console.log("111111",this.model.type);
-    if (['document', 'image','weblink'].includes(this.model.type) && mode == 'inline') {
+    if (
+      ['document', 'image', 'weblink'].includes(this.model.type) &&
+      mode == 'inline'
+    ) {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);
       assertExists(parent);
@@ -94,10 +100,6 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     });*/
   }
 
-  /*docId() {
-
-  }*/
-
   duplicate() {
     this.doc.addSiblingBlocks(this.model, [
       {
@@ -114,8 +116,29 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
     tryRemoveEmptyLine(this.model);
   }
 
+  /*docId() {
+
+  }*/
+
   parentId() {
-    return (this.doc.meta && this.doc.meta?.object_id) ?? null
+    return (this.doc.meta && this.doc.meta?.object_id) ?? null;
+  }
+
+  override previewName(): string {
+    //return super.previewName();
+    switch (this.model.type) {
+      case 'document':
+        return 'Page'
+      case 'file':
+        return 'File'
+      case 'image':
+        return 'Image'
+      case 'weblink':
+        return 'Weblink'
+      default:
+        return 'Object'
+    }
+    //return super.previewName();
   }
 
   removeBlock() {
@@ -154,16 +177,16 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<ObjectBlockMod
   }
 
   setDirection(event: CustomEvent) {
-    this.doc.updateBlock(this.model, {dir:event.detail});
+    this.doc.updateBlock(this.model, { dir: event.detail });
   }
 
   updateProps(event: CustomEvent) {
-    const props=event.detail;
+    const props = event.detail;
     //console.log("this is props",props);
     //...this.model,
     //meta:{...props}
     //const meta=
-    props.meta= merge(this.model.meta, props.meta ?? {})
+    props.meta = merge(this.model.meta, props.meta ?? {});
     this.doc.updateBlock(this.model, props);
   }
 }

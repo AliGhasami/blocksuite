@@ -49,7 +49,7 @@ export class DropIndicator extends ShadowlessElement {
         width: `${height}px`,
         height: `30px`,
         top: `${top}px`,
-        left: `${width+30}px`,
+        left: `${left+width+5}px`,
         //'background-color':'yellow'
       });
     }

@@ -159,6 +159,20 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     return result;
   }
 
+  override previewName(): string {
+    switch (this.model.type) {
+      case 'numbered':
+        return  'Number List'
+      case 'todo':
+        return 'Check List'
+      case 'toggle':
+        return 'Toggle List'
+      case 'bulleted':
+        return 'Bullet List'
+    }
+    //return super.previewName();
+  }
+
   override renderBlock(): TemplateResult<1> {
     const { model, _onClickIcon } = this;
     const collapsed = this.doc.readonly

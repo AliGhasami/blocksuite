@@ -85,6 +85,10 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
     });
   }
 
+  override previewName(): string {
+    return  `${this.model.children.length} columns`
+  }
+
   override renderBlock() {
     const children = this.model.children.map(item => {
       const temp = new BlockModel();

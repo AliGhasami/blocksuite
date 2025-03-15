@@ -56,13 +56,14 @@ export class PreviewHelper {
     };
   };
 
+
   createDragPreview = (
     blocks: BlockComponent[],
     state: DndEventState,
     dragPreviewEl?: HTMLElement,
     dragPreviewOffset?: Point
   ): DragPreview => {
-    console.log("createDragPreview",blocks,state,dragPreviewEl,dragPreviewOffset);
+    //console.log("createDragPreview",blocks,state,dragPreviewEl,dragPreviewOffset);
     if (this.widget.dragPreview) {
       this.widget.dragPreview.remove();
     }
@@ -91,12 +92,14 @@ export class PreviewHelper {
       const previewTemplate = previewStd.render();
 
       const offset = this._calculatePreviewOffset(blocks, state);
+      //console.log("offfffff",offset, state);
       const posX = state.raw.x - offset.x;
       const posY = state.raw.y - offset.y;
       //const altKey = state.raw.altKey;
 
       dragPreview = new DragPreview(offset);
       dragPreview.template = previewTemplate;
+      dragPreview.text =  blocks.length>1 ? `${blocks.length} Blocks` : blocks.length>0 ? blocks[0].previewName() : '-'
       dragPreview.onRemove = () => {
         this.widget.doc.blockCollection.clearQuery(query);
       };
@@ -109,6 +112,7 @@ export class PreviewHelper {
     return dragPreview;
   };
 
+
   removeDragPreview = () => {
     if (this.widget.dragPreview) {
       this.widget.dragPreview.remove();
@@ -117,4 +121,8 @@ export class PreviewHelper {
   };
 
   constructor(readonly widget: AffineDragHandleWidget) {}
+
+  previewText(blocks: BlockComponent[]) {
+
+  }
 }

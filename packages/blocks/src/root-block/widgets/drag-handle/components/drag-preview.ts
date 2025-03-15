@@ -49,7 +49,7 @@ export class DragPreview extends ShadowlessElement {
           cursor: grabbing !important;
         }</style
       ><!--${this.template}-->
-      <div>this is ttest</div>
+      <div>${this.text ?? '-'}</div>
     `;
   }
 
@@ -58,6 +58,10 @@ export class DragPreview extends ShadowlessElement {
 
   @property({ attribute: false })
   accessor template: TemplateResult | EditorHost | null = null;
+
+  @property({ attribute: false })
+  accessor text: string= '-';
+
 }
 
 declare global {

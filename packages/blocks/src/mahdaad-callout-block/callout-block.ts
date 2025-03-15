@@ -1,8 +1,8 @@
 import type { MahdaadCalloutBlockModel } from '@blocksuite/affine-model';
 import type { BlockModel } from '@blocksuite/store';
 
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { checkNotEmptyNote } from '@blocksuite/affine-shared/utils';
-import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
 import {pick} from 'lodash-es'
@@ -12,7 +12,7 @@ import type { MahdaadCalloutBlockService } from './callout-service.js';
 import { transformModel } from '../root-block/utils/operations/model.js';
 
 
-export class MahdaadCalloutBlockComponent extends BlockComponent<
+export class MahdaadCalloutBlockComponent extends CaptionedBlockComponent<
   MahdaadCalloutBlockModel,
   MahdaadCalloutBlockService
 > {
@@ -117,6 +117,10 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     return result;
   }
 
+  override previewName(): string {
+     return  'Callout'
+   }
+
   override renderBlock() {
     return html`
       <div dir=${this.model.dir}>
@@ -143,7 +147,8 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
     `;
   }
 
-  @property({ attribute: false })
+
+   @property({ attribute: false })
   accessor _isLoad: boolean = false;
 
 }

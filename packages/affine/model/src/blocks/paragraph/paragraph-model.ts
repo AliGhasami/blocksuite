@@ -44,6 +44,7 @@ export class ParagraphBlockModel extends BlockModel<ParagraphProps> {
   override flavour!: 'affine:paragraph';
 
   override text!: Text;
+
 }
 
 declare global {

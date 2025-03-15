@@ -9,6 +9,10 @@ import { dividerBlockStyles } from './styles.js';
 export class DividerBlockComponent extends CaptionedBlockComponent<DividerBlockModel> {
   static override styles = dividerBlockStyles;
 
+  override previewName(): string {
+    return 'Divider'
+  }
+
   override connectedCallback() {
     super.connectedCallback();
 

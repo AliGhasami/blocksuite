@@ -397,6 +397,10 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
     );
   }
 
+  override previewName(): string {
+    return 'Table'
+  }
+
   override renderBlock() {
     const peekViewService = this.std.getOptional(PeekViewProvider);
     const telemetryService = this.std.getOptional(TelemetryProvider);

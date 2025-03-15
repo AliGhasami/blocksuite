@@ -11,6 +11,7 @@ import type { ObjectLink } from '../root-block/widgets/mahdaad-object-picker/obj
 
 //@customElement('affine-mahdaad-weblink-block')
 export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<MahdaadWeblinkBlockModel> {
+
   changeViewMode(event: CustomEvent) {
     const mode = event.detail;
     if (mode == 'inline') {
@@ -54,22 +55,6 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
     });*/
   }
 
-  /*duplicate() {
-    this.doc.addSiblingBlocks(this.model, [
-      {
-        flavour: 'affine:mahdaad-object',
-        object_id: this.model.object_id,
-        type: this.model.type,
-        show_type: this.model.show_type,
-        //...this.model,
-        //name: file.name,
-        //size: file.size,
-        //type: types[index],
-      },
-    ]);
-    tryRemoveEmptyLine(this.model);
-  }*/
-
   generateWeblink(event: CustomEvent) {
     const lnk: ObjectLink = event.detail;
     this.doc.addSiblingBlocks(this.model, [
@@ -96,6 +81,26 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
       reference: null,
     });
     this.abortController.abort();*/
+  }
+
+  /*duplicate() {
+    this.doc.addSiblingBlocks(this.model, [
+      {
+        flavour: 'affine:mahdaad-object',
+        object_id: this.model.object_id,
+        type: this.model.type,
+        show_type: this.model.show_type,
+        //...this.model,
+        //name: file.name,
+        //size: file.size,
+        //type: types[index],
+      },
+    ]);
+    tryRemoveEmptyLine(this.model);
+  }*/
+
+  override previewName(): string {
+    return  'Weblink'
   }
 
   removeBlock() {

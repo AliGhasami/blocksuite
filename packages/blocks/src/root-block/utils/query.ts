@@ -5,3 +5,4 @@ export function getClosestRootBlockComponent(
 ): RootBlockComponent | null {
   return el.closest('affine-edgeless-root, affine-page-root');
 }
+

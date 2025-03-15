@@ -68,6 +68,8 @@ export class CaptionedBlockComponent<
     </div>`;
   }
 
+
+
   // There may be multiple block-caption-editors in a nested structure.
   private accessor _captionEditorRef: Ref<BlockCaptionEditor> =
     createRef<BlockCaptionEditor>();

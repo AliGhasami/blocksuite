@@ -320,6 +320,34 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   }
 
 
+  override previewName(): string {
+    //return  this.type ?? super.previewName()
+    switch (this.model.type) {
+      case 'text':
+        return 'Text'
+      case 'quote':
+        return 'Quote'
+      case 'h1':
+        return 'Heading 1'
+      case 'h2':
+        return 'Heading 2'
+      case 'h3':
+        return 'Heading 3'
+      case 'h4':
+        return 'Heading 4'
+      case 'h5':
+        return 'Heading 5'
+      case 'h6':
+        return 'Heading 6'
+      //default:
+      //return  super.previewName()
+    } //  this.type ?? super.previewName()
+    //switch(this.type){}
+    //return super.previewName();
+    return  super.previewName()
+  }
+
+
   override renderBlock(): TemplateResult<1> {
     //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
@@ -406,7 +434,6 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     `;
   }
 
-
   richText() {
     const temp = document.querySelector(
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
@@ -428,10 +455,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
           ></rich-text>`
   }
 
+
   setDirection(key:string) {
    setDirectionBasedOnText(this.model, this.doc,key);
   }
-
 
 
   @state()
