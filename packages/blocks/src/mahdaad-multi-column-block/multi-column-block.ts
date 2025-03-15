@@ -122,9 +122,9 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
         }}"
       >
         <div slot="slot_0">
-          ${this._isLoad && children[0]
-            ? this.renderChildren(children[0])
-            : nothing}
+           ${this._isLoad && children[0]
+             ? this.renderChildren(children[0])
+             : nothing}
         </div>
         <div slot="slot_1">
           ${this._isLoad && children[1]

@@ -222,7 +222,6 @@ export const ParagraphKeymapExtension = KeymapExtension(
         return true;
       },
       Delete: ctx => {
-        //console.log("ParagraphKeymapExtension delete");
         const deleted = forwardDelete(std);
         if (!deleted) {
           return;

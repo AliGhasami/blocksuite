@@ -1,5 +1,6 @@
 import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
 
+import { MahdaadCalloutBlockSchema,MahdaadMultiColumnBlockSchema } from '@blocksuite/affine-model';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { WithDisposable } from '@blocksuite/global/utils';
@@ -18,6 +19,7 @@ import {
   createKeydownObserver,
   getQuery,
 } from '../../../_common/components/utils.js';
+import { checkParentIs } from '../../../_common/mahdaad/is.js';
 import { toolsList } from '../../../_common/mahdaad/toolsList.js';
 import { actionsMenu, type MahdaadActionMenu } from './mahdaad_menu.js';
 import { styles } from './styles.js';
@@ -109,6 +111,19 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
     return list;
   }
 
+  checkKeys() {
+    let allowKeys=['*']
+    const denyKeys=[]
+    //const temp = []
+    if(checkParentIs(this.context.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
+      denyKeys.push('two_columns','three_columns','four_columns')
+    }
+    if(checkParentIs(this.context.model,MahdaadCalloutBlockSchema.model.flavour)) {
+      allowKeys=['text','h1','h2','h3','bullet_list','number_list','check_list','quote']
+    }
+    return  {allowKeys,denyKeys}
+  }
+
   override connectedCallback() {
     super.connectedCallback();
 
@@ -194,7 +209,13 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
 
   }
 
+
+
+
+
   override render() {
+    const {denyKeys,allowKeys} = this.checkKeys()
+    //this.disabledKeys()
     //this._toolsList();
     const slashMenuStyles = this._position
       ? {
@@ -221,6 +242,8 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
           search-text="${this._searchText}"
           .tools-list="${this._toolsList()}"
           .inline-editor="${this.inlineEditor}"
+          deny-keys="${JSON.stringify(denyKeys)}"
+          allow-keys="${JSON.stringify(allowKeys)}"
           @select="${(event: CustomEvent) => {
             //console.log("11111",event);
             const key = event.detail;

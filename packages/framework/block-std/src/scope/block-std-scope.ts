@@ -192,7 +192,8 @@ export class BlockStdScope {
     this._lifeCycleWatchers.forEach(watcher => {
       watcher.unmounted.call(watcher);
     });
-    this._getHost = () => null as unknown as EditorHost;
+    /** comment ali ghasami for mahdaad for fix bug */
+    //this._getHost = () => null as unknown as EditorHost;
   }
 }
 

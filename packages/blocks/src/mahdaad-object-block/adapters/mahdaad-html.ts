@@ -2,30 +2,11 @@ import { ObjectBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
-  FetchUtils,
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
-import { getFilenameFromContentDisposition } from '@blocksuite/affine-shared/utils';
-import { sha } from '@blocksuite/global/utils';
-import { nanoid } from '@blocksuite/store';
 
-/*
-export function ObjectIcon(type:string,context) {
-  return {
-    type: 'element',
-    tagName: 'div',
-    properties: {
-      /!*src: `assets/${blobName}`,
-      alt: blobName,
-      title: (o.node.props.caption as string | undefined) ?? null,
-      ...widthStyle,*!/
-    },
-    children: [],
-  }
-}
-*/
 
-function convertToFullUrl(inputString) {
+function convertToFullUrl(inputString : string) {
   // Check if the input string starts with 'http' or 'www' to avoid duplication
   if (!inputString.startsWith('http')) {
     // Add 'https://' at the beginning if not present
@@ -55,67 +36,6 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       const { assets, walkerContext, configs } = context;
       if (!assets) {
         return;
-      }
-      const image = o.node;
-      const imageURL =
-        typeof image?.properties.src === 'string' ? image.properties.src : '';
-      if (imageURL) {
-        let blobId = '';
-        if (!FetchUtils.fetchable(imageURL)) {
-          const imageURLSplit = imageURL.split('/');
-          while (imageURLSplit.length > 0) {
-            const key = assets
-              .getPathBlobIdMap()
-              .get(decodeURIComponent(imageURLSplit.join('/')));
-            if (key) {
-              blobId = key;
-              break;
-            }
-            imageURLSplit.shift();
-          }
-        } else {
-          try {
-            const res = await FetchUtils.fetchImage(
-              imageURL,
-              undefined,
-              configs.get('imageProxy') as string
-            );
-            if (!res) {
-              return;
-            }
-            const clonedRes = res.clone();
-            const name =
-              getFilenameFromContentDisposition(
-                res.headers.get('Content-Disposition') ?? ''
-              ) ??
-              (imageURL.split('/').at(-1) ?? 'image') +
-                '.' +
-                (res.headers.get('Content-Type')?.split('/').at(-1) ?? 'png');
-            const file = new File([await res.blob()], name, {
-              type: res.headers.get('Content-Type') ?? '',
-            });
-            blobId = await sha(await clonedRes.arrayBuffer());
-            assets?.getAssets().set(blobId, file);
-            await assets?.writeToBlob(blobId);
-          } catch (_) {
-            return;
-          }
-        }
-        walkerContext
-          .openNode(
-            {
-              type: 'block',
-              id: nanoid(),
-              flavour: 'affine:image',
-              props: {
-                sourceId: blobId,
-              },
-              children: [],
-            },
-            'children'
-          )
-          .closeNode();
-        walkerContext.skipAllChildren();
       }
     },
   },
@@ -183,8 +103,10 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             {
               type: 'element',
               tagName: 'img',
+
               properties: {
-                src: object.meta &&  object.meta.bucket_name ? `${minioStorageImageUrl}/${object.meta.storage}` :  `${storageUrl}/${object.meta.storage}`
+                src: object.meta &&  object.meta.bucket_name ? `${minioStorageImageUrl}/${object.meta.storage}` :  `${storageUrl}/${object.meta.storage}`,
+                style:'width:100%',
                 //className: [`title line-clamp-1`],
               },
               children:[]
@@ -192,22 +114,41 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             'children'
           ).closeNode()
         }else{
-          walkerContext.openNode(
-            {
-              type: 'element',
-              tagName: 'span',
-              properties: {
-                className: [`title line-clamp-1`],
-              },
-              children: [
-                {
-                  type:'text',
-                  value:object.title
-                }
-              ],
-            },
-            'children'
-          ).closeNode()
+         if(o.node.props?.type=='tag') {
+           walkerContext.openNode(
+             {
+               type: 'element',
+               tagName: 'span',
+               properties: {
+                 className: [`title line-clamp-1 card tag green`],
+               },
+               children: [
+                 {
+                   type:'text',
+                   value:object.title
+                 }
+               ],
+             },
+             'children'
+           ).closeNode()
+         }else{
+           walkerContext.openNode(
+             {
+               type: 'element',
+               tagName: 'span',
+               properties: {
+                 className: [`title line-clamp-1`],
+               },
+               children: [
+                 {
+                   type:'text',
+                   value:object.title
+                 }
+               ],
+             },
+             'children'
+           ).closeNode()
+         }
         }
         if(o.node.props?.type=='weblink') {
           walkerContext.openNode(
@@ -230,57 +171,8 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         }
 
       }
-
-
       walkerContext.closeNode()
 
-
-
-      /*walkerContext
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'div',
-            properties: {
-              className: [`mahdaad-block-container mahdaad-object ${o.node.props?.type}`],
-            },
-            children: [],
-          },
-          'children'
-        )
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'span',
-            properties: {
-              className: [`icon`],
-            },
-            children:o.node.props?.type!='tag'  ?  [{
-              type:'raw',
-              value:object.iconSVG ?? ''
-            }] : []
-          },
-          'children'
-        )
-        .closeNode()
-        .openNode(
-          {
-            type: 'element',
-            tagName: 'span',
-            properties: {
-              className: [`title`],
-            },
-            children: [
-              {
-                type:'text',
-                value:object.title
-              }
-            ],
-          },
-          'children'
-        )
-        .closeNode()
-        .closeNode();*/
     },
   },
 };

@@ -1,8 +1,7 @@
-import type { AffineInlineEditor } from '@blocksuite/affine-components/rich-text';
 import type { EditorHost } from '@blocksuite/block-std';
 import type { InlineEditor } from '@blocksuite/inline';
 
-import { getInlineEditorByModel } from '@blocksuite/affine-components/rich-text';
+import { type AffineInlineEditor, getInlineEditorByModel } from '@blocksuite/affine-components/rich-text';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Prefix } from '@blocksuite/global/env';
 import { WithDisposable } from '@blocksuite/global/utils';
@@ -24,6 +23,7 @@ import {
 import { replaceIdMiddleware } from '../../../_common/transformers/index.js';
 import { AffineSchemas } from '../../../schemas.js';
 import { styles } from './styles.js';
+
 export interface ObjectLink {
   link_id: string;
   //id:string,
@@ -50,7 +50,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     return getQuery(this.inlineEditor, this._startRange) || '';
   }
 
-
   constructor(
     private editorHost: EditorHost,
     private inlineEditor: AffineInlineEditor,
@@ -63,7 +62,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   //todo ali ghasami for migrate to event bus
   addObjectLink(model: BlockModel, lnk: ObjectLink) {
-   // console.log("bbbbb");
+    // console.log("bbbbb");
     //return;
     if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
       return;
@@ -86,13 +85,16 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
     //model.doc.addBlocks()
     //console.log('this', model.text?.length);
-
+/*
+    if (model.text?.length == 0) {
+      model.doc.deleteBlock(this.model);
+    }*/
     //return;
-    /*setTimeout(()=>{
+    setTimeout(()=>{
       if (model.text?.length == 0) {
         model.doc.deleteBlock(this.model);
       }
-    },10)*/
+    })
     const next = model.doc.getNext(temp[0]);
     //console.log("cccc",next);
     if (next && this.editorHost) {
@@ -111,7 +113,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   }
 
   clearTrigger() {
-    // console.log('11111', this._searchText);
+     //console.log('clearTrigger', this._searchText);
     //todo fix trigger key ali ghasami dynamic
     try {
       let trigger = null;
@@ -137,10 +139,13 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       }
 
       //const trigger = '/template/';
-     // console.log("999999",this._searchText,trigger);
+      // console.log("999999",this._searchText,trigger);
       const text = this._searchText ? trigger + this._searchText : trigger;
       // console.log('this is text', text);
-      cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
+      //setTimeout(()=>{
+        cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
+      //})
+
     } catch (e) {
       console.log(e);
     }
@@ -168,21 +173,21 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         next();
       },
       onInput: () => {
-        setTimeout(()=>{
+        setTimeout(() => {
           //console.log("22222",this._query);
           this._searchText = this._query;
-        },50)
+        }, 50);
       },
       onDelete: () => {
         //old method
-      /*  this._searchText = this._query;
-        const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
-        if (curIndex == this._startIndex - 1) {
-          this.abortController.abort();
-        }*/
-        setTimeout(()=>{
+        /*  this._searchText = this._query;
+          const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
+          if (curIndex == this._startIndex - 1) {
+            this.abortController.abort();
+          }*/
+        setTimeout(() => {
           this._searchText = this._query;
-        },50)
+        }, 50);
         //const curIndex = inlineEditor.getInlineRange()?.index ?? 0;
         const curRange = this.inlineEditor.getInlineRange();
         if (!this._startRange || !curRange) {
@@ -196,7 +201,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
         if (curRange.index - 1 < this._startRange.index) {
           this.abortController.abort();
         }
-
       },
       onMove: step => {
         this.abortController.abort();
@@ -252,7 +256,7 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       : styleMap({
           visibility: 'hidden',
         });
-    return html`<div>
+    return html` <div>
       <div
         class="${Prefix}-popover ${Prefix}-popover-element ${Prefix}-object-link-popover"
         style="${style}"

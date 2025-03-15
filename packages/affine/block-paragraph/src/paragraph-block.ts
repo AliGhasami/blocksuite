@@ -1,6 +1,6 @@
 //ali ghasami for new merge
 import type { ParagraphBlockModel } from '@blocksuite/affine-model';
-import { type BlockComponent, UIEventStateContext } from '@blocksuite/block-std';
+import type { BlockComponent, UIEventStateContext } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
@@ -310,11 +310,12 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ? nothing
       : html`<div
               contenteditable="false"
+              style="overflow: hidden"
               class=${classMap({
         'affine-paragraph-placeholder': true,
         visible: this._displayPlaceholder.value,
       })}>
-          ${this.service.placeholderGenerator(this.model)}
+          <span style="min-width: 150px"> ${this.service.placeholderGenerator(this.model)}</span> 
       </div>`
   }
 

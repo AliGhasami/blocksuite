@@ -1,6 +1,7 @@
 import type { MahdaadCalloutBlockModel } from '@blocksuite/affine-model';
 import type { BlockModel } from '@blocksuite/store';
 
+import { checkNotEmptyNote } from '@blocksuite/affine-shared/utils';
 import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
@@ -66,23 +67,12 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
       this.doc.updateBlock(this.model,{
         ...normal
       })
-
     }
   }
-
 
   override connectedCallback() {
     super.connectedCallback();
   }
-
-  override async getUpdateComplete() {
-    const result = await super.getUpdateComplete();
-    if(this.model.children.length==0){
-      this.doc.addBlock('affine:paragraph', {}, this.model);
-    }
-    return result;
-  }
-
 
   convertToType(blocksModel:BlockModel[],flavour:string,type:string) {
     blocksModel.forEach(blockModel=>{
@@ -104,8 +94,30 @@ export class MahdaadCalloutBlockComponent extends BlockComponent<
   }
 
 
-  override renderBlock() {
+  override async getUpdateComplete() {
+    const result = await super.getUpdateComplete();
+    checkNotEmptyNote(this.model,this.doc)
+    /*try{
+      let  lastChild :  null | BlockModel = null
+      if(this.model.children.length > 0) {
+        lastChild=this.model.children[this.model.children.length - 1]
+      }
+      if (
+        this.model.children.length == 0 ||
+        (lastChild &&
+          (lastChild.flavour != 'affine:paragraph' ||  (lastChild.flavour == 'affine:paragraph' && lastChild.type && lastChild.type=='quote' )))
+      ) {
+        this.doc.addBlock('affine:paragraph', {}, this.model);
+      }
+    }catch (e) {
+      console.log("error",e);
+    }finally {
 
+    }*/
+    return result;
+  }
+
+  override renderBlock() {
     return html`
       <div dir=${this.model.dir}>
       <mahdaad-callout-component

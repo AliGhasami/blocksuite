@@ -1,15 +1,16 @@
-import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import UnoCSS from 'unocss/vite'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import VueDevTools from 'vite-plugin-vue-devtools'
-import { resolve } from 'path'
-import dts from 'vite-plugin-dts'
 import { lessVars } from '@mahdaad/tokens'
+import { lessVars as pantoLess } from '@pantograph/tokens'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import { resolve } from 'node:path'
+import { fileURLToPath, URL } from 'node:url'
+import UnoCSS from 'unocss/vite'
+import { defineConfig } from 'vite'
+import dts from 'vite-plugin-dts'
+import VueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
+const {namespace, ...other} = pantoLess
 export default defineConfig({
   plugins: [
     vue({
@@ -40,7 +41,8 @@ export default defineConfig({
     preprocessorOptions: {
       less: {
         modifyVars: {
-          ...lessVars
+          ...lessVars,
+          ...other,
           // Used for global import to avoid the need to import each style file separately
           // reference:  Avoid repeated references
           //hack: ` ; @import (reference) "${resolve('./assets/css/var.less')}"`

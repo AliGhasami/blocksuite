@@ -5,7 +5,6 @@ import {
   type AffineInlineEditor,
   getInlineEditorByModel,
 } from '@blocksuite/affine-components/rich-text';
-import { MahdaadCalloutBlockSchema } from '@blocksuite/affine-model';
 import {
   getCurrentNativeRange,
   matchFlavours,
@@ -169,12 +168,12 @@ export class AffineSlashMenuWidget extends WidgetComponent {
       //console.log('this is block ',block);
       if (!model) return;
 
-      const parent=this.host.doc.getParent(model)
-      const blockComponent=this.std.view.getBlock(textSelection.blockId)
+      //const parent=this.host.doc.getParent(model)
+      //const blockComponent=this.std.view.getBlock(textSelection.blockId)
 
-      if(parent && parent.flavour==MahdaadCalloutBlockSchema.model.flavour ||
+      /*if(parent && parent.flavour==MahdaadCalloutBlockSchema.model.flavour ||
         blockComponent && blockComponent.closest('.nest-editor')
-      ) return;
+      ) return;*/
       //console.log("this is parent",parent);
       //console.log("blockComponent",blockComponent);
 
