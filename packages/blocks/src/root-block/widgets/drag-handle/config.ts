@@ -25,6 +25,7 @@ export const EDGELESS_NOTE_EXTRA_PADDING = 20;
 export const DRAG_HOVER_RECT_PADDING = 4;
 
 export type DropResult = {
+  domRect?: DOMRect,
   rect: Rect | null;
   dropBlockId: string;
   dropType: DropType;

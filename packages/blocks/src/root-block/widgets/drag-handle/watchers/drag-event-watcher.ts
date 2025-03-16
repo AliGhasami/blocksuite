@@ -86,6 +86,7 @@ export class DragEventWatcher {
   private _dragEndHandler: UIEventHandler = () => {
   //  debugger
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
+    this.widget.applyBlockDropStyle(null)
     console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
     this.removeGroupDragStyle()
     this.widget.clearRaf();
@@ -95,6 +96,7 @@ export class DragEventWatcher {
   private _dragMoveHandler: UIEventHandler = ctx => {
     //debugger
     console.log("_dragMoveHandler native");
+    //return false
     //document.body.style.cursor = 'e-resize';
     //ctx.
     //return false
@@ -125,9 +127,18 @@ export class DragEventWatcher {
   private _dragStartHandler: UIEventHandler = ctx => {
     //debugger
     /*setTimeout(()=>{
+      this.widget.hide(true)
        debugger
     },3000)*/
+    //console.log("this is ctx",ctx);
+    const a=ctx.get('defaultState')
+    const img = new Image();
+    img.src = "cursor-image.png"; // Replace with your image path
+    a.event.dataTransfer.setDragImage(img, 30, 30);
     console.log("_dragStartHandler", ctx);
+    //this.widget.hide(true)
+    //this.widget.style.height=30;
+    //this.widget.style.opacity=0;
     //return
     const state = ctx.get('dndState');
     // If not click left button to start dragging, should do nothing
@@ -145,9 +156,10 @@ export class DragEventWatcher {
    // console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
-    //return
+    return
     console.log("____dropHandler",this.widget.draggingElements);
     this.removeGroupDragStyle()
+    this.widget.applyBlockDropStyle(null)
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     this._onDrop(context);
     this._std.selection.setGroup('gfx', []);
@@ -287,12 +299,15 @@ export class DragEventWatcher {
   private _onDrop = (context: UIEventStateContext) => {
     console.log("_onDrop");
     const state = context.get('dndState');
-
+    //debugger
     const event = state.raw;
+    event.preventDefault();
     const { clientX, clientY } = event;
-    const point = new Point(clientX-30, clientY);
+    //-30
+    const point = new Point(clientX, clientY);
+    const pointElement = new Point(clientX-30, clientY);
     //console.log();
-    const element = getClosestBlockComponentByPoint(point.clone());
+    const element = getClosestBlockComponentByPoint(pointElement.clone());
     console.log("this is element",element);
     if (!element) {
       const target = captureEventTarget(event.target);
@@ -318,7 +333,6 @@ export class DragEventWatcher {
     const index =
       parent.children.indexOf(model) + (result.type === 'before' ? 0 : 1);
     console.log("this is index",index);
-    event.preventDefault();
 
     if (matchFlavours(parent, ['affine:note'])) {
       const snapshot = this._deserializeSnapshot(state);

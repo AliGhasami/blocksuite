@@ -68,7 +68,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   /**
    * When dragging, should update indicator position and target drop block id
    */
-  private _getDropResult = (state: DndEventState): DropResult | null => {
+  private _getDropResult = (state: DndEventState,isVerticalIndicator=false): DropResult | null => {
     const point = new Point(state.raw.x, state.raw.y);
     const closestBlock = getClosestBlockByPoint(
       this.host,
@@ -76,9 +76,9 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       point
     );
     if (!closestBlock) return null;
-    //console.log("dropResult blockkkkkk",closestBlock);
-
+    console.log("dropResult blockkkkkk",closestBlock);
     const blockId = closestBlock.model.id;
+    console.log("block id",blockId);
     const model = closestBlock.model;
 
     const isDatabase = matchFlavours(model, ['affine:database']);
@@ -120,7 +120,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       closestBlock,
       this.draggingElements,
       this.scale.peek(),
-      isDraggedElementNote === false
+      isDraggedElementNote === false,
+      isVerticalIndicator
     );
     console.log("result",result);
 
@@ -133,6 +134,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     if (isDraggedElementNote && dropType === 'in') return null;
 
     const dropIndicator = {
+      //domRect:
       rect,
       dropBlockId: blockId,
       dropType,
@@ -214,7 +216,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     }
     if(showVerticalIndicator) {
       this.dropIndicator.rect = null;
-      this.dropIndicator.rectVertical=result
+      console.log("qqqqqqq",dropResult);
+      this.dropIndicator.rectVertical= result
     }else{
       this.dropIndicator.rectVertical=null
       this.dropIndicator.rect = result;
@@ -379,7 +382,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     //  console.log("this is reset");
       this._resetDropResult();
     } else {
-      const dropResult = this._getDropResult(state);
+      const dropResult = this._getDropResult(state,this.isVerticalIndicator);
       if(this.isVerticalIndicator) {
         console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
         if(dropResult && dropResult.dropBlockId) {

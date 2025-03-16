@@ -194,7 +194,8 @@ export function calcDropTarget(
   /**
    * Allow the dragging block to be dropped as sublist
    */
-  allowSublist: boolean = true
+  allowSublist: boolean = true,
+  isVerticalIndicator:boolean= false
 ): DropResult | null {
   let type: DropType | 'none' = 'none';
   const height = 3 * scale;
@@ -202,7 +203,7 @@ export function calcDropTarget(
 
   const distanceToTop = Math.abs(domRect.top - point.y);
   const distanceToBottom = Math.abs(domRect.bottom - point.y);
-  const before = distanceToTop < distanceToBottom;
+  const before =  isVerticalIndicator ? true :  distanceToTop < distanceToBottom;
 
   type = before ? 'before' : 'after';
   let offsetY = 4;
@@ -287,7 +288,8 @@ export function calcDropTarget(
   }
 
   return {
-    rect: Rect.fromLWTH(domRect.left, domRect.width, top - height / 2, height),
+    //domRect,
+    rect: Rect.fromLWTH(domRect.left, domRect.width, top - height / 2, isVerticalIndicator? domRect.height : height),
     dropBlockId: model.id,
     dropType: type,
   };

@@ -332,6 +332,6 @@ export class PointerEventWatcher {
   watch() {
     this.widget.handleEvent('click', this._clickHandler);
     this.widget.handleEvent('pointerMove', this._throttledPointerMoveHandler);
-    //this.widget.handleEvent('pointerOut', this._pointerOutHandler);
+    this.widget.handleEvent('pointerOut', this._pointerOutHandler);
   }
 }
