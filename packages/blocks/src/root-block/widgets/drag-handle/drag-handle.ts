@@ -53,6 +53,7 @@ import { KeyboardEventWatcher } from './watchers/keyboard-event-watcher.js';
 import { LegacyDragEventWatcher } from './watchers/legacy-drag-event-watcher.js';
 import { PageWatcher } from './watchers/page-watcher.js';
 import { PointerEventWatcher } from './watchers/pointer-event-watcher.js';
+import { checkParentIs } from '../../../_common/mahdaad/is.js';
 
 export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   static override styles = styles;
@@ -337,6 +338,10 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     state: DndEventState,
     shouldAutoScroll: boolean = false
   ) => {
+    if(this.dragPreview){
+      this.dragPreview.tooltipMessage=""
+    }
+    window.allowDrop=true
     const point = new Point(state.raw.x, state.raw.y);
     //console.log("this is point ",point,this.host,this.rootComponent);
     const closestNoteBlock = getClosestNoteBlock(
@@ -387,28 +392,48 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
-      if(this.isVerticalIndicator) {
         console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
-
         /*if()
           const target =*/
-
-
-
-
-
         if(dropResult && dropResult.dropBlockId) {
+          const target= this._getBlockView(dropResult.dropBlockId)
+          const isContainMultiColumn=!!this.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
+
+          //console.log("ttttttttt",target,checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour));
+          if(target) {
+            if(checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour) && isContainMultiColumn){
+              window.allowDrop=false
+              if(this.dragPreview){
+                this.dragPreview.tooltipMessage="You can not add columns inside another column block ."
+              }
+            }
+          }
 
 
 
           if(this.isVerticalIndicator) {
-            const target= this._getBlockView(dropResult.dropBlockId)
             console.log('1000000', target,this.draggingElements);
             if(target) {
               if(target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour && target.model.children.length==4) {
                 window.allowDrop=false
+                if(this.dragPreview){
+                  this.dragPreview.tooltipMessage="You can not add more than 4 columns."
+                }
+                console.log("77777",this.dragPreview);
               }
+
+
+
+
             }
+
+            /*if(isContainMultiColumn){
+              window.allowDrop=false
+              //this.dragPreview.tooltipMessage="You can not add more than 4 columns."
+            }*/
+
+
+
           }
 
 
@@ -424,7 +449,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
           console.log("_dragMoveHandler block vuew",this.lastBlockDropStyle)*/
         }
 
-      }
       this._updateDropResult(dropResult,this.isVerticalIndicator);
     }
 

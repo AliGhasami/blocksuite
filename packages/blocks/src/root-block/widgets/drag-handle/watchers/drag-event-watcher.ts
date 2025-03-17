@@ -143,10 +143,9 @@ export class DragEventWatcher {
    */
   private _dragStartHandler: UIEventHandler = ctx => {
     //debugger
-    setTimeout(()=>{
+    /*setTimeout(()=>{
        debugger
-      this.widget.std.get
-    },3000)
+    },3000)*/
     //console.log("this is ctx",ctx);
     const temp=ctx.get('defaultState')
     const img = new Image();
@@ -325,7 +324,7 @@ export class DragEventWatcher {
     const pointElement = new Point(clientX-30, clientY);
     //console.log();
     const element = getClosestBlockComponentByPoint(pointElement.clone());
-    console.log("this is element",element);
+    //console.log("this is element",element);
     if (!element) {
       const target = captureEventTarget(event.target);
       const isEdgelessContainer =
@@ -595,18 +594,50 @@ export class DragEventWatcher {
         //snapshot.content.length >  1 &&
         //console.log("200000",this.widget.isVerticalIndicator);
         if(dropResult && this.widget.isVerticalIndicator) {
+          const isContainMultiColumn=!!this.widget.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
           console.log("start",dropResult,);
           if(dropResult.modelState.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
               //const temp=
             //this._std.command.
-           const res = _insertMultiColumn(this._std,dropResult.modelState.model,2)
-            console.log("this is res",res);
-           if(res) {
-             this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
-             parent= res.model.children[1].id
-             index=0
-           }
+            if(isContainMultiColumn){
+              if(this.widget.draggingElements.length==1 && this.widget.draggingElements[0].model.children.length+1<=4){
+                const res = _insertMultiColumn(this._std,dropResult.modelState.model,this.widget.draggingElements[0].model.children.length+1)
+                if(res) {
+                  this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                  //parent= res.model.children[1].id
+                  //index=0
+                //  debugger
+                  for (let i=1;i<res.model.children.length;i++){
+                    //@ts-ignore
+                    this._std.doc.deleteBlock(res.model.children[i])
+                    //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                  }
+                  for (let i=0;i<dropResult.modelState.model.children.length;i++){
+                    this._std.doc.moveBlocks([dropResult.modelState.model.children[i]],res.model.children[i+1])
+                    //@ts-ignore
+                    //this._std.doc.deleteBlock(res.model.children[i])
+                    //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                  }
+                }
+
+              }
+              return null
+            }else{
+              const res = _insertMultiColumn(this._std,dropResult.modelState.model,2)
+              //console.log("this is res",res);
+              if(res) {
+                this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                parent= res.model.children[1].id
+                index=0
+              }
+            }
+
           }else{
+            //if(this.widget.draggingElements)
+            //if(this.widget)
+            if(isContainMultiColumn){
+              return null
+            }
             const res=addColumnToMultiColumn(this._std,dropResult.modelState.model)
             if(res) {
               parent= res.children[res.children.length-1].id //.model.children[1].id

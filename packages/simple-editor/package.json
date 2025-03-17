@@ -1,6 +1,6 @@
 {
   "name": "@mahdaad/block-editor",
-  "version": "2.0.42",
+  "version": "2.0.44",
   "type": "module",
   "files": [
     "dist",

@@ -122,7 +122,7 @@ export class PreviewHelper {
 
   constructor(readonly widget: AffineDragHandleWidget) {}
 
-  previewText(blocks: BlockComponent[]) {
+  /*previewText(blocks: BlockComponent[]) {
 
-  }
+  }*/
 }

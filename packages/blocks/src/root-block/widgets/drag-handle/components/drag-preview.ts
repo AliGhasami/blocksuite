@@ -4,7 +4,7 @@ import type { TemplateResult } from 'lit';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { Point } from '@blocksuite/global/utils';
 import { baseTheme } from '@toeverything/theme';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 
 export class DragPreview extends ShadowlessElement {
@@ -53,7 +53,10 @@ export class DragPreview extends ShadowlessElement {
         <span class="hint">
           ${this.text ?? '-'}
         </span>
-        <div class="tooltip-message" >ttttt</div>
+        ${ this.tooltipMessage ? 
+            html`<div class="tooltip-message" >${this.tooltipMessage}</div>` : nothing
+          }
+        
       </div>
     `;
   }

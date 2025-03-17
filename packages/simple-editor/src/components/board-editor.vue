@@ -1459,7 +1459,7 @@ async function init() {
 
 
 affine-drag-preview{
-
+  z-index: 999;
   .tooltip-message{
     @apply bg-neutral-9 shadow-floated rounded-sm text-gray-0 ;
     padding: @space-200 @space-400;
