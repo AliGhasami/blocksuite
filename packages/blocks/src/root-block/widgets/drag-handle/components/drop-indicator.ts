@@ -46,9 +46,9 @@ export class DropIndicator extends ShadowlessElement {
       //console.log("this.rectVertical",this.rectVertical);
       const { left, top, width, height } = this.rectVertical;
       styleVertical = styleMap({
-        width: `${height}px`,
-        height: `30px`,
-        top: `${top}px`,
+        //width: `${height}px`,
+        height: `${height}px`,
+        top: `${top+5}px`,
         left: `${left+width+5}px`,
         //'background-color':'yellow'
       });

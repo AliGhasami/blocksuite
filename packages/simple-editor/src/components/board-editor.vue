@@ -1434,6 +1434,10 @@ async function init() {
   @apply h-100;
   background: @primary-5;
 
+  &.vertical{
+    @apply w-100;
+  }
+
   .circle-indicator{
     border: 2px solid @primary-5;
     width: 8px;
@@ -1445,6 +1449,7 @@ async function init() {
     position: absolute;
 
     &.vertical{
+      //@apply w-100;
       right: -3px;
     }
 

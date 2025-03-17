@@ -72,9 +72,12 @@ export class FileDropManager {
   };
 
   onDragOver = (event: DragEvent) => {
-    console.log("this is event",event);
+    //console.log("move this is event",event,window.allowDrop);
    // console.log("host drage over ");
-    event.preventDefault();
+    /*if(!window.allowDrop || window.allowDrop=false){
+      event.preventDefault();
+    }*/
+
     //return false
    // event.target.style.cursor = "copy";
 

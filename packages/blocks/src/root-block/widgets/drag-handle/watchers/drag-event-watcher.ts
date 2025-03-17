@@ -95,13 +95,15 @@ export class DragEventWatcher {
 
   private _dragMoveHandler: UIEventHandler = ctx => {
     //debugger
-    console.log("_dragMoveHandler native");
+    console.log("move _dragMoveHandler native",ctx);
     //return false
     //document.body.style.cursor = 'e-resize';
     //ctx.
     //return false
     //return
     //debugger
+
+    window.allowDrop=false
 
     if (
       this.widget.isHoverDragHandleVisible ||
@@ -114,7 +116,22 @@ export class DragEventWatcher {
       return false;
     }
     console.log("_dragMoveHandler draggingElements",this.widget.draggingElements);
-    ctx.get('defaultState').event.preventDefault();
+    //ctx.get('defaultState').event.preventDefault();
+    //const a=ctx.get('defaultState')
+    //a.event.dataTransfer.setData("ddd", "tttttttttt")
+    //a.event.temp='5555'
+    /*ctx.get('defaultState').event.dropEffect= 'ttttt';
+    ctx.get('dndState').event.stopPropagation();
+    ctx.get('dndState').event.preventDefault();
+    ctx.get('dndState').event.dropEffect='ggggg' //.setData("ddd", "tttttttttt")
+    ctx.get('sourceState').event.stopPropagation();
+    ctx.get('sourceState').event.preventDefault();
+    ctx.get('sourceState').event.dropEffect ='rrrr' //.setData("ddd", "tttttttttt")*/
+    //ctx.get('defaultState').event.stopPropagation();
+    //ctx.get('defaultState').event.dataTransfer.setData("text/plain", "");();
+    //ctx.get('defaultState').event.dataTransfer.setData("text/plain", "")
+    //ctx.get('defaultState').event.dataTransfer.setData("ddd", "tttttttttt")
+    //ctx.get('defaultState').event.d
     const state = ctx.get('dndState');
 
     // call default drag move handler if no option return true
@@ -156,7 +173,7 @@ export class DragEventWatcher {
    // console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
-    return
+    //return
     console.log("____dropHandler",this.widget.draggingElements);
     this.removeGroupDragStyle()
     this.widget.applyBlockDropStyle(null)
