@@ -348,7 +348,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     const children = html`<div dir=${this.model.dir}
       class="affine-block-children-container"
       style=${styleMap({
-        paddingStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
+        paddingInlineStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
         display: collapsed ? 'none' : undefined,
       })}
     >

@@ -269,7 +269,6 @@ function handleHeadingList(doc:Doc) {
       }
   }
     
-  console.log("doc in board editor",doc);
 }
 
 function bindEvent(doc: Doc) {

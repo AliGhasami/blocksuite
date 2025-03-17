@@ -66,106 +66,27 @@ export function isHeadingBlock(
   );
 }
 
-// export function getHeadingBlocksFromNote(
-//   note: NoteBlockModel,
-//   ignoreEmpty = false
-// ) {
-//   const models = note.children.filter(block => {
-//     const empty = block.text && block.text.length > 0;
-//     return isHeadingBlock(block) && (!ignoreEmpty || empty);
-//   });
-
-//   return models;
-// }
-
-// export function getHeadingBlocksFromNote(
-//   note: NoteBlockModel,
-//   ignoreEmpty = false
-// ) {
-//   const getHeadings = (block: BlockModel): ParagraphBlockModel[] => {
-//     const headings: ParagraphBlockModel[] = [];
-//     if (isHeadingBlock(block) && (!ignoreEmpty || (block.text && block.text.length > 0))) {
-//       headings.push(block);
-//     }
-//     block.children.forEach(child => {
-//       headings.push(...getHeadings(child));
-//     });
-//     return headings;
-//   };
-
-//   return getHeadings(note);
-// }
-// export function getHeadingBlocksFromNote(
-//   note: NoteBlockModel,
-//   ignoreEmpty = false
-// ) {
-//   const getHeadings = (block: BlockModel): ParagraphBlockModel[] => {
-//     const headings: ParagraphBlockModel[] = [];
-//     if (isHeadingBlock(block) && (!ignoreEmpty || (block.text && block.text.length > 0))) {
-//       headings.push(block);
-//     }
-//     block.children.forEach(child => {
-//       const childHeadings = getHeadings(child);
-//       if (childHeadings.length > 0) {
-//         headings.push(...childHeadings);
-//       }
-//     });
-//     return headings;
-//   };
-
-//   return getHeadings(note);
-// }
-
-// export function getHeadingBlocksFromNote(
-//   note: NoteBlockModel,
-//   ignoreEmpty = false
-// ) {
-//   const getHeadings = (block: BlockModel): ParagraphBlockModel[] => {
-//     const headings: ParagraphBlockModel[] = [];
-//     if (isHeadingBlock(block) && (!ignoreEmpty || (block.text && block.text.length > 0))) {
-//       const childrenHeadings = block.children.map(child => getHeadings(child)).flat();
-//       headings.push({
-//         ...block,
-//         children: childrenHeadings
-//       });
-//     } else {
-//       block.children.forEach(child => {
-//         headings.push(...getHeadings(child));
-//       });
-//     }
-//     return headings;
-//   };
-
-//   return getHeadings(note);
-// }
 
 export function getHeadingBlocksFromNote(
   note: NoteBlockModel,
   ignoreEmpty = false
 ) {
-  const getHeadings = (block: BlockModel, parentId: string | null = null): any[] => {
+  const getHeadings = (block: BlockModel, parentId: string | null = null, level: number = 0): any[] => {
     const headings: any[] = [];
-    // if (!['affine:'].includes(block.flavour)) return;
-    
-    // if (['affine:callout'].includes(block?.parent?.flavour)) return;
-    if (isHeadingBlock(block) && (!ignoreEmpty || (block.text && block.text.length > 0))) {
-      const childrenHeadings = block.children.map(child => getHeadings(child, block.id));
-      console.log("block:",block);
-      if (block?.parent?.flavour && !['affine:mahdaad-callout'].includes(block?.parent?.flavour)) {
-          headings.push({
-          id: block.id,
-          text: block.text.deltas$?.v[0].insert,
-          parentId: block?.parent?.id,
-          children: childrenHeadings,
-          flavour: block.parent?.flavour,
-        });
-      }
-      
-    } else {
-      block.children.forEach(child => {
-        headings.push(...getHeadings(child, parentId));
+    if (level > 3) return headings;
+
+    if (isHeadingBlock(block) && (!ignoreEmpty || (block.text && block.text.length > 0)) && block?.parent?.flavour && !['affine:mahdaad-callout'].includes(block?.parent?.flavour)) {
+      headings.push({
+        id: block.id,
+        text: block.text.deltas$?.v[0].insert,
+        parentId: parentId,
+        type: block.type
       });
     }
+
+    block.children.forEach(child => {
+      headings.push(...getHeadings(child, block.id, level + 1));
+    });
     return headings;
   };
 
