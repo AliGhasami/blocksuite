@@ -1,7 +1,7 @@
-import type { RootBlockModel } from '@blocksuite/affine-model';
 import type { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
 import type { IVec } from '@blocksuite/global/utils';
 
+import { MahdaadMultiColumnBlockSchema, type RootBlockModel } from '@blocksuite/affine-model';
 import {
   DocModeProvider,
   DragHandleConfigIdentifier,
@@ -64,6 +64,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   private _getBlockView = (blockId: string) => {
     return this.host.view.getBlock(blockId);
   };
+
 
   /**
    * When dragging, should update indicator position and target drop block id
@@ -371,6 +372,9 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     }*/
     this.applyBlockDropStyle(null)
     this.isVerticalIndicator = !!(closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock)))
+
+
+
     if (
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
@@ -385,8 +389,31 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
       if(this.isVerticalIndicator) {
         console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
+
+        /*if()
+          const target =*/
+
+
+
+
+
         if(dropResult && dropResult.dropBlockId) {
+
+
+
+          if(this.isVerticalIndicator) {
+            const target= this._getBlockView(dropResult.dropBlockId)
+            console.log('1000000', target,this.draggingElements);
+            if(target) {
+              if(target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour && target.model.children.length==4) {
+                window.allowDrop=false
+              }
+            }
+          }
+
+
           this.applyBlockDropStyle(dropResult.dropBlockId)
+
           /*if(this.lastBlockDropStyle) {
             this.lastBlockDropStyle.classList.remove('active-drop')
           }

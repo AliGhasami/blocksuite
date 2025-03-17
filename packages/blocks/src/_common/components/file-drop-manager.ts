@@ -77,6 +77,9 @@ export class FileDropManager {
     /*if(!window.allowDrop || window.allowDrop=false){
       event.preventDefault();
     }*/
+    if(!Object.hasOwn(window,'allowDrop') || window.allowDrop==true) {
+      event.preventDefault();
+    }
 
     //return false
    // event.target.style.cursor = "copy";

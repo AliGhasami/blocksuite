@@ -103,7 +103,7 @@ export class DragEventWatcher {
     //return
     //debugger
 
-    window.allowDrop=false
+    //window.allowDrop=false
 
     if (
       this.widget.isHoverDragHandleVisible ||
@@ -143,15 +143,15 @@ export class DragEventWatcher {
    */
   private _dragStartHandler: UIEventHandler = ctx => {
     //debugger
-    /*setTimeout(()=>{
-      this.widget.hide(true)
+    setTimeout(()=>{
        debugger
-    },3000)*/
+      this.widget.std.get
+    },3000)
     //console.log("this is ctx",ctx);
-    const a=ctx.get('defaultState')
+    const temp=ctx.get('defaultState')
     const img = new Image();
     img.src = "cursor-image.png"; // Replace with your image path
-    a.event.dataTransfer.setDragImage(img, 30, 30);
+    temp.event.dataTransfer.setDragImage(img, 30, 30);
     console.log("_dragStartHandler", ctx);
     //this.widget.hide(true)
     //this.widget.style.height=30;

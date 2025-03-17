@@ -49,7 +49,12 @@ export class DragPreview extends ShadowlessElement {
           cursor: grabbing !important;
         }</style
       ><!--${this.template}-->
-      <div>${this.text ?? '-'}</div>
+      <div>
+        <span class="hint">
+          ${this.text ?? '-'}
+        </span>
+        <div class="tooltip-message" >ttttt</div>
+      </div>
     `;
   }
 
@@ -61,6 +66,10 @@ export class DragPreview extends ShadowlessElement {
 
   @property({ attribute: false })
   accessor text: string= '-';
+
+  @property({ attribute: false })
+  accessor tooltipMessage: string= '';
+
 
 }
 

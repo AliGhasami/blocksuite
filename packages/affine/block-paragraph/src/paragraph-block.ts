@@ -348,6 +348,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   }
 
 
+
+
   override renderBlock(): TemplateResult<1> {
     //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
@@ -376,7 +378,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     const children = html`<div dir=${this.model.dir}
       class="affine-block-children-container"
       style=${styleMap({
-        paddingStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
+        paddingInlineStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
         display: collapsed ? 'none' : undefined,
       })}
     >

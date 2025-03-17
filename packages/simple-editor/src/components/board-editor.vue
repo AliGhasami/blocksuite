@@ -1459,10 +1459,25 @@ async function init() {
 
 
 affine-drag-preview{
-  @apply rounded-md shadow-sharp txs-body text-fg-subtle ;
-  width: 232px; //bg-target
-  padding: @space-400  @space-600;
-  background: @bg-target;
+
+  .tooltip-message{
+    @apply bg-neutral-9 shadow-floated rounded-sm text-gray-0 ;
+    padding: @space-200 @space-400;
+    max-width: 221px;
+    margin-top:20px;
+    //width: 150px;
+    min-height: 30px;
+    margin-inline-start:-30px;
+  }
+
+  .hint{
+    @apply rounded-md shadow-sharp txs-body text-fg-subtle block;
+    width: 232px; //bg-target
+    padding: @space-400  @space-600;
+    background: @bg-target;
+  }
+
+
 }
 /*
 
