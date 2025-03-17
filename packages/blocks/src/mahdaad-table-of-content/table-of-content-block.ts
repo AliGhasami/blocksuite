@@ -2,12 +2,10 @@
 import type { MahdaadTableOfContentBlockModel } from '@blocksuite/affine-model';
 
 // import { PropTypes, requiredProperties } from '@blocksuite/block-std';
-import { NoteDisplayMode } from '@blocksuite/blocks';
 // import { BlockModel } from '@blocksuite/store';
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
-import { html, nothing } from 'lit';
-
-import { getHeadingBlocksFromDoc } from '../_common/global.js';
+import { html } from 'lit';
+import { state } from 'lit/decorators.js';
 // import { property } from 'lit/decorators.js';
 // import { pick } from 'lodash-es';
 
@@ -33,13 +31,31 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     }
   }
 
+
   override connectedCallback() {
     super.connectedCallback();
-  }
 
-  // removeBlock() {
-  //   this.doc.deleteBlock(this.model);
-  // }
+    this.list= this.doc?.meta?.headingList ?? []
+    this._disposables.add(
+      this.doc.collection.slots.docUpdated.on(() => {
+        this.list= this.doc?.meta?.headingList ?? []
+        console.log('aaaaaaaaaaaaa');
+      })
+    );
+    /*this._disposables.add(
+      this.doc.collection.meta.docMetaUpdated.on(() => {
+        this.list= this.doc?.meta?.headingList ?? []
+        console.log('bbbbbbbbbbbbb');
+      })
+    );*/
+
+    /*this.disposables.add(()=>{
+      this.std.collection.slots.docUpdated.on(()=>{
+
+
+      })
+    })*/
+  }
 
   override renderBlock() {
     // const children = this.model.children.map(item => {
@@ -65,7 +81,7 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     // this.doc.collection.setDocMeta(this.doc.id, {
     //   headingList: "sssssd",
     // });
-    console.log("items headingList:",this.doc?.meta?.headingList);
+    console.log("items headingList:",this.doc?.meta?.headingList,this.list);
     
     return html` <div dir=${this.model.dir} contenteditable="false">
       <mahdaad-table-of-content-component
@@ -78,10 +94,17 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     </div>`;
   }
 
+  // removeBlock() {
+  //   this.doc.deleteBlock(this.model);
+  // }
 
   setDirection(event: CustomEvent) {
     this.doc.updateBlock(this.model, {dir:event.detail});
   }
+
+
+  @state()
+  accessor list: any[] = [];
 
 }
 
