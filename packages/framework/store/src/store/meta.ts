@@ -1,3 +1,4 @@
+import type { BlockModel } from '@blocksuite/store';
 import type * as Y from 'yjs';
 
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
@@ -7,7 +8,6 @@ import type { BlockSuiteDoc } from '../yjs/index.js';
 import type { DocCollection } from './collection.js';
 
 import { COLLECTION_VERSION, PAGE_VERSION } from '../consts.js';
-
 // please use `declare module '@blocksuite/store'` to extend this interface
 export interface DocMeta {
   id: string;
@@ -16,6 +16,8 @@ export interface DocMeta {
   createDate: number;
   updatedDate?: number;
   object_id: string | null;
+  // headingList?: BlockModel<object, BlockModel<object>>[];
+  headingList: string[];
 }
 
 export type Tag = {

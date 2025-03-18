@@ -66,16 +66,31 @@ export function isHeadingBlock(
   );
 }
 
+
 export function getHeadingBlocksFromNote(
   note: NoteBlockModel,
   ignoreEmpty = false
 ) {
-  const models = note.children.filter(block => {
-    const empty = block.text && block.text.length > 0;
-    return isHeadingBlock(block) && (!ignoreEmpty || empty);
-  });
+  const getHeadings = (block: BlockModel, parentId: string | null = null, level: number = 0): any[] => {
+    const headings: any[] = [];
+    if (level > 3) return headings;
 
-  return models;
+    if (isHeadingBlock(block) && (!ignoreEmpty || (block.text && block.text.length > 0)) && block?.parent?.flavour && !['affine:mahdaad-callout'].includes(block?.parent?.flavour)) {
+      headings.push({
+        id: block.id,
+        text: block.text.deltas$?.v[0].insert,
+        parentId: parentId,
+        type: block.type
+      });
+    }
+
+    block.children.forEach(child => {
+      headings.push(...getHeadings(child, block.id, level + 1));
+    });
+    return headings;
+  };
+
+  return getHeadings(note);
 }
 
 export function getHeadingBlocksFromDoc(

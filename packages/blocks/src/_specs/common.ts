@@ -21,6 +21,7 @@ import {ObjectBlockSpec} from  '../mahdaad-object-block/object-spec.js'
 import {MahdaadCalloutBlockSpec} from  '../mahdaad-callout-block/callout-spec.js'
 import {MahdaadWeblinkBlockSpec} from '../mahdaad-weblink-block/weblink-spec.js'
 import { MahdaadMultiColumnBlockSpec } from '../mahdaad-multi-column-block/multi-column-spec.js'
+import { MahdaadTableOfContentBlockSpec } from '../mahdaad-table-of-content/table-of-content-spec.js'
 import {
   EdgelessNoteBlockSpec,
   NoteBlockSpec,
@@ -45,7 +46,8 @@ export const CommonFirstPartyBlockSpecs: ExtensionType[] = [
   ObjectBlockSpec,
   MahdaadCalloutBlockSpec,
   MahdaadWeblinkBlockSpec,
-  MahdaadMultiColumnBlockSpec
+  MahdaadMultiColumnBlockSpec,
+  MahdaadTableOfContentBlockSpec
 ].flat();
 
 export const EdgelessFirstPartyBlockSpecs: ExtensionType[] = [
@@ -67,5 +69,6 @@ export const EdgelessFirstPartyBlockSpecs: ExtensionType[] = [
   ObjectBlockSpec,
   MahdaadCalloutBlockSpec,
   MahdaadWeblinkBlockSpec,
-  MahdaadMultiColumnBlockSpec
+  MahdaadMultiColumnBlockSpec,
+  MahdaadTableOfContentBlockSpec
 ].flat();

@@ -34,6 +34,7 @@ export * from './mahdaad-callout-block/index.js';
 export * from './mahdaad-multi-column-block/index.js';
 import './mahdaad-object-block/index.js';
 export * from  './mahdaad-object-block/index.js';
+export * from './mahdaad-table-of-content/index.js';
 export * from './mahdaad-weblink-block/index.js';
 export * from './note-block/index.js';
 export { EdgelessTemplatePanel } from './root-block/edgeless/components/toolbar/template/template-panel.js';
