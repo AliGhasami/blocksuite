@@ -343,9 +343,10 @@ export class DragEventWatcher {
     if (matchFlavours(parent, ['affine:surface'])) {
       return;
     }
-    const result: DropResult | null = calcDropTarget(point, model, element);
+    const result: DropResult | null = calcDropTarget(pointElement, model, element); //point
     if (!result) return;
     console.log("result",result);
+    return;
     const index =
       parent.children.indexOf(model) + (result.type === 'before' ? 0 : 1);
     console.log("this is index",index);
@@ -362,7 +363,8 @@ export class DragEventWatcher {
         }
       }
     }
-
+    //console.log("111111",result);
+    //return;
     this._deserializeData(state, parent.id, index,result).catch(console.error);
   };
 
@@ -573,14 +575,23 @@ export class DragEventWatcher {
     dropResult ?: DropResult
   ) {
     try {
+      //const _parent=this._std.doc.getBlock(parent)
+      //const temp= this._std.doc.getBlock()
+      console.log("^^^^^^",state,parent,index,dropResult);
+      //return
       const dataTransfer = state.raw.dataTransfer;
       if (!dataTransfer) throw new Error('No data transfer');
-
       const std = this._std;
       const job = this._getJob();
       console.log("this is state", state);
       const snapshot = this._deserializeSnapshot(state);
       console.log("this is snapshoot ",snapshot);
+
+
+
+      //console.log("this is target",target);
+      //return
+
       //return
       if (snapshot) {
         if (snapshot.content.length === 1) {
@@ -590,72 +601,51 @@ export class DragEventWatcher {
           }
 
         }
-
+        //debugger
         //snapshot.content.length >  1 &&
         //console.log("200000",this.widget.isVerticalIndicator);
         if(dropResult && this.widget.isVerticalIndicator) {
+          //const _dropResult = this._getDropResult(state,this.isVerticalIndicator);
+          //console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
+          const target= dropResult?.type=='after' ? dropResult?.modelState.model :   this._std.doc.getPrev(dropResult?.modelState.model)
+          if(!target) return  null
           const isContainMultiColumn=!!this.widget.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
-          console.log("start",dropResult,);
-          if(dropResult.modelState.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
-              //const temp=
-            //this._std.command.
+          //console.log("start",dropResult,);
+          if(target.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
             if(isContainMultiColumn) {
               if(this.widget.draggingElements.length==1 && this.widget.draggingElements[0].model.children.length+1<=4) {
                 const multiColumnBlock= this.widget.draggingElements[0]
-                console.log("ooooooo",multiColumnBlock,this.widget.draggingElements[0].model.children.length+1);
-                const res = _insertMultiColumn(this._std,dropResult.modelState.model,multiColumnBlock.model.children.length+1)
-                console.log("this is res",res,dropResult);
+                const res = _insertMultiColumn(this._std,target,multiColumnBlock.model.children.length+1)
+                //console.log("this is res",res,dropResult);
                 if(res) {
-                  this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
-                  //parent= res.model.children[1].id
-                  //index=0
-                //  debugger
-                  console.log("aaaaa",res.model.children.length);
+                  this._std.doc.moveBlocks([target],res.model.children[0])
                   for (let i=0;i<multiColumnBlock.model.children.length;i++) {
                     this._std.doc.moveBlocks([...multiColumnBlock.model.children[i].children],res.model.children[i+1])
                   }
-                  this._std.doc.deleteBlock(multiColumnBlock)
-                  /*for (let i=1;i<=res.model.children.length;i++) {
-                    //@ts-ignore
-                    //this._std.doc.deleteBlock(res.model.children[i])
-                    //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
-                  }*/
-
-
-                  /*for (let i=0;i<dropResult.modelState.model.children.length;i++) {
-                    this._std.doc.moveBlocks([dropResult.modelState.model.children[i]],res.model.children[i+1])
-                    //@ts-ignore
-                    //this._std.doc.deleteBlock(res.model.children[i])
-                    //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
-                  }*/
+                  this._std.doc.deleteBlock(multiColumnBlock.model)
                 }
-
               }
               return null
             }else{
-              const res = _insertMultiColumn(this._std,dropResult.modelState.model,2)
-              //console.log("this is res",res);
+              const res = _insertMultiColumn(this._std,target,2)
               if(res) {
-                this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                this._std.doc.moveBlocks([target],res.model.children[0])
                 parent= res.model.children[1].id
                 index=0
               }
             }
-
           }else{
-            //if(this.widget.draggingElements)
-            //if(this.widget)
+            debugger
             if(isContainMultiColumn) {
               return null
             }
-            const res=addColumnToMultiColumn(this._std,dropResult.modelState.model)
+            const res=addColumnToMultiColumn(this._std,target) //dropResult.modelState.model
             if(res) {
-              parent= res.children[res.children.length-1].id //.model.children[1].id
+              parent= res.children[res.children.length-1].id
               index=0
             }else{
               return null
             }
-            //if(dropResult.modelState.)
           }
         }
         console.log("this is final",snapshot);

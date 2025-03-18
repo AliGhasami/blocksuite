@@ -30,6 +30,7 @@ import type { DropIndicator } from './components/drop-indicator.js';
 import type { DropResult } from './config.js';
 import type { AFFINE_DRAG_HANDLE_WIDGET } from './consts.js';
 
+import { checkParentIs } from '../../../_common/mahdaad/is.js';
 import { isTopLevelBlock } from '../../../root-block/edgeless/utils/query.js';
 import { autoScroll } from '../../../root-block/text-selection/utils.js';
 import { DragHandleOptionsRunner } from './config.js';
@@ -53,7 +54,6 @@ import { KeyboardEventWatcher } from './watchers/keyboard-event-watcher.js';
 import { LegacyDragEventWatcher } from './watchers/legacy-drag-event-watcher.js';
 import { PageWatcher } from './watchers/page-watcher.js';
 import { PointerEventWatcher } from './watchers/pointer-event-watcher.js';
-import { checkParentIs } from '../../../_common/mahdaad/is.js';
 
 export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   static override styles = styles;
@@ -338,7 +338,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     state: DndEventState,
     shouldAutoScroll: boolean = false
   ) => {
-    if(this.dragPreview){
+    if(this.dragPreview) {
       this.dragPreview.tooltipMessage=""
     }
     window.allowDrop=true
@@ -398,12 +398,11 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
         if(dropResult && dropResult.dropBlockId) {
           const target= this._getBlockView(dropResult.dropBlockId)
           const isContainMultiColumn=!!this.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
-
           //console.log("ttttttttt",target,checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour));
           if(target) {
-            if(checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour) && isContainMultiColumn){
+            if(checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour) && isContainMultiColumn) {
               window.allowDrop=false
-              if(this.dragPreview){
+              if(this.dragPreview) {
                 this.dragPreview.tooltipMessage="You can not add columns inside another column block ."
               }
             }
@@ -412,32 +411,23 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
 
           if(this.isVerticalIndicator) {
-            console.log('1000000', target,this.draggingElements);
+            //console.log('1000000', target,this.draggingElements);
             if(target) {
               if(target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour && target.model.children.length==4) {
                 window.allowDrop=false
-                if(this.dragPreview){
+                if(this.dragPreview) {
                   this.dragPreview.tooltipMessage="You can not add more than 4 columns."
                 }
-                console.log("77777",this.dragPreview);
+              //  console.log("77777",this.dragPreview);
               }
-
-
-
-
             }
 
             /*if(isContainMultiColumn){
               window.allowDrop=false
               //this.dragPreview.tooltipMessage="You can not add more than 4 columns."
             }*/
-
-
-
+            this.applyBlockDropStyle(dropResult.dropBlockId)
           }
-
-
-          this.applyBlockDropStyle(dropResult.dropBlockId)
 
           /*if(this.lastBlockDropStyle) {
             this.lastBlockDropStyle.classList.remove('active-drop')
