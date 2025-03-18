@@ -599,25 +599,35 @@ export class DragEventWatcher {
           if(dropResult.modelState.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
               //const temp=
             //this._std.command.
-            if(isContainMultiColumn){
-              if(this.widget.draggingElements.length==1 && this.widget.draggingElements[0].model.children.length+1<=4){
-                const res = _insertMultiColumn(this._std,dropResult.modelState.model,this.widget.draggingElements[0].model.children.length+1)
+            if(isContainMultiColumn) {
+              if(this.widget.draggingElements.length==1 && this.widget.draggingElements[0].model.children.length+1<=4) {
+                const multiColumnBlock= this.widget.draggingElements[0]
+                console.log("ooooooo",multiColumnBlock,this.widget.draggingElements[0].model.children.length+1);
+                const res = _insertMultiColumn(this._std,dropResult.modelState.model,multiColumnBlock.model.children.length+1)
+                console.log("this is res",res,dropResult);
                 if(res) {
                   this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
                   //parent= res.model.children[1].id
                   //index=0
                 //  debugger
-                  for (let i=1;i<res.model.children.length;i++){
-                    //@ts-ignore
-                    this._std.doc.deleteBlock(res.model.children[i])
-                    //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                  console.log("aaaaa",res.model.children.length);
+                  for (let i=0;i<multiColumnBlock.model.children.length;i++) {
+                    this._std.doc.moveBlocks([...multiColumnBlock.model.children[i].children],res.model.children[i+1])
                   }
-                  for (let i=0;i<dropResult.modelState.model.children.length;i++){
+                  this._std.doc.deleteBlock(multiColumnBlock)
+                  /*for (let i=1;i<=res.model.children.length;i++) {
+                    //@ts-ignore
+                    //this._std.doc.deleteBlock(res.model.children[i])
+                    //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
+                  }*/
+
+
+                  /*for (let i=0;i<dropResult.modelState.model.children.length;i++) {
                     this._std.doc.moveBlocks([dropResult.modelState.model.children[i]],res.model.children[i+1])
                     //@ts-ignore
                     //this._std.doc.deleteBlock(res.model.children[i])
                     //this._std.doc.moveBlocks([dropResult.modelState.model],res.model.children[0])
-                  }
+                  }*/
                 }
 
               }
@@ -635,7 +645,7 @@ export class DragEventWatcher {
           }else{
             //if(this.widget.draggingElements)
             //if(this.widget)
-            if(isContainMultiColumn){
+            if(isContainMultiColumn) {
               return null
             }
             const res=addColumnToMultiColumn(this._std,dropResult.modelState.model)
