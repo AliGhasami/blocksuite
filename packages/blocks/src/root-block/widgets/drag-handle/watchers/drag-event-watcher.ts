@@ -346,7 +346,7 @@ export class DragEventWatcher {
     const result: DropResult | null = calcDropTarget(pointElement, model, element); //point
     if (!result) return;
     console.log("result",result);
-    return;
+    //return;
     const index =
       parent.children.indexOf(model) + (result.type === 'before' ? 0 : 1);
     console.log("this is index",index);
