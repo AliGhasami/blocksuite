@@ -34,6 +34,8 @@ import {
   EDGELESS_NOTE_EXTRA_PADDING,
   NOTE_CONTAINER_PADDING,
 } from './config.js';
+import { MahdaadCalloutBlockSchema } from '@blocksuite/affine-model';
+import { checkParentIs } from '../../../_common/mahdaad/is.js';
 
 const heightMap: Record<string, number> = {
   text: 23,
@@ -149,6 +151,9 @@ export const getClosestBlockByPoint = (
   rootComponent: BlockComponent,
   point: Point
 ) => {
+ /* setTimeout(()=>{
+    debugger
+  },5000)*/
   const closestNoteBlock = getClosestNoteBlock(
     editorHost,
     rootComponent,
@@ -181,6 +186,7 @@ export const getClosestBlockByPoint = (
   if (!closestBlock || !!closestBlock.closest('.surface-ref-note-portal')) {
     return null;
   }
+
 
   return closestBlock;
 };

@@ -315,16 +315,14 @@ export class DragEventWatcher {
   private _onDrop = (context: UIEventStateContext) => {
     console.log("_onDrop");
     const state = context.get('dndState');
-    //debugger
+
     const event = state.raw;
     event.preventDefault();
+
     const { clientX, clientY } = event;
-    //-30
-    const point = new Point(clientX, clientY);
-    const pointElement = new Point(clientX-30, clientY);
-    //console.log();
-    const element = getClosestBlockComponentByPoint(pointElement.clone());
-    //console.log("this is element",element);
+    const point = new Point(clientX-30, clientY);
+    const element = getClosestBlockComponentByPoint(point.clone());
+    console.log("^element",element);
     if (!element) {
       const target = captureEventTarget(event.target);
       const isEdgelessContainer =
@@ -336,20 +334,16 @@ export class DragEventWatcher {
       return;
     }
     const model = element.model;
-    //console.log("model",model);
     const parent = this._std.doc.getParent(model.id);
-    //console.log("parent",parent);
     if (!parent) return;
     if (matchFlavours(parent, ['affine:surface'])) {
       return;
     }
-    const result: DropResult | null = calcDropTarget(pointElement, model, element); //point
+    const result: DropResult | null = calcDropTarget(point, model, element);
     if (!result) return;
-    console.log("result",result);
-    //return;
+
     const index =
       parent.children.indexOf(model) + (result.type === 'before' ? 0 : 1);
-    console.log("this is index",index);
 
     if (matchFlavours(parent, ['affine:note'])) {
       const snapshot = this._deserializeSnapshot(state);
@@ -363,9 +357,7 @@ export class DragEventWatcher {
         }
       }
     }
-    //console.log("111111",result);
-    //return;
-    this._deserializeData(state, parent.id, index,result).catch(console.error);
+    this._deserializeData(state, parent.id, index).catch(console.error);
   };
 
   private _onDropNoteOnNote = (
@@ -604,21 +596,24 @@ export class DragEventWatcher {
         //debugger
         //snapshot.content.length >  1 &&
         //console.log("200000",this.widget.isVerticalIndicator);
-        if(dropResult && this.widget.isVerticalIndicator) {
+        if(this.widget.isVerticalIndicator) {
           //const _dropResult = this._getDropResult(state,this.isVerticalIndicator);
           //console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
-          const target= dropResult?.type=='after' ? dropResult?.modelState.model :   this._std.doc.getPrev(dropResult?.modelState.model)
-          if(!target) return  null
+          //const target= dropResult?.type=='after' ? dropResult?.modelState.model :   this._std.doc.getPrev(dropResult?.modelState.model)
+          //if(!target) return  null
+          if(!this.widget.verticalIndicatorDropBlockId) return null
+          const target=this.widget.doc.getBlock(this.widget.verticalIndicatorDropBlockId)
+          if(!target) return
           const isContainMultiColumn=!!this.widget.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
           //console.log("start",dropResult,);
-          if(target.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
+          if(target.model.flavour!=MahdaadMultiColumnBlockSchema.model.flavour) {
             if(isContainMultiColumn) {
               if(this.widget.draggingElements.length==1 && this.widget.draggingElements[0].model.children.length+1<=4) {
                 const multiColumnBlock= this.widget.draggingElements[0]
-                const res = _insertMultiColumn(this._std,target,multiColumnBlock.model.children.length+1)
+                const res = _insertMultiColumn(this._std,target.model,multiColumnBlock.model.children.length+1)
                 //console.log("this is res",res,dropResult);
                 if(res) {
-                  this._std.doc.moveBlocks([target],res.model.children[0])
+                  this._std.doc.moveBlocks([target.model],res.model.children[0])
                   for (let i=0;i<multiColumnBlock.model.children.length;i++) {
                     this._std.doc.moveBlocks([...multiColumnBlock.model.children[i].children],res.model.children[i+1])
                   }
@@ -627,25 +622,37 @@ export class DragEventWatcher {
               }
               return null
             }else{
-              const res = _insertMultiColumn(this._std,target,2)
+              const res = _insertMultiColumn(this._std,target.model,2)
               if(res) {
-                this._std.doc.moveBlocks([target],res.model.children[0])
+                this._std.doc.moveBlocks([target.model],res.model.children[0])
                 parent= res.model.children[1].id
                 index=0
               }
             }
           }else{
-            debugger
-            if(isContainMultiColumn) {
-              return null
-            }
-            const res=addColumnToMultiColumn(this._std,target) //dropResult.modelState.model
-            if(res) {
-              parent= res.children[res.children.length-1].id
-              index=0
+
+            //if()
+
+            if(isContainMultiColumn && target.model.children.length+this.widget.draggingElements[0].model.children.length<=4) {
+              //debugger
+              const multiColumnBlock= this.widget.draggingElements[0]
+              for (let i = 0; i < multiColumnBlock.model.children.length; i++) {
+                const res=addColumnToMultiColumn(this._std,target.model)
+                if(res){
+                  this._std.doc.moveBlocks([...multiColumnBlock.model.children[i].children],res.children[res.children.length-1])
+                }
+              }
+              //debugger
             }else{
-              return null
+              const res=addColumnToMultiColumn(this._std,target.model) //dropResult.modelState.model
+              if(res) {
+                parent= res.children[res.children.length-1].id
+                index=0
+              }else{
+                return null
+              }
             }
+            //return null
           }
         }
         console.log("this is final",snapshot);

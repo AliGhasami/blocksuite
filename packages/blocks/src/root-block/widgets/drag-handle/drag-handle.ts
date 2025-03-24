@@ -1,7 +1,11 @@
 import type { GfxBlockElementModel } from '@blocksuite/block-std/gfx';
 import type { IVec } from '@blocksuite/global/utils';
 
-import { MahdaadMultiColumnBlockSchema, type RootBlockModel } from '@blocksuite/affine-model';
+import {
+  MahdaadCalloutBlockSchema,
+  MahdaadMultiColumnBlockSchema,
+  type RootBlockModel,
+} from '@blocksuite/affine-model';
 import {
   DocModeProvider,
   DragHandleConfigIdentifier,
@@ -30,7 +34,7 @@ import type { DropIndicator } from './components/drop-indicator.js';
 import type { DropResult } from './config.js';
 import type { AFFINE_DRAG_HANDLE_WIDGET } from './consts.js';
 
-import { checkParentIs } from '../../../_common/mahdaad/is.js';
+import { checkParentIs, getParent } from '../../../_common/mahdaad/is.js';
 import { isTopLevelBlock } from '../../../root-block/edgeless/utils/query.js';
 import { autoScroll } from '../../../root-block/text-selection/utils.js';
 import { DragHandleOptionsRunner } from './config.js';
@@ -72,18 +76,37 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
    */
   private _getDropResult = (state: DndEventState,isVerticalIndicator=false): DropResult | null => {
     const point = new Point(state.raw.x, state.raw.y);
-    const closestBlock = getClosestBlockByPoint(
+    let closestBlock = getClosestBlockByPoint(
       this.host,
       this.rootComponent,
       point
     );
     if (!closestBlock) return null;
+
+    if(isVerticalIndicator){
+        let parent= null
+        if(checkParentIs(closestBlock.model,MahdaadCalloutBlockSchema.model.flavour)){
+           parent= getParent(closestBlock.model,MahdaadCalloutBlockSchema.model.flavour)
+        }
+
+      if(checkParentIs(closestBlock.model,MahdaadMultiColumnBlockSchema.model.flavour)){
+        parent= getParent(closestBlock.model,MahdaadMultiColumnBlockSchema.model.flavour)
+      }
+
+      if(parent)
+      {
+        const parentBlockComponent= this.std.view.getBlock(parent.id)
+        if(parentBlockComponent)
+          closestBlock = parentBlockComponent
+      }
+
+    }
     console.log("dropResult blockkkkkk",closestBlock);
     const blockId = closestBlock.model.id;
     console.log("block id",blockId);
     const model = closestBlock.model;
 
-    const isDatabase = matchFlavours(model, ['affine:database']);
+    const isDatabase = matchFlavours(model, ['affine:database']) && !isVerticalIndicator;
     if (isDatabase) return null;
 
     // note block can only be dropped into another note block
@@ -115,7 +138,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
     let rect = null;
     let dropType: DropType = 'before';
-
+    console.log("this is model",model.id);
     const result = calcDropTarget(
       point,
       model,
@@ -312,6 +335,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   isTopLevelDragHandleVisible = false;
 
   isVerticalIndicator : boolean = false
+  verticalIndicatorDropBlockId : string | null = null
 
   lastBlockDropStyle : null | BlockComponent = null
 
@@ -342,7 +366,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this.dragPreview.tooltipMessage=""
     }
     window.allowDrop=true
-    const point = new Point(state.raw.x, state.raw.y);
+    const point = new Point(state.raw.x-10, state.raw.y);
     //console.log("this is point ",point,this.host,this.rootComponent);
     const closestNoteBlock = getClosestNoteBlock(
       this.host,
@@ -377,9 +401,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     }*/
     this.applyBlockDropStyle(null)
     this.isVerticalIndicator = !!(closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock)))
-
-
-
+    this.verticalIndicatorDropBlockId= null
+    console.log("isEndRight(point,closestNoteBlock)",isEndRight(point,closestNoteBlock));
     if (
       !closestNoteBlock ||
       isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
@@ -388,14 +411,19 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       /*if(this.lastBlockDropStyle) {
         this.lastBlockDropStyle.classList.remove('active-drop')
       }*/
-    //  console.log("this is reset");
+     console.log("this is reset");
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
         console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
         /*if()
-          const target =*/
-        if(dropResult && dropResult.dropBlockId) {
+
+         const target =*/
+
+      /***
+       check for prevent drop
+       **/
+      if(dropResult && dropResult.dropBlockId) {
           const target= this._getBlockView(dropResult.dropBlockId)
           const isContainMultiColumn=!!this.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
           //console.log("ttttttttt",target,checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour));
@@ -408,9 +436,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
             }
           }
 
-
-
           if(this.isVerticalIndicator) {
+            this.verticalIndicatorDropBlockId= dropResult.dropBlockId
             //console.log('1000000', target,this.draggingElements);
             if(target) {
               if(target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour && target.model.children.length==4) {
@@ -418,7 +445,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
                 if(this.dragPreview) {
                   this.dragPreview.tooltipMessage="You can not add more than 4 columns."
                 }
-              //  console.log("77777",this.dragPreview);
               }
             }
 
@@ -426,8 +452,16 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
               window.allowDrop=false
               //this.dragPreview.tooltipMessage="You can not add more than 4 columns."
             }*/
-            this.applyBlockDropStyle(dropResult.dropBlockId)
+
+
+            /***
+             check for active drop hover
+             ***/
+
+              this.applyBlockDropStyle(dropResult.dropBlockId)
           }
+
+
 
           /*if(this.lastBlockDropStyle) {
             this.lastBlockDropStyle.classList.remove('active-drop')
@@ -438,7 +472,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
           }
           console.log("_dragMoveHandler block vuew",this.lastBlockDropStyle)*/
         }
-
       this._updateDropResult(dropResult,this.isVerticalIndicator);
     }
 

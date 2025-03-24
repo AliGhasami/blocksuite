@@ -122,7 +122,6 @@ export class MahdaadCalloutBlockComponent extends CaptionedBlockComponent<
    }
 
   override renderBlock() {
-    console.log("this is render block");
     return html`
       <div dir=${this.model.dir}>
       <mahdaad-callout-component
@@ -136,16 +135,13 @@ export class MahdaadCalloutBlockComponent extends CaptionedBlockComponent<
         @changeOption="${this.changeOptions}"
         direction="${this.model.dir}"
       >
-<!--        <div style="border: 1px solid red;">this is default slot</div>
-        <div slot="tt" style="border: 1px solid green;">this is slot tt</div>-->
         <div class="nest-editor">
           <div class="affine-note-block-container">
             <div class="affine-block-children-container">
-               ${this._isLoad ? this.renderChildren(this.model) : ''} 
+              ${this._isLoad ? this.renderChildren(this.model) : ''}
             </div>
           </div>
         </div>
-        <!--<div slot="tt">tttttttttttttt</div>-->
       </mahdaad-callout-component>
       </div>
     `;
@@ -156,14 +152,6 @@ export class MahdaadCalloutBlockComponent extends CaptionedBlockComponent<
   accessor _isLoad: boolean = false;
 
 }
-
-/*<div class="nest-editor">
-<div class="affine-note-block-container">
-<div class="affine-block-children-container">
-  ${this._isLoad ? this.renderChildren(this.model) : ''}
-  </div>
-  </div>
-  </div>*/
 
 declare global {
   interface HTMLElementTagNameMap {
