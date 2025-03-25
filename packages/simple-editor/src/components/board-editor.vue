@@ -1468,7 +1468,7 @@ async function init() {
   background: @primary-5;
 
   &.vertical{
-    @apply w-100;
+    @apply w-100 mt-1;
   }
 
   .circle-indicator{
@@ -1494,7 +1494,7 @@ async function init() {
 affine-drag-preview{
   z-index: 999;
   .tooltip-message{
-    @apply bg-neutral-9 shadow-floated rounded-sm text-gray-0 ;
+    @apply bg-neutral-9 shadow-floated rounded-sm text-gray-0 txs-overline;
     padding: @space-200 @space-400;
     max-width: 221px;
     margin-top:20px;
@@ -1527,12 +1527,13 @@ affine-paragraph:hover{
 }
 */
 
-.drag-test{
+//drag-test
+.on-drag{
   position: relative;
   opacity: 0.5;
 }
 
-.drag-test::after {
+.on-drag::after {
   content: "";
   @apply  rounded-lg;
   position: absolute;
@@ -1546,7 +1547,7 @@ affine-paragraph:hover{
   transition: opacity 0.3s ease;
 }
 
-.active-drop{
+.active-drop:not(affine-mahdaad-multi-column):not(affine-mahdaad-callout){
   position: relative;
   //background-color: red;
   //@apply bg-primary-fill-subtle border-primary-br-subtle-target ; //border-1
@@ -1560,7 +1561,7 @@ affine-paragraph:hover{
     @apply  rounded   bg-primary-fill-subtle; //bg-primary-fill-subtle //bg-primary-fill-subtle
     position: absolute;
     top: 0;
-    left: 0;
+    left: -4px;
     right: 0;
     bottom: 0;
     z-index: -1;
@@ -1572,6 +1573,7 @@ affine-paragraph:hover{
   }
 
 }
+
 
 
 

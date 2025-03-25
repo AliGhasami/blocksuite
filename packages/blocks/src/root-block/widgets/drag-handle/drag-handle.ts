@@ -83,13 +83,13 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     );
     if (!closestBlock) return null;
 
-    if(isVerticalIndicator){
+    if(isVerticalIndicator) {
         let parent= null
-        if(checkParentIs(closestBlock.model,MahdaadCalloutBlockSchema.model.flavour)){
+        if(checkParentIs(closestBlock.model,MahdaadCalloutBlockSchema.model.flavour)) {
            parent= getParent(closestBlock.model,MahdaadCalloutBlockSchema.model.flavour)
         }
 
-      if(checkParentIs(closestBlock.model,MahdaadMultiColumnBlockSchema.model.flavour)){
+      if(checkParentIs(closestBlock.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
         parent= getParent(closestBlock.model,MahdaadMultiColumnBlockSchema.model.flavour)
       }
 
@@ -335,7 +335,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   isTopLevelDragHandleVisible = false;
 
   isVerticalIndicator : boolean = false
-  verticalIndicatorDropBlockId : string | null = null
 
   lastBlockDropStyle : null | BlockComponent = null
 
@@ -356,7 +355,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
   scaleInNote = computed(() => this.scale.value * this.noteScale.value);
 
   selectionHelper = new SelectionHelper(this);
-
 
   updateDropIndicator = (
     state: DndEventState,
@@ -411,11 +409,11 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       /*if(this.lastBlockDropStyle) {
         this.lastBlockDropStyle.classList.remove('active-drop')
       }*/
-     console.log("this is reset");
+     //console.log("this is reset");
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
-        console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
+       // console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
         /*if()
 
          const target =*/
@@ -428,22 +426,38 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
           const isContainMultiColumn=!!this.draggingElements.find(item=> item.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour)
           //console.log("ttttttttt",target,checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour));
           if(target) {
-            if(checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour) && isContainMultiColumn) {
-              window.allowDrop=false
-              if(this.dragPreview) {
-                this.dragPreview.tooltipMessage="You can not add columns inside another column block ."
+            if(checkParentIs(target.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
+              if(isContainMultiColumn) {
+                window.allowDrop=false
+                if(this.dragPreview) {
+                  this.dragPreview.tooltipMessage="You can not add columns inside another column block ."
+                }
               }
+              const temp= getParent(target.model,)
+
+
             }
           }
 
           if(this.isVerticalIndicator) {
             this.verticalIndicatorDropBlockId= dropResult.dropBlockId
+            //const sourceLength=
             //console.log('1000000', target,this.draggingElements);
-            if(target) {
-              if(target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour && target.model.children.length==4) {
-                window.allowDrop=false
-                if(this.dragPreview) {
-                  this.dragPreview.tooltipMessage="You can not add more than 4 columns."
+
+            if(this.draggingElements.length>1 && isContainMultiColumn) {
+              window.allowDrop=false
+              /*if(this.dragPreview) {
+                this.dragPreview.tooltipMessage="You can not add more than 4 columns."
+              }*/
+            }else if(this.draggingElements.length==1) {
+              if(target) {
+                const sourceLength= this.draggingElements[0].model.flavour==MahdaadMultiColumnBlockSchema.model.flavour ? this.draggingElements[0].model.children.length : 1
+                const targetLength=target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour ?  target.model.children.length : 1
+                if(sourceLength+targetLength>4) {
+                  window.allowDrop=false
+                  if(this.dragPreview) {
+                    this.dragPreview.tooltipMessage="You can not add more than 4 columns."
+                  }
                 }
               }
             }
@@ -457,7 +471,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
             /***
              check for active drop hover
              ***/
-
               this.applyBlockDropStyle(dropResult.dropBlockId)
           }
 
@@ -507,6 +520,9 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     );
   };
 
+
+  verticalIndicatorDropBlockId : string | null = null
+
   private get _enableNewDnd() {
     return this.std.doc.awarenessStore.getFlag('enable_new_dnd') ?? true;
   }
@@ -525,10 +541,16 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   applyBlockDropStyle(blockId:string | null) {
     if(this.lastBlockDropStyle) {
+      //this.lastBlockDropStyle.classList.remove('active-drop-default')
       this.lastBlockDropStyle.classList.remove('active-drop')
     }
     if(blockId) {
-      this.lastBlockDropStyle = this._getBlockView(blockId)
+      //const activeClassName=
+      const  temp= this._getBlockView(blockId)
+      /*if(temp && temp.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour){
+        temp =
+      }*/
+      this.lastBlockDropStyle = temp
       if(this.lastBlockDropStyle) {
         this.lastBlockDropStyle.classList.add('active-drop')
       }

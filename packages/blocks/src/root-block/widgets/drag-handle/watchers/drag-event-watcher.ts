@@ -546,7 +546,7 @@ export class DragEventWatcher {
     });
   };
 
-  private  className='drag-test' //drag-test
+  private  className='on-drag' //drag-test
 
   private  wrapperDragStyle : HTMLElement | null=null //drag-test
 
@@ -569,7 +569,7 @@ export class DragEventWatcher {
     try {
       //const _parent=this._std.doc.getBlock(parent)
       //const temp= this._std.doc.getBlock()
-      console.log("^^^^^^",state,parent,index,dropResult);
+     // console.log("^^^^^^",state,parent,index,dropResult);
       //return
       const dataTransfer = state.raw.dataTransfer;
       if (!dataTransfer) throw new Error('No data transfer');
@@ -591,7 +591,6 @@ export class DragEventWatcher {
           if (first.flavour === 'affine:embed-linked-doc') {
             this._trackLinkedDocCreated(first.id);
           }
-
         }
         //debugger
         //snapshot.content.length >  1 &&
@@ -638,10 +637,19 @@ export class DragEventWatcher {
               const multiColumnBlock= this.widget.draggingElements[0]
               for (let i = 0; i < multiColumnBlock.model.children.length; i++) {
                 const res=addColumnToMultiColumn(this._std,target.model)
-                if(res){
+                //debugger
+                if(res) {
                   this._std.doc.moveBlocks([...multiColumnBlock.model.children[i].children],res.children[res.children.length-1])
                 }
               }
+              //const temp= this._std.doc.getBlock(multiColumnBlock.model.id)
+              /*console.log("tttt",temp);
+              if(temp) {
+                this._std.doc.deleteBlock(temp.model)
+              }*/
+
+              this._std.doc.deleteBlock(multiColumnBlock.model)
+              return null
               //debugger
             }else{
               const res=addColumnToMultiColumn(this._std,target.model) //dropResult.modelState.model

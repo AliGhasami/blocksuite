@@ -46,6 +46,10 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     );*/
   }
 
+  override previewName(): string {
+    return 'Table of content'
+  }
+
   override renderBlock() {
     
     return html`<div dir=${this.model.dir} contenteditable="false">
@@ -77,9 +81,9 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     this.doc.updateBlock(this.model, {dir:event.detail});
   }
 
-
   @state()
   accessor list: any[] = [];
+
 
 }
 
