@@ -60,11 +60,15 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     </div>`;
   }
 
-  scrollToBlock(event:CustomEvent) {
-    const blockId= event.detail
-    const block =  this.host.view.getBlock(blockId);
-    if(block) {
-      block.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  scrollToBlock(event: CustomEvent) {
+    const blockId = event.detail;
+    const block = this.host.view.getBlock(blockId);
+    if (block) {
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      block.classList.add('event-animate-blink');
+      setTimeout(() => {
+        block.classList.remove('event-animate-blink');
+      }, 3000);
     }
   }
 

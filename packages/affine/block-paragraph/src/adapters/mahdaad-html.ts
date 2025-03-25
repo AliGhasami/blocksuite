@@ -271,6 +271,17 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
             .openNode(
               {
                 type: 'element',
+                tagName:'a',
+                properties:{
+                    name:`${o.node.id}`
+                },
+                children:[],
+              },
+              'children'
+            )
+            .openNode(
+              {
+                type: 'element',
                 tagName:'pre',
                 children:[
                   //@ts-ignore
@@ -283,7 +294,7 @@ export const mahdaadParagraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = 
               },
               'children'
             )
-            .closeNode()
+            .closeNode().closeNode()
             .openNode(
               {
                 type: 'element',

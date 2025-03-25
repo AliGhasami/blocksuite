@@ -374,6 +374,7 @@ async function exportHTML(config: any) {
     //middlewares: [docLinkBaseURLMiddleware, titleMiddleware],
   })
   job.adapterConfigs.set('mahdaad_config', config)
+  job.adapterConfigs.set('headingList',get(doc,'meta.headingList'))
   const snapshot = job.docToSnapshot(doc)
   const adapter = new MahdaadHtmlAdapter(job)
   if (!snapshot) {
@@ -1457,4 +1458,22 @@ async function init() {
   border-radius: var(--mt-roundness-3);
   //background-color: red;
 }*!*/
+
+.event-animate-blink {
+  animation: blink 1.5s ease-in infinite;
+  animation-fill-mode: both;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+    background-color: @primary-fill-subtle-target;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 </style>
