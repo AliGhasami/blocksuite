@@ -37,7 +37,8 @@ import {
   MahdaadHtmlAdapter,
   RefNodeSlotsExtension,
   replaceIdMiddleware,
-  titleMiddleware
+  titleMiddleware,
+  NoteDisplayMode
 } from '@blocksuite/blocks' //toolsList
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
@@ -59,6 +60,8 @@ import { effects as presetsEffects } from '@blocksuite/presets/effects'
 import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examples'
 import type { ExtensionType } from '@blocksuite/block-std'
 import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
+import { getHeadingBlocksFromDoc } from './helpers/global.js';
+import { nothing } from 'lit';
 
 if (!window.$blockEditor) {
   window.$blockEditor = {}
@@ -241,6 +244,33 @@ function checkReadOnly() {
   }
 }
 
+function handleHeadingList(doc:Doc) {
+
+  if (doc.root !== null){
+      // return nothing;
+    const headingBlocks = getHeadingBlocksFromDoc(
+      doc,
+      [NoteDisplayMode.DocAndEdgeless, NoteDisplayMode.DocOnly],
+      true
+    );
+
+    
+
+    const items = [
+      ...(doc.meta?.title !== '' ? [doc.root] : []),
+      ...headingBlocks,
+    ];
+    
+    if (currentDocument.value && myCollection) {
+        // myCollection?.setDocMeta(currentDocument.value.id, { headingList: items })
+        doc.collection.setDocMeta(doc.id, {
+          headingList: items,
+    });
+      }
+  }
+    
+}
+
 function bindEvent(doc: Doc) {
   //return
   doc.slots.blockUpdated.on((data) => {
@@ -248,6 +278,7 @@ function bindEvent(doc: Doc) {
     if (stopEvent.value) {
       return
     }
+    handleHeadingList(doc)
     checkNotEmptyDocBlock(doc)
     checkIsEmpty()
     emit('change', data)
@@ -343,6 +374,7 @@ async function exportHTML(config: any) {
     //middlewares: [docLinkBaseURLMiddleware, titleMiddleware],
   })
   job.adapterConfigs.set('mahdaad_config', config)
+  job.adapterConfigs.set('headingList',get(doc,'meta.headingList'))
   const snapshot = job.docToSnapshot(doc)
   const adapter = new MahdaadHtmlAdapter(job)
   if (!snapshot) {
@@ -800,6 +832,7 @@ async function init() {
     //const temp = await exportData(myCollection, [currentDocument.value])
     //console.log('this is snap shoot ', temp)
     bindEvent(doc)
+    handleHeadingList(doc)
     appendTODOM(editorElement.value)
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
@@ -1425,4 +1458,22 @@ async function init() {
   border-radius: var(--mt-roundness-3);
   //background-color: red;
 }*!*/
+
+.highlight-heading-animation {
+  animation: blink 1.5s ease-in infinite;
+  animation-fill-mode: both;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+    background-color: @primary-fill-subtle-target;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 </style>

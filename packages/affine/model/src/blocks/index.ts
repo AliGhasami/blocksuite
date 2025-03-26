@@ -12,6 +12,7 @@ export * from './latex/index.js';
 export * from './list/index.js';
 export * from './mahdaad-multi-column/index.js';
 export * from './mahdaad-object/index.js';
+export * from './mahdaad-table-of-content/index.js';
 export * from './mahdaad-weblink/index.js';
 export * from './note/index.js';
 export * from './paragraph/index.js';

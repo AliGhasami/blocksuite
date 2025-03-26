@@ -436,6 +436,19 @@ export const actionsMenu: MahdaadActionMenu[] = [
       openObjectPicker(rootComponent, model, 'image');
     },
   },
+  {
+    key: 'table_of_content',
+    action: ({ rootComponent }) => {
+     
+        rootComponent.std.command
+        .chain()
+        .updateBlockType({
+          flavour:'affine:mahdaad-table-of-content',
+          props: {  },
+        })
+        .run();
+    },
+  },
 ];
 
 /*export const clayTapGroupMenu: ClayTapSlashMenuGroup[] = [

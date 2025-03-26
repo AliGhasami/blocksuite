@@ -742,4 +742,12 @@ blockquote {
 .mahdaad-multi-column .column {
   overflow: scroll;
 }
-/*# sourceMappingURL=mahdaad-style.css.map */
+.mahdaad-table-of-content .h1 {
+  margin-inline-start: 27px;
+}
+.mahdaad-table-of-content .h2 {
+  margin-inline-start: 43px;
+}
+.mahdaad-table-of-content .h3 {
+  margin-inline-start: 53px;
+}

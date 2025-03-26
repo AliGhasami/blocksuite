@@ -110,6 +110,8 @@ import {MahdaadCalloutBlockComponent} from './mahdaad-callout-block/index.js'
 import { effects as blockMahdaadMultiColumnEffects } from './mahdaad-multi-column-block/effects.js';
 import {MahdaadMultiColumnBlockComponent} from './mahdaad-multi-column-block/index.js'
 import { ObjectBlockComponent , type ObjectBlockService} from './mahdaad-object-block/index.js';
+import { effects as blockMahdaadTableOfContentEffects } from './mahdaad-table-of-content/effects.js';
+import {MahdaadTableOfContentBlockComponent} from './mahdaad-table-of-content/index.js'
 import { MahdaadWeblinkBlockComponent } from './mahdaad-weblink-block/index.js';
 import {
   EdgelessNoteBlockComponent,
@@ -324,6 +326,7 @@ export function effects() {
   blockLatexEffects();
   blockMahdaadCalloutEffects()
   blockMahdaadMultiColumnEffects()
+  blockMahdaadTableOfContentEffects()
   componentCaptionEffects();
   componentContextMenuEffects();
   componentDatePickerEffects();
@@ -517,6 +520,7 @@ export function effects() {
   customElements.define('affine-note', NoteBlockComponent);
   customElements.define('affine-mahdaad-callout', MahdaadCalloutBlockComponent);
   customElements.define('affine-mahdaad-multi-column', MahdaadMultiColumnBlockComponent);
+  customElements.define('affine-mahdaad-table-of-content', MahdaadTableOfContentBlockComponent);
   customElements.define('affine-template-loading', AffineTemplateLoading);
   customElements.define(
     'edgeless-color-picker-button',

@@ -18,7 +18,7 @@ import {
 import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import { getViewportElement } from '@blocksuite/affine-shared/utils';
 import { getInlineRangeProvider } from '@blocksuite/block-std';
-import { setDirectionBasedOnText } from '@blocksuite/store'
+import { setDirectionOnBlock } from '@blocksuite/store'
 import { effect } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';
@@ -70,20 +70,20 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     this._select();
   };
 
-  private _onKeyDown = (ctx: UIEventStateContext) => {
-    const eventState = ctx.get('keyboardState');
-    const event = eventState.raw;
+  // private _onKeyDown = (ctx: UIEventStateContext) => {
+  //   const eventState = ctx.get('keyboardState');
+  //   const event = eventState.raw;
 
-    const key = event.key;
-    const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
+  //   const key = event.key;
+  //   const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
 
-    if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
-      this.setDirection(key)
-    } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
-      delete this.model.dir
-      this.doc.updateBlock(this.model, {})
-    }
-  };
+  //   if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
+  //     this.setDirection(key)
+  //   } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
+  //     delete this.model.dir
+  //     this.doc.updateBlock(this.model, {})
+  //   }
+  // };
 
   get attributeRenderer() {
     return this.inlineManager.getRenderer();
@@ -127,7 +127,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
 
   override connectedCallback() {
     super.connectedCallback();
-    this.handleEvent('keyDown', this._onKeyDown);
+    // this.handleEvent('keyDown', this._onKeyDown);
     this._inlineRangeProvider = getInlineRangeProvider(this);
 
     this.disposables.add(
@@ -152,6 +152,23 @@ export class ListBlockComponent extends CaptionedBlockComponent<
       })
     );
   }
+
+    override firstUpdated() {
+      this._richTextElement?.updateComplete
+      .then(() => {      
+          if(this.inlineEditor) {
+            setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
+            this.disposables.add(
+              this.inlineEditor.slots.textChange.on(()=> {
+                  if(this.inlineEditor) {
+                    setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
+                  } 
+              })
+            );
+          }
+        })
+        .catch(console.error);
+    }
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
@@ -233,9 +250,9 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     `;
   }
 
-  setDirection(key:string) {
-    setDirectionBasedOnText(this.model as unknown as ParagraphBlockModel, this.doc, key);
-  }
+  // setDirection(key:string) {
+  //   setDirectionBasedOnText(this.model as unknown as ParagraphBlockModel, this.doc, key);
+  // }
 
 
   @state()
