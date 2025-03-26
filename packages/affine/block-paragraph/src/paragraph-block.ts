@@ -20,7 +20,7 @@ import {
   getViewportElement,
 } from '@blocksuite/affine-shared/utils';
 import { getInlineRangeProvider } from '@blocksuite/block-std';
-import { setDirectionBasedOnText } from '@blocksuite/store'
+import { setDirectionOnBlock } from '@blocksuite/store'
 import { effect, signal } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';
@@ -56,22 +56,6 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       parent = parent.parentElement;
     }
     return false;
-  };
-
-   private _onKeyDown = (ctx: UIEventStateContext) => {
-    const eventState = ctx.get('keyboardState');
-    const event = eventState.raw;
-
-    const key = event.key;
-    const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
-
-    if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
-      if(key=='/')return
-      this.setDirection(key)
-    } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
-      delete this.model.dir
-      this.doc.updateBlock(this.model, {})
-    }
   };
 
   get attributeRenderer() {
@@ -170,10 +154,12 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     return showPlaceHolder
   }
 
-
   override connectedCallback() {
     super.connectedCallback();
-    this.handleEvent('keyDown', this._onKeyDown);
+    // this.handleEvent('keyUp', this._onKeyDown);
+    // this.inlineEditor?.slots.keydown.on(()=>{
+    //   console.log("this is keydown");
+    // })
     this.handleEvent(
       'compositionStart',
       () => {
@@ -299,6 +285,25 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     );
   }
 
+  override firstUpdated() {
+
+
+    this._richTextElement?.updateComplete
+    .then(() => {
+        if(this.inlineEditor) {
+          setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
+          this.disposables.add(
+            this.inlineEditor.slots.textChange.on(()=> {
+                if(this.inlineEditor) {
+                  setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
+                }
+            })
+          );
+        }
+      })
+      .catch(console.error);
+  }
+
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
     await this._richTextElement?.updateComplete;
@@ -351,6 +356,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override renderBlock(): TemplateResult<1> {
+    console.log("this.model.dir:",this.model.dir);
+    console.log("1111",this._richTextElement);
     //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
@@ -384,6 +391,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     >
       ${this.renderChildren(this.model)}
     </div>`;
+
+    const temp= this.richText()
 
     /*const temp = document.querySelector(
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
@@ -422,10 +431,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
           ${type$.value=='quote' ? 
             html`<div class="quote-container" dir=${this.model.dir}>
               <span class="quote-icon">${html`${unsafeSVG(quoteIcon)}`}</span>
-              ${this.richText()}
+              ${temp}
               ${this.placeHolder()}
             </div>` 
-            : this.richText()}
+            : temp}
             
           ${this.model.type=='quote' ? nothing : this.placeHolder()}
           
@@ -435,6 +444,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       </div>
     `;
   }
+
 
   richText() {
     const temp = document.querySelector(
@@ -456,12 +466,6 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .verticalScrollContainerGetter=${() => scrollContainer}
           ></rich-text>`
   }
-
-
-  setDirection(key:string) {
-   setDirectionBasedOnText(this.model, this.doc,key);
-  }
-
 
   @state()
   private accessor _readonlyCollapsed = false;
