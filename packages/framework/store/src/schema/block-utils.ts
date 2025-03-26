@@ -12,8 +12,7 @@ export function setDirectionBasedOnText(model: ParagraphBlockModel, doc: any, ke
 
 export function setDirectionOnBlock(model: ParagraphBlockModel, doc: any, text: string): void {
   text = text.replace(/^[^a-zA-Z0-9آ-ی۰-۹]+/, '');
-  console.log("text:", text);
-
+  //console.log("text:", text);
   const rtlChars = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const newDir = rtlChars.test(text[0]) ? 'rtl' : 'ltr';
 

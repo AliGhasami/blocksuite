@@ -268,6 +268,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     let beforeType = this.model.type;
     this.disposables.add(
       effect(() => {
+        //console.log("5555555",);
         const type = this.model.type$.value;
         if (beforeType !== type && !type.startsWith('h')) {
           const nearestHeading = getNearestHeadingBefore(this.model);
@@ -294,6 +295,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
           setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
           this.disposables.add(
             this.inlineEditor.slots.textChange.on(()=> {
+              //console.log("this is text change");
                 if(this.inlineEditor) {
                   setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
                 }
@@ -302,6 +304,11 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
         }
       })
       .catch(console.error);
+
+    /*this.model.propsUpdated.on((key)=>{
+      console.log("1111111",key);
+    })*/
+
   }
 
   override async getUpdateComplete() {
@@ -356,8 +363,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override renderBlock(): TemplateResult<1> {
-    console.log("this.model.dir:",this.model.dir);
-    console.log("1111",this._richTextElement);
+    //console.log("this.model.dir:",this.model.dir);
+    //console.log("1111",this._richTextElement);
     //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
@@ -392,7 +399,29 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       ${this.renderChildren(this.model)}
     </div>`;
 
-    const temp= this.richText()
+    //const temp= this.richText()
+
+
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
+    const rich= html`<rich-text
+            .yText=${this.model.text.yText}
+            .inlineEventSource=${this.topContenteditableElement ?? nothing}
+            .undoManager=${this.doc.history}
+            .attributesSchema=${this.attributesSchema}
+            .attributeRenderer=${this.attributeRenderer}
+            .markdownShortcutHandler=${this.markdownShortcutHandler}
+            .embedChecker=${this.embedChecker}
+            .readonly=${this.doc.readonly}
+            .inlineRangeProvider=${this._inlineRangeProvider}
+            .enableClipboard=${false}
+            .enableUndoRedo=${false}
+            .verticalScrollContainerGetter=${() => scrollContainer}
+          ></rich-text>`
+
+
 
     /*const temp = document.querySelector(
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
@@ -431,10 +460,10 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
           ${type$.value=='quote' ? 
             html`<div class="quote-container" dir=${this.model.dir}>
               <span class="quote-icon">${html`${unsafeSVG(quoteIcon)}`}</span>
-              ${temp}
+              ${rich}
               ${this.placeHolder()}
             </div>` 
-            : temp}
+            : rich}
             
           ${this.model.type=='quote' ? nothing : this.placeHolder()}
           

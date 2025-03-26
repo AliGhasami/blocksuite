@@ -26,7 +26,7 @@ export const AIStarIcon = html`<svg
 
 // dotlottie-wc can only be used in the browser
 if (typeof window !== 'undefined') {
-  import('@lottiefiles/dotlottie-wc').catch(console.error);
+  //import('@lottiefiles/dotlottie-wc').catch(console.error);
 }
 
 export const AIStarIconWithAnimation = html`<dotlottie-wc
