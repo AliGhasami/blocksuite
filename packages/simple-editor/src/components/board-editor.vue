@@ -1459,7 +1459,7 @@ async function init() {
   //background-color: red;
 }*!*/
 
-.event-animate-blink {
+.highlight-heading-animation {
   animation: blink 1.5s ease-in infinite;
   animation-fill-mode: both;
 }

@@ -65,9 +65,9 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
     const block = this.host.view.getBlock(blockId);
     if (block) {
       block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      block.classList.add('event-animate-blink');
+      block.classList.add('highlight-heading-animation');
       setTimeout(() => {
-        block.classList.remove('event-animate-blink');
+        block.classList.remove('highlight-heading-animation');
       }, 3000);
     }
   }
