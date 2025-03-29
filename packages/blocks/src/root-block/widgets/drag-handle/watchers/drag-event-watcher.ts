@@ -87,7 +87,7 @@ export class DragEventWatcher {
   //  debugger
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     this.widget.applyBlockDropStyle(null)
-    console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
+    //console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
     this.removeGroupDragStyle()
     this.widget.clearRaf();
     this.widget.hide(true);
@@ -95,7 +95,7 @@ export class DragEventWatcher {
 
   private _dragMoveHandler: UIEventHandler = ctx => {
     //debugger
-    console.log("move _dragMoveHandler native",ctx);
+   // console.log("move _dragMoveHandler native",ctx);
     //return false
     //document.body.style.cursor = 'e-resize';
     //ctx.
@@ -115,7 +115,7 @@ export class DragEventWatcher {
     if (!this.widget.dragging || this.widget.draggingElements.length === 0) {
       return false;
     }
-    console.log("_dragMoveHandler draggingElements",this.widget.draggingElements);
+    //console.log("_dragMoveHandler draggingElements",this.widget.draggingElements);
     //ctx.get('defaultState').event.preventDefault();
     //const a=ctx.get('defaultState')
     //a.event.dataTransfer.setData("ddd", "tttttttttt")
@@ -151,7 +151,7 @@ export class DragEventWatcher {
     const img = new Image();
     img.src = "cursor-image.png"; // Replace with your image path
     temp.event.dataTransfer.setDragImage(img, 30, 30);
-    console.log("_dragStartHandler", ctx);
+    //console.log("_dragStartHandler", ctx);
     //this.widget.hide(true)
     //this.widget.style.height=30;
     //this.widget.style.opacity=0;
@@ -173,7 +173,7 @@ export class DragEventWatcher {
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //return
-    console.log("____dropHandler",this.widget.draggingElements);
+    //console.log("____dropHandler",this.widget.draggingElements);
     this.removeGroupDragStyle()
     this.widget.applyBlockDropStyle(null)
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
@@ -313,14 +313,15 @@ export class DragEventWatcher {
   };
 
   private _onDrop = (context: UIEventStateContext) => {
-    console.log("_onDrop");
+    //console.log("_onDrop");
     const state = context.get('dndState');
 
     const event = state.raw;
     event.preventDefault();
 
     const { clientX, clientY } = event;
-    const point = new Point(clientX-30, clientY);
+    //console.log("xx client",clientX,clientX-30);
+    const point = new Point(clientX-38, clientY);
     const element = getClosestBlockComponentByPoint(point.clone());
     console.log("^element",element);
     if (!element) {
@@ -365,7 +366,7 @@ export class DragEventWatcher {
     parent?: string,
     index?: number
   ) => {
-    console.log("_onDropNoteOnNote");
+    //console.log("_onDropNoteOnNote");
     const [first] = snapshot.content;
     const id = first.id;
 
@@ -387,7 +388,7 @@ export class DragEventWatcher {
   };
 
   private _onDropOnEdgelessCanvas = (context: UIEventStateContext) => {
-    console.log("_onDropOnEdgelessCanvas");
+    //console.log("_onDropOnEdgelessCanvas");
     const state = context.get('dndState');
     // If drop a note, should do nothing
     const snapshot = this._deserializeSnapshot(state);
@@ -575,9 +576,9 @@ export class DragEventWatcher {
       if (!dataTransfer) throw new Error('No data transfer');
       const std = this._std;
       const job = this._getJob();
-      console.log("this is state", state);
+      //console.log("this is state", state);
       const snapshot = this._deserializeSnapshot(state);
-      console.log("this is snapshoot ",snapshot);
+      //console.log("this is snapshoot ",snapshot);
 
 
 
@@ -663,7 +664,7 @@ export class DragEventWatcher {
             //return null
           }
         }
-        console.log("this is final",snapshot);
+        //console.log("this is final",snapshot);
        // return
         // use snapshot
         const slice = await job.snapshotToSlice(
@@ -708,7 +709,7 @@ export class DragEventWatcher {
       if (!dataTransfer) throw new Error('No data transfer');
       const data = dataTransfer.getData(this._dndAPI.mimeType);
       const snapshot = this._dndAPI.decodeSnapshot(data);
-      console.log("this is snap shoot ",snapshot);
+      //console.log("this is snap shoot ",snapshot);
       return snapshot;
     } catch {
       return null;

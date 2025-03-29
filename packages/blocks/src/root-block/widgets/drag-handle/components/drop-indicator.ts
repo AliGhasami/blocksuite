@@ -27,7 +27,7 @@ export class DropIndicator extends ShadowlessElement {
     if (!this.rect && !this.rectVertical) {
       return null;
     }
-    console.log("this is rect",this.rect,this.rectVertical);
+    //console.log("this is rect",this.rect,this.rectVertical);
 
     let style =styleMap({display:'none'})
     let styleVertical =styleMap({display:'none'})
