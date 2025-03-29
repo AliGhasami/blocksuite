@@ -156,7 +156,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
     override firstUpdated() {
       this._richTextElement?.updateComplete
       .then(() => {      
-          if(this.inlineEditor) {
+          if(this.inlineEditor && !this.doc.readonly) {
             setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
             this.disposables.add(
               this.inlineEditor.slots.textChange.on(()=> {

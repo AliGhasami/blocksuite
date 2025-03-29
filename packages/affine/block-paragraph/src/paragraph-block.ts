@@ -295,7 +295,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     if(this._richTextElement!=this.lastInlineEditor) {
       this.lastInlineEditor = this._richTextElement
       setTimeout(()=>{
-        if(this.inlineEditor) {
+        if(this.inlineEditor && !this.doc.readonly) {
           setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
           this.inlineEditor.disposables.add(this.inlineEditor.slots.textChange.on(()=> {
             if(this.inlineEditor) {

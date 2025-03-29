@@ -60,9 +60,14 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
     super();
   }
 
+  /*addImageLink( lnk: ObjectLink){
+
+  }*/
+
   //todo ali ghasami for migrate to event bus
-  addObjectLink(model: BlockModel, lnk: ObjectLink) {
+  addObjectLink(model: BlockModel, lnk: ObjectLink,deleteEmptyBlock: boolean= true) {
     // console.log("bbbbb");
+    //debugger
     //return;
     if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
       return;
@@ -90,11 +95,16 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       model.doc.deleteBlock(this.model);
     }*/
     //return;
-    setTimeout(()=>{
-      if (model.text?.length == 0) {
-        model.doc.deleteBlock(this.model);
-      }
-    })
+
+    if(deleteEmptyBlock)
+    {
+      setTimeout(()=>{
+        if (model.text?.length == 0) {
+          model.doc.deleteBlock(this.model);
+        }
+      })
+    }
+
     const next = model.doc.getNext(temp[0]);
     //console.log("cccc",next);
     if (next && this.editorHost) {
