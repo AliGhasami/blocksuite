@@ -6,7 +6,7 @@
     <!--     <Button @click="handleClick">export pdf</Button>-->
     <!--    {{ props.objectId }}-->
     <!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
-    <div class="vue-block-board-editor">
+    <div class="vue-block-board-editor" style="border: 1px solid red">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
   </div>
@@ -159,6 +159,7 @@ watch(
   async () => {
     if (props.objectId) {
       console.log('==>this is object id in watch and call init function ', props.objectId)
+      debugger
       await init()
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
@@ -254,13 +255,13 @@ function handleHeadingList(doc:Doc) {
       true
     );
 
-    
+
 
     const items = [
       ...(doc.meta?.title !== '' ? [doc.root] : []),
       ...headingBlocks,
     ];
-    
+
     if (currentDocument.value && myCollection) {
         // myCollection?.setDocMeta(currentDocument.value.id, { headingList: items })
         doc.collection.setDocMeta(doc.id, {
@@ -268,7 +269,7 @@ function handleHeadingList(doc:Doc) {
     });
       }
   }
-    
+
 }
 
 function bindEvent(doc: Doc) {
@@ -327,10 +328,11 @@ function checkNotEmptyDocBlock(doc: Doc) {
 }
 
 function appendTODOM(element: HTMLElement) {
+  debugger
   if (refEditor.value) {
     const children = refEditor.value.children
     if (children.length) {
-      refEditor.value.removeChild(children[0])
+     refEditor.value.removeChild(children[0])
     }
     refEditor.value.appendChild(element)
   }
@@ -456,6 +458,7 @@ function handleSelectAll(event: Event) {
 }
 
 onMounted(async () => {
+  debugger
   init()
   document.addEventListener('keydown', handleSelectAll)
 })
@@ -665,6 +668,7 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 }
 
 async function init() {
+  debugger
   loading.value = true
   stopEvent.value = true
   //debugger
@@ -833,6 +837,7 @@ async function init() {
     //console.log('this is snap shoot ', temp)
     bindEvent(doc)
     handleHeadingList(doc)
+    debugger
     appendTODOM(editorElement.value)
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
