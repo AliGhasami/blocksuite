@@ -89,7 +89,7 @@ export class FileDropManager {
     if (!dataTransfer) return;
 
     const effectAllowed = dataTransfer.effectAllowed;
-    console.log("effectAllowed",effectAllowed);
+    //console.log("effectAllowed",effectAllowed);
     if (effectAllowed === 'none') return;
 
 

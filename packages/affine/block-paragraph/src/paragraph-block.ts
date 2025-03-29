@@ -1,6 +1,6 @@
 //ali ghasami for new merge
 import type { ParagraphBlockModel } from '@blocksuite/affine-model';
-import type { BlockComponent, UIEventStateContext } from '@blocksuite/block-std';
+import type { BlockComponent } from '@blocksuite/block-std';
 import type { InlineRangeProvider } from '@blocksuite/inline';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
@@ -20,7 +20,7 @@ import {
   getViewportElement,
 } from '@blocksuite/affine-shared/utils';
 import { getInlineRangeProvider } from '@blocksuite/block-std';
-import { setDirectionOnBlock } from '@blocksuite/store'
+import { setDirectionOnBlock } from "@blocksuite/store";
 import { effect, signal } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';
@@ -58,6 +58,8 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     return false;
   };
 
+  private lastInlineEditor : HTMLElement | null = null
+
   get attributeRenderer() {
     return this.inlineManager.getRenderer();
   }
@@ -88,6 +90,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   get inlineManager() {
     return this.std.get(DefaultInlineManagerExtension.identifier);
   }
+
 
   get markdownShortcutHandler() {
     return this.inlineManager.markdownShortcutHandler;
@@ -286,34 +289,23 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     );
   }
 
-  override firstUpdated() {
-
-
-    this._richTextElement?.updateComplete
-    .then(() => {
-        if(this.inlineEditor) {
-          setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
-          this.disposables.add(
-            this.inlineEditor.slots.textChange.on(()=> {
-              //console.log("this is text change");
-                if(this.inlineEditor) {
-                  setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
-                }
-            })
-          );
-        }
-      })
-      .catch(console.error);
-
-    /*this.model.propsUpdated.on((key)=>{
-      console.log("1111111",key);
-    })*/
-
-  }
-
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
     await this._richTextElement?.updateComplete;
+    if(this._richTextElement!=this.lastInlineEditor) {
+      this.lastInlineEditor = this._richTextElement
+      setTimeout(()=>{
+        if(this.inlineEditor) {
+          setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
+          this.inlineEditor.disposables.add(this.inlineEditor.slots.textChange.on(()=> {
+            if(this.inlineEditor) {
+              setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
+            }
+          }))
+        }
+
+      })
+    }
     return result;
   }
 
