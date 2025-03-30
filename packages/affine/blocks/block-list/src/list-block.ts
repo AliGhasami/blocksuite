@@ -1,0 +1,295 @@
+<<<<<<< HEAD:packages/affine/block-list/src/list-block.ts
+/** @alighasami for check merge **/
+import type { ListBlockModel, type ParagraphBlockModel } from '@blocksuite/affine-model';
+import type { BaseSelection, BlockComponent } from '@blocksuite/block-std';
+import type { InlineRangeProvider } from '@blocksuite/inline';
+
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
+//import { playCheckAnimation } from '@blocksuite/affine-components/icons';
+import {
+  DefaultInlineManagerExtension,
+  type RichText,
+} from '@blocksuite/affine-components/rich-text';
+import '@blocksuite/affine-shared/commands';
+=======
+import '@blocksuite/affine-shared/commands';
+
+import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
+import { playCheckAnimation } from '@blocksuite/affine-components/icons';
+>>>>>>> origin/main:packages/affine/blocks/block-list/src/list-block.ts
+import { TOGGLE_BUTTON_PARENT_CLASS } from '@blocksuite/affine-components/toggle-button';
+import { DefaultInlineManagerExtension } from '@blocksuite/affine-inline-preset';
+import type { ListBlockModel } from '@blocksuite/affine-model';
+import type { RichText } from '@blocksuite/affine-rich-text';
+import {
+  BLOCK_CHILDREN_CONTAINER_PADDING_LEFT,
+  NOTE_SELECTOR,
+} from '@blocksuite/affine-shared/consts';
+import { DocModeProvider } from '@blocksuite/affine-shared/services';
+import { getViewportElement } from '@blocksuite/affine-shared/utils';
+<<<<<<< HEAD:packages/affine/block-list/src/list-block.ts
+import { getInlineRangeProvider } from '@blocksuite/block-std';
+import { setDirectionOnBlock } from '@blocksuite/store'
+=======
+import type { BlockComponent } from '@blocksuite/block-std';
+import { BlockSelection, TextSelection } from '@blocksuite/block-std';
+import {
+  getInlineRangeProvider,
+  type InlineRangeProvider,
+} from '@blocksuite/block-std/inline';
+import type { BaseSelection } from '@blocksuite/store';
+>>>>>>> origin/main:packages/affine/blocks/block-list/src/list-block.ts
+import { effect } from '@preact/signals-core';
+import { html, nothing, type TemplateResult } from 'lit';
+import { query, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
+
+import { correctNumberedListsOrderToPrev } from './commands/utils.js';
+import { listBlockStyles } from './styles.js';
+import { getListIcon } from './utils/get-list-icon.js';
+
+export class ListBlockComponent extends CaptionedBlockComponent<ListBlockModel> {
+  static override styles = listBlockStyles;
+
+  private _inlineRangeProvider: InlineRangeProvider | null = null;
+
+  private readonly _onClickIcon = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (this.model.props.type === 'toggle') {
+      if (this.doc.readonly) {
+        this._readonlyCollapsed = !this._readonlyCollapsed;
+      } else {
+        this.doc.captureSync();
+        this.doc.updateBlock(this.model, {
+          collapsed: !this.model.props.collapsed,
+        });
+      }
+
+      return;
+    } else if (this.model.props.type === 'todo') {
+      if (this.doc.readonly) return;
+
+      this.doc.captureSync();
+      const checkedPropObj = { checked: !this.model.props.checked };
+      this.doc.updateBlock(this.model, checkedPropObj);
+      if (this.model.props.checked) {
+        const checkEl = this.querySelector('.affine-list-block__todo-prefix');
+        if (checkEl) {
+          //playCheckAnimation(checkEl).catch(console.error);
+        }
+      }
+      return;
+    }
+    this._select();
+  };
+
+  // private _onKeyDown = (ctx: UIEventStateContext) => {
+  //   const eventState = ctx.get('keyboardState');
+  //   const event = eventState.raw;
+
+  //   const key = event.key;
+  //   const backspaceKeys = ['Backspace', 'Delete' , 'Shift' , 'Alt'];
+
+  //   if(this.inlineEditor?.yText.length == 0 && !backspaceKeys.includes(key)) {
+  //     this.setDirection(key)
+  //   } else if (this.inlineEditor?.yText?.length == 1 && backspaceKeys.includes(key)) {
+  //     delete this.model.dir
+  //     this.doc.updateBlock(this.model, {})
+  //   }
+  // };
+
+  get attributeRenderer() {
+    return this.inlineManager.getRenderer();
+  }
+
+  get attributesSchema() {
+    return this.inlineManager.getSchema();
+  }
+
+  get embedChecker() {
+    return this.inlineManager.embedChecker;
+  }
+
+  get inlineEditor() {
+    return this._richTextElement?.inlineEditor;
+  }
+
+  get inlineManager() {
+    return this.std.get(DefaultInlineManagerExtension.identifier);
+  }
+
+  override get topContenteditableElement() {
+    if (this.std.get(DocModeProvider).getEditorMode() === 'edgeless') {
+      return this.closest<BlockComponent>(NOTE_SELECTOR);
+    }
+    return this.rootComponent;
+  }
+
+  private _select() {
+    const selection = this.host.selection;
+    selection.update(selList => {
+      return selList
+        .filter<BaseSelection>(
+          sel => !sel.is(TextSelection) && !sel.is(BlockSelection)
+        )
+        .concat(selection.create(BlockSelection, { blockId: this.blockId }));
+    });
+  }
+
+  override connectedCallback() {
+    super.connectedCallback();
+    // this.handleEvent('keyDown', this._onKeyDown);
+    this._inlineRangeProvider = getInlineRangeProvider(this);
+
+    this.disposables.add(
+      effect(() => {
+        const collapsed = this.model.props.collapsed$.value;
+        this._readonlyCollapsed = collapsed;
+      })
+    );
+
+    this.disposables.add(
+      effect(() => {
+        const type = this.model.props.type$.value;
+        const order = this.model.props.order$.value;
+        // old numbered list has no order
+        if (type === 'numbered' && !Number.isInteger(order)) {
+          correctNumberedListsOrderToPrev(this.doc, this.model, false);
+        }
+        // if list is not numbered, order should be null
+        if (type !== 'numbered' && order !== null) {
+          this.model.props.order = null;
+        }
+      })
+    );
+  }
+
+    override firstUpdated() {
+      this._richTextElement?.updateComplete
+      .then(() => {      
+          if(this.inlineEditor && !this.doc.readonly) {
+            setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
+            this.disposables.add(
+              this.inlineEditor.slots.textChange.on(()=> {
+                  if(this.inlineEditor) {
+                    setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
+                  } 
+              })
+            );
+          }
+        })
+        .catch(console.error);
+    }
+
+  override async getUpdateComplete() {
+    const result = await super.getUpdateComplete();
+    await this._richTextElement?.updateComplete;
+    return result;
+  }
+
+  override previewName(): string {
+    switch (this.model.type) {
+      case 'numbered':
+        return  'Number List'
+      case 'todo':
+        return 'Check List'
+      case 'toggle':
+        return 'Toggle List'
+      case 'bulleted':
+        return 'Bullet List'
+    }
+    //return super.previewName();
+  }
+
+  override renderBlock(): TemplateResult<1> {
+    const { model, _onClickIcon } = this;
+    const collapsed = this.doc.readonly
+      ? this._readonlyCollapsed
+      : model.props.collapsed;
+
+    const listIcon = getListIcon(model, !collapsed, _onClickIcon);
+
+    const children = html`<div
+      dir=${this.model.dir}
+      class="affine-block-children-container"
+      style=${styleMap({
+        paddingStart: `${BLOCK_CHILDREN_CONTAINER_PADDING_LEFT}px`,
+        display: collapsed ? 'none' : undefined,
+      })}
+    >
+      ${this.renderChildren(this.model)}
+    </div>`;
+
+    const temp = document.querySelector(
+      `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
+    );
+    const scrollContainer = temp ? temp : getViewportElement(this.host);
+
+
+    return html`
+      <div dir=${model.dir} class=${'affine-list-block-container'}>
+        <div
+          class=${classMap({
+            'affine-list-rich-text-wrapper': true,
+            'affine-list--checked':
+              this.model.props.type === 'todo' && this.model.props.checked,
+            [TOGGLE_BUTTON_PARENT_CLASS]: true,
+          })}
+        >
+          ${this.model.children.length > 0
+            ? html`
+                <blocksuite-toggle-button
+                  .collapsed=${collapsed}
+                  .updateCollapsed=${(value: boolean) => {
+                    if (this.doc.readonly) {
+                      this._readonlyCollapsed = value;
+                    } else {
+                      this.doc.captureSync();
+                      this.doc.updateBlock(this.model, {
+                        collapsed: value,
+                      });
+                    }
+                  }}
+                ></blocksuite-toggle-button>
+              `
+            : nothing}
+          ${listIcon}
+          <rich-text
+            .yText=${this.model.props.text.yText}
+            .inlineEventSource=${this.topContenteditableElement ?? nothing}
+            .undoManager=${this.doc.history}
+            .attributeRenderer=${this.attributeRenderer}
+            .attributesSchema=${this.attributesSchema}
+            .markdownMatches=${this.inlineManager?.markdownMatches}
+            .embedChecker=${this.embedChecker}
+            .readonly=${this.doc.readonly}
+            .inlineRangeProvider=${this._inlineRangeProvider}
+            .enableClipboard=${false}
+            .enableUndoRedo=${false}
+            .verticalScrollContainerGetter=${() => scrollContainer}
+          ></rich-text>
+        </div>
+
+        ${children}
+      </div>
+    `;
+  }
+
+  // setDirection(key:string) {
+  //   setDirectionBasedOnText(this.model as unknown as ParagraphBlockModel, this.doc, key);
+  // }
+
+
+  @state()
+  private accessor _readonlyCollapsed = false;
+
+  @query('rich-text')
+  private accessor _richTextElement: RichText | null = null;
+
+  override accessor blockContainerStyles = {
+    margin: 'var(--affine-list-margin, 10px 0)',
+  };
+}
