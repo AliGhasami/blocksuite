@@ -6,7 +6,7 @@
     <!--     <Button @click="handleClick">export pdf</Button>-->
     <!--    {{ props.objectId }}-->
     <!--    <span v-if="currentDocument">{{ currentDocument.meta }}</span>-->
-    <div class="vue-block-board-editor" style="border: 1px solid red">
+    <div class="vue-block-board-editor">
       <div ref="refEditor" :class="[props.isBoardView ? 'board' : 'editor']"></div>
     </div>
   </div>
@@ -159,7 +159,6 @@ watch(
   async () => {
     if (props.objectId) {
       console.log('==>this is object id in watch and call init function ', props.objectId)
-      debugger
       await init()
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
@@ -328,11 +327,10 @@ function checkNotEmptyDocBlock(doc: Doc) {
 }
 
 function appendTODOM(element: HTMLElement) {
-  debugger
   if (refEditor.value) {
     const children = refEditor.value.children
     if (children.length) {
-     refEditor.value.removeChild(children[0])
+      refEditor.value.removeChild(children[0])
     }
     refEditor.value.appendChild(element)
   }
@@ -458,7 +456,6 @@ function handleSelectAll(event: Event) {
 }
 
 onMounted(async () => {
-  debugger
   init()
   document.addEventListener('keydown', handleSelectAll)
 })
@@ -482,66 +479,6 @@ defineExpose({
 })
 
 /************************************************************/
-
-async function handleClick() {
-  /* const doc = toRaw(unref(currentDocument.value))
-  const job = new Job({
-    collection: doc.collection,
-    middlewares: [docLinkBaseURLMiddleware, titleMiddleware]
-  })
-  job.adapterConfigs.set('aaa', 'bbb')
-  const snapshot = job.docToSnapshot(doc)
-  console.log('this is snapshoot', snapshot)
-  const adapter = new MahdaadHtmlAdapter(job)
-  if (!snapshot) {
-    return
-  }
-  const htmlResult = await adapter.fromDocSnapshot({
-    snapshot
-    //assets: job.assetsManager,
-  })
-  console.log('1111', htmlResult)
-  const iframe = document.getElementById('myIframe')
-  iframe.srcdoc = htmlResult.file*/
-  /*setTimeout(()=>{
-    debugger
-  },6000)*/
-  //let downloadBlob: Blob;
-  //const docTitle = doc.meta?.title || 'Untitled';
-  //let name: string;
-  //const contentBlob = new Blob([htmlResult.file], { type: 'plain/text' });
-  /*if (htmlResult.assetsIds.length > 0) {
-    const zip = await createAssetsArchive(job.assets, htmlResult.assetsIds);
-
-    await zip.file('index.html', contentBlob);
-
-    downloadBlob = await zip.generate();
-    name = `${docTitle}.zip`;
-  } else {
-    downloadBlob = contentBlob;
-    name = `${docTitle}.html`;
-  }
-  download(downloadBlob, name);*/
-  /// console.log("1111",refEditor.value,currentDocument.value);
-  //const temp=(refEditor.value as HTMLElement).querySelector('editor-host')
-  //const temp=(refEditor.value as HTMLElement).querySelector('affine-page-root')
-  //const service=temp.host.spec.getService('affine:page')
-  //service.exportManager.exportPdf().catch(console.error);
-  //console.log("11111",);
-  //console.log("222",temp.host?.spec.getService('affine:page'));
-  //console.log("this is temp",temp);
-}
-
-watch(
-  () => props.isBoardView,
-  () => {
-    // init()
-  }
-)
-
-/*watch(()=>props.objectId,()=>{
-  debugger
-})*/
 
 //todo ali ghasami
 async function setData(data: any, clear_history?: boolean = true) {
@@ -668,10 +605,9 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 }
 
 async function init() {
-  debugger
   loading.value = true
   stopEvent.value = true
-  //debugger
+  dispose()
   console.log('==>init function')
   const defaultFlags = {
     enable_synced_doc_block: true,
@@ -837,7 +773,6 @@ async function init() {
     //console.log('this is snap shoot ', temp)
     bindEvent(doc)
     handleHeadingList(doc)
-    debugger
     appendTODOM(editorElement.value)
     checkNotEmptyDocBlock(currentDocument.value)
     checkReadOnly()
@@ -1041,6 +976,25 @@ async function init() {
     await mountEditor()
   }
 }
+
+
+function dispose(){
+  if(myCollection){
+    myCollection.forceStop()
+    myCollection.dispose()
+  }
+}
+
+
+onUnmounted(()=>{
+  /*console.log("___collection",myCollection);
+  console.log("___doc",currentDocument.value);
+  console.log("___this is refEditor",refEditor.value);*/
+  dispose()
+  //debugger
+})
+
+
 </script>
 
 <style lang="less">
