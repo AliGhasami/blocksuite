@@ -30,7 +30,7 @@ export const ListBlockSchema = defineBlockSchema({
 
       // number type only for numbered list
       order: null,
-      dir: null
+      dir: null,
       'meta:createdAt': undefined,
       'meta:createdBy': undefined,
       'meta:updatedAt': undefined,
@@ -45,7 +45,7 @@ export const ListBlockSchema = defineBlockSchema({
       'affine:list',
       'affine:paragraph',
       'affine:edgeless-text',
-      'affine:mahdaad-callout'
+      'affine:mahdaad-callout',
     ],
   },
   toModel: () => new ListBlockModel(),
