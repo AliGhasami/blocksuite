@@ -1,4 +1,4 @@
-<<<<<<< HEAD:packages/affine/block-list/src/list-block.ts
+<<<<<<<< HEAD:packages/affine/block-list/src/list-block.ts
 /** @alighasami for check merge **/
 import type { ListBlockModel, type ParagraphBlockModel } from '@blocksuite/affine-model';
 import type { BaseSelection, BlockComponent } from '@blocksuite/block-std';
@@ -11,12 +11,12 @@ import {
   type RichText,
 } from '@blocksuite/affine-components/rich-text';
 import '@blocksuite/affine-shared/commands';
-=======
+========
 import '@blocksuite/affine-shared/commands';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { playCheckAnimation } from '@blocksuite/affine-components/icons';
->>>>>>> origin/main:packages/affine/blocks/block-list/src/list-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-list/src/list-block.ts
 import { TOGGLE_BUTTON_PARENT_CLASS } from '@blocksuite/affine-components/toggle-button';
 import { DefaultInlineManagerExtension } from '@blocksuite/affine-inline-preset';
 import type { ListBlockModel } from '@blocksuite/affine-model';
@@ -27,10 +27,10 @@ import {
 } from '@blocksuite/affine-shared/consts';
 import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import { getViewportElement } from '@blocksuite/affine-shared/utils';
-<<<<<<< HEAD:packages/affine/block-list/src/list-block.ts
+<<<<<<<< HEAD:packages/affine/block-list/src/list-block.ts
 import { getInlineRangeProvider } from '@blocksuite/block-std';
 import { setDirectionOnBlock } from '@blocksuite/store'
-=======
+========
 import type { BlockComponent } from '@blocksuite/block-std';
 import { BlockSelection, TextSelection } from '@blocksuite/block-std';
 import {
@@ -38,7 +38,7 @@ import {
   type InlineRangeProvider,
 } from '@blocksuite/block-std/inline';
 import type { BaseSelection } from '@blocksuite/store';
->>>>>>> origin/main:packages/affine/blocks/block-list/src/list-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-list/src/list-block.ts
 import { effect } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';

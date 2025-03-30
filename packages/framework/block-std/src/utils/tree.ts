@@ -1,12 +1,11 @@
-import type { Doc } from '@blocksuite/store';
-
-import type { GfxGroupModel, GfxModel } from '../gfx/model/model.js';
+import type { Store } from '@blocksuite/store';
 
 import {
   type GfxCompatibleInterface,
   type GfxGroupCompatibleInterface,
   isGfxGroupCompatibleModel,
 } from '../gfx/model/base.js';
+import type { GfxGroupModel, GfxModel } from '../gfx/model/model.js';
 
 /**
  * Get the top elements from the list of elements, which are in some tree structures.
@@ -125,13 +124,13 @@ export function isLockedImpl(element: GfxCompatibleInterface): boolean {
   return isLockedBySelfImpl(element) || isLockedByAncestorImpl(element);
 }
 
-export function lockElementImpl(doc: Doc, element: GfxCompatibleInterface) {
+export function lockElementImpl(doc: Store, element: GfxCompatibleInterface) {
   doc.transact(() => {
     element.lockedBySelf = true;
   });
 }
 
-export function unlockElementImpl(doc: Doc, element: GfxCompatibleInterface) {
+export function unlockElementImpl(doc: Store, element: GfxCompatibleInterface) {
   doc.transact(() => {
     element.lockedBySelf = false;
   });

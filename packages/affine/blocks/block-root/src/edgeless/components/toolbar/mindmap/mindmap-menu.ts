@@ -270,9 +270,9 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(
     const showNextText = dragOut && !cancelled;
     return html`<edgeless-slide-menu .height=${'64px'}>
       <div class="text-and-mindmap">
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/mindmap/mindmap-menu.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/mindmap/mindmap-menu.ts
         <!-- <div class="text-item">
-=======
+========
         <div class="media-item">
           ${isDraggingMedia
             ? html`<button
@@ -305,7 +305,7 @@ export class EdgelessMindmapMenu extends EdgelessToolbarToolMixin(
         </div>
         <div class="thin-divider"></div>
         <div class="text-item">
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/mindmap/mindmap-menu.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/mindmap/mindmap-menu.ts
           ${isDraggingText
           ? html`<button
               class="next"

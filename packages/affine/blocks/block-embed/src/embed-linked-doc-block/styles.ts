@@ -177,14 +177,14 @@ export const styles = css`
     border-radius: 4px 4px var(--1, 0px) var(--1, 0px);
   }
 
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/styles.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/styles.ts
   .affine-embed-linked-doc-block:not(.in-canvas) {
     width: 100%;
     min-width: calc(min(${EMBED_CARD_MIN_WIDTH}px, 100%));
   }
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/styles.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/styles.ts
   .affine-embed-linked-doc-block.loading {
     .affine-embed-linked-doc-content-date {
       display: none;

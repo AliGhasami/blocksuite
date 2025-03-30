@@ -27,11 +27,7 @@ export const embedSyncedDocBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
 
       if (type === 'content') {
         const syncedDocId = o.node.props.pageId as string;
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/adapters/html.ts
-        const syncedDoc = job.collection.getDoc(syncedDocId);
-=======
         const syncedDoc = job.docCRUD.get(syncedDocId);
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/adapters/html.ts
         walkerContext.setGlobalContext('hast:html-root-doc', false);
         if (!syncedDoc) return;
 

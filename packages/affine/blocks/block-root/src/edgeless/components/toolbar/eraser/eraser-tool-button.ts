@@ -1,4 +1,4 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/eraser/eraser-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/eraser/eraser-tool-button.ts
 /** @alighasami for check merge **/
 import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
 
@@ -8,11 +8,11 @@ import {
   EraserTablerIcon
 } from '@blocksuite/affine-components/icons';
 import { ThemeProvider } from "@blocksuite/affine-shared/services";
-=======
+========
 import { ThemeProvider } from '@blocksuite/affine-shared/services';
 import { EdgelessToolbarToolMixin } from '@blocksuite/affine-widget-edgeless-toolbar';
 import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/eraser/eraser-tool-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/eraser/eraser-tool-button.ts
 import { css, html, LitElement } from 'lit';
 
 import { EdgelessEraserDarkIcon, EdgelessEraserLightIcon } from './icons.js';

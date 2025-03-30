@@ -24,15 +24,15 @@ import {
 import { type BlockModel, Text } from '@blocksuite/store';
 import * as Y from 'yjs';
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
 import type { FrameBlockModel, NoteBlockModel } from '../../index.js';
 
 import { GfxBlockModel } from './block-model.js';
 import { areSetsEqual } from './utils/misc.js';
 import { isFrameBlock } from './utils/query.js';
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
 const FRAME_PADDING = 40;
 
 export type NavigatorMode = 'fill' | 'fit';
@@ -163,13 +163,13 @@ export class EdgelessFrameManager extends GfxExtension {
   }
 
   static framePresentationComparator<
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
     T extends FrameBlockModel | { index: string; presentationIndex?: string },
-=======
+========
     T extends
       | FrameBlockModel
       | { props: { index: string; presentationIndex?: string } },
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
   >(a: T, b: T) {
     function stringCompare(a: string, b: string) {
       if (a < b) return -1;
@@ -177,7 +177,7 @@ export class EdgelessFrameManager extends GfxExtension {
       return 0;
     }
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
     if (
       'presentationIndex$' in a &&
       'presentationIndex$' in b &&
@@ -196,7 +196,7 @@ export class EdgelessFrameManager extends GfxExtension {
       return 1;
     } else {
       return stringCompare(a.index, b.index);
-=======
+========
     const isModel = (
       x:
         | FrameBlockModel
@@ -226,7 +226,7 @@ export class EdgelessFrameManager extends GfxExtension {
       return 1;
     } else {
       return stringCompare(a.props.index, b.props.index);
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
     }
   }
 
@@ -249,15 +249,15 @@ export class EdgelessFrameManager extends GfxExtension {
         xywh: bound.serialize(),
         index: this.gfx.layer.generateIndex(true),
         presentationIndex: this.generatePresentationIndex(),
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
       },
       surfaceModel
     );
-=======
+========
       });
 
     const id = this.gfx.doc.addBlock('affine:frame', props, surfaceModel);
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
     const frameModel = this.gfx.getElementById(id);
 
     if (!frameModel || !isFrameBlock(frameModel)) {
@@ -334,11 +334,11 @@ export class EdgelessFrameManager extends GfxExtension {
   addElementsToFrame(frame: FrameBlockModel, elements: GfxModel[]) {
     if (frame.isLocked()) return;
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
     if (frame.childElementIds === undefined) {
-=======
+========
     if (frame.props.childElementIds === undefined) {
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
       this._addChildrenToLegacyFrame(frame);
     }
 
@@ -426,11 +426,11 @@ export class EdgelessFrameManager extends GfxExtension {
 
   generatePresentationIndex() {
     const before =
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
       this.frames[this.frames.length - 1]?.presentationIndex ?? null;
-=======
+========
       this.frames[this.frames.length - 1]?.props.presentationIndex ?? null;
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
 
     return generateKeyBetweenV2(before, null);
   }
@@ -492,30 +492,30 @@ export class EdgelessFrameManager extends GfxExtension {
   refreshLegacyFrameOrder() {
     const frames = this.frames.splice(0, this.frames.length);
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
     let splitIndex = frames.findIndex(frame => frame.presentationIndex);
-=======
+========
     let splitIndex = frames.findIndex(frame => frame.props.presentationIndex);
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
     if (splitIndex === 0) return;
 
     if (splitIndex === -1) splitIndex = frames.length;
 
     let afterPreIndex =
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/frame-manager.ts
       frames[splitIndex]?.presentationIndex || generateKeyBetweenV2(null, null);
 
     for (let index = splitIndex - 1; index >= 0; index--) {
       const preIndex = generateKeyBetweenV2(null, afterPreIndex);
       frames[index].presentationIndex = preIndex;
-=======
+========
       frames[splitIndex]?.props.presentationIndex ||
       generateKeyBetweenV2(null, null);
 
     for (let index = splitIndex - 1; index >= 0; index--) {
       const preIndex = generateKeyBetweenV2(null, afterPreIndex);
       frames[index].props.presentationIndex = preIndex;
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-manager.ts
       afterPreIndex = preIndex;
     }
   }

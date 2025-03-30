@@ -1,8 +1,8 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/navigator-setting-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/navigator-setting-button.ts
 import { NavigatorSettingsIcon } from '@blocksuite/affine-components/icons';
-=======
+========
 import { EdgelessLegacySlotIdentifier } from '@blocksuite/affine-block-surface';
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/navigator-setting-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/navigator-setting-button.ts
 import { EditPropsStore } from '@blocksuite/affine-shared/services';
 import { createButtonPopper } from '@blocksuite/affine-shared/utils';
 import type { BlockComponent } from '@blocksuite/block-std';
@@ -180,11 +180,11 @@ export class EdgelessNavigatorSettingButton extends WithDisposable(LitElement) {
   accessor blackBackground = true;
 
   @property({ attribute: false })
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/navigator-setting-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/navigator-setting-button.ts
   accessor edgeless!: EdgelessRootBlockComponent;
-=======
+========
   accessor edgeless!: BlockComponent;
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/navigator-setting-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/navigator-setting-button.ts
 
   @property({ attribute: false })
   accessor hideToolbar = false;

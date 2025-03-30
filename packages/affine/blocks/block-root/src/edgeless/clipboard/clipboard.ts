@@ -1,4 +1,4 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
 import type { Connection } from '@blocksuite/affine-model';
 import type {
   BlockStdScope,
@@ -8,10 +8,10 @@ import type {
 } from '@blocksuite/block-std';
 import type { IBound, IVec, SerializedXYWH } from '@blocksuite/global/utils';
 
-=======
+========
 import { addAttachments } from '@blocksuite/affine-block-attachment';
 import { addImages } from '@blocksuite/affine-block-image';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
 import {
   CanvasElementType,
   EdgelessCRUDIdentifier,
@@ -24,11 +24,11 @@ import {
   BookmarkStyles,
   DEFAULT_NOTE_HEIGHT,
   DEFAULT_NOTE_WIDTH,
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
-=======
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+========
   FrameBlockModel,
   MAX_IMAGE_WIDTH,
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
   ReferenceInfoSchema,
 } from '@blocksuite/affine-model';
 import {
@@ -45,11 +45,11 @@ import {
   isInsidePageEditor,
   isTopLevelBlock,
   isUrlInClipboard,
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
   matchFlavours,
-=======
+========
   matchModels,
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
   referenceToNode,
 } from '@blocksuite/affine-shared/utils';
 import type {
@@ -461,10 +461,10 @@ export class EdgelessClipboardController extends PageClipboard {
     this.registerBlock('affine:embed-html', this._createHtmlEmbedBlock);
     this.registerBlock('affine:embed-loom', this._createLoomEmbedBlock);
     this.registerBlock('affine:embed-youtube', this._createYoutubeEmbedBlock);
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
-=======
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+========
     this.registerBlock('affine:embed-iframe', this._createIframeEmbedBlock);
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
 
     // internal links
     this.registerBlock(
@@ -493,19 +493,19 @@ export class EdgelessClipboardController extends PageClipboard {
   private async _createAttachmentBlock(attachment: BlockSnapshot) {
     const { xywh, rotate, sourceId, name, size, type, embed, style,src,meta } =
       attachment.props;
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
     //todo comment for mahdaad
     /*if (!(await this.host.std.collection.blobSync.get(sourceId as string))) {
       return null;
     }*/
     const attachmentId = this.host.service.addBlock(
-=======
+========
 
     if (!(await this.host.std.workspace.blobSync.get(sourceId as string))) {
       return null;
     }
     const attachmentId = this.crud.addBlock(
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
       'affine:attachment',
       {
         xywh,
@@ -556,19 +556,19 @@ export class EdgelessClipboardController extends PageClipboard {
 
       for (const [key, value] of Object.entries(children)) {
         const newKey = context.oldToNewIdMap.get(key);
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
         assertExists(
           newKey,
           'Copy failed: cannot find the copied child in group'
         );
-=======
+========
         if (!newKey) {
           console.error(
             `Copy failed: cannot find the copied child in group, key: ${key}`
           );
           return null;
         }
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
         yMap.set(newKey, value);
       }
       clipboardData.children = yMap;
@@ -591,19 +591,19 @@ export class EdgelessClipboardController extends PageClipboard {
 
         if (oldValue.parent) {
           const newParent = context.oldToNewIdMap.get(oldValue.parent);
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
           assertExists(
             newParent,
             'Copy failed: cannot find the copied node in mind map'
           );
-=======
+========
           if (!newParent) {
             console.error(
               `Copy failed: cannot find the copied node in mind map, parent: ${oldValue.parent}`
             );
             return null;
           }
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
           newValue.parent = newParent;
         }
 
@@ -638,11 +638,11 @@ export class EdgelessClipboardController extends PageClipboard {
 
     clipboardData.lockedBySelf = false;
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
     const id = this.host.service.addElement(
-=======
+========
     const id = this.crud.addElement(
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
       clipboardData.type as CanvasElementType,
       clipboardData
     );
@@ -796,19 +796,19 @@ export class EdgelessClipboardController extends PageClipboard {
   private async _createImageBlock(image: BlockSnapshot) {
     const { xywh, rotate, sourceId, size, width, height, caption,meta,src } =
       image.props;
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
     //todo comment for mahdaad
     /*if (!(await this.host.std.collection.blobSync.get(sourceId as string))) {
       return null;
     }*/
     return this.host.service.addBlock(
-=======
+========
 
     if (!(await this.host.std.workspace.blobSync.get(sourceId as string))) {
       return null;
     }
     return this.crud.addBlock(
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
       'affine:image',
       {
         caption,
@@ -835,11 +835,11 @@ export class EdgelessClipboardController extends PageClipboard {
       description,
     });
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
     return this.host.service.addBlock(
-=======
+========
     return this.crud.addBlock(
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
       'affine:embed-linked-doc',
       {
         xywh,
@@ -1333,7 +1333,7 @@ export class EdgelessClipboardController extends PageClipboard {
     };
 
     // create blocks and canvas elements
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/clipboard/clipboard.ts
 
     const context: CreationContext = {
       oldToNewIdMap: new Map<string, string>(),
@@ -1343,8 +1343,8 @@ export class EdgelessClipboardController extends PageClipboard {
         this.edgeless
       ),
     };
-=======
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/clipboard/clipboard.ts
 
     const context: CreationContext = {
       oldToNewIdMap: new Map<string, string>(),

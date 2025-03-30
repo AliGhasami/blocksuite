@@ -1,5 +1,4 @@
 import type { Document } from '@toeverything/pdf-viewer';
-
 import {
   createPDFium,
   PageRenderingflags,
@@ -36,7 +35,6 @@ function renderToImageData(index: number, scale: number) {
   bitmap.fill(0, 0, width, height);
   page.render(bitmap, 0, 0, width, height, 0, flags);
 
-  // @ts-ignore
   const data = new Uint8ClampedArray(bitmap.toUint8Array());
 
   bitmap.close();

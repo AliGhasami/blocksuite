@@ -1,8 +1,8 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/mindmap/mindmap-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/mindmap/mindmap-tool-button.ts
 /** @alighasami for check merge **/
-=======
+========
 import { EdgelessCRUDIdentifier } from '@blocksuite/affine-block-surface';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/mindmap/mindmap-tool-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/mindmap/mindmap-tool-button.ts
 import type {
   MindmapElementModel,
   MindmapStyle,

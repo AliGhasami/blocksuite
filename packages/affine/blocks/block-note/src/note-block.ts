@@ -1,9 +1,9 @@
 import type { NoteBlockModel } from '@blocksuite/affine-model';
-<<<<<<< HEAD:packages/blocks/src/note-block/note-block.ts
+<<<<<<<< HEAD:packages/blocks/src/note-block/note-block.ts
 
 import { checkNotEmptyNote } from '@blocksuite/affine-shared/utils';
-=======
->>>>>>> origin/main:packages/affine/blocks/block-note/src/note-block.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-note/src/note-block.ts
 import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 

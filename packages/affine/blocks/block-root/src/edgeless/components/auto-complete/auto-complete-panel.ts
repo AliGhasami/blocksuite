@@ -155,7 +155,7 @@ export class EdgelessAutoCompletePanel extends WithDisposable(LitElement) {
     const { service, surfaceBlockModel } = edgeless;
     const frameMgr = service.frame;
     const frameIndex = service.frames.length + 1;
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/auto-complete/auto-complete-panel.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/auto-complete/auto-complete-panel.ts
     const id = service.addBlock(
       'affine:frame',
       {
@@ -165,14 +165,14 @@ export class EdgelessAutoCompletePanel extends WithDisposable(LitElement) {
       },
       surfaceBlockModel
     );
-=======
+========
     const props = this.std.get(EditPropsStore).applyLastProps('affine:frame', {
       title: new Y.Text(`Frame ${frameIndex}`),
       xywh: serializeXYWH(...xywh),
       presentationIndex: frameMgr.generatePresentationIndex(),
     });
     const id = this.crud.addBlock('affine:frame', props, surfaceBlockModel);
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/auto-complete/auto-complete-panel.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/auto-complete/auto-complete-panel.ts
     edgeless.doc.captureSync();
     const frame = this.crud.getElementById(id);
     if (!frame) return;

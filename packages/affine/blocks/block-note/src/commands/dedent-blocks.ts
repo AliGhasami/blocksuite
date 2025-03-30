@@ -1,24 +1,4 @@
-<<<<<<< HEAD:packages/blocks/src/note-block/commands/dedent-blocks.ts
-import type { Command } from '@blocksuite/block-std';
-
-import {
-  calculateCollapsedSiblings,
-  matchFlavours,
-} from '@blocksuite/affine-shared/utils';
-
-export const dedentBlocks: Command<
-  never,
-  never,
-  {
-    blockIds?: string[];
-    stopCapture?: boolean;
-  }
-> = (ctx, next) => {
-  let { blockIds } = ctx;
-  const { std, stopCapture = true } = ctx;
-  const { doc, selection, range, host } = std;
-  const { schema } = doc;
-=======
+//ali ghasami-check version 3
 import { ParagraphBlockModel } from '@blocksuite/affine-model';
 import {
   calculateCollapsedSiblings,
@@ -36,7 +16,6 @@ export const dedentBlocks: Command<{
   const { std, stopCapture = true } = ctx;
   const { store, selection, range, host } = std;
   const { schema } = store;
->>>>>>> origin/main:packages/affine/blocks/block-note/src/commands/dedent-blocks.ts
 
   if (!blockIds || !blockIds.length) {
     const nativeRange = range.value;
@@ -53,28 +32,16 @@ export const dedentBlocks: Command<{
     }
   }
 
-<<<<<<< HEAD:packages/blocks/src/note-block/commands/dedent-blocks.ts
-  if (!blockIds || !blockIds.length || doc.readonly) return;
-=======
   if (!blockIds || !blockIds.length || store.readonly) return;
->>>>>>> origin/main:packages/affine/blocks/block-note/src/commands/dedent-blocks.ts
 
   // Find the first model that can be unindented
   let firstDedentIndex = -1;
   for (let i = 0; i < blockIds.length; i++) {
-<<<<<<< HEAD:packages/blocks/src/note-block/commands/dedent-blocks.ts
-    const model = doc.getBlock(blockIds[i])?.model;
-    if (!model) continue;
-    const parent = doc.getParent(blockIds[i]);
-    if (!parent) continue;
-    const grandParent = doc.getParent(parent);
-=======
     const model = store.getBlock(blockIds[i])?.model;
     if (!model) continue;
     const parent = store.getParent(blockIds[i]);
     if (!parent) continue;
     const grandParent = store.getParent(parent);
->>>>>>> origin/main:packages/affine/blocks/block-note/src/commands/dedent-blocks.ts
     if (!grandParent) continue;
 
     if (schema.isValid(model.flavour, grandParent.flavour)) {
@@ -85,18 +52,6 @@ export const dedentBlocks: Command<{
 
   if (firstDedentIndex === -1) return;
 
-<<<<<<< HEAD:packages/blocks/src/note-block/commands/dedent-blocks.ts
-  if (stopCapture) doc.captureSync();
-
-  const collapsedIds: string[] = [];
-  blockIds.slice(firstDedentIndex).forEach(id => {
-    const model = doc.getBlock(id)?.model;
-    if (!model) return;
-    if (
-      matchFlavours(model, ['affine:paragraph']) &&
-      model.type.startsWith('h') &&
-      model.collapsed
-=======
   if (stopCapture) store.captureSync();
 
   const collapsedIds: string[] = [];
@@ -107,7 +62,6 @@ export const dedentBlocks: Command<{
       matchModels(model, [ParagraphBlockModel]) &&
       model.props.type.startsWith('h') &&
       model.props.collapsed
->>>>>>> origin/main:packages/affine/blocks/block-note/src/commands/dedent-blocks.ts
     ) {
       const collapsedSiblings = calculateCollapsedSiblings(model);
       collapsedIds.push(...collapsedSiblings.map(sibling => sibling.id));
@@ -118,17 +72,10 @@ export const dedentBlocks: Command<{
     .slice(firstDedentIndex)
     .filter(id => !collapsedIds.includes(id));
   dedentIds.reverse().forEach(id => {
-<<<<<<< HEAD:packages/blocks/src/note-block/commands/dedent-blocks.ts
-    std.command.exec('dedentBlock', { blockId: id, stopCapture: false });
-  });
-
-  const textSelection = selection.find('text');
-=======
     std.command.exec(dedentBlock, { blockId: id, stopCapture: false });
   });
 
   const textSelection = selection.find(TextSelection);
->>>>>>> origin/main:packages/affine/blocks/block-note/src/commands/dedent-blocks.ts
   if (textSelection) {
     host.updateComplete
       .then(() => {

@@ -53,7 +53,7 @@ export class HeaderAreaTextCell extends BaseCellRenderer<Text, string> {
     return this.view.contextGet(HostContextKey)?.std;
   }
 
-<<<<<<< HEAD:packages/blocks/src/database-block/properties/title/text.ts
+<<<<<<<< HEAD:packages/blocks/src/database-block/properties/title/text.ts
   protected override render(): unknown {
     return html`${this.renderIcon()}${this.renderBlockText()}`;
   }
@@ -111,9 +111,9 @@ export class HeaderAreaTextCell extends BaseTextCell {
 
 export class HeaderAreaTextCellEditing extends BaseTextCell {
   private _onCopy = (e: ClipboardEvent) => {
-=======
+========
   private readonly _onCopy = (e: ClipboardEvent) => {
->>>>>>> origin/main:packages/affine/blocks/block-database/src/properties/title/text.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-database/src/properties/title/text.ts
     const inlineEditor = this.inlineEditor;
     if (!inlineEditor) return;
 

@@ -1,15 +1,15 @@
-<<<<<<< HEAD:packages/blocks/src/image-block/image-block.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/image-block.ts
 /** @alighasami for check merge **/
 import type { ImageBlockModel } from '@blocksuite/affine-model';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { Peekable } from '@blocksuite/affine-components/peek';
-=======
+========
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { Peekable } from '@blocksuite/affine-components/peek';
 import type { ImageBlockModel } from '@blocksuite/affine-model';
 import { BlockSelection } from '@blocksuite/block-std';
->>>>>>> origin/main:packages/affine/blocks/block-image/src/image-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/image-block.ts
 import { IS_MOBILE } from '@blocksuite/global/env';
 import { html } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
@@ -28,14 +28,14 @@ import {
 @Peekable({
   enableOn: () => !IS_MOBILE,
 })
-<<<<<<< HEAD:packages/blocks/src/image-block/image-block.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/image-block.ts
 export class ImageBlockComponent extends CaptionedBlockComponent<
   ImageBlockModel,
   ImageBlockService
 > {
-=======
+========
 export class ImageBlockComponent extends CaptionedBlockComponent<ImageBlockModel> {
->>>>>>> origin/main:packages/affine/blocks/block-image/src/image-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/image-block.ts
   convertToCardView = () => {
     turnImageIntoCardView(this).catch(console.error);
   };
@@ -75,11 +75,11 @@ export class ImageBlockComponent extends CaptionedBlockComponent<ImageBlockModel
     this.refreshData();
     this.contentEditable = 'false';
     this._disposables.add(
-<<<<<<< HEAD:packages/blocks/src/image-block/image-block.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/image-block.ts
       this.model.propsUpdated.on(({ key }) => {
-=======
+========
       this.model.propsUpdated.subscribe(({ key }) => {
->>>>>>> origin/main:packages/affine/blocks/block-image/src/image-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/image-block.ts
         if (key === 'sourceId') {
           this.refreshData();
         }

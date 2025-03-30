@@ -1,13 +1,14 @@
+//ali ghasami-check version 3
 import { QuickToolMixin } from '@blocksuite/affine-widget-edgeless-toolbar';
 import type { GfxToolsFullOptionValue } from '@blocksuite/block-std/gfx';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
 
 import {
   SelectIcon,
 } from '@blocksuite/affine-components/icons';
-=======
+========
 import { HandIcon, SelectIcon } from '@blocksuite/icons/lit';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
 import { effect } from '@preact/signals-core';
 import { css, html, LitElement } from 'lit';
 import { query } from 'lit/decorators.js';
@@ -70,13 +71,13 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
     }
     this.disposables.add(
       effect(() => {
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
         const tool = this.edgeless.gfx.tool.currentToolName$.value;
         if (tool === 'default' ) { //|| tool === 'pan'
-=======
+========
         const tool = this.gfx.tool.currentToolName$.value;
         if (tool === 'default' || tool === 'pan') {
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
           localStorage.defaultTool = tool;
         }
       })
@@ -92,30 +93,30 @@ export class EdgelessDefaultToolButton extends QuickToolMixin(LitElement) {
         : { tip: 'Select', shortcut: 'V' };
     return html`
       <edgeless-tool-icon-button
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
         class="edgeless-default-button ${type} ${active ? 'active' : ''}"
         .tooltip=${getTooltipWithShortcut('Select', 'V')}
-=======
+========
         class="edgeless-default-button ${type}"
         .tooltip=${html`<affine-tooltip-content-with-shortcut
           data-tip="${tipInfo.tip}"
           data-shortcut="${tipInfo.shortcut}"
         ></affine-tooltip-content-with-shortcut>`}
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
         .tooltipOffset=${17}
         .active=${active}
         .iconContainerPadding=${6}
         .iconSize=${'24px'}
         @click=${this._changeTool}
       >
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/default/default-tool-button.ts
         <span class="current-icon"> ${SelectIcon} </span>
-=======
+========
         <div class="current-icon">
           ${localStorage.defaultTool === 'default' ? SelectIcon() : HandIcon()}
         </div>
         <toolbar-arrow-up-icon></toolbar-arrow-up-icon>
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/default/default-tool-button.ts
       </edgeless-tool-icon-button>
     `;
   }

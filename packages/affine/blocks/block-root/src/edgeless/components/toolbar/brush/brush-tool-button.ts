@@ -1,10 +1,10 @@
 import {
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/brush/brush-tool-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/brush/brush-tool-button.ts
   ArrowUpIcon, PenTablerIcon
 } from "@blocksuite/affine-components/icons";
 import {
-=======
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/brush/brush-tool-button.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/brush/brush-tool-button.ts
   EditPropsStore,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';

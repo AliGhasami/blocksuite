@@ -1,9 +1,10 @@
-import type { DeltaInsert } from '@blocksuite/inline';
-
-import { createIdentifier } from '@blocksuite/global/di';
+import {
+  createIdentifier,
+  type ServiceIdentifier,
+} from '@blocksuite/global/di';
+import type { DeltaInsert, ExtensionType } from '@blocksuite/store';
 
 import type { AffineTextAttributes } from '../../types/index.js';
-
 import {
   type ASTToDeltaMatcher,
   DeltaASTConverter,
@@ -18,6 +19,22 @@ export const InlineDeltaToPlainTextAdapterMatcherIdentifier =
   createIdentifier<InlineDeltaToPlainTextAdapterMatcher>(
     'InlineDeltaToPlainTextAdapterMatcher'
   );
+
+export function InlineDeltaToPlainTextAdapterExtension(
+  matcher: InlineDeltaToPlainTextAdapterMatcher
+): ExtensionType & {
+  identifier: ServiceIdentifier<InlineDeltaToPlainTextAdapterMatcher>;
+} {
+  const identifier = InlineDeltaToPlainTextAdapterMatcherIdentifier(
+    matcher.name
+  );
+  return {
+    setup: di => {
+      di.addImpl(identifier, () => matcher);
+    },
+    identifier,
+  };
+}
 
 export type PlainTextASTToDeltaMatcher = ASTToDeltaMatcher<string>;
 

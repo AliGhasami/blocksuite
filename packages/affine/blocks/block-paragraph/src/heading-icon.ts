@@ -1,8 +1,3 @@
-<<<<<<< HEAD:packages/affine/block-paragraph/src/heading-icon.ts
-import type { ParagraphBlockModel } from '@blocksuite/affine-model';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/heading-icon.ts
 import {
   Heading1Icon,
   Heading2Icon,
@@ -11,14 +6,9 @@ import {
   Heading5Icon,
   Heading6Icon,
 } from '@blocksuite/affine-components/icons';
-<<<<<<< HEAD:packages/affine/block-paragraph/src/heading-icon.ts
-import { ShadowlessElement } from '@blocksuite/block-std';
-import { WithDisposable } from '@blocksuite/global/utils';
-=======
 import type { ParagraphBlockModel } from '@blocksuite/affine-model';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { SignalWatcher, WithDisposable } from '@blocksuite/global/lit';
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/heading-icon.ts
 import { cssVarV2 } from '@toeverything/theme/v2';
 import { css, html, nothing, unsafeCSS } from 'lit';
 import { property } from 'lit/decorators.js';
@@ -42,25 +32,16 @@ function HeadingIcon(i: number) {
   }
 }
 
-<<<<<<< HEAD:packages/affine/block-paragraph/src/heading-icon.ts
-export class ParagraphHeadingIcon extends WithDisposable(ShadowlessElement) {
-=======
 export class ParagraphHeadingIcon extends SignalWatcher(
   WithDisposable(ShadowlessElement)
 ) {
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/heading-icon.ts
   static override styles = css`
     affine-paragraph-heading-icon .heading-icon {
       display: flex;
       align-items: start;
       margin-top: 0.3em;
       position: absolute;
-<<<<<<< HEAD:packages/affine/block-paragraph/src/heading-icon.ts
-      /*left: 0;*/
-      inset-inline-start: 0;
-=======
       left: 0;
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/heading-icon.ts
       transform: translateX(-64px);
       border-radius: 4px;
       padding: 2px;
@@ -86,22 +67,14 @@ export class ParagraphHeadingIcon extends SignalWatcher(
   `;
 
   override render() {
-<<<<<<< HEAD:packages/affine/block-paragraph/src/heading-icon.ts
-    const type = this.model.type;
-=======
     const type = this.model.props.type$.value;
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/heading-icon.ts
     if (!type.startsWith('h')) return nothing;
 
     const i = parseInt(type.slice(1));
 
-<<<<<<< HEAD:packages/affine/block-paragraph/src/heading-icon.ts
-    return html`<div class="heading-icon">${HeadingIcon(i)}</div>`;
-=======
     return html`<div class="heading-icon" data-testid="heading-icon-${i}">
       ${HeadingIcon(i)}
     </div>`;
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/heading-icon.ts
   }
 
   @property({ attribute: false })

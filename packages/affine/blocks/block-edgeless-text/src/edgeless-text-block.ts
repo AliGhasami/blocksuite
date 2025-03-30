@@ -95,13 +95,13 @@ export class EdgelessTextBlockComponent extends GfxBlockComponent<EdgelessTextBl
       this.model.propsUpdated.subscribe(({ key }) => {
         this.updateComplete
           .then(() => {
-<<<<<<< HEAD:packages/blocks/src/edgeless-text-block/edgeless-text-block.ts
+<<<<<<<< HEAD:packages/blocks/src/edgeless-text-block/edgeless-text-block.ts
             if (!this.host) return;
 
             const command = this.host.command;
-=======
+========
             const command = this.std.command;
->>>>>>> origin/main:packages/affine/blocks/block-edgeless-text/src/edgeless-text-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-edgeless-text/src/edgeless-text-block.ts
             const blockSelections = this.model.children.map(child =>
               this.std.selection.create(BlockSelection, {
                 blockId: child.id,

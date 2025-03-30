@@ -1,23 +1,9 @@
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/markdown.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-import type { Heading } from 'mdast';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/markdown.ts
 import { ParagraphBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockMarkdownAdapterExtension,
   type BlockMarkdownAdapterMatcher,
   type MarkdownAST,
 } from '@blocksuite/affine-shared/adapters';
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/markdown.ts
-import { nanoid } from '@blocksuite/store';
-
-const PARAGRAPH_MDAST_TYPE = ['paragraph', 'html', 'heading', 'blockquote'];
-
-const isParagraphMDASTType = (node: MarkdownAST) =>
-  PARAGRAPH_MDAST_TYPE.includes(node.type);
-=======
 import type { DeltaInsert } from '@blocksuite/store';
 import { nanoid } from '@blocksuite/store';
 import type { Heading } from 'mdast';
@@ -31,7 +17,6 @@ const PARAGRAPH_MDAST_TYPE = new Set([
 
 const isParagraphMDASTType = (node: MarkdownAST) =>
   PARAGRAPH_MDAST_TYPE.has(node.type);
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/markdown.ts
 
 export const paragraphBlockMarkdownAdapterMatcher: BlockMarkdownAdapterMatcher =
   {

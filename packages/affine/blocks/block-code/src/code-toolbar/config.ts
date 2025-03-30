@@ -8,10 +8,10 @@ import {
 } from '@blocksuite/affine-components/icons';
 import type { MenuItemGroup } from '@blocksuite/affine-components/toolbar';
 import { isInsidePageEditor } from '@blocksuite/affine-shared/utils';
-<<<<<<< HEAD:packages/blocks/src/root-block/widgets/code-toolbar/config.ts
-=======
+<<<<<<<< HEAD:packages/blocks/src/root-block/widgets/code-toolbar/config.ts
+========
 import { BlockSelection } from '@blocksuite/block-std';
->>>>>>> origin/main:packages/affine/blocks/block-code/src/code-toolbar/config.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-code/src/code-toolbar/config.ts
 import { noop, sleep } from '@blocksuite/global/utils';
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';

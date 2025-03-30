@@ -1,17 +1,20 @@
 import { type Container, createIdentifier } from '@blocksuite/global/di';
+import { DisposableGroup } from '@blocksuite/global/disposable';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import {
-  type Bound,
-  DisposableGroup,
-  type IVec,
-} from '@blocksuite/global/utils';
+import type { Bound, IVec } from '@blocksuite/global/gfx';
+import type { Extension } from '@blocksuite/store';
 
 import type { PointerEventState } from '../../event/index.js';
-import type { Extension } from '../../extension/extension.js';
 import type { EditorHost } from '../../view/index.js';
+import type {
+  DragEndContext,
+  DragMoveContext,
+  DragStartContext,
+  GfxViewTransformInterface,
+} from '../element-transform/view-transform.js';
 import type { GfxController } from '../index.js';
 import type { GfxElementGeometry, PointTestOptions } from '../model/base.js';
-import type { GfxPrimitiveElementModel } from '../model/surface/element-model.js';
+import { GfxPrimitiveElementModel } from '../model/surface/element-model.js';
 import type { GfxLocalElementModel } from '../model/surface/local-element-model.js';
 
 export type EventsHandlerMap = {
@@ -36,13 +39,12 @@ export class GfxElementModelView<
       | GfxLocalElementModel,
     RendererContext = object,
   >
-  implements GfxElementGeometry, Extension
+  implements GfxElementGeometry, Extension, GfxViewTransformInterface
 {
   static type: string;
 
-  private _handlers = new Map<
+  private readonly _handlers = new Map<
     keyof EventsHandlerMap,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((evt: any) => void)[]
   >();
 
@@ -73,7 +75,6 @@ export class GfxElementModelView<
     readonly gfx: GfxController
   ) {
     this.model = model;
-    this.onCreated();
   }
 
   static setup(di: Container): void {
@@ -170,6 +171,26 @@ export class GfxElementModelView<
   }
 
   onCreated() {}
+
+  onDragStart(_: DragStartContext) {
+    if (this.model instanceof GfxPrimitiveElementModel) {
+      this.model.stash('xywh');
+    }
+  }
+
+  onDragEnd(_: DragEndContext) {
+    if (this.model instanceof GfxPrimitiveElementModel) {
+      this.model.pop('xywh');
+    }
+  }
+
+  onDragMove({ dx, dy, currentBound }: DragMoveContext) {
+    this.model.xywh = currentBound.moveDelta(dx, dy).serialize();
+  }
+
+  onResize = () => {};
+
+  onRotate = () => {};
 
   /**
    * Called when the view is destroyed.

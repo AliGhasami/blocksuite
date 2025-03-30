@@ -29,11 +29,7 @@ export const embedSyncedDocBlockMarkdownAdapterMatcher: BlockMarkdownAdapterMatc
 
         if (type === 'content') {
           const syncedDocId = o.node.props.pageId as string;
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/adapters/markdown.ts
-          const syncedDoc = job.collection.getDoc(syncedDocId);
-=======
           const syncedDoc = job.docCRUD.get(syncedDocId);
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/adapters/markdown.ts
           if (!syncedDoc) return;
 
           if (counter === 1) {
@@ -64,9 +60,5 @@ export const embedSyncedDocBlockMarkdownAdapterMatcher: BlockMarkdownAdapterMatc
     },
   };
 
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/adapters/markdown.ts
-export const EmbedSyncedDocBlockMarkdownAdapterExtension =
-=======
 export const EmbedSyncedDocMarkdownAdapterExtension =
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/adapters/markdown.ts
   BlockMarkdownAdapterExtension(embedSyncedDocBlockMarkdownAdapterMatcher);

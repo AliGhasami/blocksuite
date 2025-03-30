@@ -1,4 +1,4 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/widgets/code-toolbar/components/lang-button.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/widgets/code-toolbar/components/lang-button.ts
 import { ArrowDownIcon } from '@blocksuite/affine-components/icons';
 import { unsafeCSSVarV2 } from '@blocksuite/affine-shared/theme';
 import { noop, SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
@@ -9,8 +9,8 @@ import { html } from 'lit/static-html.js';
 
 import type { CodeBlockComponent } from '../../../../code-block/code-block.js';
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-code/src/code-toolbar/components/lang-button.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-code/src/code-toolbar/components/lang-button.ts
 import {
   type FilterableListItem,
   type FilterableListOptions,
@@ -31,13 +31,13 @@ export class LanguageListButton extends WithDisposable(
   SignalWatcher(LitElement)
 ) {
   static override styles = css`
-<<<<<<< HEAD:packages/blocks/src/root-block/widgets/code-toolbar/components/lang-button.ts
-=======
+<<<<<<<< HEAD:packages/blocks/src/root-block/widgets/code-toolbar/components/lang-button.ts
+========
     :host {
       margin-right: auto;
     }
 
->>>>>>> origin/main:packages/affine/blocks/block-code/src/code-toolbar/components/lang-button.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-code/src/code-toolbar/components/lang-button.ts
     .lang-button {
       background-color: var(--affine-background-primary-color);
       box-shadow: var(--affine-shadow-1);

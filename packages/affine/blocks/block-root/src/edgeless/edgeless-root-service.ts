@@ -22,7 +22,7 @@ import type {
   PointTestOptions,
   ReorderingDirection,
 } from '@blocksuite/block-std/gfx';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-service.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-service.ts
 
 import {
   type ElementRenderer,
@@ -39,8 +39,8 @@ import {
 } from '@blocksuite/affine-model';
 import { EditPropsStore } from '@blocksuite/affine-shared/services';
 import { clamp } from '@blocksuite/affine-shared/utils';
-=======
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-service.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-service.ts
 import {
   GfxBlockElementModel,
   GfxControllerIdentifier,
@@ -71,7 +71,7 @@ export class EdgelessRootService extends RootService implements SurfaceContext {
 
   elementRenderers: Record<string, ElementRenderer> = elementRenderers;
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-service.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-service.ts
   slots = {
     pressShiftKeyUpdated: new Slot<boolean>(),
     copyAsPng: new Slot<{
@@ -95,8 +95,8 @@ export class EdgelessRootService extends RootService implements SurfaceContext {
     toolbarLocked: new Slot<boolean>(),
   };
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-service.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-service.ts
   TemplateJob = TemplateJob;
 
   get blocks(): GfxBlockElementModel[] {

@@ -1,13 +1,13 @@
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
 import type {
   BlockSnapshot,
   DocSnapshot,
   JobMiddleware,
 } from '@blocksuite/store';
 
-=======
+========
 import { DefaultTheme, NoteDisplayMode } from '@blocksuite/affine-model';
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
 import {
   embedSyncedDocMiddleware,
   HtmlAdapter,
@@ -20,12 +20,12 @@ import type {
 import { AssetsManager, MemoryBlobCRUD } from '@blocksuite/store';
 import { describe, expect, test } from 'vitest';
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
 import { HtmlAdapter } from '../../_common/adapters/html-adapter/html.js';
 import { nanoidReplacement } from '../../_common/test-utils/test-utils.js';
 import { embedSyncedDocMiddleware } from '../../_common/transformers/middlewares.js';
-=======
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+========
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
 import { createJob } from '../utils/create-job.js';
 import { getProvider } from '../utils/get-provider.js';
 import { nanoidReplacement } from '../utils/nanoid-replacement.js';
@@ -1163,11 +1163,11 @@ describe('snapshot to html', () => {
               flavour: 'affine:note',
               props: {
                 xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
                 background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
+========
                 background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
                 index: 'a0',
                 hidden: false,
                 displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1192,11 +1192,11 @@ describe('snapshot to html', () => {
           `<div class="affine-paragraph-block-container"><a href="${testCase.url}">${testCase.title}</a></div>`
         );
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
         const htmlAdapter = new HtmlAdapter(createJob());
-=======
+========
         const htmlAdapter = new HtmlAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
         const target = await htmlAdapter.fromBlockSnapshot({
           snapshot: blockSnapshot,
         });
@@ -1232,11 +1232,11 @@ describe('snapshot to html', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
             background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
+========
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1457,15 +1457,15 @@ describe('snapshot to html', () => {
       ],
     };
     const html = template(
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
       '<table><thead><tr><th>Title</th><th>Status</th><th>Date</th><th>Number</th><th>Progress</th><th>MultiSelect</th><th>RichText</th><th>Link</th><th>Checkbox</th></tr></thead><tbody><tr><td>Task 1</td><td>TODO</td><td>2023-12-15</td><td>1</td><td>65</td><td>test1,test2</td><td><a href="https://google.com">test2</a></td><td>https://google.com</td><td>true</td></tr><tr><td>Task 2</td><td>In Progress</td><td>2023-12-20</td><td></td><td></td><td></td><td>test1</td><td></td><td></td></tr></tbody></table>'
     );
     const htmlAdapter = new HtmlAdapter(createJob());
-=======
+========
       '<table><thead><tr><th>Title</th><th>Status</th><th>Date</th><th>Number</th><th>Progress</th><th>MultiSelect</th><th>RichText</th><th>Link</th><th>Checkbox</th></tr></thead><tbody><tr><td>Task 1</td><td>TODO</td><td>2023-12-15</td><td>1</td><td>65</td><td>test1,test2</td><td><a href="https://google.com">test2</a></td><td>https://google.com</td><td>True</td></tr><tr><td>Task 2</td><td>In Progress</td><td>2023-12-20</td><td></td><td></td><td></td><td>test1</td><td></td><td></td></tr></tbody></table>'
     );
     const htmlAdapter = new HtmlAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
     const target = await htmlAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
     });
@@ -1506,11 +1506,11 @@ describe('snapshot to html', () => {
           version: 1,
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
             background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
+========
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1542,22 +1542,22 @@ describe('snapshot to html', () => {
       ],
     };
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
     const middleware: JobMiddleware = ({ adapterConfigs }) => {
-=======
+========
     const middleware: TransformerMiddleware = ({ adapterConfigs }) => {
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
       adapterConfigs.set('title:4T5ObMgEIMII-4Bexyta1', 'Test Doc');
       adapterConfigs.set('docLinkBaseUrl', 'https://example.com');
     };
     const html = template(
       '<div class="affine-paragraph-block-container"><a href="https://example.com/4T5ObMgEIMII-4Bexyta1?mode=page&#x26;blockIds=abc%2C123&#x26;elementIds=def%2C456&#x26;databaseId=deadbeef&#x26;databaseRowId=123">Test Doc</a></div>'
     );
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
     const htmlAdapter = new HtmlAdapter(createJob([middleware]));
-=======
+========
     const htmlAdapter = new HtmlAdapter(createJob([middleware]), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
     const target = await htmlAdapter.fromBlockSnapshot({
       snapshot: blockSnapShot,
     });
@@ -1609,11 +1609,11 @@ describe('snapshot to html', () => {
             version: 1,
             props: {
               xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
               background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
+========
               background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
               index: 'a0',
               hidden: false,
               displayMode: 'both',
@@ -1947,11 +1947,11 @@ describe('snapshot to html', () => {
     await job.snapshotToDoc(syncedDocSnapshot);
     await job.snapshotToDoc(docSnapShot);
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/html.unit.spec.ts
     const mdAdapter = new HtmlAdapter(job);
-=======
+========
     const mdAdapter = new HtmlAdapter(job, provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/html.unit.spec.ts
     const target = await mdAdapter.fromDocSnapshot({
       snapshot: docSnapShot,
     });

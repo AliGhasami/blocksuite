@@ -1,18 +1,18 @@
-<<<<<<< HEAD:packages/blocks/src/attachment-block/utils.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/utils.ts
 //ali ghasami for new merge
-=======
+========
 import { toast } from '@blocksuite/affine-components/toast';
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/utils.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/utils.ts
 import type {
   AttachmentBlockModel,
   AttachmentBlockProps,
 } from '@blocksuite/affine-model';
 import { defaultAttachmentProps } from '@blocksuite/affine-model';
-<<<<<<< HEAD:packages/blocks/src/attachment-block/utils.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/utils.ts
 //import { TelemetryProvider } from '@blocksuite/affine-shared/services';
 import { humanFileSize } from '@blocksuite/affine-shared/utils';
 import { assertExists } from '@blocksuite/global/utils';
-=======
+========
 import {
   EMBED_CARD_HEIGHT,
   EMBED_CARD_WIDTH,
@@ -26,7 +26,7 @@ import type { BlockStdScope, EditorHost } from '@blocksuite/block-std';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
 import { Bound, type IVec, Point, Vec } from '@blocksuite/global/gfx';
 import type { BlockModel } from '@blocksuite/store';
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/utils.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/utils.ts
 
 import type { AttachmentBlockComponent } from './attachment-block.js';
 
@@ -107,9 +107,9 @@ export async function uploadAttachmentBlob(
       doc.updateBlock(block.model, {
         sourceId,
       } satisfies Partial<AttachmentBlockProps>);
-<<<<<<< HEAD:packages/blocks/src/attachment-block/utils.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/utils.ts
     });*/
-=======
+========
     });
 
     editorHost.std
@@ -122,7 +122,7 @@ export async function uploadAttachmentBlob(
         type: filetype,
         category: block && sourceId ? 'success' : 'failure',
       });
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/utils.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/utils.ts
   }
 }
 

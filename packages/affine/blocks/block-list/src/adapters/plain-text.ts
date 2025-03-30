@@ -1,17 +1,9 @@
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/plain-text.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/plain-text.ts
 import { ListBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockPlainTextAdapterExtension,
   type BlockPlainTextAdapterMatcher,
 } from '@blocksuite/affine-shared/adapters';
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/plain-text.ts
-=======
 import type { DeltaInsert } from '@blocksuite/store';
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/plain-text.ts
 
 export const listBlockPlainTextAdapterMatcher: BlockPlainTextAdapterMatcher = {
   flavour: ListBlockSchema.model.flavour,

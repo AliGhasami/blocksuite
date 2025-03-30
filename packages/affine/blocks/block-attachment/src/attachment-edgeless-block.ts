@@ -14,7 +14,7 @@ export class AttachmentEdgelessBlockComponent extends toGfxBlockComponent(
 ) {
   override blockDraggable = false;
 
-<<<<<<< HEAD:packages/blocks/src/attachment-block/attachment-edgeless-block.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/attachment-edgeless-block.ts
   override blockDraggable = false;
 
   get rootService() {
@@ -40,10 +40,10 @@ export class AttachmentEdgelessBlockComponent extends toGfxBlockComponent(
           this._isResizing || this._isDragging || !this._isSelected;
       })
     );
-=======
+========
   get slots() {
     return this.std.get(EdgelessLegacySlotIdentifier);
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/attachment-edgeless-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/attachment-edgeless-block.ts
   }
 
   override onClick(_: MouseEvent) {

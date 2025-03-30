@@ -6,11 +6,7 @@ import {
 } from '@blocksuite/affine-shared/adapters';
 import { nanoid } from '@blocksuite/store';
 
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/notion-html.ts
-const paragraphBlockMatchTags = [
-=======
 const paragraphBlockMatchTags = new Set([
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/notion-html.ts
   'p',
   'h1',
   'h2',
@@ -22,11 +18,7 @@ const paragraphBlockMatchTags = new Set([
   'div',
   'span',
   'figure',
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/notion-html.ts
-];
-=======
 ]);
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/notion-html.ts
 
 const NotionDatabaseTitleToken = '.collection-title';
 const NotionPageLinkToken = '.link-to-page';
@@ -38,11 +30,7 @@ export const paragraphBlockNotionHtmlAdapterMatcher: BlockNotionHtmlAdapterMatch
     flavour: ParagraphBlockSchema.model.flavour,
     toMatch: o =>
       HastUtils.isElement(o.node) &&
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/notion-html.ts
-      paragraphBlockMatchTags.includes(o.node.tagName),
-=======
       paragraphBlockMatchTags.has(o.node.tagName),
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/notion-html.ts
     fromMatch: () => false,
     toBlockSnapshot: {
       enter: (o, context) => {
@@ -205,10 +193,7 @@ export const paragraphBlockNotionHtmlAdapterMatcher: BlockNotionHtmlAdapterMatch
         const { walkerContext } = context;
         switch (o.node.tagName) {
           case 'div': {
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/notion-html.ts
-=======
             // eslint-disable-next-line sonarjs/no-collapsible-if
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/notion-html.ts
             if (
               o.parent?.node.type === 'element' &&
               !(

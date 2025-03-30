@@ -5,25 +5,25 @@ import {
   type SurfaceBlockModel,
 } from '@blocksuite/affine-block-surface';
 import type { RootBlockModel } from '@blocksuite/affine-model';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-preview-block.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-preview-block.ts
 import type {
   GfxBlockComponent,
   SurfaceSelection,
 } from '@blocksuite/block-std';
 import type { GfxViewportElement } from '@blocksuite/block-std/gfx';
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-preview-block.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-preview-block.ts
 import {
   EditorSettingProvider,
   FontLoaderService,
   ThemeProvider,
   ViewportElementProvider,
 } from '@blocksuite/affine-shared/services';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-preview-block.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-preview-block.ts
 import { BlockComponent } from '@blocksuite/block-std';
 import { assertExists } from '@blocksuite/global/utils';
-=======
+========
 import { requestThrottledConnectedFrame } from '@blocksuite/affine-shared/utils';
 import {
   BlockComponent,
@@ -34,7 +34,7 @@ import {
   GfxControllerIdentifier,
   type GfxViewportElement,
 } from '@blocksuite/block-std/gfx';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-preview-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-preview-block.ts
 import { css, html } from 'lit';
 import { query, state } from 'lit/decorators.js';
 import { type StyleInfo, styleMap } from 'lit/directives/style-map.js';
@@ -249,13 +249,13 @@ export class EdgelessRootPreviewBlockComponent extends BlockComponent<
           .enableChildrenSchedule=${!this._disableScheduleUpdate}
           .viewport=${this._gfx.viewport}
           .getModelsInViewport=${() => {
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-preview-block.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-preview-block.ts
             const blocks = this.service.gfx.grid.search(
               this.service.viewport.viewportBounds,
-=======
+========
             const blocks = this._gfx.grid.search(
               this._gfx.viewport.viewportBounds,
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-preview-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-preview-block.ts
               {
                 useSet: true,
                 filter: ['block'],

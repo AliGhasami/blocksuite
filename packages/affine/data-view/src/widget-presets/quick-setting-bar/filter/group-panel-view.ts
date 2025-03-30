@@ -6,7 +6,7 @@ import {
   popupTargetFromElement,
 } from '@blocksuite/affine-components/context-menu';
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { SignalWatcher } from '@blocksuite/global/utils';
+import { SignalWatcher } from '@blocksuite/global/lit';
 import {
   ArrowDownSmallIcon,
   ConvertIcon,
@@ -16,14 +16,14 @@ import {
   PlusIcon,
 } from '@blocksuite/icons/lit';
 import { computed, type ReadonlySignal } from '@preact/signals-core';
-import { css, html, nothing, type TemplateResult } from 'lit';
+import { cssVarV2 } from '@toeverything/theme/v2';
+import { css, html, nothing, type TemplateResult, unsafeCSS } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type { Variable } from '../../../core/expression/types.js';
 import type { Filter, FilterGroup } from '../../../core/filter/types.js';
-
 import { firstFilter, firstFilterInGroup } from '../../../core/filter/utils.js';
 
 export const popAddNewFilter = (
@@ -163,17 +163,17 @@ export class FilterGroupView extends SignalWatcher(ShadowlessElement) {
     }
 
     .filter-group-border {
-      border: 1px dashed var(--affine-border-color);
+      border: 1px dashed ${unsafeCSS(cssVarV2.layer.insideBorder.border)};
     }
 
     .filter-group-bg-1 {
       background-color: var(--affine-background-secondary-color);
-      border: 1px solid var(--affine-border-color);
+      border: 1px solid ${unsafeCSS(cssVarV2.layer.insideBorder.border)};
     }
 
     .filter-group-bg-2 {
       background-color: var(--affine-background-tertiary-color);
-      border: 1px solid var(--affine-border-color);
+      border: 1px solid ${unsafeCSS(cssVarV2.layer.insideBorder.border)};
     }
 
     .hover-style {
@@ -185,7 +185,7 @@ export class FilterGroupView extends SignalWatcher(ShadowlessElement) {
     }
   `;
 
-  private _addNew = (e: MouseEvent) => {
+  private readonly _addNew = (e: MouseEvent) => {
     if (this.isMaxDepth) {
       this.onChange({
         ...this.filterGroup.value,
@@ -203,7 +203,7 @@ export class FilterGroupView extends SignalWatcher(ShadowlessElement) {
     });
   };
 
-  private _selectOp = (event: MouseEvent) => {
+  private readonly _selectOp = (event: MouseEvent) => {
     popFilterableSimpleMenu(
       popupTargetFromElement(event.currentTarget as HTMLElement),
       [
@@ -229,7 +229,7 @@ export class FilterGroupView extends SignalWatcher(ShadowlessElement) {
     );
   };
 
-  private _setFilter = (index: number, filter: Filter) => {
+  private readonly _setFilter = (index: number, filter: Filter) => {
     this.onChange({
       ...this.filterGroup.value,
       conditions: this.filterGroup.value.conditions.map((v, i) =>
@@ -238,7 +238,7 @@ export class FilterGroupView extends SignalWatcher(ShadowlessElement) {
     });
   };
 
-  private opMap = {
+  private readonly opMap = {
     and: 'And',
     or: 'Or',
   };
@@ -263,6 +263,9 @@ export class FilterGroupView extends SignalWatcher(ShadowlessElement) {
 
   private _clickConditionOps(target: HTMLElement, i: number) {
     const filter = this.filterGroup.value.conditions[i];
+    if (!filter) {
+      return;
+    }
     popFilterableSimpleMenu(popupTargetFromElement(target), [
       menu.group({
         items: [

@@ -1,18 +1,10 @@
 import { EmbedLinkedDocBlockSchema } from '@blocksuite/affine-model';
 import {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/adapters/html.ts
-=======
   AdapterTextUtils,
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/adapters/html.ts
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
 } from '@blocksuite/affine-shared/adapters';
 
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/adapters/html.ts
-import { generateDocUrl } from '../../common/adapters/utils.js';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/adapters/html.ts
 export const embedLinkedDocBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   flavour: EmbedLinkedDocBlockSchema.model.flavour,
   toMatch: () => false,
@@ -26,11 +18,7 @@ export const embedLinkedDocBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         return;
       }
       const title = configs.get('title:' + o.node.props.pageId) ?? 'untitled';
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/adapters/html.ts
-      const url = generateDocUrl(
-=======
       const url = AdapterTextUtils.generateDocUrl(
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/adapters/html.ts
         configs.get('docLinkBaseUrl') ?? '',
         String(o.node.props.pageId),
         o.node.props.params ?? Object.create(null)

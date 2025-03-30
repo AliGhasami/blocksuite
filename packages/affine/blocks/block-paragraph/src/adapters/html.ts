@@ -1,26 +1,14 @@
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/html.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/html.ts
 import { ParagraphBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockHtmlAdapterExtension,
   type BlockHtmlAdapterMatcher,
   HastUtils,
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/html.ts
-} from '@blocksuite/affine-shared/adapters';
-import { nanoid } from '@blocksuite/store';
-
-const paragraphBlockMatchTags = [
-=======
   type HtmlAST,
 } from '@blocksuite/affine-shared/adapters';
 import type { DeltaInsert, NodeProps } from '@blocksuite/store';
 import { nanoid } from '@blocksuite/store';
 
 const paragraphBlockMatchTags = new Set([
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/html.ts
   'p',
   'h1',
   'h2',
@@ -33,9 +21,6 @@ const paragraphBlockMatchTags = new Set([
   'div',
   'span',
   'footer',
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/html.ts
-];
-=======
 ]);
 
 const tagsInAncestor = (o: NodeProps<HtmlAST>, tagNames: Array<string>) => {
@@ -51,17 +36,11 @@ const tagsInAncestor = (o: NodeProps<HtmlAST>, tagNames: Array<string>) => {
   }
   return false;
 };
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/html.ts
 
 export const paragraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   flavour: ParagraphBlockSchema.model.flavour,
   toMatch: o =>
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/html.ts
-    HastUtils.isElement(o.node) &&
-    paragraphBlockMatchTags.includes(o.node.tagName),
-=======
     HastUtils.isElement(o.node) && paragraphBlockMatchTags.has(o.node.tagName),
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/html.ts
   fromMatch: o => o.node.flavour === ParagraphBlockSchema.model.flavour,
   toBlockSnapshot: {
     enter: (o, context) => {
@@ -106,11 +85,7 @@ export const paragraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
         case 'footer': {
           if (
             o.parent?.node.type === 'element' &&
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/html.ts
-            !['li', 'p'].includes(o.parent.node.tagName) &&
-=======
             !tagsInAncestor(o, ['p', 'li']) &&
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/html.ts
             HastUtils.isParagraphLike(o.node)
           ) {
             walkerContext
@@ -192,10 +167,7 @@ export const paragraphBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       const { walkerContext } = context;
       switch (o.node.tagName) {
         case 'div': {
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/html.ts
-=======
           // eslint-disable-next-line sonarjs/no-collapsible-if
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/html.ts
           if (
             o.parent?.node.type === 'element' &&
             o.parent.node.tagName !== 'li' &&

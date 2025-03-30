@@ -1,6 +1,5 @@
 {
-  "name": "@blocksuite/docs",
-  "version": "0.19.5",
+  "name": "@blocksuite/bs-docs",
   "description": "BlockSuite documentation",
   "private": true,
   "keywords": [],
@@ -9,26 +8,14 @@
   "license": "MPL-2.0",
   "type": "module",
   "devDependencies": {
-    "typedoc": "^0.27.0",
-    "typedoc-plugin-markdown": "4.3.2",
-    "vite-plugin-wasm": "^3.3.0",
-    "vitepress": "1.5.0",
-    "vue": "^3.4.38"
+    "typedoc": "^0.28.0",
+    "typedoc-plugin-markdown": "^4.5.0"
   },
   "scripts": {
-    "typedoc": "yarn run -T build:packages && typedoc --options ../../typedoc.json",
-    "dev": "yarn run typedoc && vitepress dev --port 5200",
-    "dev:nobuild": "vitepress dev --port 5200",
-    "build": "yarn run typedoc && vitepress build",
-    "build:vercel": "yarn run typedoc && vitepress build",
-    "preview": "yarn run typedoc && vitepress preview"
+    "build": "typedoc"
   },
   "dependencies": {
-    "@blocksuite/blocks": "workspace:*",
-    "@blocksuite/presets": "workspace:*",
-    "@blocksuite/store": "workspace:*",
-    "date-fns": "^4.0.0",
-    "markdown-it-container": "^4.0.0",
-    "vitepress-plugin-sandpack": "^1.1.4"
-  }
+    "@blocksuite/affine": "workspace:*"
+  },
+  "version": "0.20.0"
 }

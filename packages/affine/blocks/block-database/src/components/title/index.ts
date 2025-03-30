@@ -1,8 +1,8 @@
-<<<<<<< HEAD:packages/blocks/src/database-block/components/title/index.ts
+<<<<<<<< HEAD:packages/blocks/src/database-block/components/title/index.ts
 import type { Text } from '@blocksuite/store';
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-database/src/components/title/index.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-database/src/components/title/index.ts
 import { stopPropagation } from '@blocksuite/affine-shared/utils';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { WithDisposable } from '@blocksuite/global/lit';

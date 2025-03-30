@@ -1,24 +1,25 @@
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+//ali ghasami-check version 3
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 /** @alighasami for check merge **/
-=======
+========
 import { SurfaceBlockModel } from '@blocksuite/affine-block-surface';
 import { isPeekable, Peekable } from '@blocksuite/affine-components/peek';
 import { RefNodeSlotsProvider } from '@blocksuite/affine-inline-reference';
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 import type {
   DocMode,
   EmbedLinkedDocModel,
   EmbedLinkedDocStyles,
 } from '@blocksuite/affine-model';
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 
 import { isPeekable, Peekable } from '@blocksuite/affine-components/peek';
 import {
   REFERENCE_NODE,
   RefNodeSlotsProvider,
 } from '@blocksuite/affine-components/rich-text';
-=======
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 import {
   EMBED_CARD_HEIGHT,
   EMBED_CARD_WIDTH,
@@ -34,13 +35,13 @@ import {
 import {
   cloneReferenceInfo,
   cloneReferenceInfoWithoutAliases,
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
   matchFlavours,
   referenceToNode,
 } from '@blocksuite/affine-shared/utils';
 import { Bound } from '@blocksuite/global/utils';
 import { DocCollection } from '@blocksuite/store';
-=======
+========
   isNewTabTrigger,
   isNewViewTrigger,
   matchModels,
@@ -49,18 +50,18 @@ import { DocCollection } from '@blocksuite/store';
 import { BlockSelection } from '@blocksuite/block-std';
 import { Bound } from '@blocksuite/global/gfx';
 import { Text } from '@blocksuite/store';
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 import { computed } from '@preact/signals-core';
 import { html, nothing } from 'lit';
 import { property, queryAsync, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { when } from 'lit/directives/when.js';
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
-=======
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+========
 import throttle from 'lodash-es/throttle';
 import * as Y from 'yjs';
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 
 import { EmbedBlockComponent } from '../common/embed-block-element.js';
 import {
@@ -206,11 +207,11 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
   };
 
   referenceInfo$ = computed(() => {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     const { pageId, params, title$, description$ } = this.model;
-=======
+========
     const { pageId, params, title$, description$ } = this.model.props;
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     return cloneReferenceInfo({
       pageId,
       params,
@@ -226,12 +227,12 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
       .icon(pageId, { params, title, referenced: true }).value;
   });
 
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
   open = () => {
     this.std
       .getOptional(RefNodeSlotsProvider)
       ?.docLinkClicked.emit(this.referenceInfo$.peek());
-=======
+========
   open = ({
     openMode,
     event,
@@ -245,7 +246,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
       event,
       host: this.host,
     });
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
   };
 
   refreshData = () => {
@@ -257,7 +258,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
 
   title$ = computed(() => {
     const { pageId, params, title } = this.referenceInfo$.value;
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     return (
       title ||
       this.std
@@ -267,8 +268,8 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
   });
 
   get config(): EmbedLinkedDocBlockConfig {
-=======
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     return (
       this.std
         .get(DocDisplayMetaProvider)
@@ -277,11 +278,11 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
   });
 
   get docTitle() {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     return this.model.title || this.linkedDoc?.meta?.title || 'Untitled';
-=======
+========
     return this.model.props.title || this.linkedDoc?.meta?.title || 'Untitled';
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
   }
 
   get editorMode() {
@@ -289,7 +290,7 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
   }
 
   get linkedDoc() {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     return this.std.collection.getDoc(this.model.pageId);
   }
 
@@ -308,14 +309,14 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
     if (isPeekable(this)) {
       return;
     }
-=======
+========
     return this.std.workspace.getDoc(this.model.props.pageId, {
       id: this.model.props.pageId,
     });
   }
 
   private _handleDoubleClick(event: MouseEvent) {
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     event.stopPropagation();
     const openDocService = this.std.get(OpenDocExtensionIdentifier);
     const shouldOpenInPeek =
@@ -337,18 +338,18 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
   }
 
   protected _handleClick(event: MouseEvent) {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     if (this.config.handleClick) {
       this.config.handleClick(event, this.host, this.referenceInfo$.peek());
       if (event.defaultPrevented) {
         return;
       }
-=======
+========
     if (isNewTabTrigger(event)) {
       this.open({ openMode: 'open-in-new-tab', event });
     } else if (isNewViewTrigger(event)) {
       this.open({ openMode: 'open-in-new-view', event });
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     }
     this._selectBlock();
   }
@@ -356,13 +357,13 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
   override connectedCallback() {
     super.connectedCallback();
 
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     this._cardStyle = this.model.style;
     this._referenceToNode = referenceToNode(this.model);
-=======
+========
     this._cardStyle = this.model.props.style;
     this._referenceToNode = referenceToNode(this.model.props);
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 
     this._load().catch(e => {
       console.error(e);
@@ -411,11 +412,11 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
       );
 
       if (this._referenceToNode) {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
         this._linkedDocMode = this.model.params?.mode ?? 'page';
-=======
+========
         this._linkedDocMode = this.model.props.params?.mode ?? 'page';
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
       } else {
         const docMode = this.std.get(DocModeProvider);
         this._linkedDocMode = docMode.getPrimaryMode(this.model.props.pageId);
@@ -428,15 +429,15 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
     }
 
     this.disposables.add(
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
       this.model.propsUpdated.on(({ key }) => {
         if (key === 'style') {
           this._cardStyle = this.model.style;
-=======
+========
       this.model.propsUpdated.subscribe(({ key }) => {
         if (key === 'style') {
           this._cardStyle = this.model.props.style;
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
         }
         if (key === 'pageId' || key === 'style') {
           this._load().catch(e => {
@@ -491,11 +492,11 @@ export class EmbedLinkedDocBlockComponent extends EmbedBlockComponent<EmbedLinke
         ? LoadingIcon
         : this.icon$.value;
     const title = isLoading ? 'Loading...' : this.title$;
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
     const description = this.model.description$;
-=======
+========
     const description = this.model.props.description$;
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-linked-doc-block/embed-linked-doc-block.ts
 
     const showDefaultNoteContent = isError || isLoading || isDeleted || isEmpty;
     const defaultNoteContent = isError

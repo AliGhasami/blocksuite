@@ -2,12 +2,14 @@ import type {
   GfxCommonBlockProps,
   GfxElementGeometry,
 } from '@blocksuite/block-std/gfx';
-
 import { GfxCompatible } from '@blocksuite/block-std/gfx';
-import { BlockModel, defineBlockSchema } from '@blocksuite/store';
+import {
+  BlockModel,
+  BlockSchemaExtension,
+  defineBlockSchema,
+} from '@blocksuite/store';
 
-import type { EmbedCardStyle } from '../../utils/index.js';
-
+import type { BlockMeta, EmbedCardStyle } from '../../utils/index.js';
 import { AttachmentBlockTransformer } from './attachment-transformer.js';
 
 /**
@@ -51,10 +53,10 @@ export type AttachmentBlockProps = {
    * Whether to show the attachment as an embed view.
    */
   embed: boolean | BackwardCompatibleUndefined;
-  src: string;
+
   style?: (typeof AttachmentBlockStyles)[number];
-  meta:Record<string, string>
-} & Omit<GfxCommonBlockProps, 'scale'>;
+} & Omit<GfxCommonBlockProps, 'scale'> &
+  BlockMeta;
 
 export const defaultAttachmentProps: AttachmentBlockProps = {
   name: '',
@@ -62,14 +64,16 @@ export const defaultAttachmentProps: AttachmentBlockProps = {
   type: 'application/octet-stream',
   sourceId: undefined,
   caption: undefined,
-  src: '',
   embed: false,
   style: AttachmentBlockStyles[1],
   index: 'a0',
   xywh: '[0,0,0,0]',
   lockedBySelf: false,
   rotate: 0,
-  meta:{}
+  'meta:createdAt': undefined,
+  'meta:updatedAt': undefined,
+  'meta:createdBy': undefined,
+  'meta:updatedBy': undefined,
 };
 
 export const AttachmentBlockSchema = defineBlockSchema({
@@ -85,22 +89,17 @@ export const AttachmentBlockSchema = defineBlockSchema({
       'affine:paragraph',
       'affine:list',
     ],
+    children: ['@attachment-viewer'],
   },
-  transformer: () => new AttachmentBlockTransformer(),
+  transformer: transformerConfigs =>
+    new AttachmentBlockTransformer(transformerConfigs),
   toModel: () => new AttachmentBlockModel(),
 });
+
+export const AttachmentBlockSchemaExtension = BlockSchemaExtension(
+  AttachmentBlockSchema
+);
 
 export class AttachmentBlockModel
   extends GfxCompatible<AttachmentBlockProps>(BlockModel)
   implements GfxElementGeometry {}
-
-declare global {
-  namespace BlockSuite {
-    interface EdgelessBlockModelMap {
-      'affine:attachment': AttachmentBlockModel;
-    }
-    interface BlockModels {
-      'affine:attachment': AttachmentBlockModel;
-    }
-  }
-}

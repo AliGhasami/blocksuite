@@ -1,16 +1,3 @@
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/html.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-import type { Element } from 'hast';
-
-import { ListBlockSchema } from '@blocksuite/affine-model';
-import {
-  BlockHtmlAdapterExtension,
-  type BlockHtmlAdapterMatcher,
-  HastUtils,
-  TextUtils,
-} from '@blocksuite/affine-shared/adapters';
-import { nanoid } from '@blocksuite/store';
-=======
 import { ListBlockSchema } from '@blocksuite/affine-model';
 import {
   AdapterTextUtils,
@@ -21,7 +8,6 @@ import {
 import type { DeltaInsert } from '@blocksuite/store';
 import { nanoid } from '@blocksuite/store';
 import type { Element } from 'hast';
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/html.ts
 
 export const listBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
   flavour: ListBlockSchema.model.flavour,
@@ -138,11 +124,7 @@ export const listBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           Array.isArray(currentTNode.properties.className) &&
           currentTNode.properties.className.includes('todo-list')
         ) ===
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/html.ts
-          TextUtils.isNullish(
-=======
           AdapterTextUtils.isNullish(
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/html.ts
             o.node.props.type === 'todo'
               ? (o.node.props.checked as boolean)
               : undefined
@@ -195,11 +177,7 @@ export const listBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           Array.isArray(previousTNode.properties.className) &&
           previousTNode.properties.className.includes('todo-list')
         ) ===
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/html.ts
-          TextUtils.isNullish(
-=======
           AdapterTextUtils.isNullish(
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/html.ts
             o.node.props.type === 'todo'
               ? (o.node.props.checked as boolean)
               : undefined

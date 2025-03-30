@@ -1,35 +1,19 @@
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/notion-html.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/notion-html.ts
 import { ListBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockNotionHtmlAdapterExtension,
   type BlockNotionHtmlAdapterMatcher,
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/notion-html.ts
-import { nanoid } from '@blocksuite/store';
-
-const listBlockMatchTags = ['ul', 'ol', 'li'];
-=======
 import type { DeltaInsert } from '@blocksuite/store';
 import { nanoid } from '@blocksuite/store';
 
 const listBlockMatchTags = new Set(['ul', 'ol', 'li']);
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/notion-html.ts
 
 export const listBlockNotionHtmlAdapterMatcher: BlockNotionHtmlAdapterMatcher =
   {
     flavour: ListBlockSchema.model.flavour,
     toMatch: o =>
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/notion-html.ts
-      HastUtils.isElement(o.node) &&
-      listBlockMatchTags.includes(o.node.tagName),
-=======
       HastUtils.isElement(o.node) && listBlockMatchTags.has(o.node.tagName),
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/notion-html.ts
     fromMatch: () => false,
     toBlockSnapshot: {
       enter: (o, context) => {

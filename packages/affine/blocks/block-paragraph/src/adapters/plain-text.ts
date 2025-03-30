@@ -1,17 +1,9 @@
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/plain-text.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-
-=======
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/plain-text.ts
 import { ParagraphBlockSchema } from '@blocksuite/affine-model';
 import {
   BlockPlainTextAdapterExtension,
   type BlockPlainTextAdapterMatcher,
 } from '@blocksuite/affine-shared/adapters';
-<<<<<<< HEAD:packages/affine/block-paragraph/src/adapters/plain-text.ts
-=======
 import type { DeltaInsert } from '@blocksuite/store';
->>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/adapters/plain-text.ts
 
 export const paragraphBlockPlainTextAdapterMatcher: BlockPlainTextAdapterMatcher =
   {

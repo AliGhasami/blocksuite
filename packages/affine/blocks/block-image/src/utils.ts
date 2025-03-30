@@ -1,9 +1,9 @@
-<<<<<<< HEAD:packages/blocks/src/image-block/utils.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/utils.ts
 /** @alighasami for check merge **/
-=======
+========
 import { autoResizeElementsCommand } from '@blocksuite/affine-block-surface';
 import { toast } from '@blocksuite/affine-components/toast';
->>>>>>> origin/main:packages/affine/blocks/block-image/src/utils.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/utils.ts
 import type {
   AttachmentBlockProps,
   ImageBlockModel,
@@ -32,13 +32,13 @@ import {
 import type { ImageBlockComponent } from './image-block.js';
 import type { ImageEdgelessBlockComponent } from './image-edgeless-block.js';
 
-<<<<<<< HEAD:packages/blocks/src/image-block/utils.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/utils.ts
 import { readImageSize } from '../root-block/edgeless/components/utils.js';
 import { transformModel } from '../root-block/utils/operations/model.js';
 import { downloadFile } from '../_common/mahdaad/url.js';
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-image/src/utils.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/utils.ts
 const MAX_RETRY_COUNT = 3;
 const DEFAULT_ATTACHMENT_NAME = 'affine-attachment';
 
@@ -273,12 +273,12 @@ function convertToPng(blob: Blob): Promise<Blob | null> {
 export async function copyImageBlob(
   block: ImageBlockComponent | ImageEdgelessBlockComponent
 ) {
-<<<<<<< HEAD:packages/blocks/src/image-block/utils.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/utils.ts
 
   const { host, model } = block;
-=======
+========
   const { host, model, std } = block;
->>>>>>> origin/main:packages/affine/blocks/block-image/src/utils.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/utils.ts
   let blob = await getImageBlob(model);
   if (!blob) {
     console.error('Failed to get image blob');

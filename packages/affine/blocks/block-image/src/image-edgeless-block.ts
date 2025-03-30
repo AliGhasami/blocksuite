@@ -63,11 +63,11 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<ImageBlockMod
     //this.refreshData();
     this.contentEditable = 'false';
     this.disposables.add(
-<<<<<<< HEAD:packages/blocks/src/image-block/image-edgeless-block.ts
+<<<<<<<< HEAD:packages/blocks/src/image-block/image-edgeless-block.ts
       this.model.propsUpdated.on(({ key }) => {
-=======
+========
       this.model.propsUpdated.subscribe(({ key }) => {
->>>>>>> origin/main:packages/affine/blocks/block-image/src/image-edgeless-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-image/src/image-edgeless-block.ts
         if (key === 'sourceId') {
           this.refreshData();
         }

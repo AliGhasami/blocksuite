@@ -1,20 +1,17 @@
-import type { ExtensionType } from '@blocksuite/block-std';
-import type { DeltaInsert } from '@blocksuite/inline/types';
-import type { PhrasingContent } from 'mdast';
-
 import {
   createIdentifier,
   type ServiceIdentifier,
 } from '@blocksuite/global/di';
+import type { DeltaInsert, ExtensionType } from '@blocksuite/store';
+import type { PhrasingContent } from 'mdast';
 
 import type { AffineTextAttributes } from '../../types/index.js';
-import type { MarkdownAST } from './type.js';
-
 import {
   type ASTToDeltaMatcher,
   DeltaASTConverter,
   type InlineDeltaMatcher,
 } from '../types/adapter.js';
+import type { MarkdownAST } from './type.js';
 
 export type InlineDeltaToMarkdownAdapterMatcher =
   InlineDeltaMatcher<PhrasingContent>;

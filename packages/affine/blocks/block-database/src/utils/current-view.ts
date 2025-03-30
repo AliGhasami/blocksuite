@@ -20,11 +20,7 @@ const createCurrentViewStorage = () => {
       if (result.success) {
         return result.data;
       }
-<<<<<<< HEAD:packages/blocks/src/database-block/utils/current-view.ts
-    } catch (_) {
-=======
     } catch {
->>>>>>> origin/main:packages/affine/blocks/block-database/src/utils/current-view.ts
       // do nothing
     }
     return;

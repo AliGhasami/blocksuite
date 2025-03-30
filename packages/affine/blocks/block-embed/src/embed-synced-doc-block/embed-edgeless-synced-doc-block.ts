@@ -123,12 +123,12 @@ export class EmbedEdgelessSyncedDocBlockComponent extends toEdgelessEmbedBlock(
   };
 
   override convertToCard = (aliasInfo?: AliasInfo) => {
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-edgeless-synced-doc-block.ts
+<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-edgeless-synced-doc-block.ts
     const { id, doc, caption, xywh } = this.model;
-=======
+========
     const { id, doc, xywh } = this.model;
     const { caption } = this.model.props;
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-edgeless-synced-doc-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-edgeless-synced-doc-block.ts
 
     const style = 'vertical';
     const bound = Bound.deserialize(xywh);

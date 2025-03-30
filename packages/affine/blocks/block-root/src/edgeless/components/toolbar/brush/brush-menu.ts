@@ -49,7 +49,7 @@ export class EdgelessBrushMenu extends EdgelessToolbarToolMixin(
   type: GfxToolsFullOptionValue['type'] = 'brush';
 
   override render() {
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/brush/brush-menu.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/brush/brush-menu.ts
     console.log("1111",this.edgeless.doc.awarenessStore.getFlag(
       'enable_color_picker'
     ))
@@ -58,8 +58,8 @@ export class EdgelessBrushMenu extends EdgelessToolbarToolMixin(
       .get(ThemeProvider)
       .getColorValue(this._props$.value.color, GET_DEFAULT_LINE_COLOR(theme));
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/brush/brush-menu.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/brush/brush-menu.ts
     return html`
       <edgeless-slide-menu>
         <div class="menu-content">

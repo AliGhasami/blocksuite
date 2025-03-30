@@ -1,9 +1,9 @@
 import { EdgelessLegacySlotIdentifier } from '@blocksuite/affine-block-surface';
 import { toast } from '@blocksuite/affine-components/toast';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/presentation-toolbar.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/presentation-toolbar.ts
 import { EditPropsStore } from '@blocksuite/affine-shared/services';
 import { Bound, SignalWatcher } from '@blocksuite/global/utils';
-=======
+========
 import type { FrameBlockModel } from '@blocksuite/affine-model';
 import {
   EditPropsStore,
@@ -21,7 +21,7 @@ import {
   StartPointArrowIcon,
   StopAiIcon,
 } from '@blocksuite/icons/lit';
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/edgeless-toolbar/presentation-toolbar.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/edgeless-toolbar/presentation-toolbar.ts
 import { effect } from '@preact/signals-core';
 import { cssVar } from '@toeverything/theme';
 import { css, html, LitElement, nothing, type PropertyValues } from 'lit';
@@ -33,15 +33,15 @@ import {
   type NavigatorMode,
 } from '../frame-manager';
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/presentation-toolbar.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/presentation-toolbar.ts
 import { isFrameBlock } from '../../utils/query.js';
 import { launchIntoFullscreen } from '../utils.js';
 import { EdgelessToolbarToolMixin } from './mixins/tool.mixin.js';
 
 const { clamp } = CommonUtils;
 
-=======
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/edgeless-toolbar/presentation-toolbar.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/edgeless-toolbar/presentation-toolbar.ts
 export class PresentationToolbar extends EdgelessToolbarToolMixin(
   SignalWatcher(LitElement)
 ) {

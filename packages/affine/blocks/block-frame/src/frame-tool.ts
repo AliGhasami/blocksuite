@@ -79,15 +79,15 @@ export class FrameTool extends BaseTool {
           xywh: Bound.fromPoints([this._startPoint, currentPoint]).serialize(),
           index: this.gfx.layer.generateIndex(true),
           presentationIndex: this.frameManager.generatePresentationIndex(),
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/gfx-tool/frame-tool.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/gfx-tool/frame-tool.ts
         },
         this.gfx.surface
       );
-=======
+========
         });
 
       const id = this.doc.addBlock('affine:frame', props, this.gfx.surface);
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-tool.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/frame-tool.ts
 
       this.std.getOptional(TelemetryProvider)?.track('CanvasElementAdded', {
         control: 'canvas:draw',

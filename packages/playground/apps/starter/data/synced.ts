@@ -1,5 +1,5 @@
-import { MarkdownTransformer } from '@blocksuite/blocks';
-import { type DocCollection, Text } from '@blocksuite/store';
+import { MarkdownTransformer } from '@blocksuite/affine/blocks/root';
+import { Text, type Workspace } from '@blocksuite/affine/store';
 
 import type { InitFn } from './utils';
 
@@ -11,7 +11,7 @@ This article has also been published [in PDF format](https://www.inkandswitch.co
 
 We welcome your feedback: [@inkandswitch](https://twitter.com/inkandswitch) or hello@inkandswitch.com.`;
 
-export const synced: InitFn = (collection: DocCollection, id: string) => {
+export const synced: InitFn = (collection: Workspace, id: string) => {
   const docMain = collection.getDoc(id) ?? collection.createDoc({ id });
 
   const docSyncedPageId = 'doc:synced-page';
@@ -20,9 +20,9 @@ export const synced: InitFn = (collection: DocCollection, id: string) => {
   const docSyncedEdgelessId = 'doc:synced-edgeless';
   const docSyncedEdgeless = collection.createDoc({ id: docSyncedEdgelessId });
 
-  docMain.clear();
-  docSyncedPage.clear();
-  docSyncedEdgeless.clear();
+  docMain.doc.clear();
+  docSyncedPage.doc.clear();
+  docSyncedEdgeless.doc.clear();
 
   docSyncedPage.load(() => {
     // Add root block and surface block at root level

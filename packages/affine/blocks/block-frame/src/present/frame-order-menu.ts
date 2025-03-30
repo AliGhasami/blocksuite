@@ -1,17 +1,17 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
 import { generateKeyBetweenV2 } from '@blocksuite/block-std/gfx';
 import {
   DisposableGroup,
   SignalWatcher,
   WithDisposable,
 } from '@blocksuite/global/utils';
-=======
+========
 import { EdgelessCRUDIdentifier } from '@blocksuite/affine-block-surface';
 import type { BlockComponent } from '@blocksuite/block-std';
 import { generateKeyBetweenV2 } from '@blocksuite/block-std/gfx';
 import { DisposableGroup } from '@blocksuite/global/disposable';
 import { SignalWatcher, WithDisposable } from '@blocksuite/global/lit';
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
 import { css, html, LitElement, nothing } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -106,10 +106,10 @@ export class EdgelessFrameOrderMenu extends SignalWatcher(
     }
   `;
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
   private get _frames() {
     return this.edgeless.service.frames;
-=======
+========
   get crud() {
     return this.edgeless.std.get(EdgelessCRUDIdentifier);
   }
@@ -120,7 +120,7 @@ export class EdgelessFrameOrderMenu extends SignalWatcher(
 
   private get _frames() {
     return this._frameMgr.frames;
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
   }
 
   private _bindEvent() {
@@ -194,7 +194,7 @@ export class EdgelessFrameOrderMenu extends SignalWatcher(
           newIndex !== index &&
           newIndex !== index + 1
         ) {
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
           const frameMgr = this.edgeless.service.frame;
           // Legacy compatibility
           frameMgr.refreshLegacyFrameOrder();
@@ -205,7 +205,7 @@ export class EdgelessFrameOrderMenu extends SignalWatcher(
           const frame = this._frames[index];
 
           this.edgeless.service.updateElement(frame.id, {
-=======
+========
           const frameMgr = this._frameMgr;
           // Legacy compatibility
           frameMgr.refreshLegacyFrameOrder();
@@ -217,7 +217,7 @@ export class EdgelessFrameOrderMenu extends SignalWatcher(
           const frame = this._frames[index];
 
           this.crud.updateElement(frame.id, {
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
             presentationIndex: generateKeyBetweenV2(before, after),
           });
           this.edgeless.doc.captureSync();
@@ -289,13 +289,13 @@ export class EdgelessFrameOrderMenu extends SignalWatcher(
 
   @property({ attribute: false })
   accessor embed = false;
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/present/frame-order-menu.ts
 }
 
 declare global {
   interface HTMLElementTagNameMap {
     'edgeless-frame-order-menu': EdgelessFrameOrderMenu;
   }
-=======
->>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-frame/src/present/frame-order-menu.ts
 }

@@ -136,7 +136,7 @@ export const styles = css`
     width: 100%;
     height: 100%;
   }
-<<<<<<< HEAD:packages/blocks/src/attachment-block/styles.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/styles.ts
 
   .affine-attachment-iframe-overlay {
     position: absolute;
@@ -152,6 +152,6 @@ export const styles = css`
   .affine-attachment-container {
     padding-inline-end: 10px;
   }
-=======
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/styles.ts
+========
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/styles.ts
 `;

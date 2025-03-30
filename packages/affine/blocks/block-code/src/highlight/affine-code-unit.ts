@@ -1,11 +1,11 @@
-<<<<<<< HEAD:packages/blocks/src/code-block/highlight/affine-code-unit.ts
+<<<<<<<< HEAD:packages/blocks/src/code-block/highlight/affine-code-unit.ts
 import type { AffineTextAttributes } from '@blocksuite/affine-shared/types';
 import type { ThemedToken } from 'shiki';
 
-=======
+========
 import { affineTextStyles } from '@blocksuite/affine-shared/styles';
 import type { AffineTextAttributes } from '@blocksuite/affine-shared/types';
->>>>>>> origin/main:packages/affine/blocks/block-code/src/highlight/affine-code-unit.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-code/src/highlight/affine-code-unit.ts
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { ZERO_WIDTH_SPACE } from '@blocksuite/block-std/inline';
 import type { DeltaInsert } from '@blocksuite/store';

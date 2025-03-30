@@ -32,10 +32,10 @@ import {
   ShapeElementModel,
   TextElementModel,
 } from '@blocksuite/affine-model';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/rects/edgeless-selected-rect.ts
-=======
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/rects/edgeless-selected-rect.ts
+========
 import { EMBED_CARD_HEIGHT } from '@blocksuite/affine-shared/consts';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/rects/edgeless-selected-rect.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/rects/edgeless-selected-rect.ts
 import { unsafeCSSVarV2 } from '@blocksuite/affine-shared/theme';
 import {
   getElementsWithoutGroup,

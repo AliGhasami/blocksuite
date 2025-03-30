@@ -235,6 +235,7 @@ export const popViewOptions = (
   items.push(
     menu.input({
       initialValue: view.name$.value,
+      placeholder: 'View name',
       onChange: text => {
         view.nameSet(text);
       },
@@ -258,7 +259,7 @@ export const popViewOptions = (
                   return;
                 }
                 const isSelected =
-                  meta.type === view.manager.currentView$.value.type;
+                  meta.type === view.manager.currentView$.value?.type;
                 const iconStyle = styleMap({
                   fontSize: '24px',
                   color: isSelected
@@ -284,10 +285,11 @@ export const popViewOptions = (
                     </div>
                   `,
                   select: () => {
-                    view.manager.viewChangeType(
-                      view.manager.currentViewId$.value,
-                      meta.type
-                    );
+                    const id = view.manager.currentViewId$.value;
+                    if (!id) {
+                      return;
+                    }
+                    view.manager.viewChangeType(id, meta.type);
                     dataViewInstance.clearSelection();
                   },
                   class: {},

@@ -386,12 +386,12 @@ export class CodeBlockComponent extends CaptionedBlockComponent<CodeBlockModel> 
 
   override renderBlock(): TemplateResult<1> {
     const showLineNumbers =
-<<<<<<< HEAD:packages/blocks/src/code-block/code-block.ts
+<<<<<<<< HEAD:packages/blocks/src/code-block/code-block.ts
       this.std.getConfig('affine:code')?.showLineNumbers ?? true;
-=======
+========
       this.std.getOptional(CodeBlockConfigExtension.identifier)
         ?.showLineNumbers ?? true;
->>>>>>> origin/main:packages/affine/blocks/block-code/src/code-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-code/src/code-block.ts
 
     return html`
       <div

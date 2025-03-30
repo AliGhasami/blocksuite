@@ -1,13 +1,16 @@
-import { DisposableGroup } from '@blocksuite/global/utils';
-
-import type { GfxController } from '../controller.js';
-import type { GfxModel } from '../model/model.js';
-import type { GfxLocalElementModel } from '../model/surface/local-element-model.js';
-import type { SurfaceBlockModel } from '../model/surface/surface-model.js';
+import { DisposableGroup } from '@blocksuite/global/disposable';
 
 import { onSurfaceAdded } from '../../utils/gfx.js';
+import {
+  type GfxBlockComponent,
+  isGfxBlockComponent,
+} from '../../view/index.js';
+import type { GfxController } from '../controller.js';
 import { GfxExtension, GfxExtensionIdentifier } from '../extension.js';
-import { GfxBlockElementModel } from '../model/gfx-block-model.js';
+import type { GfxModel } from '../model/model.js';
+import type { GfxPrimitiveElementModel } from '../model/surface/element-model.js';
+import type { GfxLocalElementModel } from '../model/surface/local-element-model.js';
+import type { SurfaceBlockModel } from '../model/surface/surface-model.js';
 import {
   GfxElementModelView,
   GfxElementModelViewExtIdentifier,
@@ -16,11 +19,11 @@ import {
 export class ViewManager extends GfxExtension {
   static override key = 'viewManager';
 
-  private _disposable = new DisposableGroup();
+  private readonly _disposable = new DisposableGroup();
 
-  private _viewCtorMap = new Map<string, typeof GfxElementModelView>();
+  private readonly _viewCtorMap = new Map<string, typeof GfxElementModelView>();
 
-  private _viewMap = new Map<string, GfxElementModelView>();
+  private readonly _viewMap = new Map<string, GfxElementModelView>();
 
   constructor(gfx: GfxController) {
     super(gfx);
@@ -34,20 +37,22 @@ export class ViewManager extends GfxExtension {
     });
   }
 
-  get(model: GfxModel | GfxLocalElementModel | string) {
-    if (typeof model === 'string') {
-      if (this._viewMap.has(model)) {
-        return this._viewMap.get(model);
-      }
+  get(
+    model: GfxModel | GfxLocalElementModel | string
+  ): GfxElementModelView | GfxBlockComponent | null {
+    model = typeof model === 'string' ? model : model.id;
 
-      return this.std.view.getBlock(model) ?? null;
-    } else {
-      if (model instanceof GfxBlockElementModel) {
-        return this.std.view.getBlock(model.id) ?? null;
-      } else {
-        return this._viewMap.get(model.id) ?? null;
-      }
+    if (this._viewMap.has(model)) {
+      return this._viewMap.get(model)!;
     }
+
+    const blockView = this.std.view.getBlock(model);
+
+    if (blockView && isGfxBlockComponent(blockView)) {
+      return blockView;
+    }
+
+    return null;
   }
 
   override mounted(): void {
@@ -58,17 +63,26 @@ export class ViewManager extends GfxExtension {
       });
 
     const updateViewOnElementChange = (surface: SurfaceBlockModel) => {
-      this._disposable.add(
-        surface.elementAdded.on(payload => {
-          const model = surface.getElementById(payload.id)!;
-          const View = this._viewCtorMap.get(model.type) ?? GfxElementModelView;
+      const createView = (
+        model: GfxPrimitiveElementModel | GfxLocalElementModel
+      ) => {
+        const ViewCtor =
+          this._viewCtorMap.get(model.type) ?? GfxElementModelView;
+        const view = new ViewCtor(model, this.gfx);
 
-          this._viewMap.set(model.id, new View(model, this.gfx));
+        this._viewMap.set(model.id, view);
+        view.onCreated();
+      };
+
+      this._disposable.add(
+        surface.elementAdded.subscribe(payload => {
+          const model = surface.getElementById(payload.id)!;
+          createView(model);
         })
       );
 
       this._disposable.add(
-        surface.elementRemoved.on(elem => {
+        surface.elementRemoved.subscribe(elem => {
           const view = this._viewMap.get(elem.id);
           this._viewMap.delete(elem.id);
           view?.onDestroyed();
@@ -76,15 +90,13 @@ export class ViewManager extends GfxExtension {
       );
 
       this._disposable.add(
-        surface.localElementAdded.on(model => {
-          const View = this._viewCtorMap.get(model.type) ?? GfxElementModelView;
-
-          this._viewMap.set(model.id, new View(model, this.gfx));
+        surface.localElementAdded.subscribe(model => {
+          createView(model);
         })
       );
 
       this._disposable.add(
-        surface.localElementDeleted.on(model => {
+        surface.localElementDeleted.subscribe(model => {
           const view = this._viewMap.get(model.id);
           this._viewMap.delete(model.id);
           view?.onDestroyed();
@@ -92,15 +104,11 @@ export class ViewManager extends GfxExtension {
       );
 
       surface.localElementModels.forEach(model => {
-        const View = this._viewCtorMap.get(model.type) ?? GfxElementModelView;
-
-        this._viewMap.set(model.id, new View(model, this.gfx));
+        createView(model);
       });
 
       surface.elementModels.forEach(model => {
-        const View = this._viewCtorMap.get(model.type) ?? GfxElementModelView;
-
-        this._viewMap.set(model.id, new View(model, this.gfx));
+        createView(model);
       });
     };
 
@@ -108,7 +116,7 @@ export class ViewManager extends GfxExtension {
       updateViewOnElementChange(this.gfx.surface);
     } else {
       this._disposable.add(
-        onSurfaceAdded(this.std.doc, surface => {
+        onSurfaceAdded(this.std.store, surface => {
           if (surface) {
             updateViewOnElementChange(surface);
           }

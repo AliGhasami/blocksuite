@@ -26,7 +26,7 @@ import { AttachmentEmbedProvider } from './embed';
 import { styles } from './styles';
 import { checkAttachmentBlob, downloadAttachmentBlob } from './utils';
 
-<<<<<<< HEAD:packages/blocks/src/attachment-block/attachment-block.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/attachment-block.ts
 import { getEmbedCardIcons } from '../_common/utils/url.js';
 import { AttachmentOptionsTemplate } from './components/options.js';
 import { AttachmentEmbedProvider } from './embed.js';
@@ -39,14 +39,14 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<
   AttachmentBlockModel,
   AttachmentBlockService
 > {
-=======
+========
 @Peekable({
   enableOn: ({ model }: AttachmentBlockComponent) => {
     return model.props.type.endsWith('pdf');
   },
 })
 export class AttachmentBlockComponent extends CaptionedBlockComponent<AttachmentBlockModel> {
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/attachment-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/attachment-block.ts
   static override styles = styles;
 
   blockDraggable = true;
@@ -186,16 +186,16 @@ export class AttachmentBlockComponent extends CaptionedBlockComponent<Attachment
     const embedView = this.embedView;
 
     return html`
-<<<<<<< HEAD:packages/blocks/src/attachment-block/attachment-block.ts
+<<<<<<<< HEAD:packages/blocks/src/attachment-block/attachment-block.ts
       <div
         ${this._whenHover ? ref(this._whenHover.setReference) : nothing}
         class="affine-attachment-container"
         draggable="${this.blockDraggable ? 'true' : 'false'}"
         style=${this.containerStyleMap}
       >
-=======
+========
       <div class="affine-attachment-container" style=${this.containerStyleMap}>
->>>>>>> origin/main:packages/affine/blocks/block-attachment/src/attachment-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-attachment/src/attachment-block.ts
         ${embedView
           ? html`<div class="affine-attachment-embed-container">
               ${embedView}

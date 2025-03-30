@@ -10,15 +10,15 @@ import {
   requestConnectedFrame,
   stopPropagation,
 } from '@blocksuite/affine-shared/utils';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/template/template-panel.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/template/template-panel.ts
 import { type Bound, WithDisposable } from '@blocksuite/global/utils';
-=======
+========
 import { EdgelessDraggableElementController } from '@blocksuite/affine-widget-edgeless-toolbar';
 import type { BlockComponent } from '@blocksuite/block-std';
 import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
 import type { Bound } from '@blocksuite/global/gfx';
 import { WithDisposable } from '@blocksuite/global/lit';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/template/template-panel.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/template/template-panel.ts
 import { baseTheme } from '@toeverything/theme';
 import { css, html, LitElement, nothing, unsafeCSS } from 'lit';
 import { property, state } from 'lit/decorators.js';
@@ -26,14 +26,14 @@ import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/template/template-panel.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/template/template-panel.ts
 import type { EdgelessRootBlockComponent } from '../../../edgeless-root-block.js';
 import type { Template } from './template-type.js';
 
 import { EdgelessDraggableElementController } from '../common/draggable/draggable-element.controller.js';
-=======
+========
 import { EdgelessRootService } from '../../../edgeless-root-service.js';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/template/template-panel.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/template/template-panel.ts
 import { builtInTemplates } from './builtin-templates.js';
 import { defaultPreview, Triangle } from './cards.js';
 import type { Template } from './template-type.js';
@@ -302,15 +302,15 @@ export class EdgelessTemplatePanel extends WithDisposable(LitElement) {
       x: bound.x + bound.w / 2,
       y: bound.y + bound.h / 2,
     };
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/template/template-panel.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/components/toolbar/template/template-panel.ts
     const templateJob = this.edgeless.service.createTemplateJob(
       template.type,
       center
     );
     const service = this.edgeless.service;
-=======
+========
     const templateJob = this.service.createTemplateJob(template.type, center);
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/template/template-panel.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/components/toolbar/template/template-panel.ts
 
     try {
       const { assets } = template;

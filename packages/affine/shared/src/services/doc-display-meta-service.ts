@@ -1,10 +1,10 @@
 import type { AliasInfo, ReferenceParams } from '@blocksuite/affine-model';
-import type { Disposable } from '@blocksuite/global/utils';
-import type { Doc } from '@blocksuite/store';
-import type { TemplateResult } from 'lit';
-
 import { LifeCycleWatcher, StdIdentifier } from '@blocksuite/block-std';
 import { type Container, createIdentifier } from '@blocksuite/global/di';
+import {
+  type DisposableMember,
+  disposeMember,
+} from '@blocksuite/global/disposable';
 import {
   AliasIcon,
   BlockLinkIcon,
@@ -14,7 +14,9 @@ import {
   LinkedPageIcon,
   PageIcon,
 } from '@blocksuite/icons/lit';
-import { computed, signal, type Signal } from '@preact/signals-core';
+import type { Store } from '@blocksuite/store';
+import { computed, type Signal, signal } from '@preact/signals-core';
+import type { TemplateResult } from 'lit';
 
 import { referenceToNode } from '../utils/reference.js';
 import { DocModeProvider } from './doc-mode-service.js';
@@ -69,11 +71,11 @@ export class DocDisplayMetaService
 
   static override key = 'doc-display-meta';
 
-  readonly disposables: Disposable[] = [];
+  readonly disposables: DisposableMember[] = [];
 
-  readonly iconMap = new WeakMap<Doc, Signal<TemplateResult>>();
+  readonly iconMap = new WeakMap<Store, Signal<TemplateResult>>();
 
-  readonly titleMap = new WeakMap<Doc, Signal<string>>();
+  readonly titleMap = new WeakMap<Store, Signal<string>>();
 
   static override setup(di: Container) {
     di.addImpl(DocDisplayMetaProvider, this, [StdIdentifier]);
@@ -81,7 +83,10 @@ export class DocDisplayMetaService
 
   dispose() {
     while (this.disposables.length > 0) {
-      this.disposables.pop()?.dispose();
+      const disposable = this.disposables.pop();
+      if (disposable) {
+        disposeMember(disposable);
+      }
     }
   }
 
@@ -89,7 +94,7 @@ export class DocDisplayMetaService
     pageId: string,
     { params, title, referenced }: DocDisplayMetaParams = {}
   ): Signal<TemplateResult> {
-    const doc = this.std.collection.getDoc(pageId);
+    const doc = this.std.workspace.getDoc(pageId);
 
     if (!doc) {
       return signal(DocDisplayMetaService.icons.deleted);
@@ -114,18 +119,19 @@ export class DocDisplayMetaService
         }, pageId);
 
       this.disposables.push(disposable);
-      this.disposables.push(
-        this.std.collection.slots.docRemoved
-          .filter(docId => docId === doc.id)
-          .once(() => {
+      const docRemovedSubscription =
+        this.std.workspace.slots.docRemoved.subscribe(docId => {
+          if (docId === doc.id) {
+            docRemovedSubscription.unsubscribe();
             const index = this.disposables.findIndex(d => d === disposable);
             if (index !== -1) {
               this.disposables.splice(index, 1);
-              disposable.dispose();
+              disposable.unsubscribe();
             }
             this.iconMap.delete(doc);
-          })
-      );
+          }
+        });
+      this.disposables.push(docRemovedSubscription);
       this.iconMap.set(doc, icon$);
     }
 
@@ -153,7 +159,7 @@ export class DocDisplayMetaService
   }
 
   title(pageId: string, { title }: DocDisplayMetaParams = {}): Signal<string> {
-    const doc = this.std.collection.getDoc(pageId);
+    const doc = this.std.workspace.getDoc(pageId);
 
     if (!doc) {
       return signal(title || 'Deleted doc');
@@ -163,23 +169,26 @@ export class DocDisplayMetaService
     if (!title$) {
       title$ = signal(doc.meta?.title || 'Untitled');
 
-      const disposable = this.std.collection.meta.docMetaUpdated.on(() => {
-        title$!.value = doc.meta?.title || 'Untitled';
-      });
+      const disposable = this.std.workspace.slots.docListUpdated.subscribe(
+        () => {
+          title$!.value = doc.meta?.title || 'Untitled';
+        }
+      );
 
       this.disposables.push(disposable);
-      this.disposables.push(
-        this.std.collection.slots.docRemoved
-          .filter(docId => docId === doc.id)
-          .once(() => {
+      const docRemovedSubscription =
+        this.std.workspace.slots.docRemoved.subscribe(docId => {
+          if (docId === doc.id) {
+            docRemovedSubscription.unsubscribe();
             const index = this.disposables.findIndex(d => d === disposable);
             if (index !== -1) {
               this.disposables.splice(index, 1);
-              disposable.dispose();
+              disposable.unsubscribe();
             }
-            this.titleMap.delete(doc);
-          })
-      );
+            this.iconMap.delete(doc);
+          }
+        });
+      this.disposables.push(docRemovedSubscription);
       this.titleMap.set(doc, title$);
     }
 

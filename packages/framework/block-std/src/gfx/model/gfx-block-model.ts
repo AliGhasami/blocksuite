@@ -1,11 +1,5 @@
-import type {
-  Constructor,
-  IVec,
-  SerializedXYWH,
-  XYWH,
-} from '@blocksuite/global/utils';
-
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
+import type { IVec, SerializedXYWH, XYWH } from '@blocksuite/global/gfx';
 import {
   Bound,
   deserializeXYWH,
@@ -16,13 +10,9 @@ import {
   polygonGetPointTangent,
   polygonNearestPoint,
   rotatePoints,
-} from '@blocksuite/global/utils';
+} from '@blocksuite/global/gfx';
+import type { Constructor } from '@blocksuite/global/utils';
 import { BlockModel } from '@blocksuite/store';
-
-import type { EditorHost } from '../../view/index.js';
-import type { GfxCompatibleInterface, PointTestOptions } from './base.js';
-import type { GfxGroupModel } from './model.js';
-import type { SurfaceBlockModel } from './surface/surface-model.js';
 
 import {
   isLockedByAncestorImpl,
@@ -31,6 +21,10 @@ import {
   lockElementImpl,
   unlockElementImpl,
 } from '../../utils/tree.js';
+import type { EditorHost } from '../../view/index.js';
+import type { GfxCompatibleInterface, PointTestOptions } from './base.js';
+import type { GfxGroupModel } from './model.js';
+import type { SurfaceBlockModel } from './surface/surface-model.js';
 
 /**
  * The props that a graphics block model should have.
@@ -68,6 +62,42 @@ export class GfxBlockElementModel<
   private _externalXYWH: SerializedXYWH | undefined = undefined;
 
   connectable = true;
+
+  get xywh() {
+    return this.props.xywh;
+  }
+
+  get xywh$() {
+    return this.props.xywh$;
+  }
+
+  set xywh(xywh: SerializedXYWH) {
+    this.props.xywh = xywh;
+  }
+
+  get index() {
+    return this.props.index;
+  }
+
+  get index$() {
+    return this.props.index$;
+  }
+
+  set index(index: string) {
+    this.props.index = index;
+  }
+
+  get lockedBySelf(): boolean | undefined {
+    return this.props.lockedBySelf;
+  }
+
+  get lockedBySelf$() {
+    return this.props.lockedBySelf$;
+  }
+
+  set lockedBySelf(lockedBySelf: boolean | undefined) {
+    this.props.lockedBySelf = lockedBySelf;
+  }
 
   /**
    * Defines the extension of the response area beyond the element's bounding box.

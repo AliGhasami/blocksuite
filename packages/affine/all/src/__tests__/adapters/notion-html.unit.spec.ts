@@ -7,11 +7,11 @@ import {
 } from '@blocksuite/store';
 import { describe, expect, test } from 'vitest';
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/notion-html.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/notion-html.unit.spec.ts
 import { NotionHtmlAdapter } from '../../_common/adapters/notion-html/notion-html.js';
 import { nanoidReplacement } from '../../_common/test-utils/test-utils.js';
-=======
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/notion-html.unit.spec.ts
+========
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/notion-html.unit.spec.ts
 import { createJob } from '../utils/create-job.js';
 import { getProvider } from '../utils/get-provider.js';
 import { nanoidReplacement } from '../utils/nanoid-replacement.js';

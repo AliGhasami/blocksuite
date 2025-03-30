@@ -1,17 +1,18 @@
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-keyboard.ts
+//ali ghasami-check version 3
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-keyboard.ts
 import {
   LayoutType,
   MindmapElementModel,
   type ShapeElementModel,
 } from '@blocksuite/affine-model';
-=======
+========
 import { insertLinkByQuickSearchCommand } from '@blocksuite/affine-block-bookmark';
 import { EdgelessTextBlockComponent } from '@blocksuite/affine-block-edgeless-text';
 import { isNoteBlock } from '@blocksuite/affine-block-surface';
 import { toast } from '@blocksuite/affine-components/toast';
 import { mountConnectorLabelEditor } from '@blocksuite/affine-gfx-connector';
 import { mountShapeTextEditor, ShapeTool } from '@blocksuite/affine-gfx-shape';
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-keyboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-keyboard.ts
 import {
   ConnectorElementModel,
   ConnectorMode,
@@ -28,7 +29,7 @@ import {
   FeatureFlagService,
   TelemetryProvider,
 } from '@blocksuite/affine-shared/services';
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-keyboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-keyboard.ts
 import { matchFlavours } from '@blocksuite/affine-shared/utils';
 import {
   type GfxToolsMap,
@@ -47,7 +48,7 @@ import {
 } from '../../_common/edgeless/mindmap/index.js';
 import { LassoMode } from '../../_common/types.js';
 import { EdgelessTextBlockComponent } from '../../edgeless-text-block/edgeless-text-block.js';
-=======
+========
 import { LassoMode } from '@blocksuite/affine-shared/types';
 import { matchModels } from '@blocksuite/affine-shared/utils';
 import { SurfaceSelection, TextSelection } from '@blocksuite/block-std';
@@ -61,7 +62,7 @@ import {
 import { IS_MAC } from '@blocksuite/global/env';
 import { Bound, getCommonBound } from '@blocksuite/global/gfx';
 
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-keyboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-keyboard.ts
 import { PageKeyboardManager } from '../keyboard/keyboard-manager.js';
 import type { EdgelessRootBlockComponent } from './edgeless-root-block.js';
 import { LassoTool } from './gfx-tool/lasso-tool.js';
@@ -521,11 +522,11 @@ export class EdgelessPageKeyboardManager extends PageKeyboardManager {
           const doc = this.rootComponent.doc;
 
           if (isSingleMindMapNode(elements)) {
-<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-keyboard.ts
+<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-keyboard.ts
             const target = service.getElementById(
-=======
+========
             const target = gfx.getElementById(
->>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-keyboard.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-keyboard.ts
               elements[0].id
             ) as ShapeElementModel;
             if (target.text) {

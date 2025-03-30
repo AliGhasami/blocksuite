@@ -1,20 +1,3 @@
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/markdown.ts
-import type { DeltaInsert } from '@blocksuite/inline';
-import type { List } from 'mdast';
-
-import { ListBlockSchema } from '@blocksuite/affine-model';
-import {
-  BlockMarkdownAdapterExtension,
-  type BlockMarkdownAdapterMatcher,
-  type MarkdownAST,
-  TextUtils,
-} from '@blocksuite/affine-shared/adapters';
-import { nanoid } from '@blocksuite/store';
-
-const LIST_MDAST_TYPE = ['list', 'listItem'];
-const isListMDASTType = (node: MarkdownAST) =>
-  LIST_MDAST_TYPE.includes(node.type);
-=======
 import { ListBlockSchema } from '@blocksuite/affine-model';
 import {
   AdapterTextUtils,
@@ -28,7 +11,6 @@ import type { List } from 'mdast';
 
 const LIST_MDAST_TYPE = new Set(['list', 'listItem']);
 const isListMDASTType = (node: MarkdownAST) => LIST_MDAST_TYPE.has(node.type);
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/markdown.ts
 
 export const listBlockMarkdownAdapterMatcher: BlockMarkdownAdapterMatcher = {
   flavour: ListBlockSchema.model.flavour,
@@ -93,13 +75,8 @@ export const listBlockMarkdownAdapterMatcher: BlockMarkdownAdapterMatcher = {
         walkerContext.getNodeContext('affine:list:parent') === o.parent &&
         currentTNode.type === 'list' &&
         currentTNode.ordered === (o.node.props.type === 'numbered') &&
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/markdown.ts
-        TextUtils.isNullish(currentTNode.children[0].checked) ===
-          TextUtils.isNullish(
-=======
         AdapterTextUtils.isNullish(currentTNode.children[0].checked) ===
           AdapterTextUtils.isNullish(
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/markdown.ts
             o.node.props.type === 'todo'
               ? (o.node.props.checked as boolean)
               : undefined
@@ -152,13 +129,8 @@ export const listBlockMarkdownAdapterMatcher: BlockMarkdownAdapterMatcher = {
         currentTNode.type === 'listItem' &&
         previousTNode?.type === 'list' &&
         previousTNode.ordered === (o.node.props.type === 'numbered') &&
-<<<<<<< HEAD:packages/affine/block-list/src/adapters/markdown.ts
-        TextUtils.isNullish(currentTNode.checked) ===
-          TextUtils.isNullish(
-=======
         AdapterTextUtils.isNullish(currentTNode.checked) ===
           AdapterTextUtils.isNullish(
->>>>>>> origin/main:packages/affine/blocks/block-list/src/adapters/markdown.ts
             o.node.props.type === 'todo'
               ? (o.node.props.checked as boolean)
               : undefined

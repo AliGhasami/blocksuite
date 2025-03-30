@@ -1,5 +1,9 @@
+//ali ghasami-check version 3
+//ali ghasami-check version 3
+//ali ghasami-check version 3
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { WithDisposable } from '@blocksuite/global/utils';
+import { WithDisposable } from '@blocksuite/global/lit';
+import { ToggleDownIcon, ToggleRightIcon } from '@blocksuite/icons/lit';
 import { css, unsafeCSS } from 'lit';
 import { property } from 'lit/decorators.js';
 import { html } from 'lit-html';
@@ -14,9 +18,15 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
       display: flex;
       align-items: start;
       margin-top: 0.45em;
+      align-items: start;
+      justify-content: start;
       position: absolute;
       /*left: 0;*/
       inset-inline-start: 0;
+      width: 16px;
+      height: 16px;
+      top: calc((1em - 16px) / 2 + 5px);
+      left: 0;
       transform: translateX(-100%);
       border-radius: 4px;
       cursor: pointer;
@@ -64,7 +74,11 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
         class="toggle-icon ${this.direction=='rtl'? 'icon-down' : ''}"
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
-        ${toggleDown}
+        ${ToggleDownIcon({
+          width: '16px',
+          height: '16px',
+          style: 'color: #77757D',
+        })}
       </div>
     `;
 
@@ -75,7 +89,11 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
         data-collapsed=${this.collapsed}
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
-        ${toggleRight}
+        ${ToggleRightIcon({
+          width: '16px',
+          height: '16px',
+          style: 'color: #77757D',
+        })}
       </div>
     `;
 

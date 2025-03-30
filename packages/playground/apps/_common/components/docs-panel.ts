@@ -1,13 +1,10 @@
-import type { AffineEditorContainer } from '@blocksuite/presets';
-import type { BlockCollection, DocCollection } from '@blocksuite/store';
-
-import { ShadowlessElement } from '@blocksuite/block-std';
-import {
-  CloseIcon,
-  createDefaultDoc,
-  GenerateDocUrlProvider,
-} from '@blocksuite/blocks';
-import { WithDisposable } from '@blocksuite/global/utils';
+import { ShadowlessElement } from '@blocksuite/affine/block-std';
+import { WithDisposable } from '@blocksuite/affine/global/lit';
+import { GenerateDocUrlProvider } from '@blocksuite/affine/shared/services';
+import { createDefaultDoc } from '@blocksuite/affine/shared/utils';
+import type { Doc, Workspace } from '@blocksuite/affine/store';
+import { CloseIcon } from '@blocksuite/icons/lit';
+import type { TestAffineEditorContainer } from '@blocksuite/integration-test';
 import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -65,23 +62,23 @@ export class DocsPanel extends WithDisposable(ShadowlessElement) {
   `;
 
   createDoc = () => {
-    createDocBlock(this.editor.doc.collection);
+    createDocBlock(this.editor.doc.workspace);
   };
 
-  gotoDoc = (doc: BlockCollection) => {
+  gotoDoc = (doc: Doc) => {
     const url = this.editor.std
       .getOptional(GenerateDocUrlProvider)
       ?.generateDocUrl(doc.id);
     if (url) history.pushState({}, '', url);
 
-    this.editor.doc = doc.getDoc();
+    this.editor.doc = doc.getStore();
     this.editor.doc.load();
     this.editor.doc.resetHistory();
     this.requestUpdate();
   };
 
   private get collection() {
-    return this.editor.doc.collection;
+    return this.editor.doc.workspace;
   }
 
   private get docs() {
@@ -111,7 +108,7 @@ export class DocsPanel extends WithDisposable(ShadowlessElement) {
     });
 
     this.disposables.add(
-      this.editor.doc.collection.slots.docUpdated.on(() => {
+      this.editor.doc.workspace.slots.docListUpdated.subscribe(() => {
         this.requestUpdate();
       })
     );
@@ -147,14 +144,14 @@ export class DocsPanel extends WithDisposable(ShadowlessElement) {
             removeModeFromStorage(doc.id);
             // When delete the current doc, we need to set the editor doc to the first remaining doc
             if (isDeleteCurrent) {
-              this.editor.doc = this.docs[0].getDoc();
+              this.editor.doc = this.docs[0].getStore();
             }
           };
           return html`<div class="doc-item" @click="${click}" style="${style}">
             ${doc.meta?.title || 'Untitled'}
             ${docs.length > 1
               ? html`<div @click="${deleteDoc}" class="delete-doc-icon">
-                  ${CloseIcon}
+                  ${CloseIcon()}
                 </div>`
               : nothing}
           </div>`;
@@ -164,13 +161,13 @@ export class DocsPanel extends WithDisposable(ShadowlessElement) {
   }
 
   @property({ attribute: false })
-  accessor editor!: AffineEditorContainer;
+  accessor editor!: TestAffineEditorContainer;
 
   @property({ attribute: false })
   accessor onClose!: () => void;
 }
 
-function createDocBlock(collection: DocCollection) {
+function createDocBlock(collection: Workspace) {
   const id = collection.idGenerator();
   createDefaultDoc(collection, { id });
 }

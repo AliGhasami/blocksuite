@@ -54,10 +54,10 @@ import { HostContextKey } from './context/host-context.js';
 import { DatabaseBlockDataSource } from './data-source.js';
 import { BlockRenderer } from './detail-panel/block-renderer.js';
 import { NoteRenderer } from './detail-panel/note-renderer.js';
-<<<<<<< HEAD:packages/blocks/src/database-block/database-block.ts
-=======
+<<<<<<<< HEAD:packages/blocks/src/database-block/database-block.ts
+========
 import { DatabaseSelection } from './selection.js';
->>>>>>> origin/main:packages/affine/blocks/block-database/src/database-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-database/src/database-block.ts
 import { currentViewStorage } from './utils/current-view.js';
 import { getSingleDocIdFromText } from './utils/title-doc.js';
 
@@ -167,11 +167,11 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<DatabaseBloc
     const addRow = () => dataViewMethod.addRow?.('start');
     return html` <affine-database-title
       style="overflow: hidden"
-<<<<<<< HEAD:packages/blocks/src/database-block/database-block.ts
+<<<<<<<< HEAD:packages/blocks/src/database-block/database-block.ts
       .titleText="${this.model.title}"
-=======
+========
       .titleText="${this.model.props.title}"
->>>>>>> origin/main:packages/affine/blocks/block-database/src/database-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-database/src/database-block.ts
       .readonly="${this.dataSource.readonly$.value}"
       .onPressEnterKey="${addRow}"
     ></affine-database-title>`;
@@ -345,11 +345,11 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<DatabaseBloc
       this._dataSource = new DatabaseBlockDataSource(this.model);
       this._dataSource.contextSet(HostContextKey, this.host);
       const id = currentViewStorage.getCurrentView(this.model.id);
-<<<<<<< HEAD:packages/blocks/src/database-block/database-block.ts
+<<<<<<<< HEAD:packages/blocks/src/database-block/database-block.ts
       if (id) {
-=======
+========
       if (id && this.dataSource.viewManager.viewGet(id)) {
->>>>>>> origin/main:packages/affine/blocks/block-database/src/database-block.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-database/src/database-block.ts
         this.dataSource.viewManager.setCurrentView(id);
       }
     }

@@ -6,11 +6,11 @@ export const codeBlockStyles = css`
     font-size: var(--affine-font-xs);
     line-height: var(--affine-line-height);
     position: relative;
-<<<<<<< HEAD:packages/blocks/src/code-block/styles.ts
+<<<<<<<< HEAD:packages/blocks/src/code-block/styles.ts
     padding: 12px;
-=======
+========
     padding: 28px 24px;
->>>>>>> origin/main:packages/affine/blocks/block-code/src/styles.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-code/src/styles.ts
     background: var(--affine-background-code-block);
     border-radius: 10px;
     box-sizing: border-box;

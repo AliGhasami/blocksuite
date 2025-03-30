@@ -1,20 +1,3 @@
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-import type {
-  BlockSnapshot,
-  DocSnapshot,
-  JobMiddleware,
-} from '@blocksuite/store';
-
-import {
-  DEFAULT_NOTE_BACKGROUND_COLOR,
-  NoteDisplayMode,
-} from '@blocksuite/affine-model';
-import { describe, expect, test } from 'vitest';
-
-import { PlainTextAdapter } from '../../_common/adapters/plain-text/plain-text.js';
-import { embedSyncedDocMiddleware } from '../../_common/transformers/middlewares.js';
-import { createJob } from '../utils/create-job.js';
-=======
 import { DefaultTheme, NoteDisplayMode } from '@blocksuite/affine-model';
 import {
   embedSyncedDocMiddleware,
@@ -31,7 +14,6 @@ import { createJob } from '../utils/create-job.js';
 import { getProvider } from '../utils/get-provider.js';
 
 const provider = getProvider();
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
 
 describe('snapshot to plain text', () => {
   test('paragraph', async () => {
@@ -61,11 +43,7 @@ describe('snapshot to plain text', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-            background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -181,11 +159,7 @@ describe('snapshot to plain text', () => {
     };
 
     const plainText = 'aaabbbccc\nddd\neee\nfff\nggg\n';
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-    const plainTextAdapter = new PlainTextAdapter(createJob());
-=======
     const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
     const target = await plainTextAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
     });
@@ -222,11 +196,7 @@ describe('snapshot to plain text', () => {
           version: 1,
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-            background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -348,11 +318,7 @@ describe('snapshot to plain text', () => {
 
     const plainText = 'aaa\nbbb\nccc\nddd\neee\n';
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-    const plainTextAdapter = new PlainTextAdapter(createJob());
-=======
     const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
     const target = await plainTextAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
     });
@@ -386,11 +352,7 @@ describe('snapshot to plain text', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-            background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -426,11 +388,7 @@ describe('snapshot to plain text', () => {
     };
 
     const plainText = 'aaa\n---\n';
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-    const plainTextAdapter = new PlainTextAdapter(createJob());
-=======
     const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
     const target = await plainTextAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
     });
@@ -464,11 +422,7 @@ describe('snapshot to plain text', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-            background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -497,11 +451,7 @@ describe('snapshot to plain text', () => {
     };
 
     const plainText = 'import this\n';
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-    const plainTextAdapter = new PlainTextAdapter(createJob());
-=======
     const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
     const target = await plainTextAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
     });
@@ -535,11 +485,7 @@ describe('snapshot to plain text', () => {
           flavour: 'affine:note',
           props: {
             xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-            background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
             background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
             index: 'a0',
             hidden: false,
             displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -620,13 +566,6 @@ describe('snapshot to plain text', () => {
         },
       ],
     };
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-    const middleware: JobMiddleware = ({ adapterConfigs }) => {
-      adapterConfigs.set('title:deadbeef', 'test');
-      adapterConfigs.set('docLinkBaseUrl', 'https://example.com');
-    };
-    const plainTextAdapter = new PlainTextAdapter(createJob([middleware]));
-=======
     const middleware: TransformerMiddleware = ({ adapterConfigs }) => {
       adapterConfigs.set('title:deadbeef', 'test');
       adapterConfigs.set('docLinkBaseUrl', 'https://example.com');
@@ -635,7 +574,6 @@ describe('snapshot to plain text', () => {
       createJob([middleware]),
       provider
     );
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
 
     const plainText =
       'aaa: https://affine.pro/\ntest: https://example.com/deadbeef?mode=page&blockIds=abc%2C123&elementIds=def%2C456&databaseId=deadbeef&databaseRowId=123\nE=mc^2\n';
@@ -716,11 +654,7 @@ describe('snapshot to plain text', () => {
               flavour: 'affine:note',
               props: {
                 xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-                background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
                 background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
                 index: 'a0',
                 hidden: false,
                 displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -741,11 +675,7 @@ describe('snapshot to plain text', () => {
           ],
         };
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-        const plainTextAdapter = new PlainTextAdapter(createJob());
-=======
         const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
         const target = await plainTextAdapter.fromBlockSnapshot({
           snapshot: blockSnapshot,
         });
@@ -787,11 +717,7 @@ describe('snapshot to plain text', () => {
             version: 1,
             props: {
               xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-              background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
               background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
               index: 'a0',
               hidden: false,
               displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -823,24 +749,16 @@ describe('snapshot to plain text', () => {
         ],
       };
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-      const middleware: JobMiddleware = ({ adapterConfigs }) => {
-=======
       const middleware: TransformerMiddleware = ({ adapterConfigs }) => {
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
         adapterConfigs.set('title:4T5ObMgEIMII-4Bexyta1', 'test');
         adapterConfigs.set('docLinkBaseUrl', 'https://example.com');
       };
       const plainText =
         'test: https://example.com/4T5ObMgEIMII-4Bexyta1?mode=page&blockIds=abc%2C123&elementIds=def%2C456&databaseId=deadbeef&databaseRowId=123\n';
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-      const plainTextAdapter = new PlainTextAdapter(createJob([middleware]));
-=======
       const plainTextAdapter = new PlainTextAdapter(
         createJob([middleware]),
         provider
       );
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
       const target = await plainTextAdapter.fromBlockSnapshot({
         snapshot: blockSnapShot,
       });
@@ -892,11 +810,7 @@ describe('snapshot to plain text', () => {
               version: 1,
               props: {
                 xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-                background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
                 background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
                 index: 'a0',
                 hidden: false,
                 displayMode: 'both',
@@ -1240,11 +1154,7 @@ describe('snapshot to plain text', () => {
       await job.snapshotToDoc(syncedDocSnapshot);
       await job.snapshotToDoc(docSnapShot);
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-      const mdAdapter = new PlainTextAdapter(job);
-=======
       const mdAdapter = new PlainTextAdapter(job, provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
       const target = await mdAdapter.fromDocSnapshot({
         snapshot: docSnapShot,
       });
@@ -1259,11 +1169,7 @@ describe('snapshot to plain text', () => {
       flavour: 'affine:note',
       props: {
         xywh: '[0,0,800,95]',
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-        background: DEFAULT_NOTE_BACKGROUND_COLOR,
-=======
         background: DefaultTheme.noteBackgrounColor,
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
         index: 'a0',
         hidden: false,
         displayMode: NoteDisplayMode.DocAndEdgeless,
@@ -1282,9 +1188,6 @@ describe('snapshot to plain text', () => {
     };
 
     const plainText = 'LaTex, with value: E=mc^2\n';
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/plain-text.unit.spec.ts
-    const plainTextAdapter = new PlainTextAdapter(createJob());
-=======
     const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
     const target = await plainTextAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
@@ -1511,7 +1414,6 @@ describe('snapshot to plain text', () => {
 | Task 2 | In Progress | 2023-12-20 |        |          |             | test1                     |                    |          |
 `;
     const plainTextAdapter = new PlainTextAdapter(createJob(), provider);
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/plain-text.unit.spec.ts
     const target = await plainTextAdapter.fromBlockSnapshot({
       snapshot: blockSnapshot,
     });

@@ -1,6 +1,6 @@
-import type { DeltaInsert } from '@blocksuite/inline';
-
-import { isEqual } from '@blocksuite/global/utils';
+import type { ReferenceParams } from '@blocksuite/affine-model';
+import type { DeltaInsert } from '@blocksuite/store';
+import isEqual from 'lodash-es/isEqual';
 
 const mergeDeltas = (
   acc: DeltaInsert[],
@@ -75,10 +75,22 @@ function toURLSearchParams(
   );
 }
 
-export const TextUtils = {
+function generateDocUrl(
+  docBaseUrl: string,
+  pageId: string,
+  params: ReferenceParams
+) {
+  const search = toURLSearchParams(params);
+  const query = search?.size ? `?${search.toString()}` : '';
+  const url = docBaseUrl ? `${docBaseUrl}/${pageId}${query}` : '';
+  return url;
+}
+
+export const AdapterTextUtils = {
   mergeDeltas,
   isNullish,
   createText,
   isText,
   toURLSearchParams,
+  generateDocUrl,
 };

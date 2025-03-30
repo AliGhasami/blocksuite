@@ -5,7 +5,7 @@ import {
   ParagraphBlockModel,
   type RootBlockModel,
 } from '@blocksuite/affine-model';
-<<<<<<< HEAD:packages/blocks/src/database-block/detail-panel/note-renderer.ts
+<<<<<<<< HEAD:packages/blocks/src/database-block/detail-panel/note-renderer.ts
 import type { AffineTextAttributes } from '@blocksuite/affine-shared/types';
 import type { DetailSlotProps, SingleView } from '@blocksuite/data-view';
 import type { BaseTextAttributes } from '@blocksuite/inline';
@@ -15,12 +15,12 @@ import {
   createDefaultDoc,
   matchFlavours,
 } from '@blocksuite/affine-shared/utils';
-=======
+========
 import { REFERENCE_NODE } from '@blocksuite/affine-shared/consts';
 import { TelemetryProvider } from '@blocksuite/affine-shared/services';
 import type { AffineTextAttributes } from '@blocksuite/affine-shared/types';
 import { createDefaultDoc, matchModels } from '@blocksuite/affine-shared/utils';
->>>>>>> origin/main:packages/affine/blocks/block-database/src/detail-panel/note-renderer.ts
+>>>>>>>> origin/main:packages/affine/blocks/block-database/src/detail-panel/note-renderer.ts
 import { type EditorHost, ShadowlessElement } from '@blocksuite/block-std';
 import type { DetailSlotProps, SingleView } from '@blocksuite/data-view';
 import { SignalWatcher, WithDisposable } from '@blocksuite/global/lit';

@@ -16,12 +16,12 @@ import type {
 import { AssetsManager, MemoryBlobCRUD } from '@blocksuite/store';
 import { describe, expect, test } from 'vitest';
 
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/markdown.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/markdown.unit.spec.ts
 import { MarkdownAdapter } from '../../_common/adapters/markdown/index.js';
 import { nanoidReplacement } from '../../_common/test-utils/test-utils.js';
 import { embedSyncedDocMiddleware } from '../../_common/transformers/middlewares.js';
-=======
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/markdown.unit.spec.ts
+========
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/markdown.unit.spec.ts
 import { createJob } from '../utils/create-job.js';
 import { getProvider } from '../utils/get-provider.js';
 import { nanoidReplacement } from '../utils/nanoid-replacement.js';
@@ -3088,7 +3088,7 @@ hhh
             checked: false,
             collapsed: false,
             order: null,
-<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/markdown.unit.spec.ts
+<<<<<<<< HEAD:packages/blocks/src/__tests__/adapters/markdown.unit.spec.ts
           },
           children: [],
         },
@@ -3198,8 +3198,8 @@ bbb
             checked: false,
             collapsed: false,
             order: 4,
-=======
->>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/markdown.unit.spec.ts
+========
+>>>>>>>> origin/main:packages/affine/all/src/__tests__/adapters/markdown.unit.spec.ts
           },
           children: [],
         },

@@ -31,11 +31,7 @@ export const embedSyncedDocBlockPlainTextAdapterMatcher: BlockPlainTextAdapterMa
 
         if (type === 'content') {
           const syncedDocId = o.node.props.pageId as string;
-<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/adapters/plain-text.ts
-          const syncedDoc = job.collection.getDoc(syncedDocId);
-=======
           const syncedDoc = job.docCRUD.get(syncedDocId);
->>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/adapters/plain-text.ts
           if (!syncedDoc) return;
 
           if (counter === 1) {

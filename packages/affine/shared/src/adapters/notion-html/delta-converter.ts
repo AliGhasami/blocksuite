@@ -1,21 +1,18 @@
-import type { ExtensionType } from '@blocksuite/block-std';
-import type { DeltaInsert } from '@blocksuite/inline';
-
 import {
   createIdentifier,
   type ServiceIdentifier,
 } from '@blocksuite/global/di';
-import { isEqual } from '@blocksuite/global/utils';
+import type { DeltaInsert, ExtensionType } from '@blocksuite/store';
+import isEqual from 'lodash-es/isEqual';
 
 import type { AffineTextAttributes } from '../../types/index.js';
-import type { HtmlAST, InlineHtmlAST } from '../types/hast.js';
-
 import {
   type ASTToDeltaMatcher,
   DeltaASTConverter,
   type DeltaASTConverterOptions,
   type InlineDeltaMatcher,
 } from '../types/adapter.js';
+import type { HtmlAST, InlineHtmlAST } from '../types/hast.js';
 
 export type InlineDeltaToNotionHtmlAdapterMatcher =
   InlineDeltaMatcher<InlineHtmlAST>;
