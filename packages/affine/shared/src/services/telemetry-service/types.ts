@@ -22,6 +22,10 @@ export interface TelemetryEvent {
   other?: unknown;
 }
 
+export interface LinkedDocCreatedEvent extends TelemetryEvent {
+  parentFlavour?: string;
+}
+
 export interface DocCreatedEvent extends TelemetryEvent {
   page?: 'doc editor' | 'whiteboard editor';
   segment?: 'whiteboard' | 'note' | 'doc';
@@ -45,6 +49,10 @@ export interface ElementLockEvent extends TelemetryEvent {
   segment: 'element toolbar';
   module: 'element toolbar';
   control: 'lock' | 'unlock' | 'group-lock';
+}
+
+export interface BlockCreationEvent extends TelemetryEvent {
+  blockType: string;
 }
 
 export interface MindMapCollapseEvent extends TelemetryEvent {

@@ -1,16 +1,14 @@
-import type { PointLocation } from '@blocksuite/global/utils';
-
 import { GfxLocalElementModel } from '@blocksuite/block-std/gfx';
-
-import type { Connection } from './connector.js';
+import type { PointLocation } from '@blocksuite/global/gfx';
 
 import {
-  type Color,
   ConnectorMode,
   DEFAULT_ROUGHNESS,
   type PointStyle,
   StrokeStyle,
-} from '../../consts/index.js';
+} from '../../consts/index';
+import { type Color, DefaultTheme } from '../../themes/index';
+import type { Connection } from './connector.js';
 
 export class LocalConnectorElementModel extends GfxLocalElementModel {
   private _path: PointLocation[] = [];
@@ -31,7 +29,7 @@ export class LocalConnectorElementModel extends GfxLocalElementModel {
     position: [0, 0],
   };
 
-  stroke: Color = '#000000';
+  stroke: Color = DefaultTheme.connectorColor;
 
   strokeStyle: StrokeStyle = StrokeStyle.Solid;
 
@@ -56,13 +54,5 @@ export class LocalConnectorElementModel extends GfxLocalElementModel {
 
   get type() {
     return 'connector';
-  }
-}
-
-declare global {
-  namespace BlockSuite {
-    interface SurfaceLocalModelMap {
-      connector: LocalConnectorElementModel;
-    }
   }
 }

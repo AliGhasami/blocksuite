@@ -1,14 +1,18 @@
 import { BlockSuiteError } from '@blocksuite/global/exceptions';
 
-import type { Doc } from '../store/index.js';
+import {
+  BlockModel,
+  type DraftModel,
+  type Store,
+  toDraftModel,
+} from '../model/index.js';
 import type { AssetsManager } from '../transformer/assets.js';
-import type { DraftModel, Job, Slice } from '../transformer/index.js';
+import type { Slice, Transformer } from '../transformer/index.js';
 import type {
   BlockSnapshot,
   DocSnapshot,
   SliceSnapshot,
 } from '../transformer/type.js';
-
 import { ASTWalkerContext } from './context.js';
 
 export type FromDocSnapshotPayload = {
@@ -63,19 +67,21 @@ export function wrapFakeNote(snapshot: SliceSnapshot) {
 }
 
 export abstract class BaseAdapter<AdapterTarget = unknown> {
-  job: Job;
+  job: Transformer;
 
   get configs() {
     return this.job.adapterConfigs;
   }
 
-  constructor(job: Job) {
+  constructor(job: Transformer) {
     this.job = job;
   }
 
-  async fromBlock(model: DraftModel) {
+  async fromBlock(model: BlockModel | DraftModel) {
     try {
-      const blockSnapshot = this.job.blockToSnapshot(model);
+      const draftModel =
+        model instanceof BlockModel ? toDraftModel(model) : model;
+      const blockSnapshot = this.job.blockToSnapshot(draftModel);
       if (!blockSnapshot) return;
       return await this.fromBlockSnapshot({
         snapshot: blockSnapshot,
@@ -94,7 +100,7 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
     | Promise<FromBlockSnapshotResult<AdapterTarget>>
     | FromBlockSnapshotResult<AdapterTarget>;
 
-  async fromDoc(doc: Doc) {
+  async fromDoc(doc: Store) {
     try {
       const docSnapshot = this.job.docToSnapshot(doc);
       if (!docSnapshot) return;
@@ -139,7 +145,7 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
 
   async toBlock(
     payload: ToBlockSnapshotPayload<AdapterTarget>,
-    doc: Doc,
+    doc: Store,
     parent?: string,
     index?: number
   ) {
@@ -176,13 +182,11 @@ export abstract class BaseAdapter<AdapterTarget = unknown> {
 
   async toSlice(
     payload: ToSliceSnapshotPayload<AdapterTarget>,
-    doc: Doc,
+    doc: Store,
     parent?: string,
     index?: number
   ) {
     try {
-      //debugger
-      console.log('toSlice');
       const snapshot = await this.toSliceSnapshot(payload);
       if (!snapshot) return;
       return await this.job.snapshotToSlice(snapshot, doc, parent, index);
@@ -221,7 +225,7 @@ export class ASTWalker<ONode extends object, TNode extends object | never> {
 
   private _leave: WalkerFn<ONode, TNode> | undefined;
 
-  private _visit = async (o: NodeProps<ONode>) => {
+  private readonly _visit = async (o: NodeProps<ONode>) => {
     if (!o.node) return;
     this.context._skipChildrenNum = 0;
     this.context._skip = false;
@@ -231,6 +235,9 @@ export class ASTWalker<ONode extends object, TNode extends object | never> {
     }
 
     if (this.context._skip) {
+      if (this._leave) {
+        await this._leave(o, this.context);
+      }
       return;
     }
 
@@ -280,7 +287,7 @@ export class ASTWalker<ONode extends object, TNode extends object | never> {
     }
   };
 
-  private context: ASTWalkerContext<TNode>;
+  private readonly context: ASTWalkerContext<TNode>;
 
   setEnter = (fn: WalkerFn<ONode, TNode>) => {
     this._enter = fn;

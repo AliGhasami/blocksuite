@@ -4,26 +4,26 @@ import {
   popupTargetFromElement,
 } from '@blocksuite/affine-components/context-menu';
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/lit';
 import { PlusIcon } from '@blocksuite/icons/lit';
 import { effect } from '@preact/signals-core';
-import { css, html } from 'lit';
+import { cssVarV2 } from '@toeverything/theme/v2';
+import { css, html, unsafeCSS } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type { DataViewRenderer } from '../../../core/data-view.js';
-import type { GroupData } from '../../../core/group-by/trait.js';
-import type { TableSingleView } from '../table-view-manager.js';
-import type { DataViewTable } from './table-view.js';
-
 import { GroupTitle } from '../../../core/group-by/group-title.js';
+import type { GroupData } from '../../../core/group-by/trait.js';
 import { createDndContext } from '../../../core/utils/wc-dnd/dnd-context.js';
 import { defaultActivators } from '../../../core/utils/wc-dnd/sensors/index.js';
 import { linearMove } from '../../../core/utils/wc-dnd/utils/linear-move.js';
 import { LEFT_TOOL_BAR_WIDTH } from '../consts.js';
-import { TableAreaSelection } from '../types.js';
+import { TableViewAreaSelection } from '../selection';
+import type { TableSingleView } from '../table-view-manager.js';
 import { DataViewColumnPreview } from './header/column-renderer.js';
 import { getVerticalIndicator } from './header/vertical-indicator.js';
+import type { DataViewTable } from './table-view.js';
 
 const styles = css`
   affine-data-view-table-group:hover .group-header-op {
@@ -40,7 +40,7 @@ const styles = css`
     cursor: pointer;
     transition: opacity 0.2s ease-in-out;
     padding: 4px 8px;
-    border-bottom: 1px solid var(--affine-border-color);
+    border-bottom: 1px solid ${unsafeCSS(cssVarV2.layer.insideBorder.border)};
   }
 
   @media print {
@@ -68,14 +68,15 @@ export class TableGroup extends SignalWatcher(
 ) {
   static override styles = styles;
 
-  private clickAddRow = () => {
+  private readonly clickAddRow = () => {
     this.view.rowAdd('end', this.group?.key);
+    const selectionController = this.viewEle.selectionController;
+    selectionController.selection = undefined;
     requestAnimationFrame(() => {
-      const selectionController = this.viewEle.selectionController;
       const index = this.view.properties$.value.findIndex(
         v => v.type$.value === 'title'
       );
-      selectionController.selection = TableAreaSelection.create({
+      selectionController.selection = TableViewAreaSelection.create({
         groupKey: this.group?.key,
         focus: {
           rowIndex: this.rows.length - 1,
@@ -86,14 +87,15 @@ export class TableGroup extends SignalWatcher(
     });
   };
 
-  private clickAddRowInStart = () => {
+  private readonly clickAddRowInStart = () => {
     this.view.rowAdd('start', this.group?.key);
+    const selectionController = this.viewEle.selectionController;
+    selectionController.selection = undefined;
     requestAnimationFrame(() => {
-      const selectionController = this.viewEle.selectionController;
       const index = this.view.properties$.value.findIndex(
         v => v.type$.value === 'title'
       );
-      selectionController.selection = TableAreaSelection.create({
+      selectionController.selection = TableViewAreaSelection.create({
         groupKey: this.group?.key,
         focus: {
           rowIndex: 0,
@@ -104,7 +106,7 @@ export class TableGroup extends SignalWatcher(
     });
   };
 
-  private clickGroupOptions = (e: MouseEvent) => {
+  private readonly clickGroupOptions = (e: MouseEvent) => {
     const group = this.group;
     if (!group) {
       return;
@@ -129,7 +131,7 @@ export class TableGroup extends SignalWatcher(
     ]);
   };
 
-  private renderGroupHeader = () => {
+  private readonly renderGroupHeader = () => {
     if (!this.group) {
       return null;
     }

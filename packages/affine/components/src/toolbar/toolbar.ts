@@ -1,6 +1,6 @@
 import { PANEL_BASE } from '@blocksuite/affine-shared/styles';
 import { stopPropagation } from '@blocksuite/affine-shared/utils';
-import { WithDisposable } from '@blocksuite/global/utils';
+import { WithDisposable } from '@blocksuite/global/lit';
 import { css, html, LitElement } from 'lit';
 
 export class EditorToolbar extends WithDisposable(LitElement) {
@@ -35,7 +35,9 @@ export class EditorToolbar extends WithDisposable(LitElement) {
       e.stopPropagation();
       e.preventDefault();
     });
-    this._disposables.addFromEvent(this, 'wheel', stopPropagation);
+    this._disposables.addFromEvent(this, 'wheel', stopPropagation, {
+      passive: false,
+    });
   }
 
   override render() {

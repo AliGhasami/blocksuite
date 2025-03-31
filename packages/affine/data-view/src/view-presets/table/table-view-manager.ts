@@ -4,27 +4,27 @@ import {
 } from '@blocksuite/affine-shared/utils';
 import { computed, type ReadonlySignal } from '@preact/signals-core';
 
-import type { FilterGroup } from '../../core/filter/types.js';
-import type { ViewManager } from '../../core/view-manager/view-manager.js';
-import type { TableViewData } from './define.js';
-import type { StatCalcOpType } from './types.js';
-
 import { evalFilter } from '../../core/filter/eval.js';
 import { generateDefaultValues } from '../../core/filter/generate-default-values.js';
 import { FilterTrait, filterTraitKey } from '../../core/filter/trait.js';
+import type { FilterGroup } from '../../core/filter/types.js';
 import { emptyFilterGroup } from '../../core/filter/utils.js';
 import {
   GroupTrait,
   groupTraitKey,
   sortByManually,
 } from '../../core/group-by/trait.js';
+import { fromJson } from '../../core/property/utils';
 import { SortManager, sortTraitKey } from '../../core/sort/manager.js';
 import { PropertyBase } from '../../core/view-manager/property.js';
 import {
   type SingleView,
   SingleViewBase,
 } from '../../core/view-manager/single-view.js';
+import type { ViewManager } from '../../core/view-manager/view-manager.js';
 import { DEFAULT_COLUMN_MIN_WIDTH, DEFAULT_COLUMN_WIDTH } from './consts.js';
+import type { TableViewData } from './define.js';
+import type { StatCalcOpType } from './types.js';
 
 export class TableSingleView extends SingleViewBase<TableViewData> {
   propertiesWithoutFilter$ = computed(() => {
@@ -40,7 +40,7 @@ export class TableSingleView extends SingleViewBase<TableViewData> {
     return result;
   });
 
-  private computedColumns$ = computed(() => {
+  private readonly computedColumns$ = computed(() => {
     return this.propertiesWithoutFilter$.value.map(id => {
       const column = this.propertyGet(id);
       return {
@@ -52,19 +52,19 @@ export class TableSingleView extends SingleViewBase<TableViewData> {
     });
   });
 
-  private filter$ = computed(() => {
+  private readonly filter$ = computed(() => {
     return this.data$.value?.filter ?? emptyFilterGroup;
   });
 
-  private groupBy$ = computed(() => {
+  private readonly groupBy$ = computed(() => {
     return this.data$.value?.groupBy;
   });
 
-  private sortList$ = computed(() => {
+  private readonly sortList$ = computed(() => {
     return this.data$.value?.sort;
   });
 
-  private sortManager = this.traitSet(
+  private readonly sortManager = this.traitSet(
     sortTraitKey,
     new SortManager(this.sortList$, this, {
       setSortList: sortList => {
@@ -307,6 +307,7 @@ export class TableSingleView extends SingleViewBase<TableViewData> {
       }
       const columns = [...this.computedColumns$.value];
       const [column] = columns.splice(columnIndex, 1);
+      if (!column) return {};
       const index = insertPositionToIndex(toAfterOfColumn, columns);
       columns.splice(index, 0, column);
       return {
@@ -327,8 +328,8 @@ export class TableSingleView extends SingleViewBase<TableViewData> {
       Object.entries(defaultValues).forEach(([propertyId, jsonValue]) => {
         const property = this.propertyGet(propertyId);
         const propertyMeta = this.propertyMetaGet(property.type$.value);
-        if (propertyMeta?.config.cellFromJson) {
-          const value = propertyMeta.config.cellFromJson({
+        if (propertyMeta) {
+          const value = fromJson(propertyMeta.config, {
             value: jsonValue,
             data: property.data$.value,
             dataSource: this.dataSource,
@@ -357,12 +358,12 @@ export class TableSingleView extends SingleViewBase<TableViewData> {
     this.groupTrait.moveCardTo(rowId, fromGroup, toGroup, position);
   }
 
-  override rowNextGet(rowId: string): string {
+  override rowNextGet(rowId: string): string | undefined {
     const index = this.rows$.value.indexOf(rowId);
     return this.rows$.value[index + 1];
   }
 
-  override rowPrevGet(rowId: string): string {
+  override rowPrevGet(rowId: string): string | undefined {
     const index = this.rows$.value.indexOf(rowId);
     return this.rows$.value[index - 1];
   }
@@ -386,7 +387,7 @@ export class TableColumn extends PropertyBase {
   }
 
   constructor(
-    private tableView: TableSingleView,
+    private readonly tableView: TableSingleView,
     columnId: string
   ) {
     super(tableView as SingleView, columnId);

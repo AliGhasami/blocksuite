@@ -1,8 +1,7 @@
 import type { Variable } from '../expression/index.js';
 import type { DVJSON } from '../property/types.js';
-import type { FilterGroup, SingleFilter } from './types.js';
-
 import { filterMatcher } from './filter-fn/matcher.js';
+import type { FilterGroup, SingleFilter } from './types.js';
 
 /**
  * Generate default values for a new row based on current filter conditions.
@@ -29,6 +28,7 @@ export function generateDefaultValues(
   for (const [propertyId, conditions] of propertyConditions) {
     if (conditions.length === 1) {
       const condition = conditions[0];
+      if (!condition) continue;
       const filterConfig = filterMatcher.getFilterByName(condition.function);
       if (filterConfig?.defaultValue) {
         const argValues = condition.args.map(arg => arg.value);

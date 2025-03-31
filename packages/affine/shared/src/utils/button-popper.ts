@@ -1,8 +1,7 @@
-import type { Disposable } from '@blocksuite/global/utils';
-
-import { autoUpdate } from '@floating-ui/dom';
+import type { Disposable } from '@blocksuite/global/disposable';
 import {
   autoPlacement,
+  autoUpdate,
   computePosition,
   offset,
   type Rect,
@@ -33,6 +32,17 @@ export function listenClickAway(
 type Display = 'show' | 'hidden';
 
 const ATTR_SHOW = 'data-show';
+
+export type ButtonPopperOptions = {
+  reference: HTMLElement;
+  popperElement: HTMLElement;
+  stateUpdated?: (state: { display: Display }) => void;
+  mainAxis?: number;
+  crossAxis?: number;
+  rootBoundary?: Rect | (() => Rect | undefined);
+  ignoreShift?: boolean;
+  offsetHeight?: number;
+};
 /**
  * Using attribute 'data-show' to control popper visibility.
  *
@@ -45,26 +55,19 @@ const ATTR_SHOW = 'data-show';
  * }
  * ```
  */
-export function createButtonPopper(
-  reference: HTMLElement,
-  popperElement: HTMLElement,
-  stateUpdated: (state: { display: Display }) => void = () => {
-    /** DEFAULT EMPTY FUNCTION */
-  },
-  {
+export function createButtonPopper(options: ButtonPopperOptions) {
+  let display: Display = 'hidden';
+  let cleanup: (() => void) | void;
+  const {
+    reference,
+    popperElement,
+    stateUpdated = () => {},
     mainAxis,
     crossAxis,
     rootBoundary,
     ignoreShift,
-  }: {
-    mainAxis?: number;
-    crossAxis?: number;
-    rootBoundary?: Rect | (() => Rect | undefined);
-    ignoreShift?: boolean;
-  } = {}
-) {
-  let display: Display = 'hidden';
-  let cleanup: (() => void) | void;
+    offsetHeight,
+  } = options;
 
   const originMaxHeight = window.getComputedStyle(popperElement).maxHeight;
 
@@ -88,9 +91,10 @@ export function createButtonPopper(
         size({
           ...overflowOptions,
           apply({ availableHeight }) {
-            popperElement.style.maxHeight = originMaxHeight
-              ? `min(${originMaxHeight}, ${availableHeight}px)`
-              : `${availableHeight}px`;
+            popperElement.style.maxHeight =
+              originMaxHeight && originMaxHeight !== 'none'
+                ? `min(${originMaxHeight}, ${availableHeight}px)`
+                : `${availableHeight - (offsetHeight ?? 0)}px`;
           },
         }),
       ],

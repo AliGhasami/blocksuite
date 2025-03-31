@@ -1,9 +1,10 @@
 import { popupTargetFromElement } from '@blocksuite/affine-components/context-menu';
 import { unsafeCSSVarV2 } from '@blocksuite/affine-shared/theme';
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/lit';
 import { CenterPeekIcon, MoreHorizontalIcon } from '@blocksuite/icons/lit';
-import { css } from 'lit';
+import { cssVarV2 } from '@toeverything/theme/v2';
+import { css, unsafeCSS } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -11,7 +12,6 @@ import { html } from 'lit/static-html.js';
 
 import type { DataViewRenderer } from '../../../core/data-view.js';
 import type { KanbanColumn, KanbanSingleView } from '../kanban-view-manager.js';
-
 import { popCardMenu } from './menu.js';
 
 const styles = css`
@@ -19,7 +19,7 @@ const styles = css`
     display: flex;
     position: relative;
     flex-direction: column;
-    border: 0.5px solid var(--affine-border-color);
+    border: 0.5px solid ${unsafeCSS(cssVarV2.layer.insideBorder.border)};
     box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.05);
     border-radius: 8px;
     background-color: var(--affine-background-kanban-card-color);
@@ -37,7 +37,7 @@ const styles = css`
   }
 
   .mobile-card-header.has-divider {
-    border-bottom: 0.5px solid var(--affine-border-color);
+    border-bottom: 0.5px solid ${unsafeCSS(cssVarV2.layer.insideBorder.border)};
   }
 
   .mobile-card-header-title {
@@ -92,7 +92,7 @@ export class MobileKanbanCard extends SignalWatcher(
 ) {
   static override styles = styles;
 
-  private clickCenterPeek = (e: MouseEvent) => {
+  private readonly clickCenterPeek = (e: MouseEvent) => {
     e.stopPropagation();
     this.dataViewEle.openDetailPanel({
       view: this.view,
@@ -100,7 +100,7 @@ export class MobileKanbanCard extends SignalWatcher(
     });
   };
 
-  private clickMore = (e: MouseEvent) => {
+  private readonly clickMore = (e: MouseEvent) => {
     e.stopPropagation();
     popCardMenu(
       popupTargetFromElement(e.currentTarget as HTMLElement),

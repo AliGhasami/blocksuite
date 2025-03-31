@@ -1,10 +1,10 @@
+//ali ghasami-check version 3
 import { ShadowlessElement } from '@blocksuite/block-std';
-import { WithDisposable } from '@blocksuite/global/utils';
+import { WithDisposable } from '@blocksuite/global/lit';
+import { ToggleDownIcon, ToggleRightIcon } from '@blocksuite/icons/lit';
 import { css, unsafeCSS } from 'lit';
 import { property } from 'lit/decorators.js';
 import { html } from 'lit-html';
-
-import { toggleDown, toggleRight } from '../icons/list.js';
 
 export const TOGGLE_BUTTON_PARENT_CLASS = 'blocksuite-toggle-button-parent';
 
@@ -13,8 +13,13 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     .toggle-icon {
       display: flex;
       align-items: start;
+      justify-content: start;
       margin-top: 0.45em;
       position: absolute;
+      width: 16px;
+      height: 16px;
+      top: calc((1em - 16px) / 2 + 5px);
+      left: 0;
       /*left: 0;*/
       inset-inline-start: 0;
       transform: translateX(-100%);
@@ -23,6 +28,7 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
       opacity: 0;
       transition: opacity 0.2s ease-in-out;
     }
+
     
     .icon-right{
       transform: translateX(100%) rotate(-180deg);
@@ -64,7 +70,11 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
         class="toggle-icon ${this.direction=='rtl'? 'icon-down' : ''}"
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
-        ${toggleDown}
+        ${ToggleDownIcon({
+          width: '16px',
+          height: '16px',
+          style: 'color: #77757D',
+        })}
       </div>
     `;
 
@@ -75,7 +85,11 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
         data-collapsed=${this.collapsed}
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
-        ${toggleRight}
+        ${ToggleRightIcon({
+          width: '16px',
+          height: '16px',
+          style: 'color: #77757D',
+        })}
       </div>
     `;
 

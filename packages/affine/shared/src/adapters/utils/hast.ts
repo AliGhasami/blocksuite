@@ -232,10 +232,8 @@ const flatNodes = (
     return {
       ...ast,
       children: children.flatMap(child => {
-        if (child.type === 'element') {
-          if (expression(child.tagName)) {
-            return child.children;
-          }
+        if (child.type === 'element' && expression(child.tagName)) {
+          return child.children;
         }
         return child;
       }) as ElementContent[],

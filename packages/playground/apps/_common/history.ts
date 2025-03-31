@@ -1,12 +1,9 @@
-import type { DocModeProvider } from '@blocksuite/blocks';
-import type { AffineEditorContainer } from '@blocksuite/presets';
-import type { BlockCollection, Doc, DocCollection } from '@blocksuite/store';
-import type { LitElement } from 'lit';
+import type { DocModeProvider } from '@blocksuite/affine/shared/services';
+import type { Doc, Store, Workspace } from '@blocksuite/affine/store';
+import type { TestAffineEditorContainer } from '@blocksuite/integration-test';
 
-import { assertExists } from '@blocksuite/global/utils';
-
-export function getDocFromUrlParams(collection: DocCollection, url: URL) {
-  let doc: Doc | null = null;
+export function getDocFromUrlParams(collection: Workspace, url: URL) {
+  let doc: Store | null = null;
 
   const docId = decodeURIComponent(url.hash.slice(1));
 
@@ -14,17 +11,19 @@ export function getDocFromUrlParams(collection: DocCollection, url: URL) {
     doc = collection.getDoc(docId);
   }
   if (!doc) {
-    const blockCollection = collection.docs.values().next()
-      .value as BlockCollection;
-    assertExists(blockCollection, 'Need to create a doc first');
-    doc = blockCollection.getDoc();
+    const blockCollection = collection.docs.values().next().value as Doc;
+    if (!blockCollection) {
+      throw new Error('Need to create a doc first');
+    }
+    doc = blockCollection.getStore();
   }
 
   doc.load();
   doc.resetHistory();
 
-  assertExists(doc.ready, 'Doc is not ready');
-  assertExists(doc.root, 'Doc root is not ready');
+  if (!doc.root) {
+    throw new Error('Doc root is not ready');
+  }
 
   return doc;
 }
@@ -43,10 +42,10 @@ export function setDocModeFromUrlParams(
 }
 
 export function listenHashChange(
-  collection: DocCollection,
-  editor: AffineEditorContainer,
-  panel?: LitElement
+  collection: Workspace,
+  editor: TestAffineEditorContainer
 ) {
+  const panel = document.querySelector('docs-panel');
   window.addEventListener('hashchange', () => {
     const url = new URL(location.toString());
     const doc = getDocFromUrlParams(collection, url);

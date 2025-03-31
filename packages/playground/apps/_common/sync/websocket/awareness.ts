@@ -1,8 +1,5 @@
 import type { AwarenessSource } from '@blocksuite/sync';
 import type { Awareness } from 'y-protocols/awareness';
-
-import { assertExists } from '@blocksuite/global/utils';
-import { Base64 } from 'js-base64';
 import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
@@ -13,15 +10,19 @@ import type { WebSocketMessage } from './types';
 type AwarenessChanges = Record<'added' | 'updated' | 'removed', number[]>;
 
 export class WebSocketAwarenessSource implements AwarenessSource {
-  private _onAwareness = (changes: AwarenessChanges, origin: unknown) => {
-    //console.log('_onAwareness');
+  private readonly _onAwareness = (
+    changes: AwarenessChanges,
+    origin: unknown
+  ) => {
     if (origin === 'remote') return;
 
     const changedClients = Object.values(changes).reduce((res, cur) =>
       res.concat(cur)
     );
 
-    assertExists(this.awareness);
+    if (!this.awareness) {
+      throw new Error('awareness is not found');
+    }
     const update = encodeAwarenessUpdate(this.awareness, changedClients);
     this.ws.send(
       JSON.stringify({
@@ -35,8 +36,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
     );
   };
 
-  private _onWebSocket = (event: MessageEvent<string>) => {
-    //console.log('_onWebSocket');
+  private readonly _onWebSocket = (event: MessageEvent<string>) => {
     const data = JSON.parse(event.data) as WebSocketMessage;
 
     if (data.channel !== 'awareness') return;
@@ -45,13 +45,17 @@ export class WebSocketAwarenessSource implements AwarenessSource {
       console.log("==>send time awareness",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
     }
     if (type === 'update') {
-      const update = Base64.toUint8Array(data.payload.update);
-      assertExists(this.awareness);
-      applyAwarenessUpdate(this.awareness, update, 'remote');
+      const update = data.payload.update;
+      if (!this.awareness) {
+        throw new Error('awareness is not found');
+      }
+      applyAwarenessUpdate(this.awareness, new Uint8Array(update), 'remote');
     }
 
     if (type === 'connect') {
-      assertExists(this.awareness);
+      if (!this.awareness) {
+        throw new Error('awareness is not found');
+      }
       this.ws.send(
         JSON.stringify({
           channel: 'awareness',

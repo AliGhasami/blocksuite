@@ -1,7 +1,7 @@
 import { unsafeCSSVar, unsafeCSSVarV2 } from '@blocksuite/affine-shared/theme';
 import { ShadowlessElement } from '@blocksuite/block-std';
 import { IS_MOBILE } from '@blocksuite/global/env';
-import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/lit';
 import {
   ArrowLeftBigIcon,
   ArrowLeftSmallIcon,
@@ -14,17 +14,17 @@ import {
   computePosition,
   type Middleware,
   offset,
-  type ReferenceElement, shift
-} from "@floating-ui/dom";
+  type ReferenceElement,
+  shift,
+} from '@floating-ui/dom';
 import { css, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { MenuFocusable } from './focusable.js';
-import type { MenuComponentInterface } from './types.js';
-
 import { Menu, type MenuConfig, type MenuOptions } from './menu.js';
+import type { MenuComponentInterface } from './types.js';
 
 export class MenuComponent
   extends SignalWatcher(WithDisposable(ShadowlessElement))
@@ -83,13 +83,13 @@ export class MenuComponent
     }
   `;
 
-  private _clickContainer = (e: MouseEvent) => {
+  private readonly _clickContainer = (e: MouseEvent) => {
     e.stopPropagation();
     this.focusInput();
     this.menu.closeSubMenu();
   };
 
-  private searchRef = createRef<HTMLInputElement>();
+  private readonly searchRef = createRef<HTMLInputElement>();
 
   override firstUpdated() {
     const input = this.searchRef.value;
@@ -204,7 +204,7 @@ export class MenuComponent
     }
     return html`
       <div
-        style="display:flex;align-items:center;gap: 4px;min-width: 300px;padding:3px 4px 3px 2px"
+        style="display:flex;align-items:center;gap: 4px;padding:3px 4px 3px 2px"
         @mouseenter="${() => this.menu.closeSubMenu()}"
       >
         ${title.onBack
@@ -369,7 +369,7 @@ export class MobileMenuComponent
 
 declare global {
   interface HTMLElementTagNameMap {
-    'affine-menu-mobile': MobileMenuComponent;
+    'mobile-menu': MobileMenuComponent;
   }
 }
 
@@ -535,7 +535,6 @@ export const popMenu = (
     ...props.options,
     onClose: onClose,
   });
-  //console.log("contanier",props.container,target);
   const closePopup = createPopup(target, menu.menuElement, {
     onClose: () => {
       menu.close();

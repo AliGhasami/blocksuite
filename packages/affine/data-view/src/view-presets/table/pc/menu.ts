@@ -12,9 +12,8 @@ import {
 import { html } from 'lit';
 
 import type { DataViewRenderer } from '../../../core/data-view.js';
+import { TableViewRowSelection } from '../selection';
 import type { TableSelectionController } from './controller/selection.js';
-
-import { TableRowSelection } from '../types.js';
 
 export const openDetail = (
   dataViewEle: DataViewRenderer,
@@ -38,11 +37,11 @@ export const popRowMenu = (
   selectionController: TableSelectionController
 ) => {
   const selection = selectionController.selection;
-  if (!TableRowSelection.is(selection)) {
+  if (!TableViewRowSelection.is(selection)) {
     return;
   }
   if (selection.rows.length > 1) {
-    const rows = TableRowSelection.rowsIds(selection);
+    const rows = TableViewRowSelection.rowsIds(selection);
     popFilterableSimpleMenu(ele, [
       menu.group({
         name: '',
@@ -79,6 +78,7 @@ export const popRowMenu = (
     return;
   }
   const row = selection.rows[0];
+  if (!row) return;
   popFilterableSimpleMenu(ele, [
     /*menu.action({
       name: 'Expand Row',

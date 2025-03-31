@@ -1,3 +1,4 @@
+//ali ghasami-check version 3
 export * from './attachment/index.js';
 export * from './bookmark/index.js';
 export * from './callout/index.js';
@@ -18,3 +19,5 @@ export * from './note/index.js';
 export * from './paragraph/index.js';
 export * from './root/index.js';
 export * from './surface-ref/index.js';
+export * from './table';
+export * from './transcription';

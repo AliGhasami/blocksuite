@@ -1,15 +1,11 @@
+//ali ghasami-check version 3
 import type { DocSource } from '@blocksuite/sync';
-
-import { assertExists } from '@blocksuite/global/utils';
-import { Base64 } from 'js-base64';
 import { diffUpdate, encodeStateVectorFromUpdate, mergeUpdates } from 'yjs';
 
 import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
-  private _onMessage = (event: MessageEvent<string>) => {
-    //console.log("_onMessage");
-    //todo ali ghasami for convert base 64
+  private readonly _onMessage = (event: MessageEvent<string>) => {
     const data = JSON.parse(event.data) as WebSocketMessage;
     if (data.channel !== 'doc') return;
     if(data.payload && data.payload.time) {
@@ -114,6 +110,19 @@ export class WebSocketDocSource implements DocSource {
     }
     //todo convert to base 64
     const latest = this.docMap.get(docId);
+    if (!latest) {
+      throw new Error('latest is not found');
+    }
+    this.ws.send(
+      JSON.stringify({
+        channel: 'doc',
+        payload: {
+          type: 'update',
+          docId,
+          updates: Array.from(latest),
+        },
+      } satisfies WebSocketMessage)
+    );
     //todo back if has bug
     //const edge = this.docMap.get(`edgeless_${docId}`);
     assertExists(latest);

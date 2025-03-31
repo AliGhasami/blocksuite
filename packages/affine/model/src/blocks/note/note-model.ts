@@ -1,15 +1,18 @@
+//ali ghasami-check version 3
 import type {
   GfxCompatibleProps,
   GfxElementGeometry,
 } from '@blocksuite/block-std/gfx';
-
 import { GfxCompatible } from '@blocksuite/block-std/gfx';
-import { Bound } from '@blocksuite/global/utils';
-import { BlockModel, defineBlockSchema } from '@blocksuite/store';
+import { Bound } from '@blocksuite/global/gfx';
+import {
+  BlockModel,
+  BlockSchemaExtension,
+  defineBlockSchema,
+} from '@blocksuite/store';
+import { z } from 'zod';
 
 import {
-  type Color,
-  DEFAULT_NOTE_BACKGROUND_COLOR,
   DEFAULT_NOTE_BORDER_SIZE,
   DEFAULT_NOTE_BORDER_STYLE,
   DEFAULT_NOTE_CORNER,
@@ -17,14 +20,44 @@ import {
   DEFAULT_NOTE_SHADOW,
   DEFAULT_NOTE_WIDTH,
   NoteDisplayMode,
+  NoteDisplayModeSchema,
+  NoteShadowsSchema,
   type StrokeStyle,
-} from '../../consts/index.js';
+  StrokeStyleSchema,
+} from '../../consts/note';
+import { type Color, ColorSchema, DefaultTheme } from '../../themes';
+
+export const NoteZodSchema = z
+  .object({
+    background: ColorSchema,
+    displayMode: NoteDisplayModeSchema,
+    edgeless: z.object({
+      style: z.object({
+        borderRadius: z.number(),
+        borderSize: z.number(),
+        borderStyle: StrokeStyleSchema,
+        shadowType: NoteShadowsSchema,
+      }),
+    }),
+  })
+  .default({
+    background: DefaultTheme.noteBackgrounColor,
+    displayMode: NoteDisplayMode.EdgelessOnly,
+    edgeless: {
+      style: {
+        borderRadius: DEFAULT_NOTE_CORNER,
+        borderSize: DEFAULT_NOTE_BORDER_SIZE,
+        borderStyle: DEFAULT_NOTE_BORDER_STYLE,
+        shadowType: DEFAULT_NOTE_SHADOW,
+      },
+    },
+  });
 
 export const NoteBlockSchema = defineBlockSchema({
   flavour: 'affine:note',
   props: (): NoteProps => ({
     xywh: `[0,0,${DEFAULT_NOTE_WIDTH},${DEFAULT_NOTE_HEIGHT}]`,
-    background: DEFAULT_NOTE_BACKGROUND_COLOR,
+    background: DefaultTheme.noteBackgrounColor,
     index: 'a0',
     lockedBySelf: false,
     hidden: false,
@@ -41,8 +74,12 @@ export const NoteBlockSchema = defineBlockSchema({
   metadata: {
     version: 1,
     role: 'hub',
-    parent: ['affine:page','affine:note','affine:mahdaad-multi-column'],
+    parent: ['@root','affine:page','affine:note','affine:mahdaad-multi-column'],
     children: [
+      '@content',
+      'affine:database',
+      'affine:data-view',
+      'affine:callout',
       'affine:paragraph',
       'affine:list',
       'affine:hint',
@@ -71,6 +108,7 @@ export const NoteBlockSchema = defineBlockSchema({
   },
 });
 
+export const NoteBlockSchemaExtension = BlockSchemaExtension(NoteBlockSchema);
 export type NoteProps = {
   background: Color;
   displayMode: NoteDisplayMode;
@@ -103,7 +141,7 @@ export class NoteBlockModel
   implements GfxElementGeometry
 {
   private _isSelectable(): boolean {
-    return this.displayMode !== NoteDisplayMode.DocOnly;
+    return this.props.displayMode !== NoteDisplayMode.DocOnly;
   }
 
   override containsBound(bounds: Bound): boolean {
@@ -122,15 +160,28 @@ export class NoteBlockModel
     if (!this._isSelectable()) return false;
     return super.intersectsBound(bound);
   }
-}
 
-declare global {
-  namespace BlockSuite {
-    interface BlockModels {
-      'affine:note': NoteBlockModel;
+  override isEmpty(): boolean {
+    if (this.children.length === 0) return true;
+    if (this.children.length === 1) {
+      const firstChild = this.children[0];
+      if (firstChild.flavour === 'affine:paragraph') {
+        return firstChild.isEmpty();
+      }
     }
-    interface EdgelessBlockModelMap {
-      'affine:note': NoteBlockModel;
-    }
+    return false;
+  }
+
+  /**
+   * We define a note block as a page block if it is the first visible note
+   */
+  isPageBlock() {
+    return (
+      this.parent?.children.find(
+        child =>
+          child instanceof NoteBlockModel &&
+          child.props.displayMode !== NoteDisplayMode.EdgelessOnly
+      ) === this
+    );
   }
 }

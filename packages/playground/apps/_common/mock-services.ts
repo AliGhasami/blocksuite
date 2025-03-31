@@ -1,28 +1,22 @@
-import type {
-  PeekOptions,
-  PeekViewService,
-} from '@blocksuite/affine-components/peek';
-import type { AffineEditorContainer } from '@blocksuite/presets';
-import type { TemplateResult } from 'lit';
-
-import { PeekViewExtension } from '@blocksuite/affine-components/peek';
-import { BlockComponent } from '@blocksuite/block-std';
+import { toast } from '@blocksuite/affine/components/toast';
 import {
   ColorScheme,
   type DocMode,
+  type ReferenceParams,
+} from '@blocksuite/affine/model';
+import {
   type DocModeProvider,
+  type EditorSetting,
+  GeneralSettingSchema,
   type GenerateDocUrlService,
-  matchFlavours,
   type NotificationService,
   type ParseDocUrlService,
-  type ReferenceParams,
   type ThemeExtension,
-  toast,
-} from '@blocksuite/blocks';
-import { type DocCollection, Slot } from '@blocksuite/store';
-import { signal } from '@preact/signals-core';
-
-import type { AttachmentViewerPanel } from './components/attachment-viewer-panel.js';
+} from '@blocksuite/affine/shared/services';
+import { type Workspace } from '@blocksuite/affine/store';
+import type { TestAffineEditorContainer } from '@blocksuite/integration-test';
+import { Signal, signal } from '@preact/signals-core';
+import { Subject } from 'rxjs';
 
 function getModeFromStorage() {
   const mapJson = localStorage.getItem('playground:docMode');
@@ -43,26 +37,26 @@ export function removeModeFromStorage(docId: string) {
 }
 
 const DEFAULT_MODE: DocMode = 'page';
-const slotMap = new Map<string, Slot<DocMode>>();
+const slotMap = new Map<string, Subject<DocMode>>();
 
-export function mockDocModeService(
-  getEditorModeCallback: () => DocMode,
-  setEditorModeCallback: (mode: DocMode) => void
-) {
+export function mockDocModeService(editor: TestAffineEditorContainer) {
+  const getEditorModeCallback: () => DocMode = () => editor.mode;
+  const setEditorModeCallback: (mode: DocMode) => void = mode =>
+    editor.switchEditor(mode);
   const docModeService: DocModeProvider = {
     getPrimaryMode: (docId: string) => {
       try {
         const modeMap = getModeFromStorage();
         return modeMap.get(docId) ?? DEFAULT_MODE;
-      } catch (_e) {
+      } catch {
         return DEFAULT_MODE;
       }
     },
     onPrimaryModeChange: (handler: (mode: DocMode) => void, docId: string) => {
       if (!slotMap.get(docId)) {
-        slotMap.set(docId, new Slot());
+        slotMap.set(docId, new Subject());
       }
-      return slotMap.get(docId)!.on(handler);
+      return slotMap.get(docId)!.subscribe(handler);
     },
     getEditorMode: () => {
       return getEditorModeCallback();
@@ -74,7 +68,7 @@ export function mockDocModeService(
       const modeMap = getModeFromStorage();
       modeMap.set(docId, mode);
       saveModeToStorage(modeMap);
-      slotMap.get(docId)?.emit(mode);
+      slotMap.get(docId)?.next(mode);
     },
     togglePrimaryMode: (docId: string) => {
       const mode =
@@ -86,7 +80,7 @@ export function mockDocModeService(
   return docModeService;
 }
 
-export function mockNotificationService(editor: AffineEditorContainer) {
+export function mockNotificationService(editor: TestAffineEditorContainer) {
   const notificationService: NotificationService = {
     toast: (message, options) => {
       toast(editor.host!, message, options?.duration);
@@ -107,14 +101,14 @@ export function mockNotificationService(editor: AffineEditorContainer) {
   return notificationService;
 }
 
-export function mockParseDocUrlService(collection: DocCollection) {
+export function mockParseDocUrlService(collection: Workspace) {
   const parseDocUrlService: ParseDocUrlService = {
     parseDocUrl: (url: string) => {
       if (url && URL.canParse(url)) {
         const path = decodeURIComponent(new URL(url).hash.slice(1));
         const item =
           path.length > 0
-            ? [...collection.docs.values()].find(doc => doc.id === path)
+            ? Array.from(collection.docs.values()).find(doc => doc.id === path)
             : null;
         if (item) {
           return {
@@ -152,37 +146,7 @@ export const themeExtension: ThemeExtension = {
   },
 };
 
-export function mockPeekViewExtension(
-  attachmentViewerPanel: AttachmentViewerPanel
-) {
-  return PeekViewExtension({
-    peek(
-      element: {
-        target: HTMLElement;
-        docId: string;
-        blockIds?: string[];
-        template?: TemplateResult;
-      },
-      options?: PeekOptions
-    ) {
-      const { target } = element;
-
-      if (target instanceof BlockComponent) {
-        if (matchFlavours(target.model, ['affine:attachment'])) {
-          attachmentViewerPanel.open(target.model);
-          return Promise.resolve();
-        }
-      }
-
-      alert('Peek view not implemented in playground');
-      console.log('peek', element, options);
-
-      return Promise.resolve();
-    },
-  } satisfies PeekViewService);
-}
-
-export function mockGenerateDocUrlService(collection: DocCollection) {
+export function mockGenerateDocUrlService(collection: Workspace) {
   const generateDocUrlService: GenerateDocUrlService = {
     generateDocUrl: (docId: string, params?: ReferenceParams) => {
       const doc = collection.getDoc(docId);
@@ -202,4 +166,29 @@ export function mockGenerateDocUrlService(collection: DocCollection) {
     },
   };
   return generateDocUrlService;
+}
+
+export function mockEditorSetting() {
+  if (window.editorSetting$) return window.editorSetting$;
+
+  const initialVal = Object.entries(GeneralSettingSchema.shape).reduce(
+    (pre: EditorSetting, [key, schema]) => {
+      // @ts-expect-error key is EditorSetting field
+      pre[key as keyof EditorSetting] = schema.parse(undefined);
+      return pre;
+    },
+    {} as EditorSetting
+  );
+
+  const signal = new Signal<EditorSetting>(initialVal);
+
+  window.editorSetting$ = signal;
+
+  return signal;
+}
+
+declare global {
+  interface Window {
+    editorSetting$: Signal<EditorSetting>;
+  }
 }

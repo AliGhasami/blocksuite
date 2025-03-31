@@ -1,5 +1,4 @@
-import type { IVec, SerializedXYWH, XYWH } from '@blocksuite/global/utils';
-
+import type { IVec, SerializedXYWH, XYWH } from '@blocksuite/global/gfx';
 import {
   Bound,
   deserializeXYWH,
@@ -9,7 +8,7 @@ import {
   polygonGetPointTangent,
   polygonNearestPoint,
   rotatePoints,
-} from '@blocksuite/global/utils';
+} from '@blocksuite/global/gfx';
 import { mutex } from 'lib0';
 
 import type { EditorHost } from '../../../view/index.js';
@@ -40,7 +39,7 @@ export function prop<V, T extends GfxLocalElementModel>() {
 }
 
 export abstract class GfxLocalElementModel implements GfxCompatibleInterface {
-  private _mutex: mutex.mutex = mutex.createMutex();
+  private readonly _mutex: mutex.mutex = mutex.createMutex();
 
   protected _local = new Map<string | symbol, unknown>();
 
@@ -127,14 +126,14 @@ export abstract class GfxLocalElementModel implements GfxCompatibleInterface {
           this._local.delete('deserializedXYWH');
         }
 
-        // @ts-ignore
+        // @ts-expect-error ignore
         const oldValue = target[prop as string];
 
         if (oldValue === value) {
           return true;
         }
 
-        // @ts-ignore
+        // @ts-expect-error ignore
         target[prop as string] = value;
 
         if (!this._props.has(prop)) {
@@ -143,7 +142,7 @@ export abstract class GfxLocalElementModel implements GfxCompatibleInterface {
 
         if (surfaceModel.localElementModels.has(p)) {
           this._mutex(() => {
-            surfaceModel.localElementUpdated.emit({
+            surfaceModel.localElementUpdated.next({
               model: p,
               props: {
                 [prop as string]: value,
@@ -159,6 +158,7 @@ export abstract class GfxLocalElementModel implements GfxCompatibleInterface {
       },
     });
 
+    // oxlint-disable-next-line no-constructor-return
     return p;
   }
 

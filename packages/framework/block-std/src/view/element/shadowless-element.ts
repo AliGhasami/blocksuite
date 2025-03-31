@@ -1,6 +1,5 @@
 import type { Constructor } from '@blocksuite/global/utils';
 import type { CSSResultGroup, CSSResultOrNative } from 'lit';
-
 import { CSSResult, LitElement } from 'lit';
 
 export class ShadowlessElement extends LitElement {
@@ -13,7 +12,7 @@ export class ShadowlessElement extends LitElement {
 
   static onDisconnectedMap = new WeakMap<
     Constructor, // class
-    (() => void) | null
+    WeakMap<Node, (() => void) | null>
   >();
 
   // styles registered in ShadowlessElement will be available globally
@@ -68,7 +67,10 @@ export class ShadowlessElement extends LitElement {
           injectedStyles.push(style);
         }
       });
-      SE.onDisconnectedMap.set(SE, () => {
+      if (!SE.onDisconnectedMap.has(SE)) {
+        SE.onDisconnectedMap.set(SE, new WeakMap());
+      }
+      SE.onDisconnectedMap.get(SE)?.set(parentRoot, () => {
         injectedStyles.forEach(style => style.remove());
       });
     }
@@ -80,6 +82,7 @@ export class ShadowlessElement extends LitElement {
   }
 
   override disconnectedCallback(): void {
+    const parentRoot = this.getRootNode();
     super.disconnectedCallback();
     const SE = this.constructor as typeof ShadowlessElement;
     let styleInjectedCount = this.getConnectedCount();
@@ -87,7 +90,8 @@ export class ShadowlessElement extends LitElement {
     this.setConnectedCount(styleInjectedCount);
 
     if (styleInjectedCount === 0) {
-      SE.onDisconnectedMap.get(SE)?.();
+      // remove the style element when the last shadowless element is disconnected in the parent root
+      SE.onDisconnectedMap.get(SE)?.get(parentRoot)?.();
     }
   }
 }

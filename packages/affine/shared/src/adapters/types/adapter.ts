@@ -1,13 +1,15 @@
-import type { BaseTextAttributes, DeltaInsert } from '@blocksuite/inline';
-
+import { createIdentifier, type ServiceProvider } from '@blocksuite/global/di';
 import {
   type AssetsManager,
   type ASTWalker,
   type ASTWalkerContext,
+  type BaseAdapter,
+  type BaseTextAttributes,
   type BlockSnapshot,
   BlockSnapshotSchema,
-  type Job,
+  type DeltaInsert,
   type NodeProps,
+  type Transformer,
 } from '@blocksuite/store';
 
 import type { AffineTextAttributes } from '../../types/index.js';
@@ -34,9 +36,10 @@ export type AdapterContext<
   walker: ASTWalker<ONode, TNode>;
   walkerContext: ASTWalkerContext<TNode>;
   configs: Map<string, string>;
-  job: Job;
+  job: Transformer;
   deltaConverter: TConverter;
   textBuffer: TextBuffer;
+  provider?: ServiceProvider;
   assets?: AssetsManager;
   pageMap?: Map<string, string>;
   updateAssetIds?: (assetsId: string) => void;
@@ -150,7 +153,8 @@ export type InlineDeltaMatcher<TNode extends object = never> = {
     context: {
       configs: Map<string, string>;
       current: TNode;
-    }
+    },
+    provider?: ServiceProvider
   ) => TNode;
 };
 
@@ -169,3 +173,11 @@ export type ASTToDeltaMatcher<AST> = {
     }
   ) => DeltaInsert<AffineTextAttributes>[];
 };
+
+export type AdapterFactory = {
+  // TODO(@chen): Make it return the specific adapter type
+  get: (job: Transformer) => BaseAdapter;
+};
+
+export const AdapterFactoryIdentifier =
+  createIdentifier<AdapterFactory>('AdapterFactory');

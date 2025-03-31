@@ -1,25 +1,10 @@
-import type { TemplateResult } from 'lit';
-
 import { IS_MOBILE } from '@blocksuite/global/env';
 import { computed, signal } from '@preact/signals-core';
+import type { TemplateResult } from 'lit';
 
-import type { MenuComponentInterface, MenuItemRender } from './types.js';
-
-import { menuButtonItems } from './button.js';
-import { menuDynamicItems } from './dynamic.js';
 import { MenuFocusable } from './focusable.js';
-import { menuGroupItems } from './group.js';
-import { menuInputItems } from './input.js';
-import { MenuComponent, MobileMenuComponent } from './menu-renderer.js';
-import { subMenuItems } from './sub-menu.js';
+import type { MenuComponentInterface } from './types.js';
 
-export const menu = {
-  ...menuButtonItems,
-  ...subMenuItems,
-  ...menuInputItems,
-  ...menuGroupItems,
-  ...menuDynamicItems,
-} satisfies Record<string, MenuItemRender<never>>;
 export type MenuConfig = (
   menu: Menu,
   index: number
@@ -58,9 +43,9 @@ export function onMenuOpen(listener: MenuOpenListener) {
 export class Menu {
   private _cleanupFns: Array<() => void> = [];
 
-  private _currentFocused$ = signal<MenuFocusable>();
+  private readonly _currentFocused$ = signal<MenuFocusable>();
 
-  private _subMenu$ = signal<Menu>();
+  private readonly _subMenu$ = signal<Menu>();
 
   closed = false;
 
@@ -84,8 +69,8 @@ export class Menu {
 
   constructor(public options: MenuOptions) {
     this.menuElement = IS_MOBILE
-      ? new MobileMenuComponent()
-      : new MenuComponent();
+      ? document.createElement('mobile-menu')
+      : document.createElement('affine-menu');
     this.menuElement.menu = this;
 
     // Call global menu open listeners
@@ -160,6 +145,7 @@ export class Menu {
 
   renderItems(items: MenuConfig[]) {
     const result = [];
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const template = item(this, result.length);
