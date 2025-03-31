@@ -31,37 +31,23 @@ import {
   requestThrottledConnectedFrame,
 } from '@blocksuite/affine-shared/utils';
 import {
-<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-block.ts
-========
   BlockComponent,
   type GfxBlockComponent,
   SurfaceSelection,
   type UIEventHandler,
 } from '@blocksuite/block-std';
 import {
->>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-block.ts
   GfxControllerIdentifier,
   type GfxViewportElement,
 } from '@blocksuite/block-std/gfx';
 import { IS_WINDOWS } from '@blocksuite/global/env';
-<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-block.ts
-import { assertExists, Bound, Point, Vec } from '@blocksuite/global/utils';
-========
 import { Bound, Point, Vec } from '@blocksuite/global/gfx';
->>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-block.ts
 import { effect } from '@preact/signals-core';
 import { css, html } from 'lit';
 import { query } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import type { EdgelessRootBlockWidgetName } from '../types.js';
-<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-block.ts
-import type { EdgelessSelectedRectWidget } from './components/rects/edgeless-selected-rect.js';
-import type { EdgelessRootService } from './edgeless-root-service.js';
-
-import { isSingleMindMapNode } from '../../_common/edgeless/mindmap/index.js';
-========
->>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-block.ts
 import { EdgelessClipboardController } from './clipboard/clipboard.js';
 import type { EdgelessSelectedRectWidget } from './components/rects/edgeless-selected-rect.js';
 import { EdgelessPageKeyboardManager } from './edgeless-keyboard.js';
@@ -211,11 +197,6 @@ export class EdgelessRootBlockComponent extends BlockComponent<
         const [p1, p2] = multiPointersState.pointers;
 
         const dx =
-<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-block.ts
-          (0.25 * (p1.delta.x + p2.delta.x)) / viewport.zoom / viewport.scale;
-        const dy =
-          (0.25 * (p1.delta.y + p2.delta.y)) / viewport.zoom / viewport.scale;
-========
           (0.25 * (p1.delta.x + p2.delta.x)) /
           viewport.zoom /
           viewport.viewScale;
@@ -223,7 +204,6 @@ export class EdgelessRootBlockComponent extends BlockComponent<
           (0.25 * (p1.delta.y + p2.delta.y)) /
           viewport.zoom /
           viewport.viewScale;
->>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-block.ts
 
         // direction is opposite
         viewport.applyDeltaCenter(-dx, -dy);
@@ -327,25 +307,6 @@ export class EdgelessRootBlockComponent extends BlockComponent<
     disposables.add(
       effect(() => {
         this.style.cursor = this.gfx.cursor$.value;
-<<<<<<<< HEAD:packages/blocks/src/root-block/edgeless/edgeless-root-block.ts
-      })
-    );
-
-    let canCopyAsPng = true;
-    disposables.add(
-      slots.copyAsPng.on(({ blocks, shapes }) => {
-        if (!canCopyAsPng) return;
-        canCopyAsPng = false;
-
-        this.clipboardController
-          .copyAsPng(blocks, shapes)
-          .then(() => toast(this.host, 'Copied to clipboard'))
-          .catch(() => toast(this.host, 'Failed to copy as PNG'))
-          .finally(() => {
-            canCopyAsPng = true;
-          });
-========
->>>>>>>> origin/main:packages/affine/blocks/block-root/src/edgeless/edgeless-root-block.ts
       })
     );
   }

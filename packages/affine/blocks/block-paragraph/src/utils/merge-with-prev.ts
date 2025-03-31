@@ -19,16 +19,12 @@ import { EMBED_BLOCK_MODEL_LIST } from '@blocksuite/affine-shared/consts';
 import type { ExtendedModel } from '@blocksuite/affine-shared/types';
 import {
   focusTitle,
-  getDocTitleInlineEditor, getNextContentBlock,
+  getDocTitleInlineEditor,
   getPrevContentBlock,
   matchModels,
 } from '@blocksuite/affine-shared/utils';
-<<<<<<<< HEAD:packages/affine/block-paragraph/src/utils/merge-with-prev.ts
-import { MahdaadCalloutBlockSchema } from '@blocksuite/affine-model';
-========
 import { BlockSelection, type EditorHost } from '@blocksuite/block-std';
 import type { BlockModel, Text } from '@blocksuite/store';
->>>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/utils/merge-with-prev.ts
 
 /**
  * Merge the paragraph with prev block
@@ -49,13 +45,8 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
   const parent = doc.getParent(model);
   if (!parent) return false;
 
-<<<<<<<< HEAD:packages/affine/block-paragraph/src/utils/merge-with-prev.ts
-  if (matchFlavours(parent, ['affine:edgeless-text'])) {
-    return false;
-========
   if (matchModels(parent, [EdgelessTextBlockModel])) {
     return true;
->>>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/utils/merge-with-prev.ts
   }
 
   const prevBlock = getPrevContentBlock(editorHost, model);
@@ -63,15 +54,6 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
     return handleNoPreviousSibling(editorHost, model);
   }
 
-<<<<<<<< HEAD:packages/affine/block-paragraph/src/utils/merge-with-prev.ts
-  const blockComponent= editorHost.std.view.getBlock(model.id)
-  const prevBlockComponent=editorHost.std.view.getBlock(prevBlock.id)
-  //check for callout block
-  const insideCallout= blockComponent && !blockComponent.closest('.nest-editor') && prevBlockComponent && prevBlockComponent.closest('.nest-editor')
-
-  if (!insideCallout && matchFlavours(prevBlock, ['affine:paragraph', 'affine:list'])) {
-    const modelIndex = parent.children.indexOf(model);
-========
   const modelIndex = parent.children.indexOf(model);
   const prevSibling = doc.getPrev(model);
   if (matchModels(prevSibling, [CalloutBlockModel])) {
@@ -84,7 +66,6 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
   }
 
   if (matchModels(prevBlock, [ParagraphBlockModel, ListBlockModel])) {
->>>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/utils/merge-with-prev.ts
     if (
       (modelIndex === -1 || modelIndex === parent.children.length - 1) &&
       parent.role === 'content'
@@ -105,18 +86,6 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
 
   //todo ali ghasami for delete with backspace
   if (
-<<<<<<<< HEAD:packages/affine/block-paragraph/src/utils/merge-with-prev.ts
-    matchFlavours(prevBlock, [
-      'affine:attachment',
-      'affine:bookmark',
-      'affine:code',
-      'affine:image',
-      'affine:divider',
-      ...EMBED_BLOCK_FLAVOUR_LIST,
-      'affine:mahdaad-object',
-      'affine:mahdaad-weblink-block',
-      'affine:mahdaad-callout'
-========
     matchModels(prevBlock, [
       AttachmentBlockModel,
       BookmarkBlockModel,
@@ -124,7 +93,6 @@ export function mergeWithPrev(editorHost: EditorHost, model: BlockModel) {
       ImageBlockModel,
       DividerBlockModel,
       ...EMBED_BLOCK_MODEL_LIST,
->>>>>>>> origin/main:packages/affine/blocks/block-paragraph/src/utils/merge-with-prev.ts
     ])
   ) {
     const selection = editorHost.selection.create(BlockSelection, {

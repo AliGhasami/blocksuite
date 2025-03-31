@@ -432,12 +432,7 @@ class NoteKeymap {
       .pipe(selectBlocksBetween, { tail: false });
   };
 
-<<<<<<<< HEAD:packages/blocks/src/note-block/note-service.ts
-  private _onEnter = (ctx: UIEventStateContext) => {
-    //debugger
-========
   private readonly _onEnter = (ctx: UIEventStateContext) => {
->>>>>>>> origin/main:packages/affine/blocks/block-note/src/note-keymap.ts
     const event = ctx.get('defaultState').event;
     const [result] = this._std.command
       .chain()
@@ -590,12 +585,7 @@ class NoteKeymap {
         return true;
       },
       'Mod-Backspace': ctx => {
-<<<<<<<< HEAD:packages/blocks/src/note-block/note-service.ts
-        console.log("Mod-Backspace");
-        const { success } = this.std.command.exec('dedentBlocksToRoot');
-========
         const [success] = this.std.command.exec(dedentBlocksToRoot);
->>>>>>>> origin/main:packages/affine/blocks/block-note/src/note-keymap.ts
 
         if (!success) return;
 
@@ -613,65 +603,9 @@ class NoteKeymap {
   }
 }
 
-<<<<<<<< HEAD:packages/blocks/src/note-block/note-service.ts
-export const NoteDragHandleOption = DragHandleConfigExtension({
-  flavour: NoteBlockSchema.model.flavour,
-  edgeless: true,
-  onDragEnd: ({
-    draggingElements,
-    dropBlockId,
-    dropType,
-    state,
-    editorHost,
-  }) => {
-    console.log("note onDragEnd");
-    if (
-      draggingElements.length !== 1 ||
-      !matchFlavours(draggingElements[0].model, [NoteBlockSchema.model.flavour])
-    ) {
-      return false;
-    }
-
-    if (dropType === 'in') {
-      return true;
-    }
-
-    const noteBlock = draggingElements[0].model as NoteBlockModel;
-    const targetBlock = editorHost.doc.getBlockById(dropBlockId);
-    const parentBlock = editorHost.doc.getParent(dropBlockId);
-    if (!targetBlock || !parentBlock) {
-      return true;
-    }
-
-    const altKey = state.raw.altKey;
-    if (altKey) {
-      const duplicateBlocks = getDuplicateBlocks(noteBlock.children);
-
-      const parentIndex =
-        parentBlock.children.indexOf(targetBlock) +
-        (dropType === 'after' ? 1 : 0);
-
-      editorHost.doc.addBlocks(duplicateBlocks, parentBlock, parentIndex);
-    } else {
-      editorHost.doc.moveBlocks(
-        noteBlock.children,
-        parentBlock,
-        targetBlock,
-        dropType === 'before'
-      );
-
-      editorHost.doc.deleteBlock(noteBlock);
-      editorHost.selection.setGroup('gfx', []);
-    }
-
-    return true;
-  },
-});
-========
 export const NoteKeymapExtension = KeymapExtension(
   std => new NoteKeymap(std).hotKeys,
   {
     flavour: NoteBlockSchema.model.flavour,
   }
 );
->>>>>>>> origin/main:packages/affine/blocks/block-note/src/note-keymap.ts

@@ -25,13 +25,13 @@ import {
   type DocCollectionOptions,
   type DocSnapshot,
   IdGeneratorType,
-  Job,
-  Schema
+  Job, nanoid,
+  Schema,
 } from '@blocksuite/store'
 import { computed, nextTick, onMounted, onUnmounted, ref, toRaw, unref, watch } from 'vue'
 /** @alighasami for check merge **/
 import {
-  AffineSchemas,
+  //AffineSchemas,
   docLinkBaseURLMiddleware,
   DocModeExtension,
   MahdaadHtmlAdapter,
@@ -39,7 +39,8 @@ import {
   replaceIdMiddleware,
   titleMiddleware,
   NoteDisplayMode
-} from '@blocksuite/blocks' //toolsList
+} from '@blocksuite/affine-shared/services'; //from '@blocksuite/blocks' //toolsList
+import { AffineSchemas } from '@blocksuite/affine/schemas';
 import 'tippy.js/dist/tippy.css'
 import resources from './locale/resources'
 import i18next from 'i18next'
@@ -55,13 +56,14 @@ import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/web
 import { WebSocketAwarenessSource } from '@blocksuite/playground/apps/_common/sync/websocket/awareness'
 import { assertExists } from '@blocksuite/global/utils'
 import { get } from 'lodash'
-import { effects as blocksEffects } from '@blocksuite/blocks/effects'
-import { effects as presetsEffects } from '@blocksuite/presets/effects'
+//import { effects as blocksEffects } from '@blocksuite/integration-test/effects'
+import { effects as presetsEffects } from '@blocksuite/affine/effects';
+import { effects as blocksEffects } from '@blocksuite/affine/effects';
+//import { effects as presetsEffects } from '@blocksuite/presets/effects'
 import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examples'
 import type { ExtensionType } from '@blocksuite/block-std'
 import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
 import { getHeadingBlocksFromDoc } from './helpers/global.js';
-import { nothing } from 'lit';
 
 if (!window.$blockEditor) {
   window.$blockEditor = {}
@@ -787,7 +789,7 @@ async function init() {
     //const objectId = props.objectId
     //const edgelessId =
     const BASE_WEBSOCKET_URL = props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
-    const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
+    const idGenerator: IdGeneratorType =  nanoid //IdGeneratorType.NanoID
     let docSources: DocCollectionOptions['docSources'] = {
       main: new IndexedDBDocSource()
     }

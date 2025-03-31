@@ -30,23 +30,17 @@ import {
   ObjectBlockSchema,
   ParagraphBlockSchema,
   RootBlockSchema,
-<<<<<<<< HEAD:packages/blocks/src/schemas.ts
-  SurfaceRefBlockSchema
-} from '@blocksuite/affine-model';
-
-import { DataViewBlockSchema } from './data-view-block/data-view-model.js';
-import { HintBlockSchema } from './hint-block/hint-model.js';
-//import { ObjectBlockSchema } from './mahdaad-object-block/object-model.js';
-//import { MahdaadWeblinkBlockSchema } from './mahdaad-weblink-block/weblink-model.js';
-========
   SurfaceRefBlockSchema,
   TableBlockSchema,
   TranscriptionBlockSchema,
 } from '@blocksuite/affine-model';
+
+import { DataViewBlockSchema } from './data-view-block/data-view-model.js';
+import { HintBlockSchema } from './hint-block/hint-model.js';
+
 import type { BlockSchema } from '@blocksuite/store';
 import type { z } from 'zod';
 
->>>>>>>> origin/main:packages/affine/all/src/schemas.ts
 /** Built-in first party block models built for affine */
 export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   CodeBlockSchema,
@@ -72,16 +66,13 @@ export const AffineSchemas: z.infer<typeof BlockSchema>[] = [
   EmbedLoomBlockSchema,
   EdgelessTextBlockSchema,
   LatexBlockSchema,
-<<<<<<<< HEAD:packages/blocks/src/schemas.ts
   HintBlockSchema,
   ObjectBlockSchema,
   MahdaadWeblinkBlockSchema,
   MahdaadCalloutBlockSchema,
   MahdaadMultiColumnBlockSchema,
-  MahdaadTableOfContentBlockSchema
-========
+  MahdaadTableOfContentBlockSchema,
   TableBlockSchema,
   CalloutBlockSchema,
   TranscriptionBlockSchema,
->>>>>>>> origin/main:packages/affine/all/src/schemas.ts
 ];

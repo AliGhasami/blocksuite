@@ -1,11 +1,7 @@
 //ali ghasami-check version 3
 import { Peekable } from '@blocksuite/affine-components/peek';
 import {
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-  REFERENCE_NODE,
-========
   type DocLinkClickedEvent,
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
   RefNodeSlotsProvider,
 } from '@blocksuite/affine-inline-reference';
 import {
@@ -25,13 +21,6 @@ import {
   ThemeExtensionIdentifier,
   ThemeProvider,
 } from '@blocksuite/affine-shared/services';
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-import {
-  cloneReferenceInfo,
-  SpecProvider,
-} from '@blocksuite/affine-shared/utils';
-========
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
 import {
   cloneReferenceInfo,
   SpecProvider,
@@ -42,18 +31,6 @@ import {
   type EditorHost,
   LifeCycleWatcher,
 } from '@blocksuite/block-std';
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-import { GfxControllerIdentifier } from '@blocksuite/block-std/gfx';
-import { assertExists, Bound, getCommonBound } from '@blocksuite/global/utils';
-import {
-  BlockViewType,
-  DocCollection,
-  type GetDocOptions,
-  type Query,
-} from '@blocksuite/store';
-import { computed } from '@preact/signals-core';
-import { html, type PropertyValues } from 'lit';
-========
 import {
   GfxControllerIdentifier,
   GfxExtension,
@@ -62,7 +39,6 @@ import { Bound, getCommonBound } from '@blocksuite/global/gfx';
 import { type GetBlocksOptions, type Query, Text } from '@blocksuite/store';
 import { computed, signal } from '@preact/signals-core';
 import { html, nothing, type PropertyValues } from 'lit';
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
 import { query, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -305,12 +281,8 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
   });
 
   convertToCard = (aliasInfo?: AliasInfo) => {
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-    const { doc, caption } = this.model;
-========
     const { doc } = this.model;
     const { caption } = this.model.props;
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
 
     const parent = doc.getParent(this.model);
     if (!parent) {
@@ -373,23 +345,14 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
   };
 
   icon$ = computed(() => {
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-    const { pageId, params } = this.model;
-========
     const { pageId, params } = this.model.props;
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
     return this.std
       .get(DocDisplayMetaProvider)
       .icon(pageId, { params, referenced: true }).value;
   });
 
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-  open = () => {
-    const pageId = this.model.pageId;
-========
   open = (event?: Partial<DocLinkClickedEvent>) => {
     const pageId = this.model.props.pageId;
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
     if (pageId === this.doc.id) return;
 
     this.std
@@ -405,22 +368,11 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
   };
 
   title$ = computed(() => {
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-    const { pageId, params } = this.model;
-========
     const { pageId, params } = this.model.props;
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
     return this.std
       .get(DocDisplayMetaProvider)
       .title(pageId, { params, referenced: true });
   });
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-
-  private get _rootService() {
-    return this.std.getService('affine:page');
-  }
-========
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
 
   get blockState() {
     return {
@@ -456,15 +408,9 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
   }
 
   get syncedDoc() {
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-    const options: GetDocOptions = { readonly: true };
-    if (this.isPageMode) options.query = this._pageFilter;
-    return this.std.collection.getDoc(this.model.pageId, options);
-========
     const options: GetBlocksOptions = { readonly: true };
     if (this.isPageMode) options.query = this._pageFilter;
     return this.std.workspace.getDoc(this.model.props.pageId, options);
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
   }
 
   private _checkCycle() {
@@ -564,11 +510,7 @@ export class EmbedSyncedDocBlockComponent extends EmbedBlockComponent<EmbedSynce
     this.contentEditable = 'false';
 
     this.disposables.add(
-<<<<<<<< HEAD:packages/affine/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
-      this.model.propsUpdated.on(({ key }) => {
-========
       this.model.propsUpdated.subscribe(({ key }) => {
->>>>>>>> origin/main:packages/affine/blocks/block-embed/src/embed-synced-doc-block/embed-synced-doc-block.ts
         if (key === 'pageId' || key === 'style') {
           this._load().catch(e => {
             console.error(e);

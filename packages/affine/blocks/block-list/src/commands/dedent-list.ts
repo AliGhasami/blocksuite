@@ -1,13 +1,7 @@
 import { ListBlockModel } from '@blocksuite/affine-model';
 import type { IndentContext } from '@blocksuite/affine-shared/types';
-<<<<<<<< HEAD:packages/affine/block-list/src/commands/dedent-list.ts
-import type { Command } from '@blocksuite/block-std';
-
-import { matchFlavours } from '@blocksuite/affine-shared/utils';
-========
 import { matchModels } from '@blocksuite/affine-shared/utils';
 import { type Command, TextSelection } from '@blocksuite/block-std';
->>>>>>>> origin/main:packages/affine/blocks/block-list/src/commands/dedent-list.ts
 
 import { correctNumberedListsOrderToPrev } from './utils.js';
 
@@ -103,11 +97,7 @@ export const dedentListCommand: Command<{
   indentContext: IndentContext;
 }> = (ctx, next) => {
   const { indentContext: dedentContext, std } = ctx;
-<<<<<<<< HEAD:packages/affine/block-list/src/commands/dedent-list.ts
-  const { doc, selection, range, host } = std;
-========
   const { store, selection, range, host } = std;
->>>>>>>> origin/main:packages/affine/blocks/block-list/src/commands/dedent-list.ts
 
   if (
     !dedentContext ||
@@ -162,11 +152,7 @@ export const dedentListCommand: Command<{
   store.moveBlocks([model], grandParent, parent, false);
   correctNumberedListsOrderToPrev(store, model);
 
-<<<<<<<< HEAD:packages/affine/block-list/src/commands/dedent-list.ts
-  const textSelection = selection.find('text');
-========
   const textSelection = selection.find(TextSelection);
->>>>>>>> origin/main:packages/affine/blocks/block-list/src/commands/dedent-list.ts
   if (textSelection) {
     host.updateComplete
       .then(() => {
