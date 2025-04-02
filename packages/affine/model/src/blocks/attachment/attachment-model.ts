@@ -54,11 +54,10 @@ export type AttachmentBlockProps = {
    */
   embed: boolean | BackwardCompatibleUndefined;
   src: string;
+  meta:Record<string, string>;
   style?: (typeof AttachmentBlockStyles)[number];
 } & Omit<GfxCommonBlockProps, 'scale'> &
   BlockMeta;
-  meta:Record<string, string>
-} & Omit<GfxCommonBlockProps, 'scale'>;
 
 export const defaultAttachmentProps: AttachmentBlockProps = {
   name: '',

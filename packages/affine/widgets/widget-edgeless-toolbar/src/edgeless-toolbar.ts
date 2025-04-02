@@ -46,7 +46,7 @@ import {
   SeniorToolIdentifier,
 } from './extension/index.js';
 //import { getQuickTools, getSeniorTools } from './tools.js';
-import { getQuickTools, getSeniorTools } from './mahdaad-tools.js';
+//import { getQuickTools, getSeniorTools } from './mahdaad-tools.js';
 
 const TOOLBAR_PADDING_X = 12;
 const TOOLBAR_HEIGHT = 64;

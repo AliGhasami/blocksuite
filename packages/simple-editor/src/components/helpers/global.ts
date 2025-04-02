@@ -1,9 +1,10 @@
-export function isRTL() {
+/*export function isRTL() {
   return window.$blockEditor.locale == 'fa';
-}
+}*/
 
 import type { BlockModel, Doc } from '@blocksuite/store';
 
+/*
 import {
   BlocksUtils,
   type NoteBlockModel,
@@ -11,6 +12,15 @@ import {
   type ParagraphBlockModel,
   type RootBlockModel,
 } from '@blocksuite/blocks';
+*/
+
+import {
+  NoteBlockModel,
+  NoteDisplayMode,
+  ParagraphBlockModel,
+  RootBlockModel,
+} from '@blocksuite/affine-model';
+
 
 import { headingKeys } from './config.js';
 
@@ -53,9 +63,9 @@ export function getNotesFromDoc(
   return notes;
 }
 
-export function isRootBlock(block: BlockModel): block is RootBlockModel {
+/*export function isRootBlock(block: BlockModel): block is RootBlockModel {
   return BlocksUtils.matchFlavours(block, ['affine:page']);
-}
+}*/
 
 export function isHeadingBlock(
   block: BlockModel

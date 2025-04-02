@@ -13,6 +13,7 @@ import {
   IndexedDBBlobSource,
   MemoryBlobSource,
 } from '@blocksuite/affine/sync';
+
 import * as Y from 'yjs';
 
 import { MockServerBlobSource } from '../../_common/sync/blob/mock-server.js';

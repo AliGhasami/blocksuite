@@ -4,7 +4,6 @@ import { computed, type ReadonlySignal, signal } from '@preact/signals-core';
 
 import type { DataViewContextKey } from '../data-source/context.js';
 import type { Variable } from '../expression/types.js';
-import type { DVJSON } from '../index.js';
 import type { TypeInstance } from '../logical/type.js';
 import type { PropertyMetaConfig } from '../property/property-config.js';
 import { fromJson } from '../property/utils';
@@ -54,8 +53,6 @@ export interface SingleView {
   cellJsonValueGet(rowId: string, propertyId: string): unknown | null;
 
   cellJsonValueSet(rowId: string, propertyId: string, value: unknown): void;
-
-  cellJsonValueSet(rowId: string, propertyId: string, value: DVJSON): void;
 
   cellStringValueGet(rowId: string, propertyId: string): string | undefined;
 
@@ -310,23 +307,6 @@ export abstract class SingleViewBase<
       dataSource: this.dataSource,
     });
     this.dataSource.cellValueChange(rowId, propertyId, rawValue);
-  }
-
-  cellJsonValueSet(rowId: string, propertyId: string, value: DVJSON): void {
-    const type = this.propertyTypeGet(propertyId);
-    if (!type) {
-      return;
-    }
-    const fromJson = this.dataSource.propertyMetaGet(type).config.cellFromJson;
-    this.dataSource.cellValueChange(
-      rowId,
-      propertyId,
-      fromJson({
-        value,
-        data: this.propertyDataGet(propertyId),
-        dataSource: this.dataSource,
-      })
-    );
   }
 
   cellStringValueGet(rowId: string, propertyId: string): string | undefined {

@@ -469,10 +469,19 @@ export class EdgelessClipboardController extends PageClipboard {
   }
 
   private async _createAttachmentBlock(attachment: BlockSnapshot) {
-    const { xywh, rotate, sourceId, name, size, type, embed, style,src,meta } =
-      attachment.props;
+    const {
+      xywh,
+      rotate,
+      sourceId,
+      name,
+      size,
+      type,
+      embed,
+      style,
+      src,
+      meta,
+    } = attachment.props;
 
-    if (!(await this.host.std.workspace.blobSync.get(sourceId as string))) {
     //todo comment for mahdaad
     /*if (!(await this.host.std.collection.blobSync.get(sourceId as string))) {
       return null;
@@ -491,7 +500,7 @@ export class EdgelessClipboardController extends PageClipboard {
         embed,
         style,
         src,
-        meta
+        meta,
       },
       this.surface.model.id
     );
@@ -750,10 +759,9 @@ export class EdgelessClipboardController extends PageClipboard {
   }
 
   private async _createImageBlock(image: BlockSnapshot) {
-    const { xywh, rotate, sourceId, size, width, height, caption,meta,src } =
+    const { xywh, rotate, sourceId, size, width, height, caption, meta, src } =
       image.props;
 
-    if (!(await this.host.std.workspace.blobSync.get(sourceId as string))) {
     //todo comment for mahdaad
     /*if (!(await this.host.std.collection.blobSync.get(sourceId as string))) {
       return null;
@@ -771,7 +779,7 @@ export class EdgelessClipboardController extends PageClipboard {
         width,
         height,
         meta,
-        src
+        src,
       },
       this.surface.model.id
     );

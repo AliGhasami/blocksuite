@@ -55,12 +55,6 @@ export const ParagraphBlockSchema = defineBlockSchema({
 
 export const ParagraphBlockSchemaExtension =
   BlockSchemaExtension(ParagraphBlockSchema);
-export class ParagraphBlockModel extends BlockModel<ParagraphProps> {
-  override flavour!: 'affine:paragraph';
-
-  override text!: Text;
-
-}
 
 export class ParagraphBlockModel extends BlockModel<ParagraphProps> {
   override isEmpty(): boolean {

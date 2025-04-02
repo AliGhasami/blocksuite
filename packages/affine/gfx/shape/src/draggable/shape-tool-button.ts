@@ -1,13 +1,12 @@
 /** @alighasami for check merge **/
-import {
-  ArrowUpIcon,
-  ShapeTablerIcon
-} from '@blocksuite/affine-components/icons';
+import {} from //ArrowUpIcon,
+//ShapeTablerIcon
+'@blocksuite/affine-components/icons';
 import { type ShapeName, ShapeType } from '@blocksuite/affine-model';
 import { EdgelessToolbarToolMixin } from '@blocksuite/affine-widget-edgeless-toolbar';
 import { SignalWatcher } from '@blocksuite/global/lit';
 import { css, html, LitElement } from 'lit';
-import { styleMap } from "lit/directives/style-map.js";
+import { styleMap } from 'lit/directives/style-map.js';
 
 import { ShapeTool } from '../shape-tool.js';
 import type { DraggableShape } from './utils.js';
@@ -64,7 +63,7 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         };
       },
     });
-    this._handleWrapperClick()
+    this._handleWrapperClick();
   }
 
   private _updateOverlay() {
@@ -105,7 +104,6 @@ export class EdgelessShapeToolButton extends EdgelessToolbarToolMixin(
         <span class="arrow-up-icon" style=${styleMap({ color: arrowColor })}>
           ${ArrowUpIcon}
         </span>
-        
       </edgeless-tool-icon-button>
     `;
   }

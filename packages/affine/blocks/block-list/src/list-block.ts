@@ -3,7 +3,7 @@
 import '@blocksuite/affine-shared/commands';
 
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
-import { playCheckAnimation } from '@blocksuite/affine-components/icons';
+//import { playCheckAnimation } from '@blocksuite/affine-components/icons';
 import { TOGGLE_BUTTON_PARENT_CLASS } from '@blocksuite/affine-components/toggle-button';
 import { DefaultInlineManagerExtension } from '@blocksuite/affine-inline-preset';
 import type { ListBlockModel } from '@blocksuite/affine-model';
@@ -15,7 +15,7 @@ import {
 import { DocModeProvider } from '@blocksuite/affine-shared/services';
 import { getViewportElement } from '@blocksuite/affine-shared/utils';
 import type { BlockComponent } from '@blocksuite/block-std';
-import { setDirectionOnBlock } from '@blocksuite/store'
+import { setDirectionOnBlock } from '../../../../framework/store/src/schema/block-utils'; // @blocksuite/store
 import { BlockSelection, TextSelection } from '@blocksuite/block-std';
 import {
   getInlineRangeProvider,
@@ -150,22 +150,30 @@ export class ListBlockComponent extends CaptionedBlockComponent<ListBlockModel> 
     );
   }
 
-    override firstUpdated() {
-      this._richTextElement?.updateComplete
+  override firstUpdated() {
+    this._richTextElement?.updateComplete
       .then(() => {
-          if(this.inlineEditor && !this.doc.readonly) {
-            setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
-            this.disposables.add(
-              this.inlineEditor.slots.textChange.on(()=> {
-                  if(this.inlineEditor) {
-                    setDirectionOnBlock(this.model as unknown as ParagraphBlockModel, this.doc,this.inlineEditor?.yText.toString().trim())
-                  }
-              })
-            );
-          }
-        })
-        .catch(console.error);
-    }
+        if (this.inlineEditor && !this.doc.readonly) {
+          setDirectionOnBlock(
+            this.model as unknown as ParagraphBlockModel,
+            this.doc,
+            this.inlineEditor?.yText.toString().trim()
+          );
+          this.disposables.add(
+            this.inlineEditor.slots.textChange.on(() => {
+              if (this.inlineEditor) {
+                setDirectionOnBlock(
+                  this.model as unknown as ParagraphBlockModel,
+                  this.doc,
+                  this.inlineEditor?.yText.toString().trim()
+                );
+              }
+            })
+          );
+        }
+      })
+      .catch(console.error);
+  }
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
@@ -176,13 +184,13 @@ export class ListBlockComponent extends CaptionedBlockComponent<ListBlockModel> 
   override previewName(): string {
     switch (this.model.type) {
       case 'numbered':
-        return  'Number List'
+        return 'Number List';
       case 'todo':
-        return 'Check List'
+        return 'Check List';
       case 'toggle':
-        return 'Toggle List'
+        return 'Toggle List';
       case 'bulleted':
-        return 'Bullet List'
+        return 'Bullet List';
     }
     //return super.previewName();
   }
@@ -210,7 +218,6 @@ export class ListBlockComponent extends CaptionedBlockComponent<ListBlockModel> 
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
     );
     const scrollContainer = temp ? temp : getViewportElement(this.host);
-
 
     return html`
       <div dir=${model.dir} class=${'affine-list-block-container'}>
@@ -264,7 +271,6 @@ export class ListBlockComponent extends CaptionedBlockComponent<ListBlockModel> 
   // setDirection(key:string) {
   //   setDirectionBasedOnText(this.model as unknown as ParagraphBlockModel, this.doc, key);
   // }
-
 
   @state()
   private accessor _readonlyCollapsed = false;

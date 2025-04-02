@@ -1,3 +1,4 @@
+//ali ghasami-check version 3
 import type { ServiceProvider } from '@blocksuite/global/di';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 import type {
@@ -140,8 +141,6 @@ export class Clipboard extends LifeCycleWatcher {
         const payload = {
           file: item,
           assets: job.assetsManager,
-          workspaceId: doc.workspace.id,
-          blockVersions: doc.collection.meta.blockVersions,
           workspaceId: doc.collection.id,
           pageId: doc.id,
         };

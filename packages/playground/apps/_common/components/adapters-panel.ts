@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-restricted-imports */
-import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js';
+//import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js';
 
 import { ShadowlessElement } from '@blocksuite/affine/block-std';
 import { defaultImageProxyMiddleware } from '@blocksuite/affine/blocks/image';

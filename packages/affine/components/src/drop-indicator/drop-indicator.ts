@@ -1,13 +1,15 @@
 //ali ghasami-check version 3
+//ali ghasami-check version 3
 import { type Rect } from '@blocksuite/global/gfx';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { ShadowlessElement } from '@blocksuite/block-std';
 /** convert  from  LitElement to ShadowlessElement for mahdaad */
 //LitElement
 export class DropIndicator extends ShadowlessElement {
   static override styles = css`
-    .affine-drop-indicator{
+    .affine-drop-indicator {
       position: absolute;
       top: 0;
       left: 0;
@@ -27,49 +29,48 @@ export class DropIndicator extends ShadowlessElement {
       return null;
     }
 
-    const { left, top, width, height } = this.rect;
-    const style = styleMap({
+    //const { left, top, width, height } = this.rect;
+    /*const style = styleMap({
       width: `${width}px`,
       height: `${height}px`,
       top: `${top}px`,
       left: `${left}px`,
       zIndex: this.zIndex,
-    });
+    });*/
 
-    return html`<div class="affine-drop-indicator" style=${style}></div>`;
+    // return html`<div class="affine-drop-indicator" style=${style}></div>`;
     //console.log("this is rect",this.rect,this.rectVertical);
 
-    let style =styleMap({display:'none'})
-    let styleVertical =styleMap({display:'none'})
+    let style = styleMap({ display: 'none' });
+    let styleVertical = styleMap({ display: 'none' });
     //const styleVertical=styleMap({})
-    if(this.rect) {
+    if (this.rect) {
       const { left, top, width, height } = this.rect;
       style = styleMap({
         width: `${width}px`,
-       // height: `${height}px`,
+        // height: `${height}px`,
         top: `${top}px`,
         left: `${left}px`,
         //'background-color':'green'
       });
     }
-    if(this.rectVertical) {
+    if (this.rectVertical) {
       //console.log("this.rectVertical",this.rectVertical);
       const { left, top, width, height } = this.rectVertical;
       styleVertical = styleMap({
         //width: `${height}px`,
         height: `${height}px`,
-        top: `${top+5}px`,
-        left: `${left+width+5}px`,
+        top: `${top + 5}px`,
+        left: `${left + width + 5}px`,
         //'background-color':'yellow'
       });
     }
     return html`<div class="affine-drop-indicator" style=${style}>
-      <span class="circle-indicator"></span>
-    </div>
-        <div class="affine-drop-indicator vertical" style=${styleVertical}>
-          <span class="circle-indicator vertical"></span>
-        </div>
-    `;
+        <span class="circle-indicator"></span>
+      </div>
+      <div class="affine-drop-indicator vertical" style=${styleVertical}>
+        <span class="circle-indicator vertical"></span>
+      </div> `;
   }
 
   @property({ attribute: false })

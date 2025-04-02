@@ -15,7 +15,7 @@ import {
   resetImageSize,
   turnImageIntoCardView,
 } from './utils.js';
-import { getStorageURL } from '../_common/upload.js';
+import { getStorageURL } from '../../../../blocks/src/_common/upload';
 
 @Peekable()
 export class ImageEdgelessBlockComponent extends GfxBlockComponent<ImageBlockModel> {
@@ -78,10 +78,9 @@ export class ImageEdgelessBlockComponent extends GfxBlockComponent<ImageBlockMod
     super.disconnectedCallback();
   }
 
-  get fullSrc() :string{
-    return this.model.src ? getStorageURL()+this.model.src : ''
+  get fullSrc(): string {
+    return this.model.src ? getStorageURL() + this.model.src : '';
   }
-
 
   override renderGfxBlock() {
     //console.log("1111",this.model, getStorageURL()+this.model.src,this.loading ,this.error ,!this.model.src);
