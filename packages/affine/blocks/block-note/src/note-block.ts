@@ -1,3 +1,4 @@
+//ali ghasami-check version 3
 import type { NoteBlockModel } from '@blocksuite/affine-model';
 import { BlockComponent } from '@blocksuite/block-std';
 import { css, html } from 'lit';
@@ -19,7 +20,7 @@ export class NoteBlockComponent extends BlockComponent<NoteBlockModel> {
 
   override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
-    checkNotEmptyNote(this.model,this.doc)
+    //checkNotEmptyNote(this.model,this.doc)
     /*try{
       let  lastChild :  null | BlockModel = null
       if(this.model.children.length > 0) {
@@ -39,7 +40,6 @@ export class NoteBlockComponent extends BlockComponent<NoteBlockModel> {
     }*/
     return result;
   }
-
 
   override renderBlock() {
     return html`

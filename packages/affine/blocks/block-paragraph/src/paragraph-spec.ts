@@ -10,7 +10,7 @@ import {
 } from './paragraph-keymap.js';
 
 const placeholders = {
-  text: "Type '/' for commands",
+  text: "Type '/' for commands 11",
   h1: 'Heading 1',
   h2: 'Heading 2',
   h3: 'Heading 3',

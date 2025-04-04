@@ -7,21 +7,11 @@
 </template>
 
 <script setup lang="ts">
-//import '@blocksuite/presets/themes/affine.css'
 import '@toeverything/theme/style.css'
-//import { EdgelessEditor, MahdaadEditorContainer, PageEditor } from '@blocksuite/presets'
-//import { createEmptyDoc } from './helpers'
-import { nanoid, Schema, Store, Transformer } from '@blocksuite/affine/store'
+import { nanoid, Schema, Store, Text, Transformer } from '@blocksuite/affine/store'
 import {
- // type BlockCollection,
   type BlockModel,
- // Doc,
- // DocCollection,
- // type DocCollectionOptions,
   type DocSnapshot,
-  //IdGeneratorType,
-  //Job,
-  //Schema
 } from '@blocksuite/store'
 import { computed, nextTick, onMounted, onUnmounted, ref, toRaw, unref, watch } from 'vue'
 import { AffineSchemas } from '@blocksuite/affine/schemas';
@@ -44,15 +34,17 @@ import i18next from 'i18next'
 import { initLitI18n } from 'lit-i18n'
 import type { Doc } from '@blocksuite/affine/store';
 import {
+  createAutoIncrementIdGenerator,
   type DocCollectionOptions,
   TestWorkspace,
-} from '@blocksuite/affine/store/test';
+} from '@blocksuite/affine/store/test'
 import Dexie from 'dexie'
 import {
+  type BlobSource,
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
-  DEFAULT_DB_NAME,
-  IndexedDBDocSource
+  DEFAULT_DB_NAME, IndexedDBBlobSource,
+  IndexedDBDocSource, MemoryBlobSource,
 } from '@blocksuite/sync'
 import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
 import { WebSocketAwarenessSource } from '@blocksuite/playground/apps/_common/sync/websocket/awareness'
@@ -61,19 +53,22 @@ import { get } from 'lodash'
 import {
   createStarterDocCollection,
   initStarterDocCollection,
-} from '../../../playground/apps/starter/utils/collection.js';
+} from '../../playground/apps/starter/utils/collection.js';
 import { effects as blocksEffects } from '@blocksuite/affine/effects';
 //import { effects as commentEffects } from '../../../playground/apps/comment/effects';
 import { effects as presetsEffects } from '@blocksuite/integration-test/effects';
-import { mountDefaultDocEditor } from '../../../playground/apps/starter/utils/setup-playground';
+//import { mountDefaultDocEditor,initStarterDocCollection,createStarterDocCollection } from './initEditor';
 //import { effects as blocksEffects } from '@blocksuite/affine/effects';
 //import { effects as presetsEffects } from '@blocksuite/presets/effects'
 //import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examples'
 //import type { ExtensionType } from '@blocksuite/block-std'
-import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
-import { getHeadingBlocksFromDoc } from './helpers/global.js';
+//import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
+//import { getHeadingBlocksFromDoc } from './helpers/global.js';
 import { EdgelessEditorBlockSpecs, PageEditorBlockSpecs } from '@blocksuite/affine/extensions'
-import { getTestCommonExtensions } from '../../../playground/apps/starter/utils/extensions'
+import { getTestCommonExtensions } from '../../playground/apps/starter/utils/extensions'
+import { MockServerBlobSource } from '../../playground/apps/_common/sync/blob/mock-server'
+import { SpecProvider } from '@blocksuite/affine-shared/utils'
+import * as Y from 'yjs'
 //import { nothing } from 'lit';
 
 if (!window.$blockEditor) {
@@ -164,33 +159,34 @@ i18next.use(initLitI18n).init({
   resources
 })
 
-const schemas = computed(() => {
-  /** @alighasami for check merge **/
+/*const schemas = computed(() => {
+  /!** @alighasami for check merge **!/
   //const temp = props.disableTools.map((item) => toolsList[item])
   return AffineSchemas //.filter((item) => !temp.includes(item.model.flavour))
-})
+})*/
 
 watch(
   () => props.objectId,
   async () => {
     if (props.objectId) {
       console.log('==>this is object id in watch and call init function ', props.objectId)
-      await init()
+      await init2()
       if (currentDocument.value) {
-        myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
+       // myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
       }
     }
   }
   //{ immediate: true }
 )
 
-/*watch(()=>{
+const edgelessId = computed(() => {
+  return `edgeless_${props.objectId}`
+})
 
-})*/
 
 watch(currentDocument, () => {
   if (props.objectId) {
-    myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
+   // myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
   }
 })
 
@@ -472,31 +468,7 @@ function handleSelectAll(event: Event) {
   }
 }
 
-onMounted(async () => {
-  init()
-  init2()
-  document.addEventListener('keydown', handleSelectAll)
-})
 
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleSelectAll)
-})
-
-defineExpose({
-  getData,
-  setData,
-  exportHTML,
-  setFocus,
-  //reset,
-  isEmpty,
-  doc: currentDocument,
-  checkIsEmpty,
-  editor: refEditor,
-  exportHTMLFromSnapshot
-  //collection:myCollection
-})
-
-/************************************************************/
 
 
 //todo ali ghasami
@@ -560,9 +532,7 @@ async function setData(data: any, clear_history?: boolean = true) {
   }*/
 }
 
-const edgelessId = computed(() => {
-  return `edgeless_${props.objectId}`
-})
+
 
 /*function patchPageRootSpec(spec: ExtensionType[]) {
   const setEditorModeCallBack = editorElement.value.switchEditor.bind(editorElement.value)
@@ -613,22 +583,92 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
   }
 }
 
-async function init() {
+function createTestOptions() {
+  const idGenerator = createAutoIncrementIdGenerator();
+  return { id: 'test-collection', idGenerator };
+}
+
+async function _mountEditor(){
+  //debugger
+  console.log('==>start for mount editor')
+  const blockCollection = myCollection.docs.values().next().value as Doc
+  //assertExists(blockCollection, '==>Need to create a doc first')
+  if (!blockCollection) {
+    throw new Error('Need to create a doc first');
+  }
+  const doc = blockCollection.getStore()
+  //const doc = blockCollection.getDoc()
+  //assertExists(doc.ready, '==>Doc is not ready')
+  //assertExists(doc.root, '==>Doc root is not ready')
+  /*if (!doc.root) {
+    throw new Error('Doc root is not ready');
+  }*/
+  doc.load();
+  doc.resetHistory();
+  if (!doc.root) {
+    throw new Error('Doc root is not ready');
+  }
+  //const app = document.getElementById('app');
+  /* const app = refEditor.value;
+   if (!app) return;*/
+  // editorElement.value = createTestEditor(doc, collection);
+  // debugger
+  const editor= document.createElement('affine-editor-container');
+  editorElement.value = editor
+  editorElement.value.doc = doc.doc;
+  const defaultExtensions = getTestCommonExtensions(editor);
+  editor.pageSpecs = [...PageEditorBlockSpecs, ...defaultExtensions];
+  editor.edgelessSpecs = [...EdgelessEditorBlockSpecs, ...defaultExtensions];
+  //editorElement.value = editor
+  /*const defaultExtensions = getTestCommonExtensions(editor);
+  editor.pageSpecs = [...PageEditorBlockSpecs, ...defaultExtensions];
+  editor.edgelessSpecs = [...EdgelessEditorBlockSpecs, ...defaultExtensions];*/
+  //editorElement.value = new MahdaadEditorContainer()
+  /*const specs = getExampleSpecs()
+  const refNodeSlotsExtension = RefNodeSlotsExtension()
+  editorElement.value.pageSpecs = patchPageRootSpec([
+    refNodeSlotsExtension,
+    ...specs.pageModeSpecs
+  ])
+  editorElement.value.edgelessSpecs = patchPageRootSpec([
+    refNodeSlotsExtension,
+    ...specs.edgelessModeSpecs
+  ])
+  if (props.isBoardView) {
+    editorElement.value.mode = 'edgeless'
+  } else {
+    editorElement.value.mode = 'page'
+  }*/
+  console.log('==>doc for mount is', doc)
+  //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
+  myCollection.awarenessStore.awareness.setLocalStateField('user', {
+    user_id: props.userId,
+    color: props.userColor
+  })
+  currentDocument.value = doc
+  editorElement.value.doc = doc
+
+  //checkIsEmpty()
+  //console.log('111111', doc.blockSize)
+  //todo ali ghasami for remove after
+  //const temp = await exportData(myCollection, [currentDocument.value])
+  //console.log('this is snap shoot ', temp)
+  //bindEvent(doc)
+  //handleHeadingList(doc)
+  appendTODOM(editorElement.value)
+  //checkNotEmptyDocBlock(currentDocument.value)
+  //checkReadOnly()
+  stopEvent.value = false
+  loading.value = false
+}
+
+async function init2() {
+  debugger
   loading.value = true
   stopEvent.value = true
-  console.log('==>init function')
-  //todo check ali ghasami
-  const defaultFlags = {
-    enable_synced_doc_block: true,
-    enable_pie_menu: true,
-    enable_lasso_tool: true,
-    enable_color_picker: true
-    // ...flags,
+  if (!window.$blockEditor) {
+    window.$blockEditor = {}
   }
-  //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
-  //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
-  //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
-  /********************/
   if (props.objectId) {
     console.log('==>has object id', props.objectId)
     try {
@@ -637,179 +677,23 @@ async function init() {
       console.log('==>run delete edgeless', edgelessId.value)
       await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, 'collection', edgelessId.value)
     } catch (e) {
-      console.log('==>error in remove recode object and edgless from collection', e)
+      console.log('==>error in remove recode object and edgeless from collection', e)
     }
-    /*const deleteRecord=async (dbName, storeName, keyToDelete)=> {
-      try {
-        // Open the IndexedDB database
-        const db = await openDB(dbName);
-        // Start a transaction
-        const transaction = db.transaction(storeName, 'readwrite');
-        const objectStore = transaction.objectStore(storeName);
-        // Delete the record
-        await objectStore.delete(keyToDelete);
-        console.log('Record deleted successfully.');
-        // Complete the transaction
-        await transaction.complete;
-        console.log('Transaction completed.');
-        //resolve(true)
-      } catch (error) {
-        console.error('Error deleting record:', error);
-        //resolve(true)
-      }
-
-       /!* return new Promise(async (resolve, reject) => {
-
-        })*!/
-    }
-
-    const openDB=async (dbName)=> {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName);
-
-        request.onsuccess = (event) => resolve(event.target.result);
-        request.onerror = (event) => reject(event.target.error);
-      });
-    }
-
-
-   try {
-      await deleteRecord(DEFAULT_DB_NAME,'collection',props.objectId)
-    }catch (e) {
-      console.log("can not delete record");
-    }*/
-
-    /* const request = indexedDB.open(DEFAULT_DB_NAME, dbVersion);
-     request.onsuccess = function (event) {
-       const db = event.target.result;
-
-       // Start a transaction
-       const transaction = db.transaction('collection', 'readwrite');
-       const objectStore = transaction.objectStore('collection');
-
-       // Define the key of the record you want to delete
-       const keyToDelete = props.objectId; // Replace with the actual key
-
-       // Delete the record
-       const deleteRequest = objectStore.delete(keyToDelete);
-
-       deleteRequest.onsuccess = function () {
-         console.log('Record deleted successfully');
-       };
-
-       deleteRequest.onerror = function () {
-         console.error('Error deleting record:', deleteRequest.error);
-       };
-
-       transaction.oncomplete = function () {
-         console.log('Transaction completed.');
-       };
-
-       transaction.onerror = function (event) {
-         console.error('Transaction failed:', event.target.error);
-       };
-     };
-
-     request.onerror = function () {
-       console.error('Error opening database:', request.error);
-     };*/
   }
-  /*******************/
-  if (!window.$blockEditor) {
-    window.$blockEditor = {}
-  }
-
-  const schema = new Schema()
-  schema.register(schemas.value)
   let editorData = props.data
   if (editorData && editorData.meta.id && props.objectId) {
     editorData.meta.id = props.objectId //temp.meta.object_id
   }
-  console.log('==>data for set in editor is', editorData)
-  const mountEditor = async () => {
-    console.log('==>start for mount editor')
-    const blockCollection = myCollection.docs.values().next().value as Doc
-    //assertExists(blockCollection, '==>Need to create a doc first')
-    if (!blockCollection) {
-      throw new Error('Need to create a doc first');
-    }
-    const doc = blockCollection.getStore()
-    //const doc = blockCollection.getDoc()
-    //assertExists(doc.ready, '==>Doc is not ready')
-    //assertExists(doc.root, '==>Doc root is not ready')
-    if (!doc.root) {
-      throw new Error('Doc root is not ready');
-    }
-    doc.load();
-    doc.resetHistory();
-    if (!doc.root) {
-      throw new Error('Doc root is not ready');
-    }
-    //const app = document.getElementById('app');
-    /* const app = refEditor.value;
-     if (!app) return;*/
-   // editorElement.value = createTestEditor(doc, collection);
-
-    editorElement.value = document.createElement('affine-editor-container');
-    editorElement.value.doc = doc;
-
-    const defaultExtensions = getTestCommonExtensions(editor);
-    editor.pageSpecs = [...PageEditorBlockSpecs, ...defaultExtensions];
-    editor.edgelessSpecs = [...EdgelessEditorBlockSpecs, ...defaultExtensions];
-
-    /*const defaultExtensions = getTestCommonExtensions(editor);
-    editor.pageSpecs = [...PageEditorBlockSpecs, ...defaultExtensions];
-    editor.edgelessSpecs = [...EdgelessEditorBlockSpecs, ...defaultExtensions];*/
-
-
-    //editorElement.value = new MahdaadEditorContainer()
-    /*const specs = getExampleSpecs()
-    const refNodeSlotsExtension = RefNodeSlotsExtension()
-    editorElement.value.pageSpecs = patchPageRootSpec([
-      refNodeSlotsExtension,
-      ...specs.pageModeSpecs
-    ])
-    editorElement.value.edgelessSpecs = patchPageRootSpec([
-      refNodeSlotsExtension,
-      ...specs.edgelessModeSpecs
-    ])
-    if (props.isBoardView) {
-      editorElement.value.mode = 'edgeless'
-    } else {
-      editorElement.value.mode = 'page'
-    }*/
-    console.log('==>doc for mount is', doc)
-    //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
-    myCollection.awarenessStore.awareness.setLocalStateField('user', {
-      user_id: props.userId,
-      color: props.userColor
-    })
-    currentDocument.value = doc
-    editorElement.value.doc = doc
-
-    checkIsEmpty()
-    //console.log('111111', doc.blockSize)
-    //todo ali ghasami for remove after
-    //const temp = await exportData(myCollection, [currentDocument.value])
-    //console.log('this is snap shoot ', temp)
-    bindEvent(doc)
-    handleHeadingList(doc)
-    appendTODOM(editorElement.value)
-    checkNotEmptyDocBlock(currentDocument.value)
-    checkReadOnly()
-    stopEvent.value = false
-    loading.value = false
-  }
-
-  //console.log("this is object id",props.objectId);
+  const schema = new Schema()
+  schema.register(AffineSchemas) //schemas.value
+  //is collboration mode
   if (props.isCollaboration && props.objectId && props.websocketUrl) {
     console.log('==>is collaboration mode')
     //console.log("100000",props.objectId);
     //const objectId = props.objectId
     //const edgelessId =
     const BASE_WEBSOCKET_URL = props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
-    //const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
-    const idGenerator =  nanoid;
+    const idGenerator = nanoid //IdGeneratorType.NanoID
     let docSources: DocCollectionOptions['docSources'] = {
       main: new IndexedDBDocSource()
     }
@@ -850,6 +734,7 @@ async function init() {
     console.log('==>this is list web socket is', window.$blockEditor.wsMap)
     //console.log("this is ws map",);
     const initDoc = async () => {
+      debugger
       console.log('==>start initDoc function')
       //exist:boolean
       //console.log("this is exist",exist);
@@ -868,7 +753,7 @@ async function init() {
         if (props.data) {
           //todo ali ghasami for inject data if has bug and client id in used
           //Object.assign(temp,{})
-          const job = new  Transformer({  middlewares: [] }) //replaceIdMiddleware //collection: myCollection,
+          const job = new Job({ collection: myCollection, middlewares: [] }) //replaceIdMiddleware
           const doc = await job.snapshotToDoc(editorData)
           //const doc=await job.snapshotToDoc(props.data)
           if (doc) {
@@ -907,6 +792,399 @@ async function init() {
             );*/
         console.log('==>doc is exist and get from collection and load')
         const doc = myCollection.getDoc(props.objectId)
+        console.log("this is doc",doc)
+        //console.log('this is original doc for set ', doc)
+        //assertExists(doc)
+        doc.load()
+        // wait for data injected from provider
+        if (!doc.root) {
+          //await new Promise((resolve) => doc.doc.slots.rootAdded.once(resolve))
+        }
+        doc.resetHistory()
+      }
+
+      await _mountEditor()
+    }
+
+    await new Promise((resolve, reject) => {
+      if (web_socket.readyState === WebSocket.OPEN) resolve(true)
+      web_socket.addEventListener('open', resolve)
+      web_socket.addEventListener('error', reject)
+    })
+      .then(() => {
+        console.log('==>resolve websocket')
+        docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new WebSocketDocSource(web_socket, props.objectId, initDoc)]
+        }
+        awarenessSources = [new WebSocketAwarenessSource(web_socket)]
+      })
+      .catch(() => {
+        console.log('==>catch for open websocket and Broadcast channel')
+        docSources = {
+          main: new IndexedDBDocSource(),
+          shadows: [new BroadcastChannelDocSource()]
+        }
+        awarenessSources = [
+          //new BroadcastChannelAwarenessSource('quickEdgeless'),
+          new BroadcastChannelAwarenessSource(edgelessId.value)
+        ]
+      })
+    const options: DocCollectionOptions = {
+      //id: 'quickEdgeless',
+      id: edgelessId.value,
+      //schema,
+      idGenerator,
+      /*blobSources: {
+        main: new IndexedDBBlobSource('quickEdgeless'),
+        //main: new IndexedDBBlobSource(edgelessId),
+      },*/
+      docSources,
+      awarenessSources,
+      //defaultFlags
+      /*defaultFlags: {
+        enable_synced_doc_block: true,
+        enable_pie_menu: true,
+        enable_lasso_tool: true,
+        enable_color_picker: true,
+        // ...flags,
+      }*/
+    }
+    console.log('==>Init collection in collaboration mode and start')
+    myCollection =  new TestWorkspace(options);
+    myCollection.storeExtensions = SpecProvider._.getSpec('store').value;
+    //myCollection = new DocCollection(options)
+    myCollection.start()
+    //await myCollection.waitForSynced()
+  } else {
+    console.log('==>not collaboration mode')
+    //console.log("5555555",props.data);
+    //myCollection = new DocCollection({ schema, defaultFlags })
+    myCollection = new TestWorkspace();
+    myCollection.storeExtensions = SpecProvider._.getSpec('store').value;
+    myCollection.start();
+    //myCollection = new DocCollection({ schema, defaultFlags })
+    //myCollection.start()
+    myCollection.meta.initialize()
+    if (editorData) {
+      //const temp=props.data
+      //temp.meta.id=props.objectId //temp.meta.object_id
+      const job = new Job({ collection: myCollection, middlewares: [] }) //replaceIdMiddleware
+      const doc = await job.snapshotToDoc(editorData)
+      if (doc) {
+        doc.load()
+        doc.resetHistory()
+      }
+    } else {
+      const doc = myCollection.createDoc({ id: 'doc:home' })
+      doc.doc.clear();
+      doc.load(() => {
+        const rootId = doc.addBlock('affine:page')
+        //debugger
+        doc.addBlock('affine:surface', {}, rootId)
+        if (!props.isBoardView) {
+          const noteId = doc.addBlock('affine:note', {}, rootId)
+          doc.addBlock('affine:paragraph', {}, noteId)
+        }
+      })
+      doc.resetHistory()
+    }
+    await _mountEditor()
+  }
+}
+
+
+async function _createCollection(options: DocCollectionOptions = {}){
+  //const collectionId = room ?? 'starter';
+  //const schema = new Schema();
+  //schema.register(AffineSchemas);
+  //const idGenerator = nanoid;
+  //let docSources: DocCollectionOptions['docSources'];
+  /*if (room) {
+    docSources = {
+      main: new BroadcastChannelDocSource(`broadcast-channel-${room}`),
+    };
+  }*/
+  //const id = room ?? `starter-${Math.random().toString(16).slice(2, 8)}`;
+
+  /*const blobSources = {
+    main: new MemoryBlobSource(),
+    shadows: [] as BlobSource[],
+  } satisfies DocCollectionOptions['blobSources'];
+  if (blobSourceArgs.includes('mock')) {
+    blobSources.shadows.push(new MockServerBlobSource(collectionId));
+  }
+  if (blobSourceArgs.includes('idb')) {
+    blobSources.shadows.push(new IndexedDBBlobSource(collectionId));
+  }*/
+
+  /*const options: DocCollectionOptions = {
+    id: collectionId,
+    idGenerator,
+    awarenessSources: [new BroadcastChannelAwarenessSource(id)],
+    docSources: _docSources,
+    blobSources,
+  };*/
+  const collection = new TestWorkspace(options);
+  collection.storeExtensions = SpecProvider._.getSpec('store').value;
+  collection.start();
+  // debug info
+  /*window.collection = collection;
+  window.blockSchemas = AffineSchemas;
+  window.job = new Transformer({
+    schema,
+    blobCRUD: collection.blobSync,
+    docCRUD: {
+      create: (id: string) => collection.createDoc({ id }),
+      get: (id: string) => collection.getDoc(id),
+      delete: (id: string) => collection.removeDoc(id),
+    },
+  });
+  window.Y = Y;*/
+
+  return collection;
+}
+
+
+async function init() {
+  //return
+  /*****************************************************/
+  //method 1
+  /*const collection = createStarterDocCollection();
+  collection.meta.initialize();
+  const id='doc:home'
+  const doc = collection.getDoc(id) ?? collection.createDoc({ id });
+  doc.doc.clear();
+
+  doc.load(() => {
+    // Add root block and surface block at root level
+    const rootId = doc.addBlock('affine:page', {
+      title: new Text(),
+    });
+
+    doc.addBlock('affine:surface', {}, rootId);
+
+    // Add note block inside root block
+    const noteId = doc.addBlock('affine:note', {}, rootId);
+    // Add paragraph block inside note block
+    doc.addBlock('affine:paragraph', {}, noteId);
+  });
+
+  doc.resetHistory();*/
+  //return
+  //debugger
+  loading.value = true
+  stopEvent.value = true
+  if (!window.$blockEditor) {
+    window.$blockEditor = {}
+  }
+  console.log('==>init function')
+  //todo check ali ghasami
+  const defaultFlags = {
+    enable_synced_doc_block: true,
+    enable_pie_menu: true,
+    enable_lasso_tool: true,
+    enable_color_picker: true
+    // ...flags,
+  }
+  //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
+  //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
+  if (props.objectId) {
+    console.log('==>has object id', props.objectId)
+    try {
+      console.log('==>run delete cord with id ', props.objectId)
+      await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, 'collection', props.objectId)
+      console.log('==>run delete edgeless', edgelessId.value)
+      await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, 'collection', edgelessId.value)
+    } catch (e) {
+      console.log('==>error in remove recode object and edgeless from collection', e)
+    }
+  }
+
+
+  const schema = new Schema()
+  schema.register(AffineSchemas) //schemas.value
+  let editorData = props.data
+  if (editorData && editorData.meta.id && props.objectId) {
+    editorData.meta.id = props.objectId //temp.meta.object_id
+  }
+  console.log('==>data for set in editor is', editorData)
+  const mountEditor = async () => {
+    //debugger
+    console.log('==>start for mount editor')
+    const blockCollection = myCollection.docs.values().next().value as Doc
+    //assertExists(blockCollection, '==>Need to create a doc first')
+    if (!blockCollection) {
+      throw new Error('Need to create a doc first');
+    }
+    const doc = blockCollection.getStore()
+    //const doc = blockCollection.getDoc()
+    //assertExists(doc.ready, '==>Doc is not ready')
+    //assertExists(doc.root, '==>Doc root is not ready')
+    if (!doc.root) {
+      throw new Error('Doc root is not ready');
+    }
+    doc.load();
+    doc.resetHistory();
+    if (!doc.root) {
+      throw new Error('Doc root is not ready');
+    }
+    //const app = document.getElementById('app');
+    /* const app = refEditor.value;
+     if (!app) return;*/
+   // editorElement.value = createTestEditor(doc, collection);
+   // debugger
+    const editor= document.createElement('affine-editor-container');
+    editorElement.value = editor
+    editorElement.value.doc = doc.doc;
+
+    const defaultExtensions = getTestCommonExtensions(editor);
+    editor.pageSpecs = [...PageEditorBlockSpecs, ...defaultExtensions];
+    editor.edgelessSpecs = [...EdgelessEditorBlockSpecs, ...defaultExtensions];
+    //editorElement.value = editor
+    /*const defaultExtensions = getTestCommonExtensions(editor);
+    editor.pageSpecs = [...PageEditorBlockSpecs, ...defaultExtensions];
+    editor.edgelessSpecs = [...EdgelessEditorBlockSpecs, ...defaultExtensions];*/
+
+
+    //editorElement.value = new MahdaadEditorContainer()
+    /*const specs = getExampleSpecs()
+    const refNodeSlotsExtension = RefNodeSlotsExtension()
+    editorElement.value.pageSpecs = patchPageRootSpec([
+      refNodeSlotsExtension,
+      ...specs.pageModeSpecs
+    ])
+    editorElement.value.edgelessSpecs = patchPageRootSpec([
+      refNodeSlotsExtension,
+      ...specs.edgelessModeSpecs
+    ])
+    if (props.isBoardView) {
+      editorElement.value.mode = 'edgeless'
+    } else {
+      editorElement.value.mode = 'page'
+    }*/
+    console.log('==>doc for mount is', doc)
+    //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
+    myCollection.awarenessStore.awareness.setLocalStateField('user', {
+      user_id: props.userId,
+      color: props.userColor
+    })
+    currentDocument.value = doc
+    editorElement.value.doc = doc
+
+    //checkIsEmpty()
+    //console.log('111111', doc.blockSize)
+    //todo ali ghasami for remove after
+    //const temp = await exportData(myCollection, [currentDocument.value])
+    //console.log('this is snap shoot ', temp)
+    //bindEvent(doc)
+    //handleHeadingList(doc)
+    appendTODOM(editorElement.value)
+    //checkNotEmptyDocBlock(currentDocument.value)
+    //checkReadOnly()
+    stopEvent.value = false
+    loading.value = false
+  }
+
+  if (props.isCollaboration && props.objectId && props.websocketUrl) {
+    console.log('==>is collaboration mode')
+    const BASE_WEBSOCKET_URL = props.websocketUrl
+    const idGenerator =  nanoid;
+    let docSources: DocCollectionOptions['docSources'] = {
+      main: new IndexedDBDocSource()
+    }
+    let awarenessSources: DocCollectionOptions['awarenessSources']
+    let web_socket!: WebSocket
+    if (!Object.hasOwn(window.$blockEditor, 'wsMap')) {
+      Object.assign(window.$blockEditor, { wsMap: new Map() })
+    }
+
+    const wsMap: Map<string, any> = window.$blockEditor.wsMap
+    if (
+      !wsMap.has(props.objectId) ||
+      (wsMap.has(props.objectId) &&
+        wsMap.get(props.objectId).readyState != wsMap.get(props.objectId).OPEN)
+    ) {
+      wsMap.set(
+        props.objectId,
+        new WebSocket(
+          `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
+        )
+      )
+    }
+    web_socket = wsMap.get(props.objectId)
+    console.log('==>this is list web socket is', window.$blockEditor.wsMap)
+    //console.log("this is ws map",);
+    const initDoc = async () => {
+      console.log('==>start initDoc function')
+      //exist:boolean
+      //console.log("this is exist",exist);
+      // const id=props.objectId
+      console.log('==>before waitForSynced')
+      await myCollection.waitForSynced()
+      console.log('==>after waitForSynced')
+      //console.log("2000000",objectId,);
+      //console.log('start initttttt doc')
+      console.log('==>find doc in collection', myCollection.getDoc(props.objectId))
+      const shouldInit = !myCollection.getDoc(props.objectId)
+      console.log('==>shouldInit', shouldInit)
+      if (shouldInit) {
+        console.log('==>start create empty doc and inject editorData')
+        myCollection.meta.initialize()
+        if (props.data) {
+          //todo ali ghasami for inject data if has bug and client id in used
+          //Object.assign(temp,{})
+          const job = new  Transformer({
+            schema,
+            //blobCRUD: docCollection.blobSync,
+            middlewares: [],
+            docCRUD: {
+              create: (id: string) => myCollection.createDoc({ id }),
+              get: (id: string) => myCollection.getDoc(id),
+              delete: (id: string) => myCollection.removeDoc(id),
+            },
+          }) //replaceIdMiddleware //collection: myCollection,
+          const doc = await job.snapshotToDoc(editorData)
+          //const doc=await job.snapshotToDoc(props.data)
+          if (doc) {
+            doc.load()
+            doc.resetHistory()
+          }
+        } else {
+          console.log('==>start create empty doc for new doc in collaboration mode')
+          const doc = myCollection.createDoc({ id: props.objectId }) //'doc:home'
+          doc.load()
+          const rootId = doc.addBlock('affine:page')
+          doc.addBlock('affine:surface', {}, rootId)
+          if (!props.isBoardView) {
+            //console.log("aaaaa");
+            const noteId = doc.addBlock('affine:note', {}, rootId)
+            doc.addBlock('affine:paragraph', {}, noteId)
+
+            //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
+            //doc.addBlock('affine:paragraph', {}, temp1)
+          }
+          doc.resetHistory()
+        }
+        /*  if(!exist){
+            debugger
+          }else{
+
+          }*/
+      } else {
+        // debugger
+        // wait for data injected from provider
+        /*const firstPageId =
+          myCollection.docs.size > 0
+            ? myCollection.docs.keys().next().value
+            : await new Promise<string>(resolve =>
+              myCollection.slots.docAdded.once(id => resolve(id))
+            );*/
+        console.log('==>doc is exist and get from collection and load')
+        debugger
+        const doc = myCollection.getDoc(props.objectId)
+        console.log("this is doc",doc)
         //console.log('this is original doc for set ', doc)
         //assertExists(doc)
         doc.load()
@@ -966,13 +1244,17 @@ async function init() {
     }
     console.log('==>Init collection in collaboration mode and start')
     //myCollection = new DocCollection(options)
-    myCollection = new TestWorkspace(options)
+    //myCollection = createStarterDocCollection(options)  //new TestWorkspace(options)
+    //myCollection = new TestWorkspace(options)  //new TestWorkspace(options)
+    myCollection = createStarterDocCollection(docSources);
     myCollection.start()
     //await myCollection.waitForSynced()
   } else {
     console.log('==>not collaboration mode')
     //console.log("5555555",props.data);
-    myCollection = new TestWorkspace()
+    //const options = createTestOptions();
+    //myCollection = new TestWorkspace({id: 'test-collection', idGenerator:nanoid})
+    myCollection = createStarterDocCollection();
     myCollection.start()
     myCollection.meta.initialize()
     if (editorData) {
@@ -994,14 +1276,19 @@ async function init() {
         doc?.resetHistory()
       }
     } else {
-      const doc = myCollection.createDoc()
-      doc.load()
-      const rootId = doc.addBlock('affine:page')
-      doc.addBlock('affine:surface', {}, rootId)
-      if (!props.isBoardView) {
-        const noteId = doc.addBlock('affine:note', {}, rootId)
-        doc.addBlock('affine:paragraph', {}, noteId)
-      }
+      //debugger
+      //myCollection.meta.initialize();
+      const doc = myCollection.createDoc({id:'doc:home'})
+      doc.doc.clear();
+      doc.load(()=>{
+        const rootId = doc.addBlock('affine:page')
+        //debugger
+        doc.addBlock('affine:surface', {}, rootId)
+        if (!props.isBoardView) {
+          const noteId = doc.addBlock('affine:note', {}, rootId)
+          doc.addBlock('affine:paragraph', {}, noteId)
+        }
+      })
       doc.resetHistory()
     }
     //if()
@@ -1010,21 +1297,28 @@ async function init() {
 }
 
 
+onMounted(async () => {
+  init2()
+  document.addEventListener('keydown', handleSelectAll)
+})
 
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleSelectAll)
+})
 
-
-async function init2(){
-  //return
-  //debugger
-  const collection = createStarterDocCollection();
-  //debugger
-  await initStarterDocCollection(collection);
-  await mountDefaultDocEditor(collection);
-}
-
-
-
-
+defineExpose({
+  getData,
+  setData,
+  exportHTML,
+  setFocus,
+  //reset,
+  isEmpty,
+  doc: currentDocument,
+  checkIsEmpty,
+  editor: refEditor,
+  exportHTMLFromSnapshot
+  //collection:myCollection
+})
 
 </script>
 

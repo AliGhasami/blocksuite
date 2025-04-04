@@ -42,15 +42,25 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
     if (data.channel !== 'awareness') return;
     const { type } = data.payload;
-    if(data.payload && data.payload.time) {
-      console.log("==>send time awareness",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+    if (data.payload && data.payload.time) {
+      console.log(
+        '==>send time awareness',
+        data.payload.time,
+        '==>recive time ',
+        Date.now(),
+        '==>diff',
+        Date.now() - data.payload.time,
+        'ms'
+      );
     }
     if (type === 'update') {
-      const update = data.payload.update;
+      //const update = data.payload.update;
+      const update = Base64.toUint8Array(data.payload.update);
       if (!this.awareness) {
         throw new Error('awareness is not found');
       }
-      applyAwarenessUpdate(this.awareness, new Uint8Array(update), 'remote');
+      // applyAwarenessUpdate(this.awareness, new Uint8Array(update), 'remote');
+      applyAwarenessUpdate(this.awareness, update, 'remote');
     }
 
     if (type === 'connect') {

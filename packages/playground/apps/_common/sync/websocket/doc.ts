@@ -1,15 +1,24 @@
 //ali ghasami-check version 3
 import type { DocSource } from '@blocksuite/sync';
 import { diffUpdate, encodeStateVectorFromUpdate, mergeUpdates } from 'yjs';
-
+import { Base64 } from 'js-base64';
 import type { WebSocketMessage } from './types';
 
 export class WebSocketDocSource implements DocSource {
   private readonly _onMessage = (event: MessageEvent<string>) => {
+    debugger;
     const data = JSON.parse(event.data) as WebSocketMessage;
     if (data.channel !== 'doc') return;
-    if(data.payload && data.payload.time) {
-      console.log("==>send time",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+    if (data.payload && data.payload.time) {
+      console.log(
+        '==>send time',
+        data.payload.time,
+        '==>recive time ',
+        Date.now(),
+        '==>diff',
+        Date.now() - data.payload.time,
+        'ms'
+      );
     }
     //@ts-ignore
     if (data.not_exists) {
@@ -43,7 +52,11 @@ export class WebSocketDocSource implements DocSource {
     const { docId, updates } = data.payload;
     const update = this.docMap.get(docId);
     if (update) {
-      this.docMap.set(docId, mergeUpdates([update, Base64.toUint8Array(updates) ]));
+      console.log('a update', updates);
+      this.docMap.set(
+        docId,
+        mergeUpdates([update, Base64.toUint8Array(updates)])
+      );
     } else {
       this.docMap.set(docId, Base64.toUint8Array(updates));
     }
@@ -73,7 +86,8 @@ export class WebSocketDocSource implements DocSource {
     private initDoc: () => {}
     //private status: boolean
   ) {
-    console.log("constructor");
+    debugger;
+    console.log('constructor');
     this.ws.addEventListener('message', this._onMessage);
     this.docId = docId;
     //console.log('this is initttttttttttttttttt');
@@ -92,6 +106,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   pull(docId: string, state: Uint8Array) {
+    debugger;
     //console.log("pull");
     //console.log('this is pull in websocket');
     const update = this.docMap.get(docId);
@@ -101,6 +116,7 @@ export class WebSocketDocSource implements DocSource {
   }
 
   push(docId: string, data: Uint8Array) {
+    debugger;
     //console.log('push');
     const update = this.docMap.get(docId);
     if (update) {
@@ -119,13 +135,13 @@ export class WebSocketDocSource implements DocSource {
         payload: {
           type: 'update',
           docId,
-          updates: Array.from(latest),
+          updates: Base64.fromUint8Array(latest),
         },
       } satisfies WebSocketMessage)
     );
     //todo back if has bug
     //const edge = this.docMap.get(`edgeless_${docId}`);
-    assertExists(latest);
+    //assertExists(latest);
     //console.log('777777', this.isInit);
     if (this.isInit) {
       this.ws.send(
@@ -135,7 +151,7 @@ export class WebSocketDocSource implements DocSource {
             time: Date.now(),
             type: 'update',
             docId,
-            updates: Base64.fromUint8Array(latest) ,
+            updates: Base64.fromUint8Array(latest),
           },
         } satisfies WebSocketMessage)
       );
@@ -156,20 +172,30 @@ export class WebSocketDocSource implements DocSource {
   }
 
   subscribe(cb: (docId: string, data: Uint8Array) => void) {
+    debugger;
     //console.log("subscribe");
     const abortController = new AbortController();
     this.ws.addEventListener(
       'message',
       (event: MessageEvent<string>) => {
+        debugger;
         //console.log("subscribe  on message");
         //todo convert ali ghasami to base 64
         const data = JSON.parse(event.data) as WebSocketMessage;
-        if(data.payload && data.payload.time) {
-          console.log("==>send time",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
+        if (data.payload && data.payload.time) {
+          console.log(
+            '==>send time',
+            data.payload.time,
+            '==>recive time ',
+            Date.now(),
+            '==>diff',
+            Date.now() - data.payload.time,
+            'ms'
+          );
         }
         if (data.channel !== 'doc' || data.payload.type !== 'update') return;
         const { docId, updates } = data.payload;
-        cb(docId,Base64.toUint8Array(updates));
+        cb(docId, Base64.toUint8Array(updates));
       },
       { signal: abortController.signal }
     );
