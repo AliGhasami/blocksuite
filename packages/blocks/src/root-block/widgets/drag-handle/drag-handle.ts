@@ -399,7 +399,23 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       console.log("33333",);
     }*/
     this.applyBlockDropStyle(null)
-    this.isVerticalIndicator = !!(closestNoteBlock && (!isPointInElement(point,closestNoteBlock) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,closestNoteBlock)))
+    console.log("closestNoteBlock",closestNoteBlock);
+    console.log("isPointInElement",isPointInElement(point,closestNoteBlock));
+    console.log("isEndRight(point,closestNoteBlock)",isEndRight(point,closestNoteBlock));
+    console.log("isPointInElement(point,this.rootComponent)",isPointInElement(point,this.rootComponent),this.rootComponent);
+    let checkElement=  closestNoteBlock
+    if(checkElement && checkParentIs(checkElement.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
+      const parent= getParent(checkElement?.model,MahdaadMultiColumnBlockSchema.model.flavour)
+      if(parent && parent.flavour==MahdaadMultiColumnBlockSchema.model.flavour) {
+        debugger
+        checkElement= this._getBlockView(parent.id)
+      }
+    }
+    console.log("4444444",checkElement);
+    this.isVerticalIndicator = !!(closestNoteBlock &&
+      (!isPointInElement(point,checkElement) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,checkElement))
+    )
+    console.log("11111",this.isVerticalIndicator);
     this.verticalIndicatorDropBlockId= null
     //console.log("isEndRight(point,closestNoteBlock)",isEndRight(point,closestNoteBlock));
     if (
