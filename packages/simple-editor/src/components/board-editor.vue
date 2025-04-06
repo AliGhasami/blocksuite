@@ -1506,15 +1506,13 @@ affine-paragraph:hover{
   transition: opacity 0.3s ease;
 }
 
-.active-drop:not(affine-mahdaad-multi-column):not(affine-mahdaad-callout){
+.active-drop:not(affine-mahdaad-multi-column):not(affine-mahdaad-callout):not(affine-mahdaad-object):not(:has(.claytap-quote)){
   position: relative;
   //background-color: red;
   //@apply bg-primary-fill-subtle border-primary-br-subtle-target ; //border-1
-
   /*.affine-paragraph-block-container,.claytap-quote{
     @apply bg-primary-fill-subtle;
   }*/
-
   &::after{
     content: "";
     @apply  rounded   bg-primary-fill-subtle; //bg-primary-fill-subtle //bg-primary-fill-subtle
@@ -1530,7 +1528,6 @@ affine-paragraph:hover{
     //opacity: 0.5;
     //transition: opacity 0.3s ease;
   }
-
 }
 
 

@@ -224,6 +224,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     //console.log("this.dropBlockId",this.dropBlockId);
     this.dropType = dropResult?.dropType ?? null;
     if (dropResult?.rect) {
+      //console.log("11111",this.dragHandleContainerOffsetParent);
       const offsetParentRect =
         this.dragHandleContainerOffsetParent.getBoundingClientRect();
       let { left, top } = dropResult.rect;
@@ -429,7 +430,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
-       // console.log("_dragMoveHandler dropResult",dropResult?.dropBlockId);
+       // console.log("_dragMoveHandler dropResult",dropResult);
         /*if()
 
          const target =*/

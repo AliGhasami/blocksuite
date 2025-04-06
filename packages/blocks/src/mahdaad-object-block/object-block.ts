@@ -181,7 +181,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
   }
 
   updateProps(event: CustomEvent) {
-    const props = event.detail;
+    const props = event.detail[0];
     //console.log("this is props",props);
     //...this.model,
     //meta:{...props}
