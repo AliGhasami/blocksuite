@@ -66,11 +66,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   private _dragEventWatcher = new DragEventWatcher(this);
 
-  private _getBlockView = (blockId: string) => {
-    return this.host.view.getBlock(blockId);
-  };
-
-
   /**
    * When dragging, should update indicator position and target drop block id
    */
@@ -170,6 +165,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
 
   private _handleEventWatcher = new HandleEventWatcher(this);
 
+
   private _keyboardEventWatcher = new KeyboardEventWatcher(this);
 
   private _legacyDragEventWatcher = new LegacyDragEventWatcher(this);
@@ -248,6 +244,12 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this.dropIndicator.rectVertical=null
       this.dropIndicator.rect = result;
     }
+  };
+
+  _dropResult :  DropResult | null =  null
+
+  _getBlockView = (blockId: string) => {
+    return this.host.view.getBlock(blockId);
   };
 
   anchorBlockId = signal<string | null>(null);
@@ -430,6 +432,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
+      this._dropResult= dropResult
        // console.log("_dragMoveHandler dropResult",dropResult);
         /*if()
 

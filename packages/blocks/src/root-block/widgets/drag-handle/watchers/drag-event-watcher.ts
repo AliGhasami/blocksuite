@@ -14,10 +14,9 @@ import {
 } from '@blocksuite/affine-shared/services';
 import {
   captureEventTarget,
-  getBlockComponentsExcludeSubtrees,
-  getClosestBlockComponentByPoint,
-  matchFlavours,
-} from '@blocksuite/affine-shared/utils';
+  getBlockComponentsExcludeSubtrees, getClosestBlockComponentByPoint,
+  matchFlavours
+} from "@blocksuite/affine-shared/utils";
 import {
   type BlockComponent,
   type DndEventState,
@@ -46,7 +45,7 @@ import { DropIndicator } from '../components/drop-indicator.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../consts.js';
 import { newIdCrossDoc } from '../middleware/new-id-cross-doc.js';
 import { surfaceRefToEmbed } from '../middleware/surface-ref-to-embed.js';
-import { containBlock, includeTextSelection } from '../utils.js';
+import { containBlock, includeTextSelection } from "../utils.js";
 
 export class DragEventWatcher {
   private _computeEdgelessBound = (
@@ -322,8 +321,16 @@ export class DragEventWatcher {
     const { clientX, clientY } = event;
     //console.log("xx client",clientX,clientX-30);
     const point = new Point(clientX-38, clientY);
-    const element = getClosestBlockComponentByPoint(point.clone());
-    console.log("^element",element);
+    let element = getClosestBlockComponentByPoint(point.clone());
+    if(!element &&  this.widget._dropResult) {
+      element= this.widget._getBlockView(this.widget._dropResult.dropBlockId)
+    }
+    /*const element = getClosestNoteBlock(
+      this.widget.host,
+      this.widget.rootComponent,
+      point
+    );*/
+    //console.log("^element",element,this.widget._dropResult,this.widget._dropResult?.dropBlockId,); //closestNoteBlock
     if (!element) {
       const target = captureEventTarget(event.target);
       const isEdgelessContainer =
@@ -340,6 +347,7 @@ export class DragEventWatcher {
     if (matchFlavours(parent, ['affine:surface'])) {
       return;
     }
+    //const result: DropResult | null = calcDropTarget(point, model, element);
     const result: DropResult | null = calcDropTarget(point, model, element);
     if (!result) return;
 
@@ -565,7 +573,7 @@ export class DragEventWatcher {
     state: DndEventState,
     parent?: string,
     index?: number,
-    dropResult ?: DropResult
+    //dropResult ?: DropResult
   ) {
     try {
       //const _parent=this._std.doc.getBlock(parent)
