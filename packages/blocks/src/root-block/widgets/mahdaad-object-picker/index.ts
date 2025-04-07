@@ -92,7 +92,10 @@ export function showPopover({
 
   // Mount
   container.append(objectPicker);
-  disposables.add(() => objectPicker.remove());
+  disposables.add(() => {
+    objectPicker.clearTrigger()
+    objectPicker.remove()
+  });
 
   // Handle position
   const updatePosition = throttle(() => {
