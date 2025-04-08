@@ -116,6 +116,7 @@ export class Clipboard extends LifeCycleWatcher {
     );
     for (const [type, { adapter }] of byPriority) {
       const item = getItem(type);
+      //console.log("this is item",item);
       if (Array.isArray(item)) {
         if (item.length === 0) {
           continue;
@@ -215,7 +216,6 @@ export class Clipboard extends LifeCycleWatcher {
 
     try {
       const json = this.readFromClipboard(data);
-     // debugger
       const slice = await this._getSnapshotByPriority(
         type => json[type],
         doc,

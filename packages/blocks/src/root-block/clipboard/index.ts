@@ -1,6 +1,6 @@
 /** @alighasami for check merge **/
 import type { BlockComponent, UIEventHandler } from '@blocksuite/block-std';
-import type { BlockSnapshot, Doc } from '@blocksuite/store';
+import type { BlockSnapshot, Doc } from "@blocksuite/store";
 
 import { DisposableGroup } from '@blocksuite/global/utils';
 
@@ -60,6 +60,20 @@ export class PageClipboard {
     this._std.clipboard.use(copy);
     this._std.clipboard.use(paste);
     this._std.clipboard.use(replaceIdMiddleware);
+    /*const _titleMiddleware: JobMiddleware = ({
+                                              slots,
+                                              collection,
+                                              adapterConfigs,
+                                            }) => {
+      //slots.
+      slots.beforeImport.on(payload => {
+        //debugger
+        console.log("beforeImport",payload);
+        //payload.
+        payload.snapshot.content=[]
+      });
+    };
+    this._std.clipboard.use(_titleMiddleware)*/
     this._std.clipboard.use(titleMiddleware);
     this._std.clipboard.use(defaultImageProxyMiddleware);
 
@@ -127,10 +141,10 @@ export class PageClipboard {
   };
 
   onPagePaste: UIEventHandler = ctx => {
-    console.log("onPagePaste");
+    //return
+    //console.log("onPagePaste");
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
-
     this._std.doc.captureSync();
     this._std.command
       .chain()
