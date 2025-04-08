@@ -11,7 +11,7 @@ import { CommentPanel } from '../../comment/comment-panel';
 import { createTestEditor } from './extensions';
 
 export async function createTestApp(doc: Store, collection: Workspace) {
-  const app = document.querySelector('#app');
+  const app = document.querySelector('#qaz');
   if (!app) {
     throw new Error('Cannot find app root element(#app).');
   }

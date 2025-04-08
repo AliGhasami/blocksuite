@@ -1,24 +1,24 @@
 <template>
-  <div>this is temp</div>
+  <div id="qaz">this is temp</div>
 </template>
 
 <script setup lang="ts">
-
-
   import { onMounted } from 'vue'
-  import {
-    createStarterDocCollection,
-    initStarterDocCollection,
-  } from '@blocksuite/playground/apps/starter/utils/collection.ts'
-  import * as store from '@blocksuite/affine/store'
-  import * as databaseBlocks from '@blocksuite/affine/blocks/database'
-  import * as noteBlocks from '@blocksuite/affine/blocks/note'
-  import * as globalUtils from '@blocksuite/affine/global/utils'
-  import * as services from '@blocksuite/affine/shared/services'
-  import * as editor from '@blocksuite/integration-test'
-  import * as blockStd from '@blocksuite/affine/block-std'
-  import { prepareTestApp } from '@blocksuite/playground/apps/starter/utils/test.ts'
+  import { effects as blocksEffects } from '@blocksuite/affine/effects'
+  import {createStarterDocCollection,initStarterDocCollection} from './setupEditor.ts'
+
   import { mountDefaultDocEditor } from '@blocksuite/playground/apps/starter/utils/setup-playground.ts'
+  import { effects as presetsEffects } from '@blocksuite/integration-test/effects'
+  import { effects as commentEffects } from '@blocksuite/playground/apps/comment/effects.ts'
+  /**
+   * register all web component and custom element
+   */
+  if(!window.mahdaadEditor){
+    window.mahdaadEditor={}
+    blocksEffects();
+    presetsEffects();
+    commentEffects();
+  }
 
   onMounted(async ()=>{
     const collection = createStarterDocCollection();
@@ -30,4 +30,7 @@
 
 <style  lang="less">
 
+</style>
+<style>
+  @import '@toeverything/theme/style.css';
 </style>
