@@ -9,6 +9,7 @@ import {pick} from 'lodash-es'
 
 import type { MahdaadCalloutBlockService } from './callout-service.js';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import { transformModel } from '../root-block/utils/operations/model.js';
 
 
@@ -118,7 +119,9 @@ export class MahdaadCalloutBlockComponent extends CaptionedBlockComponent<
   }
 
   override previewName(): string {
-     return  'Callout'
+    //this.model.
+    return  getBlockName(this)
+     //return  'Callout'
    }
 
   override renderBlock() {

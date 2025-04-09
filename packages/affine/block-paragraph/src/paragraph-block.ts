@@ -31,6 +31,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import type { ParagraphBlockService } from './paragraph-service.js';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import quoteIcon from './assets/quote.svg?raw'
 import {mahdaadParagraphBlockStyles } from './styles.js';
 
@@ -325,8 +326,9 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override previewName(): string {
+    return getBlockName(this)
     //return  this.type ?? super.previewName()
-    switch (this.model.type) {
+    /*switch (this.model.type) {
       case 'text':
         return 'Text'
       case 'quote':
@@ -343,12 +345,11 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
         return 'Heading 5'
       case 'h6':
         return 'Heading 6'
-      //default:
-      //return  super.previewName()
-    } //  this.type ?? super.previewName()
+    }*/
+    //  this.type ?? super.previewName()
     //switch(this.type){}
     //return super.previewName();
-    return  super.previewName()
+    //return  super.previewName()
   }
 
 

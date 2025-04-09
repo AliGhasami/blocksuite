@@ -9,7 +9,7 @@ import {
   //BlockModel,
   defineBlockSchema, type SchemaToModel } from '@blocksuite/store';
 
-import {
+import type {
   //type Color,
   /*DEFAULT_NOTE_BACKGROUND_COLOR,
   DEFAULT_NOTE_BORDER_SIZE,
@@ -19,7 +19,7 @@ import {
   DEFAULT_NOTE_SHADOW,
   DEFAULT_NOTE_WIDTH,*/
   //NoteDisplayMode,
-  type StrokeStyle,
+  StrokeStyle,
 } from '../../consts/index.js';
 //import { CodeBlockSchema } from '../code/index.js';
 
@@ -52,21 +52,21 @@ export const MahdaadCalloutBlockSchema = defineBlockSchema({
     children: [
       'affine:paragraph',
       'affine:list',
-      'affine:hint',
-      'affine:code',
-      'affine:divider',
-      'affine:mahdaad-object',
-      'affine:mahdaad-weblink-block',
+      //'affine:hint',
+      //'affine:code',
+      //'affine:divider',
+      //'affine:mahdaad-object',
+      //'affine:mahdaad-weblink-block',
       //'affine:mention',
-      'affine:simple',
-      'affine:database',
-      'affine:data-view',
-      'affine:image',
-      'affine:bookmark',
-      'affine:attachment',
-      'affine:surface-ref',
-      'affine:embed-*',
-      'affine:latex',
+      //'affine:simple',
+      //'affine:database',
+      //'affine:data-view',
+      //'affine:image',
+      //'affine:bookmark',
+      //'affine:attachment',
+      //'affine:surface-ref',
+      //'affine:embed-*',
+      //'affine:latex',
       //'affine:note'
     ],
   },

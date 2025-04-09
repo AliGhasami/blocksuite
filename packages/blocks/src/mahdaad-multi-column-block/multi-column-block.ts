@@ -7,6 +7,8 @@ import { html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { pick } from 'lodash-es';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
+
 //@customElement('affine-mahdaad-object')
 export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<MahdaadMultiColumnBlockModel> {
   // static override styles = objectBlockStyles;
@@ -86,7 +88,8 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
   }
 
   override previewName(): string {
-    return  `${this.model.children.length} columns`
+    return  getBlockName(this)
+    //return  `${this.model.children.length} columns`
   }
 
   override renderBlock() {

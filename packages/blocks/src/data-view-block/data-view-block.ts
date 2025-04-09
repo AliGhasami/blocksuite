@@ -41,6 +41,7 @@ import { html } from 'lit/static-html.js';
 import type { NoteBlockComponent } from '../note-block/index.js';
 import type { DataViewBlockModel } from './data-view-model.js';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import { BlockRenderer } from '../database-block/detail-panel/block-renderer.js';
 import { NoteRenderer } from '../database-block/detail-panel/note-renderer.js';
 import {
@@ -259,7 +260,8 @@ export class DataViewBlockComponent extends CaptionedBlockComponent<DataViewBloc
   }
 
   override previewName(): string {
-    return 'Table'
+    return  getBlockName(this)
+    //return 'Table'
   }
 
   override renderBlock() {

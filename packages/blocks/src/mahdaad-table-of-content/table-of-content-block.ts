@@ -6,6 +6,8 @@ import type { MahdaadTableOfContentBlockModel } from '@blocksuite/affine-model';
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { html } from 'lit';
 import { state } from 'lit/decorators.js';
+
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 // import { property } from 'lit/decorators.js';
 // import { pick } from 'lodash-es';
 
@@ -47,7 +49,8 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
   }
 
   override previewName(): string {
-    return 'Table of content'
+    return  getBlockName(this)
+    //return 'Table of content'
   }
 
   override renderBlock() {

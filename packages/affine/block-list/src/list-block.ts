@@ -27,6 +27,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 import type { ListBlockService } from './list-service.js';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import { correctNumberedListsOrderToPrev } from './commands/utils.js';
 import { listBlockStyles } from './styles.js';
 import { getListIcon } from './utils/get-list-icon.js';
@@ -177,7 +178,8 @@ export class ListBlockComponent extends CaptionedBlockComponent<
   }
 
   override previewName(): string {
-    switch (this.model.type) {
+    return  getBlockName(this)
+    /*switch (this.model.type) {
       case 'numbered':
         return  'Number List'
       case 'todo':
@@ -186,7 +188,7 @@ export class ListBlockComponent extends CaptionedBlockComponent<
         return 'Toggle List'
       case 'bulleted':
         return 'Bullet List'
-    }
+    }*/
     //return super.previewName();
   }
 

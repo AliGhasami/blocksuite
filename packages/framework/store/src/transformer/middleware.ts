@@ -21,6 +21,9 @@ export type BeforeImportPayload =
   | {
       snapshot: SliceSnapshot;
       type: 'slice';
+      /** add for mahdaad  */
+      parent?: string;
+      index?: number;
     }
   | {
       snapshot: DocSnapshot;

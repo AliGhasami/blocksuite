@@ -255,6 +255,9 @@ export class Job {
       this._slots.beforeImport.emit({
         type: 'slice',
         snapshot,
+        /** add for mahdaad  */
+        parent: parent,
+        index: index,
       });
 
       const { content, workspaceId, pageId } = snapshot;

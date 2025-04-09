@@ -15,6 +15,8 @@ import {
   replaceIdMiddleware,
   titleMiddleware,
 } from '../../_common/transformers/middlewares.js';
+import { mahdaadCalloutMiddleware } from "../../mahdaad-callout-block/middleware/index.js";
+import { mahdaadMultiColumnMiddleware } from "../../mahdaad-multi-column-block/middleware/index.js";
 import { ClipboardAdapter } from './adapter.js';
 import { copyMiddleware, pasteMiddleware } from './middlewares/index.js';
 
@@ -60,22 +62,10 @@ export class PageClipboard {
     this._std.clipboard.use(copy);
     this._std.clipboard.use(paste);
     this._std.clipboard.use(replaceIdMiddleware);
-    /*const _titleMiddleware: JobMiddleware = ({
-                                              slots,
-                                              collection,
-                                              adapterConfigs,
-                                            }) => {
-      //slots.
-      slots.beforeImport.on(payload => {
-        //debugger
-        console.log("beforeImport",payload);
-        //payload.
-        payload.snapshot.content=[]
-      });
-    };
-    this._std.clipboard.use(_titleMiddleware)*/
     this._std.clipboard.use(titleMiddleware);
     this._std.clipboard.use(defaultImageProxyMiddleware);
+    this._std.clipboard.use(mahdaadCalloutMiddleware);
+    this._std.clipboard.use(mahdaadMultiColumnMiddleware);
 
     this._disposables.add({
       dispose: () => {
@@ -97,6 +87,8 @@ export class PageClipboard {
         this._std.clipboard.unuse(replaceIdMiddleware);
         this._std.clipboard.unuse(titleMiddleware);
         this._std.clipboard.unuse(defaultImageProxyMiddleware);
+        this._std.clipboard.unuse(mahdaadCalloutMiddleware);
+        this._std.clipboard.use(mahdaadMultiColumnMiddleware);
       },
     });
   };

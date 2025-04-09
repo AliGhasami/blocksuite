@@ -17,6 +17,7 @@ import {
 
 import type {ObjectBlockService} from './object-service.js'
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import { tryRemoveEmptyLine } from '../root-block/widgets/slash-menu/utils.js';
 import { objectBlockStyles } from './styles.js';
 //@customElement('affine-mahdaad-object')
@@ -126,7 +127,8 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
 
   override previewName(): string {
     //return super.previewName();
-    switch (this.model.type) {
+    return  getBlockName(this)
+    /*switch (this.model.type) {
       case 'document':
         return 'Page'
       case 'file':
@@ -137,7 +139,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
         return 'Weblink'
       default:
         return 'Object'
-    }
+    }*/
     //return super.previewName();
   }
 

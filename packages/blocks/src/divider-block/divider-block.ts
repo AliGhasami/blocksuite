@@ -3,15 +3,12 @@ import type { DividerBlockModel } from '@blocksuite/affine-model';
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { html } from 'lit';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import { BLOCK_CHILDREN_CONTAINER_PADDING_LEFT } from '../_common/consts.js';
 import { dividerBlockStyles } from './styles.js';
 
 export class DividerBlockComponent extends CaptionedBlockComponent<DividerBlockModel> {
   static override styles = dividerBlockStyles;
-
-  override previewName(): string {
-    return 'Divider'
-  }
 
   override connectedCallback() {
     super.connectedCallback();
@@ -25,6 +22,11 @@ export class DividerBlockComponent extends CaptionedBlockComponent<DividerBlockM
         }),
       ]);
     });
+  }
+
+  override previewName(): string {
+    return getBlockName(this)
+    //return 'Divider'
   }
 
   override renderBlock() {

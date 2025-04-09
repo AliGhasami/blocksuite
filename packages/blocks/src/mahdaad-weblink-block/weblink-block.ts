@@ -9,6 +9,8 @@ import type { MahdaadWeblinkBlockModel } from "@blocksuite/affine-model";
 
 import type { ObjectLink } from '../root-block/widgets/mahdaad-object-picker/object-picker-popover.js';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
+
 //@customElement('affine-mahdaad-weblink-block')
 export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<MahdaadWeblinkBlockModel> {
 
@@ -100,7 +102,8 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
   }*/
 
   override previewName(): string {
-    return  'Weblink'
+    return  getBlockName(this)
+    //return  'Weblink'
   }
 
   removeBlock() {

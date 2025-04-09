@@ -1,0 +1,25 @@
+import type { JobMiddleware } from "@blocksuite/store";
+
+import { MahdaadCalloutBlockSchema } from "@blocksuite/affine-model";
+
+import { denyBlockWarningMessage, getBlockName } from "../../../../../../components/BoardBlockEditor/utils.js";
+import { checkParentIs } from "../../_common/mahdaad/is.js";
+
+export const mahdaadCalloutMiddleware: JobMiddleware = ({slots,collection}) => {
+  slots.beforeImport.on(payload => {
+    if(payload && payload.type=='slice') {
+      const doc= collection.getDoc(payload.snapshot.pageId)
+      if(doc) {
+        const block =doc.getBlock(payload?.parent)
+        if(block && (block.flavour==MahdaadCalloutBlockSchema.model.flavour ||  checkParentIs(block.model,MahdaadCalloutBlockSchema.model.flavour))) {
+          const allowList= MahdaadCalloutBlockSchema.model.children
+          const denyList=payload.snapshot.content.filter(item=> !allowList.includes(item.flavour))
+          payload.snapshot.content=payload.snapshot.content.filter(item=> allowList.includes(item.flavour))
+          if(denyList.length>0) {
+            denyBlockWarningMessage(denyList.length>1 ? null :  getBlockName(denyList[0]),getBlockName(block))
+          }
+        }
+      }
+    }
+  });
+};

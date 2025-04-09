@@ -39,7 +39,9 @@ import {
   calcDropTarget,
   type DropResult,
 } from '../../../../_common/utils/index.js';
+import { mahdaadCalloutMiddleware } from "../../../../mahdaad-callout-block/middleware/index.js";
 import { _insertMultiColumn, addColumnToMultiColumn } from '../../../../mahdaad-multi-column-block/commands/index.js';
+import { mahdaadMultiColumnMiddleware } from "../../../../mahdaad-multi-column-block/middleware/index.js";
 import { addNoteAtPoint } from '../../../edgeless/utils/common.js';
 import { DropIndicator } from '../components/drop-indicator.js';
 import { AFFINE_DRAG_HANDLE_WIDGET } from '../consts.js';
@@ -728,7 +730,7 @@ export class DragEventWatcher {
     const std = this._std;
     return new Job({
       collection: std.collection,
-      middlewares: [newIdCrossDoc(std), surfaceRefToEmbed(std)],
+      middlewares: [newIdCrossDoc(std), surfaceRefToEmbed(std),mahdaadCalloutMiddleware,mahdaadMultiColumnMiddleware],
     });
   }
 

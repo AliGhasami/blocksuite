@@ -49,6 +49,7 @@ import type { NoteBlockComponent } from '../note-block/index.js';
 import type { DatabaseOptionsConfig } from './config.js';
 import type { DatabaseBlockService } from './database-service.js';
 
+import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.js";
 import { EdgelessRootBlockComponent } from '../root-block/index.js';
 import { getDropResult } from '../root-block/widgets/drag-handle/utils.js';
 import { popSideDetail } from './components/layout.js';
@@ -398,7 +399,8 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
   }
 
   override previewName(): string {
-    return 'Table'
+    return  getBlockName(this)
+    //return 'Table'
   }
 
   override renderBlock() {
