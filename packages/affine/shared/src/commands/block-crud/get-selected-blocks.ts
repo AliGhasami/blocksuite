@@ -5,10 +5,12 @@ import type {
 } from '@blocksuite/block-std';
 import type { RoleType } from '@blocksuite/store';
 
+import { MahdaadMultiColumnBlockSchema } from "@blocksuite/affine-model";
 import { BlockComponent } from '@blocksuite/block-std';
 
 import type { ImageSelection } from '../../selection/index.js';
 
+import { checkParentIs,  } from "../../../../../blocks/src/_common/mahdaad/is.js";
 export const getSelectedBlocksCommand: Command<
   'currentTextSelection' | 'currentBlockSelections' | 'currentImageSelections',
   'selectedBlocks',
@@ -87,7 +89,7 @@ export const getSelectedBlocksCommand: Command<
           if (!(view instanceof BlockComponent)) {
             return true;
           }
-          if (roles.includes(view.model.role)) {
+          if (roles.includes(view.model.role) || checkParentIs(view.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
             blocks.push(view);
           }
           return;
