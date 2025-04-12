@@ -1,6 +1,6 @@
 import type { JobMiddleware } from "@blocksuite/store";
 
-import { MahdaadCalloutBlockSchema, MahdaadMultiColumnBlockSchema } from "@blocksuite/affine-model";
+import { MahdaadCalloutBlockSchema } from "@blocksuite/affine-model";
 
 import { denyBlockWarningMessage, getBlockName } from "../../../../../../components/BoardBlockEditor/utils.js";
 import { checkParentIs, getParent } from "../../_common/mahdaad/is.js";
@@ -11,12 +11,12 @@ export const mahdaadCalloutMiddleware: JobMiddleware = ({slots,collection}) => {
       const doc= collection.getDoc(payload.snapshot.pageId)
       if(doc) {
         const block =doc.getBlock(payload?.parent)
-        if(block && (block.flavour==MahdaadCalloutBlockSchema.model.flavour ||  checkParentIs(block.model,MahdaadCalloutBlockSchema.model.flavour))) {
+        if(block && (block.flavour==MahdaadCalloutBlockSchema.model.flavour || checkParentIs(block.model,MahdaadCalloutBlockSchema.model.flavour))) {
           const allowList= MahdaadCalloutBlockSchema.model.children
           const denyList=payload.snapshot.content.filter(item=> !allowList.includes(item.flavour))
           payload.snapshot.content=payload.snapshot.content.filter(item=> allowList.includes(item.flavour))
           if(denyList.length>0) {
-            const selectedBlock= block.flavour==MahdaadMultiColumnBlockSchema.model.flavour  ? block : getParent(block.model,MahdaadCalloutBlockSchema.model.flavour)
+            const selectedBlock= block.flavour==MahdaadCalloutBlockSchema.model.flavour  ? block : getParent(block.model,MahdaadCalloutBlockSchema.model.flavour)
             denyBlockWarningMessage(denyList.length>1 ? null :  getBlockName(denyList[0]),getBlockName(selectedBlock))
           }
         }
