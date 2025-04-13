@@ -6,7 +6,7 @@ import {
 } from '@blocksuite/block-std';
 import { BLOCK_ID_ATTR  } from '@blocksuite/block-std';
 import { assertExists , WithDisposable } from '@blocksuite/global/utils';
-import { computePosition, inline, offset, shift } from '@floating-ui/dom';
+import { computePosition } from '@floating-ui/dom';
 import { html, nothing } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
@@ -701,24 +701,28 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
       getBoundingClientRect: () => range.getBoundingClientRect(),
       getClientRects: () => range.getClientRects(),
     };
+    console.log("11111",this.popupContainer);
     computePosition(visualElement, this.popupContainer, {
       strategy: 'fixed',
       middleware: [
+       /* autoPlacement(),
         offset(10),
         inline(),
         shift({
           padding: 6,
-        }),
+        }),*/
       ],
     })
       .then(({ x, y }) => {
         const popupContainer = this.popupContainer;
-        //console.log('11111', popupContainer, x, y);
-        const domRects = range.getClientRects();
+
+        //const domRects = range.getClientRects();
+        const domRects = range.getBoundingClientRect();
+        console.log("1111",domRects,range);
         if (!popupContainer) return;
         popupContainer.style.position = 'fixed';
-        popupContainer.style.left = `${domRects[0].x}px`;
-        popupContainer.style.top = `${domRects[0].y + 30}px`;
+        popupContainer.style.left = `${domRects.x}px`;
+        popupContainer.style.top = `${domRects.y + 83}px`;
         popupContainer.style.zIndex = `99999`;
         /*popupContainer.style.left = `${x}px`;
         popupContainer.style.top = `${y}px`;*/

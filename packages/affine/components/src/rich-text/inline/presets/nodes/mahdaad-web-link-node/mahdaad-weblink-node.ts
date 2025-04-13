@@ -181,7 +181,7 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
       : styleMap({});
     //console.log("qqqqq",styles);
     return html`
-      <a
+        <a
         @mouseup=${this._onMouseUp}
         ${ref(this._whenHover.setReference)}
         href=${this.link}
@@ -189,7 +189,18 @@ export class MahdaadWebLinkNode extends WithDisposable(ShadowlessElement) {
         target="_blank"
         style=${styleMap(linkStyles)}
         ><v-text .str=${this.delta.insert}></v-text
-      ></a>
+      ></a> 
+     <!-- ${ref(this._whenHover.setReference)} -->
+    <!--  <mahdaad-link-inline>
+        <a
+        @mouseup=${this._onMouseUp}
+        href=${this.link}
+        rel="noopener noreferrer"
+        target="_blank"
+        style=${styleMap(linkStyles)}
+        ><v-text .str=${this.delta.insert}></v-text
+      ></a>  
+      </mahdaad-link-inline> --> 
     `;
 
     /*return html`<mahdaad-weblink>
