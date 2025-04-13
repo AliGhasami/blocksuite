@@ -722,7 +722,7 @@ export class MahdaadWebLinkPopup extends WithDisposable(ShadowlessElement) {
         if (!popupContainer) return;
         popupContainer.style.position = 'fixed';
         popupContainer.style.left = `${domRects.x}px`;
-        popupContainer.style.top = `${domRects.y + 83}px`;
+        popupContainer.style.top = `${domRects.y + domRects.height+10}px`;
         popupContainer.style.zIndex = `99999`;
         /*popupContainer.style.left = `${x}px`;
         popupContainer.style.top = `${y}px`;*/
