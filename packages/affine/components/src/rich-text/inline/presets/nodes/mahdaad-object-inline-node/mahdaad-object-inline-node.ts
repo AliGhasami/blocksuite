@@ -12,7 +12,8 @@ import {
 } from '@blocksuite/inline';
 import { html } from 'lit';
 import {  property } from 'lit/decorators.js';
-import {merge,cloneDeep} from 'lodash-es'
+import {cloneDeep,merge} from 'lodash-es'
+
 import { Peekable } from '../../../../../peek/index.js';
 import { REFERENCE_NODE } from '../consts.js';
 
@@ -136,6 +137,11 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     return (doc.meta && doc.meta?.object_id) ?? null
   }
 
+  remove() {
+    this.inlineEditor.insertText(this.selfInlineRange, REFERENCE_NODE);
+  }
+
+
 
   override render() {
     const meta = this.getMeta();
@@ -155,6 +161,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
         @convertToLink="${this._convertLink}"
         @updateProps="${this.updateProps}"
         meta="${JSON.stringify(meta?.meta ?? {})}"
+        @remove="${this.remove}"
       ></mahdaad-object-link-component
       ><v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text
     ></span>`;
@@ -166,7 +173,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     if(format.mahdaadObjectLink) {
       merge(format.mahdaadObjectLink,{meta:data.meta})
     }
-    console.log("this is format",format,cloneDeep(format));
+    //console.log("this is format",format,cloneDeep(format));
     //
     this.inlineEditor.formatText(this.selfInlineRange, {
       ...cloneDeep(format)  /*{

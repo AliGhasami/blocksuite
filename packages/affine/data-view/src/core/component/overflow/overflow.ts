@@ -33,6 +33,7 @@ export class Overflow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
     }
 
     this.frameId = requestAnimationFrame(() => {
+      console.log("444444");
       this.doAdjustStyle();
     });
   }
@@ -40,6 +41,7 @@ export class Overflow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   override connectedCallback() {
     super.connectedCallback();
     const resize = new ResizeObserver(() => {
+      console.log("aaaaaaa");
       this.adjustStyle();
     });
     resize.observe(this);
@@ -49,13 +51,15 @@ export class Overflow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   }
 
   protected doAdjustStyle() {
+    console.log("doAdjustStyle");
+    //debugger
     const moreWidth = this.more.getBoundingClientRect().width;
     this.widthList[this.renderCount] = moreWidth;
 
     const containerWidth = this.getBoundingClientRect().width;
 
     let width = 0;
-    for (let i = 0; i < this.items.length; i++) {
+    for (let i = 0; i < this.items.length-1; i++) {
       const itemWidth = this.items[i].getBoundingClientRect().width;
       // Try to calculate the width occupied by rendering n+1 items;
       // if it exceeds the limit, render n items(in i++ round).
@@ -86,7 +90,9 @@ export class Overflow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
   }
 
   protected override updated(_changedProperties: PropertyValues) {
+    console.log("11111",_changedProperties);
     super.updated(_changedProperties);
+    console.log("bbbbbb");
     this.adjustStyle();
   }
 

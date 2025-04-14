@@ -13,9 +13,10 @@ import {
   MoveRightIcon,
   PlusIcon,
 } from '@blocksuite/icons/lit';
-import { css, html } from 'lit';
+import { css, html } from "lit";
 import { property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { repeat } from "lit/directives/repeat.js";
 
 import { WidgetBase } from '../../core/widget/widget-base.js';
 
@@ -224,6 +225,7 @@ export class DataViewHeaderViews extends WidgetBase {
 
   renderMore = (count: number) => {
     const views = this.viewManager.views$.value;
+    console.log("1111",views);
     if (count === views.length) {
       if (this.readonly) {
         return;
@@ -286,11 +288,16 @@ export class DataViewHeaderViews extends WidgetBase {
   }
 
   override render() {
+    const temp = this.renderViews()
     return html`
-      <component-overflow
+      ${repeat(temp.slice(0,3), (render, index) => {
+        return html`<div class="">${render()}</div>`;
+      })}
+      ${ this.renderMore(temp.length <= 3 ? temp.length : 3)}
+      <!-- <component-overflow
         .renderItem="${this.renderViews()}"
         .renderMore="${this.renderMore}"
-      ></component-overflow>
+      ></component-overflow> -->
     `;
   }
 

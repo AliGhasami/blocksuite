@@ -134,7 +134,7 @@ export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<Mahdaa
   }
 
   save(event: CustomEvent) {
-    const data = event.detail;
+    const data = event.detail[0];
     this.doc.updateBlock(this.model, {
       title: data.title,
       url: data.url,
