@@ -226,6 +226,17 @@ export class PointerEventWatcher {
     }
     if (this.widget.isTopLevelDragHandleVisible) return;
 
+    const {event }= ctx.get('defaultState')
+    if(event.target) {
+      const _target= event.target as HTMLElement
+      //@ts-ignore
+      if(Object.hasOwn(_target.dataset, 'disableDragHandle') && _target.dataset.disableDragHandle=='true') {
+        this.widget.hide();
+        return
+      }
+    }
+
+    //debugger
     const state = ctx.get('pointerState');
     const { target } = state.raw;
     const element = captureEventTarget(target);

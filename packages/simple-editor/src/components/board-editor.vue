@@ -61,11 +61,16 @@ import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examp
 import type { ExtensionType } from '@blocksuite/block-std'
 import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
 import { getHeadingBlocksFromDoc } from './helpers/global.js';
-import { nothing } from 'lit';
+//import { nothing } from 'lit';
+import { useWebSocket } from '@vueuse/core'
 
 if (!window.$blockEditor) {
-  window.$blockEditor = {}
+  window.$blockEditor = {wsMap: new Map()}
 }
+
+/*if (!window.$blockEditor) {
+  window.$blockEditor = {}
+}*/
 
 if (!window.$blockEditor.is_loaded_custom_elements) {
   blocksEffects()
@@ -714,9 +719,12 @@ async function init() {
      };*/
   }
   /*******************/
-  if (!window.$blockEditor) {
-    window.$blockEditor = {}
-  }
+
+
+/*  if (!Object.hasOwn(window.$blockEditor, 'wsMap')) {
+    Object.assign(window.$blockEditor, { wsMap: new Map() })
+  }*/
+
 
   const schema = new Schema()
   schema.register(schemas.value)
@@ -786,7 +794,7 @@ async function init() {
     //console.log("100000",props.objectId);
     //const objectId = props.objectId
     //const edgelessId =
-    const BASE_WEBSOCKET_URL = props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
+    //const BASE_WEBSOCKET_URL = props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
     const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
     let docSources: DocCollectionOptions['docSources'] = {
       main: new IndexedDBDocSource()
@@ -806,10 +814,8 @@ async function init() {
       )
     }
     const web_socket: WebSocket = window.$blockEditor.wss*/
-    let web_socket!: WebSocket
-    if (!Object.hasOwn(window.$blockEditor, 'wsMap')) {
-      Object.assign(window.$blockEditor, { wsMap: new Map() })
-    }
+    //let web_socket!: WebSocket
+
 
     const wsMap: Map<string, any> = window.$blockEditor.wsMap
     if (
@@ -817,14 +823,28 @@ async function init() {
       (wsMap.has(props.objectId) &&
         wsMap.get(props.objectId).readyState != wsMap.get(props.objectId).OPEN)
     ) {
-      wsMap.set(
+      /*wsMap.set(
         props.objectId,
         new WebSocket(
           `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
         )
+      )*/
+
+      /*const socket= new WebSocket(
+        `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
       )
+
+      //const {ws}=useWebSocket(`${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`,{  autoReconnect: true,})
+      //const socket= ws.value
+      //console.log("socksss",socket);
+    wsMap.set (
+        props.objectId,
+       socket
+      )*/
+      createSocket()
+
     }
-    web_socket = wsMap.get(props.objectId)
+    let web_socket = getCurrentSocket()  //wsMap.get(props.objectId)
     console.log('==>this is list web socket is', window.$blockEditor.wsMap)
     //console.log("this is ws map",);
     const initDoc = async () => {
@@ -902,6 +922,18 @@ async function init() {
       if (web_socket.readyState === WebSocket.OPEN) resolve(true)
       web_socket.addEventListener('open', resolve)
       web_socket.addEventListener('error', reject)
+      web_socket.addEventListener('close', (event)=>{
+        if (event.code !== 1000) {
+          console.log("Trying to reconnect...");
+          reconnectWebSocket()
+        } else {
+          console.log("WebSocket closed normally. No reconnection.");
+        }
+        //debugger
+      })
+      /*web_socket.onclose(()=>{
+        debugger
+      })*/
     })
       .then(() => {
         console.log('==>resolve websocket')
@@ -977,12 +1009,71 @@ async function init() {
   }
 }
 
+const webSocketURL= computed(()=>{
+  return `${props.websocketUrl}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
+})
+
+function createSocket(){
+  const wsMap: Map<string, WebSocket> = window.$blockEditor.wsMap
+  const socket= new WebSocket(
+    webSocketURL.value
+  )
+  //const {ws}=useWebSocket(`${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`,{  autoReconnect: true,})
+  //const socket= ws.value
+  //console.log("socksss",socket);
+  wsMap.set (
+    props.objectId,
+    socket
+  )
+
+  return socket
+}
+
+function getCurrentSocket(){
+  const wsMap: Map<string, WebSocket> = window.$blockEditor.wsMap
+  if(props.objectId){
+    return  wsMap.get(props.objectId)
+  }
+  return undefined
+}
+
+function closeSocket(){
+  const wsMap: Map<string, WebSocket> = window.$blockEditor.wsMap
+  const socket= getCurrentSocket()
+  if(socket && socket.readyState === WebSocket.OPEN){
+    socket.close(1000, "Manual close"); // Won't reconnect
+  }
+  if(props.objectId){
+    wsMap.delete(props.objectId)
+  }
+}
+
+function reconnectWebSocket() {
+  debugger
+  const socket=getCurrentSocket()
+  // Only try to reconnect if the socket is CLOSED
+  //!socket
+  if ( socket && socket.readyState === WebSocket.CLOSED) {
+    setTimeout(() => {
+      console.log("111111");
+       createSocket() //connectWebSocket();
+    }, 3000); // Retry in 3 seconds
+  }
+}
+
+/*function closeSocket(){
+  const socket= getCurrentSocket()
+  if()
+}*/
+
+
 
 function dispose(){
   if(myCollection){
     myCollection.forceStop()
     myCollection.dispose()
   }
+  closeSocket()
 }
 
 
