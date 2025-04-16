@@ -160,7 +160,6 @@ export const getClosestBlockByPoint = (
   if (!closestNoteBlock || closestNoteBlock.closest('.affine-surface-ref')) {
     return null;
   }
-  //console.log("closestNoteBlock",closestNoteBlock);
 
   const noteRect = Rect.fromDOM(closestNoteBlock);
 

@@ -71,7 +71,8 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
       border-radius: 8px;
       background-color: var(--affine-background-primary-color);
       padding: 8px;
-      margin: 8px -8px -8px;
+      /* set for mahdaad */
+      //margin: 8px -8px -8px;
     }
 
     .database-block-selected {

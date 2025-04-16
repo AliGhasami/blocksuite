@@ -28,7 +28,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
   static override styles = objectBlockStyles;
 
   _convertLink(event: CustomEvent) {
-    const data = event.detail;
+    const data = event.detail[0];
     const { doc } = this.model;
     const parent = doc.getParent(this.model);
     assertExists(parent);
@@ -52,7 +52,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
   }
 
   changeViewMode(event: CustomEvent) {
-    const mode = event.detail;
+    const mode = event.detail[0];
     //console.log("111111",this.model.type);
     if (
       ['document', 'image', 'weblink'].includes(this.model.type) &&
@@ -179,7 +179,7 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
   }
 
   setDirection(event: CustomEvent) {
-    this.doc.updateBlock(this.model, { dir: event.detail });
+    this.doc.updateBlock(this.model, { dir: event.detail[0] });
   }
 
   updateProps(event: CustomEvent) {

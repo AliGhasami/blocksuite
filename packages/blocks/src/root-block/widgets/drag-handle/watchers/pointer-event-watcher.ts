@@ -161,10 +161,12 @@ export class PointerEventWatcher {
       this.widget.rootComponent,
       point
     );
+    //console.log("closestBlock",closestBlock);
     if (!closestBlock) {
       this.widget.anchorBlockId.value = null;
       return;
     }
+
 
     const blockId = closestBlock.getAttribute(BLOCK_ID_ATTR);
     if (!blockId) return;
@@ -278,10 +280,16 @@ export class PointerEventWatcher {
     return false;
   }, 1000 / 60);
 
+
   // Multiple blocks: drag handle should show on the vertical middle of all blocks
   showDragHandleOnHoverBlock = () => {
     const block = this.widget.anchorBlockComponent.peek();
-    if (!block) return;
+    /** mahdaad- check for when scroll block in multi column */
+    if (!block ) return;
+    const percentLeftSide= this.getLeftSideVisibilityPercentage(block)
+    if(percentLeftSide==0) return;
+    //console.log("block",block);
+    //console.log("percent block",this.getLeftSideVisibilityPercentage(block));
 
     const container = this.widget.dragHandleContainer;
     const grabber = this.widget.dragHandleGrabber;
@@ -334,6 +342,23 @@ export class PointerEventWatcher {
   };
 
   constructor(readonly widget: AffineDragHandleWidget) {}
+
+  getLeftSideVisibilityPercentage(element: HTMLElement): number {
+    const rect = element.getBoundingClientRect();
+    const steps = 10; // تعداد نقاط بیشتر برای دقت بالاتر
+
+    const points = Array.from({ length: steps }, (_, index) => ({
+      x: rect.left,
+      y: rect.top + (rect.height * index) / (steps - 1)
+    }));
+
+    const visiblePoints = points.filter(point => {
+      const elementAtPoint = document.elementFromPoint(point.x, point.y);
+      return elementAtPoint && (element === elementAtPoint || element.contains(elementAtPoint));
+    });
+
+    return (visiblePoints.length / points.length) * 100;
+  }
 
   reset() {
     this._lastHoveredBlockId = null;

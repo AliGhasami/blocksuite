@@ -225,7 +225,6 @@ export class DataViewHeaderViews extends WidgetBase {
 
   renderMore = (count: number) => {
     const views = this.viewManager.views$.value;
-    console.log("1111",views);
     if (count === views.length) {
       if (this.readonly) {
         return;

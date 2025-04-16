@@ -157,7 +157,9 @@ export class EdgelessWatcher {
 
     const posX = state.raw.x - dragPreviewOffset.x - offsetParentRect.left;
 
-    const posY = state.raw.y - dragPreviewOffset.y - offsetParentRect.top;
+    /** disable for mahdaad */
+    //const posY = state.raw.y - dragPreviewOffset.y - offsetParentRect.top;
+    const posY = state.raw.y - offsetParentRect.top + 50;
 
     this.widget.dragPreview.style.transform = `translate(${posX}px, ${posY}px) scale(${this.widget.scaleInNote.peek()})`;
 
