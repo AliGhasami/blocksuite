@@ -6,13 +6,12 @@ import {
   ShadowlessElement,
 } from '@blocksuite/block-std';
 import {
-  type AbstractEditor,
   type DocMode,
   EdgelessEditorBlockSpecs,
   PageEditorBlockSpecs,
   ThemeProvider,
 } from '@blocksuite/blocks';
-import { SignalWatcher, Slot, WithDisposable } from '@blocksuite/global/utils';
+import { SignalWatcher, WithDisposable } from '@blocksuite/global/utils';
 import { computed, signal } from '@preact/signals-core';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
@@ -20,7 +19,6 @@ import { keyed } from 'lit/directives/keyed.js';
 
 export class MahdaadEditorContainer
   extends SignalWatcher(WithDisposable(ShadowlessElement))
-  implements AbstractEditor
 {
   static override styles = css`
     .affine-page-viewport {
@@ -117,9 +115,9 @@ export class MahdaadEditorContainer
   /**
    * @deprecated need to refactor
    */
-  slots: AbstractEditor['slots'] = {
+ /* slots: AbstractEditor['slots'] = {
     docUpdated: new Slot(),
-  };
+  };*/
 
   get doc() {
     return this._doc.value as Doc;
@@ -226,7 +224,7 @@ export class MahdaadEditorContainer
   /**
    * @deprecated need to refactor
    */
-  override updated(changedProperties: Map<string, unknown>) {
+  /*override updated(changedProperties: Map<string, unknown>) {
     if (changedProperties.has('doc')) {
       this.slots.docUpdated.emit({ newDocId: this.doc.id });
     }
@@ -234,7 +232,7 @@ export class MahdaadEditorContainer
     if (!changedProperties.has('doc') && !changedProperties.has('mode')) {
       return;
     }
-  }
+  }*/
 
   @property({ attribute: false })
   override accessor autofocus = false;
