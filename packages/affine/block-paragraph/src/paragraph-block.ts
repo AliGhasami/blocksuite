@@ -359,7 +359,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override renderBlock(): TemplateResult<1> {
-    console.log("this is renderBlock paragraph");
+   // console.log("this is renderBlock paragraph");
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
       ? this._readonlyCollapsed

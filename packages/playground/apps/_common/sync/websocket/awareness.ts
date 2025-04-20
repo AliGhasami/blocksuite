@@ -41,9 +41,11 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
     if (data.channel !== 'awareness') return;
     const { type } = data.payload;
-    if(data.payload && data.payload.time) {
+
+    //todo for develop
+    /*if(data.payload && data.payload.time) {
       console.log("==>send time awareness",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
-    }
+    }*/
     if (type === 'update') {
       const update = Base64.toUint8Array(data.payload.update);
       assertExists(this.awareness);
