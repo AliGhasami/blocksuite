@@ -17,9 +17,6 @@
       "path": "../../framework/block-std"
     },
     {
-      "path": "../../framework/inline"
-    },
-    {
       "path": "../shared"
     },
     {

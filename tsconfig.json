@@ -44,9 +44,6 @@
       "path": "./packages/framework/global"
     },
     {
-      "path": "./packages/framework/inline"
-    },
-    {
       "path": "./tests"
     },
     {

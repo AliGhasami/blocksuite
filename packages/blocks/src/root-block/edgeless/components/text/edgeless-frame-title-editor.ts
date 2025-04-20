@@ -2,10 +2,11 @@ import type { RichText } from '@blocksuite/affine-components/rich-text';
 
 import { FrameBlockModel } from '@blocksuite/affine-model';
 import {
-  RANGE_SYNC_EXCLUDE_ATTR,
+  //RANGE_SYNC_EXCLUDE_ATTR,
   ShadowlessElement,
 } from '@blocksuite/block-std';
 import { assertExists, Bound, WithDisposable } from '@blocksuite/global/utils';
+import {RANGE_SYNC_EXCLUDE_ATTR} from '@blocksuite/std/inline'
 import { cssVarV2 } from '@toeverything/theme/v2';
 import { css, html, nothing } from 'lit';
 import { property, query } from 'lit/decorators.js';
