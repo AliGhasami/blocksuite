@@ -53,7 +53,7 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
 
   override renderBlock() {
     
-    return html`<div dir=${this.model.dir} contenteditable="false">
+    return html`<div contenteditable="false">
       <mahdaad-table-of-content-component
       list=${JSON.stringify(this.list)}
       direction=${this.model.dir}
