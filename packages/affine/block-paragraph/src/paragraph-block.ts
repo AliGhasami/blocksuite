@@ -20,6 +20,7 @@ import {
   getViewportElement,
 } from '@blocksuite/affine-shared/utils';
 import { getInlineRangeProvider } from '@blocksuite/block-std';
+import { setDirectionOnBlock } from "@blocksuite/store";
 import { effect, signal } from '@preact/signals-core';
 import { html, nothing, type TemplateResult } from 'lit';
 import { query, state } from 'lit/decorators.js';
@@ -289,20 +290,16 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
     );
   }
 
-  /*override async getUpdateComplete() {
+  override async getUpdateComplete() {
     const result = await super.getUpdateComplete();
     await this._richTextElement?.updateComplete;
     if(this._richTextElement!=this.lastInlineEditor) {
-      console.log("11111");
       this.lastInlineEditor = this._richTextElement
       setTimeout(()=>{
         if(this.inlineEditor && !this.doc.readonly) {
-          console.log("222222");
           setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
           this.inlineEditor.disposables.add(this.inlineEditor.slots.textChange.on(()=> {
-            console.log("33333333");
             if(this.inlineEditor) {
-              console.log("44444444");
               setDirectionOnBlock(this.model, this.doc,this.inlineEditor?.yText.toString().trim())
             }
           }))
@@ -311,7 +308,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
       })
     }
     return result;
-  }*/
+  }
 
   placeHolder() {
     return this.inEdgelessText
@@ -359,14 +356,16 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
 
 
   override renderBlock(): TemplateResult<1> {
-   // console.log("this is renderBlock paragraph");
+    //console.log("this.model.dir:",this.model.dir);
+    //console.log("1111",this._richTextElement);
+    //console.log("this is render block",this.model.id);
     const { type$ } = this.model;
     const collapsed = this.doc.readonly
       ? this._readonlyCollapsed
       : this.model.collapsed;
     const collapsedSiblings = this.collapsedSiblings;
     /** alighasami - fix for show placeholder in claytap when delete text*/
-   // this.checkShowPlaceHolder()
+    this.checkShowPlaceHolder()
 
     let style = html``;
     if (this.model.type.startsWith('h') && collapsed) {
@@ -469,7 +468,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
   }
 
 
- /* richText() {
+  richText() {
     const temp = document.querySelector(
       `.editor-scroll-container:has([data-block-id='${this.doc.root?.id}'])`
     );
@@ -488,7 +487,7 @@ export class ParagraphBlockComponent extends CaptionedBlockComponent<
             .enableUndoRedo=${false}
             .verticalScrollContainerGetter=${() => scrollContainer}
           ></rich-text>`
-  }*/
+  }
 
   @state()
   private accessor _readonlyCollapsed = false;
