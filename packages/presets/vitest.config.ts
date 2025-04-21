@@ -47,12 +47,12 @@ export default defineConfig(_configEnv =>
         '@blocksuite/store': path.resolve(
           fileURLToPath(new URL('../framework/store/src', import.meta.url))
         ),
-        /*'@blocksuite/inline': path.resolve(
+        '@blocksuite/inline': path.resolve(
           fileURLToPath(new URL('../framework/inline/src', import.meta.url))
-        ),*/
-        /*'@blocksuite/inline/!*': path.resolve(
-          fileURLToPath(new URL('../framework/inline/src/!*', import.meta.url))
-        ),*/
+        ),
+        '@blocksuite/inline/*': path.resolve(
+          fileURLToPath(new URL('../framework/inline/src/*', import.meta.url))
+        ),
       },
     },
   })

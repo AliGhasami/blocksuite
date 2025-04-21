@@ -11,8 +11,7 @@
     "@blocksuite/affine-model": "workspace:*",
     "@blocksuite/block-std": "workspace:*",
     "@blocksuite/global": "workspace:*",
-    "@blocksuite/presets": "workspace:*",
-    "@blocksuite/std": "workspace:*"
+    "@blocksuite/presets": "workspace:*"
   },
   "repository": {
     "type": "git",

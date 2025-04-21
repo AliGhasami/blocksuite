@@ -2,6 +2,7 @@
   "entryPoints": [
     "packages/framework/block-std",
     "packages/framework/store",
+    "packages/framework/inline",
     "packages/blocks",
     "packages/presets",
     "packages/affine/block-list",

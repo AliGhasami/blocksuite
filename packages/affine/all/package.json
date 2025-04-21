@@ -24,7 +24,6 @@
     "@blocksuite/global": "workspace:*",
     "@blocksuite/inline": "workspace:*",
     "@blocksuite/presets": "workspace:*",
-    "@blocksuite/std": "workspace:*",
     "@blocksuite/store": "workspace:*"
   },
   "exports": {

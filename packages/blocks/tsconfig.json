@@ -17,6 +17,9 @@
       "path": "../framework/block-std"
     },
     {
+      "path": "../framework/inline"
+    },
+    {
       "path": "../affine/model"
     },
     {

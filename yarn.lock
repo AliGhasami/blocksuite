@@ -2024,9 +2024,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blocksuite/inline@workspace:*, @blocksuite/inline@workspace:packages/framework/inline-old":
+"@blocksuite/inline@workspace:*, @blocksuite/inline@workspace:packages/framework/inline":
   version: 0.0.0-use.local
-  resolution: "@blocksuite/inline@workspace:packages/framework/inline-old"
+  resolution: "@blocksuite/inline@workspace:packages/framework/inline"
   dependencies:
     "@blocksuite/global": "workspace:*"
     "@preact/signals-core": "npm:^1.8.0"

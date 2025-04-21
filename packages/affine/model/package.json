@@ -22,7 +22,6 @@
     "@blocksuite/block-std": "workspace:*",
     "@blocksuite/global": "workspace:*",
     "@blocksuite/inline": "workspace:*",
-    "@blocksuite/std": "workspace:*",
     "@blocksuite/store": "workspace:*",
     "fractional-indexing": "^3.2.0",
     "zod": "^3.23.8"

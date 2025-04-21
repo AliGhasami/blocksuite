@@ -24,7 +24,6 @@
     "@blocksuite/global": "workspace:*",
     "@blocksuite/icons": "2.1.75",
     "@blocksuite/inline": "workspace:*",
-    "@blocksuite/std": "workspace:*",
     "@blocksuite/store": "workspace:*",
     "@floating-ui/dom": "^1.6.10",
     "@lit/context": "^1.1.2",

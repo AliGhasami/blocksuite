@@ -6,6 +6,7 @@
     "composite": false,
     "paths": {
       "@blocks/*": ["../packages/blocks/src/*"],
+      "@inline/*": ["../packages/framework/inline/src/*"],
       "@store/*": ["../packages/framework/store/src/*"],
       "@playground/*": ["../packages/playground/*"]
     }
