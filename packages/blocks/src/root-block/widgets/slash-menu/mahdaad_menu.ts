@@ -17,6 +17,10 @@ import type { DirectiveResult } from 'lit/directive.js';
 //import { format, formatISO } from 'date-fns';
 //import link_to_page from './icons/link_to_page.svg?raw';
 
+
+
+import type { InlineEditor } from "@blocksuite/inline";
+
 import {
   getInlineEditorByModel,
   insertContent,
@@ -438,15 +442,34 @@ export const actionsMenu: MahdaadActionMenu[] = [
   },
   {
     key: 'table_of_content',
-    action: ({ rootComponent }) => {
+    action: ({ rootComponent,model }) => {
      
-        rootComponent.std.command
+        const [result,{std,updatedBlocks}]= rootComponent.std.command
         .chain()
         .updateBlockType({
           flavour:'affine:mahdaad-table-of-content',
           props: {  },
         })
         .run();
+
+      if(updatedBlocks && updatedBlocks.length) {
+        const new_model=updatedBlocks[0]
+        const next = new_model.doc.getNext(new_model);
+
+        if (next && rootComponent.host) {
+          const inline: InlineEditor | null = getInlineEditorByModel(
+            rootComponent.std.host,
+            next
+          );
+          if (inline) {
+            inline.focusEnd();
+          }
+        }
+      }
+
+        /*setTimeout(()=>{
+
+        },5000)*/
     },
   },
 ];

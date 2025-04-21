@@ -12,9 +12,10 @@ export class WebSocketDocSource implements DocSource {
     //todo ali ghasami for convert base 64
     const data = JSON.parse(event.data) as WebSocketMessage;
     if (data.channel !== 'doc') return;
-    if(data.payload && data.payload.time) {
+    //todo for develop
+    /*if(data.payload && data.payload.time) {
       console.log("==>send time",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
-    }
+    }*/
     //@ts-ignore
     if (data.not_exists) {
       console.log('==>message from socket server and not doc not exists');
@@ -155,9 +156,10 @@ export class WebSocketDocSource implements DocSource {
         //console.log("subscribe  on message");
         //todo convert ali ghasami to base 64
         const data = JSON.parse(event.data) as WebSocketMessage;
-        if(data.payload && data.payload.time) {
+        //todo for develop
+        /*if(data.payload && data.payload.time) {
           console.log("==>send time",data.payload.time,"==>recive time ", Date.now(),"==>diff",Date.now() - data.payload.time,"ms");
-        }
+        }*/
         if (data.channel !== 'doc' || data.payload.type !== 'update') return;
         const { docId, updates } = data.payload;
         cb(docId,Base64.toUint8Array(updates));
