@@ -14,9 +14,7 @@ import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.j
 export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent<MahdaadTableOfContentBlockModel> {
 
   changeOptions(event:CustomEvent) {
-    const key=event.detail
-    console.log("event:",event);
-    console.log("key:",key);
+    const key=event.detail[0]
     switch (key) {
       case 'delete':
         this.std.doc.deleteBlock(this.model)
