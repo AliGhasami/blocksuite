@@ -451,25 +451,22 @@ export const actionsMenu: MahdaadActionMenu[] = [
           props: {  },
         })
         .run();
+        setTimeout(()=>{
+          if(updatedBlocks && updatedBlocks.length) {
+            const new_model=updatedBlocks[0]
+            const next = new_model.doc.getNext(new_model);
 
-      if(updatedBlocks && updatedBlocks.length) {
-        const new_model=updatedBlocks[0]
-        const next = new_model.doc.getNext(new_model);
-
-        if (next && rootComponent.host) {
-          const inline: InlineEditor | null = getInlineEditorByModel(
-            rootComponent.std.host,
-            next
-          );
-          if (inline) {
-            inline.focusEnd();
+            if (next && rootComponent.host) {
+              const inline: InlineEditor | null = getInlineEditorByModel(
+                rootComponent.std.host,
+                next
+              );
+              if (inline) {
+                inline.focusEnd();
+              }
+            }
           }
-        }
-      }
-
-        /*setTimeout(()=>{
-
-        },5000)*/
+        })
     },
   },
 ];
