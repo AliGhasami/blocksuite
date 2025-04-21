@@ -150,8 +150,6 @@ export class Clipboard extends LifeCycleWatcher {
           parent,
           index
         );
-        console.log("this is result",result);
-
         if (result) {
           return result;
         }
