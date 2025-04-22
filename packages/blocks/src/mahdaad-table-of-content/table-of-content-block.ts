@@ -66,7 +66,7 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
   }
 
   scrollToBlock(event: CustomEvent) {
-    const blockId = event.detail;
+    const blockId = event.detail[0];
     const block = this.host.view.getBlock(blockId);
     if (block) {
       block.scrollIntoView({ behavior: 'smooth', block: 'center' });
