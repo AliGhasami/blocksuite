@@ -259,7 +259,7 @@ function handleHeadingList(doc:Doc) {
     const items = [
       ...(doc.meta?.title !== '' ? [doc.root] : []),
       ...headingBlocks,
-    ];
+    ].filter(item=> item.text.trim()!='') ;
 
     if (currentDocument.value && myCollection) {
         // myCollection?.setDocMeta(currentDocument.value.id, { headingList: items })
