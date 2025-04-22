@@ -1,7 +1,5 @@
-/* eslint-disable perfectionist/sort-classes */
-/* eslint-disable @stylistic/ts/lines-between-class-members */
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import { assertExists } from '@blocksuite/global/utils';
+import type { BaseTextAttributes } from '@blocksuite/store';
 import { html, render } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import * as Y from 'yjs';
@@ -9,48 +7,14 @@ import * as Y from 'yjs';
 import type { VLine } from '../components/v-line.js';
 import type { InlineEditor } from '../inline-editor.js';
 import type { InlineRange } from '../types.js';
-import type { BaseTextAttributes } from '../utils/base-attributes.js';
-
 import { deltaInsertsToChunks } from '../utils/delta-convert.js';
 
-//todo ali ghasami for remove if has bug or fix after  - fix for mahdaad
-export function cleanIllegalAttributes(deltas) {
-  //const savedAttributes = null;
-  /*deltas.forEach(item => {
-    if (
-      (savedAttributes &&
-        item.attributes &&
-        item.attributes.mention &&
-        item.attributes.mention.id == savedAttributes.id) ||
-      (item.attributes.mahdaadObjectLink &&
-        item.attributes.mahdaadObjectLink.id == savedAttributes.id)
-    ) {
-      item.attributes = undefined;
-    }
-    if (item.attributes && item.attributes.mention) {
-      savedAttributes = item.attributes.mention;
-    }
-    console.log(' ===>', savedAttributes);
-  });*/
-  //debugger;
-  deltas.forEach(item => {
-    if (
-      item.insert != ' ' &&
-      item.attributes &&
-      (Object.hasOwn(item.attributes, 'mahdaadObjectLink') ||
-        Object.hasOwn(item.attributes, 'mention') || Object.hasOwn(item.attributes, 'date'))
-    ) {
-      item.attributes = undefined;
-    }
-  });
-
-  return deltas;
-}
-
-
 export class RenderService<TextAttributes extends BaseTextAttributes> {
-  private _onYTextChange = (_: Y.YTextEvent, transaction: Y.Transaction) => {
-    this.editor.slots.textChange.emit();
+  private readonly _onYTextChange = (
+    _: Y.YTextEvent,
+    transaction: Y.Transaction
+  ) => {
+    this.editor.slots.textChange.next();
 
     const yText = this.editor.yText;
 
@@ -71,7 +35,10 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
     if (!lastStartRelativePosition || !lastEndRelativePosition) return;
 
     const doc = this.editor.yText.doc;
-    assertExists(doc);
+    if (!doc) {
+      console.error('doc is not found when syncing yText');
+      return;
+    }
     const absoluteStart = Y.createAbsolutePositionFromRelativePosition(
       lastStartRelativePosition,
       doc
@@ -113,14 +80,13 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
   }
   // render current deltas to VLines
   render = () => {
-    let syncInlineRange = true
-    if (!this.editor.mounted) return;
+    if (!this.editor.rootElement) return;
 
     this._rendering = true;
 
     const rootElement = this.editor.rootElement;
     const embedDeltas = this.editor.deltaService.embedDeltas;
-    const chunks = deltaInsertsToChunks(cleanIllegalAttributes(embedDeltas));
+    const chunks = deltaInsertsToChunks(embedDeltas);
 
     let deltaIndex = 0;
     // every chunk is a line
@@ -178,65 +144,37 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
         ),
         rootElement
       );
-    } catch (_) {
+    } catch {
       // Lit may be crashed by IME input and we need to rerender whole editor for it
       this.editor.rerenderWholeEditor();
-    }
-
-    const matchDelta = this.getCurrentInlineRangeDelta;
-    if (matchDelta?.attributes?.date) syncInlineRange = false;
-    if (syncInlineRange) {
-      // We need to synchronize the selection immediately after rendering is completed,
-      // otherwise there is a possibility of an error in the cursor position
-      this.editor.rangeService.syncInlineRange();
     }
 
     this.editor
       .waitForUpdate()
       .then(() => {
         this._rendering = false;
-        this.editor.slots.renderComplete.emit();
-        if (syncInlineRange) {
-          this.editor.syncInlineRange();
-        }
-
+        this.editor.slots.renderComplete.next();
+        this.editor.syncInlineRange();
       })
       .catch(console.error);
   };
 
-  // TODO return if has bug
-  get getCurrentInlineRangeDelta() {
-    const range = this.editor.getInlineRange();
-    //console.log("1111",range);
-    if (range) return this.getDeltaByInlineRange(range);
-    return undefined;
-  }
-
-  // TODO return if has bug
-  getDeltaByInlineRange(inlineRange: InlineRange) {
-    //console.log("22222",this.editor.getDeltasByInlineRange(inlineRange));
-    return this.editor.getDeltasByInlineRange(inlineRange)?.find(
-      ([_, _inlineRange]) =>
-        _inlineRange.length == inlineRange.length &&
-        _inlineRange.index == inlineRange.index
-    )?.[0];
-  }
-
   rerenderWholeEditor = () => {
     const rootElement = this.editor.rootElement;
 
-    if (!rootElement.isConnected) return;
+    if (!rootElement || !rootElement.isConnected) return;
 
     rootElement.replaceChildren();
     // Because we bypassed Lit and disrupted the DOM structure, this will cause an inconsistency in the original state of `ChildPart`.
     // Therefore, we need to remove the original `ChildPart`.
     // https://github.com/lit/lit/blob/a2cd76cfdea4ed717362bb1db32710d70550469d/packages/lit-html/src/lit-html.ts#L2248
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     delete (rootElement as any)['_$litPart$'];
     this.render();
   };
 
   waitForUpdate = async () => {
+    if (!this.editor.rootElement) return;
     const vLines = Array.from(
       this.editor.rootElement.querySelectorAll('v-line')
     );

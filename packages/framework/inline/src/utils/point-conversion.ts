@@ -1,9 +1,8 @@
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
 
 import type { VElement, VLine } from '../components/index.js';
+import { INLINE_ROOT_ATTR, ZERO_WIDTH_FOR_EMPTY_LINE } from '../consts.js';
 import type { DomPoint, TextPoint } from '../types.js';
-
-import { INLINE_ROOT_ATTR, ZERO_WIDTH_SPACE } from '../consts.js';
 import {
   isInlineRoot,
   isNativeTextInVText,
@@ -77,7 +76,7 @@ export function textPointToDomPoint(
     index += calculateTextLength(text);
   }
 
-  if (text.wholeText !== ZERO_WIDTH_SPACE) {
+  if (text.wholeText !== ZERO_WIDTH_FOR_EMPTY_LINE) {
     index += offset;
   }
 

@@ -1,3 +1,4 @@
+/* for remove */
 import { VElement, VLine, VText } from './components/index.js';
 
 export function effects() {
