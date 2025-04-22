@@ -1,9 +1,4 @@
-import type { BaseTextAttributes, DeltaInsert } from '@blocksuite/store';
-
-//import { DisposableGroup } from '@blocksuite/global/disposable';
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-
-//import { SignalWatcher } from '@blocksuite/global/lit';
 import { DisposableGroup, SignalWatcher } from '@blocksuite/global/utils';
 import { effect, signal } from '@preact/signals-core';
 import { html, LitElement } from 'lit';
@@ -11,8 +6,10 @@ import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import type { InlineEditor } from '../inline-editor.js';
+import type { DeltaInsert } from '../types.js';
+import type { BaseTextAttributes } from '../utils/base-attributes.js';
 
-import { ZERO_WIDTH_FOR_EMPTY_LINE } from '../consts.js';
+import { ZERO_WIDTH_SPACE } from '../consts.js';
 import { isInlineRangeIntersect } from '../utils/inline-range.js';
 
 export class VElement<
@@ -27,7 +24,7 @@ export class VElement<
 
     this.disposables.add(
       effect(() => {
-        const inlineRange = this.inlineEditor?.inlineRange$.value;
+        const inlineRange = this.inlineEditor.inlineRange$.value;
         this.selected.value =
           !!inlineRange &&
           isInlineRangeIntersect(inlineRange, {
@@ -94,7 +91,7 @@ export class VElement<
 
   @property({ type: Object })
   accessor delta: DeltaInsert<T> = {
-    insert: ZERO_WIDTH_FOR_EMPTY_LINE,
+    insert: ZERO_WIDTH_SPACE,
   };
 
   @property({ attribute: false })

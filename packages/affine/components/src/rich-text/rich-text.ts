@@ -13,6 +13,7 @@ import {
   type KeyboardBindingContext,
   type VLine,
 } from '@blocksuite/inline';
+
 import { DocCollection, Text } from '@blocksuite/store';
 import { effect } from '@preact/signals-core';
 import { css, html, type TemplateResult } from 'lit';

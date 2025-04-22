@@ -1,7 +1,6 @@
-import type { BaseTextAttributes } from '@blocksuite/store';
-
 import type { InlineEditor } from '../inline-editor.js';
 import type { InlineRange } from '../types.js';
+import type { BaseTextAttributes } from './base-attributes.js';
 
 function handleInsertText<TextAttributes extends BaseTextAttributes>(
   inlineRange: InlineRange,

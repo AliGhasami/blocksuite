@@ -1,7 +1,8 @@
-import type { BaseTextAttributes, DeltaInsert } from '@blocksuite/store';
-
+/** @alighasami for check merge **/
 import type { InlineEditor } from '../inline-editor.js';
-import type { DeltaEntry, InlineRange } from '../types.js';
+import type { DeltaEntry, DeltaInsert, InlineRange } from '../types.js';
+import type { BaseTextAttributes } from '../utils/index.js';
+
 import { transformDeltasToEmbedDeltas } from '../utils/index.js';
 
 export class DeltaService<TextAttributes extends BaseTextAttributes> {
@@ -123,7 +124,6 @@ export class DeltaService<TextAttributes extends BaseTextAttributes> {
     const deltas = this.editor.embedDeltas;
     const result: Result[] = [];
 
-    // eslint-disable-next-line sonarjs/no-ignored-return
     deltas.reduce((rangeIndex, delta, deltaIndex) => {
       const length = delta.insert.length;
       const from = inlineRange.index - length;

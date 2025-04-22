@@ -1,16 +1,20 @@
-import { type BaseTextAttributes, baseTextAttributes } from '@blocksuite/store';
 import type { z, ZodTypeDef } from 'zod';
 
 import type { InlineEditor } from '../inline-editor.js';
 import type { AttributeRenderer, InlineRange } from '../types.js';
-import { getDefaultAttributeRenderer } from '../utils/index.js';
+import type { BaseTextAttributes } from '../utils/index.js';
+
+import {
+  baseTextAttributes,
+  getDefaultAttributeRenderer,
+} from '../utils/index.js';
 
 export class AttributeService<TextAttributes extends BaseTextAttributes> {
   private _attributeRenderer: AttributeRenderer<TextAttributes> =
     getDefaultAttributeRenderer<TextAttributes>();
 
   private _attributeSchema: z.ZodSchema<TextAttributes, ZodTypeDef, unknown> =
-    baseTextAttributes as never;
+    baseTextAttributes as z.ZodSchema<TextAttributes, ZodTypeDef, unknown>;
 
   private _marks: TextAttributes | null = null;
 
@@ -53,7 +57,7 @@ export class AttributeService<TextAttributes extends BaseTextAttributes> {
         // we will treat it as having no format
         if (acc[typedKey] === cur[typedKey]) {
           // This cast is secure because we have checked that the value of the key is the same.
-
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           newFormat[typedKey] = acc[typedKey] as any;
         }
       }

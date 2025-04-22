@@ -1,10 +1,14 @@
-import type { BaseTextAttributes } from '@blocksuite/store';
+/* eslint-disable perfectionist/sort-classes */
+/* eslint-disable @stylistic/ts/lines-between-class-members */
+import { assertExists } from '@blocksuite/global/utils';
 import { effect } from '@preact/signals-core';
 import * as Y from 'yjs';
 
 import type { VLine } from '../components/v-line.js';
 import type { InlineEditor } from '../inline-editor.js';
 import type { InlineRange, TextPoint } from '../types.js';
+import type { BaseTextAttributes } from '../utils/base-attributes.js';
+
 import { isInEmbedGap } from '../utils/embed.js';
 import { isMaybeInlineRangeEqual } from '../utils/inline-range.js';
 import {
@@ -46,9 +50,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
       return null;
     }
     const textNode = text.childNodes[1];
-    if (!(textNode instanceof Text)) {
-      return null;
-    }
+    assertExists(textNode instanceof Text);
     range.setStart(textNode, 0);
     range.setEnd(textNode, textNode.textContent?.length ?? 0);
     const inlineRange = this.toInlineRange(range);
@@ -64,8 +66,6 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     rangeIndexRelatedToLine: number;
   } | null => {
     const rootElement = this.editor.rootElement;
-    if (!rootElement) return null;
-
     const lineElements = Array.from(rootElement.querySelectorAll('v-line'));
 
     let beforeIndex = 0;
@@ -103,8 +103,6 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
 
   getTextPoint = (rangeIndex: InlineRange['index']): TextPoint | null => {
     const rootElement = this.editor.rootElement;
-    if (!rootElement) return null;
-
     const vLines = Array.from(rootElement.querySelectorAll('v-line'));
 
     let index = 0;
@@ -159,10 +157,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     // can not in the first line because if we apply the inline ranage manually the
     // cursor will jump to the second line.
     const container = range.commonAncestorContainer.parentElement;
-    if (!container) {
-      console.error('failed to get container');
-      return false;
-    }
+    assertExists(container);
     const containerRect = container.getBoundingClientRect();
     // There will be two rects if the cursor is at the edge of the line:
     // aaaaaaaa| or aaaaaaaa
@@ -204,10 +199,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     // can not in the first line because if we apply the inline range manually the
     // cursor will jump to the second line.
     const container = range.commonAncestorContainer.parentElement;
-    if (!container) {
-      console.error('failed to get container');
-      return false;
-    }
+    assertExists(container);
     const containerRect = container.getBoundingClientRect();
     // There will be two rects if the cursor is at the edge of the line:
     // aaaaaaaa| or aaaaaaaa
@@ -257,8 +249,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
         if (editor.inlineRangeProviderOverride) return;
 
         if (this.editor.renderService.rendering) {
-          const subscription = editor.slots.renderComplete.subscribe(() => {
-            subscription.unsubscribe();
+          editor.slots.renderComplete.once(() => {
             this.syncInlineRange(newInlineRange);
           });
         } else {
@@ -292,7 +283,6 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     const handler = () => {
       const selection = document.getSelection();
       if (!selection) return;
-      if (!this.editor.rootElement) return;
 
       if (inlineRange === null) {
         if (selection.rangeCount > 0) {
@@ -309,14 +299,11 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
             selection.addRange(newRange);
             this.editor.rootElement.focus();
 
-            this.editor.slots.inlineRangeSync.next(newRange);
+            this.editor.slots.inlineRangeSync.emit(newRange);
           } else {
-            const subscription = this.editor.slots.renderComplete.subscribe(
-              () => {
-                subscription.unsubscribe();
-                this.syncInlineRange(inlineRange);
-              }
-            );
+            this.editor.slots.renderComplete.once(() => {
+              this.syncInlineRange(inlineRange);
+            });
           }
         } catch (error) {
           console.error('failed to apply inline range');
@@ -326,10 +313,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
     };
 
     if (this.editor.renderService.rendering) {
-      const subscription = this.editor.slots.renderComplete.subscribe(() => {
-        subscription.unsubscribe();
-        handler();
-      });
+      this.editor.slots.renderComplete.once(handler);
     } else {
       handler();
     }
@@ -340,7 +324,6 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    */
   toDomRange = (inlineRange: InlineRange): Range | null => {
     const rootElement = this.editor.rootElement;
-    if (!rootElement) return null;
     return inlineRangeToDomRange(rootElement, inlineRange);
   };
 
@@ -378,7 +361,7 @@ export class RangeService<TextAttributes extends BaseTextAttributes> {
    */
   toInlineRange = (range: Range): InlineRange | null => {
     const { rootElement, yText } = this.editor;
-    if (!rootElement || !yText) return null;
+
     return domRangeToInlineRange(range, rootElement, yText);
   };
 

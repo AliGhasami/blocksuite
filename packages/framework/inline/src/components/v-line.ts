@@ -1,11 +1,13 @@
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import type { DeltaInsert } from '@blocksuite/store';
+import { assertExists } from '@blocksuite/global/utils';
 import { html, LitElement, type TemplateResult } from 'lit';
 import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import { INLINE_ROOT_ATTR, ZERO_WIDTH_FOR_EMPTY_LINE } from '../consts.js';
 import type { InlineRootElement } from '../inline-editor.js';
+import type { DeltaInsert } from '../types.js';
+
+import { INLINE_ROOT_ATTR, ZERO_WIDTH_SPACE } from '../consts.js';
 import { EmbedGap } from './embed-gap.js';
 
 export class VLine extends LitElement {
@@ -13,19 +15,12 @@ export class VLine extends LitElement {
     const rootElement = this.closest(
       `[${INLINE_ROOT_ATTR}]`
     ) as InlineRootElement;
-    if (!rootElement) {
-      throw new BlockSuiteError(
-        BlockSuiteError.ErrorCode.ValueNotExists,
-        'v-line must be inside a v-root'
-      );
-    }
+    assertExists(rootElement, 'v-line must be inside a v-root');
     const inlineEditor = rootElement.inlineEditor;
-    if (!inlineEditor) {
-      throw new BlockSuiteError(
-        BlockSuiteError.ErrorCode.ValueNotExists,
-        'v-line must be inside a v-root with inline-editor'
-      );
-    }
+    assertExists(
+      inlineEditor,
+      'v-line must be inside a v-root with inline-editor'
+    );
 
     return inlineEditor;
   }
@@ -89,9 +84,7 @@ export class VLine extends LitElement {
   renderVElements() {
     if (this.elements.length === 0) {
       // don't use v-element because it not correspond to the actual delta
-      return html`
-        <div><v-text .str=${ZERO_WIDTH_FOR_EMPTY_LINE}></v-text></div>
-      `;
+      return html`<div><v-text .str=${ZERO_WIDTH_SPACE}></v-text></div>`;
     }
 
     const inlineEditor = this.inlineEditor;

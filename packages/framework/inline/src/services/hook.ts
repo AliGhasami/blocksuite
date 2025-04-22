@@ -1,7 +1,6 @@
-import type { BaseTextAttributes } from '@blocksuite/store';
-
 import type { InlineEditor } from '../inline-editor.js';
 import type { InlineRange } from '../types.js';
+import type { BaseTextAttributes } from '../utils/base-attributes.js';
 
 export interface BeforeinputHookCtx<TextAttributes extends BaseTextAttributes> {
   inlineEditor: InlineEditor<TextAttributes>;

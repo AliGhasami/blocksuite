@@ -1,27 +1,25 @@
-import type { BaseTextAttributes } from '@blocksuite/store';
-
 import type { InlineEditor } from '../inline-editor.js';
 import type { InlineRange } from '../types.js';
+import type { BeforeinputHookCtx, CompositionEndHookCtx } from './hook.js';
+
 import {
+  type BaseTextAttributes,
   isInEmbedElement,
   isInEmbedGap,
   isInEmptyLine,
 } from '../utils/index.js';
 import { isMaybeInlineRangeEqual } from '../utils/inline-range.js';
 import { transformInput } from '../utils/transform-input.js';
-import type { BeforeinputHookCtx, CompositionEndHookCtx } from './hook.js';
 
 export class EventService<TextAttributes extends BaseTextAttributes> {
   private _compositionInlineRange: InlineRange | null = null;
 
   private _isComposing = false;
 
-  private readonly _isRangeCompletelyInRoot = (range: Range) => {
+  private _isRangeCompletelyInRoot = (range: Range) => {
     if (range.commonAncestorContainer.ownerDocument !== document) return false;
 
     const rootElement = this.editor.rootElement;
-    if (!rootElement) return false;
-
     const rootRange = document.createRange();
     rootRange.selectNode(rootElement);
 
@@ -41,12 +39,13 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     }
   };
 
-  private readonly _onBeforeInput = (event: InputEvent) => {
+  private _onBeforeInput = (event: InputEvent) => {
     const target = event.target as Element;
     //@ts-ignore
     if (target && Object.hasOwn(target.dataset, 'inlineIgnoreInput')) {
       return;
     }
+
     const range = this.editor.rangeService.getNativeRange();
     if (
       this.editor.isReadonly ||
@@ -76,7 +75,6 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
         isInEmptyLine(range.commonAncestorContainer) &&
         inlineRange.length === 0 &&
         inlineRange.index > 0
-        // eslint-disable-next-line sonarjs/no-duplicated-branches
       ) {
         // do not use target range when deleting across lines
         // https://github.com/toeverything/blocksuite/issues/5381
@@ -121,13 +119,13 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       ctx.data,
       ctx.attributes,
       ctx.inlineRange,
-      this.editor as never
+      this.editor as InlineEditor
     );
 
-    this.editor.slots.inputting.next();
+    this.editor.slots.inputting.emit();
   };
 
-  private readonly _onClick = (event: MouseEvent) => {
+  private _onClick = (event: MouseEvent) => {
     // select embed element when click on it
     if (event.target instanceof Node && isInEmbedElement(event.target)) {
       const selection = document.getSelection();
@@ -146,11 +144,9 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     }
   };
 
-  private readonly _onCompositionEnd = async (event: CompositionEvent) => {
+  private _onCompositionEnd = async (event: CompositionEvent) => {
     this._isComposing = false;
-    if (!this.editor.rootElement || !this.editor.rootElement.isConnected) {
-      return;
-    }
+    if (!this.editor.rootElement.isConnected) return;
 
     const range = this.editor.rangeService.getNativeRange();
     if (
@@ -186,12 +182,11 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       });
     }
 
-    this.editor.slots.inputting.next();
+    this.editor.slots.inputting.emit();
   };
 
-  private readonly _onCompositionStart = () => {
+  private _onCompositionStart = () => {
     this._isComposing = true;
-    if (!this.editor.rootElement) return;
     // embeds is not editable and it will break IME
     const embeds = this.editor.rootElement.querySelectorAll(
       '[data-v-embed="true"]'
@@ -208,10 +203,8 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     }
   };
 
-  private readonly _onCompositionUpdate = () => {
-    if (!this.editor.rootElement || !this.editor.rootElement.isConnected) {
-      return;
-    }
+  private _onCompositionUpdate = () => {
+    if (!this.editor.rootElement.isConnected) return;
 
     const range = this.editor.rangeService.getNativeRange();
     if (
@@ -221,14 +214,14 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     )
       return;
 
-    this.editor.slots.inputting.next();
+    this.editor.slots.inputting.emit();
   };
 
-  private readonly _onKeyDown = (event: KeyboardEvent) => {
+  private _onKeyDown = (event: KeyboardEvent) => {
     const inlineRange = this.editor.getInlineRange();
     if (!inlineRange) return;
 
-    this.editor.slots.keydown.next(event);
+    this.editor.slots.keydown.emit(event);
 
     if (
       !event.shiftKey &&
@@ -283,10 +276,8 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
     }
   };
 
-  private readonly _onSelectionChange = () => {
+  private _onSelectionChange = () => {
     const rootElement = this.editor.rootElement;
-    if (!rootElement) return;
-
     const previousInlineRange = this.editor.getInlineRange();
     if (this._isComposing) {
       return;
@@ -349,11 +340,11 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       return;
     }
 
-    this.editor.disposables.addFromEvent(
+    /*this.editor.disposables.addFromEvent(
       eventSource,
       'beforeinput',
       this._onBeforeInput
-    );
+    );*/
     this.editor.disposables.addFromEvent(
       eventSource,
       'compositionstart',
@@ -376,9 +367,7 @@ export class EventService<TextAttributes extends BaseTextAttributes> {
       'keydown',
       this._onKeyDown
     );
-    if (rootElement) {
-      this.editor.disposables.addFromEvent(rootElement, 'click', this._onClick);
-    }
+    this.editor.disposables.addFromEvent(rootElement, 'click', this._onClick);
   };
 
   get isComposing() {
