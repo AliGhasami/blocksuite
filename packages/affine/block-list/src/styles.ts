@@ -4,20 +4,33 @@ export const listPrefix = css`
   .affine-list-block__prefix {
     display: flex;
     //color: var(--affine-blue-700);
-    font-size: var(--affine-font-sm);
+    //font-size: var(--affine-font-sm);
     user-select: none;
     position: relative;
     align-items: center;
     //justify-content: center;
     flex-direction: column;
-    margin-top: 3px;
+    ///margin-top: 3px;
   }
 
   .affine-list-block__numbered {
-    min-width: 18px;
-    height: 24px;
-    margin-left: 2px;
+    //min-width: 18px;
+    //height: 24px;
+    //margin-left: 2px;
+    //margin-bottom: 2px;
+    margin-top: 4px;
+    margin-inline-end: 3px;
   }
+
+  .affine-list-block__bullet{
+    margin-top: 5px;
+    //width: 15px;
+  }
+
+  .affine-list-block__bullet svg{
+    width: 18px;
+  }
+  
 
   .affine-list-block__todo-prefix {
     display: flex;
@@ -26,6 +39,7 @@ export const listPrefix = css`
     width: 24px;
     height: 24px;
     color: var(--affine-icon-color);
+    margin-top: 3.5px;
   }
 
   .affine-list-block__todo-prefix.readonly {
@@ -58,6 +72,7 @@ export const listBlockStyles = css`
     position: relative;
     display: flex;
     position: relative;
+    //align-items: center;
   }
   .affine-list-rich-text-wrapper rich-text {
     flex: 1;

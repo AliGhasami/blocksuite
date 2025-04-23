@@ -20,7 +20,12 @@
 20- full check old save data on stage and production
 21- check date time inline for edit in text input event title and edit mode when hover and check (ignoreSyncInlineRange in inline)
 22- google calendar add event (in next block of selected of end of blocks)
-23- 
-
-
-
+23- override select all block with ctrl + a 
+24- check all inline (all object - date time - event title  - mention - resize image)
+25- check all block 
+26- check all prevent for sub note (callout - multi column )
+27- check and migrate vertical indicator drag for all block for multi column
+28-check web socket and store data and collboration
+29- check rtl all block and editor and when user typeing check direction 
+30- migrate all block to new block in editor
+31- check dark mode

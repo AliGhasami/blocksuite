@@ -163,7 +163,10 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
   private dataView = new DataView();
 
   private renderTitle = (dataViewMethod: DataViewInstance) => {
-    const addRow = () => dataViewMethod.addRow?.('start');
+    const addRow = () => {
+      //debugger
+      //dataViewMethod.addRow?.('start');
+    }
     return html` <affine-database-title
       style="overflow: hidden"
       .titleText="${this.model.title}"

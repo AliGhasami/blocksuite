@@ -53,20 +53,24 @@ export class MenuInput extends MenuFocusable {
 
   private onInput = (e: InputEvent) => {
     e.stopPropagation();
+    this.complete();
     if (e.isComposing) return;
     this.data.onChange?.(this.inputRef.value);
   };
 
   private onKeydown = (e: KeyboardEvent) => {
     e.stopPropagation();
+    //this.complete();
     if (e.isComposing) return;
     if (e.key === 'Escape') {
       this.complete();
       this.inputRef.blur();
       this.menu.focusTo(this);
+      //this.complete();
       return;
     }
     if (e.key === 'Enter') {
+      //debugger
       this.complete();
       this.menu.close();
       return;
