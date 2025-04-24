@@ -448,7 +448,7 @@ export const actionsMenu: MahdaadActionMenu[] = [
         .chain()
         .updateBlockType({
           flavour:'affine:mahdaad-table-of-content',
-          props: {  },
+          props: {},
         })
         .run();
         setTimeout(()=>{

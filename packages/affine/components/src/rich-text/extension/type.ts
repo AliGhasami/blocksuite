@@ -43,7 +43,7 @@ export interface AffineTextAttributes {
   } | null;
   mahdaadObjectLink?: {
     object_id: string;
-    link_id: string | number | undefined;
+    link_id: string | number | undefined | null;
     type: string;
     meta?:Record<string, string | null | number> | undefined
   } | null;

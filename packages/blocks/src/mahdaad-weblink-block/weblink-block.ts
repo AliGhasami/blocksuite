@@ -15,7 +15,7 @@ import { getBlockName } from "../../../../../components/BoardBlockEditor/utils.j
 export class MahdaadWeblinkBlockComponent extends CaptionedBlockComponent<MahdaadWeblinkBlockModel> {
 
   changeViewMode(event: CustomEvent) {
-    const mode = event.detail;
+    const mode = event.detail[0];
     if (mode == 'inline') {
       const { doc } = this.model;
       const parent = doc.getParent(this.model);

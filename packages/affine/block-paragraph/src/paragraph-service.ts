@@ -46,12 +46,12 @@ export class ParagraphBlockService extends BlockService {
     }
 
     const placeholders = {
-      h1: 'Heading 1',
-      h2: 'Heading 2',
-      h3: 'Heading 3',
-      h4: 'Heading 4',
-      h5: 'Heading 5',
-      h6: 'Heading 6',
+      h1: t('heading_1'),
+      h2: t('heading_2'),
+      h3: t('heading_3'),
+      h4: t('heading_4'),
+      h5: t('heading_5'),
+      h6: t('heading_6'),
       //quote: '',
     };
     return placeholders[model.type];

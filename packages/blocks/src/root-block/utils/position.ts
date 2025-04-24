@@ -26,13 +26,30 @@ export function calcSafeCoordinate({
   offsetX = 0,
   offsetY = 0,
   edgeGap = 20,
-}: CollisionBox) {
-  const safeX = clamp(
-    positioningPoint.x + offsetX,
-    edgeGap,
-    boundaryRect.width - objRect.width - edgeGap
-  );
+  direction = 'ltr'
+}: CollisionBox & { direction?: 'rtl' | 'ltr' }) {
+  const width = objRect?.width ?? 0;
+  
+  let x = positioningPoint.x + offsetX;
   const y = positioningPoint.y + offsetY;
+
+  // محاسبه محدودیت‌های افقی با توجه به RTL/LTR
+  if (direction === 'rtl') {
+    // در RTL، از سمت راست چک می‌کنیم
+    if (x < boundaryRect.left) {
+      x = boundaryRect.left;
+    } else if (x + width > boundaryRect.right) {
+      x = boundaryRect.right - width;
+    }
+  } else {
+    // در LTR، از سمت چپ چک می‌کنیم
+    if (x + width > boundaryRect.right) {
+      x = boundaryRect.right - width;
+    } else if (x < boundaryRect.left) {
+      x = boundaryRect.left;
+    }
+  }
+
   // Not use clamp for y coordinate to avoid the quick bar always showing after scrolling
   // const safeY = clamp(
   //   positioningPoint.y + offsetY,
@@ -40,7 +57,7 @@ export function calcSafeCoordinate({
   //   boundaryRect.height - objRect.height - edgeGap
   // );
   return {
-    x: safeX,
+    x,
     y,
   };
 }
@@ -79,14 +96,15 @@ export function getPopperPosition(
   reference: {
     getBoundingClientRect: () => DOMRect;
   },
-  { gap = 12, offsetY = 5 }: { gap?: number; offsetY?: number } = {}
+  { gap = 12, offsetY = 5 }: { gap?: number; offsetY?: number } = {},
+  direction: 'rtl' | 'ltr' = 'ltr'
 ) {
   if (!popper) {
-    // foolproof, someone may use element with non-null assertion
     console.warn(
       'The popper element is not exist. Popper position maybe incorrect'
     );
   }
+  
   const { placement, height } = compareTopAndBottomSpace(
     reference,
     document.body,
@@ -94,22 +112,26 @@ export function getPopperPosition(
   );
 
   const referenceRect = reference.getBoundingClientRect();
+  const popperRect = popper?.getBoundingClientRect();
+  
+  // تغییر محاسبه نقطه موقعیت با توجه به RTL/LTR
   const positioningPoint = {
-    x: referenceRect.x,
+    // در حالت RTL، از سمت راست محاسبه می‌کنیم
+    x: direction === 'rtl' 
+      ? referenceRect.right - (popperRect?.width ?? 0)
+      : referenceRect.x,
     y: referenceRect.y + (placement === 'bottom' ? referenceRect.height : 0),
   };
 
-  // TODO maybe use the editor container as the boundary rect to avoid the format bar being covered by other elements
   const boundaryRect = document.body.getBoundingClientRect();
-  // Note: the popperRect.height maybe incorrect
-  // because we are calculated its correct height
-  const popperRect = popper?.getBoundingClientRect();
 
+  // اضافه کردن محدودیت‌های RTL به calcSafeCoordinate
   const safeCoordinate = calcSafeCoordinate({
     positioningPoint,
     objRect: popperRect,
     boundaryRect,
     offsetY: placement === 'bottom' ? offsetY : -offsetY,
+    direction, // اضافه کردن direction به پارامترها
   });
 
   return {
@@ -122,10 +144,10 @@ export function getPopperPosition(
      */
     height,
     x: `${safeCoordinate.x}px`,
-    y:
-      placement === 'bottom'
-        ? `${safeCoordinate.y}px`
-        : // We need to use `calc(-100%)` since the height of popper maybe incorrect
-          `calc(${safeCoordinate.y}px - 100%)`,
+    y: placement === 'bottom'
+      ? `${safeCoordinate.y}px`
+      : `calc(${safeCoordinate.y}px - 100%)`,
+    // اضافه کردن direction به خروجی برای استفاده در کامپوننت
+    direction,
   };
 }

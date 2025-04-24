@@ -13,7 +13,7 @@ export type MultiColumnProps = {
 export const MahdaadTableOfContentBlockSchema = defineBlockSchema({
   flavour: 'affine:mahdaad-table-of-content',
   props: () => ({
-    dir:'ltr',
+    dir:null,
     data: [],
     //sizes:[]
     // type:'info',

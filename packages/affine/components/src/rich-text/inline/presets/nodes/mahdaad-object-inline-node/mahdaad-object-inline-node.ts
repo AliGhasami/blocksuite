@@ -57,7 +57,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
   }
 
   _convertLink(event: CustomEvent) {
-    const data = event.detail;
+    const data = event.detail[0];
     this.inlineEditor.insertText(this.selfInlineRange, data.title, {
       link: data.url,
       reference: null,
@@ -89,7 +89,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
   }*/
 
   changeViewMode(event: CustomEvent) {
-    const mode = event.detail;
+    const mode = event.detail[0];
 
     if (mode == 'inline') return;
 

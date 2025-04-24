@@ -23,6 +23,7 @@ import type { SlashMenuContext } from "../slash-menu/config.js";
 //import { SlashMenu } from './slash-menu-popover.js';
 import type { InnerSlashMenuContext } from '../slash-menu/mahdaad-slash-menu-popover.js';
 
+import { getDirection } from "../../../../../../../components/BoardBlockEditor/utils.js";
 //import { isRootComponent } from '../../utils/guard.js';
 import { getPopperPosition } from '../../utils/position.js';
 import { defaultMahdaadMentionMenuConfig } from './config.js';
@@ -80,7 +81,7 @@ export const showMentionMenu = debounce(
         menuElement,
         'You should render the slash menu node even if no position'
       );
-      const position = getPopperPosition(menuElement, range);
+      const position = getPopperPosition(menuElement, range,{},getDirection());
       menu.updatePosition(position);
     }, 10);
 

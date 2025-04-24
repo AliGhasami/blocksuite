@@ -23,8 +23,8 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
         this.doc.updateBlock(this.model, { dir: 'rtl'})
         break
       case 'left_to_right':
-        delete this.model.dir
-        this.doc.updateBlock(this.model, { })
+        //delete this.model.dir
+        this.doc.updateBlock(this.model, { dir: 'ltr'})
         break
     }
   }
@@ -78,9 +78,9 @@ export class MahdaadTableOfContentBlockComponent extends CaptionedBlockComponent
   }
 
 
-  setDirection(event: CustomEvent) {
+  /*setDirection(event: CustomEvent) {
     this.doc.updateBlock(this.model, {dir:event.detail});
-  }
+  }*/
 
   @state()
   accessor list: any[] = [];

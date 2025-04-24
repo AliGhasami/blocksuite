@@ -1,10 +1,13 @@
+import en from '../../../../../../locales/en/block_editor'
+import fa from '../../../../../../locales/fa/block_editor'
 export default {
   en: {
     translation: {
       typing_placeholder: 'Start typing or Press',
       for_block_types : 'for block types',
       quote_placeholder: 'Start typing a quote',
-      start_typing:'Start typing'
+      start_typing:'Start typing',
+        ...en
       /*text:'Text',
       normal_text:'Normal Text',
       basic:'Basic',
@@ -51,7 +54,8 @@ export default {
       typing_placeholder: 'شروع به تایپ کنید یا دکمه',
       quote_placeholder: 'شروع به تایپ یک نقل قول کنید',
       for_block_types : 'برای انتخاب بلاک بزنید',
-      start_typing:'شروع به تایپ کنید'
+      start_typing:'شروع به تایپ کنید',
+      ...fa
       /*text:'text',
       normal_text:'متن Normal',
       basic:'Basic',

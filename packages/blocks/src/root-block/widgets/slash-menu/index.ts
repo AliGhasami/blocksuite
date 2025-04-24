@@ -21,6 +21,7 @@ import { InlineEditor } from '@blocksuite/inline';
 
 import type { RootBlockComponent } from '../../types.js';
 
+import { getDirection } from "../../../../../../../components/BoardBlockEditor/utils.js";
 import { getPopperPosition } from '../../utils/position.js';
 import { AffineMahdaadObjectPickerWidget } from "../mahdaad-object-picker/index.js";
 import {
@@ -33,7 +34,6 @@ import {
   type SlashMenuStaticConfig,
   type SlashSubMenu,
 } from './config.js';
-
 //import { SlashMenu } from './slash-menu-popover.js';
 import {
   SlashMenu,
@@ -94,7 +94,7 @@ const showSlashMenu = debounce(
         slashMenuElement,
         'You should render the slash menu node even if no position'
       );
-      const position = getPopperPosition(slashMenuElement, curRange);
+      const position = getPopperPosition(slashMenuElement, curRange,{},getDirection());
       slashMenu.updatePosition(position);
     }, 10);
 
