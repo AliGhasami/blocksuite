@@ -78,7 +78,7 @@ export class WebSocketDocSource implements DocSource {
     private initDoc: () => {}
     //private status: boolean
   ) {
-    console.log("constructor");
+    //console.log("constructor");
     this.ws.addEventListener('message', this._onMessage);
     this.docId = docId;
     //console.log('this is initttttttttttttttttt');

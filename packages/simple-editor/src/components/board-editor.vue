@@ -48,7 +48,7 @@ import Dexie from 'dexie'
 import {
   BroadcastChannelAwarenessSource,
   BroadcastChannelDocSource,
-  DEFAULT_DB_NAME,
+  //DEFAULT_DB_NAME,
   IndexedDBDocSource
 } from '@blocksuite/sync'
 import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
@@ -61,11 +61,15 @@ import { getExampleSpecs } from '@blocksuite/playground/apps/default/specs-examp
 import type { ExtensionType } from '@blocksuite/block-std'
 import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
 import { getHeadingBlocksFromDoc } from './helpers/global.js';
-import { nothing } from 'lit';
+import { useWebSocket } from '@vueuse/core'
 
 if (!window.$blockEditor) {
   window.$blockEditor = {}
 }
+if (!Object.hasOwn(window.$blockEditor, 'wsMap')) {
+  Object.assign(window.$blockEditor, { wsMap: new Map() })
+}
+
 
 if (!window.$blockEditor.is_loaded_custom_elements) {
   blocksEffects()
@@ -79,6 +83,7 @@ const editorElement = ref<EdgelessEditor | PageEditor | null>(null)
 const isEmpty = ref<boolean>(false)
 let myCollection: DocCollection | null = null
 const stopEvent = ref<boolean>(false)
+const status=ref<string>('')
 interface Props {
   isBoardView?: boolean
   //mentionUserList?: any[]
@@ -272,9 +277,7 @@ function handleHeadingList(doc:Doc) {
 }
 
 function bindEvent(doc: Doc) {
-  //return
   doc.slots.blockUpdated.on((data) => {
-    //console.log('this is event', data)
     if (stopEvent.value) {
       return
     }
@@ -499,9 +502,7 @@ async function setData(data: any, clear_history?: boolean = true) {
       })
       const notes: BlockModel[] = doc.getBlocksByFlavour('affine:note')
       let index = 1
-      //doc.load()
       if (notes.length > 0) {
-        // console.log('11111', notes[0])
         notes[0].model.children.forEach((item) => {
           doc.deleteBlock(item)
         })
@@ -513,47 +514,25 @@ async function setData(data: any, clear_history?: boolean = true) {
            const targetIndex =
              parent.children.findIndex(({ id }) => id === this.model.id) ?? 0;
            let insertIndex = targetIndex + 1; //place === 'before' ? targetIndex :
-
          }*/
       }
     }
-    //const doc = this.model.doc;
   }
-  //old method (before collabration)
-  /*if (myCollection) {
-    if (props.isBoardView) {
-      editorElement.value = new EdgelessEditor()
-    } else {
-      editorElement.value = new PageEditor()
-    }
-    const job = new Job({ collection: myCollection, middlewares: [replaceIdMiddleware] })
-    const new_doc = await job.snapshotToDoc(data)
-    bindEvent(new_doc)
-    editorElement.value.doc = new_doc
-    currentDocument.value = new_doc
-    checkIsEmpty()
-    if (clear_history) {
-      new_doc?.resetHistory()
-    }
-    appendTODOM(editorElement.value)
-    checkNotEmptyDocBlock(currentDocument.value)
-    checkReadOnly()
-  }*/
 }
-
-/**
- * @deprecated
- */
-/*
-function reset() {
-  //debugger
-  //init()
-}
-*/
 
 const edgelessId = computed(() => {
   return `edgeless_${props.objectId}`
 })
+
+const webSocketURL=computed(()=>{
+  //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
+  //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
+  //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
+  //'ws://localhost:8080'
+  // 'wss://sence.misdc.com'
+  return `${ props.websocketUrl}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
+})
+
 
 function patchPageRootSpec(spec: ExtensionType[]) {
   const setEditorModeCallBack = editorElement.value.switchEditor.bind(editorElement.value)
@@ -616,108 +595,18 @@ async function init() {
     enable_color_picker: true
     // ...flags,
   }
-  //debugger
-  //console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]");
-  /* await new Promise((resolve, reject) => {
-     setTimeout(() => {
-       resolve(true)
-     }, 1000)
-   })*/
-  //if(!props.objectId) return
-  //const BASE_WEBSOCKET_URL = 'wss://blocksuite-playground.toeverything.workers.dev'
-  //const BASE_WEBSOCKET_URL = 'wss://collab.claytap.com'
-  //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
-  /********************/
-  if (props.objectId) {
+  /** comment for save data  in indexDb*/
+  /*if (props.objectId) {
     console.log('==>has object id', props.objectId)
     try {
       console.log('==>run delete cord with id ', props.objectId)
       await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, 'collection', props.objectId)
-      console.log('==>run delete edgeless', edgelessId.value)
-      await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, 'collection', edgelessId.value)
+     console.log('==>run delete edgeless', edgelessId.value)
+     await deleteRecordFromUnknownSchema(DEFAULT_DB_NAME, 'collection', edgelessId.value)
     } catch (e) {
       console.log('==>error in remove recode object and edgless from collection', e)
     }
-    /*const deleteRecord=async (dbName, storeName, keyToDelete)=> {
-      try {
-        // Open the IndexedDB database
-        const db = await openDB(dbName);
-        // Start a transaction
-        const transaction = db.transaction(storeName, 'readwrite');
-        const objectStore = transaction.objectStore(storeName);
-        // Delete the record
-        await objectStore.delete(keyToDelete);
-        console.log('Record deleted successfully.');
-        // Complete the transaction
-        await transaction.complete;
-        console.log('Transaction completed.');
-        //resolve(true)
-      } catch (error) {
-        console.error('Error deleting record:', error);
-        //resolve(true)
-      }
-
-       /!* return new Promise(async (resolve, reject) => {
-
-        })*!/
-    }
-
-    const openDB=async (dbName)=> {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName);
-
-        request.onsuccess = (event) => resolve(event.target.result);
-        request.onerror = (event) => reject(event.target.error);
-      });
-    }
-
-
-   try {
-      await deleteRecord(DEFAULT_DB_NAME,'collection',props.objectId)
-    }catch (e) {
-      console.log("can not delete record");
-    }*/
-
-    /* const request = indexedDB.open(DEFAULT_DB_NAME, dbVersion);
-     request.onsuccess = function (event) {
-       const db = event.target.result;
-
-       // Start a transaction
-       const transaction = db.transaction('collection', 'readwrite');
-       const objectStore = transaction.objectStore('collection');
-
-       // Define the key of the record you want to delete
-       const keyToDelete = props.objectId; // Replace with the actual key
-
-       // Delete the record
-       const deleteRequest = objectStore.delete(keyToDelete);
-
-       deleteRequest.onsuccess = function () {
-         console.log('Record deleted successfully');
-       };
-
-       deleteRequest.onerror = function () {
-         console.error('Error deleting record:', deleteRequest.error);
-       };
-
-       transaction.oncomplete = function () {
-         console.log('Transaction completed.');
-       };
-
-       transaction.onerror = function (event) {
-         console.error('Transaction failed:', event.target.error);
-       };
-     };
-
-     request.onerror = function () {
-       console.error('Error opening database:', request.error);
-     };*/
-  }
-  /*******************/
-  if (!window.$blockEditor) {
-    window.$blockEditor = {}
-  }
-
+  }*/
   const schema = new Schema()
   schema.register(schemas.value)
   let editorData = props.data
@@ -732,9 +621,6 @@ async function init() {
     const doc = blockCollection.getDoc()
     assertExists(doc.ready, '==>Doc is not ready')
     assertExists(doc.root, '==>Doc root is not ready')
-    //const app = document.getElementById('app');
-    /* const app = refEditor.value;
-     if (!app) return;*/
     editorElement.value = new MahdaadEditorContainer()
     const specs = getExampleSpecs()
     const refNodeSlotsExtension = RefNodeSlotsExtension()
@@ -748,26 +634,17 @@ async function init() {
     ])
     if (props.isBoardView) {
       editorElement.value.mode = 'edgeless'
-      //editorElement.value = new EdgelessEditor()
-      /* editorElement.value.specs=patchPageRootSpec([
-        ...EdgelessEditorBlockSpecs,
-      ])*/
-      //console.log("1111",editorElement.value);
     } else {
       editorElement.value.mode = 'page'
-      //editorElement.value = new PageEditor()
     }
     console.log('==>doc for mount is', doc)
-    //myCollection.awarenessStore.awareness.setLocalStateField('user',{name:'ali ghasami'})
     myCollection.awarenessStore.awareness.setLocalStateField('user', {
       user_id: props.userId,
       color: props.userColor
     })
     currentDocument.value = doc
     editorElement.value.doc = doc
-
     checkIsEmpty()
-    //console.log('111111', doc.blockSize)
     //todo ali ghasami for remove after
     //const temp = await exportData(myCollection, [currentDocument.value])
     //console.log('this is snap shoot ', temp)
@@ -779,64 +656,43 @@ async function init() {
     stopEvent.value = false
     loading.value = false
   }
-
-  //console.log("this is object id",props.objectId);
   if (props.isCollaboration && props.objectId && props.websocketUrl) {
     console.log('==>is collaboration mode')
-    //console.log("100000",props.objectId);
-    //const objectId = props.objectId
-    //const edgelessId =
-    const BASE_WEBSOCKET_URL = props.websocketUrl //'ws://localhost:8080'  //'wss://sence.misdc.com'
     const idGenerator: IdGeneratorType = IdGeneratorType.NanoID
     let docSources: DocCollectionOptions['docSources'] = {
       main: new IndexedDBDocSource()
     }
     let awarenessSources: DocCollectionOptions['awarenessSources']
-    //old method
-    /*if (!window.$blockEditor ||
-      !window.$blockEditor.wss ||
-      (window.$blockEditor.wss && window.$blockEditor.wss.readyState === WebSocket.CLOSED)
-    ) {
-      //const {  data, send, open, close,ws,status } = useWebSocket(`${BASE_WEBSOCKET_URL}?r=${room}&u=${Math.ceil(Math.random()*50)}`)
-      if(!window.$blockEditor){
-        window.$blockEditor={}
-      }
-      window.$blockEditor.wss = new WebSocket(
-        `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
-      )
-    }
-    const web_socket: WebSocket = window.$blockEditor.wss*/
-    let web_socket!: WebSocket
-    if (!Object.hasOwn(window.$blockEditor, 'wsMap')) {
-      Object.assign(window.$blockEditor, { wsMap: new Map() })
-    }
-
     const wsMap: Map<string, any> = window.$blockEditor.wsMap
     if (
       !wsMap.has(props.objectId) ||
       (wsMap.has(props.objectId) &&
         wsMap.get(props.objectId).readyState != wsMap.get(props.objectId).OPEN)
     ) {
-      wsMap.set(
+      /*wsMap.set(
         props.objectId,
         new WebSocket(
-          `${BASE_WEBSOCKET_URL}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
+          webSocketURL.value
         )
+      )*/
+      const { status, data, send, open, close,ws } = useWebSocket(webSocketURL.value,{
+        autoReconnect: true,
+      })
+      wsMap.set(
+        props.objectId,
+        ws
       )
+
+
+
     }
-    web_socket = wsMap.get(props.objectId)
+    const web_socket = wsMap.get(props.objectId)
     console.log('==>this is list web socket is', window.$blockEditor.wsMap)
-    //console.log("this is ws map",);
     const initDoc = async () => {
       console.log('==>start initDoc function')
-      //exist:boolean
-      //console.log("this is exist",exist);
-      // const id=props.objectId
       console.log('==>before waitForSynced')
       await myCollection.waitForSynced()
       console.log('==>after waitForSynced')
-      //console.log("2000000",objectId,);
-      //console.log('start initttttt doc')
       console.log('==>find doc in collection', myCollection.getDoc(props.objectId))
       const shouldInit = !myCollection.getDoc(props.objectId)
       console.log('==>shouldInit', shouldInit)
@@ -845,7 +701,6 @@ async function init() {
         myCollection.meta.initialize()
         if (props.data) {
           //todo ali ghasami for inject data if has bug and client id in used
-          //Object.assign(temp,{})
           const job = new Job({ collection: myCollection, middlewares: [] }) //replaceIdMiddleware
           const doc = await job.snapshotToDoc(editorData)
           //const doc=await job.snapshotToDoc(props.data)
@@ -860,32 +715,16 @@ async function init() {
           const rootId = doc.addBlock('affine:page')
           doc.addBlock('affine:surface', {}, rootId)
           if (!props.isBoardView) {
-            //console.log("aaaaa");
             const noteId = doc.addBlock('affine:note', {}, rootId)
             doc.addBlock('affine:paragraph', {}, noteId)
-
             //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
             //doc.addBlock('affine:paragraph', {}, temp1)
           }
           doc.resetHistory()
         }
-        /*  if(!exist){
-            debugger
-          }else{
-
-          }*/
       } else {
-        // debugger
-        // wait for data injected from provider
-        /*const firstPageId =
-          myCollection.docs.size > 0
-            ? myCollection.docs.keys().next().value
-            : await new Promise<string>(resolve =>
-              myCollection.slots.docAdded.once(id => resolve(id))
-            );*/
         console.log('==>doc is exist and get from collection and load')
         const doc = myCollection.getDoc(props.objectId)
-        //console.log('this is original doc for set ', doc)
         assertExists(doc)
         doc.load()
         // wait for data injected from provider
@@ -894,7 +733,6 @@ async function init() {
         }
         doc.resetHistory()
       }
-
       await mountEditor()
     }
 
