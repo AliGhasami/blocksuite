@@ -83,7 +83,7 @@ const editorElement = ref<EdgelessEditor | PageEditor | null>(null)
 const isEmpty = ref<boolean>(false)
 let myCollection: DocCollection | null = null
 const stopEvent = ref<boolean>(false)
-const status=ref<string>('')
+const status=ref<'offline' | 'saving'|'synced' | null>(null)
 interface Props {
   isBoardView?: boolean
   //mentionUserList?: any[]
@@ -130,6 +130,7 @@ const props = withDefaults(defineProps<Props>(), {
   isCollaboration: false
 })
 const loading = ref(true)
+let webSocketDocSource = null
 const emit = defineEmits<{
   (e: 'change', val: IBlockChange): void
   (e: 'addBlock', val: IBlockChange): void
@@ -583,6 +584,52 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
   }
 }
 
+function getWebSocketInstance(){
+  const wsMap: Map<string, any> = window.$blockEditor.wsMap
+  if (
+    !wsMap.has(props.objectId) )
+    /*(wsMap.has(props.objectId)
+      //&& wsMap.get(props.objectId).ws &&
+      //wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
+  )*/ {
+    /*wsMap.set(
+      props.objectId,
+      new WebSocket(
+        webSocketURL.value
+      )
+    )*/
+    //console.log("create web socket");
+    const { status, data, send, open, close,ws } = useWebSocket(webSocketURL.value,{
+      autoReconnect: true,
+    })
+    wsMap.set(
+      props.objectId,
+      {ws:ws.value,close}
+    )
+    /* watch(status,()=>{
+       console.log("status",status);
+     })*/
+    watch(ws,()=>{
+      console.log("==> watch in ws",ws);
+      if(ws.value){
+        wsMap.set(
+          props.objectId,
+          {ws:ws.value,close}
+        )
+      }
+
+      /*if(webSocketDocSource){
+        webSocketDocSource.ws=ws.value
+      }*/
+      //myCollection?.docSync.shadows[0].
+    })
+
+  }
+  return wsMap.get(props.objectId).ws
+  //return null
+  //console.log("getWebSocketInstance",wsMap.get(props.objectId));
+}
+
 async function init() {
   loading.value = true
   stopEvent.value = true
@@ -663,30 +710,43 @@ async function init() {
       main: new IndexedDBDocSource()
     }
     let awarenessSources: DocCollectionOptions['awarenessSources']
-    const wsMap: Map<string, any> = window.$blockEditor.wsMap
-    if (
+    //const wsMap: Map<string, any> = window.$blockEditor.wsMap
+
+    /*if (
       !wsMap.has(props.objectId) ||
       (wsMap.has(props.objectId) &&
         wsMap.get(props.objectId).readyState != wsMap.get(props.objectId).OPEN)
     ) {
-      /*wsMap.set(
+      /!*wsMap.set(
         props.objectId,
         new WebSocket(
           webSocketURL.value
         )
-      )*/
+      )*!/
+      //console.log("create web socket");
       const { status, data, send, open, close,ws } = useWebSocket(webSocketURL.value,{
         autoReconnect: true,
       })
       wsMap.set(
         props.objectId,
-        ws
+        ws.value
       )
-
-
-
-    }
-    const web_socket = wsMap.get(props.objectId)
+     /!* watch(status,()=>{
+        console.log("status",status);
+      })*!/
+     watch(ws,()=>{
+       console.log("==> watch in ws",ws);
+       wsMap.set(
+         props.objectId,
+         ws.value
+       )
+       /!*if(webSocketDocSource){
+         webSocketDocSource.ws=ws.value
+       }*!/
+       //myCollection?.docSync.shadows[0].
+     })
+    }*/
+    //const web_socket = wsMap.get(props.objectId)
     console.log('==>this is list web socket is', window.$blockEditor.wsMap)
     const initDoc = async () => {
       console.log('==>start initDoc function')
@@ -735,7 +795,8 @@ async function init() {
       }
       await mountEditor()
     }
-
+    //console.log("original web socket",web_socket);
+    const web_socket= getWebSocketInstance()
     await new Promise((resolve, reject) => {
       if (web_socket.readyState === WebSocket.OPEN) resolve(true)
       web_socket.addEventListener('open', resolve)
@@ -745,9 +806,9 @@ async function init() {
         console.log('==>resolve websocket')
         docSources = {
           main: new IndexedDBDocSource(),
-          shadows: [new WebSocketDocSource(web_socket, props.objectId, initDoc)]
+          shadows: [new WebSocketDocSource(getWebSocketInstance, props.objectId, initDoc)]
         }
-        awarenessSources = [new WebSocketAwarenessSource(web_socket)]
+        awarenessSources = [new WebSocketAwarenessSource(getWebSocketInstance)]
       })
       .catch(() => {
         console.log('==>catch for open websocket and Broadcast channel')
@@ -823,13 +884,23 @@ function dispose(){
   }
 }
 
+function disconnectWebsocket(){
+  const wsMap: Map<string, any> = window.$blockEditor.wsMap
+  const socketRef= wsMap.get(props.objectId)
+  if (socketRef){
+    console.log("==>disconnect web socket",socketRef);
+    socketRef.close()
+    wsMap.delete(props.objectId)
+    //socketRef.close(1000)
+  }
+}
 
 onUnmounted(()=>{
   /*console.log("___collection",myCollection);
   console.log("___doc",currentDocument.value);
   console.log("___this is refEditor",refEditor.value);*/
   dispose()
-  //debugger
+  disconnectWebsocket()
 })
 
 

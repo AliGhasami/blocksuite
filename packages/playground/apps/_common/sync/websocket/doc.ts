@@ -72,17 +72,19 @@ export class WebSocketDocSource implements DocSource {
 
   name = 'websocket';
 
+  //ws!: WebSocket
+
   constructor(
-    readonly ws: WebSocket,
+    readonly ws: ()=> WebSocket,
     docId: string,
     private initDoc: () => {}
     //private status: boolean
   ) {
+    //this.ws=_ws
     //console.log("constructor");
-    this.ws.addEventListener('message', this._onMessage);
+    this.ws().addEventListener('message', this._onMessage);
     this.docId = docId;
-    //console.log('this is initttttttttttttttttt');
-    this.ws.send(
+    this.ws().send(
       JSON.stringify({
         channel: 'doc',
         payload: {
@@ -120,7 +122,7 @@ export class WebSocketDocSource implements DocSource {
     assertExists(latest);
     //console.log('777777', this.isInit);
     if (this.isInit) {
-      this.ws.send(
+      this.ws().send(
         JSON.stringify({
           channel: 'doc',
           payload: {
@@ -150,7 +152,7 @@ export class WebSocketDocSource implements DocSource {
   subscribe(cb: (docId: string, data: Uint8Array) => void) {
     //console.log("subscribe");
     const abortController = new AbortController();
-    this.ws.addEventListener(
+    this.ws().addEventListener(
       'message',
       (event: MessageEvent<string>) => {
         //console.log("subscribe  on message");

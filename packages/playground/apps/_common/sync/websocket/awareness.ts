@@ -23,7 +23,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
     assertExists(this.awareness);
     const update = encodeAwarenessUpdate(this.awareness, changedClients);
-    this.ws.send(
+    this.ws().send(
       JSON.stringify({
         channel: 'awareness',
         payload: {
@@ -54,7 +54,7 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
     if (type === 'connect') {
       assertExists(this.awareness);
-      this.ws.send(
+      this.ws().send(
         JSON.stringify({
           channel: 'awareness',
           payload: {
@@ -71,15 +71,15 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
   awareness: Awareness | null = null;
 
-  constructor(readonly ws: WebSocket) {}
+  constructor(readonly ws: ()=> WebSocket) {}
 
   connect(awareness: Awareness): void {
     //console.log('awareness connect');
     this.awareness = awareness;
     awareness.on('update', this._onAwareness);
 
-    this.ws.addEventListener('message', this._onWebSocket);
-    this.ws.send(
+    this.ws().addEventListener('message', this._onWebSocket);
+    this.ws().send(
       JSON.stringify({
         channel: 'awareness',
         payload: {
@@ -92,6 +92,6 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
   disconnect(): void {
     this.awareness?.off('update', this._onAwareness);
-    this.ws.close();
+    this.ws().close();
   }
 }
