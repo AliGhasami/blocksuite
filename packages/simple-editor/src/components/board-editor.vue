@@ -611,10 +611,9 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 
 function getWebSocketInstance(){
   const wsMap: Map<string, any> = window.$blockEditor.wsMap
-  if (
-    !wsMap.has(props.objectId) ||
-    (wsMap.has(props.objectId) && !wsMap.get(props.objectId).ws) // && wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
-    ){
+  const socketRef=wsMap.get(props.objectId)
+  if (!socketRef ||  !socketRef.ws || socketRef.ws.readyState!=socketRef.ws.OPEN){
+    ////(wsMap.has(props.objectId) && (!wsMap.get(props.objectId).ws  ||) ) // && wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
     //disconnectWebsocket()
     /*wsMap.set(
       props.objectId,
@@ -670,6 +669,7 @@ function getWebSocketInstance(){
 
 /** code Refactor  */
 async function init() {
+  //debugger
   loading.value = true
   stopEvent.value = true
   dispose()
