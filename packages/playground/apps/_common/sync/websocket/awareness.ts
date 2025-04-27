@@ -92,6 +92,10 @@ export class WebSocketAwarenessSource implements AwarenessSource {
 
   disconnect(): void {
     this.awareness?.off('update', this._onAwareness);
-    this.ws().close();
+    const socket=this.ws()
+    if(socket.readyState==socket.OPEN) {
+      socket.close();
+    }
+
   }
 }
