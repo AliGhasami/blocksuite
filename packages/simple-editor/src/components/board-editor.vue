@@ -184,9 +184,11 @@ const schemas = computed(() => {
 
 watch(
   () => props.objectId,
-  async () => {
+  async (newValue, oldValue) => {
+    disconnectWebsocket(oldValue)
     if (props.objectId) {
       console.log('==>this is object id in watch and call init function ', props.objectId)
+
       await init()
       if (currentDocument.value) {
         myCollection?.setDocMeta(currentDocument.value.id, { object_id: props.objectId })
@@ -608,11 +610,24 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
     console.error('==>Error deleting record:', error)
   }
 }
-
+let stopWatchWs : any=null
+let stopWatchStatus : any=null
+//todo refactor after
 function getWebSocketInstance(){
   const wsMap: Map<string, any> = window.$blockEditor.wsMap
   const socketRef=wsMap.get(props.objectId)
-  if (!socketRef ||  !socketRef.ws || socketRef.ws.readyState!=socketRef.ws.OPEN){
+  if (!socketRef ||  !socketRef.ws ||  [2,3].includes(socketRef.ws.readyState) ){
+    disconnectWebsocket(props.objectId)
+    debugger
+    if(stopWatchWs){
+      debugger
+      stopWatchWs.stop()
+    }
+    if(stopWatchStatus){
+      stopWatchStatus.stop()
+    }
+    //socketRef.ws.readyState!=socketRef.ws.OPEN
+    //debugger
     ////(wsMap.has(props.objectId) && (!wsMap.get(props.objectId).ws  ||) ) // && wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
     //disconnectWebsocket()
     /*wsMap.set(
@@ -636,31 +651,21 @@ function getWebSocketInstance(){
       props.objectId,
       {ws:ws.value,close}
     )
-    /* watch(status,()=>{
-       console.log("status",status);
-     })*/
-    watch(status,()=>{
+     stopWatchStatus= watch(status,()=>{
         if(['CLOSED','CONNECTING'].includes(status.value)){
           webSocketStatus.value='offline'
         }else{
           webSocketStatus.value=''
         }
-      //console.log("qqqqq",status);
-      //if(status.value==)
     })
-    watch(ws,()=>{
+     stopWatchWs = watch(ws,()=>{
       console.log("==> watch in ws",ws);
       if(ws.value){
         wsMap.set(
           props.objectId,
-          {ws:ws.value,close}
+          {ws:ws.value,close,}
         )
       }
-
-      /*if(webSocketDocSource){
-        webSocketDocSource.ws=ws.value
-      }*/
-      //myCollection?.docSync.shadows[0].
     })
 
   }
@@ -669,7 +674,6 @@ function getWebSocketInstance(){
 
 /** code Refactor  */
 async function init() {
-  //debugger
   loading.value = true
   stopEvent.value = true
   dispose()
@@ -923,13 +927,14 @@ function dispose(){
   }
 }
 
-function disconnectWebsocket(){
+function disconnectWebsocket(id:string){
+  console.log("11111",id);
   const wsMap: Map<string, any> = window.$blockEditor.wsMap
-  const socketRef= wsMap.get(props.objectId)
+  const socketRef= wsMap.get(id) //props.objectId
   if (socketRef){
     console.log("==>disconnect web socket",socketRef);
     socketRef.close()
-    wsMap.delete(props.objectId)
+    wsMap.delete(id) //props.objectId
     //socketRef.close(1000)
   }
 }
@@ -939,7 +944,7 @@ onUnmounted(()=>{
   console.log("___doc",currentDocument.value);
   console.log("___this is refEditor",refEditor.value);*/
   dispose()
-  disconnectWebsocket()
+  disconnectWebsocket(props.objectId)
 })
 
 
