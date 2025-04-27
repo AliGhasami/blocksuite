@@ -1,5 +1,6 @@
 <template>
   <div>
+<!--    {{ webSocketStatus }}-->
     <!--         <div class="flex-1 ps-6">
        <iframe id="myIframe" ></iframe>
      </div>-->
@@ -47,10 +48,10 @@ import { initLitI18n } from 'lit-i18n'
 import Dexie from 'dexie'
 import {
   BroadcastChannelAwarenessSource,
-  BroadcastChannelDocSource,
+  BroadcastChannelDocSource, DocEngineStep,
   //DEFAULT_DB_NAME,
   IndexedDBDocSource
-} from '@blocksuite/sync'
+} from "@blocksuite/sync";
 import { WebSocketDocSource } from '@blocksuite/playground/apps/_common/sync/websocket/doc'
 import { WebSocketAwarenessSource } from '@blocksuite/playground/apps/_common/sync/websocket/awareness'
 import { assertExists } from '@blocksuite/global/utils'
@@ -62,6 +63,7 @@ import type { ExtensionType } from '@blocksuite/block-std'
 import { mockDocModeService } from '@blocksuite/playground/apps/_common/mock-services'
 import { getHeadingBlocksFromDoc } from './helpers/global.js';
 import { useWebSocket } from '@vueuse/core'
+import { watchDebounced } from '@vueuse/core'
 
 if (!window.$blockEditor) {
   window.$blockEditor = {}
@@ -83,7 +85,8 @@ const editorElement = ref<EdgelessEditor | PageEditor | null>(null)
 const isEmpty = ref<boolean>(false)
 let myCollection: DocCollection | null = null
 const stopEvent = ref<boolean>(false)
-const status=ref<'offline' | 'saving'|'synced' | null>(null)
+const lastDocSyncStatus=ref<DocEngineStep | null>(null)
+const webSocketStatus=ref<'offline' | 'saving'|'synced' | null>(null)
 interface Props {
   isBoardView?: boolean
   //mentionUserList?: any[]
@@ -130,7 +133,7 @@ const props = withDefaults(defineProps<Props>(), {
   isCollaboration: false
 })
 const loading = ref(true)
-let webSocketDocSource = null
+//let webSocketDocSource = null
 const emit = defineEmits<{
   (e: 'change', val: IBlockChange): void
   (e: 'addBlock', val: IBlockChange): void
@@ -148,6 +151,25 @@ watch(
   },
   { immediate: true }
 )
+//'offline' | 'saving'|'synced
+watchDebounced(
+  lastDocSyncStatus,
+  () => {
+    if(webSocketStatus.value!='offline'){
+      if(lastDocSyncStatus.value==2){
+        webSocketStatus.value='synced'
+      }
+      if(lastDocSyncStatus.value==1){
+        webSocketStatus.value='saving'
+      }
+      setTimeout(()=>{
+        webSocketStatus.value=''
+      },1000)
+    }
+  },
+  { debounce: 1000,  },
+)
+
 
 i18next.use(initLitI18n).init({
   lng: props.locale ?? 'en',
@@ -173,10 +195,6 @@ watch(
   }
   //{ immediate: true }
 )
-
-/*watch(()=>{
-
-})*/
 
 watch(currentDocument, () => {
   if (props.objectId) {
@@ -302,6 +320,12 @@ function bindEvent(doc: Doc) {
     }
     if (data.type == 'update') emit('updateBlock', data)
   })
+
+  myCollection?.docSync.onStatusChange.on((s)=>{
+    //console.log("77777",s);
+    lastDocSyncStatus.value=s.step
+  })
+
 }
 
 function checkNotEmptyDocBlock(doc: Doc) {
@@ -478,7 +502,8 @@ defineExpose({
   doc: currentDocument,
   checkIsEmpty,
   editor: refEditor,
-  exportHTMLFromSnapshot
+  exportHTMLFromSnapshot,
+  webSocketStatus
   //collection:myCollection
 })
 
@@ -587,11 +612,10 @@ const deleteRecordFromUnknownSchema = async (dbName, tableName, recordKey) => {
 function getWebSocketInstance(){
   const wsMap: Map<string, any> = window.$blockEditor.wsMap
   if (
-    !wsMap.has(props.objectId) )
-    /*(wsMap.has(props.objectId)
-      //&& wsMap.get(props.objectId).ws &&
-      //wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
-  )*/ {
+    !wsMap.has(props.objectId) ||
+    (wsMap.has(props.objectId) && !wsMap.get(props.objectId).ws) // && wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
+    ){
+    //disconnectWebsocket()
     /*wsMap.set(
       props.objectId,
       new WebSocket(
@@ -600,7 +624,14 @@ function getWebSocketInstance(){
     )*/
     //console.log("create web socket");
     const { status, data, send, open, close,ws } = useWebSocket(webSocketURL.value,{
-      autoReconnect: true,
+      //autoReconnect: true,
+      autoReconnect: {
+        //retries: 3,
+        delay: 3000,
+        /*onFailed() {
+          alert('Failed to connect WebSocket after 3 retries')
+        },*/
+      },
     })
     wsMap.set(
       props.objectId,
@@ -609,6 +640,15 @@ function getWebSocketInstance(){
     /* watch(status,()=>{
        console.log("status",status);
      })*/
+    watch(status,()=>{
+        if(['CLOSED','CONNECTING'].includes(status.value)){
+          webSocketStatus.value='offline'
+        }else{
+          webSocketStatus.value=''
+        }
+      //console.log("qqqqq",status);
+      //if(status.value==)
+    })
     watch(ws,()=>{
       console.log("==> watch in ws",ws);
       if(ws.value){
@@ -626,10 +666,9 @@ function getWebSocketInstance(){
 
   }
   return wsMap.get(props.objectId).ws
-  //return null
-  //console.log("getWebSocketInstance",wsMap.get(props.objectId));
 }
 
+/** code Refactor  */
 async function init() {
   loading.value = true
   stopEvent.value = true

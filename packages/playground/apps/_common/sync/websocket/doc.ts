@@ -82,8 +82,12 @@ export class WebSocketDocSource implements DocSource {
   ) {
     //this.ws=_ws
     //console.log("constructor");
+    //const socket=
     this.ws().addEventListener('message', this._onMessage);
     this.docId = docId;
+    /*if(this.ws()) {
+
+    }*/
     this.ws().send(
       JSON.stringify({
         channel: 'doc',
