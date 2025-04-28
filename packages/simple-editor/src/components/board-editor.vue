@@ -618,9 +618,7 @@ function getWebSocketInstance(){
   const socketRef=wsMap.get(props.objectId)
   if (!socketRef ||  !socketRef.ws ||  [2,3].includes(socketRef.ws.readyState) ){
     disconnectWebsocket(props.objectId)
-    debugger
     if(stopWatchWs){
-      debugger
       stopWatchWs.stop()
     }
     if(stopWatchStatus){
