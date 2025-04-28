@@ -164,7 +164,6 @@ export class DatabaseBlockComponent extends CaptionedBlockComponent<
 
   private renderTitle = (dataViewMethod: DataViewInstance) => {
     const addRow = () => {
-      //debugger
       //dataViewMethod.addRow?.('start');
     }
     return html` <affine-database-title

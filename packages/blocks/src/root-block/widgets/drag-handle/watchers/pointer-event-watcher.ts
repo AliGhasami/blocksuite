@@ -238,7 +238,6 @@ export class PointerEventWatcher {
       }
     }
 
-    //debugger
     const state = ctx.get('pointerState');
     const { target } = state.raw;
     const element = captureEventTarget(target);

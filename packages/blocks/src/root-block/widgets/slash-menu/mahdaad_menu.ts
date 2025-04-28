@@ -1202,7 +1202,6 @@ function runCommand(
   //console.log('aa',aa);
   //const temp1=doc.addBlock('affine:mahdaad-callout', {}, noteId)
   //doc.addBlock('affine:paragraph', {}, temp1)
-  //debugger
 
   /* rootElement.host.std.command
     .chain()

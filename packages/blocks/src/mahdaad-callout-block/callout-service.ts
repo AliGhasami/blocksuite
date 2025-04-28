@@ -592,8 +592,7 @@ export const calloutDragHandleOption = DragHandleConfigExtension({
   flavour: MahdaadCalloutBlockSchema.model.flavour,
   edgeless:true,
   /*onDragStart:()=>{
-    //debugger
-    console.log("111111111111111111111111111111111111111111111111");
+
     return false
   },*/
   //edgeless: true,
@@ -604,7 +603,6 @@ export const calloutDragHandleOption = DragHandleConfigExtension({
     state,
     editorHost,
   }) => {
-    //debugger
     console.log("note onDragEnd");
     if (
       draggingElements.length !== 1 ||

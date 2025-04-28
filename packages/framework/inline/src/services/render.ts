@@ -32,7 +32,6 @@ export function cleanIllegalAttributes(deltas) {
     }
     console.log(' ===>', savedAttributes);
   });*/
-  //debugger;
   deltas.forEach(item => {
     if (
       item.insert != ' ' &&

@@ -250,7 +250,6 @@ export class PageRootBlockComponent extends BlockComponent<
             });
           });
         this.std.selection.setGroup('note', blocks);*/
-        //debugger
         this.selectAllBlock();
         return true;
       },

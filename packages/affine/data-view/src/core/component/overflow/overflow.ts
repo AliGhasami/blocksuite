@@ -52,7 +52,6 @@ export class Overflow extends SignalWatcher(WithDisposable(ShadowlessElement)) {
 
   protected doAdjustStyle() {
     console.log("doAdjustStyle");
-    //debugger
     const moreWidth = this.more.getBoundingClientRect().width;
     this.widthList[this.renderCount] = moreWidth;
 

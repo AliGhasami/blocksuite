@@ -625,7 +625,6 @@ function getWebSocketInstance(){
       stopWatchStatus.stop()
     }
     //socketRef.ws.readyState!=socketRef.ws.OPEN
-    //debugger
     ////(wsMap.has(props.objectId) && (!wsMap.get(props.objectId).ws  ||) ) // && wsMap.get(props.objectId).ws.readyState != wsMap.get(props.objectId).ws.OPEN)
     //disconnectWebsocket()
     /*wsMap.set(

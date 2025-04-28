@@ -142,7 +142,6 @@ export class Clipboard extends LifeCycleWatcher {
           workspaceId: doc.collection.id,
           pageId: doc.id,
         };
-        //debugger
         //console.log('this is result', payload);
         const result = await adapterInstance.toSlice(
           payload,
@@ -208,7 +207,6 @@ export class Clipboard extends LifeCycleWatcher {
     parent?: string,
     index?: number
   ) => {
-    //debugger
     const data = event.clipboardData;
     if (!data) return;
 

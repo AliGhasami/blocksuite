@@ -70,7 +70,6 @@ export class MenuInput extends MenuFocusable {
       return;
     }
     if (e.key === 'Enter') {
-      //debugger
       this.complete();
       this.menu.close();
       return;

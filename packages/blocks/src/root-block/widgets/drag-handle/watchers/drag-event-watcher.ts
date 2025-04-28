@@ -85,7 +85,6 @@ export class DragEventWatcher {
   };
 
   private _dragEndHandler: UIEventHandler = () => {
-  //  debugger
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     this.widget.applyBlockDropStyle(null)
     //console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
@@ -95,14 +94,12 @@ export class DragEventWatcher {
   };
 
   private _dragMoveHandler: UIEventHandler = ctx => {
-    //debugger
    // console.log("move _dragMoveHandler native",ctx);
     //return false
     //document.body.style.cursor = 'e-resize';
     //ctx.
     //return false
     //return
-    //debugger
 
     //window.allowDrop=false
 
@@ -143,7 +140,6 @@ export class DragEventWatcher {
    * When start dragging, should set dragging elements and create drag preview
    */
   private _dragStartHandler: UIEventHandler = ctx => {
-    //debugger
    /* setTimeout(()=>{
        debugger
     },3000)*/
@@ -169,7 +165,6 @@ export class DragEventWatcher {
   };
 
   private _dropHandler = (context: UIEventStateContext) => {
-   // debugger
    // console.log("_dropHandler",this.widget.selectionHelper.selectedBlockComponents);
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.remove(this.className))
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
@@ -224,7 +219,6 @@ export class DragEventWatcher {
 
     //console.log("~~ draggingElements",this.widget.draggingElements);
 
-    //debugger
 
     if (this.widget.draggingElements.length === 0) {
       const dragByBlock =
@@ -603,7 +597,6 @@ export class DragEventWatcher {
             this._trackLinkedDocCreated(first.id);
           }
         }
-        //debugger
         //snapshot.content.length >  1 &&
         //console.log("200000",this.widget.isVerticalIndicator);
         if(this.widget.isVerticalIndicator) {
@@ -644,11 +637,9 @@ export class DragEventWatcher {
             //if()
 
             if(isContainMultiColumn && target.model.children.length+this.widget.draggingElements[0].model.children.length<=4) {
-              //debugger
               const multiColumnBlock= this.widget.draggingElements[0]
               for (let i = 0; i < multiColumnBlock.model.children.length; i++) {
                 const res=addColumnToMultiColumn(this._std,target.model)
-                //debugger
                 if(res) {
                   this._std.doc.moveBlocks([...multiColumnBlock.model.children[i].children],res.children[res.children.length-1])
                 }
@@ -661,7 +652,6 @@ export class DragEventWatcher {
 
               this._std.doc.deleteBlock(multiColumnBlock.model)
               return null
-              //debugger
             }else{
               const res=addColumnToMultiColumn(this._std,target.model) //dropResult.modelState.model
               if(res) {
@@ -786,7 +776,6 @@ export class DragEventWatcher {
 
   watch() {
     this.widget.handleEvent('pointerDown', ctx => {
-     // debugger
       //return true
       //console.log("drag event pointerDown ");
       const state = ctx.get('pointerState');
@@ -802,7 +791,6 @@ export class DragEventWatcher {
     });
 
     this.widget.handleEvent('dragStart', ctx => {
-     // debugger
       //console.log("drag event drag start ");
       //console.log("this.widget.handleEvent('dragStart'");
       //return true

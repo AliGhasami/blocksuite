@@ -1,10 +1,11 @@
-//import { AffineSchemas } from '@blocksuite/blocks/schemas'
-import { type BlockSchema, DocCollection, type DocCollectionOptions, Schema, Text } from "@blocksuite/store";
 import type { z } from "zod";
-import { IndexedDBDocSource } from "@blocksuite/sync";
-import { WebSocketDocSource } from "@blocksuite/playground/apps/_common/sync/websocket/doc";
-import { WebSocketAwarenessSource } from "@blocksuite/playground/apps/_common/sync/websocket/awareness";
+
 import { assertExists } from "@blocksuite/global/utils";
+import { WebSocketAwarenessSource } from "@blocksuite/playground/apps/_common/sync/websocket/awareness";
+import { WebSocketDocSource } from "@blocksuite/playground/apps/_common/sync/websocket/doc";
+//import { AffineSchemas } from '@blocksuite/blocks/schemas'
+import { type BlockSchema, DocCollection, type DocCollectionOptions, Schema } from "@blocksuite/store";
+import { IndexedDBDocSource } from "@blocksuite/sync";
 export async function createEmptyDoc(isBoard: boolean = false,schemas: z.infer<typeof BlockSchema>[]=[]) {
   //console.log('AffineSchemas', AffineSchemas);
   //AffineSchemas
@@ -61,8 +62,7 @@ export async function createEmptyDoc(isBoard: boolean = false,schemas: z.infer<t
   //collection.
   console.log("this is collection",collection);
   let doc=null
-  if(collection.docs.size === 0){
-     // debugger
+  if(collection.docs.size === 0) {
    // collection.docs.size === 0
     collection.meta.initialize()
     doc = collection.createDoc({id:'page1'})

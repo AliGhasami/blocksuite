@@ -66,8 +66,6 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
 
   //todo ali ghasami for migrate to event bus
   addObjectLink(model: BlockModel, lnk: ObjectLink,deleteEmptyBlock: boolean= true) {
-    // console.log("bbbbb");
-    //debugger
     //return;
     if (!model.doc.getSchemaByFlavour('affine:mahdaad-object')) {
       return;
