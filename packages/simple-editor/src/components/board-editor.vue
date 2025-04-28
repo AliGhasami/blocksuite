@@ -926,7 +926,7 @@ function dispose(){
 }
 
 function disconnectWebsocket(id:string){
-  console.log("11111",id);
+  //console.log("11111",id);
   const wsMap: Map<string, any> = window.$blockEditor.wsMap
   const socketRef= wsMap.get(id) //props.objectId
   if (socketRef){

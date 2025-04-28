@@ -3,9 +3,7 @@ import type { TemplateResult } from 'lit';
 
 import {
   BoldIcon,
-  CodeIcon,
   ItalicIcon,
-  LinkIcon,
   StrikethroughIcon,
   UnderlineIcon,
 } from '../../icons/index.js';
@@ -84,7 +82,8 @@ export const textFormatConfigs: TextFormatConfig[] = [
       host.std.command.chain().toggleStrike().run();
     },
   },
-  {
+  /** disable for mahdaad */
+  /*{
     id: 'code',
     name: 'Code',
     icon: CodeIcon,
@@ -99,8 +98,9 @@ export const textFormatConfigs: TextFormatConfig[] = [
     action: host => {
       host.std.command.chain().toggleCode().run();
     },
-  },
-  {
+  },*/
+  /** disable for mahdaad */
+  /*{
     id: 'link',
     name: 'Link',
     icon: LinkIcon,
@@ -113,7 +113,8 @@ export const textFormatConfigs: TextFormatConfig[] = [
       return result;
     },
     action: host => {
+      return
       host.std.command.chain().toggleLink().run();
     },
-  },
+  },*/
 ];

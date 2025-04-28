@@ -31,9 +31,6 @@ export const ParagraphKeymapExtension = KeymapExtension(
         if (!model || !matchFlavours(model, ['affine:paragraph'])) return;
 
 
-
-
-
         // const { model, doc } = this;
         const event = ctx.get('keyboardState').raw;
         event.preventDefault();
