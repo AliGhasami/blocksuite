@@ -133,7 +133,6 @@ export class PageClipboard {
   };
 
   onPagePaste: UIEventHandler = ctx => {
-    //return
     //console.log("onPagePaste",ctx);
      const target= ctx.get('defaultState').event.target
     //console.log("this is target",target,this.host.contains(target));

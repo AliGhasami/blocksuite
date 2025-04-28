@@ -1,7 +1,6 @@
 import type { ExtensionType } from '@blocksuite/block-std';
 
 import { BlockSuiteError, ErrorCode } from '@blocksuite/global/exceptions';
-import { sha } from '@blocksuite/global/utils';
 import {
   type AssetsManager,
   BaseAdapter,
@@ -94,7 +93,7 @@ export class ImageAdapter extends BaseAdapter<Image> {
     payload: ImageToSliceSnapshotPayload
   ): Promise<SliceSnapshot | null> {
     const content: SliceSnapshot['content'] = [];
-    if(!window.$blockEditor.files){
+    if(!window.$blockEditor.files) {
       window.$blockEditor.files=[]
     }
     for (const item of payload.file) {
