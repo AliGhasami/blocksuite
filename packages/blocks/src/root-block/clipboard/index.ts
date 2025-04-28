@@ -135,7 +135,12 @@ export class PageClipboard {
   onPagePaste: UIEventHandler = ctx => {
     //debugger
     //return
-    //console.log("onPagePaste");
+    //console.log("onPagePaste",ctx);
+     const target= ctx.get('defaultState').event.target
+    //console.log("this is target",target,this.host.contains(target));
+     /** prevent other element paste for mahdaad */
+     if(!(target==this.host || this.host.contains(target)))
+       return
     const e = ctx.get('clipboardState').raw;
     e.preventDefault();
     this._std.doc.captureSync();
