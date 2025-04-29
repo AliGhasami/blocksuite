@@ -547,6 +547,11 @@ blockquote {
   color: rgb(var(--mt-blue-5));
   background: rgb(var(--mt-blue-0));
 }
+.mahdaad-object.file.xlsx .icon,
+.mahdaad-object-link-inline.file.xlsx .icon {
+  color: rgb(var(--mt-green-5));
+  background: rgb(var(--mt-green-0));
+}
 .mahdaad-object.image .icon,
 .mahdaad-object-link-inline.image .icon {
   color: var(--pta-blue-br);
