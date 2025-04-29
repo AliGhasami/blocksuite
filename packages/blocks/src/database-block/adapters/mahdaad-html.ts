@@ -194,7 +194,6 @@ export const mahdaadDatabaseBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             if (!cell && col.type !== 'title') {
               return createAstTableCell([{ type: 'text', value: '' }]);
             }
-            console.log("type",col.type);
             switch (col.type) {
               case 'rich-text':
                 return createAstTableCell(
@@ -229,7 +228,7 @@ export const mahdaadDatabaseBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
                     val =>
                       col.data.options.find(
                         (opt: Record<string, string>) => val === opt.id
-                      ).value ?? ''
+                      )?.value ?? ''
                   )
                   .filter(Boolean)
                   .join(',');
