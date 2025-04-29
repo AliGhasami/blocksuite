@@ -24,8 +24,8 @@ import {
 //import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 import type { IObjectType } from './type.js';
 
+import { getDirection } from "../../../../../../../components/BoardBlockEditor/utils.js";
 import { matchFlavours } from '../../../_common/utils/index.js';
-
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
   //getInlineEditorByModel,
@@ -104,7 +104,7 @@ export function showPopover({
       objectPickerPopOverElement,
       'You should render the object picker PopOver Element node even if no position'
     );
-    const position = getPopperPosition(objectPickerPopOverElement, range);
+    const position = getPopperPosition(objectPickerPopOverElement, range,{},getDirection());
     objectPicker.updatePosition(position);
   }, 10);
   disposables.addFromEvent(window, 'resize', updatePosition);

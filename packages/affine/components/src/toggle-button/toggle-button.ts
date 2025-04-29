@@ -4,6 +4,7 @@ import { css, unsafeCSS } from 'lit';
 import { property } from 'lit/decorators.js';
 import { html } from 'lit-html';
 
+import { getDirection } from "../../../../../../components/BoardBlockEditor/utils.js";
 import { toggleDown, toggleRight } from '../icons/list.js';
 
 export const TOGGLE_BUTTON_PARENT_CLASS = 'blocksuite-toggle-button-parent';
@@ -57,11 +58,17 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     }
   `;
 
+  get directionMode() {
+    if(this.direction==null)
+      return getDirection()
+    return this.direction
+  }
+
   override render() {
     const toggleDownTemplate = html`
       <div
         contenteditable="false"
-        class="toggle-icon ${this.direction=='rtl'? 'icon-down' : ''}"
+        class="toggle-icon ${this.directionMode=='rtl'? 'icon-down' : ''}"
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
         ${toggleDown}
@@ -71,7 +78,7 @@ export class ToggleButton extends WithDisposable(ShadowlessElement) {
     const toggleRightTemplate = html`
       <div
         contenteditable="false"
-        class="toggle-icon ${this.direction=='rtl'? 'icon-right' : ''}"
+        class="toggle-icon ${this.directionMode=='rtl'? 'icon-right' : ''}"
         data-collapsed=${this.collapsed}
         @click=${() => this.updateCollapsed(!this.collapsed)}
       >
