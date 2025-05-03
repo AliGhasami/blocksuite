@@ -558,7 +558,7 @@ const webSocketURL=computed(()=>{
   //const BASE_WEBSOCKET_URL = 'ws://localhost:8080'
   //'ws://localhost:8080'
   // 'wss://sence.misdc.com'
-  return `${ props.websocketUrl}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
+  return `${props.websocketUrl}?r=${props.objectId}&u=${Math.ceil(Math.random() * 50)}`
 })
 
 
