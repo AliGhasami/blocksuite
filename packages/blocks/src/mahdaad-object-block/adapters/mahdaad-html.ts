@@ -120,7 +120,7 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
                type: 'element',
                tagName: 'span',
                properties: {
-                 className: [`title line-clamp-1 card tag green`],
+                 className: [`title line-clamp-1 card tag ${object?.meta?.color ?? ''}`],
                },
                children: [
                  {

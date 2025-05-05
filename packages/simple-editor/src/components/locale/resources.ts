@@ -51,10 +51,10 @@ export default {
   },
   fa: {
     translation: {
-      typing_placeholder: 'شروع به تایپ کنید یا دکمه',
-      quote_placeholder: 'شروع به تایپ یک نقل قول کنید',
-      for_block_types : 'برای انتخاب بلاک بزنید',
-      start_typing:'شروع به تایپ کنید',
+      typing_placeholder: 'شروع به نوشتن کنید و برای استفاده از انواع بلاک‌ها',
+      quote_placeholder: 'شروع به نوشتن یک نقل قول کنید',
+      for_block_types : ' را تایپ کنید...',
+      start_typing:'شروع به نوشتن کنید',
       ...fa
       /*text:'text',
       normal_text:'متن Normal',

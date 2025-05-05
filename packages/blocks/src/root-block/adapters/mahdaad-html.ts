@@ -37,7 +37,7 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       const include_style : boolean=context.configs.get('mahdaad_config')?.include_style ?? false
 
       const lang : string | null=context.configs.get('mahdaad_config')?.lang ?? null
-
+      const title : string | null=context.configs.get('mahdaad_config')?.title ?? null
 
       walkerContext
         .openNode(
@@ -107,7 +107,21 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             children: [],
           },
           'children'
-        )
+        ).openNode({
+          type: 'element',
+          tagName: 'div',
+          properties: {
+            class:'page-title'
+            //style: 'width: 70vw; margin: 60px auto;',
+          },
+          children: [
+            {
+              type:'text',
+              value:title,
+            }
+          ],
+        },
+        'children').closeNode()
         /*.openNode(
           {
             type: 'element',
