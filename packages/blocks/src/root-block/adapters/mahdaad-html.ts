@@ -6,6 +6,7 @@ import {
 } from '@blocksuite/affine-shared/adapters';
 import { generateCSSVars } from '@mahdaad/tokens'
 
+import { getDirection } from '../../../../../../components/BoardBlockEditor/utils.js'
 import fa from './fa.css?raw'
 import mahdaadStyle from './mahdaad-style.css?raw'
 
@@ -35,7 +36,6 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
       }
 
       const include_style : boolean=context.configs.get('mahdaad_config')?.include_style ?? false
-
       const lang : string | null=context.configs.get('mahdaad_config')?.lang ?? null
       const title : string | null=context.configs.get('mahdaad_config')?.title ?? null
 
@@ -111,7 +111,8 @@ export const mahdaadRootBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
           type: 'element',
           tagName: 'div',
           properties: {
-            class:'page-title'
+            class:'page-title',
+            dir:getDirection()
             //style: 'width: 70vw; margin: 60px auto;',
           },
           children: [
