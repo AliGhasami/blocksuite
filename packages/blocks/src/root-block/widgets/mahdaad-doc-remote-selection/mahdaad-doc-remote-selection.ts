@@ -262,24 +262,130 @@ export class MahdaadDocRemoteSelectionWidget extends WidgetComponent {
     const remoteColorManager = this._remoteColorManager;
     assertExists(remoteColorManager);
 
-    console.log("aaaa",selections)
-    const group : BaseSelection[][]=[]
-    selections.forEach(item=>{
-      if(item.selections.length==1 && item.selections[0].type=='text') {
-          const first=item.selections[0]
-          group.forEach(i=>{
-            i.forEach(s=> {
-              if(s?.from && (s?.from?.blockId==first?.from?.blockId && s?.from?.index==first?.from?.index)) {
-                i.push(item)
-              }
-            })
+    // Group selections by blockId and first equal selection
+    const groupedSelections = selections.reduce((groups: Array<Array<any>>, item) => {
+      // Only process text selections
+      if (item.selections.length === 1 && item.selections[0].type === 'text') {
+        const currentSelection = item.selections[0];
+        
+        // Try to find an existing group with matching criteria
+        const existingGroup = groups.find(group => 
+          group.some(groupItem => {
+            const groupSelection = groupItem.selections[0];
+            return groupSelection?.from?.blockId === currentSelection.from?.blockId && 
+                   groupSelection?.from?.index === currentSelection.from?.index;
           })
-      }else{
-        group.push([item])
+        );
+
+        if (existingGroup) {
+          existingGroup.push(item);
+        } else {
+          groups.push([item]);
+        }
+      } else {
+        groups.push([item]);
       }
-    })
-    console.log("this is group",group)
-    /*const  temp= selections.filter(item=> item.)*/
+      return groups;
+    }, []);
+
+
+    const a=html`<div>
+      ${selections.flatMap(selection => {
+      const color = remoteColorManager.get(selection.id);
+      if (!color) return;
+      return selection.rects
+        .map(
+          r =>
+            html`<div
+                style="${selectionStyle(r, selection.user?.color ?? color)}"
+              ></div>`
+        )
+    })}
+    </div>`;
+
+    const b= html`<div>
+      ${groupedSelections.flatMap(g => {
+        const selection = g[0]
+        const color = remoteColorManager.get(selection.id);
+        if (!color) return;
+        const cursorRect = this._getCursorRect(selection.selections);
+
+        return  html`
+          <div
+            style="${cursorRect
+              ? cursorStyle(cursorRect, selection.user?.color ?? color)
+              : styleMap({
+                display: 'none',
+              })}"
+          >
+            <div
+              style="${styleMap({
+                position: 'relative',
+                height: '100%',
+              })}"
+            >
+              <div
+                style="${styleMap({
+                  userSelect: 'none',
+                  position: 'absolute',
+                  left: '-4px',
+                  bottom: `${
+                    cursorRect?.height ? cursorRect.height - 4 : 0
+                  }px`,
+                  //backgroundColor: selection.user?.color ?? color,
+                  color: 'white',
+                  maxWidth: '160px',
+                  padding: '0 3px',
+                  display:'flex',
+                  flexDirection:'column',
+                  gap:'2px'
+                  //border: '1px solid var(--affine-pure-black-20)',
+                  //boxShadow: '0px 1px 6px 0px rgba(0, 0, 0, 0.16)',
+                  //borderRadius: '4px',
+                  //fontSize: '12px',
+                  //lineHeight: '18px',
+                  //overflow: 'hidden',
+                  //textOverflow: 'ellipsis',
+                  //whiteSpace: 'nowrap',
+                  //display: selection.user ? 'block' : 'none',
+                })}"
+              >
+                ${g.map(gItem=>{
+                    return html`<div style="${styleMap({
+                      backgroundColor: gItem.user?.color ?? color,
+                      color: 'white',
+                      maxWidth: '160px',
+                      padding: '0 3px',
+                      border: '1px solid var(--affine-pure-black-20)',
+                      boxShadow: '0px 1px 6px 0px rgba(0, 0, 0, 0.16)',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      lineHeight: '18px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      display: selection.user ? 'block' : 'none',
+                    })}">
+                      <mahdaad-doc-selection-cursor
+                      user-id="${gItem.user?.user_id}"
+                    ></mahdaad-doc-selection-cursor> </div>`  
+                })}
+              </div>
+            </div>
+          </div>
+        `
+      })}
+    </div>`;
+
+
+
+
+    return html`<div>
+      ${a}
+      ${b}
+    </div>`
+
+    
     return html`<div>
       ${selections.flatMap(selection => {
         const color = remoteColorManager.get(selection.id);

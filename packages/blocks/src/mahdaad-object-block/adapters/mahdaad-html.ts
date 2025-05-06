@@ -5,6 +5,8 @@ import {
   HastUtils,
 } from '@blocksuite/affine-shared/adapters';
 
+import { getDirection } from '../../../../../../components/BoardBlockEditor/utils.js'
+
 
 function convertToFullUrl(inputString : string) {
   // Check if the input string starts with 'http' or 'www' to avoid duplication
@@ -65,7 +67,7 @@ export const mahdaadObjectBlockHtmlAdapterMatcher: BlockHtmlAdapterMatcher = {
             type: 'element',
             tagName: 'div',
             properties: {
-              dir: o.node.props.dir as string,
+              dir: o.node.props.dir ? o.node.props.dir as string : getDirection() ,
               className: [`mahdaad-block-container `,isEmbed ? 'mahdaad-object-embed' : `mahdaad-object ${o.node.props?.show_type} ${o.node.props?.type} ${object?.meta?.color ?? ''} ${object.object_type=='file' ? object.meta.type : ''} `],
             },
             children: [],
