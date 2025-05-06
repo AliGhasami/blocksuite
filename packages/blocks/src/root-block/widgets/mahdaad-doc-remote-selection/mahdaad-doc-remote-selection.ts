@@ -261,6 +261,25 @@ export class MahdaadDocRemoteSelectionWidget extends WidgetComponent {
 
     const remoteColorManager = this._remoteColorManager;
     assertExists(remoteColorManager);
+
+    console.log("aaaa",selections)
+    const group : BaseSelection[][]=[]
+    selections.forEach(item=>{
+      if(item.selections.length==1 && item.selections[0].type=='text') {
+          const first=item.selections[0]
+          group.forEach(i=>{
+            i.forEach(s=> {
+              if(s?.from && (s?.from?.blockId==first?.from?.blockId && s?.from?.index==first?.from?.index)) {
+                i.push(item)
+              }
+            })
+          })
+      }else{
+        group.push([item])
+      }
+    })
+    console.log("this is group",group)
+    /*const  temp= selections.filter(item=> item.)*/
     return html`<div>
       ${selections.flatMap(selection => {
         const color = remoteColorManager.get(selection.id);
