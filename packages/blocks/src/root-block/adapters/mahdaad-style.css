@@ -38,10 +38,8 @@ pre {
 }
 ul,
 ol {
-  padding-inline-start: 20px;
-}
-ul.todo-list {
-  padding-inline-start: 20px;
+  list-style-position: inside;
+  padding-left: 0;
 }
 ul.todo-list .todo-item {
   display: flex;
