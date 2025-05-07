@@ -154,6 +154,12 @@ export class SlashMenu extends WithDisposable(ShadowlessElement) {
       signal: this.abortController.signal,
       interceptor: (event, next) => {
         const { key, isComposing, code } = event;
+
+        if(key=='Escape') {
+          this.abortController.abort()
+          return
+        }
+
         if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'Enter') {
           return;
         }
