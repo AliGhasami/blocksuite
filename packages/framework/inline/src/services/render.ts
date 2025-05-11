@@ -49,6 +49,14 @@ export function cleanIllegalAttributes(deltas) {
 
 export class RenderService<TextAttributes extends BaseTextAttributes> {
   private _onYTextChange = (_: Y.YTextEvent, transaction: Y.Transaction) => {
+    /** for ignore input mahdaad date time */
+    this.forceInlineSyncStop=false
+    _.changes.delta.forEach(item=>{
+      if(!item.insert && item?.attributes && item.attributes.date) {
+        this.forceInlineSyncStop=true
+        console.log("this is force stop true")
+      }
+    })
     this.editor.slots.textChange.emit();
 
     const yText = this.editor.yText;
@@ -184,6 +192,7 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
 
     const matchDelta = this.getCurrentInlineRangeDelta;
     if (matchDelta?.attributes?.date) syncInlineRange = false;
+    if(this.forceInlineSyncStop)  syncInlineRange = false;
     if (syncInlineRange) {
       // We need to synchronize the selection immediately after rendering is completed,
       // otherwise there is a possibility of an error in the cursor position
@@ -243,4 +252,8 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
   };
 
   constructor(readonly editor: InlineEditor<TextAttributes>) {}
+
+
+  forceInlineSyncStop : boolean = false
+
 }
