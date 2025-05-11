@@ -24,7 +24,7 @@ import {
 //import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 import type { IObjectType } from './type.js';
 
-import { getDirection } from "../../../../../../../components/BoardBlockEditor/utils.js";
+import { getDirection, objectTriggerKey } from '../../../../../../../components/BoardBlockEditor/utils.js'
 import { matchFlavours } from '../../../_common/utils/index.js';
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
@@ -153,48 +153,56 @@ export const AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET =
 
 @customElement(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)
 export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
-  static DEFAULT_OPTIONS: Options = {
-    /**
-     * The first item of the trigger keys will be the primary key
-     */
-    triggerKeys: [
-      //'@',
-      //comment for support mention
-      //'@',
-    ],
-    triggerWords: [
-      {
-        word: '/File/',
-        type: 'file',
-      },
-      {
-        word: '/Page/',
-        type: 'document',
-      },
-      {
-        word: '/Image/',
-        type: 'image',
-      },
-      {
-        word: '/Weblink/',
-        type: 'weblink',
-      },
-      {
-        word: '/Tag/',
-        type: 'tag',
-      },
-      {
-        word: '/Template/',
-        type: 'template',
-      },
-    ],
-    ignoreBlockTypes: ['affine:code'],
-    /**
-     * Convert trigger key to primary key (the first item of the trigger keys)
-     */
-    convertTriggerKey: true,
-    //getMenus,
-  };
+  static DEFAULT_OPTIONS =():Options=> {
+   return {
+     /**
+      * The first item of the trigger keys will be the primary key
+      */
+     triggerKeys: [
+       //'@',
+       //comment for support mention
+       //'@',
+     ],
+     triggerWords: [
+       {
+         word: objectTriggerKey.value.file,
+         //word: '/File/',
+         type: 'file',
+       },
+       {
+         word: objectTriggerKey.value.page,
+         //word: '/Page/',
+         type: 'document',
+       },
+       {
+         word: objectTriggerKey.value.image,
+         //word: '/Image/',
+         type: 'image',
+       },
+       {
+         word: objectTriggerKey.value.weblink,
+         //word: '/Weblink/',
+         type: 'weblink',
+       },
+       {
+         word: objectTriggerKey.value.tag,
+         //word: '/Tag/',
+         type: 'tag',
+       },
+       {
+         word: objectTriggerKey.value.template,
+         //word: '/Template/',
+         type: 'template',
+       },
+     ],
+     ignoreBlockTypes: ['affine:code'],
+     /**
+      * Convert trigger key to primary key (the first item of the trigger keys)
+      */
+     convertTriggerKey: true,
+     //getMenus,
+   }
+  }
 
   private _onBeforeInput = (ctx: UIEventStateContext) => {
     //const eventState = ctx.get('defaultState');
@@ -274,7 +282,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     });*/
   };
 
-  options = AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS;
+  options =  AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS();
 
   showObjectPicker = (
     inlineEditor: AffineInlineEditor,

@@ -192,7 +192,7 @@ export class AffineSlashMenuWidget extends WidgetComponent {
         : '';
 
       if (text) {
-        for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS
+        for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS()
           .triggerWords) {
           if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
             closeSlashMenu();

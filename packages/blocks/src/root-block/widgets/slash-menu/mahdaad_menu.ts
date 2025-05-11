@@ -34,9 +34,9 @@ import type { IObjectType } from '../mahdaad-object-picker/type.js';
 //import link from './icons/link.svg?raw';
 import type { SlashMenuContext } from './config.js';
 
+import { objectTriggerKey } from '../../../../../../../components/BoardBlockEditor/utils.js'
 //import { REFERENCE_NODE } from '../../../_common/inline/presets/nodes/consts.js';
 import { closeMentionMenu, showMentionMenu } from '../mahdaad-mention/index.js';
-
 /*import accordion_h1 from './icons/accordion_h1.svg?raw';
 import accordion_h2 from './icons/accordion_h2.svg?raw';
 import accordion_h3 from './icons/accordion_h3.svg?raw';
@@ -395,7 +395,9 @@ export const actionsMenu: MahdaadActionMenu[] = [
     key: 'page',
     action: ({ rootComponent, model }) => {
       //rootComponent.doc.deleteBlock(model)
-      const triggerKey = '/page/';
+      //const triggerKey = '/page/';
+      //const triggerKey = getObjectTriggerKey('page');
+      const triggerKey = objectTriggerKey.value.page;
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'document');
     },
@@ -403,7 +405,9 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'file',
     action: ({ rootComponent, model }) => {
-      const triggerKey = '/file/';
+      //const triggerKey = '/file/';
+      //const triggerKey = getObjectTriggerKey('file');
+      const triggerKey = objectTriggerKey.value.file;
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'file');
     },
@@ -411,7 +415,9 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'weblink',
     action: ({ rootComponent, model }) => {
-      const triggerKey = '/weblink/';
+      //const triggerKey = '/weblink/';
+      //const triggerKey = getObjectTriggerKey('weblink');
+      const triggerKey = objectTriggerKey.value.weblink;
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'weblink');
     },
@@ -419,7 +425,9 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'tag',
     action: ({ rootComponent, model }) => {
-      const triggerKey = '/tag/';
+      //const triggerKey = '/tag/';
+      //const triggerKey = getObjectTriggerKey('tag');
+      const triggerKey =objectTriggerKey.value.tag;
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'tag');
     },
@@ -427,7 +435,9 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'template',
     action: ({ rootComponent, model }) => {
-      const triggerKey = '/template/';
+      //const triggerKey = '/template/';
+      //const triggerKey = getObjectTriggerKey('template');
+      const triggerKey = objectTriggerKey.value.template;
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'template');
     },
@@ -435,7 +445,9 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'image',
     action: ({ rootComponent, model }) => {
-      const triggerKey = '/image/';
+     //const triggerKey = '/image/';
+      //const triggerKey = getObjectTriggerKey('image');
+      const triggerKey = objectTriggerKey.value.image;
       insertContent(rootComponent.host, model, triggerKey);
       openObjectPicker(rootComponent, model, 'image');
     },
@@ -443,7 +455,6 @@ export const actionsMenu: MahdaadActionMenu[] = [
   {
     key: 'table_of_content',
     action: ({ rootComponent,model }) => {
-     
         const [result,{std,updatedBlocks}]= rootComponent.std.command
         .chain()
         .updateBlockType({

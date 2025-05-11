@@ -14,6 +14,7 @@ import { get } from 'lodash';
 import type { Options } from './index.js';
 import type { IObjectType } from './type.js';
 
+import { objectTriggerKey } from '../../../../../../../components/BoardBlockEditor/utils.js'
 //import '../../../_common/components/button.js';
 import {
   cleanSpecifiedTail,
@@ -127,22 +128,22 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
       let trigger = null;
       switch (this.obj_type) {
         case 'template':
-          trigger = '/template/';
+          trigger =  objectTriggerKey.value.template // '/template/';
           break;
         case 'document':
-          trigger = '/page/';
+          trigger =objectTriggerKey.value.page  //'/page/';
           break;
         case 'image':
-          trigger = '/image/';
+          trigger = objectTriggerKey.value.image //'/image/';
           break;
         case 'weblink':
-          trigger = '/weblink/';
+          trigger = objectTriggerKey.value.weblink //'/weblink/';
           break;
         case 'tag':
-          trigger = '/tag/';
+          trigger =objectTriggerKey.value.tag  //'/tag/';
           break;
         case 'file':
-          trigger = '/file/';
+          trigger = objectTriggerKey.value.file //'/file/';
           break;
       }
 
