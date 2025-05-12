@@ -24,7 +24,7 @@ import {
 //import { isControlledKeyboardEvent } from '../../../_common/utils/event.js';
 import type { IObjectType } from './type.js';
 
-import { getDirection, objectTriggerKey } from '../../../../../../../components/BoardBlockEditor/utils.js'
+import { getDirection, objectTriggerWords } from '../../../../../../../components/BoardBlockEditor/utils.js'
 import { matchFlavours } from '../../../_common/utils/index.js';
 //import { matchFlavours } from '../../../_common/utils/index.js';
 import {
@@ -39,7 +39,7 @@ import { MahdaadObjectPickerPopover } from './object-picker-popover.js';
 
 export type Options = {
   triggerKeys: string[];
-  triggerWords: { word: string; type: IObjectType }[];
+  triggerWords: { words: string[]; type: IObjectType }[];
   ignoreBlockTypes: BlockSuite.Flavour[];
   convertTriggerKey: boolean;
   /*getMenus: (ctx: {
@@ -153,56 +153,48 @@ export const AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET =
 
 @customElement(AFFINE_MAHDAAD_OBJECT_PICKER_WIDGET)
 export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
-  static DEFAULT_OPTIONS =():Options=> {
-   return {
-     /**
-      * The first item of the trigger keys will be the primary key
-      */
-     triggerKeys: [
-       //'@',
-       //comment for support mention
-       //'@',
-     ],
-     triggerWords: [
-       {
-         word: objectTriggerKey.value.file,
-         //word: '/File/',
-         type: 'file',
-       },
-       {
-         word: objectTriggerKey.value.page,
-         //word: '/Page/',
-         type: 'document',
-       },
-       {
-         word: objectTriggerKey.value.image,
-         //word: '/Image/',
-         type: 'image',
-       },
-       {
-         word: objectTriggerKey.value.weblink,
-         //word: '/Weblink/',
-         type: 'weblink',
-       },
-       {
-         word: objectTriggerKey.value.tag,
-         //word: '/Tag/',
-         type: 'tag',
-       },
-       {
-         word: objectTriggerKey.value.template,
-         //word: '/Template/',
-         type: 'template',
-       },
-     ],
-     ignoreBlockTypes: ['affine:code'],
-     /**
-      * Convert trigger key to primary key (the first item of the trigger keys)
-      */
-     convertTriggerKey: true,
-     //getMenus,
-   }
-  }
+  static DEFAULT_OPTIONS: Options = {
+    /**
+     * The first item of the trigger keys will be the primary key
+     */
+    triggerKeys: [
+      //'@',
+      //comment for support mention
+      //'@',
+    ],
+    triggerWords: [
+      {
+        words: objectTriggerWords.file,
+        type: 'file',
+      },
+      {
+        words: objectTriggerWords.page,
+        type: 'document',
+      },
+      {
+        words: objectTriggerWords.image,
+        type: 'image',
+      },
+      {
+        words: objectTriggerWords.weblink,
+        type: 'weblink',
+      },
+      {
+        words: objectTriggerWords.tag,
+        type: 'tag',
+      },
+      {
+        words: objectTriggerWords.template,
+        type: 'template',
+      },
+    ],
+    ignoreBlockTypes: ['affine:code'],
+    /**
+     * Convert trigger key to primary key (the first item of the trigger keys)
+     */
+    convertTriggerKey: true,
+    //getMenus,
+  };
 
   private _onBeforeInput = (ctx: UIEventStateContext) => {
     //const eventState = ctx.get('defaultState');
@@ -230,8 +222,12 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     if (text) {
       //const triggerWorkds = this.options.triggerWords.map(item => item.word);
       this.options.triggerWords.forEach(item => {
-        if (text.toLowerCase() == item.word.toLowerCase()) {
+        const temp=item.words.map(_=>_.toLowerCase())
+        //text.toLowerCase() == item.word.toLowerCase()
+        if (temp.includes(text.toLowerCase())) {
           //showPopover({})
+          const triggerKey= temp.find(key=>key==text.toLowerCase())
+          ?? ''
           //alert('11110');
           const curRange = getCurrentNativeRange();
           if (!curRange) return;
@@ -241,7 +237,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
             inlineEditor,
             range: curRange,
             options: this.options,
-            triggerKey: '',
+            triggerKey,
             obj_type: item.type,
             model,
           });
@@ -282,7 +278,7 @@ export class AffineMahdaadObjectPickerWidget extends WidgetComponent {
     });*/
   };
 
-  options =  AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS();
+  options = AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS;
 
   showObjectPicker = (
     inlineEditor: AffineInlineEditor,

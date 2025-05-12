@@ -12,6 +12,7 @@ import type { NoteBlockComponent } from '../../../../note-block/index.js';
 import type { EdgelessRootBlockComponent } from '../../../edgeless/index.js';
 import type { AffineDragHandleWidget } from '../drag-handle.js';
 
+import { isRTL } from '../../../../../../../../components/BoardBlockEditor/utils.js'
 import {
   DRAG_HANDLE_CONTAINER_WIDTH,
   DRAG_HANDLE_GRABBER_BORDER_RADIUS,
@@ -105,6 +106,7 @@ export class PointerEventWatcher {
 
   private _containerStyle = computed(() => {
     const draggingAreaRect = this.widget.draggingAreaRect.value;
+
     if (!draggingAreaRect) return null;
 
     const block = this.widget.anchorBlockComponent.value;
@@ -130,7 +132,8 @@ export class PointerEventWatcher {
       paddingTop: `${paddingTop}px`,
       paddingBottom: `${paddingBottom}px`,
       width: `${DRAG_HANDLE_CONTAINER_WIDTH * scaleInNote}px`,
-      left: `${draggingAreaRect.left}px`,
+      //left: `${draggingAreaRect.left}px`,
+      left: `${ isRTL() ?  draggingAreaRect.right : draggingAreaRect.left }px`,
       top: `${draggingAreaRect.top}px`,
       height: `${draggingAreaRect.height}px`,
     };

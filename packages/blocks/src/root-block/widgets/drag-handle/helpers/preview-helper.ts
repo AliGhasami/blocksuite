@@ -92,8 +92,7 @@ export class PreviewHelper {
       const previewTemplate = previewStd.render();
 
       const offset = this._calculatePreviewOffset(blocks, state);
-      //console.log("offfffff",offset, state);
-      const posX = state.raw.x - offset.x;
+      const posX =  offset.x; //state.raw.x -
       /** change for mahdaad  */
       const posY = 10 //state.raw.y - offset.y;
       //const altKey = state.raw.altKey;

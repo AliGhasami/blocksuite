@@ -396,60 +396,54 @@ export const actionsMenu: MahdaadActionMenu[] = [
     action: ({ rootComponent, model }) => {
       //rootComponent.doc.deleteBlock(model)
       //const triggerKey = '/page/';
-      //const triggerKey = getObjectTriggerKey('page');
       const triggerKey = objectTriggerKey.value.page;
       insertContent(rootComponent.host, model, triggerKey);
-      openObjectPicker(rootComponent, model, 'document');
+      openObjectPicker(rootComponent, model, 'document',triggerKey);
     },
   },
   {
     key: 'file',
     action: ({ rootComponent, model }) => {
       //const triggerKey = '/file/';
-      //const triggerKey = getObjectTriggerKey('file');
       const triggerKey = objectTriggerKey.value.file;
       insertContent(rootComponent.host, model, triggerKey);
-      openObjectPicker(rootComponent, model, 'file');
+      openObjectPicker(rootComponent, model, 'file',triggerKey);
     },
   },
   {
     key: 'weblink',
     action: ({ rootComponent, model }) => {
       //const triggerKey = '/weblink/';
-      //const triggerKey = getObjectTriggerKey('weblink');
       const triggerKey = objectTriggerKey.value.weblink;
       insertContent(rootComponent.host, model, triggerKey);
-      openObjectPicker(rootComponent, model, 'weblink');
+      openObjectPicker(rootComponent, model, 'weblink',triggerKey);
     },
   },
   {
     key: 'tag',
     action: ({ rootComponent, model }) => {
       //const triggerKey = '/tag/';
-      //const triggerKey = getObjectTriggerKey('tag');
       const triggerKey =objectTriggerKey.value.tag;
       insertContent(rootComponent.host, model, triggerKey);
-      openObjectPicker(rootComponent, model, 'tag');
+      openObjectPicker(rootComponent, model, 'tag',triggerKey);
     },
   },
   {
     key: 'template',
     action: ({ rootComponent, model }) => {
       //const triggerKey = '/template/';
-      //const triggerKey = getObjectTriggerKey('template');
       const triggerKey = objectTriggerKey.value.template;
       insertContent(rootComponent.host, model, triggerKey);
-      openObjectPicker(rootComponent, model, 'template');
+      openObjectPicker(rootComponent, model, 'template',triggerKey);
     },
   },
   {
     key: 'image',
     action: ({ rootComponent, model }) => {
      //const triggerKey = '/image/';
-      //const triggerKey = getObjectTriggerKey('image');
       const triggerKey = objectTriggerKey.value.image;
       insertContent(rootComponent.host, model, triggerKey);
-      openObjectPicker(rootComponent, model, 'image');
+      openObjectPicker(rootComponent, model, 'image',triggerKey);
     },
   },
   {
@@ -1137,7 +1131,8 @@ export const actionsMenu: MahdaadActionMenu[] = [
 function openObjectPicker(
   rootComponent: RootBlockComponent,
   model: BlockModel,
-  obj_type: IObjectType
+  obj_type: IObjectType,
+  triggerKey:string
 ) {
   //console.log('111', rootComponent.host);
   /*rootComponent.host.std.command
@@ -1172,7 +1167,7 @@ function openObjectPicker(
 
   return;*/
 
-  const triggerKey = 'templates/';
+  //const triggerKey = 'templates/';
   const widgetEle =
     // @ts-ignore
     rootComponent.widgetComponents['affine-mahdaad-object-picker-widget'];

@@ -143,7 +143,6 @@ export class DragEventWatcher {
    /* setTimeout(()=>{
        debugger
     },3000)*/
-    //console.log("this is ctx",ctx);
     const temp=ctx.get('defaultState')
     const img = new Image();
     img.src = "cursor-image.png"; // Replace with your image path

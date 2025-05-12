@@ -110,9 +110,9 @@ export const isOutOfNoteBlock = (
   editorHost: EditorHost,
   noteBlock: Element,
   point: Point,
-  scale: number
+  scale: number,
+  isRTL: boolean = false
 ) => {
-  // TODO: need to find a better way to check if the point is out of note block
   const rect = noteBlock.getBoundingClientRect();
   const insidePageEditor =
     editorHost.std.get(DocModeProvider).getEditorMode() === 'page';
@@ -120,16 +120,25 @@ export const isOutOfNoteBlock = (
     (NOTE_CONTAINER_PADDING +
       (insidePageEditor ? 0 : EDGELESS_NOTE_EXTRA_PADDING)) *
     scale;
-  return rect
-    ? insidePageEditor
-      ? point.y < rect.top ||
-        point.y > rect.bottom ||
-        point.x > rect.right + padding
-      : point.y < rect.top ||
-        point.y > rect.bottom ||
-        point.x < rect.left - padding ||
-        point.x > rect.right + padding
-    : true;
+
+  if (!rect) return true;
+
+  if (insidePageEditor) {
+    if (isRTL) {
+      return point.y < rect.top ||
+             point.y > rect.bottom ||
+             point.x < rect.left - padding;
+    }
+    return point.y < rect.top ||
+           point.y > rect.bottom ||
+           point.x > rect.right + padding;
+  }
+
+  // برای حالت غیر page editor
+  return point.y < rect.top ||
+         point.y > rect.bottom ||
+         point.x < rect.left - padding ||
+         point.x > rect.right + padding;
 };
 
 export const getClosestNoteBlock = (
@@ -391,6 +400,7 @@ export function isPointInElement(
 }
 
 
+//todo refactor
 export function isEndRight(
   point: { x: number; y: number },
   element: HTMLElement,
@@ -409,6 +419,28 @@ export function isEndRight(
   //console.log("this is rect 2",point.x > scaledRect.right);
   return (
     point.x > scaledRect.right
+  );
+}
+
+//todo refactor
+export function isEndLeft(
+  point: { x: number; y: number },
+  element: HTMLElement,
+  scale: number = 1
+): boolean {
+  // Get the element's bounding rectangle
+  const rect = element.getBoundingClientRect();
+  //console.log("this is rect",rect,point);
+  // Account for scaling if needed
+  const scaledRect = {
+    //left: rect.left * scale,
+    left: rect.left * scale,
+    //top: rect.top * scale,
+    //bottom: rect.bottom * scale
+  };
+  //console.log("this is rect 2",point.x > scaledRect.right);
+  return (
+    point.x < scaledRect.left
   );
 }
 

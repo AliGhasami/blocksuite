@@ -24,6 +24,7 @@ import {
 } from '@blocksuite/block-std';
 import { DisposableGroup, Point, Rect } from '@blocksuite/global/utils';
 import { computed, type ReadonlySignal, signal } from '@preact/signals-core';
+import { t } from 'i18next'
 import { html } from 'lit';
 import { query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -34,6 +35,7 @@ import type { DropIndicator } from './components/drop-indicator.js';
 import type { DropResult } from './config.js';
 import type { AFFINE_DRAG_HANDLE_WIDGET } from './consts.js';
 
+import { isRTL } from '../../../../../../../components/BoardBlockEditor/utils.js'
 import { checkParentIs, getParent } from '../../../_common/mahdaad/is.js';
 import { isTopLevelBlock } from '../../../root-block/edgeless/utils/query.js';
 import { autoScroll } from '../../../root-block/text-selection/utils.js';
@@ -47,10 +49,10 @@ import {
   containBlock,
   containChildBlock,
   getClosestBlockByPoint,
-  getClosestNoteBlock, isEndRight,
+  getClosestNoteBlock, isEndLeft, isEndRight,
   isOutOfNoteBlock, isPointInElement,
   updateDragHandleClassName,
-} from './utils.js';
+} from './utils.js'
 import { DragEventWatcher } from './watchers/drag-event-watcher.js';
 import { EdgelessWatcher } from './watchers/edgeless-watcher.js';
 import { HandleEventWatcher } from './watchers/handle-event-watcher.js';
@@ -226,9 +228,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       let { left, top } = dropResult.rect;
       left -= offsetParentRect.left;
       top -= offsetParentRect.top;
-
       const { width, height } = dropResult.rect;
-
       const rect = Rect.fromLWTH(left, width, top, height);
       result= rect
       //this.dropIndicator.rect = rect;
@@ -376,36 +376,8 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       point
     );
 
-    /*console.log("final",this.rootComponent,isPointInElement(point,this.rootComponent));
-    if() {
-      console.log("show vertical indicator");
-    }else{
-      console.log("hide vertical indicator");
-    }*/
-    //console.log("closestNoteBlock",closestNoteBlock);
-    //console.log("aaaaa",findClosestBlockComponent(this.rootComponent, point, 'affine-page-root'));
-    /*if(findClosestBlockComponent(rootComponent, point, 'affine-note')) {
-      console.log("1111111111");
-    }*/
-    //console.log("aaaa",isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek()));
-    /*if(closestNoteBlock) {
-      //console.log("ZZZZZZZZZZZZZZZZZZZZZZ");
-    }*/
-
-    //const b = getClosestBlockComponentByPoint(point) as BlockComponent;
-    //console.log("bbbbbbbb",b);
-    //console.log("aaaaaa",isOutOfNoteBlock(this.rootComponent, closestNoteBlock, point, this.scale.peek()))
-    //console.log("isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())",isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek()));
-    //return;
-    //console.log("11111",closestNoteBlock ? && );
-    /*if(closestNoteBlock){
-      console.log("33333",);
-    }*/
     this.applyBlockDropStyle(null)
-   /* console.log("closestNoteBlock",closestNoteBlock);
-    console.log("isPointInElement",isPointInElement(point,closestNoteBlock));
-    console.log("isEndRight(point,closestNoteBlock)",isEndRight(point,closestNoteBlock));
-    console.log("isPointInElement(point,this.rootComponent)",isPointInElement(point,this.rootComponent),this.rootComponent);*/
+
     let checkElement=  closestNoteBlock
     if(checkElement && checkParentIs(checkElement.model,MahdaadMultiColumnBlockSchema.model.flavour)) {
       const parent= getParent(checkElement?.model,MahdaadMultiColumnBlockSchema.model.flavour)
@@ -413,26 +385,21 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
         checkElement= this._getBlockView(parent.id)
       }
     }
-    //console.log("4444444",checkElement);
     this.isVerticalIndicator = !!(checkElement &&
-      (!isPointInElement(point,checkElement) &&  isPointInElement(point,this.rootComponent) && isEndRight(point,checkElement))
+      (!isPointInElement(point,checkElement) &&  isPointInElement(point,this.rootComponent) &&
+      isRTL() ? isEndLeft(point,checkElement) : isEndRight(point,checkElement))
     )
-    //console.log("11111",this.isVerticalIndicator);
     this.verticalIndicatorDropBlockId= null
-    //console.log("isEndRight(point,closestNoteBlock)",isEndRight(point,closestNoteBlock));
     if (
       !closestNoteBlock ||
-      isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek())
+      isOutOfNoteBlock(this.host, closestNoteBlock, point, this.scale.peek(),true)
     ) {
-       //this.applyBlockDropStyle(null)
-      /*if(this.lastBlockDropStyle) {
-        this.lastBlockDropStyle.classList.remove('active-drop')
-      }*/
-     //console.log("this is reset");
+      //console.log("this is reset")
       this._resetDropResult();
     } else {
       const dropResult = this._getDropResult(state,this.isVerticalIndicator);
       this._dropResult= dropResult
+      //console.log("this is drop resul",this._dropResult)
        // console.log("_dragMoveHandler dropResult",dropResult);
         /*if()
 
@@ -450,7 +417,7 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
               if(isContainMultiColumn) {
                 window.allowDrop=false
                 if(this.dragPreview) {
-                  this.dragPreview.tooltipMessage="You can not add columns inside another column block ."
+                  this.dragPreview.tooltipMessage=t('not_allow_drop_column_in_block_column') //"You can not add columns inside another column block ."
                 }
               }
               //const temp= getParent(target.model,)
@@ -471,12 +438,16 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
               }*/
             }else if(this.draggingElements.length==1) {
               if(target) {
-                const sourceLength= this.draggingElements[0].model.flavour==MahdaadMultiColumnBlockSchema.model.flavour ? this.draggingElements[0].model.children.length : 1
+                const sourceLength =
+                  this.draggingElements[0].model.flavour ==
+                  MahdaadMultiColumnBlockSchema.model.flavour
+                    ? this.draggingElements[0].model.children.length
+                    : 1;
                 const targetLength=target.model.flavour==MahdaadMultiColumnBlockSchema.model.flavour ?  target.model.children.length : 1
                 if(sourceLength+targetLength>4) {
                   window.allowDrop=false
                   if(this.dragPreview) {
-                    this.dragPreview.tooltipMessage="You can not add more than 4 columns."
+                    this.dragPreview.tooltipMessage= t('not_allow_more_column')//'You can not add more than 4 columns.'
                   }
                 }
               }
@@ -567,7 +538,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
       this.lastBlockDropStyle.classList.remove('active-drop-column')
     }
     if(blockId) {
-      //const activeClassName=
       let  temp= this._getBlockView(blockId)
       if(temp) {
           const isInsideMultiColumn=checkParentIs(temp.model,MahdaadMultiColumnBlockSchema.model.flavour)
@@ -576,7 +546,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
               const parent = getParent(temp.model,NoteBlockSchema.model.flavour)
               if(parent) {
                 temp= this._getBlockView(parent.id)
-                //console.log("idddddd",temp);
               }
             }
             this.lastBlockDropStyle = temp
@@ -585,7 +554,6 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
             }
           }
       }
-      //console.log("ttttttt",temp);
     }
   }
 

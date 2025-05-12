@@ -192,16 +192,15 @@ export class AffineSlashMenuWidget extends WidgetComponent {
         : '';
 
       if (text) {
-        for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS()
-          .triggerWords) {
-          if (text.toLowerCase().startsWith(item.word.toLowerCase())) {
+        for (const item of AffineMahdaadObjectPickerWidget.DEFAULT_OPTIONS.triggerWords) {
+          //text.toLowerCase().startsWith(item.word.toLowerCase())
+          const temp= item.words.map(_=> _.toLowerCase())
+          if (temp.includes(text.toLowerCase())) {
             closeSlashMenu();
             return;
           }
         }
       }
-
-
 
       const matchedKey = this.config.triggerKeys.find(triggerKey =>
         text.endsWith(triggerKey)

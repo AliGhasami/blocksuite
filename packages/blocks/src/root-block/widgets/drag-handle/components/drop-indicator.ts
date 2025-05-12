@@ -4,6 +4,8 @@ import { ShadowlessElement } from '@blocksuite/block-std';
 import { css, html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+
+import { isRTL } from '../../../../../../../../components/BoardBlockEditor/utils.js'
 /** convert  from  LitElement to ShadowlessElement for mahdaad */
 //LitElement
 export class DropIndicator extends ShadowlessElement {
@@ -49,7 +51,7 @@ export class DropIndicator extends ShadowlessElement {
         //width: `${height}px`,
         height: `${height}px`,
         top: `${top+5}px`,
-        left: `${left+width+5}px`,
+        left:isRTL() ?  `${left-10}px` : `${left+width+5}px`, //+width+5
         //'background-color':'yellow'
       });
     }

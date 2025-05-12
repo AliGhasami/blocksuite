@@ -14,7 +14,6 @@ import { get } from 'lodash';
 import type { Options } from './index.js';
 import type { IObjectType } from './type.js';
 
-import { objectTriggerKey } from '../../../../../../../components/BoardBlockEditor/utils.js'
 //import '../../../_common/components/button.js';
 import {
   cleanSpecifiedTail,
@@ -122,38 +121,9 @@ export class MahdaadObjectPickerPopover extends WithDisposable(
   }
 
   clearTrigger() {
-     //console.log('clearTrigger', this._searchText);
-    //todo fix trigger key ali ghasami dynamic
     try {
-      let trigger = null;
-      switch (this.obj_type) {
-        case 'template':
-          trigger =  objectTriggerKey.value.template // '/template/';
-          break;
-        case 'document':
-          trigger =objectTriggerKey.value.page  //'/page/';
-          break;
-        case 'image':
-          trigger = objectTriggerKey.value.image //'/image/';
-          break;
-        case 'weblink':
-          trigger = objectTriggerKey.value.weblink //'/weblink/';
-          break;
-        case 'tag':
-          trigger =objectTriggerKey.value.tag  //'/tag/';
-          break;
-        case 'file':
-          trigger = objectTriggerKey.value.file //'/file/';
-          break;
-      }
-
-      //const trigger = '/template/';
-      // console.log("999999",this._searchText,trigger);
-      const text = this._searchText ? trigger + this._searchText : trigger;
-      // console.log('this is text', text);
-      //setTimeout(()=>{
-        cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
-      //})
+      const text = this._searchText ? this.triggerKey + this._searchText : this.triggerKey;
+      cleanSpecifiedTail(this.editorHost, this.inlineEditor, text);
 
     } catch (e) {
       console.log(e);

@@ -151,8 +151,8 @@ export class ObjectBlockComponent extends CaptionedBlockComponent<
     //console.log('this is model and props', this.model.meta);
     //.doc="${this.doc}"
     //this.model.propsUpdated({})
-
-    return html`<div dir=${this.model.dir} contenteditable="false">
+    //dir=${this.model.dir}
+    return html`<div contenteditable="false">
       <mahdaad-object-link-component
         direction=${this.model.dir}
         .model="${this.model}"

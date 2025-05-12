@@ -13,6 +13,7 @@ import type {
 } from '../../../edgeless/index.js';
 import type { AffineDragHandleWidget } from '../drag-handle.js';
 
+import { isRTL } from '../../../../../../../../components/BoardBlockEditor/utils.js'
 import {
   getSelectedRect,
   isTopLevelBlock,
@@ -154,8 +155,7 @@ export class EdgelessWatcher {
       this.widget.dragHandleContainerOffsetParent.getBoundingClientRect();
 
     const dragPreviewOffset = this.widget.dragPreview.offset;
-
-    const posX = state.raw.x - dragPreviewOffset.x - offsetParentRect.left;
+    const posX = isRTL() ?  (state.raw.x -250) : state.raw.x - dragPreviewOffset.x - offsetParentRect.left;
 
     /** disable for mahdaad */
     //const posY = state.raw.y - dragPreviewOffset.y - offsetParentRect.top;
