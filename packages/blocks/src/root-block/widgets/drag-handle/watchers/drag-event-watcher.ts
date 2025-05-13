@@ -88,7 +88,8 @@ export class DragEventWatcher {
    // console.log("selected blosk",this.widget.selectionHelper.selectedBlockComponents);
     this.widget.applyBlockDropStyle(null)
     //console.log("____dragEndHandler this.widget.draggingElements",this.widget.draggingElements);
-    this.removeGroupDragStyle()
+    //todo ali ghasami
+    //this.removeGroupDragStyle()
     this.widget.clearRaf();
     this.widget.hide(true);
   };
@@ -169,7 +170,8 @@ export class DragEventWatcher {
     //this.widget.selectionHelper.selectedBlockComponents.forEach(item=>item.classList.add(this.className))
     //return
     //console.log("____dropHandler",this.widget.draggingElements);
-    this.removeGroupDragStyle()
+    //todo ali ghasami
+    //this.removeGroupDragStyle()
     this.widget.applyBlockDropStyle(null)
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     this._onDrop(context);
@@ -736,11 +738,11 @@ export class DragEventWatcher {
     dataTransfer.setData(this._dndAPI.mimeType, data);
   }
 
-  //todo ali ghasami for check and test
+  //todo ali ghasami for check and test - after update editor check and apply
   groupingStyleForDrag() {
     //this.widget.draggingElements.forEach(item=>item.classList.remove(this.className))
     //this.widget.draggingElements.forEach(item=>item.classList.add(this.className))
-    //return
+    return
     const blocks=this.widget.draggingElements
     if(blocks.length>0) {
       this.wrapperDragStyle = document.createElement("div");
@@ -754,7 +756,6 @@ export class DragEventWatcher {
 
   //todo ali ghasami for check and test
   removeGroupDragStyle() {
-    //return
     const blocks=this.widget.draggingElements
     if(this.wrapperDragStyle && blocks.length>0) {
       //console.log("aaaaaa",this.wrapperDragStyle.parentElement);

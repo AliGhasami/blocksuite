@@ -605,10 +605,11 @@ export class AffineDragHandleWidget extends WidgetComponent<RootBlockModel> {
     const hoverRectStyle = styleMap(
       this.dragHoverRect
         ? {
-            width: `${this.dragHoverRect.width}px`,
+            width: `${this.dragHoverRect.width - 13}px`,
             height: `${this.dragHoverRect.height}px`,
             top: `${this.dragHoverRect.top}px`,
-            left: `${this.dragHoverRect.left}px`,
+            left: `${this.dragHoverRect.left + 13}px`,
+            border:'1px dashed rgba(var(--pt-gray-3))'
           }
         : {
             display: 'none',

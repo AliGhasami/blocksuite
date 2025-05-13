@@ -1436,12 +1436,16 @@ affine-paragraph:hover{
 }
 */
 
+
+
 //drag-test
+/** todo remvoe after -old method  */
 .on-drag{
   position: relative;
   opacity: 0.5;
 }
 
+/** todo remvoe after - old method */
 .on-drag::after {
   content: "";
   @apply  rounded-lg;
@@ -1592,4 +1596,9 @@ affine-paragraph:hover{
     opacity: 0;
   }
 }
+
+/*.affine-drag-hover-rect{
+  border: 1px dashed @gray-5;
+}*/
+
 </style>
