@@ -74,6 +74,12 @@ export class MahdaadDateTimeInline extends ShadowlessElement {
     return std;
   }
 
+  addParagraph() {
+    setTimeout(()=>{
+      this.std.command.exec('addParagraph');
+    },50)
+  }
+
   override connectedCallback() {
     super.connectedCallback();
   }
@@ -89,6 +95,7 @@ export class MahdaadDateTimeInline extends ShadowlessElement {
         class="${Prefix}-date-time" 
         data-event-id="${this.id}"
         @update=${this.selfUpdate}
+        @addParagraph="${this.addParagraph}"
         readonly="${this.blockElement.doc.readonly}"
         date="${this.delta.attributes?.date?.date}"
         time="${this.delta.attributes?.date?.time}"

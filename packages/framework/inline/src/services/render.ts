@@ -54,7 +54,6 @@ export class RenderService<TextAttributes extends BaseTextAttributes> {
     _.changes.delta.forEach(item=>{
       if(!item.insert && item?.attributes && item.attributes.date) {
         this.forceInlineSyncStop=true
-        console.log("this is force stop true")
       }
     })
     this.editor.slots.textChange.emit();
