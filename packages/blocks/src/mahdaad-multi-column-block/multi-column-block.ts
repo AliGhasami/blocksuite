@@ -101,6 +101,7 @@ export class MahdaadMultiColumnBlockComponent extends CaptionedBlockComponent<Ma
     //console.log("this is children in block suite",children.length);
     return html` <div>
       <mahdaad-multi-column-component
+        read-only="${this.doc.readonly}"
         column-count="${children.length}"
         sizes="${JSON.stringify(this.model.sizes)}"
         @add-column="${(event: CustomEvent) => {

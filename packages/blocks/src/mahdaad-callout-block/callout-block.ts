@@ -132,6 +132,7 @@ export class MahdaadCalloutBlockComponent extends CaptionedBlockComponent<
         background="${this.model.background}"
         icon="${this.model.icon}"
         @changeProps="${this.changeProps}"
+        read-only="${this.doc.readonly}"
         @mount="${() => {
           this._isLoad = true;
         }}"
