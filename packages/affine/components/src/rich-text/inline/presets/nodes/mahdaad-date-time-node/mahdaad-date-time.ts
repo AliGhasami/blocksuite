@@ -96,7 +96,7 @@ export class MahdaadDateTimeInline extends ShadowlessElement {
         data-event-id="${this.id}"
         @update=${this.selfUpdate}
         @addParagraph="${this.addParagraph}"
-        readonly="${this.blockElement.doc.readonly}"
+        read-only="${this.blockElement.doc.readonly}"
         date="${this.delta.attributes?.date?.date}"
         time="${this.delta.attributes?.date?.time}"
         id="${this.delta.attributes?.date?.id}"

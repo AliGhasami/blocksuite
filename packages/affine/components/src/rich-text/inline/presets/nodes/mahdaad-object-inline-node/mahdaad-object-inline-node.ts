@@ -36,6 +36,14 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     return block;
   }
 
+  get blockElement() {
+    const blockElement = this.inlineEditor.rootElement.closest<BlockComponent>(
+      `[${BLOCK_ID_ATTR}]`
+    );
+    assertExists(blockElement);
+    return blockElement;
+  }
+
   get inlineEditor() {
     const inlineRoot = this.closest<InlineRootElement<AffineTextAttributes>>(
       `[${INLINE_ROOT_ATTR}]`
@@ -55,6 +63,10 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     assertExists(std);
     return std;
   }
+
+  /*override willUpdate(_changedProperties: Map<PropertyKey, unknown>) {
+    super.willUpdate(_changedProperties);
+  }*/
 
   _convertLink(event: CustomEvent) {
     const data = event.detail[0];
@@ -83,10 +95,6 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
     );
     doc.deleteBlock(this.model);*/
   }
-
-  /*override willUpdate(_changedProperties: Map<PropertyKey, unknown>) {
-    super.willUpdate(_changedProperties);
-  }*/
 
   changeViewMode(event: CustomEvent) {
     const mode = event.detail[0];
@@ -151,7 +159,7 @@ export class MahdaadObjectLinkInline extends WithDisposable(ShadowlessElement) {
       class="mahdaad-object-link-inline"
       ><mahdaad-object-link-component
         style="display: inline"
-        read-only="false"
+        read-only="${this.blockElement.doc.readonly}"
         object-id="${meta?.object_id}"
         link-id="${meta?.link_id}"
         parent-id="${this.parentId()}"
