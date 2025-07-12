@@ -55,7 +55,7 @@ export class MahdaadMention extends ShadowlessElement {
       class="${Prefix}-mahdaad-mention"
       style="display: inline-block"
     >
-      <mahdaad-mention-item user-id="${this.userId}"></mahdaad-mention-item>
+      <mahdaad-mention-item is-read-only="${this.blockElement.doc.readonly}" user-id="${this.userId}"></mahdaad-mention-item>
       <v-text .str=${ZERO_WIDTH_NON_JOINER}></v-text>
     </span>`;
   }
